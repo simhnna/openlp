@@ -27,6 +27,7 @@ OpenLP work.
 from distutils.version import LooseVersion
 import logging
 import os
+import re
 
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 
@@ -258,11 +259,12 @@ def check_item_selected(list_widget, message):
     return True
 
 
-def clean_tags(text):
+def clean_tags(text, chords=False):
     """
     Remove Tags from text for display
 
     :param text: Text to be cleaned
+    :param chords: Clean ChordPro tags
     """
     text = text.replace('<br>', '\n')
     text = text.replace('{br}', '\n')
@@ -270,19 +272,45 @@ def clean_tags(text):
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], '')
         text = text.replace(tag['end tag'], '')
+    # Remove ChordPro tags
+    if chords:
+        text = re.sub(r'\[.+?\]', r'', text)
     return text
 
 
-def expand_tags(text):
+def expand_tags(text, chords=False):
     """
     Expand tags HTML for display
 
     :param text: The text to be expanded.
+    :param chords: Convert ChordPro tags to html
     """
+    if chords:
+        text = expand_chords(text)
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], tag['start html'])
         text = text.replace(tag['end tag'], tag['end html'])
     return text
+
+
+def expand_chords(text):
+    """
+    Expand ChordPro tags
+
+    :param text:
+    """
+    text_lines = text.split('{br}')
+    expanded_text_lines = []
+    for line in text_lines:
+        # If a ChordPro is detected in the line, replace it with a html-span tag and wrap the line in a span tag.
+        if '[' in line and ']' in line:
+            new_line = '<span class="chordline">'
+            new_line += re.sub(r'(.*?)\[(.+?)\](.*?)', r'\1<span class="chord" style="display:none">\2</span>\3', line)
+            new_line += '</span>'
+            expanded_text_lines.append(new_line)
+        else:
+            expanded_text_lines.append(line)
+    return '{br}'.join(expanded_text_lines)
 
 
 def create_separated_list(string_list):

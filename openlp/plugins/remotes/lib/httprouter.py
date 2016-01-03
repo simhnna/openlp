@@ -546,8 +546,14 @@ class HttpRouter(RegistryProperties):
                         item['tag'] = str(frame['verseTag'])
                     else:
                         item['tag'] = str(index + 1)
-                    item['text'] = str(frame['text'])
+                    # Use chords if available and enabled
+                    if current_item.is_capable(ItemCapabilities.HasChords):
+                        item['text'] = str(frame['chords_text'])
+                    else:
+                        item['text'] = str(frame['text'])
                     item['html'] = str(frame['html'])
+                    print('text: %s' % item['text'])
+                    print('html: %s' % item['html'])
                 # Handle images, unless a custom thumbnail is given or if thumbnails is disabled
                 elif current_item.is_image() and not frame.get('image', '') and Settings().value('remotes/thumbnails'):
                     item['tag'] = str(index + 1)

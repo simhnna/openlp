@@ -65,7 +65,10 @@ __default_settings__ = {
     'songs/last directory export': '',
     'songs/songselect username': '',
     'songs/songselect password': '',
-    'songs/songselect searches': ''
+    'songs/songselect searches': '',
+    'songs/chords': True,
+    'songs/stageview chords': False,
+    'songs/mainview chords': False
 }
 
 

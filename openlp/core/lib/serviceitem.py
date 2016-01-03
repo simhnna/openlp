@@ -34,7 +34,7 @@ import ntpath
 from PyQt5 import QtGui
 
 from openlp.core.common import RegistryProperties, Settings, translate, AppLocation, md5_hash
-from openlp.core.lib import ImageSource, build_icon, clean_tags, expand_tags, create_thumb
+from openlp.core.lib import ImageSource, build_icon, clean_tags, expand_tags, expand_chords
 
 log = logging.getLogger(__name__)
 
@@ -118,6 +118,8 @@ class ItemCapabilities(object):
     ``HasThumbnails``
             The item has related thumbnails available
 
+    ``HasChords``
+            The item has chords - only for songs
     """
     CanPreview = 1
     CanEdit = 2
@@ -140,6 +142,7 @@ class ItemCapabilities(object):
     HasDisplayTitle = 19
     HasNotes = 20
     HasThumbnails = 21
+    HasChords = 22
 
 
 class ServiceItem(RegistryProperties):
@@ -260,13 +263,16 @@ class ServiceItem(RegistryProperties):
                     previous_pages[verse_tag] = (slide['raw_slide'], pages)
                 for page in pages:
                     page = page.replace('<br>', '{br}')
-                    html_data = expand_tags(html.escape(page.rstrip()))
-                    self._display_frames.append({
+                    html_data = expand_tags(html.escape(page.rstrip()), self.is_capable(ItemCapabilities.HasChords))
+                    new_frame = {
                         'title': clean_tags(page),
-                        'text': clean_tags(page.rstrip()),
+                        'text': clean_tags(page.rstrip(), self.is_capable(ItemCapabilities.HasChords)),
                         'html': html_data.replace('&amp;nbsp;', '&nbsp;'),
                         'verseTag': verse_tag
-                    })
+                    }
+                    if self.is_capable(ItemCapabilities.HasChords):
+                        new_frame['chords_text'] = expand_chords(clean_tags(page.rstrip()))
+                    self._display_frames.append(new_frame)
         elif self.service_item_type == ServiceItemType.Image or self.service_item_type == ServiceItemType.Command:
             pass
         else:

@@ -254,11 +254,11 @@ class Renderer(OpenLPMixin, RegistryMixin, RegistryProperties):
                     # If there are (at least) two occurrences of [---] we use the first two slides (and neglect the last
                     # for now).
                     if len(slides) == 3:
-                        html_text = expand_tags('\n'.join(slides[:2]))
+                        html_text = expand_tags('\n'.join(slides[:2]), item.is_capable(ItemCapabilities.HasChords))
                     # We check both slides to determine if the optional split is needed (there is only one optional
                     # split).
                     else:
-                        html_text = expand_tags('\n'.join(slides))
+                        html_text = expand_tags('\n'.join(slides), item.is_capable(ItemCapabilities.HasChords))
                     html_text = html_text.replace('\n', '<br>')
                     if self._text_fits_on_slide(html_text):
                         # The first two optional slides fit (as a whole) on one slide. Replace the first occurrence
