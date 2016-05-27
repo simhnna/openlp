@@ -66,9 +66,9 @@ __default_settings__ = {
     'songs/songselect username': '',
     'songs/songselect password': '',
     'songs/songselect searches': '',
-    'songs/chords': True,
-    'songs/stageview chords': False,
-    'songs/mainview chords': False
+    'songs/stageview chords': True,
+    'songs/mainview chords': False,
+    'songs/disable chords import': False,
 }
 
 

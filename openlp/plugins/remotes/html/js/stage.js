@@ -16,8 +16,8 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 59  *
  * Temple Place, Suite 330, Boston, MA 02111-1307 USA                          *
  ******************************************************************************/
- var lastChord;
- 
+var lastChord;
+
 function getTransposeValue(songId) {
   if (localStorage.getItem(songId + '_transposeValue')) {return localStorage.getItem(songId + '_transposeValue');}
   else {return 0;}
@@ -78,7 +78,8 @@ function transposeChord(chord, transposeValue) {
 
 var OpenLPChordOverflowFillCount = 0;
 window.OpenLP = {
-  showchords:true,
+  showchords:false,
+  stageviewChords:false,
   loadService: function (event) {
     $.getJSON(
       "/api/service/list",
@@ -251,11 +252,39 @@ window.OpenLP = {
       m = '0' + m + '';
     div.html(h + ":" + m);
   },
+  stageChords: function(stageviewChords) {
+    if (stageviewChords != OpenLP.stageviewChords) {
+      OpenLP.stageviewChords = stageviewChords;
+      OpenLP.showchords = stageviewChords;
+      if (!stageviewChords) {
+        $('#transpose').hide();
+        $('#transposedown').hide();
+        $('#transposevalue').hide();
+        $('#transposeup').hide();
+        $('#transposeup').hide();
+        $('#capodisplay').hide();
+        $('#chords').hide();
+        $('#plus').hide();
+        $('#minus').hide();
+      } else {
+        $('#transpose').show();
+        $('#transposedown').show();
+        $('#transposevalue').show();
+        $('#transposeup').show();
+        $('#transposeup').show();
+        $('#capodisplay').show();
+        $('#chords').show();
+        $('#plus').show();
+        $('#minus').show();
+      }
+    }
+  },
   pollServer: function () {
     $.getJSON(
       "/api/poll",
       function (data, status) {
         OpenLP.updateClock(data);
+        OpenLP.stageChords(data.results.stageviewChords);
         if (OpenLP.currentItem != data.results.item || OpenLP.currentService != data.results.service) {
           OpenLP.currentItem = data.results.item;
           OpenLP.currentService = data.results.service;

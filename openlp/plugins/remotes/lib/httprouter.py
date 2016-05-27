@@ -477,7 +477,8 @@ class HttpRouter(RegistryProperties):
             'display': self.live_controller.desktop_screen.isChecked(),
             'version': 2,
             'isSecure': Settings().value(self.settings_section + '/authentication enabled'),
-            'isAuthorised': self.authorised
+            'isAuthorised': self.authorised,
+            'stageviewChords': Settings().value('songs/stageview chords'),
         }
         self.do_json_header()
         return json.dumps({'results': result}).encode()
