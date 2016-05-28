@@ -81,6 +81,12 @@ class RemoteTab(SettingsTab):
         self.stage_url.setObjectName('stage_url')
         self.stage_url.setOpenExternalLinks(True)
         self.http_setting_layout.addRow(self.stage_url_label, self.stage_url)
+        self.chords_url_label = QtWidgets.QLabel(self.http_settings_group_box)
+        self.chords_url_label.setObjectName('chords_url_label')
+        self.chords_url = QtWidgets.QLabel(self.http_settings_group_box)
+        self.chords_url.setObjectName('chords_url')
+        self.chords_url.setOpenExternalLinks(True)
+        self.http_setting_layout.addRow(self.chords_url_label, self.chords_url)
         self.live_url_label = QtWidgets.QLabel(self.http_settings_group_box)
         self.live_url_label.setObjectName('live_url_label')
         self.live_url = QtWidgets.QLabel(self.http_settings_group_box)
@@ -117,6 +123,12 @@ class RemoteTab(SettingsTab):
         self.stage_https_url.setObjectName('stage_https_url')
         self.stage_https_url.setOpenExternalLinks(True)
         self.https_settings_layout.addRow(self.stage_https_url_label, self.stage_https_url)
+        self.chords_https_url_label = QtWidgets.QLabel(self.http_settings_group_box)
+        self.chords_https_url_label.setObjectName('chords_https_url_label')
+        self.chords_https_url = QtWidgets.QLabel(self.https_settings_group_box)
+        self.chords_https_url.setObjectName('chords_https_url')
+        self.chords_https_url.setOpenExternalLinks(True)
+        self.https_settings_layout.addRow(self.chords_https_url_label, self.chords_https_url)
         self.live_https_url_label = QtWidgets.QLabel(self.https_settings_group_box)
         self.live_https_url_label.setObjectName('live_url_label')
         self.live_https_url = QtWidgets.QLabel(self.https_settings_group_box)
@@ -171,6 +183,7 @@ class RemoteTab(SettingsTab):
         self.port_label.setText(translate('RemotePlugin.RemoteTab', 'Port number:'))
         self.remote_url_label.setText(translate('RemotePlugin.RemoteTab', 'Remote URL:'))
         self.stage_url_label.setText(translate('RemotePlugin.RemoteTab', 'Stage view URL:'))
+        self.chords_url_label.setText(translate('RemotePlugin.RemoteTab', 'Chords view URL:'))
         self.live_url_label.setText(translate('RemotePlugin.RemoteTab', 'Live view URL:'))
         self.twelve_hour_check_box.setText(translate('RemotePlugin.RemoteTab', 'Display stage time in 12h format'))
         self.thumbnails_check_box.setText(translate('RemotePlugin.RemoteTab',
@@ -187,6 +200,7 @@ class RemoteTab(SettingsTab):
         self.https_port_label.setText(self.port_label.text())
         self.remote_https_url_label.setText(self.remote_url_label.text())
         self.stage_https_url_label.setText(self.stage_url_label.text())
+        self.chords_https_url_label.setText(self.chords_url_label.text())
         self.live_https_url_label.setText(self.live_url_label.text())
         self.user_login_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'User Authentication'))
         self.user_id_label.setText(translate('RemotePlugin.RemoteTab', 'User id:'))
@@ -205,6 +219,10 @@ class RemoteTab(SettingsTab):
         https_url_temp = https_url + 'stage'
         self.stage_url.setText('<a href="%s">%s</a>' % (http_url_temp, http_url_temp))
         self.stage_https_url.setText('<a href="%s">%s</a>' % (https_url_temp, https_url_temp))
+        http_url_temp = http_url + 'chords'
+        https_url_temp = https_url + 'chords'
+        self.chords_url.setText('<a href="%s">%s</a>' % (http_url_temp, http_url_temp))
+        self.chords_https_url.setText('<a href="%s">%s</a>' % (https_url_temp, https_url_temp))
         http_url_temp = http_url + 'main'
         https_url_temp = https_url + 'main'
         self.live_url.setText('<a href="%s">%s</a>' % (http_url_temp, http_url_temp))

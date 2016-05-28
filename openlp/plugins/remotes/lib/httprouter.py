@@ -151,6 +151,7 @@ class HttpRouter(RegistryProperties):
             ('^/$', {'function': self.serve_file, 'secure': False}),
             ('^/(stage)$', {'function': self.serve_file, 'secure': False}),
             ('^/(stage)/(.*)$', {'function': self.stages, 'secure': False}),
+            ('^/(chords)$', {'function': self.serve_file, 'secure': False}),
             ('^/(main)$', {'function': self.serve_file, 'secure': False}),
             (r'^/(\w+)/thumbnails([^/]+)?/(.*)$', {'function': self.serve_thumbnail, 'secure': False}),
             (r'^/api/poll$', {'function': self.poll, 'secure': False}),
@@ -313,10 +314,12 @@ class HttpRouter(RegistryProperties):
         """
         remote = translate('RemotePlugin.Mobile', 'Remote')
         stage = translate('RemotePlugin.Mobile', 'Stage View')
+        chords = translate('RemotePlugin.Mobile', 'Chords View')
         live = translate('RemotePlugin.Mobile', 'Live View')
         self.template_vars = {
             'app_title': "%s %s" % (UiStrings().OLPV2x, remote),
             'stage_title': "%s %s" % (UiStrings().OLPV2x, stage),
+            'chords_title': "%s %s" % (UiStrings().OLPV2x, chords),
             'live_title': "%s %s" % (UiStrings().OLPV2x, live),
             'service_manager': translate('RemotePlugin.Mobile', 'Service Manager'),
             'slide_controller': translate('RemotePlugin.Mobile', 'Slide Controller'),
@@ -403,6 +406,8 @@ class HttpRouter(RegistryProperties):
             file_name = 'index.html'
         elif file_name == 'stage':
             file_name = 'stage.html'
+        elif file_name == 'chords':
+            file_name = 'chords.html'
         elif file_name == 'main':
             file_name = 'main.html'
         if file_name.startswith('/'):
@@ -478,7 +483,6 @@ class HttpRouter(RegistryProperties):
             'version': 2,
             'isSecure': Settings().value(self.settings_section + '/authentication enabled'),
             'isAuthorised': self.authorised,
-            'stageviewChords': Settings().value('songs/stageview chords'),
         }
         self.do_json_header()
         return json.dumps({'results': result}).encode()
