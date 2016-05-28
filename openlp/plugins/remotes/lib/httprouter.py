@@ -483,6 +483,7 @@ class HttpRouter(RegistryProperties):
             'version': 2,
             'isSecure': Settings().value(self.settings_section + '/authentication enabled'),
             'isAuthorised': self.authorised,
+            'chordNotation': Settings().value('songs/chord notation'),
         }
         self.do_json_header()
         return json.dumps({'results': result}).encode()
@@ -560,8 +561,6 @@ class HttpRouter(RegistryProperties):
                     else:
                         item['text'] = str(frame['text'])
                     item['html'] = str(frame['html'])
-                    print('text: %s' % item['text'])
-                    print('html: %s' % item['html'])
                 # Handle images, unless a custom thumbnail is given or if thumbnails is disabled
                 elif current_item.is_image() and not frame.get('image', '') and Settings().value('remotes/thumbnails'):
                     item['tag'] = str(index + 1)

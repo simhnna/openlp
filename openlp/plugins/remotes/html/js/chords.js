@@ -18,6 +18,16 @@
  ******************************************************************************/
 var lastChord;
 
+var notesSharpNotation = {}
+var notesFlatNotation = {}
+
+notesSharpNotation['german'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','H'];
+notesFlatNotation['german'] = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','B','H'];
+notesSharpNotation['english'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+notesFlatNotation['english'] = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','Bb','B'];
+notesSharpNotation['neo-latin'] = ['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si'];
+notesFlatNotation['neo-latin'] = ['Do','Reb','Re','Mib','Fab','Fa','Solb','Sol','Lab','La','Sib','Si'];
+
 function getTransposeValue(songId) {
   if (localStorage.getItem(songId + '_transposeValue')) {return localStorage.getItem(songId + '_transposeValue');}
   else {return 0;}
@@ -27,10 +37,10 @@ function storeTransposeValue(songId,transposeValueToSet) {
   localStorage.setItem(songId + '_transposeValue', transposeValueToSet);
 }
 
-function transposeChord(chord, transposeValue) {
+function transposeChord(chord, transposeValue, notation) {
   var chordSplit = chord.replace('♭', 'b').split(/[\/\(\)]/), transposedChord = '', note, notenumber, rest, currentChord,
-  notesSharp = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','H'],
-  notesFlat = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','B','H'],
+  notesSharp = notesSharpNotation[notation],
+  notesFlat = notesFlatNotation[notation],
   notesPreferred = ['b','#','#','#','#','#','#','#','#','#','#','#'];
   chordNotes = Array();
   for (i = 0; i <= chordSplit.length - 1; i++) {
@@ -164,7 +174,7 @@ window.OpenLP = {
 //                                         regchord=/<span class="chord" style="display:inline">[\[{]([\(\w#b♭\+\*\d/\)-]+)[\]}]<\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g,
     var v='', w='';
     var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
-    $1 = transposeChord($1, transposeValue);
+    $1 = transposeChord($1, transposeValue, OpenLP.chordNotation);
     for (var i = 0; i < $1.length; i++) if (slimchars.indexOf($1.charAt(i)) === -1) {$1len += 2;} else {$1len += 1;}
     for (var i = 0; i < $2.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
     for (var i = 0; i < $3.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
@@ -256,6 +266,7 @@ window.OpenLP = {
       "/api/poll",
       function (data, status) {
         OpenLP.updateClock(data);
+        OpenLP.chordNotation = data.results.chordNotation;
         if (OpenLP.currentItem != data.results.item || OpenLP.currentService != data.results.service) {
           OpenLP.currentItem = data.results.item;
           OpenLP.currentService = data.results.service;
