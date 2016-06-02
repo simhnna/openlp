@@ -21,6 +21,7 @@ var lastChord;
 var notesSharpNotation = {}
 var notesFlatNotation = {}
 
+// See https://en.wikipedia.org/wiki/Musical_note#12-tone_chromatic_scale
 notesSharpNotation['german'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','H'];
 notesFlatNotation['german'] = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','B','H'];
 notesSharpNotation['english'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -99,7 +100,6 @@ window.OpenLP = {
           idx = parseInt(idx, 10);
           if (data.results.items[idx]["selected"]) {
             $("#notes").html(data.results.items[idx]["notes"].replace(/\n/g, "<br />"));
-            $("#songtitle").html(data.results.items[idx]["title"].replace(/\n/g, "<br />"));
             if (data.results.items.length > idx + 1) {
               OpenLP.nextSong = data.results.items[idx + 1]["title"];
             }
@@ -171,7 +171,6 @@ window.OpenLP = {
                                          chordclassshow='class="chord" style="display:inline"',
                                          regchord=/<span class="chord" style="display:inline">([\(\w#b♭\+\*\d/\)-]+)<\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g,
                                          replaceChords=function(mstr,$1,$2,$3,$4) {
-//                                         regchord=/<span class="chord" style="display:inline">[\[{]([\(\w#b♭\+\*\d/\)-]+)[\]}]<\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g,
     var v='', w='';
     var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
     $1 = transposeChord($1, transposeValue, OpenLP.chordNotation);
@@ -240,8 +239,9 @@ window.OpenLP = {
         else
             text = text + "<br />";
       }
-  text = text.replace(/\n/g, "<br />");
+      text = text.replace(/\n/g, "<br />");
       $("#nextslide").html(text);
+      $("#nextslide").class("nextslide");
     }
     else {
       text = "<p class=\"nextslide\">" + $("#next-text").val() + ": " + OpenLP.nextSong + "</p>";
@@ -288,8 +288,6 @@ $(document).ready(function() {
   $('#transposeup').click(function(e) {
     $('#transposevalue').text(parseInt($('#transposevalue').text()) + 1);
     storeTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0], $('#transposevalue').text());
-    //alert(getTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0]));
-    //$('body').get(0).style.'font-size' = (parseFloat($('body').css('font-size')) + 0.1) + 'vw');
     OpenLP.loadSlides();
   });
   $('#transposedown').click(function(e) {  
@@ -297,8 +295,4 @@ $(document).ready(function() {
     storeTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0], $('#transposevalue').text());
     OpenLP.loadSlides();
   });
-  $("#chords").click(function(){ OpenLP.showchords=OpenLP.showchords?false:true; OpenLP.updateSlide(); });
-  $('#plus').click(function() { var fs=$('#currentslide').css('font-size').match(/\d+/); $('#currentslide').css("font-size",+fs+10+"px");$('#nextslide').css("font-size",+fs+10+"px"); } );
-  $("#minus").click(function() {var fs=$('#currentslide').css('font-size').match(/\d+/); $('#currentslide').css("font-size",+fs-10+"px");$('#nextslide').css("font-size",+fs-10+"px"); } );
-  $('body').hover(function(){ $('#controls').fadeIn(500);},function(){ $('#controls').fadeOut(500);});
 });
