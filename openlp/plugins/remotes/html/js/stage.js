@@ -149,7 +149,7 @@ window.OpenLP = {
   pollServer: function () {
     if ("WebSocket" in window) {
         // Let us open a web socket
-        var ws = new WebSocket("ws://192.168.0.51:4318/poll");
+        var ws = new WebSocket('ws://' + location.hostname + ':4318/poll');
         ws.binaryType = 'arraybuffer';
         ws.onmessage = function (evt) {
             var msg = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(evt.data)));
