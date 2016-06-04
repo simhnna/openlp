@@ -159,15 +159,19 @@ window.OpenLP = {
     );
   },
   pollServer: function () {
-    $.getJSON(
-      "/api/poll",
-      function (data, status) {
-        var prevItem = OpenLP.currentItem;
-        OpenLP.currentSlide = data.results.slide;
-        OpenLP.currentItem = data.results.item;
-        OpenLP.isSecure = data.results.isSecure;
-        OpenLP.isAuthorised = data.results.isAuthorised;
-        if ($("#service-manager").is(":visible")) {
+    if ("WebSocket" in window) {
+        // Let us open a web socket
+        var ws = new WebSocket('ws://' + location.hostname + ':4318/poll');
+        ws.binaryType = 'arraybuffer';
+        ws.onmessage = function (evt) {
+          var data = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(evt.data)));
+
+          var prevItem = OpenLP.currentItem;
+          OpenLP.currentSlide = data.results.slide;
+          OpenLP.currentItem = data.results.item;
+          OpenLP.isSecure = data.results.isSecure;
+          OpenLP.isAuthorised = data.results.isAuthorised;
+          if ($("#service-manager").is(":visible")) {
           if (OpenLP.currentService != data.results.service) {
             OpenLP.currentService = data.results.service;
             OpenLP.loadService();
@@ -185,7 +189,7 @@ window.OpenLP = {
           });
           $("#service-manager div[data-role=content] ul[data-role=listview]").listview("refresh");
         }
-        if ($("#slide-controller").is(":visible")) {
+          if ($("#slide-controller").is(":visible")) {
           if (prevItem != OpenLP.currentItem) {
             OpenLP.loadController();
             return;
@@ -205,8 +209,11 @@ window.OpenLP = {
           });
           $("#slide-controller div[data-role=content] ul[data-role=listview]").listview("refresh");
         }
-      }
-    );
+        }
+    } else {
+      // The browser doesn't support WebSocket
+      alert("WebSocket NOT supported by your Browser!");
+    }
   },
   nextItem: function (event) {
     event.preventDefault();
@@ -380,5 +387,4 @@ $.ajaxSetup({cache: false});
 $("#search").live("pageinit", function (event) {
   OpenLP.getSearchablePlugins();
 });
-setInterval("OpenLP.pollServer();", 500);
 OpenLP.pollServer();
