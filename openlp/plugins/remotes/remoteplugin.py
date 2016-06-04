@@ -24,6 +24,7 @@ import logging
 
 from PyQt5 import QtWidgets
 
+from openlp.core.common import OpenLPMixin
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.lib import RemoteTab, OpenLPServer
 
@@ -42,7 +43,7 @@ __default_settings__ = {
 }
 
 
-class RemotesPlugin(Plugin):
+class RemotesPlugin(Plugin, OpenLPMixin):
     log.info('Remote Plugin loaded')
 
     def __init__(self):
@@ -59,9 +60,11 @@ class RemotesPlugin(Plugin):
         """
         Initialise the remotes plugin, and start the http server
         """
-        log.debug('initialise')
+        log.debug('Initialise Remote Plugin')
         super(RemotesPlugin, self).initialise()
         self.server = OpenLPServer()
+        self.server_ws = OpenLPServer(websocket=True)
+        self.server_secure = OpenLPServer(secure=True)
         if not hasattr(self, 'remote_server_icon'):
             self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
             size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -87,6 +90,9 @@ class RemotesPlugin(Plugin):
         if self.server:
             self.server.stop_server()
             self.server = None
+        if self.server_secure:
+            self.server_secure.stop_server()
+            self.server_secure = None
 
     @staticmethod
     def about():
