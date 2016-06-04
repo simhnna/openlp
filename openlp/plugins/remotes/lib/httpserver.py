@@ -197,7 +197,6 @@ class OpenLPServer(RegistryProperties, OpenLPMixin):
         :return:
         """
         log.debug("web socket handler registered with client")
-        print(path)
         previous_poll = None
         if path == '/poll':
             while True:

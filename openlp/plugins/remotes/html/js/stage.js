@@ -135,11 +135,11 @@ window.OpenLP = {
       $("#nextslide").html(text);
     }
   },
-  updateClock: function(data) {
+  updateClock: function() {
     var div = $("#clock");
     var t = new Date();
     var h = t.getHours();
-    if (data.results.twelve && h > 12)
+    if (OpenLP.twelve && h > 12)
       h = h - 12;
     var m = t.getMinutes();
     if (m < 10)
@@ -147,24 +147,32 @@ window.OpenLP = {
     div.html(h + ":" + m);
   },
   pollServer: function () {
-    $.getJSON(
-      "/api/poll",
-      function (data, status) {
-        OpenLP.updateClock(data);
-        if (OpenLP.currentItem != data.results.item ||
-            OpenLP.currentService != data.results.service) {
-          OpenLP.currentItem = data.results.item;
-          OpenLP.currentService = data.results.service;
-          OpenLP.loadSlides();
+    if ("WebSocket" in window) {
+        // Let us open a web socket
+        var ws = new WebSocket("ws://192.168.0.51:4318/poll");
+        ws.binaryType = 'arraybuffer';
+        ws.onmessage = function (evt) {
+            var msg = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(evt.data)));
+            OpenLP.twelve = msg.results.twelve;
+            OpenLP.updateClock();
+            if (OpenLP.currentItem != msg.results.item ||
+                OpenLP.currentService != msg.results.service) {
+                OpenLP.currentItem = msg.results.item;
+                OpenLP.currentService = msg.results.service;
+                OpenLP.loadSlides();
+            }
+            else if (OpenLP.currentSlide != msg.results.slide) {
+                OpenLP.currentSlide = parseInt(mag.results.slide, 10);
+                OpenLP.updateSlide();
+            }
         }
-        else if (OpenLP.currentSlide != data.results.slide) {
-          OpenLP.currentSlide = parseInt(data.results.slide, 10);
-          OpenLP.updateSlide();
-        }
-      }
-    );
-  }
-}
+    } else {
+        // The browser doesn't support WebSocket
+        alert("WebSocket NOT supported by your Browser!");
+    }
+  },
+};
 $.ajaxSetup({ cache: false });
-setInterval("OpenLP.pollServer();", 500);
+setInterval("OpenLP.updateClock();", 1000);
 OpenLP.pollServer();
+OpenLP.updateClock();

@@ -34,6 +34,7 @@ __default_settings__ = {
     'remotes/twelve hour': True,
     'remotes/port': 4316,
     'remotes/https port': 4317,
+    'remotes/websocket port': 4318,
     'remotes/https enabled': False,
     'remotes/user id': 'openlp',
     'remotes/password': 'password',
@@ -60,7 +61,6 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         Initialise the remotes plugin, and start the http server
         """
-        log.debug('Initialise Remote Plugin')
         super(RemotesPlugin, self).initialise()
         self.server = OpenLPServer()
         self.server_ws = OpenLPServer(websocket=True)
@@ -85,7 +85,6 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         Tidy up and close down the http server
         """
-        log.debug('finalise')
         super(RemotesPlugin, self).finalise()
         if self.server:
             self.server.stop_server()

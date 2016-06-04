@@ -116,7 +116,7 @@ from urllib.parse import urlparse, parse_qs
 
 from mako.template import Template
 
-from openlp.core.common import RegistryProperties, AppLocation, Settings, translate, UiStrings
+from openlp.core.common import OpenLPMixin, RegistryProperties, AppLocation, Settings, translate, UiStrings
 from openlp.core.lib import PluginStatus, StringContent, image_to_byte, ItemCapabilities, create_thumb
 
 log = logging.getLogger(__name__)
@@ -131,7 +131,7 @@ FILE_TYPES = {
 }
 
 
-class HttpRouter(RegistryProperties):
+class HttpRouter(RegistryProperties, OpenLPMixin):
     """
     This code is called by the HttpServer upon a request and it processes it based on the routing table.
     This code is stateless and is created on each request.
