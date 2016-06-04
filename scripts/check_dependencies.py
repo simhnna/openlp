@@ -94,6 +94,7 @@ MODULES = [
     'mako',
     'uno',
     'websockets',
+    'asyncio',
     'six'
 ]
 

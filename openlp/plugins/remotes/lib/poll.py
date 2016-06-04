@@ -50,3 +50,12 @@ class OpenLPPoll(RegistryProperties):
             'isAuthorised': False
         }
         return json.dumps({'results': result}).encode()
+
+    def main_poll(self):
+        """
+        Poll OpenLP to determine the current slide count.
+        """
+        result = {
+            'slide_count': self.live_controller.slide_count
+        }
+        return json.dumps({'results': result}).encode()

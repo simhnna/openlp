@@ -198,12 +198,20 @@ class OpenLPServer(RegistryProperties, OpenLPMixin):
         """
         log.debug("web socket handler registered with client")
         previous_poll = None
+        previous_main_poll = None
         if path == '/poll':
             while True:
                 current_poll = OpenLPPoll().poll()
                 if current_poll != previous_poll:
                     await request.send(current_poll)
                     previous_poll = current_poll
+                await asyncio.sleep(0.2)
+        elif path == '/main_poll':
+            while True:
+                main_poll = OpenLPPoll().main_poll()
+                if main_poll != previous_main_poll:
+                    await request.send(main_poll)
+                    previous_main_poll = main_poll
                 await asyncio.sleep(0.2)
 
     def stop_server(self):

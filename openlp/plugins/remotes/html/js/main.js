@@ -28,18 +28,23 @@ window.OpenLP = {
     );
   },
   pollServer: function () {
-    $.getJSON(
-      "/main/poll",
-      function (data, status) {
-        if (OpenLP.slideCount != data.results.slide_count) {
-          OpenLP.slideCount = data.results.slide_count;
-          OpenLP.loadSlide();
+    if ("WebSocket" in window) {
+        // Let us open a web socket
+        var ws = new WebSocket('ws://' + location.hostname + ':4318/main_poll');
+        ws.binaryType = 'arraybuffer';
+        ws.onmessage = function (evt) {
+            var msg = JSON.parse(String.fromCharCode.apply(null, new Uint8Array(evt.data)));
+            if (OpenLP.slideCount != msg.results.slide_count) {
+              OpenLP.slideCount = msg.results.slide_count;
+              OpenLP.loadSlide();
+            }
         }
-      }
-    );
+    } else {
+        // The browser doesn't support WebSocket
+        alert("WebSocket NOT supported by your Browser!");
+    }      
   }
-}
+};
 $.ajaxSetup({ cache: false });
-setInterval("OpenLP.pollServer();", 500);
 OpenLP.pollServer();
 
