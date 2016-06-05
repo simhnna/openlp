@@ -37,8 +37,6 @@ from tests.helpers.testmixin import TestMixin
 __default_settings__ = {
     'remotes/twelve hour': True,
     'remotes/port': 4316,
-    'remotes/https port': 4317,
-    'remotes/https enabled': False,
     'remotes/user id': 'openlp',
     'remotes/password': 'password',
     'remotes/authentication enabled': False,
@@ -114,36 +112,5 @@ class TestRemoteTab(TestCase, TestMixin):
             self.form.set_urls()
             # THEN: the following screen values should be set
             self.assertEqual(self.form.address_edit.text(), ZERO_URL, 'The default URL should be set on the screen')
-            self.assertEqual(self.form.https_settings_group_box.isEnabled(), False,
-                             'The Https box should not be enabled')
-            self.assertEqual(self.form.https_settings_group_box.isChecked(), False,
-                             'The Https checked box should note be Checked')
             self.assertEqual(self.form.user_login_group_box.isChecked(), False,
                              'The authentication box should not be enabled')
-
-    def set_certificate_urls_test(self):
-        """
-        Test the set_urls function with certificate available
-        """
-        # GIVEN: A mocked location
-        with patch('openlp.core.common.Settings') as mocked_class, \
-                patch('openlp.core.common.applocation.AppLocation.get_directory') as mocked_get_directory, \
-                patch('openlp.core.common.check_directory_exists') as mocked_check_directory_exists, \
-                patch('openlp.core.common.applocation.os') as mocked_os:
-            # GIVEN: A mocked out Settings class and a mocked out AppLocation.get_directory()
-            mocked_settings = mocked_class.return_value
-            mocked_settings.contains.return_value = False
-            mocked_get_directory.return_value = TEST_PATH
-            mocked_check_directory_exists.return_value = True
-            mocked_os.path.normpath.return_value = TEST_PATH
-
-            # WHEN: when the set_urls is called having reloaded the form.
-            self.form.load()
-            self.form.set_urls()
-            # THEN: the following screen values should be set
-            self.assertEqual(self.form.http_settings_group_box.isEnabled(), True,
-                             'The Http group box should be enabled')
-            self.assertEqual(self.form.https_settings_group_box.isChecked(), False,
-                             'The Https checked box should be Checked')
-            self.assertEqual(self.form.https_settings_group_box.isEnabled(), True,
-                             'The Https box should be enabled')

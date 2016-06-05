@@ -28,6 +28,7 @@ from unittest import TestCase
 
 from openlp.core.common import Settings, Registry
 from openlp.core.ui import ServiceManager
+from openlp.core.lib.remote import OpenLPPoll
 from openlp.plugins.remotes.lib.httpserver import HttpRouter
 from tests.functional import MagicMock, patch, mock_open
 from tests.helpers.testmixin import TestMixin
@@ -35,8 +36,6 @@ from tests.helpers.testmixin import TestMixin
 __default_settings__ = {
     'remotes/twelve hour': True,
     'remotes/port': 4316,
-    'remotes/https port': 4317,
-    'remotes/https enabled': False,
     'remotes/user id': 'openlp',
     'remotes/password': 'password',
     'remotes/authentication enabled': False,
@@ -74,6 +73,8 @@ class TestRouter(TestCase, TestMixin):
         # GIVEN: A default configuration
         Settings().setValue('remotes/user id', 'openlp')
         Settings().setValue('remotes/password', 'password')
+        poll = MagicMock()
+        Registry().register('OpenLPPoll', poll)
 
         # WHEN: called with the defined userid
         router = HttpRouter()
@@ -157,15 +158,13 @@ class TestRouter(TestCase, TestMixin):
         """
         # GIVEN: a defined router with two slides
         Registry.create()
-        Registry().register('live_controller', MagicMock)
-        router = HttpRouter()
-        router.send_response = MagicMock()
-        router.send_header = MagicMock()
-        router.end_headers = MagicMock()
-        router.live_controller.slide_count = 2
+        live_controller = MagicMock()
+        Registry().register('live_controller', live_controller)
+        poll = OpenLPPoll()
+        live_controller.slide_count = 2
 
         # WHEN: main poll called
-        results = router.main_poll()
+        results = poll.main_poll()
 
         # THEN: the correct response should be returned
         self.assertEqual(results.decode('utf-8'), '{"results": {"slide_count": 2}}',

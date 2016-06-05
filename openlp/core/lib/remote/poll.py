@@ -22,7 +22,7 @@
 
 import json
 
-from openlp.core.common import RegistryProperties, Settings, OpenLPMixin
+from openlp.core.common import RegistryProperties, Settings
 
 
 class OpenLPPoll(RegistryProperties):
