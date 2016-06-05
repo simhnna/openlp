@@ -22,9 +22,6 @@
 
 import os
 from openlp.core.common import AppLocation
-from .poll import OpenLPPoll
-from .wsserver import OpenWSServer
-from .remotecontroller import RemoteController
 
 
 def get_cert_file(file_type):
@@ -35,5 +32,10 @@ def get_cert_file(file_type):
     """
     local_data = AppLocation.get_directory(AppLocation.DataDir)
     return os.path.join(local_data, 'remotes', 'openlp.{type}'.format(type=file_type))
+
+
+from .poll import OpenLPPoll
+from .wsserver import OpenWSServer
+from .remotecontroller import RemoteController
 
 __all__ = ['OpenLPPoll', 'RemoteController', 'get_cert_file']

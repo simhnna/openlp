@@ -22,11 +22,13 @@
 
 import json
 
-from openlp.core.common import RegistryProperties, Settings
+from openlp.core.common import RegistryProperties, Settings, OpenLPMixin
 
 
-class OpenLPPoll(RegistryProperties):
-
+class OpenLPPoll(RegistryProperties, OpenLPMixin):
+    """
+    Access by the web layer to get status type information from the application
+    """
     def __init__(self):
         """
         Constructor for the poll builder class.

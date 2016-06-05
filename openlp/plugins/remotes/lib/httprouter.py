@@ -116,7 +116,7 @@ from urllib.parse import urlparse, parse_qs
 
 from mako.template import Template
 
-from openlp.core.common import OpenLPMixin, RegistryProperties, AppLocation, Settings, translate, UiStrings
+from openlp.core.common import OpenLPMixin, RegistryProperties, AppLocation, Settings, Registry, translate, UiStrings
 from openlp.core.lib import PluginStatus, StringContent, image_to_byte, ItemCapabilities, create_thumb
 
 log = logging.getLogger(__name__)
@@ -143,6 +143,7 @@ class HttpRouter(RegistryProperties, OpenLPMixin):
         """
         auth_code = "{user}:{password}".format(user=Settings().value('remotes/user id'),
                                                password=Settings().value('remotes/password'))
+        self.openlppoll = Registry().get('OpenLPPoll')
         try:
             self.auth = base64.b64encode(auth_code)
         except TypeError:
@@ -154,8 +155,8 @@ class HttpRouter(RegistryProperties, OpenLPMixin):
             ('^/(stage)/(.*)$', {'function': self.stages, 'secure': False}),
             ('^/(main)$', {'function': self.serve_file, 'secure': False}),
             (r'^/(\w+)/thumbnails([^/]+)?/(.*)$', {'function': self.serve_thumbnail, 'secure': False}),
-            (r'^/api/poll$', {'function': self.poll, 'secure': False}),
-            (r'^/main/poll$', {'function': self.main_poll, 'secure': False}),
+            (r'^/api/poll$', {'function': self.openlppoll.poll, 'secure': False}),
+            (r'^/main/poll$', {'function': self.openlppoll.main_poll, 'secure': False}),
             (r'^/main/image$', {'function': self.main_image, 'secure': False}),
             (r'^/api/controller/(live|preview)/text$', {'function': self.controller_text, 'secure': False}),
             (r'^/api/controller/(live|preview)/(.*)$', {'function': self.controller, 'secure': True}),
@@ -467,35 +468,6 @@ class HttpRouter(RegistryProperties, OpenLPMixin):
         self.send_header('Content-type', content_type)
         self.end_headers()
         return content
-
-    def poll(self):
-        """
-        Poll OpenLP to determine the current slide number and item name.
-        """
-        result = {
-            'service': self.service_manager.service_id,
-            'slide': self.live_controller.selected_row or 0,
-            'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
-            'twelve': Settings().value('remotes/twelve hour'),
-            'blank': self.live_controller.blank_screen.isChecked(),
-            'theme': self.live_controller.theme_screen.isChecked(),
-            'display': self.live_controller.desktop_screen.isChecked(),
-            'version': 2,
-            'isSecure': Settings().value(self.settings_section + '/authentication enabled'),
-            'isAuthorised': self.authorised
-        }
-        self.do_json_header()
-        return json.dumps({'results': result}).encode()
-
-    def main_poll(self):
-        """
-        Poll OpenLP to determine the current slide count.
-        """
-        result = {
-            'slide_count': self.live_controller.slide_count
-        }
-        self.do_json_header()
-        return json.dumps({'results': result}).encode()
 
     def main_image(self):
         """

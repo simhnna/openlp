@@ -20,7 +20,7 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
-from openlp.core.lib.remote import OpenWSServer
+from openlp.core.lib.remote import OpenWSServer, OpenLPPoll
 
 
 class RemoteController(RegistryMixin, OpenLPMixin, RegistryProperties):
@@ -41,13 +41,12 @@ class RemoteController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Constructor
         """
         super(RemoteController, self).__init__(parent)
-        self.media_players = {}
-        self.display_controllers = {}
-        self.current_media_players = {}
         # Registry().register_function('playbackPlay', self.media_play_msg)
 
     def bootstrap_post_set_up(self):
         """
         process the bootstrap post setup request
         """
+        self.poll = OpenLPPoll()
+        Registry().register('OpenLPPoll', self.poll)
         self.wsserver = OpenWSServer()

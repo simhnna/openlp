@@ -162,7 +162,7 @@ window.OpenLP = {
                 OpenLP.loadSlides();
             }
             else if (OpenLP.currentSlide != msg.results.slide) {
-                OpenLP.currentSlide = parseInt(mag.results.slide, 10);
+                OpenLP.currentSlide = parseInt(msg.results.slide, 10);
                 OpenLP.updateSlide();
             }
         }
