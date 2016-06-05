@@ -242,11 +242,11 @@ class SongMediaItem(MediaManagerItem):
 
     def on_song_list_load(self):
         """
-        Handle the exit from the edit dialog and trigger api updates of songs
+        Handle the exit from the edit dialog and trigger remote updates of songs
         """
         log.debug('on_song_list_load - start')
         # Called to redisplay the song list screen edit from a search or from the exit of the Song edit dialog. If
-        # api editing is active Trigger it and clean up so it will not update again. Push edits to the service
+        # remote editing is active Trigger it and clean up so it will not update again. Push edits to the service
         # manager to update items
         if self.edit_item and self.update_service_on_edit and not self.remote_triggered:
             item = self.build_service_item(self.edit_item)
@@ -555,7 +555,7 @@ class SongMediaItem(MediaManagerItem):
         :param service_item: The service item to be built on
         :param item: The Song item to be used
         :param xml_version: The xml version (not used)
-        :param remote: Triggered from api
+        :param remote: Triggered from remote
         :param context: Why is it being generated
         """
         log.debug('generate_slide_data: {service}, {item}, {remote}'.format(service=service_item, item=item,

@@ -229,7 +229,7 @@ ERROR_MSG = {E_OK: translate('OpenLP.ProjectorConstants', 'OK'),  # E_OK | S_OK
              E_CONNECTION_REFUSED: translate('OpenLP.ProjectorConstants',
                                              'The connection was refused by the peer (or timed out)'),
              E_REMOTE_HOST_CLOSED_CONNECTION: translate('OpenLP.ProjectorConstants',
-                                                        'The api host closed the connection'),
+                                                        'The remote host closed the connection'),
              E_HOST_NOT_FOUND: translate('OpenLP.ProjectorConstants', 'The host address was not found'),
              E_SOCKET_ACCESS: translate('OpenLP.ProjectorConstants',
                                         'The socket operation failed because the application '

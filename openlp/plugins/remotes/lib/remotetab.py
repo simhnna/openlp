@@ -151,7 +151,7 @@ class RemoteTab(SettingsTab):
         self.live_url_label.setText(translate('RemotePlugin.RemoteTab', 'Live view URL:'))
         self.twelve_hour_check_box.setText(translate('RemotePlugin.RemoteTab', 'Display stage time in 12h format'))
         self.thumbnails_check_box.setText(translate('RemotePlugin.RemoteTab',
-                                                    'Show thumbnails of non-text slides in api and stage view.'))
+                                                    'Show thumbnails of non-text slides in remote and stage view.'))
         self.android_app_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Android App'))
         self.android_qr_description_label.setText(
             translate('RemotePlugin.RemoteTab',

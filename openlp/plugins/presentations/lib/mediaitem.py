@@ -266,7 +266,7 @@ class PresentationMediaItem(MediaManagerItem):
         :param service_item: The service item to be built on
         :param item: The Song item to be used
         :param xml_version: The xml version (not used)
-        :param remote: Triggered from api
+        :param remote: Triggered from remote
         :param context: Why is it being generated
         """
         if item:

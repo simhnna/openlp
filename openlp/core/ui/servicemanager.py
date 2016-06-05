@@ -344,7 +344,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         """
         Setter for property "modified". Sets whether or not the current service has been modified.
 
-        :param modified: Indicates if the service has new or removed items.  Used to trigger a api update.
+        :param modified: Indicates if the service has new or removed items.  Used to trigger a remote update.
         """
         if modified:
             self.service_id += 1
@@ -1079,7 +1079,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
 
     def on_set_item(self, message, field=None):
         """
-        Called by a signal to select a specific item and make it live usually from api.
+        Called by a signal to select a specific item and make it live usually from remote.
 
         :param field:
         :param message: The data passed in from a remove message
@@ -1523,7 +1523,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
 
     def remote_edit(self, field=None):
         """
-        Triggers a api edit to a plugin to allow item to be edited.
+        Triggers a remote edit to a plugin to allow item to be edited.
         :param field:
         """
         item = self.find_service_item()[0]

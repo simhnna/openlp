@@ -453,7 +453,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         :param service_item: The service Item to be processed
         :param item: The database item to be used to build the service item
         :param xml_version:
-        :param remote: Was this api triggered (False)
+        :param remote: Was this remote triggered (False)
         :param context: The service context
         """
         raise NotImplementedError('MediaManagerItem.generate_slide_data needs to be defined by the plugin')
@@ -580,7 +580,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
 
         :param item: Item to be processed
         :param replace: Replace the existing item
-        :param remote: Triggered from api
+        :param remote: Triggered from remote
         :param position: Position to place item
         """
         service_item = self.build_service_item(item, True, remote=remote, context=ServiceItemContext.Service)
