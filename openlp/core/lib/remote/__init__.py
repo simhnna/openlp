@@ -20,8 +20,20 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from .httprouter import HttpRouter
-from .httpserver import OpenLPServer
-from .remotetab import RemoteTab
+import os
+from openlp.core.common import AppLocation
+from .poll import OpenLPPoll
+from .wsserver import OpenWSServer
+from .remotecontroller import RemoteController
 
-__all__ = ['RemoteTab', 'OpenLPServer', 'HttpRouter']
+
+def get_cert_file(file_type):
+    """
+    Helper method to get certificate files
+    :param file_type: file suffix key, cert or pem
+    :return: full path to file
+    """
+    local_data = AppLocation.get_directory(AppLocation.DataDir)
+    return os.path.join(local_data, 'remotes', 'openlp.{type}'.format(type=file_type))
+
+__all__ = ['OpenLPPoll', 'RemoteController', 'get_cert_file']

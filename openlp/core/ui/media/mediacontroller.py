@@ -38,7 +38,6 @@ from openlp.core.ui.media.mediaplayer import MediaPlayer
 from openlp.core.ui.media import MediaState, MediaInfo, MediaType, get_media_players, set_media_players,\
     parse_optical_path
 from openlp.core.ui.lib.toolbar import OpenLPToolbar
-from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 
 log = logging.getLogger(__name__)
 

@@ -25,47 +25,18 @@ The :mod:`http` module contains the API web server. This is a lightweight web se
 with OpenLP. It uses JSON to communicate with the remotes.
 """
 
-import ssl
-import socket
+import asyncio
+import websockets
 import logging
 import time
 
 from PyQt5 import QtCore
 
 from openlp.core.common import Settings, RegistryProperties, OpenLPMixin
+from openlp.core.lib.remote import OpenLPPoll
 
-from openlp.plugins.remotes.lib import HttpRouter
-from openlp.core.lib.remote import get_cert_file
-
-from socketserver import BaseServer, ThreadingMixIn
-from http.server import BaseHTTPRequestHandler, HTTPServer
 
 log = logging.getLogger(__name__)
-
-
-class WebHandler(BaseHTTPRequestHandler, HttpRouter):
-    """
-    Stateless session handler to handle the HTTP request and process it.
-    This class handles just the overrides to the base methods and the logic to invoke the methods within the HttpRouter
-    class.
-    DO not try change the structure as this is as per the documentation.
-    """
-
-    def do_POST(self):
-        """
-        Present pages / data and invoke URL level user authentication.
-        """
-        self.do_post_processor()
-
-    def do_GET(self):
-        """
-        Present pages / data and invoke URL level user authentication.
-        """
-        self.do_post_processor()
-
-
-class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
-    pass
 
 
 class HttpThread(QtCore.QThread):
@@ -91,7 +62,7 @@ class HttpThread(QtCore.QThread):
         self.http_server.stop = True
 
 
-class OpenLPServer(RegistryProperties, OpenLPMixin):
+class OpenWSServer(RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
@@ -99,7 +70,7 @@ class OpenLPServer(RegistryProperties, OpenLPMixin):
         """
         Initialise the http server, and start the server of the correct type http / https
         """
-        super(OpenLPServer, self).__init__()
+        super(OpenWSServer, self).__init__()
         self.settings_section = 'remotes'
         self.secure = secure
         self.http_thread = HttpThread(self)
@@ -111,48 +82,62 @@ class OpenLPServer(RegistryProperties, OpenLPMixin):
         """
         address = Settings().value(self.settings_section + '/ip address')
         is_secure = Settings().value(self.settings_section + '/https enabled')
-        # Try to start secure server but not enabled.
-        if self.secure and not is_secure:
-            return
-        if self.secure:
-            port = Settings().value(self.settings_section + '/https port')
+        port = '4318'
+        self.start_websocket_instance(address, port)
+        # If web socket server start listening
+        if hasattr(self, 'ws_server') and self.ws_server:
+            event_loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(event_loop)
+            event_loop.run_until_complete(self.ws_server)
+            event_loop.run_forever()
         else:
-            port = Settings().value(self.settings_section + '/port')
-        if self.secure:
-            self.start_server_instance(address, port, HTTPSServer)
-        else:
-            self.start_server_instance(address, port, ThreadingHTTPServer)
-        # If HTTP server start listening
-        if hasattr(self, 'httpd') and self.httpd:
-            self.httpd.serve_forever()
-        else:
-            log.debug('Failed to start http server on port {port}'.format(port=port))
+            log.debug('Failed to start ws server on port {port}'.format(port=port))
 
-    def start_server_instance(self, address, port, server_class):
+    def start_websocket_instance(self, address, port):
         """
         Start the server
 
         :param address: The server address
         :param port: The run port
-        :param server_class: the class to start
         """
         loop = 1
         while loop < 4:
             try:
-                self.httpd = server_class((address, port), WebHandler)
-                log.debug("Server started for class {name} {address} {port:d}".format(name=server_class,
-                                                                                      address=address,
-                                                                                      port=port))
+                self.ws_server = websockets.serve(self.handle_websocket, address, port)
+                log.debug("Web Socket Server started for class {address} {port}".format(address=address, port=port))
                 break
-            except OSError:
-                log.debug("failed to start http server thread state "
-                          "{loop:d} {running}".format(loop=loop, running=self.http_thread.isRunning()))
-                loop += 1
-                time.sleep(0.1)
             except Exception as e:
-                log.error('Failed to start http server {why}'.format(why=e))
+                log.error('Failed to start ws server {why}'.format(why=e))
                 loop += 1
                 time.sleep(0.1)
+
+    @staticmethod
+    async def handle_websocket(request, path):
+        """
+        Handle web socket requests and return the poll information.
+        Check ever 0.5 seconds to get the latest postion and send if changed.
+        Only gets triggered when 1st client attaches
+        :param request: request from client
+        :param path: not used - future to register for a different end point
+        :return:
+        """
+        log.debug("web socket handler registered with client")
+        previous_poll = None
+        previous_main_poll = None
+        if path == '/poll':
+            while True:
+                current_poll = OpenLPPoll().poll()
+                if current_poll != previous_poll:
+                    await request.send(current_poll)
+                    previous_poll = current_poll
+                await asyncio.sleep(0.2)
+        elif path == '/main_poll':
+            while True:
+                main_poll = OpenLPPoll().main_poll()
+                if main_poll != previous_main_poll:
+                    await request.send(main_poll)
+                    previous_main_poll = main_poll
+                await asyncio.sleep(0.2)
 
     def stop_server(self):
         """
@@ -162,18 +147,3 @@ class OpenLPServer(RegistryProperties, OpenLPMixin):
             self.http_thread.stop()
         self.httpd = None
         log.debug('Stopped the server.')
-
-
-class HTTPSServer(HTTPServer):
-    def __init__(self, address, handler):
-        """
-        Initialise the secure handlers for the SSL server if required.s
-        """
-        BaseServer.__init__(self, address, handler)
-        self.socket = ssl.SSLSocket(
-            sock=socket.socket(self.address_family, self.socket_type),
-            certfile=get_cert_file('crt'),
-            keyfile=get_cert_file('key'),
-            server_side=True)
-        self.server_bind()
-        self.server_activate()

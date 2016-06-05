@@ -63,7 +63,6 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         super(RemotesPlugin, self).initialise()
         self.server = OpenLPServer()
-        self.server_ws = OpenLPServer(websocket=True)
         self.server_secure = OpenLPServer(secure=True)
         if not hasattr(self, 'remote_server_icon'):
             self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)

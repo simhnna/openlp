@@ -19,9 +19,35 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
+from openlp.core.lib.remote import OpenWSServer
 
-from .httprouter import HttpRouter
-from .httpserver import OpenLPServer
-from .remotetab import RemoteTab
 
-__all__ = ['RemoteTab', 'OpenLPServer', 'HttpRouter']
+class RemoteController(RegistryMixin, OpenLPMixin, RegistryProperties):
+    """
+    The implementation of the Media Controller. The Media Controller adds an own class for every Player.
+    Currently these are QtWebkit, Phonon and Vlc. display_controllers are an array of controllers keyed on the
+    slidecontroller or plugin which built them.
+
+    ControllerType is the class containing the key values.
+
+    media_players are an array of media players keyed on player name.
+
+    current_media_players is an array of player instances keyed on ControllerType.
+
+    """
+    def __init__(self, parent=None):
+        """
+        Constructor
+        """
+        super(RemoteController, self).__init__(parent)
+        self.media_players = {}
+        self.display_controllers = {}
+        self.current_media_players = {}
+        # Registry().register_function('playbackPlay', self.media_play_msg)
+
+    def bootstrap_post_set_up(self):
+        """
+        process the bootstrap post setup request
+        """
+        self.wsserver = OpenWSServer()

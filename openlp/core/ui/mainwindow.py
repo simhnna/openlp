@@ -40,13 +40,13 @@ from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.versionchecker import get_application_version
 from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
 from openlp.core.lib.ui import UiStrings, create_action
+from openlp.core.lib.remote import RemoteController
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.printserviceform import PrintServiceForm
 from openlp.core.ui.projector.manager import ProjectorManager
-from openlp.core.ui.lib.toolbar import OpenLPToolbar
 from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 from openlp.core.ui.lib.mediadockmanager import MediaDockManager
 
@@ -529,6 +529,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Settings().set_up_default_values()
         self.about_form = AboutForm(self)
         MediaController()
+        RemoteController()
         SettingsForm(self)
         self.formatting_tag_form = FormattingTagForm(self)
         self.shortcut_form = ShortcutListForm(self)
