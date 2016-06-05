@@ -149,3 +149,24 @@ class TestRegistry(TestCase):
 
     def dummy_function_2(self):
         return "function_2"
+
+    def test_registry_remote_apis(self):
+        """
+        Test the registry working flags creation and its usage
+        """
+        # GIVEN: A new registry
+        Registry.create()
+
+        # WHEN: I register a API to function
+        func = MagicMock()
+        func1 = MagicMock()
+        Registry().remote_api(r'^/api/poll$', func)
+        Registry().remote_api(r'^/main/poll$', func1, True)
+
+        # THEN: When I look to a function
+        call_structure, args = Registry().remote_execute('/api/poll')
+        self.assertEqual(call_structure['function'], func, 'Calling function should match')
+        self.assertEqual(call_structure['secure'], False, 'Calling function should not require security')
+        call_structure, args = Registry().remote_execute('/main/poll')
+        self.assertEqual(call_structure['function'], func1, 'Calling function should match')
+        self.assertEqual(call_structure['secure'], True, 'Calling function should not require security')

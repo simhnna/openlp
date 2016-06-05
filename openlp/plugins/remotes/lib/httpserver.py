@@ -25,8 +25,6 @@ The :mod:`http` module contains the API web server. This is a lightweight web se
 with OpenLP. It uses JSON to communicate with the remotes.
 """
 
-import ssl
-import socket
 import logging
 import time
 
