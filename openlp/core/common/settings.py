@@ -213,7 +213,9 @@ class Settings(QtCore.QSettings):
         ('media/players', 'media/players_temp', [(media_players_conv, None)]),  # Convert phonon to system
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
-        ('advanced/default image', '/core/logo file', [])  # Default image renamed + moved to general after 2.4.
+        ('advanced/default image', '/core/logo file', []),  # Default image renamed + moved to general after 2.4.
+        ('remotes/https enabled', '', []),
+        ('remotes/https port', '', [])
     ]
 
     @staticmethod

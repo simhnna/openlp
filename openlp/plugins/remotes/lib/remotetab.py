@@ -88,42 +88,6 @@ class RemoteTab(SettingsTab):
         self.live_url.setOpenExternalLinks(True)
         self.http_setting_layout.addRow(self.live_url_label, self.live_url)
         self.left_layout.addWidget(self.http_settings_group_box)
-        self.https_settings_group_box = QtWidgets.QGroupBox(self.left_column)
-        self.https_settings_group_box.setCheckable(True)
-        self.https_settings_group_box.setChecked(False)
-        self.https_settings_group_box.setObjectName('https_settings_group_box')
-        self.https_settings_layout = QtWidgets.QFormLayout(self.https_settings_group_box)
-        self.https_settings_layout.setObjectName('https_settings_layout')
-        self.https_error_label = QtWidgets.QLabel(self.https_settings_group_box)
-        self.https_error_label.setVisible(False)
-        self.https_error_label.setWordWrap(True)
-        self.https_error_label.setObjectName('https_error_label')
-        self.https_settings_layout.addRow(self.https_error_label)
-        self.https_port_label = QtWidgets.QLabel(self.https_settings_group_box)
-        self.https_port_label.setObjectName('https_port_label')
-        self.https_port_spin_box = QtWidgets.QSpinBox(self.https_settings_group_box)
-        self.https_port_spin_box.setMaximum(32767)
-        self.https_port_spin_box.setObjectName('https_port_spin_box')
-        self.https_settings_layout.addRow(self.https_port_label, self.https_port_spin_box)
-        self.remote_https_url = QtWidgets.QLabel(self.https_settings_group_box)
-        self.remote_https_url.setObjectName('remote_http_url')
-        self.remote_https_url.setOpenExternalLinks(True)
-        self.remote_https_url_label = QtWidgets.QLabel(self.https_settings_group_box)
-        self.remote_https_url_label.setObjectName('remote_http_url_label')
-        self.https_settings_layout.addRow(self.remote_https_url_label, self.remote_https_url)
-        self.stage_https_url_label = QtWidgets.QLabel(self.http_settings_group_box)
-        self.stage_https_url_label.setObjectName('stage_https_url_label')
-        self.stage_https_url = QtWidgets.QLabel(self.https_settings_group_box)
-        self.stage_https_url.setObjectName('stage_https_url')
-        self.stage_https_url.setOpenExternalLinks(True)
-        self.https_settings_layout.addRow(self.stage_https_url_label, self.stage_https_url)
-        self.live_https_url_label = QtWidgets.QLabel(self.https_settings_group_box)
-        self.live_https_url_label.setObjectName('live_url_label')
-        self.live_https_url = QtWidgets.QLabel(self.https_settings_group_box)
-        self.live_https_url.setObjectName('live_https_url')
-        self.live_https_url.setOpenExternalLinks(True)
-        self.https_settings_layout.addRow(self.live_https_url_label, self.live_https_url)
-        self.left_layout.addWidget(self.https_settings_group_box)
         self.user_login_group_box = QtWidgets.QGroupBox(self.left_column)
         self.user_login_group_box.setCheckable(True)
         self.user_login_group_box.setChecked(False)
@@ -177,8 +141,6 @@ class RemoteTab(SettingsTab):
         self.thumbnails_check_box.stateChanged.connect(self.on_thumbnails_check_box_changed)
         self.address_edit.textChanged.connect(self.set_urls)
         self.port_spin_box.valueChanged.connect(self.set_urls)
-        self.https_port_spin_box.valueChanged.connect(self.set_urls)
-        self.https_settings_group_box.clicked.connect(self.https_changed)
 
     def retranslateUi(self):
         self.server_settings_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Server Settings'))
@@ -200,14 +162,6 @@ class RemoteTab(SettingsTab):
             translate('RemotePlugin.RemoteTab',
                       'Scan the QR code or click <a href="{qr}">download</a> to install the iOS app from the App '
                       'Store.').format(qr='https://itunes.apple.com/app/id1096218725'))
-        self.https_settings_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'HTTPS Server'))
-        self.https_error_label.setText(
-            translate('RemotePlugin.RemoteTab', 'Could not find an SSL certificate. The HTTPS server will not be '
-                      'available unless an SSL certificate is found. Please see the manual for more information.'))
-        self.https_port_label.setText(self.port_label.text())
-        self.remote_https_url_label.setText(self.remote_url_label.text())
-        self.stage_https_url_label.setText(self.stage_url_label.text())
-        self.live_https_url_label.setText(self.live_url_label.text())
         self.user_login_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'User Authentication'))
         self.user_id_label.setText(translate('RemotePlugin.RemoteTab', 'User id:'))
         self.password_label.setText(translate('RemotePlugin.RemoteTab', 'Password:'))
@@ -218,17 +172,11 @@ class RemoteTab(SettingsTab):
         """
         ip_address = self.get_ip_address(self.address_edit.text())
         http_url = 'http://{url}:{text}/'.format(url=ip_address, text=self.port_spin_box.value())
-        https_url = 'https://{url}:{text}/'.format(url=ip_address, text=self.https_port_spin_box.value())
         self.remote_url.setText('<a href="{url}">{url}</a>'.format(url=http_url))
-        self.remote_https_url.setText('<a href="{url}">{url}</a>'.format(url=https_url))
         http_url_temp = http_url + 'stage'
-        https_url_temp = https_url + 'stage'
         self.stage_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
-        self.stage_https_url.setText('<a href="{url}">{url}</a>'.format(url=https_url_temp))
         http_url_temp = http_url + 'main'
-        https_url_temp = https_url + 'main'
         self.live_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
-        self.live_https_url.setText('<a href="{url}">{url}</a>'.format(url=https_url_temp))
 
     def get_ip_address(self, ip_address):
         """
@@ -254,43 +202,25 @@ class RemoteTab(SettingsTab):
         """
         Load the configuration and update the server configuration if necessary
         """
-        self.is_secure = Settings().value(self.settings_section + '/https enabled')
         self.port_spin_box.setValue(Settings().value(self.settings_section + '/port'))
-        self.https_port_spin_box.setValue(Settings().value(self.settings_section + '/https port'))
         self.address_edit.setText(Settings().value(self.settings_section + '/ip address'))
         self.twelve_hour = Settings().value(self.settings_section + '/twelve hour')
         self.twelve_hour_check_box.setChecked(self.twelve_hour)
         self.thumbnails = Settings().value(self.settings_section + '/thumbnails')
         self.thumbnails_check_box.setChecked(self.thumbnails)
-        local_data = AppLocation.get_directory(AppLocation.DataDir)
-        if not os.path.exists(os.path.join(local_data, 'remotes', 'openlp.crt')) or \
-                not os.path.exists(os.path.join(local_data, 'remotes', 'openlp.key')):
-            self.https_settings_group_box.setChecked(False)
-            self.https_settings_group_box.setEnabled(False)
-            self.https_error_label.setVisible(True)
-        else:
-            self.https_settings_group_box.setChecked(Settings().value(self.settings_section + '/https enabled'))
-            self.https_settings_group_box.setEnabled(True)
-            self.https_error_label.setVisible(False)
         self.user_login_group_box.setChecked(Settings().value(self.settings_section + '/authentication enabled'))
         self.user_id.setText(Settings().value(self.settings_section + '/user id'))
         self.password.setText(Settings().value(self.settings_section + '/password'))
         self.set_urls()
-        self.https_changed()
 
     def save(self):
         """
         Save the configuration and update the server configuration if necessary
         """
         if Settings().value(self.settings_section + '/ip address') != self.address_edit.text() or \
-                Settings().value(self.settings_section + '/port') != self.port_spin_box.value() or \
-                Settings().value(self.settings_section + '/https port') != self.https_port_spin_box.value() or \
-                Settings().value(self.settings_section + '/https enabled') != \
-                self.https_settings_group_box.isChecked():
+                Settings().value(self.settings_section + '/port') != self.port_spin_box.value():
             self.settings_form.register_post_process('remotes_config_updated')
         Settings().setValue(self.settings_section + '/port', self.port_spin_box.value())
-        Settings().setValue(self.settings_section + '/https port', self.https_port_spin_box.value())
-        Settings().setValue(self.settings_section + '/https enabled', self.https_settings_group_box.isChecked())
         Settings().setValue(self.settings_section + '/ip address', self.address_edit.text())
         Settings().setValue(self.settings_section + '/twelve hour', self.twelve_hour)
         Settings().setValue(self.settings_section + '/thumbnails', self.thumbnails)
@@ -317,12 +247,6 @@ class RemoteTab(SettingsTab):
         if check_state == QtCore.Qt.Checked:
             self.thumbnails = True
 
-    def https_changed(self):
-        """
-        Invert the HTTP group box based on Https group settings
-        """
-        self.http_settings_group_box.setEnabled(not self.https_settings_group_box.isChecked())
-
     def generate_icon(self):
         """
         Generate icon for main window
@@ -330,12 +254,6 @@ class RemoteTab(SettingsTab):
         self.remote_server_icon.hide()
         icon = QtGui.QImage(':/remote/network_server.png')
         icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        if self.is_secure:
-            overlay = QtGui.QImage(':/remote/network_ssl.png')
-            overlay = overlay.scaled(60, 60, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-            painter = QtGui.QPainter(icon)
-            painter.drawImage(0, 0, overlay)
-            painter.end()
         if Settings().value(self.settings_section + '/authentication enabled'):
             overlay = QtGui.QImage(':/remote/network_auth.png')
             overlay = overlay.scaled(60, 60, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)

@@ -33,9 +33,7 @@ log = logging.getLogger(__name__)
 __default_settings__ = {
     'remotes/twelve hour': True,
     'remotes/port': 4316,
-    'remotes/https port': 4317,
     'remotes/websocket port': 4318,
-    'remotes/https enabled': False,
     'remotes/user id': 'openlp',
     'remotes/password': 'password',
     'remotes/authentication enabled': False,
@@ -63,7 +61,6 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         super(RemotesPlugin, self).initialise()
         self.server = OpenLPServer()
-        self.server_secure = OpenLPServer(secure=True)
         if not hasattr(self, 'remote_server_icon'):
             self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
             size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
@@ -88,9 +85,6 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         if self.server:
             self.server.stop_server()
             self.server = None
-        if self.server_secure:
-            self.server_secure.stop_server()
-            self.server_secure = None
 
     @staticmethod
     def about():

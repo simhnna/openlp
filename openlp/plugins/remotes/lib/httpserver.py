@@ -35,9 +35,8 @@ from PyQt5 import QtCore
 from openlp.core.common import Settings, RegistryProperties, OpenLPMixin
 
 from openlp.plugins.remotes.lib import HttpRouter
-from openlp.core.lib.remote import get_cert_file
 
-from socketserver import BaseServer, ThreadingMixIn
+from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 log = logging.getLogger(__name__)
@@ -110,18 +109,9 @@ class OpenLPServer(RegistryProperties, OpenLPMixin):
         Start the correct server and save the handler
         """
         address = Settings().value(self.settings_section + '/ip address')
-        is_secure = Settings().value(self.settings_section + '/https enabled')
         # Try to start secure server but not enabled.
-        if self.secure and not is_secure:
-            return
-        if self.secure:
-            port = Settings().value(self.settings_section + '/https port')
-        else:
-            port = Settings().value(self.settings_section + '/port')
-        if self.secure:
-            self.start_server_instance(address, port, HTTPSServer)
-        else:
-            self.start_server_instance(address, port, ThreadingHTTPServer)
+        port = Settings().value(self.settings_section + '/port')
+        self.start_server_instance(address, port, ThreadingHTTPServer)
         # If HTTP server start listening
         if hasattr(self, 'httpd') and self.httpd:
             self.httpd.serve_forever()
@@ -162,18 +152,3 @@ class OpenLPServer(RegistryProperties, OpenLPMixin):
             self.http_thread.stop()
         self.httpd = None
         log.debug('Stopped the server.')
-
-
-class HTTPSServer(HTTPServer):
-    def __init__(self, address, handler):
-        """
-        Initialise the secure handlers for the SSL server if required.s
-        """
-        BaseServer.__init__(self, address, handler)
-        self.socket = ssl.SSLSocket(
-            sock=socket.socket(self.address_family, self.socket_type),
-            certfile=get_cert_file('crt'),
-            keyfile=get_cert_file('key'),
-            server_side=True)
-        self.server_bind()
-        self.server_activate()

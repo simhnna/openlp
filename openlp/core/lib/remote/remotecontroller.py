@@ -19,8 +19,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
+
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
 from openlp.core.lib.remote import OpenWSServer, OpenLPPoll
+
+log = logging.getLogger(__name__)
 
 
 class RemoteController(RegistryMixin, OpenLPMixin, RegistryProperties):

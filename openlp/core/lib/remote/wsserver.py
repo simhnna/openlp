@@ -29,12 +29,10 @@ import asyncio
 import websockets
 import logging
 import time
-import ssl
 
 from PyQt5 import QtCore
 
 from openlp.core.common import Settings, RegistryProperties, OpenLPMixin, Registry
-from openlp.core.lib.remote import get_cert_file
 
 log = logging.getLogger(__name__)
 
@@ -100,15 +98,9 @@ class OpenWSServer(RegistryProperties, OpenLPMixin):
         :param port: The run port
         """
         loop = 1
-        is_secure = Settings().value(self.settings_section + '/https enabled')
         while loop < 4:
             try:
-                if is_secure:
-                    context = ssl.create_default_context()
-                    context.load_cert_chain(certfile=get_cert_file('crt'), keyfile=get_cert_file('key'))
-                    self.ws_server = websockets.serve(self.handle_websocket, address, port, ssl=context)
-                else:
-                    self.ws_server = websockets.serve(self.handle_websocket, address, port)
+                self.ws_server = websockets.serve(self.handle_websocket, address, port)
                 log.debug("Web Socket Server started for class {address} {port}".format(address=address, port=port))
                 break
             except Exception as e:
