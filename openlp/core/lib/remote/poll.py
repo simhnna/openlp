@@ -25,7 +25,7 @@ import json
 from openlp.core.common import RegistryProperties, Settings, OpenLPMixin
 
 
-class OpenLPPoll(RegistryProperties, OpenLPMixin):
+class OpenLPPoll(RegistryProperties):
     """
     Access by the web layer to get status type information from the application
     """
