@@ -39,11 +39,12 @@ function storeTransposeValue(songId,transposeValueToSet) {
 }
 
 function transposeChord(chord, transposeValue, notation) {
-  var chordSplit = chord.replace('♭', 'b').split(/[\/\(\)]/), transposedChord = '', note, notenumber, rest, currentChord,
-  notesSharp = notesSharpNotation[notation],
-  notesFlat = notesFlatNotation[notation],
-  notesPreferred = ['b','#','#','#','#','#','#','#','#','#','#','#'];
-  chordNotes = Array();
+  var chordSplit = chord.replace('♭', 'b').split(/[\/\(\)]/);
+  var transposedChord = '', note, notenumber, rest, currentChord;
+  var notesSharp = notesSharpNotation[notation];
+  var notesFlat = notesFlatNotation[notation];
+  var notesPreferred = ['b','#','#','#','#','#','#','#','#','#','#','#'];
+  var chordNotes = Array();
   for (i = 0; i <= chordSplit.length - 1; i++) {
     if (i > 0) {
       transposedChord += '/';
@@ -70,18 +71,25 @@ function transposeChord(chord, transposeValue, notation) {
         note = currentchord;
         rest = "";
       }
-      notenumber = (notesSharp.indexOf(note) === -1?notesFlat.indexOf(note):notesSharp.indexOf(note));
+      notenumber = (notesSharp.indexOf(note) === -1 ? notesFlat.indexOf(note) : notesSharp.indexOf(note));
       notenumber -= parseInt(transposeValue);
-      while (notenumber > 11) {notenumber -= 12;}
-      while (notenumber < 0) {notenumber += 12;}
+      while (notenumber > 11) {
+        notenumber -= 12;
+      }
+      while (notenumber < 0) {
+        notenumber += 12;
+      }
       if (i === 0) {
         currentChord = notesPreferred[notenumber] === '#' ? notesSharp[notenumber] : notesFlat[notenumber];
         lastChord = currentChord;
-      }else {
+      } else {
         currentChord = notesSharp.indexOf(lastChord) === -1 ? notesFlat[notenumber] : notesSharp[notenumber];
       }
-      if(!(notesFlat.indexOf(note)===-1 && notesSharp.indexOf(note)===-1)) transposedChord += currentChord + rest; else transposedChord += note + rest; //note+rest;
-      //transposedChord += currentChord + rest;
+      if (!(notesFlat.indexOf(note) === -1 && notesSharp.indexOf(note) === -1)) {
+        transposedChord += currentChord + rest;
+      } else {
+        transposedChord += note + rest;
+      }
     }
   }
   return transposedChord;
