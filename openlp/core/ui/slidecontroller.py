@@ -531,7 +531,7 @@ class SlideController(DisplayController, RegistryProperties):
 
     def toggle_display(self, action):
         """
-        Toggle the display settings triggered from remote messages.
+        Toggle the display settings triggered from api messages.
 
         :param action: The blank action to be processed.
         """
@@ -797,7 +797,7 @@ class SlideController(DisplayController, RegistryProperties):
 
     def replace_service_manager_item(self, item):
         """
-        Replacement item following a remote edit
+        Replacement item following a api edit
 
         :param item: The current service item
         """
@@ -841,7 +841,7 @@ class SlideController(DisplayController, RegistryProperties):
         """
         self.on_stop_loop()
         old_item = self.service_item
-        # rest to allow the remote pick up verse 1 if large imaged
+        # rest to allow the api pick up verse 1 if large imaged
         self.selected_row = 0
         # take a copy not a link to the servicemanager copy.
         self.service_item = copy.copy(service_item)
@@ -931,7 +931,7 @@ class SlideController(DisplayController, RegistryProperties):
         """
         Go to the requested slide
 
-        :param message: remote message to be processed.
+        :param message: api message to be processed.
         """
         index = int(message[0])
         if not self.service_item:

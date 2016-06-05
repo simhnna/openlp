@@ -396,7 +396,7 @@ class PJLink1(QTcpSocket):
             return
         log.debug('({ip}) get_data(): Checking new data "{data}"'.format(ip=self.ip, data=data))
         if data.upper().startswith('PJLINK'):
-            # Reconnected from remote host disconnect ?
+            # Reconnected from api host disconnect ?
             self.check_login(data)
             self.send_busy = False
             self.projectorReceivedData.emit()

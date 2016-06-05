@@ -178,29 +178,3 @@ class Registry(object):
         """
         if key in self.working_flags:
             del self.working_flags[key]
-
-    def remote_api(self, path, function, secure=False):
-        """
-        Sets a working_flag based on the key passed in.
-
-        :param path: The working_flag to be created this is usually a major class like "renderer" or "main_window" .
-        :param function: The data to be saved.
-        :param secure: The data to be saved.
-        """
-        self.remote_apis[path] = {'function': function, 'secure': secure}
-
-    def remote_execute(self, url_path):
-        """
-        Execute all the handlers associated with the event and return an array of results.
-
-        :param url_path: The url path to be found
-        """
-        for url, funcs in self.remote_apis.items():
-            a = url
-            match = re.match(url, url_path)
-            if match:
-                log.debug('Route "{route}" matched "{path}"'.format(route=url_path, path=url_path))
-                args = []
-                for param in match.groups():
-                    args.append(param)
-                return funcs, args

@@ -22,6 +22,7 @@
 
 from .poll import OpenLPPoll
 from .wsserver import OpenWSServer
+from .httpserver import OpenLPHttpServer
 from .remotecontroller import RemoteController
 
-__all__ = ['OpenLPPoll', 'RemoteController']
+__all__ = ['OpenLPPoll', 'RemoteController', 'OpenLPHttpServer']

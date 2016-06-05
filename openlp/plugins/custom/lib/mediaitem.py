@@ -129,7 +129,7 @@ class CustomMediaItem(MediaManagerItem):
                 self.list_view.setCurrentItem(custom_name)
         self.auto_select_id = -1
         # Called to redisplay the custom list screen edith from a search
-        # or from the exit of the Custom edit dialog. If remote editing is
+        # or from the exit of the Custom edit dialog. If api editing is
         # active trigger it and clean up so it will not update again.
         self.check_search_result()
 

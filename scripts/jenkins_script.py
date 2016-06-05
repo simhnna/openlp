@@ -171,7 +171,7 @@ def get_repo_name():
     # Determine the branch's name
     repo_name = ''
     for line in output_list:
-        # Check if it is remote branch.
+        # Check if it is api branch.
         if 'push branch' in line:
             match = re.match(REPO_REGEX, line)
             if match:

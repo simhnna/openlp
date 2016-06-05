@@ -28,7 +28,7 @@ from unittest import TestCase
 
 from openlp.core.common import Settings, Registry
 from openlp.core.ui import ServiceManager
-from openlp.core.lib.remote import OpenLPPoll
+from openlp.core.lib.api import OpenLPPoll
 from openlp.plugins.remotes.lib.httpserver import HttpRouter
 from tests.functional import MagicMock, patch, mock_open
 from tests.helpers.testmixin import TestMixin
@@ -327,7 +327,7 @@ class TestRouter(TestCase, TestMixin):
 
     def remote_next_test(self):
         """
-        Test service manager receives remote next click properly (bug 1407445)
+        Test service manager receives api next click properly (bug 1407445)
         """
         # GIVEN: initial setup and mocks
         self.router.routes = [(r'^/api/service/(.*)$', {'function': self.router.service, 'secure': False})]
@@ -348,7 +348,7 @@ class TestRouter(TestCase, TestMixin):
 
     def remote_previous_test(self):
         """
-        Test service manager receives remote previous click properly (bug 1407445)
+        Test service manager receives api previous click properly (bug 1407445)
         """
         # GIVEN: initial setup and mocks
         self.router.routes = [(r'^/api/service/(.*)$', {'function': self.router.service, 'secure': False})]

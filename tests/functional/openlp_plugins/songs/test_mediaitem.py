@@ -502,7 +502,7 @@ class TestMediaItem(TestCase, TestMixin):
 
     def build_remote_search_test(self):
         """
-        Test results for the remote search api
+        Test results for the api search api
         """
         # GIVEN: A Song and a search a JSON array should be returned.
         mock_song = MagicMock()

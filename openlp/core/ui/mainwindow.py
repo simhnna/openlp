@@ -40,7 +40,7 @@ from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.versionchecker import get_application_version
 from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
 from openlp.core.lib.ui import UiStrings, create_action
-from openlp.core.lib.remote import RemoteController
+from openlp.core.lib.api import RemoteController
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm

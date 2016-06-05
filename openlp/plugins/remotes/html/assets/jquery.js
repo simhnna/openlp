@@ -7158,7 +7158,7 @@ jQuery.fn.extend({
 
 		var self = this;
 
-		// Request the remote document
+		// Request the api document
 		jQuery.ajax({
 			url: url,
 			type: type,

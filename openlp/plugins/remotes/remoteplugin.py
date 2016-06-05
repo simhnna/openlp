@@ -92,9 +92,9 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         Information about this plugin
         """
         about_text = translate('RemotePlugin', '<strong>Remote Plugin</strong>'
-                               '<br />The remote plugin provides the ability to send messages to '
+                               '<br />The api plugin provides the ability to send messages to '
                                'a running version of OpenLP on a different computer via a web '
-                               'browser or through the remote API.')
+                               'browser or through the api API.')
         return about_text
 
     def set_plugin_text_strings(self):
@@ -115,7 +115,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         Called when Config is changed to requests a restart with the server on new address or port
         """
-        log.debug('remote config changed')
+        log.debug('api config changed')
         QtWidgets.QMessageBox.information(self.main_window,
                                           translate('RemotePlugin', 'Server Config Change'),
                                           translate('RemotePlugin',

@@ -151,7 +151,7 @@ class RemoteTab(SettingsTab):
         self.live_url_label.setText(translate('RemotePlugin.RemoteTab', 'Live view URL:'))
         self.twelve_hour_check_box.setText(translate('RemotePlugin.RemoteTab', 'Display stage time in 12h format'))
         self.thumbnails_check_box.setText(translate('RemotePlugin.RemoteTab',
-                                                    'Show thumbnails of non-text slides in remote and stage view.'))
+                                                    'Show thumbnails of non-text slides in api and stage view.'))
         self.android_app_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Android App'))
         self.android_qr_description_label.setText(
             translate('RemotePlugin.RemoteTab',
@@ -252,10 +252,10 @@ class RemoteTab(SettingsTab):
         Generate icon for main window
         """
         self.remote_server_icon.hide()
-        icon = QtGui.QImage(':/remote/network_server.png')
+        icon = QtGui.QImage(':/api/network_server.png')
         icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         if Settings().value(self.settings_section + '/authentication enabled'):
-            overlay = QtGui.QImage(':/remote/network_auth.png')
+            overlay = QtGui.QImage(':/api/network_auth.png')
             overlay = overlay.scaled(60, 60, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
             painter = QtGui.QPainter(icon)
             painter.drawImage(20, 0, overlay)
