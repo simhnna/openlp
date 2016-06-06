@@ -111,65 +111,35 @@ class OpenWSServer(RegistryProperties, OpenLPMixin):
                 loop += 1
                 time.sleep(0.1)
 
-    if sys.version_info >= (3, 5):
-        @staticmethod
-        async def handle_websocket(request, path):
-            """
-            Handle web socket requests and return the poll information.
-            Check ever 0.5 seconds to get the latest postion and send if changed.
-            Only gets triggered when 1st client attaches
-            :param request: request from client
-            :param path: not used - future to register for a different end point
-            :return:
-            """
-            log.debug("web socket handler registered with client")
-            previous_poll = None
-            previous_main_poll = None
-            openlppoll = Registry().get('OpenLPPoll')
-            if path == '/poll':
-                while True:
-                    current_poll = openlppoll.poll()
-                    if current_poll != previous_poll:
-                        await request.send(current_poll)
-                        previous_poll = current_poll
-                    await asyncio.sleep(0.2)
-            elif path == '/main_poll':
-                while True:
-                    main_poll = openlppoll.main_poll()
-                    if main_poll != previous_main_poll:
-                        await request.send(main_poll)
-                        previous_main_poll = main_poll
-                    await asyncio.sleep(0.2)
-    else:
-        @staticmethod
-        @asyncio.coroutine
-        def handle_websocket(request, path):
-            """
-            Handle web socket requests and return the poll information.
-            Check ever 0.5 seconds to get the latest postion and send if changed.
-            Only gets triggered when 1st client attaches
-            :param request: request from client
-            :param path: not used - future to register for a different end point
-            :return:
-            """
-            log.debug("web socket handler registered with client")
-            previous_poll = None
-            previous_main_poll = None
-            openlppoll = Registry().get('OpenLPPoll')
-            if path == '/poll':
-                while True:
-                    current_poll = openlppoll.poll()
-                    if current_poll != previous_poll:
-                        yield from request.send(current_poll)
-                        previous_poll = current_poll
-                    yield from asyncio.sleep(0.2)
-            elif path == '/main_poll':
-                while True:
-                    main_poll = openlppoll.main_poll()
-                    if main_poll != previous_main_poll:
-                        yield from request.send(main_poll)
-                        previous_main_poll = main_poll
-                    yield from asyncio.sleep(0.2)
+    @staticmethod
+    @asyncio.coroutine
+    def handle_websocket(request, path):
+        """
+        Handle web socket requests and return the poll information.
+        Check ever 0.5 seconds to get the latest postion and send if changed.
+        Only gets triggered when 1st client attaches
+        :param request: request from client
+        :param path: not used - future to register for a different end point
+        :return:
+        """
+        log.debug("web socket handler registered with client")
+        previous_poll = None
+        previous_main_poll = None
+        openlppoll = Registry().get('OpenLPPoll')
+        if path == '/poll':
+            while True:
+                current_poll = openlppoll.poll()
+                if current_poll != previous_poll:
+                    yield from request.send(current_poll)
+                    previous_poll = current_poll
+                yield from asyncio.sleep(0.2)
+        elif path == '/main_poll':
+            while True:
+                main_poll = openlppoll.main_poll()
+                if main_poll != previous_main_poll:
+                    yield from request.send(main_poll)
+                    previous_main_poll = main_poll
+                yield from asyncio.sleep(0.2)
 
     def stop_server(self):
         """
