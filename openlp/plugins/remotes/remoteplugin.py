@@ -115,7 +115,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         Called when Config is changed to requests a restart with the server on new address or port
         """
-        log.debug('api config changed')
+        log.debug('remote config changed')
         QtWidgets.QMessageBox.information(self.main_window,
                                           translate('RemotePlugin', 'Server Config Change'),
                                           translate('RemotePlugin',

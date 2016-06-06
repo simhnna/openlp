@@ -607,7 +607,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
                 self.generate_slide_data(service_item)
                 self.service_manager.add_service_item(service_item, replace=True)
             else:
-                # Turn off the api edit update message indicator
+                # Turn off the remote edit update message indicator
                 QtWidgets.QMessageBox.information(self, translate('OpenLP.MediaManagerItem', 'Invalid Service Item'),
                                                   translate('OpenLP.MediaManagerItem',
                                                             'You must select a {title} '

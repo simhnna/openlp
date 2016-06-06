@@ -24,7 +24,6 @@ Provide Registry Services
 """
 import logging
 import sys
-import re
 
 from openlp.core.common import trace_error_handler
 
@@ -57,7 +56,6 @@ class Registry(object):
         registry.service_list = {}
         registry.functions_list = {}
         registry.working_flags = {}
-        registry.remote_apis = {}
         # Allow the tests to remove Registry entries but not the live system
         registry.running_under_test = 'nose' in sys.argv[0]
         registry.initialising = True

@@ -95,6 +95,7 @@ MODULES = [
     'uno',
     'websockets',
     'asyncio',
+    'waitress',
     'six'
 ]
 
