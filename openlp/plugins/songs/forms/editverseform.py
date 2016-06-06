@@ -48,6 +48,8 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.split_button.clicked.connect(self.on_split_button_clicked)
         self.verse_text_edit.cursorPositionChanged.connect(self.on_cursor_position_changed)
         self.verse_type_combo_box.currentIndexChanged.connect(self.on_verse_type_combo_box_changed)
+        self.transpose_down_button.clicked.connect(self.on_transepose_down_button_clicked)
+        self.transpose_up_button.clicked.connect(self.on_transepose_up_button_clicked)
 
     def insert_verse(self, verse_tag, verse_num=1):
         """
@@ -94,6 +96,18 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         The cursor position has been changed
         """
         self.update_suggested_verse_number()
+
+    def on_transepose_up_button_clicked(self):
+        """
+        The transpose up button clicked
+        """
+        print('...')
+
+    def on_transepose_down_button_clicked(self):
+        """
+        The transpose down button clicked
+        """
+        print('...')
 
     def update_suggested_verse_number(self):
         """

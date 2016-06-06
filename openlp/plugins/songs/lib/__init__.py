@@ -521,6 +521,18 @@ def strip_rtf(text, default_encoding=None):
     return text, default_encoding
 
 
+def transpose_lyrics(lyric, transepose_value):
+    """
+    Transepose lyrics
+
+    :param lyrcs: The lyrics to be transposed
+    :param transepose_value: The value to transpose the lyrics with
+    :return: The transposed lyrics
+    """
+    if '[' not in lyrics:
+        return lyrics
+    
+
 def delete_song(song_id, song_plugin):
     """
     Deletes a song from the database. Media files associated to the song are removed prior to the deletion of the song.
