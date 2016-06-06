@@ -37,7 +37,7 @@ from openlp.core.common import Settings, RegistryProperties, OpenLPMixin, Regist
 log = logging.getLogger(__name__)
 
 
-class HttpThread(QtCore.QThread):
+class WSThread(QtCore.QObject):
     """
     A special Qt thread class to allow the HTTP server to run at the same time as the UI.
     """
@@ -47,32 +47,34 @@ class HttpThread(QtCore.QThread):
 
         :param server: The http server class.
         """
-        super(HttpThread, self).__init__(None)
-        self.http_server = server
+        super().__init__()
+        self.ws_server = server
 
-    def run(self):
+    def start(self):
         """
         Run the thread.
         """
-        self.http_server.start_server()
+        self.ws_server.start_server()
 
     def stop(self):
-        self.http_server.stop = True
+        self.ws_server.stop = True
 
 
 class OpenWSServer(RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
-    def __init__(self, secure=False):
+    def __init__(self):
         """
         Initialise the http server, and start the server of the correct type http / https
         """
         super(OpenWSServer, self).__init__()
         self.settings_section = 'remotes'
-        self.secure = secure
-        self.http_thread = HttpThread(self)
-        self.http_thread.start()
+        self.thread = QtCore.QThread()
+        self.worker = WSThread(self)
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.start)
+        self.thread.start()
 
     def start_server(self):
         """
