@@ -38,6 +38,7 @@ function storeTransposeValue(songId,transposeValueToSet) {
   localStorage.setItem(songId + '_transposeValue', transposeValueToSet);
 }
 
+// NOTE: This function has a python equivalent in openlp/plugins/songs/lib/__init__.py - make sure to update both!
 function transposeChord(chord, transposeValue, notation) {
   var chordSplit = chord.replace('♭', 'b').split(/[\/\(\)]/);
   var transposedChord = '', note, notenumber, rest, currentChord;
@@ -174,36 +175,36 @@ window.OpenLP = {
     // Show the current slide on top. Any trailing slides for the same verse
     // are shown too underneath in grey.
     // Then leave a blank line between following verses
-  var transposeValue = getTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0]),
-                                         chordclass=/class="[a-z\s]*chord[a-z\s]*"\s*style="display:\s?none"/g,
-                                         chordclassshow='class="chord" style="display:inline"',
-                                         regchord=/<span class="chord" style="display:inline">([\(\w#b♭\+\*\d/\)-]+)<\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g,
-                                         replaceChords=function(mstr,$1,$2,$3,$4) {
-    var v='', w='';
-    var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
-    $1 = transposeChord($1, transposeValue, OpenLP.chordNotation);
-    for (var i = 0; i < $1.length; i++) if (slimchars.indexOf($1.charAt(i)) === -1) {$1len += 2;} else {$1len += 1;}
-    for (var i = 0; i < $2.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
-    for (var i = 0; i < $3.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
-    if ($1len>=$2len && !$4) {
-      if ($2.length){
-        if (!$3.length) {
-          for (c = 0; c < Math.ceil(($1len - $2len) / 2) + 1; c++) {w += '_';}
+    var transposeValue = getTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0]),
+                                           chordclass=/class="[a-z\s]*chord[a-z\s]*"\s*style="display:\s?none"/g,
+                                           chordclassshow='class="chord" style="display:inline"',
+                                           regchord=/<span class="chord" style="display:inline">([\(\w#b♭\+\*\d/\)-]+)<\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g,
+                                           replaceChords=function(mstr,$1,$2,$3,$4) {
+      var v='', w='';
+      var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
+      $1 = transposeChord($1, transposeValue, OpenLP.chordNotation);
+      for (var i = 0; i < $1.length; i++) if (slimchars.indexOf($1.charAt(i)) === -1) {$1len += 2;} else {$1len += 1;}
+      for (var i = 0; i < $2.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
+      for (var i = 0; i < $3.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
+      if ($1len >= $2len && !$4) {
+        if ($2.length){
+          if (!$3.length) {
+            for (c = 0; c < Math.ceil(($1len - $2len) / 2) + 1; c++) {w += '_';}
+          } else {
+            for (c = 0; c < $1len - $2len + 2; c++) {w += '&nbsp;';}
+          }
         } else {
-          for (c = 0; c < $1len - $2len + 2; c++) {w += '&nbsp;';}
-        }
+          if (!$3.length) {
+            for (c = 0; c < Math.floor(($1len - $2len) / 2) + 1; c++) {w += '_';}
+          } else {
+            for (c = 0; c < $1len - $2len + 1; c++) {w += '&nbsp;';}
+          }
+        };
       } else {
-        if (!$3.length) {
-          for (c = 0; c < Math.floor(($1len - $2len) / 2) + 1; c++) {w += '_';}
-        } else {
-          for (c = 0; c < $1len - $2len + 1; c++) {w += '&nbsp;';}
-        }
-      };
-    } else {
-      if (!$2 && $3.charAt(0) == ' ') {for (c = 0; c < $1len; c++) {w += '&nbsp;';}}
-    }
-    return $.grep(['<span class="chord" style="display:inline"><span><strong>', $1, '</strong></span>', $2, w, $3, '</span>', $4], Boolean).join('');
-  };
+        if (!$2 && $3.charAt(0) == ' ') {for (c = 0; c < $1len; c++) {w += '&nbsp;';}}
+      }
+      return $.grep(['<span class="chord" style="display:inline"><span><strong>', $1, '</strong></span>', $2, w, $3, '</span>', $4], Boolean).join('');
+    };
     $("#verseorder span").removeClass("currenttag");
     $("#tag" + OpenLP.currentTags[OpenLP.currentSlide]).addClass("currenttag");
     var slide = OpenLP.currentSlides[OpenLP.currentSlide];
@@ -286,7 +287,6 @@ window.OpenLP = {
         }
       }
     );
-//  $('span.chord').each(function(){this.style.display="inline"});
   }
 }
 $.ajaxSetup({ cache: false });
