@@ -552,13 +552,32 @@ def transpose_lyrics(lyrics, transepose_value):
     :param transepose_value: The value to transpose the lyrics with
     :return: The transposed lyrics
     """
-    if '[' not in lyrics:
-        return lyrics
+    # Split text by verse delimiter - both normal and optional
+    verse_list = re.split('(---\[.+?:.+?\]---|\[---\])', lyrics)
+    transposed_lyrics = ''
+    notation = Settings().value('songs/chord notation')
+    for verse in verse_list:
+        if verse.startswith('---[') or verse == '[---]':
+            transposed_lyrics += verse
+        else:
+            transposed_lyrics += transpose_verse(verse, transepose_value, notation)
+    return transposed_lyrics
+
+
+def transpose_verse(verse_text, transepose_value, notation):
+    """
+    Transepose lyrics
+
+    :param lyrcs: The lyrics to be transposed
+    :param transepose_value: The value to transpose the lyrics with
+    :return: The transposed lyrics
+    """
+    if '[' not in verse_text:
+        return verse_text
     # Split the lyrics based on chord tags
-    lyric_list = re.split('(\[|\]|/)', lyrics)
+    lyric_list = re.split('(\[|\]|/)', verse_text)
     transposed_lyrics = ''
     in_tag = False
-    notation = Settings().value('songs/chord notation')
     for word in lyric_list:
         if not in_tag:
             transposed_lyrics += word
@@ -575,7 +594,7 @@ def transpose_lyrics(lyrics, transepose_value):
                 transposed_lyrics += transpose_chord(word, transepose_value, notation)
     # If still inside a chord tag something is wrong!
     if in_tag:
-        return lyrics
+        return verse_text
     else:
         return transposed_lyrics
 
