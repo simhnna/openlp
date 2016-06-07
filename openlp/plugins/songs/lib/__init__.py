@@ -29,7 +29,7 @@ import re
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import AppLocation
+from openlp.core.common import AppLocation, Settings
 from openlp.core.lib import translate
 from openlp.core.utils import CONTROL_CHARS
 from openlp.plugins.songs.lib.db import MediaFile, Song
@@ -521,18 +521,6 @@ def strip_rtf(text, default_encoding=None):
     return text, default_encoding
 
 
-def transpose_lyrics(lyric, transepose_value):
-    """
-    Transepose lyrics
-
-    :param lyrcs: The lyrics to be transposed
-    :param transepose_value: The value to transpose the lyrics with
-    :return: The transposed lyrics
-    """
-    if '[' not in lyrics:
-        return lyrics
-    
-
 def delete_song(song_id, song_plugin):
     """
     Deletes a song from the database. Media files associated to the song are removed prior to the deletion of the song.
@@ -554,3 +542,107 @@ def delete_song(song_id, song_plugin):
     except OSError:
         log.exception('Could not remove directory: %s', save_path)
     song_plugin.manager.delete_object(Song, song_id)
+
+
+def transpose_lyrics(lyrics, transepose_value):
+    """
+    Transepose lyrics
+
+    :param lyrcs: The lyrics to be transposed
+    :param transepose_value: The value to transpose the lyrics with
+    :return: The transposed lyrics
+    """
+    if '[' not in lyrics:
+        return lyrics
+    # Split the lyrics based on chord tags
+    lyric_list = re.split('(\[|\]|/)', lyrics)
+    transposed_lyrics = ''
+    in_tag = False
+    notation = Settings().value('songs/chord notation')
+    for word in lyric_list:
+        if not in_tag:
+            transposed_lyrics += word
+            if word == '[':
+                in_tag = True
+        else:
+            if word == ']':
+                in_tag = False
+                transposed_lyrics += word
+            elif word == '/':
+                transposed_lyrics += word
+            else:
+                # This MUST be a chord
+                transposed_lyrics += transpose_chord(word, transepose_value, notation)
+    # If still inside a chord tag something is wrong!
+    if in_tag:
+        return lyrics
+    else:
+        return transposed_lyrics
+
+def transpose_chord(chord, transpose_value, notation):
+    """
+    Transpose chord according to the notation used.
+    NOTE: This function has a javascript equivalent in chords.js - make sure to update both!
+
+    :param chord: The chord to transpose.
+    :param transpose_value: The value the chord should be transposed.
+    :param notation: The notation to use when transposing.
+    :return: The transposed chord.
+    """
+    # See https://en.wikipedia.org/wiki/Musical_note#12-tone_chromatic_scale
+    notes_sharp_notation = {}
+    notes_flat_notation = {}
+    notes_sharp_notation['german'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','H']
+    notes_flat_notation['german'] = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','B','H']
+    notes_sharp_notation['english'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+    notes_flat_notation['english'] = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','Bb','B']
+    notes_sharp_notation['neo-latin'] = ['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si']
+    notes_flat_notation['neo-latin'] = ['Do','Reb','Re','Mib','Fab','Fa','Solb','Sol','Lab','La','Sib','Si']
+    chord_split = chord.replace('♭', 'b').split('/[\/\(\)]/')
+    transposed_chord = ''
+    note = ''
+    notenumber = -1
+    rest = ''
+    current_chord = ''
+    last_chord = ''
+    notes_sharp = notes_sharp_notation[notation]
+    notes_flat = notes_flat_notation[notation]
+    notes_preferred = ['b','#','#','#','#','#','#','#','#','#','#','#']
+    chord_notes = []
+    for i in range(0, len(chord_split)):
+        if i > 0:
+            transposed_chord += '/'
+        currentchord = chord_split[i]
+        if currentchord[0] == '(':
+            transposed_chord += '('
+            if len(currentchord) > 1:
+                currentchord = currentchord[1:]
+            else:
+                currentchord = ""
+        if len(currentchord) > 0:
+            if len(currentchord) > 1:
+                if '#b'.find(currentchord[1]) == -1:
+                    note = currentchord[0:1]
+                    rest = currentchord[1:]
+                else:
+                    note = currentchord[0:2]
+                    rest = currentchord[2:]
+            else:
+                note = currentchord
+                rest = ''
+            notenumber = notes_flat.index(note) if note not in notes_sharp else notes_sharp.index(note)
+            notenumber += transpose_value
+            while notenumber > 11:
+                notenumber -= 12
+            while notenumber < 0:
+                notenumber += 12
+            if i == 0:
+                current_chord = notes_sharp[notenumber] if notes_preferred[notenumber] == '#' else notes_flat[notenumber]
+                last_chord = current_chord
+            else:
+                current_chord = notes_flat[notenumber] if last_chord not in notes_sharp else notes_sharp[notenumber]
+            if not (note not in notes_flat and note not in notes_sharp):
+                transposed_chord += current_chord + rest
+            else:
+                transposed_chord += note + rest
+    return transposed_chord

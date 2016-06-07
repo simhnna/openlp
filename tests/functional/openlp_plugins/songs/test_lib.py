@@ -24,7 +24,7 @@ This module contains tests for the lib submodule of the Songs plugin.
 """
 from unittest import TestCase
 
-from openlp.plugins.songs.lib import VerseType, clean_string, clean_title, strip_rtf
+from openlp.plugins.songs.lib import VerseType, clean_string, clean_title, strip_rtf, transpose_chord
 from openlp.plugins.songs.lib.songcompare import songs_probably_equal, _remove_typos, _op_length
 from tests.functional import patch, MagicMock
 
@@ -263,6 +263,32 @@ class TestLib(TestCase):
 
             # THEN: The stripped text matches thed expected result
             assert result == exp_result, 'The result should be %s' % exp_result
+
+    def transpose_chord_up_test(self):
+        """
+        Test that the transpose_chord() method works when transposing up
+        """
+        # GIVEN: A Chord
+        chord = 'C'
+
+        # WHEN: Transposing it 1 up
+        new_chord = transpose_chord(chord, 1, 'english')
+
+        # THEN: The chord should be transposed up one note
+        self.assertEqual(new_chord, 'C#', 'The chord should be transposed up.')
+
+    def transpose_chord_down_test(self):
+        """
+        Test that the transpose_chord() method works when transposing down
+        """
+        # GIVEN: A Chord
+        chord = 'C'
+
+        # WHEN: Transposing it 1 down
+        new_chord = transpose_chord(chord, -1, 'english')
+
+        # THEN: The chord should be transposed down one note
+        self.assertEqual(new_chord, 'B', 'The chord should be transposed down.')
 
 
 class TestVerseType(TestCase):

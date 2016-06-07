@@ -25,7 +25,7 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.plugins.songs.lib import VerseType
+from openlp.plugins.songs.lib import VerseType, transpose_lyrics
 from .editversedialog import Ui_EditVerseDialog
 
 log = logging.getLogger(__name__)
@@ -101,13 +101,15 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         The transpose up button clicked
         """
-        print('...')
+        transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
+        self.verse_text_edit.setPlainText(transposed_lyrics)
 
     def on_transepose_down_button_clicked(self):
         """
         The transpose down button clicked
         """
-        print('...')
+        transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), -1)
+        self.verse_text_edit.setPlainText(transposed_lyrics)
 
     def update_suggested_verse_number(self):
         """
