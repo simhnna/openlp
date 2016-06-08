@@ -103,6 +103,8 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
         self.verse_text_edit.setPlainText(transposed_lyrics)
+        self.verse_text_edit.setFocus()
+        self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)
 
     def on_transepose_down_button_clicked(self):
         """
@@ -110,6 +112,8 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), -1)
         self.verse_text_edit.setPlainText(transposed_lyrics)
+        self.verse_text_edit.setFocus()
+        self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)
 
     def update_suggested_verse_number(self):
         """
