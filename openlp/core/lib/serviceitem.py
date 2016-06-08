@@ -34,7 +34,7 @@ import ntpath
 from PyQt5 import QtGui
 
 from openlp.core.common import RegistryProperties, Settings, translate, AppLocation, md5_hash
-from openlp.core.lib import ImageSource, build_icon, clean_tags, expand_tags, expand_chords
+from openlp.core.lib import ImageSource, build_icon, clean_tags, expand_tags, expand_chords, create_thumb
 
 log = logging.getLogger(__name__)
 
