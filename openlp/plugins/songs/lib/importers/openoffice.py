@@ -25,8 +25,7 @@ import time
 
 from PyQt5 import QtCore
 
-from openlp.core.common import is_win
-from openlp.core.utils import get_uno_command, get_uno_instance
+from openlp.core.common import is_win, get_uno_command, get_uno_instance
 from openlp.core.lib import translate
 from .songimport import SongImport
 
@@ -162,7 +161,7 @@ class OpenOfficeImport(SongImport):
             else:
                 self.import_wizard.increment_progress_bar('Processing file ' + file_path, 0)
         except AttributeError:
-            log.exception("open_ooo_file failed: %s", url)
+            log.exception("open_ooo_file failed: {url}".format(url=url))
         return
 
     def create_property(self, name, value):

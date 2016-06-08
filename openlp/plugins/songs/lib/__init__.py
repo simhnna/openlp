@@ -29,9 +29,8 @@ import re
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import AppLocation, Settings
+from openlp.core.common import AppLocation, CONTROL_CHARS, Settings
 from openlp.core.lib import translate
-from openlp.core.utils import CONTROL_CHARS
 from openlp.plugins.songs.lib.db import MediaFile, Song
 from .db import Author
 from .ui import SongStrings
@@ -256,6 +255,7 @@ class VerseType(object):
         for num, translation in enumerate(VerseType.translated_names):
             if verse_name == translation.lower():
                 return num
+        return None
 
     @staticmethod
     def from_loose_input(verse_name, default=Other):
@@ -271,7 +271,7 @@ class VerseType(object):
             if verse_index is None:
                 verse_index = VerseType.from_string(verse_name, default)
         elif len(verse_name) == 1:
-            verse_index = VerseType.from_translated_tag(verse_name, default)
+            verse_index = VerseType.from_translated_tag(verse_name, None)
             if verse_index is None:
                 verse_index = VerseType.from_tag(verse_name, default)
         else:
@@ -534,13 +534,13 @@ def delete_song(song_id, song_plugin):
         try:
             os.remove(media_file.file_name)
         except OSError:
-            log.exception('Could not remove file: %s', media_file.file_name)
+            log.exception('Could not remove file: {name}'.format(name=media_file.file_name))
     try:
         save_path = os.path.join(AppLocation.get_section_data_path(song_plugin.name), 'audio', str(song_id))
         if os.path.exists(save_path):
             os.rmdir(save_path)
     except OSError:
-        log.exception('Could not remove directory: %s', save_path)
+        log.exception('Could not remove directory: {path}'.format(path=save_path))
     song_plugin.manager.delete_object(Song, song_id)
 
 

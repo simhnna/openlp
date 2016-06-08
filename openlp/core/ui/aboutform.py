@@ -26,8 +26,8 @@ import webbrowser
 
 from PyQt5 import QtCore, QtWidgets
 
+from openlp.core.common.versionchecker import get_application_version
 from openlp.core.lib import translate
-from openlp.core.utils import get_application_version
 from .aboutdialog import UiAboutDialog
 
 
@@ -52,7 +52,7 @@ class AboutForm(QtWidgets.QDialog, UiAboutDialog):
         about_text = self.about_text_edit.toPlainText()
         about_text = about_text.replace('<version>', application_version['version'])
         if application_version['build']:
-            build_text = translate('OpenLP.AboutForm', ' build %s') % application_version['build']
+            build_text = translate('OpenLP.AboutForm', ' build {version}').format(version=application_version['build'])
         else:
             build_text = ''
         about_text = about_text.replace('<revision>', build_text)

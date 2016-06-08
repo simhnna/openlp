@@ -24,17 +24,16 @@ import logging
 
 from PyQt5 import QtGui
 
-
 from openlp.core.common import Settings, translate
+from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
-from openlp.core.lib.ui import create_action, UiStrings
 from openlp.core.lib.theme import VerticalType
+from openlp.core.lib.ui import create_action, UiStrings
 from openlp.core.ui import AlertLocation
-from openlp.core.utils.actions import ActionList
+from openlp.plugins.alerts.forms import AlertForm
 from openlp.plugins.alerts.lib import AlertsManager, AlertsTab
 from openlp.plugins.alerts.lib.db import init_schema
-from openlp.plugins.alerts.forms import AlertForm
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +88,7 @@ JAVASCRIPT = """
         }
     }
 """
+# TODO: Verify format() with variable templates
 CSS = """
     #alert {
         position: absolute;
@@ -245,6 +245,9 @@ class AlertsPlugin(Plugin):
         :param frame: The Web frame holding the page.
         """
         align = VerticalType.Names[self.settings_tab.location]
-        frame.evaluateJavaScript('update_css("%s", "%s", "%s", "%s", "%s")' %
-                                 (align, self.settings_tab.font_face, self.settings_tab.font_size,
-                                  self.settings_tab.font_color, self.settings_tab.background_color))
+        frame.evaluateJavaScript('update_css("{align}", "{face}", "{size}", "{color}", '
+                                 '"{background}")'.format(align=align,
+                                                          face=self.settings_tab.font_face,
+                                                          size=self.settings_tab.font_size,
+                                                          color=self.settings_tab.font_color,
+                                                          background=self.settings_tab.background_color))

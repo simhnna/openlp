@@ -107,8 +107,8 @@ class SongsTab(SettingsTab):
                                                           'Import missing songs from service files'))
         self.display_songbook_check_box.setText(translate('SongsPlugin.SongsTab', 'Display songbook in footer'))
         self.display_copyright_check_box.setText(translate('SongsPlugin.SongsTab',
-                                                           'Display "%s" symbol before copyright info') %
-                                                 SongStrings.CopyrightSymbol)
+                                                           'Display "{symbol}" symbol before copyright '
+                                                           'info').format(symbol=SongStrings.CopyrightSymbol))
         self.chords_group_box.setTitle(translate('SongsPlugin.SongsTab', 'Chords'))
         self.mainview_chords_check_box.setText(translate('SongsPlugin.SongsTab', 'Display chords in the main view'))
         self.disable_chords_import_check_box.setText(translate('SongsPlugin.SongsTab', 'Ignore chords when importing songs'))

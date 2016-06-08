@@ -35,7 +35,7 @@ import logging
 import os
 import time
 
-from openlp.core.common import is_win, Registry
+from openlp.core.common import is_win, Registry, get_uno_command, get_uno_instance, delete_file
 
 if is_win():
     from win32com.client import Dispatch
@@ -57,7 +57,7 @@ else:
 from PyQt5 import QtCore
 
 from openlp.core.lib import ScreenList
-from openlp.core.utils import delete_file, get_uno_command, get_uno_instance
+from openlp.core.common import get_uno_command, get_uno_instance
 from .presentationcontroller import PresentationController, PresentationDocument, TextType
 
 
@@ -236,7 +236,7 @@ class ImpressDocument(PresentationDocument):
         try:
             self.document = desktop.loadComponentFromURL(url, '_blank', 0, properties)
         except:
-            log.warning('Failed to load presentation %s' % url)
+            log.warning('Failed to load presentation {url}'.format(url=url))
             return False
         self.presentation = self.document.getPresentation()
         self.presentation.Display = ScreenList().current['number'] + 1
@@ -269,16 +269,16 @@ class ImpressDocument(PresentationDocument):
         for index in range(pages.getCount()):
             page = pages.getByIndex(index)
             doc.getCurrentController().setCurrentPage(page)
-            url_path = '%s/%s.png' % (thumb_dir_url, str(index + 1))
+            url_path = '{path}/{name}.png'.format(path=thumb_dir_url, name=str(index + 1))
             path = os.path.join(self.get_temp_folder(), str(index + 1) + '.png')
             try:
                 doc.storeToURL(url_path, properties)
                 self.convert_thumbnail(path, index + 1)
                 delete_file(path)
             except ErrorCodeIOException as exception:
-                log.exception('ERROR! ErrorCodeIOException %d' % exception.ErrCode)
+                log.exception('ERROR! ErrorCodeIOException {error:d}'.format(error=exception.ErrCode))
             except:
-                log.exception('%s - Unable to store openoffice preview' % path)
+                log.exception('{path} - Unable to store openoffice preview'.format(path=path))
 
     def create_property(self, name, value):
         """
