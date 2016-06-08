@@ -598,6 +598,7 @@ def transpose_verse(verse_text, transepose_value, notation):
     else:
         return transposed_lyrics
 
+
 def transpose_chord(chord, transpose_value, notation):
     """
     Transpose chord according to the notation used.
@@ -611,18 +612,18 @@ def transpose_chord(chord, transpose_value, notation):
     # See https://en.wikipedia.org/wiki/Musical_note#12-tone_chromatic_scale
     notes_sharp_notation = {}
     notes_flat_notation = {}
-    notes_sharp_notation['german'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','H']
-    notes_flat_notation['german'] = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','B','H']
-    notes_sharp_notation['english'] = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
-    notes_flat_notation['english'] = ['C','Db','D','Eb','Fb','F','Gb','G','Ab','A','Bb','B']
-    notes_sharp_notation['neo-latin'] = ['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si']
-    notes_flat_notation['neo-latin'] = ['Do','Reb','Re','Mib','Fab','Fa','Solb','Sol','Lab','La','Sib','Si']
+    notes_sharp_notation['german'] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H']
+    notes_flat_notation['german'] = ['C', 'Db', 'D', 'Eb', 'Fb', 'F', 'Gb', 'G', 'Ab', 'A', 'B', 'H']
+    notes_sharp_notation['english'] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+    notes_flat_notation['english'] = ['C', 'Db', 'D', 'Eb', 'Fb', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
+    notes_sharp_notation['neo-latin'] = ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si']
+    notes_flat_notation['neo-latin'] = ['Do', 'Reb', 'Re', 'Mib', 'Fab', 'Fa', 'Solb', 'Sol', 'Lab', 'La', 'Sib', 'Si']
     chord_split = chord.replace('♭', 'b').split('/[\/\(\)]/')
     transposed_chord = ''
     last_chord = ''
     notes_sharp = notes_sharp_notation[notation]
     notes_flat = notes_flat_notation[notation]
-    notes_preferred = ['b','#','#','#','#','#','#','#','#','#','#','#']
+    notes_preferred = ['b', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#']
     for i in range(0, len(chord_split)):
         if i > 0:
             transposed_chord += '/'
@@ -651,7 +652,8 @@ def transpose_chord(chord, transpose_value, notation):
             while notenumber < 0:
                 notenumber += 12
             if i == 0:
-                current_chord = notes_sharp[notenumber] if notes_preferred[notenumber] == '#' else notes_flat[notenumber]
+                current_chord = notes_sharp[notenumber] if notes_preferred[notenumber] == '#' else notes_flat[
+                    notenumber]
                 last_chord = current_chord
             else:
                 current_chord = notes_flat[notenumber] if last_chord not in notes_sharp else notes_sharp[notenumber]

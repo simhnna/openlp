@@ -111,11 +111,13 @@ class SongsTab(SettingsTab):
                                                            'info').format(symbol=SongStrings.CopyrightSymbol))
         self.chords_group_box.setTitle(translate('SongsPlugin.SongsTab', 'Chords'))
         self.mainview_chords_check_box.setText(translate('SongsPlugin.SongsTab', 'Display chords in the main view'))
-        self.disable_chords_import_check_box.setText(translate('SongsPlugin.SongsTab', 'Ignore chords when importing songs'))
+        self.disable_chords_import_check_box.setText(translate('SongsPlugin.SongsTab',
+                                                               'Ignore chords when importing songs'))
         self.chord_notation_label.setText(translate('SongsPlugin.SongsTab', 'Chord notation to use:'))
         self.english_notation_radio_button.setText(translate('SongsPlugin.SongsTab', 'English') + ' (C-D-E-F-G-A-B)')
         self.german_notation_radio_button.setText(translate('SongsPlugin.SongsTab', 'German') + ' (C-D-E-F-G-A-H)')
-        self.neolatin_notation_radio_button.setText(translate('SongsPlugin.SongsTab', 'Neo-Latin') + ' (Do-Re-Mi-Fa-Sol-La-Si)')
+        self.neolatin_notation_radio_button.setText(
+            translate('SongsPlugin.SongsTab', 'Neo-Latin') + ' (Do-Re-Mi-Fa-Sol-La-Si)')
 
     def on_search_as_type_check_box_changed(self, check_state):
         self.song_search = (check_state == QtCore.Qt.Checked)
