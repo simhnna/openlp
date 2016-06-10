@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
@@ -20,18 +19,49 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+"""
+HTTP Error classes
+"""
 
-import asyncio
-import websockets
-import random
 
-async def tester():
-    async with websockets.connect('ws://localhost:4317/poll') as websocket:
+class HttpError(Exception):
+    """
+    A base HTTP error (aka status code)
+    """
+    def __init__(self, status, message):
+        """
+        Initialise the exception
+        """
+        super(HttpError, self).__init__(message)
+        self.status = status
+        self.message = message
 
-        while True:
-            greeting = await websocket.recv()
-            print("< {}".format(greeting))
-            import time
-            time.sleep(random.random() * 3)
+    def to_response(self):
+        """
+        Convert this exception to a Response object
+        """
+        return self.message, self.status
 
-asyncio.get_event_loop().run_until_complete(tester())
+
+class NotFound(HttpError):
+    """
+    A 404
+    """
+    def __init__(self):
+        """
+        Make this a 404
+        """
+        super(NotFound, self).__init__(404, 'Not Found')
+
+
+class ServerError(HttpError):
+    """
+    A 500
+    """
+    def __init__(self):
+        """
+        Make this a 500
+        """
+        super(ServerError, self).__init__(500, 'Server Error')
+
+

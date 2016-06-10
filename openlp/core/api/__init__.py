@@ -20,55 +20,39 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-"""
-The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
-with OpenLP. It uses JSON to communicate with the remotes.
-"""
+from .errors import NotFound, ServerError
+from .httprouter import WSGIApplication
 
-import logging
-from waitress import serve
-
-from PyQt5 import QtCore
-
-from openlp.core.common import RegistryProperties, OpenLPMixin
-
-log = logging.getLogger(__name__)
+application = WSGIApplication('api')
 
 
-class HttpThread(QtCore.QObject):
+def _route_from_url(url_prefix, url):
     """
-    A special Qt thread class to allow the HTTP server to run at the same time as the UI.
+    Create a route from the URL
     """
-    def __init__(self):
-        """
-        Constructor for the thread class.
-
-        :param server: The http server class.
-        """
-        super().__init__()
-
-    def start(self):
-        """
-        Run the thread.
-        """
-        wsgiapp = object()
-        serve(wsgiapp, host='0.0.0.0', port=4317)
-
-    def stop(self):
-        pass
+    url_prefix = '/{prefix}/'.format(prefix=url_prefix.strip('/'))
+    if not url:
+        url = url_prefix[:-1]
+    else:
+        url = url_prefix + url
+    url = url.replace('//', '/')
+    return url
 
 
-class OpenLPHttpServer(RegistryProperties, OpenLPMixin):
+def register_endpoint(endpoint):
     """
-    Wrapper round a server instance
+    Register an endpoint with the app
     """
-    def __init__(self):
-        """
-        Initialise the http server, and start the server of the correct type http / https
-        """
-        super(OpenLPHttpServer, self).__init__()
-        self.thread = QtCore.QThread()
-        self.worker = HttpThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.start)
-        self.thread.start()
+    print("ep", endpoint)
+    for url, view_func, method, secure in endpoint.routes:
+        route = _route_from_url(endpoint.url_prefix, url)
+        application.add_route(route, view_func, method, secure)
+
+from .endpoint import Endpoint
+from .apitab import ApiTab
+from .poll import OpenLPPoll
+from .wsserver import OpenWSServer
+from .httpserver import OpenLPHttpServer
+from .apicontroller import ApiController
+
+__all__ = ['OpenLPPoll', 'RemoteController', 'OpenLPHttpServer', 'application']

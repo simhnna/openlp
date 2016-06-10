@@ -29,7 +29,6 @@ import asyncio
 import websockets
 import logging
 import time
-import sys
 
 from PyQt5 import QtCore
 
@@ -82,7 +81,7 @@ class OpenWSServer(RegistryProperties, OpenLPMixin):
         Start the correct server and save the handler
         """
         address = Settings().value(self.settings_section + '/ip address')
-        port = '4318'
+        port = '4317'
         self.start_websocket_instance(address, port)
         # If web socket server start listening
         if hasattr(self, 'ws_server') and self.ws_server:

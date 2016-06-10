@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
-# vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
-
+<!DOCTYPE html>
+<html>
+<!--
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
@@ -19,39 +19,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import logging
-
-from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
-from openlp.core.lib.api import OpenWSServer, OpenLPPoll, OpenLPHttpServer
-
-log = logging.getLogger(__name__)
-
-
-class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
-    """
-    The implementation of the Media Controller. The Media Controller adds an own class for every Player.
-    Currently these are QtWebkit, Phonon and Vlc. display_controllers are an array of controllers keyed on the
-    slidecontroller or plugin which built them.
-
-    ControllerType is the class containing the key values.
-
-    media_players are an array of media players keyed on player name.
-
-    current_media_players is an array of player instances keyed on ControllerType.
-
-    """
-    def __init__(self, parent=None):
-        """
-        Constructor
-        """
-        super(ApiController, self).__init__(parent)
-        # Registry().register_function('playbackPlay', self.media_play_msg)
-
-    def bootstrap_post_set_up(self):
-        """
-        process the bootstrap post setup request
-        """
-        self.poll = OpenLPPoll()
-        Registry().register('OpenLPPoll', self.poll)
-        self.wsserver = OpenWSServer()
-        self.httpserver = OpenLPHttpServer()
+-->
+<head>
+  <meta charset="utf-8" />
+  <title>${live_title}</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
+  <script type="text/javascript" src="/assets/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/main.js"></script>
+</head>
+<body>
+<img id="image" class="size"/>
+</body>
+</html>

@@ -26,9 +26,9 @@ import os
 import urllib.request
 from unittest import TestCase
 
+from openlp.core.api.api import OpenLPPoll
 from openlp.core.common import Settings, Registry
 from openlp.core.ui import ServiceManager
-from openlp.core.lib.api import OpenLPPoll
 from openlp.plugins.remotes.lib.httpserver import HttpRouter
 from tests.functional import MagicMock, patch, mock_open
 from tests.helpers.testmixin import TestMixin

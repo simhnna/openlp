@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
@@ -20,18 +19,40 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
 
-import asyncio
-import websockets
-import random
+from openlp.core.api import OpenWSServer, OpenLPPoll, OpenLPHttpServer
+from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
+from openlp.core.api.uiinterfaces import stage_endpoint
 
-async def tester():
-    async with websockets.connect('ws://localhost:4317/poll') as websocket:
+log = logging.getLogger(__name__)
 
-        while True:
-            greeting = await websocket.recv()
-            print("< {}".format(greeting))
-            import time
-            time.sleep(random.random() * 3)
 
-asyncio.get_event_loop().run_until_complete(tester())
+class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
+    """
+    The implementation of the Media Controller. The Media Controller adds an own class for every Player.
+    Currently these are QtWebkit, Phonon and Vlc. display_controllers are an array of controllers keyed on the
+    slidecontroller or plugin which built them.
+
+    ControllerType is the class containing the key values.
+
+    media_players are an array of media players keyed on player name.
+
+    current_media_players is an array of player instances keyed on ControllerType.
+
+    """
+    def __init__(self, parent=None):
+        """
+        Constructor
+        """
+        super(ApiController, self).__init__(parent)
+        print("apic")
+
+    def bootstrap_post_set_up(self):
+        """
+        process the bootstrap post setup request
+        """
+        self.poll = OpenLPPoll()
+        Registry().register('OpenLPPoll', self.poll)
+        self.wsserver = OpenWSServer()
+        self.httpserver = OpenLPHttpServer()

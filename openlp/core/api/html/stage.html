@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
-
+<!DOCTYPE html>
+<html>
+<!--
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
@@ -20,18 +19,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-import asyncio
-import websockets
-import random
-
-async def tester():
-    async with websockets.connect('ws://localhost:4317/poll') as websocket:
-
-        while True:
-            greeting = await websocket.recv()
-            print("< {}".format(greeting))
-            import time
-            time.sleep(random.random() * 3)
-
-asyncio.get_event_loop().run_until_complete(tester())
+-->
+<head>
+  <meta charset="utf-8" />
+  <title>${stage_title}</title>
+  <link rel="stylesheet" href="/css/stage.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
+  <script type="text/javascript" src="/assets/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/stage.js"></script>
+</head>
+<body>
+<input type="hidden" id="next-text" value="${next}" />
+<div id="right">
+  <div id="clock"></div>
+  <div id="notes"></div>
+</div>
+<div id="verseorder"></div>
+<div id="currentslide"></div>
+<div id="nextslide"></div>
+</body>
+</html>
