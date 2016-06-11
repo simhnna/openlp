@@ -19,36 +19,37 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import logging
+"""
+Functional tests to test the API Error Class.
+"""
 
-from openlp.core.api import OpenLPWSServer, OpenLPPoll, OpenLPHttpServer
-from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
+from unittest import TestCase
 
-# These are here to load the endpoints
-from openlp.core.api.coreendpoints import stage_endpoint
-from openlp.core.api.controllerendpoints import controller_endpoint
+from openlp.core.api import ApiController
+from openlp.core.common import Registry
 
-log = logging.getLogger(__name__)
+from tests.functional import patch
 
 
-class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
+class TestApiController(TestCase):
     """
-    The APIController handles the starting of the API middleware.
-    The HTTP and Websocket servers are started
-    The core endpoints are generated (just by their declaration).
-
+    A test suite to test out the Error in the API code
     """
-    def __init__(self, parent=None):
+    @patch('openlp.core.api.apicontroller.OpenLPPoll')
+    @patch('openlp.core.api.apicontroller.OpenLPWSServer')
+    @patch('openlp.core.api.apicontroller.OpenLPHttpServer')
+    def test_bootstrap(self, mock_http, mock_ws, mock_poll):
         """
-        Constructor
+        Test the Not Found error displays the correct information
         """
-        super(ApiController, self).__init__(parent)
+        # GIVEN: A controller
+        Registry.create()
+        apicontroller = ApiController()
 
-    def bootstrap_post_set_up(self):
-        """
-        Register the poll return service and start the servers.
-        """
-        self.poll = OpenLPPoll()
-        Registry().register('OpenLPPoll', self.poll)
-        self.wsserver = OpenLPWSServer()
-        self.httpserver = OpenLPHttpServer()
+        # WHEN: I call the bootstrap
+        apicontroller.bootstrap_post_set_up()
+
+        # THEN: the api environment should have been created
+        self.assertEquals(1, mock_http.call_count, 'The Http server should have been called once')
+        self.assertEquals(1, mock_ws.call_count, 'The WS server should have been called once')
+        self.assertEquals(1, mock_poll.call_count, 'The OpenLPPoll should have been called once')

@@ -51,7 +51,7 @@ def register_endpoint(end_point):
 from .endpoint import Endpoint
 from .apitab import ApiTab
 from .poll import OpenLPPoll
-from .wsserver import OpenWSServer
+from .wsserver import OpenLPWSServer
 from .httpserver import OpenLPHttpServer
 from .apicontroller import ApiController
 

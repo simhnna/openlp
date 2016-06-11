@@ -36,9 +36,12 @@ class TestApiError(TestCase):
         """
         Test the Not Found error displays the correct information
         """
+        # GIVEN:
+        # WHEN: I raise an exception
         with self.assertRaises(Exception) as context:
             raise NotFound()
 
+        # THEN: we get an error and a status
         self.assertEquals('Not Found', context.exception.message, 'A Not Found exception should be thrown')
         self.assertEquals(404, context.exception.status, 'A 404 status should be thrown')
 
@@ -46,8 +49,11 @@ class TestApiError(TestCase):
         """
         Test the server error displays the correct information
         """
+        # GIVEN:
+        # WHEN: I raise an exception
         with self.assertRaises(Exception) as context:
             raise ServerError()
 
+        # THEN: we get an error and a status
         self.assertEquals('Server Error', context.exception.message, 'A Not Found exception should be thrown')
         self.assertEquals(500, context.exception.status, 'A 500 status should be thrown')

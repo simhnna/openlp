@@ -60,7 +60,7 @@ class WSThread(QtCore.QObject):
         self.ws_server.stop = True
 
 
-class OpenWSServer(RegistryProperties, OpenLPMixin):
+class OpenLPWSServer(RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
@@ -68,7 +68,7 @@ class OpenWSServer(RegistryProperties, OpenLPMixin):
         """
         Initialise the http server, and start the server of the correct type http / https
         """
-        super(OpenWSServer, self).__init__()
+        super(OpenLPWSServer, self).__init__()
         self.settings_section = 'remotes'
         self.thread = QtCore.QThread()
         self.worker = WSThread(self)

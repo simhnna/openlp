@@ -26,7 +26,7 @@ import os
 import urllib.request
 from unittest import TestCase
 
-from openlp.core.api.api import OpenLPPoll
+from openlp.core.api.poll import OpenLPPoll
 from openlp.core.common import Settings, Registry
 from openlp.core.ui import ServiceManager
 from openlp.plugins.remotes.lib.httpserver import HttpRouter
