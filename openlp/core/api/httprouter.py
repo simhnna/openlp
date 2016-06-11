@@ -37,6 +37,7 @@ def _make_response(view_result):
     """
     Create a Response object from response
     """
+    print(view_result)
     if isinstance(view_result, Response):
         return view_result
     elif isinstance(view_result, tuple):
@@ -54,8 +55,12 @@ def _make_response(view_result):
         return Response(body=json.dumps(view_result), status=200,
                         content_type='application/json', charset='utf8')
     elif isinstance(view_result, str):
-        return Response(body=view_result, status=200,
-                        content_type='text/html', charset='utf8')
+        if 'body {' in view_result:
+            return Response(body=view_result, status=200,
+                            content_type='text/css', charset='utf8')
+        else:
+            return Response(body=view_result, status=200,
+                            content_type='text/html', charset='utf8')
 
 
 def _handle_exception(error):
@@ -92,14 +97,13 @@ class WSGIApplication(object):
         """
         Find the appropriate URL and run the view function
         """
-        print(request.path)
-        print(self.route_map.items())
         for route, views in self.route_map.items():
             if re.match(route, request.path):
                 if request.method.upper() in views:
                     log.debug('Found {method} {url}'.format(method=request.method, url=request.path))
                     view_func = views[request.method.upper()]['function']
                     return _make_response(view_func(request))
+        log.error('Not Found url {url} '.format(url=request.path))
         raise NotFound()
 
     def wsgi_app(self, environ, start_response):

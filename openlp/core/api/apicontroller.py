@@ -23,7 +23,10 @@ import logging
 
 from openlp.core.api import OpenWSServer, OpenLPPoll, OpenLPHttpServer
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
-from openlp.core.api.uiinterfaces import stage_endpoint
+
+# These are here to load the endpoints
+from openlp.core.api.coreendpoints import stage_endpoint
+from openlp.core.api.controllerendpoints import controller_endpoint
 
 log = logging.getLogger(__name__)
 

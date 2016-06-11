@@ -1,0 +1,122 @@
+# -*- coding: utf-8 -*-
+# vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
+
+###############################################################################
+# OpenLP - Open Source Lyrics Projection                                      #
+# --------------------------------------------------------------------------- #
+# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# --------------------------------------------------------------------------- #
+# This program is free software; you can redistribute it and/or modify it     #
+# under the terms of the GNU General Public License as published by the Free  #
+# Software Foundation; version 2 of the License.                              #
+#                                                                             #
+# This program is distributed in the hope that it will be useful, but WITHOUT #
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       #
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for    #
+# more details.                                                               #
+#                                                                             #
+# You should have received a copy of the GNU General Public License along     #
+# with this program; if not, write to the Free Software Foundation, Inc., 59  #
+# Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
+###############################################################################
+import logging
+import os
+import urllib.request
+import urllib.error
+
+from openlp.core.api import Endpoint, register_endpoint
+from openlp.core.common import Registry, AppLocation, Settings
+from openlp.core.lib import ItemCapabilities, create_thumb
+
+log = logging.getLogger(__name__)
+
+controller_endpoint = Endpoint('api')
+
+
+@controller_endpoint.route('controller/live/text')
+def controller_text(request):
+    """
+    Perform an action on the slide controller.
+
+    :param request: the http request - not used
+    """
+    log.debug("controller_text ")
+    live_controller = Registry().get('live_controller')
+    current_item = live_controller.service_item
+    data = []
+    if current_item:
+        for index, frame in enumerate(current_item.get_frames()):
+            item = {}
+            # Handle text (songs, custom, bibles)
+            if current_item.is_text():
+                if frame['verseTag']:
+                    item['tag'] = str(frame['verseTag'])
+                else:
+                    item['tag'] = str(index + 1)
+                item['text'] = str(frame['text'])
+                item['html'] = str(frame['html'])
+            # Handle images, unless a custom thumbnail is given or if thumbnails is disabled
+            elif current_item.is_image() and not frame.get('image', '') and Settings().value('remotes/thumbnails'):
+                item['tag'] = str(index + 1)
+                thumbnail_path = os.path.join('images', 'thumbnails', frame['title'])
+                full_thumbnail_path = os.path.join(AppLocation.get_data_path(), thumbnail_path)
+                # Create thumbnail if it doesn't exists
+                if not os.path.exists(full_thumbnail_path):
+                    create_thumb(current_item.get_frame_path(index), full_thumbnail_path, False)
+                item['img'] = urllib.request.pathname2url(os.path.sep + thumbnail_path)
+                item['text'] = str(frame['title'])
+                item['html'] = str(frame['title'])
+            else:
+                # Handle presentation etc.
+                item['tag'] = str(index + 1)
+                if current_item.is_capable(ItemCapabilities.HasDisplayTitle):
+                    item['title'] = str(frame['display_title'])
+                if current_item.is_capable(ItemCapabilities.HasNotes):
+                    item['slide_notes'] = str(frame['notes'])
+                if current_item.is_capable(ItemCapabilities.HasThumbnails) and \
+                        Settings().value('remotes/thumbnails'):
+                    # If the file is under our app directory tree send the portion after the match
+                    data_path = AppLocation.get_data_path()
+                    if frame['image'][0:len(data_path)] == data_path:
+                        item['img'] = urllib.request.pathname2url(frame['image'][len(data_path):])
+                item['text'] = str(frame['title'])
+                item['html'] = str(frame['title'])
+            item['selected'] = (live_controller.selected_row == index)
+            data.append(item)
+    json_data = {'results': {'slides': data}}
+    if current_item:
+        json_data['results']['item'] = live_controller.service_item.unique_identifier
+    return json_data
+
+
+@controller_endpoint.route('service/list')
+def service_list(request):
+    """
+    Handles requests for service items in the service manager
+
+    """
+    return {'results': {'items': get_service_items()}}
+
+
+def get_service_items():
+    """
+    Read the service item in use and return the data as a json object
+    """
+    live_controller = Registry().get('live_controller')
+    service_items = []
+    if live_controller.service_item:
+        current_unique_identifier = live_controller.service_item.unique_identifier
+    else:
+        current_unique_identifier = None
+    for item in Registry().get('service_manager').service_items:
+        service_item = item['service_item']
+        service_items.append({
+            'id': str(service_item.unique_identifier),
+            'title': str(service_item.get_display_title()),
+            'plugin': str(service_item.name),
+            'notes': str(service_item.notes),
+            'selected': (service_item.unique_identifier == current_unique_identifier)
+        })
+    return service_items
+
+register_endpoint(controller_endpoint)
