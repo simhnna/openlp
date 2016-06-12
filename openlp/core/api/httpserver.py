@@ -52,7 +52,6 @@ class HttpThread(QtCore.QObject):
         """
         Run the thread.
         """
-        print("start")
         serve(application, host='0.0.0.0', port=4318)
 
     def stop(self):

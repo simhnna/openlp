@@ -43,7 +43,6 @@ def register_endpoint(end_point):
     """
     Register an endpoint with the app
     """
-    print("ep", end_point)
     for url, view_func, method, secure in end_point.routes:
         route = _route_from_url(end_point.url_prefix, url)
         application.add_route(route, view_func, method, secure)
