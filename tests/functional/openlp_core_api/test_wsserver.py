@@ -25,24 +25,24 @@ Functional tests to test the Http Server Class.
 
 from unittest import TestCase
 
-from openlp.core.api import OpenLPHttpServer
+from openlp.core.api import OpenLPWSServer
 
 from tests.functional import patch
 
 
-class TestHttpServer(TestCase):
+class TestWSServer(TestCase):
     """
-    A test suite to test starting the http server
+    A test suite to test starting the websocket server
     """
-    @patch('openlp.core.api.httpserver.HttpThread')
-    @patch('openlp.core.api.httpserver.QtCore.QThread')
+    @patch('openlp.core.api.wsserver.WSThread')
+    @patch('openlp.core.api.wsserver.QtCore.QThread')
     def test_serverstart(self, mock_qthread, mock_thread):
         """
-        Test the starting of the Waitress Server
+        Test the starting of the WebSockets Server
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        server = OpenLPHttpServer()
+        server = OpenLPWSServer()
 
         # THEN: the api environment should have been created
         self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
