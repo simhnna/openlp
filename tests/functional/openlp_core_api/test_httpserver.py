@@ -19,56 +19,31 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 """
-The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
-with OpenLP. It uses JSON to communicate with the remotes.
+Functional tests to test the Http Server Class.
 """
 
-import logging
+from unittest import TestCase
 
-from PyQt5 import QtCore
-from waitress import serve
+from openlp.core.api import OpenLPHttpServer
 
-from openlp.core.api import application
-from openlp.core.common import RegistryProperties, OpenLPMixin
-
-log = logging.getLogger(__name__)
+from tests.functional import patch
 
 
-class HttpThread(QtCore.QObject):
+class TestHttpServer(TestCase):
     """
-    A special Qt thread class to allow the HTTP server to run at the same time as the UI.
+    A test suite to test starting the http server
     """
-    def __init__(self):
+    @patch('openlp.core.api.httpserver.HttpThread')
+    @patch('openlp.core.api.httpserver.QtCore.QThread')
+    def test_bootstrap(self, mock_qthread, mock_thread):
         """
-        Constructor for the thread class.
+        Test the starting of the Waitress Server
+        """
+        # GIVEN: A new httpserver
+        # WHEN: I start the server
+        server = OpenLPHttpServer()
 
-        :param server: The http server class.
-        """
-        super().__init__()
-
-    def start(self):
-        """
-        Run the thread.
-        """
-        serve(application, host='0.0.0.0', port=4318)
-
-    def stop(self):
-        pass
-
-
-class OpenLPHttpServer(RegistryProperties, OpenLPMixin):
-    """
-    Wrapper round a server instance
-    """
-    def __init__(self):
-        """
-        Initialise the http server, and start the http server
-        """
-        super(OpenLPHttpServer, self).__init__()
-        self.thread = QtCore.QThread()
-        self.worker = HttpThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.start)
-        self.thread.start()
+        # THEN: the api environment should have been created
+        self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
+        self.assertEquals(1, mock_thread.call_count, 'The http thread should have been called once')

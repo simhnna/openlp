@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 
 class WSThread(QtCore.QObject):
     """
-    A special Qt thread class to allow the HTTP server to run at the same time as the UI.
+    A special Qt thread class to allow the WebSockets server to run at the same time as the UI.
     """
     def __init__(self, server):
         """
@@ -66,7 +66,7 @@ class OpenLPWSServer(RegistryProperties, OpenLPMixin):
     """
     def __init__(self):
         """
-        Initialise the http server, and start the server of the correct type http / https
+        Initialise the http server, and start the WebSockets server
         """
         super(OpenLPWSServer, self).__init__()
         self.settings_section = 'remotes'
@@ -115,10 +115,11 @@ class OpenLPWSServer(RegistryProperties, OpenLPMixin):
     def handle_websocket(request, path):
         """
         Handle web socket requests and return the poll information.
-        Check ever 0.5 seconds to get the latest postion and send if changed.
+        Check ever 0.2 seconds to get the latest position and send if changed.
         Only gets triggered when 1st client attaches
+
         :param request: request from client
-        :param path: not used - future to register for a different end point
+        :param path: determines the endpoints supported
         :return:
         """
         log.debug("web socket handler registered with client")
