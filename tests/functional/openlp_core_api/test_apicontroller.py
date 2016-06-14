@@ -36,7 +36,7 @@ class TestApiController(TestCase):
     A test suite to test out the Error in the API code
     """
     @patch('openlp.core.api.apicontroller.Poll')
-    @patch('openlp.core.api.apicontroller.WsServer')
+    @patch('openlp.core.api.apicontroller.WebSocketServer')
     @patch('openlp.core.api.apicontroller.HttpServer')
     def test_bootstrap(self, mock_http, mock_ws, mock_poll):
         """
