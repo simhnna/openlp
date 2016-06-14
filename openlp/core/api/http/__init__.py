@@ -20,55 +20,29 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-"""
-The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
-with OpenLP. It uses JSON to communicate with the remotes.
-"""
+from openlp.core.api.http.wsgiapp import WSGIApplication
 
-import logging
-
-from PyQt5 import QtCore
-from waitress import serve
-
-from openlp.core.api import application
-from openlp.core.common import RegistryProperties, OpenLPMixin
-
-log = logging.getLogger(__name__)
+application = WSGIApplication('api')
 
 
-class HttpThread(QtCore.QObject):
+def _route_from_url(url_prefix, url):
     """
-    A special Qt thread class to allow the HTTP server to run at the same time as the UI.
+    Create a route from the URL
     """
-    def __init__(self):
-        """
-        Constructor for the thread class.
-
-        :param server: The http server class.
-        """
-        super().__init__()
-
-    def start(self):
-        """
-        Run the thread.
-        """
-        serve(application, host='0.0.0.0', port=4318)
-
-    def stop(self):
-        pass
+    url_prefix = '/{prefix}/'.format(prefix=url_prefix.strip('/'))
+    if not url:
+        url = url_prefix[:-1]
+    else:
+        url = url_prefix + url
+    url = url.replace('//', '/')
+    return url
 
 
-class OpenLPHttpServer(RegistryProperties, OpenLPMixin):
+def register_endpoint(end_point):
     """
-    Wrapper round a server instance
+    Register an endpoint with the app
     """
-    def __init__(self):
-        """
-        Initialise the http server, and start the http server
-        """
-        super(OpenLPHttpServer, self).__init__()
-        self.thread = QtCore.QThread()
-        self.worker = HttpThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.start)
-        self.thread.start()
+    for url, view_func, method, secure in end_point.routes:
+        route = _route_from_url(end_point.url_prefix, url)
+        application.add_route(route, view_func, method, secure)
+

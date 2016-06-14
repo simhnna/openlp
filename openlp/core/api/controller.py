@@ -19,10 +19,34 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
 
-from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint
-from openlp.core.api.tab import ApiTab
-from openlp.core.api.controller import ApiController
+from openlp.core.api.http.server import HttpServer
+from openlp.core.api.websockets import WebSocketServer
+from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
 
-__all__ = ['Endpoint', 'ApiController', 'ApiTab', 'register_endpoint']
+log = logging.getLogger(__name__)
+
+
+class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
+    """
+    The APIController handles the starting of the API middleware.
+    The HTTP and Websocket servers are started
+    The core endpoints are generated (just by their declaration).
+
+    """
+    def __init__(self, parent=None):
+        """
+        Constructor
+        """
+        super(ApiController, self).__init__(parent)
+
+    def bootstrap_post_set_up(self):
+        """
+        Register the poll return service and start the servers.
+        """
+        self.poller = Poller()
+        Registry().register('Poller', self.poller)
+        self.ws_server = WebSocketServer()
+        self.http_server = HttpServer()
+

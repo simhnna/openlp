@@ -37,7 +37,7 @@ from openlp.core.common import Settings, RegistryProperties, OpenLPMixin, Regist
 log = logging.getLogger(__name__)
 
 
-class WSThread(QtCore.QObject):
+class WebSocketWorker(QtCore.QObject):
     """
     A special Qt thread class to allow the WebSockets server to run at the same time as the UI.
     """
@@ -47,7 +47,7 @@ class WSThread(QtCore.QObject):
 
         :param server: The http server class.
         """
-        super().__init__()
+        super(WebSocketWorker).__init__()
         self.ws_server = server
 
     def start(self):
@@ -60,7 +60,7 @@ class WSThread(QtCore.QObject):
         self.ws_server.stop = True
 
 
-class OpenLPWSServer(RegistryProperties, OpenLPMixin):
+class WebSocketServer(RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
@@ -68,10 +68,10 @@ class OpenLPWSServer(RegistryProperties, OpenLPMixin):
         """
         Initialise the http server, and start the WebSockets server
         """
-        super(OpenLPWSServer, self).__init__()
+        super(WebSocketServer, self).__init__()
         self.settings_section = 'remotes'
         self.thread = QtCore.QThread()
-        self.worker = WSThread(self)
+        self.worker = WebSocketWorker(self)
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.start)
         self.thread.start()
@@ -125,17 +125,18 @@ class OpenLPWSServer(RegistryProperties, OpenLPMixin):
         log.debug("web socket handler registered with client")
         previous_poll = None
         previous_main_poll = None
-        openlppoll = Registry().get('OpenLPPoll')
+        poller = Registry().get('Poller')
+        # TODO: FIXME: These URLs need to be named better
         if path == '/poll':
             while True:
-                current_poll = openlppoll.poll()
+                current_poll = poller.poll()
                 if current_poll != previous_poll:
                     yield from request.send(current_poll)
                     previous_poll = current_poll
                 yield from asyncio.sleep(0.2)
         elif path == '/main_poll':
             while True:
-                main_poll = openlppoll.main_poll()
+                main_poll = poller.main_poll()
                 if main_poll != previous_main_poll:
                     yield from request.send(main_poll)
                     previous_main_poll = main_poll

@@ -28,7 +28,7 @@ import re
 
 from webob import Request, Response
 
-from .errors import HttpError, NotFound, ServerError
+from openlp.core.api.http.errors import HttpError, NotFound, ServerError
 
 log = logging.getLogger(__name__)
 

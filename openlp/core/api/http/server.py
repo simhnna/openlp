@@ -19,36 +19,56 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+
+"""
+The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
+with OpenLP. It uses JSON to communicate with the remotes.
+"""
+
 import logging
 
-from openlp.core.api import OpenLPWSServer, OpenLPPoll, OpenLPHttpServer
-from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
+from PyQt5 import QtCore
+from waitress import serve
 
-# These are here to load the endpoints
-from openlp.core.api.coreendpoints import stage_endpoint
-from openlp.core.api.controllerendpoints import controller_endpoint
+from openlp.core.api.http import application
+from openlp.core.common import RegistryProperties, OpenLPMixin
 
 log = logging.getLogger(__name__)
 
 
-class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
+class HttpWorker(QtCore.QObject):
     """
-    The APIController handles the starting of the API middleware.
-    The HTTP and Websocket servers are started
-    The core endpoints are generated (just by their declaration).
-
+    A special Qt thread class to allow the HTTP server to run at the same time as the UI.
     """
-    def __init__(self, parent=None):
+    def __init__(self):
         """
-        Constructor
-        """
-        super(ApiController, self).__init__(parent)
+        Constructor for the thread class.
 
-    def bootstrap_post_set_up(self):
+        :param server: The http server class.
         """
-        Register the poll return service and start the servers.
+        super(HttpWorker).__init__()
+
+    def start(self):
         """
-        self.poll = OpenLPPoll()
-        Registry().register('OpenLPPoll', self.poll)
-        self.wsserver = OpenLPWSServer()
-        self.httpserver = OpenLPHttpServer()
+        Run the thread.
+        """
+        serve(application, host='0.0.0.0', port=4318)
+
+    def stop(self):
+        pass
+
+
+class HttpServer(RegistryProperties, OpenLPMixin):
+    """
+    Wrapper round a server instance
+    """
+    def __init__(self):
+        """
+        Initialise the http server, and start the http server
+        """
+        super(HttpServer, self).__init__()
+        self.thread = QtCore.QThread()
+        self.worker = HttpWorker()
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.start)
+        self.thread.start()
