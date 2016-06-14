@@ -38,7 +38,7 @@ from openlp.core.common import Settings, RegistryProperties, OpenLPMixin, Regist
 log = logging.getLogger(__name__)
 
 
-class WSThread(QtCore.QObject):
+class WebSocketWorker(QtCore.QObject):
     """
     A special Qt thread class to allow the WebSockets server to run at the same time as the UI.
     """
@@ -61,7 +61,7 @@ class WSThread(QtCore.QObject):
         self.ws_server.stop = True
 
 
-class WsServer(RegistryProperties, OpenLPMixin):
+class WebSocketServer(RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
@@ -69,10 +69,10 @@ class WsServer(RegistryProperties, OpenLPMixin):
         """
         Initialise the http server, and start the WebSockets server
         """
-        super(WsServer, self).__init__()
+        super(WebSocketServer, self).__init__()
         self.settings_section = 'remotes'
         self.thread = QtCore.QThread()
-        self.worker = WSThread(self)
+        self.worker = WebSocketWorker(self)
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.start)
         self.thread.start()
@@ -150,6 +150,8 @@ class WsServer(RegistryProperties, OpenLPMixin):
             self.http_thread.stop()
         self.httpd = None
         log.debug('Stopped the server.')
+
+
 class Poll(RegistryProperties):
     """
     Access by the web layer to get status type information from the application

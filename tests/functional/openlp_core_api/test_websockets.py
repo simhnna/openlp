@@ -26,7 +26,7 @@ import json
 from unittest import TestCase
 
 from openlp.core.common import Registry, Settings
-from openlp.core.api import Poll, WsServer
+from openlp.core.api import Poll, WebSocketServer
 from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
@@ -60,20 +60,19 @@ class TestWSServer(TestCase, TestMixin):
         """
         self.destroy_settings()
 
-
-    @patch('openlp.core.api.websockets.WSThread')
+    @patch('openlp.core.api.websockets.WebSocketWorker')
     @patch('openlp.core.api.websockets.QtCore.QThread')
-    def test_serverstart(self, mock_qthread, mock_thread):
+    def test_serverstart(self, mock_qthread, mock_worker):
         """
         Test the starting of the WebSockets Server
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        server = WsServer()
+        server = WebSocketServer()
 
         # THEN: the api environment should have been created
         self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
-        self.assertEquals(1, mock_thread.call_count, 'The http thread should have been called once')
+        self.assertEquals(1, mock_worker.call_count, 'The http thread should have been called once')
 
     def test_main_poll(self):
         """

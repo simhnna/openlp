@@ -21,7 +21,7 @@
 ###############################################################################
 import logging
 
-from openlp.core.api import WsServer, Poll, HttpServer
+from openlp.core.api import WebSocketServer, Poll, HttpServer
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
 
 # These are here to load the endpoints
@@ -50,5 +50,5 @@ class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         self.poll = Poll()
         Registry().register('api_poll', self.poll)
-        self.wsserver = WsServer()
-        self.httpserver = HttpServer()
+        self.websocket_server = WebSocketServer()
+        self.http_server = HttpServer()

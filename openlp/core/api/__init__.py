@@ -47,7 +47,7 @@ def register_endpoint(end_point):
 
 from .endpoint import Endpoint
 from .apitab import ApiTab
-from .websockets import WsServer, Poll
+from .websockets import WebSocketServer, Poll
 from .http import HttpServer
 from .apicontroller import ApiController
 
