@@ -54,4 +54,4 @@ from .wsserver import WsServer
 from .httpserver import HttpServer
 from .apicontroller import ApiController
 
-__all__ = ['Poll', 'RemoteController', 'HttpServer', 'application']
+__all__ = ['Poll', 'ApiController', 'HttpServer', 'application']

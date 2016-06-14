@@ -49,6 +49,6 @@ class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Register the poll return service and start the servers.
         """
         self.poll = Poll()
-        Registry().register('OpenLPPoll', self.poll)
+        Registry().register('api_poll', self.poll)
         self.wsserver = WsServer()
         self.httpserver = HttpServer()

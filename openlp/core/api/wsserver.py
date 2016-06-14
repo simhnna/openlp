@@ -125,17 +125,17 @@ class WsServer(RegistryProperties, OpenLPMixin):
         log.debug("web socket handler registered with client")
         previous_poll = None
         previous_main_poll = None
-        openlppoll = Registry().get('OpenLPPoll')
+        api_poll = Registry().get('api_poll')
         if path == '/poll':
             while True:
-                current_poll = openlppoll.poll()
+                current_poll = api_poll.poll()
                 if current_poll != previous_poll:
                     yield from request.send(current_poll)
                     previous_poll = current_poll
                 yield from asyncio.sleep(0.2)
         elif path == '/main_poll':
             while True:
-                main_poll = openlppoll.main_poll()
+                main_poll = api_poll.main_poll()
                 if main_poll != previous_main_poll:
                     yield from request.send(main_poll)
                     previous_main_poll = main_poll
