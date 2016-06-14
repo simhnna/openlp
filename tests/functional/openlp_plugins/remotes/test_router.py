@@ -26,7 +26,7 @@ import os
 import urllib.request
 from unittest import TestCase
 
-from openlp.core.api.poll import Poll
+from openlp.core.api import Poll
 from openlp.core.common import Settings, Registry
 from openlp.core.ui import ServiceManager
 from openlp.plugins.remotes.lib.httpserver import HttpRouter
@@ -74,7 +74,7 @@ class TestRouter(TestCase, TestMixin):
         Settings().setValue('remotes/user id', 'openlp')
         Settings().setValue('remotes/password', 'password')
         poll = MagicMock()
-        Registry().register('OpenLPPoll', poll)
+        Registry().register('api_poll', poll)
 
         # WHEN: called with the defined userid
         router = HttpRouter()
