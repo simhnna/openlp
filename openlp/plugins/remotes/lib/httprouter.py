@@ -143,7 +143,7 @@ class HttpRouter(RegistryProperties, OpenLPMixin):
         """
         auth_code = "{user}:{password}".format(user=Settings().value('remotes/user id'),
                                                password=Settings().value('remotes/password'))
-        self.openlppoll = Registry().get('OpenLPPoll')
+        self.openlppoll = Registry().get('api_poll')
         try:
             self.auth = base64.b64encode(auth_code)
         except TypeError:

@@ -20,10 +20,8 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from .errors import NotFound, ServerError
-from .httprouter import WSGIApplication
-
-application = WSGIApplication('api')
+from .errors import NotFound, ServerError, HttpError
+from .http import WSGIApplication, application
 
 
 def _route_from_url(url_prefix, url):
@@ -49,9 +47,8 @@ def register_endpoint(end_point):
 
 from .endpoint import Endpoint
 from .apitab import ApiTab
-from .poll import Poll
-from .wsserver import WsServer
-from .httpserver import HttpServer
+from .websockets import WsServer, Poll
+from .http import HttpServer
 from .apicontroller import ApiController
 
 __all__ = ['Poll', 'ApiController', 'HttpServer', 'application']

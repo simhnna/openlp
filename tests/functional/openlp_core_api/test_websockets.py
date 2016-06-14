@@ -20,14 +20,14 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-This module contains tests for the lib submodule of the Remotes plugin.
+Functional tests to test the Http Server Class.
 """
 import json
 from unittest import TestCase
 
 from openlp.core.common import Registry, Settings
-from openlp.core.api.poll import Poll
-from tests.functional import MagicMock
+from openlp.core.api import Poll, WsServer
+from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
@@ -41,9 +41,9 @@ __default_settings__ = {
 }
 
 
-class TestOpenLPPoll(TestCase, TestMixin):
+class TestWSServer(TestCase, TestMixin):
     """
-    Test the functions in the :mod:`lib` module.
+    A test suite to test starting the websocket server
     """
     def setUp(self):
         """
@@ -59,6 +59,21 @@ class TestOpenLPPoll(TestCase, TestMixin):
         Delete all the C++ objects at the end so that we don't have a segfault
         """
         self.destroy_settings()
+
+
+    @patch('openlp.core.api.websockets.WSThread')
+    @patch('openlp.core.api.websockets.QtCore.QThread')
+    def test_serverstart(self, mock_qthread, mock_thread):
+        """
+        Test the starting of the WebSockets Server
+        """
+        # GIVEN: A new httpserver
+        # WHEN: I start the server
+        server = WsServer()
+
+        # THEN: the api environment should have been created
+        self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
+        self.assertEquals(1, mock_thread.call_count, 'The http thread should have been called once')
 
     def test_main_poll(self):
         """

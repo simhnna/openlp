@@ -29,6 +29,7 @@ import asyncio
 import websockets
 import logging
 import time
+import json
 
 from PyQt5 import QtCore
 
@@ -149,3 +150,39 @@ class WsServer(RegistryProperties, OpenLPMixin):
             self.http_thread.stop()
         self.httpd = None
         log.debug('Stopped the server.')
+class Poll(RegistryProperties):
+    """
+    Access by the web layer to get status type information from the application
+    """
+    def __init__(self):
+        """
+        Constructor for the poll builder class.
+        """
+        super(Poll, self).__init__()
+
+    def poll(self):
+        """
+        Poll OpenLP to determine the current slide number and item name.
+        """
+        result = {
+            'service': self.service_manager.service_id,
+            'slide': self.live_controller.selected_row or 0,
+            'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
+            'twelve': Settings().value('remotes/twelve hour'),
+            'blank': self.live_controller.blank_screen.isChecked(),
+            'theme': self.live_controller.theme_screen.isChecked(),
+            'display': self.live_controller.desktop_screen.isChecked(),
+            'version': 2,
+            'isSecure': Settings().value('remotes/authentication enabled'),
+            'isAuthorised': False
+        }
+        return json.dumps({'results': result}).encode()
+
+    def main_poll(self):
+        """
+        Poll OpenLP to determine the current slide count.
+        """
+        result = {
+            'slide_count': self.live_controller.slide_count
+        }
+        return json.dumps({'results': result}).encode()
