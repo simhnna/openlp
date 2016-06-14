@@ -58,7 +58,7 @@ class HttpThread(QtCore.QObject):
         pass
 
 
-class OpenLPHttpServer(RegistryProperties, OpenLPMixin):
+class HttpServer(RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
@@ -66,7 +66,7 @@ class OpenLPHttpServer(RegistryProperties, OpenLPMixin):
         """
         Initialise the http server, and start the http server
         """
-        super(OpenLPHttpServer, self).__init__()
+        super(HttpServer, self).__init__()
         self.thread = QtCore.QThread()
         self.worker = HttpThread()
         self.worker.moveToThread(self.thread)

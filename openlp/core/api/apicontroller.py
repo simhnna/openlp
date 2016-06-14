@@ -21,7 +21,7 @@
 ###############################################################################
 import logging
 
-from openlp.core.api import OpenLPWSServer, OpenLPPoll, OpenLPHttpServer
+from openlp.core.api import WsServer, Poll, HttpServer
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
 
 # These are here to load the endpoints
@@ -48,7 +48,7 @@ class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         Register the poll return service and start the servers.
         """
-        self.poll = OpenLPPoll()
+        self.poll = Poll()
         Registry().register('OpenLPPoll', self.poll)
-        self.wsserver = OpenLPWSServer()
-        self.httpserver = OpenLPHttpServer()
+        self.wsserver = WsServer()
+        self.httpserver = HttpServer()

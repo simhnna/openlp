@@ -25,7 +25,7 @@ Functional tests to test the Http Server Class.
 
 from unittest import TestCase
 
-from openlp.core.api import OpenLPWSServer
+from openlp.core.api import WsServer
 
 from tests.functional import patch
 
@@ -42,7 +42,7 @@ class TestWSServer(TestCase):
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        server = OpenLPWSServer()
+        server = WsServer()
 
         # THEN: the api environment should have been created
         self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')

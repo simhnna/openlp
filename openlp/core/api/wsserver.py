@@ -60,7 +60,7 @@ class WSThread(QtCore.QObject):
         self.ws_server.stop = True
 
 
-class OpenLPWSServer(RegistryProperties, OpenLPMixin):
+class WsServer(RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
@@ -68,7 +68,7 @@ class OpenLPWSServer(RegistryProperties, OpenLPMixin):
         """
         Initialise the http server, and start the WebSockets server
         """
-        super(OpenLPWSServer, self).__init__()
+        super(WsServer, self).__init__()
         self.settings_section = 'remotes'
         self.thread = QtCore.QThread()
         self.worker = WSThread(self)

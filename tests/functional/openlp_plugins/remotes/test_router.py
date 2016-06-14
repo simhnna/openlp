@@ -26,7 +26,7 @@ import os
 import urllib.request
 from unittest import TestCase
 
-from openlp.core.api.poll import OpenLPPoll
+from openlp.core.api.poll import Poll
 from openlp.core.common import Settings, Registry
 from openlp.core.ui import ServiceManager
 from openlp.plugins.remotes.lib.httpserver import HttpRouter
@@ -160,7 +160,7 @@ class TestRouter(TestCase, TestMixin):
         Registry.create()
         live_controller = MagicMock()
         Registry().register('live_controller', live_controller)
-        poll = OpenLPPoll()
+        poll = Poll()
         live_controller.slide_count = 2
 
         # WHEN: main poll called

@@ -49,9 +49,9 @@ def register_endpoint(end_point):
 
 from .endpoint import Endpoint
 from .apitab import ApiTab
-from .poll import OpenLPPoll
-from .wsserver import OpenLPWSServer
-from .httpserver import OpenLPHttpServer
+from .poll import Poll
+from .wsserver import WsServer
+from .httpserver import HttpServer
 from .apicontroller import ApiController
 
-__all__ = ['OpenLPPoll', 'RemoteController', 'OpenLPHttpServer', 'application']
+__all__ = ['Poll', 'RemoteController', 'HttpServer', 'application']

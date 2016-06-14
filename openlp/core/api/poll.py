@@ -25,7 +25,7 @@ import json
 from openlp.core.common import RegistryProperties, Settings
 
 
-class OpenLPPoll(RegistryProperties):
+class Poll(RegistryProperties):
     """
     Access by the web layer to get status type information from the application
     """
@@ -33,7 +33,7 @@ class OpenLPPoll(RegistryProperties):
         """
         Constructor for the poll builder class.
         """
-        super(OpenLPPoll, self).__init__()
+        super(Poll, self).__init__()
 
     def poll(self):
         """

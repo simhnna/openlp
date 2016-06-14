@@ -26,7 +26,7 @@ import json
 from unittest import TestCase
 
 from openlp.core.common import Registry, Settings
-from openlp.core.api.poll import OpenLPPoll
+from openlp.core.api.poll import Poll
 from tests.functional import MagicMock
 from tests.helpers.testmixin import TestMixin
 
@@ -52,7 +52,7 @@ class TestOpenLPPoll(TestCase, TestMixin):
         self.build_settings()
         Settings().extend_default_settings(__default_settings__)
         Registry().create()
-        self.poll = OpenLPPoll()
+        self.poll = Poll()
 
     def tearDown(self):
         """
