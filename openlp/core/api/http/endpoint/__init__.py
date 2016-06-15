@@ -20,29 +20,34 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-openlp/core/api/endpoint.py: Endpoint stuff
+The Endpoint class, which provides plugins with a way to serve their own portion of the API
 """
+import os
+
+from mako.template import Template
 
 
 class Endpoint(object):
     """
     This is an endpoint for the HTTP API
     """
-    def __init__(self, url_prefix):
+    def __init__(self, url_prefix, template_dir=None, static_dir=None):
         """
         Create an endpoint with a URL prefix
         """
         print("init")
         self.url_prefix = url_prefix
+        self.static_dir = static_dir
+        self.template_dir = template_dir
         self.routes = []
 
-    def add_url_route(self, url, view_func, method, secure):
+    def add_url_route(self, url, view_func, method):
         """
         Add a url route to the list of routes
         """
-        self.routes.append((url, view_func, method, secure))
+        self.routes.append((url, view_func, method))
 
-    def route(self, rule, method='GET', secure=False):
+    def route(self, rule, method='GET'):
         """
         Set up a URL route
         """
@@ -50,6 +55,15 @@ class Endpoint(object):
             """
             Make this a decorator
             """
-            self.add_url_route(rule, func, method, secure)
+            self.add_url_route(rule, func, method)
             return func
         return decorator
+
+    def render_template(self, filename, **kwargs):
+        """
+        Render a mako template
+        """
+        if not self.template_dir:
+            raise Exception('No template directory specified')
+        path = os.path.abspath(os.path.join(self.template_dir, filename))
+        return Template(filename=path, input_encoding='utf-8').render(**kwargs)
