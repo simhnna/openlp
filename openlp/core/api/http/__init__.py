@@ -42,7 +42,13 @@ def register_endpoint(end_point):
     """
     Register an endpoint with the app
     """
-    for url, view_func, method, secure in end_point.routes:
+    for url, view_func, method in end_point.routes:
+        # Set the view functions
         route = _route_from_url(end_point.url_prefix, url)
-        application.add_route(route, view_func, method, secure)
+        application.add_route(route, view_func, method)
+        # Add a static route if necessary
+        if end_point.static_dir:
+            static_route = _route_from_url(end_point.url_prefix, 'static')
+            static_route += '(.*)'
+            application.add_static_route(static_route, end_point.static_dir)
 
