@@ -29,7 +29,6 @@ import asyncio
 import websockets
 import logging
 import time
-import json
 
 from PyQt5 import QtCore
 
@@ -48,13 +47,15 @@ class WebSocketWorker(QtCore.QObject):
 
         :param server: The http server class.
         """
-        super().__init__()
+        print("ws init")
         self.ws_server = server
+        super(WebSocketWorker, self).__init__()
 
-    def start(self):
+    def run(self):
         """
         Run the thread.
         """
+        print("ws run")
         self.ws_server.start_server()
 
     def stop(self):
@@ -67,14 +68,14 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
     """
     def __init__(self):
         """
-        Initialise the http server, and start the WebSockets server
+        Initialise and start the WebSockets server
         """
         super(WebSocketServer, self).__init__()
         self.settings_section = 'remotes'
-        self.thread = QtCore.QThread()
         self.worker = WebSocketWorker(self)
+        self.thread = QtCore.QThread()
         self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.start)
+        self.thread.started.connect(self.worker.run)
         self.thread.start()
 
     def start_server(self):
@@ -126,17 +127,18 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
         log.debug("web socket handler registered with client")
         previous_poll = None
         previous_main_poll = None
-        api_poll = Registry().get('api_poll')
+        poller = Registry().get('Poller')
+        # TODO: FIXME: These URLs need to be named better
         if path == '/poll':
             while True:
-                current_poll = api_poll.poll()
+                current_poll = poller.poll()
                 if current_poll != previous_poll:
                     yield from request.send(current_poll)
                     previous_poll = current_poll
                 yield from asyncio.sleep(0.2)
         elif path == '/main_poll':
             while True:
-                main_poll = api_poll.main_poll()
+                main_poll = poller.main_poll()
                 if main_poll != previous_main_poll:
                     yield from request.send(main_poll)
                     previous_main_poll = main_poll
@@ -150,41 +152,3 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
             self.http_thread.stop()
         self.httpd = None
         log.debug('Stopped the server.')
-
-
-class Poll(RegistryProperties):
-    """
-    Access by the web layer to get status type information from the application
-    """
-    def __init__(self):
-        """
-        Constructor for the poll builder class.
-        """
-        super(Poll, self).__init__()
-
-    def poll(self):
-        """
-        Poll OpenLP to determine the current slide number and item name.
-        """
-        result = {
-            'service': self.service_manager.service_id,
-            'slide': self.live_controller.selected_row or 0,
-            'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
-            'twelve': Settings().value('remotes/twelve hour'),
-            'blank': self.live_controller.blank_screen.isChecked(),
-            'theme': self.live_controller.theme_screen.isChecked(),
-            'display': self.live_controller.desktop_screen.isChecked(),
-            'version': 2,
-            'isSecure': Settings().value('remotes/authentication enabled'),
-            'isAuthorised': False
-        }
-        return json.dumps({'results': result}).encode()
-
-    def main_poll(self):
-        """
-        Poll OpenLP to determine the current slide count.
-        """
-        result = {
-            'slide_count': self.live_controller.slide_count
-        }
-        return json.dumps({'results': result}).encode()

@@ -35,9 +35,9 @@ class TestApiController(TestCase):
     """
     A test suite to test out the Error in the API code
     """
-    @patch('openlp.core.api.apicontroller.Poll')
-    @patch('openlp.core.api.apicontroller.WebSocketServer')
-    @patch('openlp.core.api.apicontroller.HttpServer')
+    @patch('openlp.core.api.controller.Poll')
+    @patch('openlp.core.api.controller.WebSocketServer')
+    @patch('openlp.core.api.controller.http.HttpServer')
     def test_bootstrap(self, mock_http, mock_ws, mock_poll):
         """
         Test the Not Found error displays the correct information

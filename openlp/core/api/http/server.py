@@ -19,47 +19,58 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+
 """
-HTTP Error classes
+The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
+with OpenLP. It uses JSON to communicate with the remotes.
 """
 
+import logging
 
-class HttpError(Exception):
+from PyQt5 import QtCore
+from waitress import serve
+
+from openlp.core.api.http import application
+from openlp.core.common import RegistryProperties, OpenLPMixin
+
+log = logging.getLogger(__name__)
+
+
+class HttpWorker(QtCore.QObject):
     """
-    A base HTTP error (aka status code)
-    """
-    def __init__(self, status, message):
-        """
-        Initialise the exception
-        """
-        super(HttpError, self).__init__(message)
-        self.status = status
-        self.message = message
-
-    def to_response(self):
-        """
-        Convert this exception to a Response object
-        """
-        return self.message, self.status
-
-
-class NotFound(HttpError):
-    """
-    A 404
+    A special Qt thread class to allow the HTTP server to run at the same time as the UI.
     """
     def __init__(self):
         """
-        Make this a 404
+        Constructor for the thread class.
+
+        :param server: The http server class.
         """
-        super(NotFound, self).__init__(404, 'Not Found')
+        print("http init")
+        super(HttpWorker, self).__init__()
+
+    def run(self):
+        """
+        Run the thread.
+        """
+        print("runnnn")
+        serve(application, host='0.0.0.0', port=4318)
+
+    def stop(self):
+        pass
 
 
-class ServerError(HttpError):
+class HttpServer(RegistryProperties, OpenLPMixin):
     """
-    A 500
+    Wrapper round a server instance
     """
     def __init__(self):
         """
-        Make this a 500
+        Initialise the http server, and start the http server
         """
-        super(ServerError, self).__init__(500, 'Server Error')
+        super(HttpServer, self).__init__()
+        self.worker = HttpWorker()
+        self.thread = QtCore.QThread()
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+        self.thread.start()

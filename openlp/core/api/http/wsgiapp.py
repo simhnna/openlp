@@ -19,62 +19,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 """
-The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
-with OpenLP. It uses JSON to communicate with the remotes.
+App stuff
 """
-
 import logging
 import json
 import re
 
-from PyQt5 import QtCore
-from waitress import serve
 from webob import Request, Response
 
-from openlp.core.api import NotFound, ServerError, HttpError
-from openlp.core.common import RegistryProperties, OpenLPMixin
+from openlp.core.api.http.errors import HttpError, NotFound, ServerError
 
 log = logging.getLogger(__name__)
-
-
-class HttpThread(QtCore.QObject):
-    """
-    A special Qt thread class to allow the HTTP server to run at the same time as the UI.
-    """
-    def __init__(self):
-        """
-        Constructor for the thread class.
-
-        :param server: The http server class.
-        """
-        super().__init__()
-
-    def start(self):
-        """
-        Run the thread.
-        """
-        serve(application, host='0.0.0.0', port=4318)
-
-    def stop(self):
-        pass
-
-
-class HttpServer(RegistryProperties, OpenLPMixin):
-    """
-    Wrapper round a server instance
-    """
-    def __init__(self):
-        """
-        Initialise the http server, and start the http server
-        """
-        super(HttpServer, self).__init__()
-        self.thread = QtCore.QThread()
-        self.worker = HttpThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.start)
-        self.thread.start()
 
 
 def _make_response(view_result):
@@ -167,5 +123,3 @@ class WSGIApplication(object):
         """
         return self.wsgi_app(environ, start_response)
 
-
-application = WSGIApplication('api')

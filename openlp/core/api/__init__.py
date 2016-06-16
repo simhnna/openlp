@@ -20,35 +20,10 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from .errors import NotFound, ServerError, HttpError
-from .http import WSGIApplication, application
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http import register_endpoint
+from openlp.core.api.tab import ApiTab
+from openlp.core.api.controller import ApiController
+from openlp.core.api.poll import Poller
 
-
-def _route_from_url(url_prefix, url):
-    """
-    Create a route from the URL
-    """
-    url_prefix = '/{prefix}/'.format(prefix=url_prefix.strip('/'))
-    if not url:
-        url = url_prefix[:-1]
-    else:
-        url = url_prefix + url
-    url = url.replace('//', '/')
-    return url
-
-
-def register_endpoint(end_point):
-    """
-    Register an endpoint with the app
-    """
-    for url, view_func, method, secure in end_point.routes:
-        route = _route_from_url(end_point.url_prefix, url)
-        application.add_route(route, view_func, method, secure)
-
-from .endpoint import Endpoint
-from .apitab import ApiTab
-from .websockets import WebSocketServer, Poll
-from .http import HttpServer
-from .apicontroller import ApiController
-
-__all__ = ['Poll', 'ApiController', 'HttpServer', 'application']
+__all__ = ['Endpoint', 'ApiController', 'ApiTab', 'register_endpoint']

@@ -19,45 +19,35 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
 
-import json
+from openlp.core.api.http.server import HttpServer
+from openlp.core.api.websockets import WebSocketServer
+from openlp.core.api.poll import Poller
+from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
 
-from openlp.core.common import RegistryProperties, Settings
+log = logging.getLogger(__name__)
 
 
-class Poller(RegistryProperties):
+class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
     """
-    Access by the web layer to get status type information from the application
+    The APIController handles the starting of the API middleware.
+    The HTTP and Websocket servers are started
+    The core endpoints are generated (just by their declaration).
+
     """
-    def __init__(self):
+    def __init__(self, parent=None):
         """
-        Constructor for the poll builder class.
+        Constructor
         """
-        super(Poller, self).__init__()
+        super(ApiController, self).__init__(parent)
 
-    def poll(self):
+    def bootstrap_post_set_up(self):
         """
-        Poll OpenLP to determine the current slide number and item name.
+        Register the poll return service and start the servers.
         """
-        result = {
-            'service': self.service_manager.service_id,
-            'slide': self.live_controller.selected_row or 0,
-            'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
-            'twelve': Settings().value('remotes/twelve hour'),
-            'blank': self.live_controller.blank_screen.isChecked(),
-            'theme': self.live_controller.theme_screen.isChecked(),
-            'display': self.live_controller.desktop_screen.isChecked(),
-            'version': 2,
-            'isSecure': Settings().value('remotes/authentication enabled'),
-            'isAuthorised': False
-        }
-        return json.dumps({'results': result}).encode()
+        self.poller = Poller()
+        Registry().register('Poller', self.poller)
+        self.ws_server = WebSocketServer()
+        self.http_server = HttpServer()
 
-    def main_poll(self):
-        """
-        Poll OpenLP to determine the current slide count.
-        """
-        result = {
-            'slide_count': self.live_controller.slide_count
-        }
-        return json.dumps({'results': result}).encode()

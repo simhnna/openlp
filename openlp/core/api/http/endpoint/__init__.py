@@ -19,45 +19,37 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+"""
+openlp/core/api/endpoint.py: Endpoint stuff
+"""
 
-import json
 
-from openlp.core.common import RegistryProperties, Settings
-
-
-class Poller(RegistryProperties):
+class Endpoint(object):
     """
-    Access by the web layer to get status type information from the application
+    This is an endpoint for the HTTP API
     """
-    def __init__(self):
+    def __init__(self, url_prefix):
         """
-        Constructor for the poll builder class.
+        Create an endpoint with a URL prefix
         """
-        super(Poller, self).__init__()
+        print("init")
+        self.url_prefix = url_prefix
+        self.routes = []
 
-    def poll(self):
+    def add_url_route(self, url, view_func, method, secure):
         """
-        Poll OpenLP to determine the current slide number and item name.
+        Add a url route to the list of routes
         """
-        result = {
-            'service': self.service_manager.service_id,
-            'slide': self.live_controller.selected_row or 0,
-            'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
-            'twelve': Settings().value('remotes/twelve hour'),
-            'blank': self.live_controller.blank_screen.isChecked(),
-            'theme': self.live_controller.theme_screen.isChecked(),
-            'display': self.live_controller.desktop_screen.isChecked(),
-            'version': 2,
-            'isSecure': Settings().value('remotes/authentication enabled'),
-            'isAuthorised': False
-        }
-        return json.dumps({'results': result}).encode()
+        self.routes.append((url, view_func, method, secure))
 
-    def main_poll(self):
+    def route(self, rule, method='GET', secure=False):
         """
-        Poll OpenLP to determine the current slide count.
+        Set up a URL route
         """
-        result = {
-            'slide_count': self.live_controller.slide_count
-        }
-        return json.dumps({'results': result}).encode()
+        def decorator(func):
+            """
+            Make this a decorator
+            """
+            self.add_url_route(rule, func, method, secure)
+            return func
+        return decorator

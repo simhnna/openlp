@@ -25,7 +25,7 @@ Functional tests to test the API Error Class.
 
 from unittest import TestCase
 
-from openlp.core.api.errors import NotFound, ServerError
+from openlp.core.api.http.errors import NotFound, ServerError
 
 
 class TestApiError(TestCase):

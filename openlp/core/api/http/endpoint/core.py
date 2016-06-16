@@ -114,7 +114,6 @@ def main_image(request):
     # return json.dumps({'results': result}).encode()
     pass
 
-
 @stage_endpoint.route(r'^/(\w+)/thumbnails([^/]+)?/(.*)$')
 def main_image(request):
     """

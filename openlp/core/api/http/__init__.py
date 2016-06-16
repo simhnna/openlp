@@ -19,36 +19,30 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import logging
 
-from openlp.core.api import WebSocketServer, Poll, HttpServer
-from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
+from openlp.core.api.http.wsgiapp import WSGIApplication
 
-# These are here to load the endpoints
-from openlp.core.api.coreendpoints import stage_endpoint
-from openlp.core.api.controllerendpoints import controller_endpoint
-
-log = logging.getLogger(__name__)
+application = WSGIApplication('api')
 
 
-class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
+def _route_from_url(url_prefix, url):
     """
-    The APIController handles the starting of the API middleware.
-    The HTTP and Websocket servers are started
-    The core endpoints are generated (just by their declaration).
-
+    Create a route from the URL
     """
-    def __init__(self, parent=None):
-        """
-        Constructor
-        """
-        super(ApiController, self).__init__(parent)
+    url_prefix = '/{prefix}/'.format(prefix=url_prefix.strip('/'))
+    if not url:
+        url = url_prefix[:-1]
+    else:
+        url = url_prefix + url
+    url = url.replace('//', '/')
+    return url
 
-    def bootstrap_post_set_up(self):
-        """
-        Register the poll return service and start the servers.
-        """
-        self.poll = Poll()
-        Registry().register('api_poll', self.poll)
-        self.websocket_server = WebSocketServer()
-        self.http_server = HttpServer()
+
+def register_endpoint(end_point):
+    """
+    Register an endpoint with the app
+    """
+    for url, view_func, method, secure in end_point.routes:
+        route = _route_from_url(end_point.url_prefix, url)
+        application.add_route(route, view_func, method, secure)
+

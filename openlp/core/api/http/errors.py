@@ -19,45 +19,49 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+"""
+HTTP Error classes
+"""
 
-import json
 
-from openlp.core.common import RegistryProperties, Settings
-
-
-class Poller(RegistryProperties):
+class HttpError(Exception):
     """
-    Access by the web layer to get status type information from the application
+    A base HTTP error (aka status code)
+    """
+    def __init__(self, status, message):
+        """
+        Initialise the exception
+        """
+        super(HttpError, self).__init__(message)
+        self.status = status
+        self.message = message
+
+    def to_response(self):
+        """
+        Convert this exception to a Response object
+        """
+        return self.message, self.status
+
+
+class NotFound(HttpError):
+    """
+    A 404
     """
     def __init__(self):
         """
-        Constructor for the poll builder class.
+        Make this a 404
         """
-        super(Poller, self).__init__()
+        super(NotFound, self).__init__(404, 'Not Found')
 
-    def poll(self):
-        """
-        Poll OpenLP to determine the current slide number and item name.
-        """
-        result = {
-            'service': self.service_manager.service_id,
-            'slide': self.live_controller.selected_row or 0,
-            'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
-            'twelve': Settings().value('remotes/twelve hour'),
-            'blank': self.live_controller.blank_screen.isChecked(),
-            'theme': self.live_controller.theme_screen.isChecked(),
-            'display': self.live_controller.desktop_screen.isChecked(),
-            'version': 2,
-            'isSecure': Settings().value('remotes/authentication enabled'),
-            'isAuthorised': False
-        }
-        return json.dumps({'results': result}).encode()
 
-    def main_poll(self):
+class ServerError(HttpError):
+    """
+    A 500
+    """
+    def __init__(self):
         """
-        Poll OpenLP to determine the current slide count.
+        Make this a 500
         """
-        result = {
-            'slide_count': self.live_controller.slide_count
-        }
-        return json.dumps({'results': result}).encode()
+        super(ServerError, self).__init__(500, 'Server Error')
+
+
