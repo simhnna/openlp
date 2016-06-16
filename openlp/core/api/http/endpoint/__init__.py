@@ -53,3 +53,6 @@ class Endpoint(object):
             self.add_url_route(rule, func, method, secure)
             return func
         return decorator
+
+from .controller import controller_endpoint
+from .core import stage_endpoint

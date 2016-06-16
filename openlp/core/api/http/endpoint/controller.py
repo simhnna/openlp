@@ -24,7 +24,8 @@ import os
 import urllib.request
 import urllib.error
 
-from openlp.core.api import Endpoint, register_endpoint
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import Registry, AppLocation, Settings
 from openlp.core.lib import ItemCapabilities, create_thumb
 

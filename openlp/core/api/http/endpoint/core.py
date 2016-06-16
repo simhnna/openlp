@@ -1,7 +1,8 @@
 import logging
 import os
 
-from openlp.core.api import Endpoint, register_endpoint
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, UiStrings, translate
 
 
