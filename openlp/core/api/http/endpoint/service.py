@@ -20,6 +20,7 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
+import json
 
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint
@@ -32,12 +33,29 @@ service_endpoint = Endpoint('service')
 
 
 @service_endpoint.route('list')
-def service_list(request):
+def list(request):
     """
     Handles requests for service items in the service manager
 
     """
     return {'results': {'items': get_service_items()}}
+
+
+@service_endpoint.route('set')
+def service_set(request):
+    """
+    Handles requests for setting service items in the service manager
+
+    :param action: The action to perform.
+    """
+    event = getattr(Registry().get('service_manager'), 'servicemanager_set_item')
+    try:
+        json_data = request.GET.get('data')
+        data = int(json.loads(json_data)['request']['id'])
+        event.emit(data)
+    except KeyError:
+        log.error("Endpoint service/set request id not found")
+    return {'results': {'success': True}}
 
 
 def get_service_items():

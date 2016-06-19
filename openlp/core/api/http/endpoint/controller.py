@@ -23,6 +23,7 @@ import logging
 import os
 import urllib.request
 import urllib.error
+import json
 
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint
@@ -89,5 +90,21 @@ def controller_text(request):
         json_data['results']['item'] = live_controller.service_item.unique_identifier
     return json_data
 
+
+@controller_endpoint.route('live/set')
+def controller_set(request):
+    """
+    Perform an action on the slide controller.
+
+    :param request: The action to perform.
+    """
+    event = getattr(Registry().get('live_controller'), 'slidecontroller_live_set')
+    try:
+        json_data = request.GET.get('data')
+        data = int(json.loads(json_data)['request']['id'])
+        event.emit([data])
+    except KeyError:
+        log.error("Endpoint controller/live/set request id not found")s
+    return {'results': {'success': True}}
 
 register_endpoint(controller_endpoint)

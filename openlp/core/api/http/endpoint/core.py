@@ -90,10 +90,10 @@ def main_index(request):
 @blank_endpoint.route('')
 def static_file_loader(request):
     """
-    Dummy endpoint to trigger endpoint creation
+    Deliver the page for the / url
     :param request:
     """
-    pass
+    return blank_endpoint.render_template('index.mako', **TRANSLATED_STRINGS)
 
 
 # @stage_endpoint.route('(stage)/(.*)$')
