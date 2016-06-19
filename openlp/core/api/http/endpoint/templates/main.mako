@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
-# vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
-
+<!DOCTYPE html>
+<html>
+<!--
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
@@ -19,11 +19,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint, requires_auth
-from openlp.core.api.tab import ApiTab
-from openlp.core.api.controller import ApiController
-from openlp.core.api.poll import Poller
-
-__all__ = ['Endpoint', 'ApiController', 'ApiTab', 'register_endpoint', 'requires_auth']
+-->
+<head>
+  <meta charset="utf-8" />s
+  <title>${live_title}</title>
+  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico">
+  <script type="text/javascript" src="/static/assets/jquery.min.js"></script>
+  <script type="text/javascript" src="/static/js/main.js"></script>
+</head>
+<body>
+<img id="image" class="size"/>
+</body>
+</html>

@@ -20,6 +20,11 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
+import base64
+from functools import wraps
+from webob import Response
+
+from openlp.core.common.settings import Settings
 from openlp.core.api.http.wsgiapp import WSGIApplication
 
 application = WSGIApplication('api')
@@ -52,3 +57,53 @@ def register_endpoint(end_point):
             static_route += '(.*)'
             application.add_static_route(static_route, end_point.static_dir)
 
+
+def check_auth(auth):
+    """
+    This function is called to check if a username password combination is valid.
+
+    :param auth: the authorisation object which needs to be tested
+    :return Whether authentication have been successful
+    """
+    auth_code = "{user}:{password}".format(user=Settings().value('remotes/user id'),
+                                           password=Settings().value('remotes/password'))
+    try:
+        auth_base = base64.b64encode(auth_code)
+    except TypeError:
+        auth_base = base64.b64encode(auth_code.encode()).decode()
+    if auth[1] == auth_base:
+        return True
+    else:
+        return False
+
+
+def authenticate():
+    """
+    Sends a 401 response that enables basic auth to be triggered
+    """
+    resp = Response(status=401)
+    resp.www_authenticate = 'Basic realm="OpenLP Login Required"'
+    return resp
+
+
+def requires_auth(f):
+    """
+    Decorates a function which needs to be authenticated before it can be used from the remote.
+
+    :param f: The function which has been wrapped
+    :return: the called function or a request to authenticate
+    """
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not Settings().value('remotes/authentication enabled'):
+            return f(*args, **kwargs)
+        req = args[0]
+        if not hasattr(req, 'authorization'):
+            return authenticate()
+        else:
+            auth = req.authorization
+            if check_auth(auth):
+                return f(*args, **kwargs)
+            else:
+                return authenticate()
+    return decorated

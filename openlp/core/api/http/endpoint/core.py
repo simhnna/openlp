@@ -2,11 +2,12 @@ import logging
 import os
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint
+from openlp.core.api.http import register_endpoint, requires_auth
 from openlp.core.common import Registry, AppLocation, UiStrings, translate
-from openlp.core.lib import image_to_byte
+from openlp.core.lib import image_to_byte, PluginStatus, StringContent
 
-template_dir = static_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
+
+template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 static_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 
 
@@ -88,13 +89,47 @@ def main_index(request):
 
 
 @blank_endpoint.route('')
-def static_file_loader(request):
+def index(request):
     """
     Deliver the page for the / url
     :param request:
     """
     return blank_endpoint.render_template('index.mako', **TRANSLATED_STRINGS)
 
+
+@blank_endpoint.route('poll')
+def poll(request):
+    """
+    Deliver the page for the /poll url
+    :param request:
+    """
+    return Registry().get('poller').raw_poll()
+
+
+@blank_endpoint.route('display/{display:hide|show|blank|theme|desktop}')
+@requires_auth
+def toggle_display(request, display):
+    """
+    Deliver the functions for the /display url
+    :param request: the http request - not used
+    :param display: the display function to be triggered
+    """
+    Registry().get('live_controller').slidecontroller_toggle_display.emit(display)
+    return {'results': {'success': True}}
+
+
+@blank_endpoint.route('plugin/{search:search}')
+def plugin_search(request, search):
+    """
+    Deliver the functions for the /display url
+    :param request: the http request - not used
+    :param search: the display function to be triggered
+    """
+    searches = []
+    for plugin in Registry().get('plugin_manager').plugins:
+        if plugin.status == PluginStatus.Active and plugin.media_item and plugin.media_item.has_search:
+            searches.append([plugin.name, str(plugin.text_strings[StringContent.Name]['plural'])])
+    return {'results': {'items': searches}}
 
 # @stage_endpoint.route('(stage)/(.*)$')
 # def bespoke_file_access(request):

@@ -35,11 +35,8 @@ class Poller(RegistryProperties):
         """
         super(Poller, self).__init__()
 
-    def poll(self):
-        """
-        Poll OpenLP to determine the current slide number and item name.
-        """
-        result = {
+    def raw_poll(self):
+        return {
             'service': self.service_manager.service_id,
             'slide': self.live_controller.selected_row or 0,
             'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
@@ -47,11 +44,16 @@ class Poller(RegistryProperties):
             'blank': self.live_controller.blank_screen.isChecked(),
             'theme': self.live_controller.theme_screen.isChecked(),
             'display': self.live_controller.desktop_screen.isChecked(),
-            'version': 2,
+            'version': 3,
             'isSecure': Settings().value('remotes/authentication enabled'),
             'isAuthorised': False
         }
-        return json.dumps({'results': result}).encode()
+
+    def poll(self):
+        """
+        Poll OpenLP to determine the current slide number and item name.
+        """
+        return json.dumps({'results': self.raw_poll()}).encode()
 
     def main_poll(self):
         """

@@ -69,8 +69,6 @@ def _make_response(view_result):
     """
     Create a Response object from response
     """
-    print("##")
-    print(type(view_result))
     if isinstance(view_result, Response):
         return view_result
     elif isinstance(view_result, tuple):
@@ -120,7 +118,6 @@ class WSGIApplication(object):
         Add a route
         """
         route_regex = _route_to_regex(route)
-        print("###", route, route_regex)
         if route_regex not in self.route_map:
             self.route_map[route_regex] = {}
         self.route_map[route_regex][method.upper()] = view_func
@@ -137,14 +134,13 @@ class WSGIApplication(object):
         Find the appropriate URL and run the view function
         """
         # We are not interested in this so discard
-        print("rrr",request.path)
         if '/favicon.ico' in request.path:
             return
         # First look to see if this is a static file request
         for route, static_app in self.static_routes.items():
             print(route, request.path)
             if re.match(route, request.path):
-                print("matched")
+                print("matched static")
                 # Pop the path info twice in order to get rid of the "/<plugin>/static"
                 # request.path_info_pop()
                 request.path_info_pop()
@@ -154,9 +150,8 @@ class WSGIApplication(object):
             path = request.path
             # /api is legacy so we need to handle backwards compatibility
             if path.startswith('/api'):
-               path = path[4:]
-            print("MMMATCHED")
-            print(route, request.path, path)
+                path = path[4:]
+            print("route MATCHED", route, request.path, path)
             match = re.match(route, path)
             print(match)
             if match and request.method.upper() in views:
@@ -183,4 +178,3 @@ class WSGIApplication(object):
         Shortcut for wsgi_app.
         """
         return self.wsgi_app(environ, start_response)
-

@@ -19,58 +19,41 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-"""
-The Endpoint class, which provides plugins with a way to serve their own portion of the API
-"""
+import logging
+import json
+import urllib
 
-import os
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.common import Registry
+from openlp.core.lib import PluginStatus
 
-from mako.template import Template
+
+log = logging.getLogger(__name__)
+
+alert_endpoint = Endpoint('alert')
 
 
-class Endpoint(object):
+@alert_endpoint.route('')
+@requires_auth
+def alert(request):
     """
-    This is an endpoint for the HTTP API
+    Handles requests for setting service items in the service manager
+
+    :param request: The http request object.
     """
-    def __init__(self, url_prefix, template_dir=None, static_dir=None):
-        """
-        Create an endpoint with a URL prefix
-        """
-        self.url_prefix = url_prefix
-        self.static_dir = static_dir
-        self.template_dir = template_dir
-        self.routes = []
+    plugin = Registry().get('plugin_manager').get_plugin_by_name("alerts")
+    if plugin.status == PluginStatus.Active:
+        try:
+            json_data = request.GET.get('data')
+            text = int(json.loads(json_data)['request']['text'])
+        except KeyError:
+            log.error("Endpoint alerts request text not found")
+        text = urllib.parse.unquote(text)
+        Registry().get('alerts_manager').alerts_text.emit([text])
+        success = True
+    else:
+        success = False
+    return {'results': {'success': success}}
 
-    def add_url_route(self, url, view_func, method):
-        """
-        Add a url route to the list of routes
-        """
-        self.routes.append((url, view_func, method))
-
-    def route(self, rule, method='GET'):
-        """
-        Set up a URL route
-        """
-        def decorator(func):
-            """
-            Make this a decorator
-            """
-            self.add_url_route(rule, func, method)
-            return func
-        return decorator
-
-    def render_template(self, filename, **kwargs):
-        """
-        Render a mako template
-        """
-        if not self.template_dir:
-            raise Exception('No template directory specified')
-        path = os.path.abspath(os.path.join(self.template_dir, filename))
-        print("path = ", path)
-        return Template(filename=path, input_encoding='utf-8').render(**kwargs)
-
-
-from .controller import controller_endpoint
-from .core import stage_endpoint
-from .service import service_endpoint
-from .alert import alert_endpoint
+register_endpoint(alert_endpoint)
