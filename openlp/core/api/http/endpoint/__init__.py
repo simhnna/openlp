@@ -24,8 +24,10 @@ The Endpoint class, which provides plugins with a way to serve their own portion
 """
 
 import os
+from functools import wraps
 
 from mako.template import Template
+from webob import Request, Response
 
 
 class Endpoint(object):
@@ -68,6 +70,7 @@ class Endpoint(object):
         path = os.path.abspath(os.path.join(self.template_dir, filename))
         print("path = ", path)
         return Template(filename=path, input_encoding='utf-8').render(**kwargs)
+
 
 from .controller import controller_endpoint
 from .core import stage_endpoint

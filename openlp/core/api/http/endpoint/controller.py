@@ -104,7 +104,7 @@ def controller_set(request):
         data = int(json.loads(json_data)['request']['id'])
         event.emit([data])
     except KeyError:
-        log.error("Endpoint controller/live/set request id not found")s
+        log.error("Endpoint controller/live/set request id not found")
     return {'results': {'success': True}}
 
 register_endpoint(controller_endpoint)

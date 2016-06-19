@@ -19,7 +19,7 @@
 window.OpenLP = {
   loadService: function (event) {
     $.getJSON(
-      "/api/service/list",
+      "/service/list",
       function (data, status) {
         OpenLP.nextSong = "";
         $("#notes").html("");
@@ -39,7 +39,7 @@ window.OpenLP = {
   },
   loadSlides: function (event) {
     $.getJSON(
-      "/api/controller/live/text",
+      "/controller/live/text",
       function (data, status) {
         OpenLP.currentSlides = data.results.slides;
         OpenLP.currentSlide = 0;
