@@ -3,15 +3,18 @@ import os
 
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import AppLocation, UiStrings, translate
+from openlp.core.common import Registry, AppLocation, UiStrings, translate
+from openlp.core.lib import image_to_byte
 
-
-from mako.template import Template
+template_dir = static_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
+static_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 
 
 log = logging.getLogger(__name__)
 
-stage_endpoint = Endpoint('')
+stage_endpoint = Endpoint('stage', template_dir=template_dir, static_dir=static_dir)
+main_endpoint = Endpoint('main', template_dir=template_dir, static_dir=static_dir)
+blank_endpoint = Endpoint('', template_dir=template_dir, static_dir=static_dir)
 
 FILE_TYPES = {
     '.html': 'text/html',
@@ -27,7 +30,7 @@ remote = translate('RemotePlugin.Mobile', 'Remote')
 stage = translate('RemotePlugin.Mobile', 'Stage View')
 live = translate('RemotePlugin.Mobile', 'Live View')
 
-template_vars = {
+TRANSLATED_STRINGS = {
     'app_title': "{main} {remote}".format(main=UiStrings().OLPV2x, remote=remote),
     'stage_title': "{main} {stage}".format(main=UiStrings().OLPV2x, stage=stage),
     'live_title': "{main} {live}".format(main=UiStrings().OLPV2x, live=live),
@@ -56,101 +59,87 @@ template_vars = {
 }
 
 
-@stage_endpoint.route('$')
-@stage_endpoint.route('(stage)$')
-@stage_endpoint.route('(main)$')
-@stage_endpoint.route('(css)')
-@stage_endpoint.route('(js)')
-@stage_endpoint.route('(assets)')
-def file_access(request):
+@stage_endpoint.route('')
+def stage_index(request):
     """
-    Get a list of songs`
+    Deliver the page for the /stage url
     """
-    file_name = request.path
-    html_dir = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'core', 'api', 'html')
-    log.debug('serve file request {name}'.format(name=file_name))
-    if file_name.startswith('/'):
-        file_name = file_name[1:]
-    if not file_name:
-        file_name = 'index.html'
-    if '.' not in file_name:
-        file_name += '.html'
-    if file_name.startswith('/'):
-        file_name = file_name[1:]
-    path = os.path.normpath(os.path.join(html_dir, file_name))
-    return _process_file(path)
+    #file_name = request.path
+    #html_dir = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'core', 'api', 'html')
+    #log.debug('serve file request {name}'.format(name=file_name))
+    #if file_name.startswith('/'):
+    #    file_name = file_name[1:]
+    #if not file_name:
+    #    file_name = 'index.mako'
+    #if '.' not in file_name:
+    #    file_name += '.html'
+    #if file_name.startswith('/'):
+    #    file_name = file_name[1:]
+    #path = os.path.normpath(os.path.join(html_dir, file_name))
+    return stage_endpoint.render_template('stage.mako', **TRANSLATED_STRINGS, static_url=static_dir)
 
 
-@stage_endpoint.route('(stage)/(.*)$')
-def bespoke_file_access(request):
+@main_endpoint.route('')
+def main_index(request):
     """
-    Allow Stage view to be delivered with custom views.
-
-    :param request: base path of the URL. Not used but passed by caller
-    :return:
+    Deliver the page for the /main url
     """
-    file_name = request.path
-    config_dir = os.path.join(AppLocation.get_data_path(), 'stages')
-    log.debug('serve file request {name}'.format(name=file_name))
-    parts = file_name.split('/')
-    if len(parts) == 1:
-        file_name = os.path.join(parts[0], 'stage.html')
-    elif len(parts) == 3:
-        file_name = os.path.join(parts[1], parts[2])
-    path = os.path.normpath(os.path.join(config_dir, file_name))
-    return _process_file(path)
+    return stage_endpoint.render_template('main.mako', **TRANSLATED_STRINGS)
 
 
-@stage_endpoint.route('main/image$')
+@blank_endpoint.route('')
+def static_file_loader(request):
+    """
+    Dummy endpoint to trigger endpoint creation
+    :param request:
+    """
+    pass
+
+
+# @stage_endpoint.route('(stage)/(.*)$')
+# def bespoke_file_access(request):
+#     """
+#     Allow Stage view to be delivered with custom views.
+#
+#     :param request: base path of the URL. Not used but passed by caller
+#     :return:
+#     """
+#     file_name = request.path
+#     config_dir = os.path.join(AppLocation.get_data_path(), 'stages')
+#     log.debug('serve file request {name}'.format(name=file_name))
+#     parts = file_name.split('/')
+#     if len(parts) == 1:
+#         file_name = os.path.join(parts[0], 'stage.mako')
+#     elif len(parts) == 3:
+#         file_name = os.path.join(parts[1], parts[2])
+#     path = os.path.normpath(os.path.join(config_dir, file_name))
+#     #return _process_file(path)
+#     pass
+
+
+@main_endpoint.route('image')
 def main_image(request):
     """
     Return the latest display image as a byte stream.
     :param request: base path of the URL. Not used but passed by caller
     :return:
     """
-    # result = {
-    #     'slide_image': 'data:image/png;base64,' + str(image_to_byte(self.live_controller.slide_image))
-    # }
-    # self.do_json_header()
-    # return json.dumps({'results': result}).encode()
-    pass
+    live_controller = Registry().get('live_controller')
+    result = {
+        'slide_image': 'data:image/png;base64,' + str(image_to_byte(live_controller.slide_image))
+    }
+    return {'results': result}
 
-@stage_endpoint.route(r'^/(\w+)/thumbnails([^/]+)?/(.*)$')
-def main_image(request):
-    """
-    Get a list of songs
-    :param request: base path of the URL. Not used but passed by caller
-    :return:
-    """
-    # songs = db.query(Song).get()
-    # return {'songs': [dictify(song) for song in songs]}
-    print("AAA")
-
-
-def _process_file(path):
-    """
-    Common file processing code
-
-    :param path: path to file to be loaded
-    :return: web resource to be loaded
-    """
-    ext, content_type = get_content_type(path)
-    file_handle = None
-    try:
-        if ext == '.html':
-            variables = template_vars
-            content = Template(filename=path, input_encoding='utf-8').render(**variables)
-        else:
-            file_handle = open(path, 'rb')
-            log.debug('Opened {path}'.format(path=path))
-            content = file_handle.read().decode("utf-8")
-    except IOError:
-        log.exception('Failed to open {path}'.format(path=path))
-        return None
-    finally:
-        if file_handle:
-            file_handle.close()
-    return content
+# @stage_endpoint.route(r'^/(\w+)/thumbnails([^/]+)?/(.*)$')
+# def main_image(request):
+#     """
+#     Get a list of songs
+#     :param request: base path of the URL. Not used but passed by caller
+#     :return:
+#     """
+#     # songs = db.query(Song).get()
+#     # return {'songs': [dictify(song) for song in songs]}
+#     print("AAA")
 
 
 def get_content_type(file_name):
@@ -165,3 +154,5 @@ def get_content_type(file_name):
     return ext, content_type
 
 register_endpoint(stage_endpoint)
+register_endpoint(blank_endpoint)
+register_endpoint(main_endpoint)

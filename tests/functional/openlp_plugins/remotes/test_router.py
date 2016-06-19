@@ -369,7 +369,7 @@ class TestRouter(TestCase, TestMixin):
 
     def remote_stage_personal_html_test(self):
         """
-        Test the stage url with a parameter after loaded a url/stage.html file
+        Test the stage url with a parameter after loaded a url/stage.mako file
         """
         # GIVEN: initial route
         self.router.config_dir = ''
@@ -383,7 +383,7 @@ class TestRouter(TestCase, TestMixin):
         self.router.stages('stages', 'trb')
 
         # THEN: we should use the specific stage file instance
-        self.router._process_file.assert_called_with(os.path.join('trb', 'stage.html'))
+        self.router._process_file.assert_called_with(os.path.join('trb', 'stage.mako'))
 
     def remote_stage_personal_css_test(self):
         """

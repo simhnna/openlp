@@ -22,6 +22,7 @@
 """
 The Endpoint class, which provides plugins with a way to serve their own portion of the API
 """
+
 import os
 
 from mako.template import Template
@@ -35,7 +36,6 @@ class Endpoint(object):
         """
         Create an endpoint with a URL prefix
         """
-        print("init")
         self.url_prefix = url_prefix
         self.static_dir = static_dir
         self.template_dir = template_dir
@@ -59,5 +59,16 @@ class Endpoint(object):
             return func
         return decorator
 
+    def render_template(self, filename, **kwargs):
+        """
+        Render a mako template
+        """
+        if not self.template_dir:
+            raise Exception('No template directory specified')
+        path = os.path.abspath(os.path.join(self.template_dir, filename))
+        print("path = ", path)
+        return Template(filename=path, input_encoding='utf-8').render(**kwargs)
+
 from .controller import controller_endpoint
 from .core import stage_endpoint
+from .service import service_endpoint

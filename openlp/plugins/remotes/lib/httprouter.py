@@ -359,7 +359,7 @@ class HttpRouter(RegistryProperties, OpenLPMixin):
         log.debug('serve file request {name}'.format(name=file_name))
         parts = file_name.split('/')
         if len(parts) == 1:
-            file_name = os.path.join(parts[0], 'stage.html')
+            file_name = os.path.join(parts[0], 'stage.mako')
         elif len(parts) == 3:
             file_name = os.path.join(parts[1], parts[2])
         path = os.path.normpath(os.path.join(self.config_dir, file_name))
@@ -406,7 +406,7 @@ class HttpRouter(RegistryProperties, OpenLPMixin):
         """
         log.debug('serve file request {name}'.format(name=file_name))
         if not file_name:
-            file_name = 'index.html'
+            file_name = 'index.mako'
         if '.' not in file_name:
             file_name += '.html'
         if file_name.startswith('/'):

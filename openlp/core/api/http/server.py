@@ -46,14 +46,12 @@ class HttpWorker(QtCore.QObject):
 
         :param server: The http server class.
         """
-        print("http init")
         super(HttpWorker, self).__init__()
 
     def run(self):
         """
         Run the thread.
         """
-        print("runnnn")
         serve(application, host='0.0.0.0', port=4318)
 
     def stop(self):

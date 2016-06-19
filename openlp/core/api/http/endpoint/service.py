@@ -21,33 +21,44 @@
 ###############################################################################
 import logging
 
-from openlp.core.api.http.server import HttpServer
-from openlp.core.api.websockets import WebSocketServer
-from openlp.core.api.poll import Poller
-from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http import register_endpoint
+from openlp.core.common import Registry
+
 
 log = logging.getLogger(__name__)
 
+service_endpoint = Endpoint('service')
 
-class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
+
+@service_endpoint.route('list')
+def service_list(request):
     """
-    The APIController handles the starting of the API middleware.
-    The HTTP and Websocket servers are started
-    The core endpoints are generated (just by their declaration).
+    Handles requests for service items in the service manager
 
     """
-    def __init__(self, parent=None):
-        """
-        Constructor
-        """
-        super(ApiController, self).__init__(parent)
+    return {'results': {'items': get_service_items()}}
 
-    def bootstrap_post_set_up(self):
-        """
-        Register the poll return service and start the servers.
-        """
-        self.poller = Poller()
-        Registry().register('poller', self.poller)
-        self.ws_server = WebSocketServer()
-        self.http_server = HttpServer()
 
+def get_service_items():
+    """
+    Read the service item in use and return the data as a json object
+    """
+    live_controller = Registry().get('live_controller')
+    service_items = []
+    if live_controller.service_item:
+        current_unique_identifier = live_controller.service_item.unique_identifier
+    else:
+        current_unique_identifier = None
+    for item in Registry().get('service_manager').service_items:
+        service_item = item['service_item']
+        service_items.append({
+            'id': str(service_item.unique_identifier),
+            'title': str(service_item.get_display_title()),
+            'plugin': str(service_item.name),
+            'notes': str(service_item.notes),
+            'selected': (service_item.unique_identifier == current_unique_identifier)
+        })
+    return service_items
+
+register_endpoint(service_endpoint)

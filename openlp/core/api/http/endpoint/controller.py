@@ -31,10 +31,10 @@ from openlp.core.lib import ItemCapabilities, create_thumb
 
 log = logging.getLogger(__name__)
 
-controller_endpoint = Endpoint('api')
+controller_endpoint = Endpoint('controller')
 
 
-@controller_endpoint.route('controller/live/text')
+@controller_endpoint.route('live/text')
 def controller_text(request):
     """
     Perform an action on the slide controller.
@@ -89,35 +89,5 @@ def controller_text(request):
         json_data['results']['item'] = live_controller.service_item.unique_identifier
     return json_data
 
-
-@controller_endpoint.route('service/list')
-def service_list(request):
-    """
-    Handles requests for service items in the service manager
-
-    """
-    return {'results': {'items': get_service_items()}}
-
-
-def get_service_items():
-    """
-    Read the service item in use and return the data as a json object
-    """
-    live_controller = Registry().get('live_controller')
-    service_items = []
-    if live_controller.service_item:
-        current_unique_identifier = live_controller.service_item.unique_identifier
-    else:
-        current_unique_identifier = None
-    for item in Registry().get('service_manager').service_items:
-        service_item = item['service_item']
-        service_items.append({
-            'id': str(service_item.unique_identifier),
-            'title': str(service_item.get_display_title()),
-            'plugin': str(service_item.name),
-            'notes': str(service_item.notes),
-            'selected': (service_item.unique_identifier == current_unique_identifier)
-        })
-    return service_items
 
 register_endpoint(controller_endpoint)

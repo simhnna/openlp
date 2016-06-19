@@ -69,7 +69,8 @@ def _make_response(view_result):
     """
     Create a Response object from response
     """
-    print(view_result)
+    print("##")
+    print(type(view_result))
     if isinstance(view_result, Response):
         return view_result
     elif isinstance(view_result, tuple):
@@ -86,6 +87,9 @@ def _make_response(view_result):
     elif isinstance(view_result, dict):
         return Response(body=json.dumps(view_result), status=200,
                         content_type='application/json', charset='utf8')
+    elif isinstance(view_result, str):
+        return Response(body=view_result, status=200,
+                        content_type='text/html', charset='utf8')
 
 
 def _handle_exception(error):
@@ -116,6 +120,7 @@ class WSGIApplication(object):
         Add a route
         """
         route_regex = _route_to_regex(route)
+        print("###", route, route_regex)
         if route_regex not in self.route_map:
             self.route_map[route_regex] = {}
         self.route_map[route_regex][method.upper()] = view_func
@@ -124,23 +129,36 @@ class WSGIApplication(object):
         """
         Add a static directory as a route
         """
-        if not route in self.static_routes:
+        if route not in self.static_routes:
             self.static_routes[route] = DirectoryApp(os.path.abspath(static_dir))
 
     def dispatch(self, request):
         """
         Find the appropriate URL and run the view function
         """
+        # We are not interested in this so discard
+        print("rrr",request.path)
+        if '/favicon.ico' in request.path:
+            return
         # First look to see if this is a static file request
         for route, static_app in self.static_routes.items():
+            print(route, request.path)
             if re.match(route, request.path):
+                print("matched")
                 # Pop the path info twice in order to get rid of the "/<plugin>/static"
-                request.path_info_pop()
+                # request.path_info_pop()
                 request.path_info_pop()
                 return request.get_response(static_app)
         # If not a static route, try the views
         for route, views in self.route_map.items():
-            match = re.match(route, request.path)
+            path = request.path
+            # /api is legacy so we need to handle backwards compatibility
+            if path.startswith('/api'):
+               path = path[4:]
+            print("MMMATCHED")
+            print(route, request.path, path)
+            match = re.match(route, path)
+            print(match)
             if match and request.method.upper() in views:
                 kwargs = match.groupdict()
                 log.debug('Found {method} {url}'.format(method=request.method, url=request.path))

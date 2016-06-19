@@ -47,7 +47,6 @@ class WebSocketWorker(QtCore.QObject):
 
         :param server: The http server class.
         """
-        print("ws init")
         self.ws_server = server
         super(WebSocketWorker, self).__init__()
 
@@ -55,7 +54,6 @@ class WebSocketWorker(QtCore.QObject):
         """
         Run the thread.
         """
-        print("ws run")
         self.ws_server.start_server()
 
     def stop(self):
@@ -127,7 +125,7 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
         log.debug("web socket handler registered with client")
         previous_poll = None
         previous_main_poll = None
-        poller = Registry().get('Poller')
+        poller = Registry().get('poller')
         # TODO: FIXME: These URLs need to be named better
         if path == '/poll':
             while True:
@@ -143,12 +141,3 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
                     yield from request.send(main_poll)
                     previous_main_poll = main_poll
                 yield from asyncio.sleep(0.2)
-
-    def stop_server(self):
-        """
-        Stop the server
-        """
-        if self.http_thread.isRunning():
-            self.http_thread.stop()
-        self.httpd = None
-        log.debug('Stopped the server.')
