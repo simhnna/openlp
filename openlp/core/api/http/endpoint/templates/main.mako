@@ -21,7 +21,7 @@
 ###############################################################################
 -->
 <head>
-  <meta charset="utf-8" />s
+  <meta charset="utf-8" />
   <title>${live_title}</title>
   <link rel="stylesheet" href="/static/css/main.css" />
   <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico">

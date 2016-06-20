@@ -23,7 +23,7 @@ import logging
 import json
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint
+from openlp.core.api.http import register_endpoint, requires_auth
 from openlp.core.common import Registry
 
 
@@ -33,20 +33,22 @@ service_endpoint = Endpoint('service')
 
 
 @service_endpoint.route('list')
-def list(request):
+def list_service(request):
     """
     Handles requests for service items in the service manager
 
+    :param request: The http request object.
     """
     return {'results': {'items': get_service_items()}}
 
 
 @service_endpoint.route('set')
+@requires_auth
 def service_set(request):
     """
     Handles requests for setting service items in the service manager
 
-    :param action: The action to perform.
+    :param request: The http request object.
     """
     event = getattr(Registry().get('service_manager'), 'servicemanager_set_item')
     try:
