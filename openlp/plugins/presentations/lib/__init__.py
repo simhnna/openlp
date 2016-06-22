@@ -24,3 +24,4 @@ from .presentationcontroller import PresentationController
 from .messagelistener import MessageListener
 from .mediaitem import PresentationMediaItem
 from .presentationtab import PresentationTab
+from .endpoint import presentations_endpoint

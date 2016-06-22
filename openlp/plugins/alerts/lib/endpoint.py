@@ -22,6 +22,7 @@
 import logging
 import json
 import urllib
+from urllib.parse import urlparse
 
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint, requires_auth
@@ -32,9 +33,11 @@ from openlp.core.lib import PluginStatus
 log = logging.getLogger(__name__)
 
 alert_endpoint = Endpoint('alert')
+api_alert_endpoint = Endpoint('api')
 
 
 @alert_endpoint.route('')
+@api_alert_endpoint.route('alert')
 @requires_auth
 def alert(request):
     """
@@ -46,10 +49,10 @@ def alert(request):
     if plugin.status == PluginStatus.Active:
         try:
             json_data = request.GET.get('data')
-            text = int(json.loads(json_data)['request']['text'])
+            text = json.loads(json_data)['request']['text']
         except KeyError:
             log.error("Endpoint alerts request text not found")
-        text = urllib.parse.unquote(text)
+            text = urllib.parse.unquote(text)
         Registry().get('alerts_manager').alerts_text.emit([text])
         success = True
     else:
@@ -57,3 +60,4 @@ def alert(request):
     return {'results': {'success': success}}
 
 register_endpoint(alert_endpoint)
+register_endpoint(api_alert_endpoint)

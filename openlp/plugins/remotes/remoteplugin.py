@@ -61,21 +61,21 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         super(RemotesPlugin, self).initialise()
         self.server = OpenLPServer()
-        if not hasattr(self, 'remote_server_icon'):
-            self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
-            size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-            size_policy.setHorizontalStretch(0)
-            size_policy.setVerticalStretch(0)
-            size_policy.setHeightForWidth(self.remote_server_icon.sizePolicy().hasHeightForWidth())
-            self.remote_server_icon.setSizePolicy(size_policy)
-            self.remote_server_icon.setFrameShadow(QtWidgets.QFrame.Plain)
-            self.remote_server_icon.setLineWidth(1)
-            self.remote_server_icon.setScaledContents(True)
-            self.remote_server_icon.setFixedSize(20, 20)
-            self.remote_server_icon.setObjectName('remote_server_icon')
-            self.main_window.status_bar.insertPermanentWidget(2, self.remote_server_icon)
-            self.settings_tab.remote_server_icon = self.remote_server_icon
-        self.settings_tab.generate_icon()
+        # if not hasattr(self, 'remote_server_icon'):
+        #     self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
+        #     size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        #     size_policy.setHorizontalStretch(0)
+        #     size_policy.setVerticalStretch(0)
+        #     size_policy.setHeightForWidth(self.remote_server_icon.sizePolicy().hasHeightForWidth())
+        #     self.remote_server_icon.setSizePolicy(size_policy)
+        #     self.remote_server_icon.setFrameShadow(QtWidgets.QFrame.Plain)
+        #     self.remote_server_icon.setLineWidth(1)
+        #     self.remote_server_icon.setScaledContents(True)
+        #     self.remote_server_icon.setFixedSize(20, 20)
+        #     self.remote_server_icon.setObjectName('remote_server_icon')
+        #     self.main_window.status_bar.insertPermanentWidget(2, self.remote_server_icon)
+        #     self.settings_tab.remote_server_icon = self.remote_server_icon
+        # self.settings_tab.generate_icon()
 
     def finalise(self):
         """

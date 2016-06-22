@@ -251,14 +251,15 @@ class RemoteTab(SettingsTab):
         """
         Generate icon for main window
         """
-        self.remote_server_icon.hide()
-        icon = QtGui.QImage(':/remote/network_server.png')
-        icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        if Settings().value(self.settings_section + '/authentication enabled'):
-            overlay = QtGui.QImage(':/remote/network_auth.png')
-            overlay = overlay.scaled(60, 60, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-            painter = QtGui.QPainter(icon)
-            painter.drawImage(20, 0, overlay)
-            painter.end()
-        self.remote_server_icon.setPixmap(QtGui.QPixmap.fromImage(icon))
-        self.remote_server_icon.show()
+        pass
+        # self.remote_server_icon.hide()
+        # icon = QtGui.QImage(':/remote/network_server.png')
+        # icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        # if Settings().value(self.settings_section + '/authentication enabled'):
+        #     overlay = QtGui.QImage(':/remote/network_auth.png')
+        #     overlay = overlay.scaled(60, 60, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+        #     painter = QtGui.QPainter(icon)
+        #     painter.drawImage(20, 0, overlay)
+        #     painter.end()
+        # self.remote_server_icon.setPixmap(QtGui.QPixmap.fromImage(icon))
+        # self.remote_server_icon.show()

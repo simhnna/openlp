@@ -22,3 +22,4 @@
 
 from .mediaitem import ImageMediaItem
 from .imagetab import ImageTab
+from .endpoint import images_endpoint

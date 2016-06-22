@@ -19,9 +19,52 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
 
-from .mediaitem import MediaMediaItem
-from .mediatab import MediaTab
-from .endpoint import media_endpoint
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.endpoint.pluginhelpers import search, live, service
+from openlp.core.api.http import register_endpoint, requires_auth
 
-__all__ = ['MediaMediaItem']
+
+log = logging.getLogger(__name__)
+
+media_endpoint = Endpoint('media')
+api_media_endpoint = Endpoint('api')
+
+
+@media_endpoint.route('search')
+@api_media_endpoint.route('media/search')
+def media_search(request):
+    """
+    Handles requests for searching the media plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'media', log)
+
+
+@media_endpoint.route('live')
+@api_media_endpoint.route('media/live')
+@requires_auth
+def media_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'media', log)
+
+
+@media_endpoint.route('add')
+@api_media_endpoint.route('media/add')
+@requires_auth
+def media_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    return service(request, 'media', log)
+
+register_endpoint(media_endpoint)
+register_endpoint(api_media_endpoint)

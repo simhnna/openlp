@@ -26,6 +26,7 @@ from webob import Response
 
 from openlp.core.common.settings import Settings
 from openlp.core.api.http.wsgiapp import WSGIApplication
+from .errors import NotFound, ServerError, HttpError
 
 application = WSGIApplication('api')
 
@@ -102,7 +103,7 @@ def requires_auth(f):
             return authenticate()
         else:
             auth = req.authorization
-            if check_auth(auth):
+            if auth and check_auth(auth):
                 return f(*args, **kwargs)
             else:
                 return authenticate()

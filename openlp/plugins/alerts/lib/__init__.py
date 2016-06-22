@@ -22,3 +22,4 @@
 
 from .alertsmanager import AlertsManager
 from .alertstab import AlertsTab
+from .endpoint import alert_endpoint

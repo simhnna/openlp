@@ -19,9 +19,52 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
 
-from .mediaitem import MediaMediaItem
-from .mediatab import MediaTab
-from .endpoint import media_endpoint
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.endpoint.pluginhelpers import search, live, service
+from openlp.core.api.http import register_endpoint, requires_auth
 
-__all__ = ['MediaMediaItem']
+
+log = logging.getLogger(__name__)
+
+bibles_endpoint = Endpoint('bibles')
+api_bibles_endpoint = Endpoint('api')
+
+
+@bibles_endpoint.route('search')
+@api_bibles_endpoint.route('bibles/search')
+def bibles_search(request):
+    """
+    Handles requests for searching the bibles plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'bibles', log)
+
+
+@bibles_endpoint.route('live')
+@api_bibles_endpoint.route('bibles/live')
+@requires_auth
+def bibles_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'bibles', log)
+
+
+@bibles_endpoint.route('add')
+@api_bibles_endpoint.route('bibles/add')
+@requires_auth
+def bibles_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    return service(request, 'bibles', log)
+
+register_endpoint(bibles_endpoint)
+register_endpoint(api_bibles_endpoint)

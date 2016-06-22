@@ -75,4 +75,4 @@ class Endpoint(object):
 from .controller import controller_endpoint
 from .core import stage_endpoint
 from .service import service_endpoint
-from .alert import alert_endpoint
+from .pluginhelpers import search, live, service

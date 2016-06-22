@@ -19,9 +19,52 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
 
-from .mediaitem import MediaMediaItem
-from .mediatab import MediaTab
-from .endpoint import media_endpoint
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.endpoint.pluginhelpers import search, live, service
+from openlp.core.api.http import register_endpoint, requires_auth
 
-__all__ = ['MediaMediaItem']
+
+log = logging.getLogger(__name__)
+
+songs_endpoint = Endpoint('songs')
+api_songs_endpoint = Endpoint('api')
+
+
+@songs_endpoint.route('search')
+@api_songs_endpoint.route('songs/search')
+def songs_search(request):
+    """
+    Handles requests for searching the songs plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'songs', log)
+
+
+@songs_endpoint.route('live')
+@api_songs_endpoint.route('songs/live')
+@requires_auth
+def songs_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'songs', log)
+
+
+@songs_endpoint.route('add')
+@api_songs_endpoint.route('songs/add')
+@requires_auth
+def songs_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    return service(request, 'songs', log)
+
+register_endpoint(songs_endpoint)
+register_endpoint(api_songs_endpoint)
