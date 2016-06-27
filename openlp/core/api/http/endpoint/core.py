@@ -118,6 +118,7 @@ def toggle_display(request, display):
     return {'results': {'success': True}}
 
 
+@blank_endpoint.route('api/plugin/{search:search}')
 @blank_endpoint.route('plugin/{search:search}')
 def plugin_search(request, search):
     """
@@ -131,25 +132,25 @@ def plugin_search(request, search):
             searches.append([plugin.name, str(plugin.text_strings[StringContent.Name]['plural'])])
     return {'results': {'items': searches}}
 
-# @stage_endpoint.route('(stage)/(.*)$')
-# def bespoke_file_access(request):
-#     """
-#     Allow Stage view to be delivered with custom views.
-#
-#     :param request: base path of the URL. Not used but passed by caller
-#     :return:
-#     """
-#     file_name = request.path
-#     config_dir = os.path.join(AppLocation.get_data_path(), 'stages')
-#     log.debug('serve file request {name}'.format(name=file_name))
-#     parts = file_name.split('/')
-#     if len(parts) == 1:
-#         file_name = os.path.join(parts[0], 'stage.mako')
-#     elif len(parts) == 3:
-#         file_name = os.path.join(parts[1], parts[2])
-#     path = os.path.normpath(os.path.join(config_dir, file_name))
-#     #return _process_file(path)
-#     pass
+
+@stage_endpoint.route('{local_path}')
+def bespoke_file_access(request, local_path):
+    """
+    Allow Stage view to be delivered with custom views.
+
+    :param request: base path of the URL. Not used but passed by caller
+    :param local_path: path within the stages config directory
+    :return:
+    """
+    config_dir = os.path.join(AppLocation.get_data_path(), 'stages')
+    log.debug('serve file request {name}'.format(name=local_path))
+    parts = local_path.split('/')
+    if len(parts) == 1:
+        file_name = os.path.join(parts[0], 'stage.mako')
+    elif len(parts) == 3:
+        file_name = os.path.join(parts[1], parts[2])
+    path = os.path.normpath(os.path.join(config_dir, file_name))
+    #return _process_file(path)
 
 
 @main_endpoint.route('image')
@@ -164,17 +165,6 @@ def main_image(request):
         'slide_image': 'data:image/png;base64,' + str(image_to_byte(live_controller.slide_image))
     }
     return {'results': result}
-
-# @stage_endpoint.route(r'^/(\w+)/thumbnails([^/]+)?/(.*)$')
-# def main_image(request):
-#     """
-#     Get a list of songs
-#     :param request: base path of the URL. Not used but passed by caller
-#     :return:
-#     """
-#     # songs = db.query(Song).get()
-#     # return {'songs': [dictify(song) for song in songs]}
-#     print("AAA")
 
 
 def get_content_type(file_name):

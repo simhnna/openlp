@@ -26,15 +26,17 @@ import urllib.error
 import json
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint
+from openlp.core.api.http import register_endpoint, requires_auth
 from openlp.core.common import Registry, AppLocation, Settings
 from openlp.core.lib import ItemCapabilities, create_thumb
 
 log = logging.getLogger(__name__)
 
 controller_endpoint = Endpoint('controller')
+api_controller_endpoint = Endpoint('api')
 
 
+@api_controller_endpoint.route('controller/live/text')
 @controller_endpoint.route('live/text')
 def controller_text(request):
     """
@@ -65,6 +67,7 @@ def controller_text(request):
                 # Create thumbnail if it doesn't exists
                 if not os.path.exists(full_thumbnail_path):
                     create_thumb(current_item.get_frame_path(index), full_thumbnail_path, False)
+                Registry().get('image_manager').add_image(full_thumbnail_path, frame['title'], None, 88, 88)
                 item['img'] = urllib.request.pathname2url(os.path.sep + thumbnail_path)
                 item['text'] = str(frame['title'])
                 item['html'] = str(frame['title'])
@@ -81,6 +84,7 @@ def controller_text(request):
                     data_path = AppLocation.get_data_path()
                     if frame['image'][0:len(data_path)] == data_path:
                         item['img'] = urllib.request.pathname2url(frame['image'][len(data_path):])
+                    Registry().get('image_manager').add_image(frame['image'], frame['title'], None, 88, 88)
                 item['text'] = str(frame['title'])
                 item['html'] = str(frame['title'])
             item['selected'] = (live_controller.selected_row == index)
@@ -91,7 +95,9 @@ def controller_text(request):
     return json_data
 
 
+@api_controller_endpoint.route('controller/live/set')
 @controller_endpoint.route('live/set')
+@requires_auth
 def controller_set(request):
     """
     Perform an action on the slide controller.
@@ -108,3 +114,4 @@ def controller_set(request):
     return {'results': {'success': True}}
 
 register_endpoint(controller_endpoint)
+register_endpoint(api_controller_endpoint)

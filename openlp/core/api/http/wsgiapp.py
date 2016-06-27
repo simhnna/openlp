@@ -79,6 +79,9 @@ def _make_response(view_result):
             body = json.dumps(body)
         response = Response(body=body, status=view_result[1],
                             content_type=content_type, charset='utf8')
+        response.headers.add("Cache-Control", "no-cache, no-store, must-revalidate")
+        response.headers.add("Pragma", "no-cache")
+        response.headers.add("Expires", "0")
         if len(view_result) >= 3:
             response.headers.update(view_result[2])
         return response
@@ -134,13 +137,11 @@ class WSGIApplication(object):
         Find the appropriate URL and run the view function
         """
         # We are not interested in this so discard
-        if '/favicon.ico' in request.path:
+        if 'favicon' in request.path:
             return
         # First look to see if this is a static file request
         for route, static_app in self.static_routes.items():
-            print(route, request.path)
             if re.match(route, request.path):
-                print("matched static")
                 # Pop the path info twice in order to get rid of the "/<plugin>/static"
                 # request.path_info_pop()
                 request.path_info_pop()
@@ -148,12 +149,7 @@ class WSGIApplication(object):
         # If not a static route, try the views
         for route, views in self.route_map.items():
             path = request.path
-            # /api is legacy so we need to handle backwards compatibility
-            if path.startswith('/api'):
-                path = path[4:]
-            print("route MATCHED", route, request.path, path)
             match = re.match(route, path)
-            print(match)
             if match and request.method.upper() in views:
                 kwargs = match.groupdict()
                 log.debug('Found {method} {url}'.format(method=request.method, url=request.path))
@@ -171,10 +167,16 @@ class WSGIApplication(object):
             response = self.dispatch(request)
         except Exception as e:
             response = _make_response(_handle_exception(e))
+        response.headers.add("cache-control", "no-cache, no-store, must-revalidate")
+        response.headers.add("pragma", "no-cache")
+        response.headers.add("expires", "0")
         return response(environ, start_response)
 
     def __call__(self, environ, start_response):
         """
         Shortcut for wsgi_app.
         """
+        # We are not interested in this so discard
+        if 'favicon' in environ["PATH_INFO"]:
+            return
         return self.wsgi_app(environ, start_response)

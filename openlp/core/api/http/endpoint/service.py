@@ -30,8 +30,10 @@ from openlp.core.common import Registry
 log = logging.getLogger(__name__)
 
 service_endpoint = Endpoint('service')
+api_service_endpoint = Endpoint('api/service')
 
 
+@api_service_endpoint.route('list')
 @service_endpoint.route('list')
 def list_service(request):
     """
@@ -42,6 +44,7 @@ def list_service(request):
     return {'results': {'items': get_service_items()}}
 
 
+@api_service_endpoint.route('set')
 @service_endpoint.route('set')
 @requires_auth
 def service_set(request):
@@ -82,3 +85,4 @@ def get_service_items():
     return service_items
 
 register_endpoint(service_endpoint)
+register_endpoint(api_service_endpoint)

@@ -66,5 +66,43 @@ def presentations_service(request):
     """
     return service(request, 'presentations', log)
 
+
+# /presentations/thumbnails88x88/PA%20Rota.pdf/slide5.png
+@api_presentations_endpoint.route('presentations/thumbnails88x88/{file_name}/{slide}')
+@presentations_endpoint.route('thumbnails88x88/{file_name}/{slide}')
+def presentations_thumbnails(request, file_name, slide):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    controller_name = 'presentations'
+    dimensions = '88x88'
+    import os
+    import time
+    import urllib
+    from urllib.parse import urlparse
+    from webob import Response
+    from openlp.core.common import Registry, AppLocation
+
+    log.debug('serve thumbnail {cname}/thumbnails{dim}/{fname}'.format(cname=controller_name,
+                                                                       dim=dimensions,
+                                                                       fname=file_name))
+    content = None
+    if controller_name and file_name:
+        file_name = urllib.parse.unquote(file_name)
+        if '..' not in file_name:  # no hacking please
+            full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
+                                                      'thumbnails/', file_name, slide))
+            if os.path.exists(full_path):
+                image_manager = Registry().get("image_manager")
+                i = 0
+                while i < 4 and content is None:
+                    content = image_manager.get_image_bytes(full_path, file_name, 88, 88)
+                    time.sleep(0.1)
+                    i += 1
+    return Response(body=content, status=200, content_type='data:image/png;base64', charset='utf8')
+
+
 register_endpoint(presentations_endpoint)
 register_endpoint(api_presentations_endpoint)

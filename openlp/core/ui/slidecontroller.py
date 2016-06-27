@@ -1068,8 +1068,8 @@ class SlideController(DisplayController, RegistryProperties):
         if self.service_item is not None:
             if hide:
                 Registry().execute('live_display_hide', HideMode.Screen)
-                Registry().execute('{text}_hide'.format(text=self.service_item.name.lower()),
-                                   [self.service_item, self.is_live])
+                # Registry().execute('{text}_hide'.format(text=self.service_item.name.lower()),
+                #                    [self.service_item, self.is_live])
             else:
                 if not self.service_item.is_command():
                     Registry().execute('live_display_show')
