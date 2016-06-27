@@ -323,7 +323,19 @@ class OpenLyrics(object):
                 # Do not add the break attribute to the last lines element.
                 if index < len(optional_verses) - 1:
                     lines_element.set('break', 'optional')
-        return self._extract_xml(song_xml).decode()
+        xml_text = self._extract_xml(song_xml).decode()
+        return self._chordpro_to_openlyrics(xml_text)
+
+    def _chordpro_to_openlyrics(self, text):
+        """
+        Convert chords from Chord Pro format to Open Lyrics format
+
+        :param text: the lyric with chords
+        :return: the lyrics with the converted chords
+        """
+        # Process chords.
+        new_text = re.sub(r'\[(..?.?)\]', r'<chord name="\1"/>', text)
+        return new_text
 
     def _get_missing_tags(self, text):
         """
@@ -611,9 +623,10 @@ class OpenLyrics(object):
                 # Append tail text at chord element.
                 text += element.tail
             return text
-        # Skip <chord> element - not yet supported.
+        # Convert chords to ChordPro format which OpenLP uses internally
         # TODO: Verify format() with template variables
         elif element.tag == NSMAP % 'chord':
+            text += '[{chord}]'.format(chord=element.get('name'))
             if element.tail:
                 # Append tail text at chord element.
                 text += element.tail
