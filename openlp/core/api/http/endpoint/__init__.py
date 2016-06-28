@@ -66,6 +66,9 @@ class Endpoint(object):
         if not self.template_dir:
             raise Exception('No template directory specified')
         path = os.path.abspath(os.path.join(self.template_dir, filename))
+        print(path)
+        print(self.static_dir)
+        print('/{prefix}/static'.format(prefix=self.url_prefix))
         # if self.static_dir:
         #     kwargs['static_url'] = '/{prefix}/static'.format(prefix=self.url_prefix)
         return Template(filename=path, input_encoding='utf-8').render(**kwargs)

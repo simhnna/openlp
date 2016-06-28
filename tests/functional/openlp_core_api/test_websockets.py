@@ -26,7 +26,8 @@ import json
 from unittest import TestCase
 
 from openlp.core.common import Registry, Settings
-from openlp.core.api import Poll, WebSocketServer
+from openlp.core.api.websockets import WebSocketServer
+from openlp.core.api.poll import Poller
 from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
@@ -52,7 +53,7 @@ class TestWSServer(TestCase, TestMixin):
         self.build_settings()
         Settings().extend_default_settings(__default_settings__)
         Registry().create()
-        self.poll = Poll()
+        self.poll = Poller()
 
     def tearDown(self):
         """
@@ -112,7 +113,7 @@ class TestWSServer(TestCase, TestMixin):
         self.assertFalse(data['results']['isSecure'], 'The isSecure return value should be False')
         self.assertFalse(data['results']['isAuthorised'], 'The isAuthorised return value should be False')
         self.assertTrue(data['results']['twelve'], 'The twelve return value should be False')
-        self.assertEquals(data['results']['version'], 2, 'The version return value should be 2')
+        self.assertEquals(data['results']['version'], 3, 'The version return value should be 3')
         self.assertEquals(data['results']['slide'], 5, 'The slide return value should be 5')
         self.assertEquals(data['results']['service'], 21, 'The version return value should be 21')
         self.assertEquals(data['results']['item'], '23-34-45', 'The item return value should match 23-34-45')

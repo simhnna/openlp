@@ -25,7 +25,7 @@ Functional tests to test the Http Server Class.
 
 from unittest import TestCase
 
-from openlp.core.api import HttpServer
+from openlp.core.api.http.server import HttpServer
 
 from tests.functional import patch
 
@@ -34,8 +34,8 @@ class TestHttpServer(TestCase):
     """
     A test suite to test starting the http server
     """
-    @patch('openlp.core.api.http.HttpThread')
-    @patch('openlp.core.api.http.QtCore.QThread')
+    @patch('openlp.core.api.http.server.HttpWorker')
+    @patch('openlp.core.api.http.server.QtCore.QThread')
     def test_serverstart(self, mock_qthread, mock_thread):
         """
         Test the starting of the Waitress Server
