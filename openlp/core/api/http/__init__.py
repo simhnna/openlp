@@ -21,6 +21,7 @@
 ###############################################################################
 
 import base64
+import os
 from functools import wraps
 from webob import Response
 
@@ -28,7 +29,9 @@ from openlp.core.common.settings import Settings
 from openlp.core.api.http.wsgiapp import WSGIApplication
 from .errors import NotFound, ServerError, HttpError
 
-application = WSGIApplication('api')
+ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'endpoint')
+
+application = WSGIApplication('api', ROOT_DIR)
 
 
 def _route_from_url(url_prefix, url):
@@ -57,9 +60,6 @@ def register_endpoint(end_point):
             static_route = _route_from_url(end_point.url_prefix, 'static')
             static_route += '(.*)'
             application.add_static_route(static_route, end_point.static_dir)
-        assets_route = _route_from_url('', 'assets')
-        assets_route += '(.*)'
-        application.add_static_route(assets_route, end_point.assets_dir)
 
 
 def check_auth(auth):

@@ -33,6 +33,7 @@ from webob.static import DirectoryApp
 
 from openlp.core.api.http.errors import HttpError, NotFound, ServerError
 
+
 ARGS_REGEX = re.compile(r'''\{(\w+)(?::([^}]+))?\}''', re.VERBOSE)
 
 log = logging.getLogger(__name__)
@@ -105,13 +106,22 @@ class WSGIApplication(object):
     """
     This is the core of the API, the WSGI app
     """
-    def __init__(self, name):
+    def __init__(self, name, root_dir):
         """
         Create the app object
         """
         self.name = name
         self.static_routes = {}
         self.route_map = {}
+        self.initialise(root_dir)
+
+    def initialise(self, root_dir):
+        """
+        Set up generic roots for the whole application
+        :return: None
+        """
+        self.add_static_route('/assets(.*)', root_dir)
+        self.add_static_route('/images(.*)', root_dir)
 
     def add_route(self, route, view_func, method):
         """
@@ -139,14 +149,13 @@ class WSGIApplication(object):
                 return request.get_response(static_app)
         # If not a static route, try the views
         for route, views in self.route_map.items():
-            path = request.path
-            match = re.match(route, path)
+            match = re.match(route, request.path)
             if match and request.method.upper() in views:
                 kwargs = match.groupdict()
                 log.debug('Found {method} {url}'.format(method=request.method, url=request.path))
                 view_func = views[request.method.upper()]
                 return _make_response(view_func(request, **kwargs))
-        log.error('Not Found url {url} '.format(url=request.path))
+        log.error('URL {url} - Not found'.format(url=request.path))
         raise NotFound()
 
     def wsgi_app(self, environ, start_response):

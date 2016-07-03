@@ -2,20 +2,21 @@ import logging
 import os
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.api.http import register_endpoint, requires_auth, ROOT_DIR
 from openlp.core.common import Registry, AppLocation, UiStrings, translate
 from openlp.core.lib import image_to_byte, PluginStatus, StringContent
 
 
-template_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
-static_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
+template_dir = os.path.join(ROOT_DIR, 'templates')
+static_dir = os.path.join(ROOT_DIR, 'static')
+blank_dir = os.path.join(static_dir, 'index')
 
 
 log = logging.getLogger(__name__)
 
 stage_endpoint = Endpoint('stage', template_dir=template_dir, static_dir=static_dir)
 main_endpoint = Endpoint('main', template_dir=template_dir, static_dir=static_dir)
-blank_endpoint = Endpoint('', template_dir=template_dir, static_dir=static_dir)
+blank_endpoint = Endpoint('', template_dir=template_dir, static_dir=blank_dir)
 
 FILE_TYPES = {
     '.html': 'text/html',

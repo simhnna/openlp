@@ -72,6 +72,7 @@ class Endpoint(object):
         path = os.path.abspath(os.path.join(self.template_dir, filename))
         if self.static_dir:
             kwargs['static_url'] = '/{prefix}/static'.format(prefix=self.url_prefix)
+            kwargs['static_url'] = kwargs['static_url'].replace('//', '/')
         kwargs['assets_url'] = '/assets'
         return Template(filename=path, input_encoding='utf-8').render(**kwargs)
 
