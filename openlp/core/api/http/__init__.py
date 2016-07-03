@@ -57,6 +57,9 @@ def register_endpoint(end_point):
             static_route = _route_from_url(end_point.url_prefix, 'static')
             static_route += '(.*)'
             application.add_static_route(static_route, end_point.static_dir)
+        assets_route = _route_from_url('', 'assets')
+        assets_route += '(.*)'
+        application.add_static_route(assets_route, end_point.assets_dir)
 
 
 def check_auth(auth):

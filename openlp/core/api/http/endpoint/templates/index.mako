@@ -24,12 +24,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1" />
   <title>${app_title}</title>
-  <link rel="stylesheet" href="/static/assets/jquery.mobile.min.css" />
-  <link rel="stylesheet" href="/static/css/openlp.css" />
+  <link rel="stylesheet" href="${assets_url}/jquery.mobile.min.css" />
+  <link rel="stylesheet" href="${static_url}/css/openlp.css" />
   <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico">
-  <script type="text/javascript" src="/static/assets/jquery.min.js"></script>
-  <script type="text/javascript" src="/static/js/openlp.js"></script>
-  <script type="text/javascript" src="/static/assets/jquery.mobile.min.js"></script>
+  <script type="text/javascript" src="${assets_url}/jquery.min.js"></script>
+  <script type="text/javascript" src="${static_url}/js/openlp.js"></script>
+  <script type="text/javascript" src="${assets_url}/jquery.mobile.min.js"></script>
   <script type="text/javascript">
   translationStrings = {
     "go_live": "${go_live}",

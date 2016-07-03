@@ -100,7 +100,7 @@ window.OpenLP = {
           }
           text = text.replace(/\n/g, '<br />');
           if (slide["img"]) {
-            text += "<img src='" + slide["img"].replace("/thumbnails/", "/thumbnails88x88/") + "'>";
+            text += "<img src='" + slide["img"].replace("/thumbnails/", "/thumbnails/88x88/") + "'>";
           }
           var li = $("<li data-icon=\"false\">").append($("<a href=\"#\">").html(text));
           if (slide["selected"]) {

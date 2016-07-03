@@ -23,10 +23,10 @@
 <head>
   <meta charset="utf-8" />
   <title>${live_title}</title>
-  <link rel="stylesheet" href="/static/css/main.css" />
+  <link rel="stylesheet" href="${static_url}/css/main.css" />
   <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico">
-  <script type="text/javascript" src="/static/assets/jquery.min.js"></script>
-  <script type="text/javascript" src="/static/js/main.js"></script>
+  <script type="text/javascript" src="${assets_url}/jquery.min.js"></script>
+  <script type="text/javascript" src="${static_url}/js/main.js"></script>
 </head>
 <body>
 <img id="image" class="size"/>

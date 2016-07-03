@@ -65,19 +65,7 @@ def stage_index(request):
     """
     Deliver the page for the /stage url
     """
-    #file_name = request.path
-    #html_dir = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'core', 'api', 'html')
-    #log.debug('serve file request {name}'.format(name=file_name))
-    #if file_name.startswith('/'):
-    #    file_name = file_name[1:]
-    #if not file_name:
-    #    file_name = 'index.mako'
-    #if '.' not in file_name:
-    #    file_name += '.html'
-    #if file_name.startswith('/'):
-    #    file_name = file_name[1:]
-    #path = os.path.normpath(os.path.join(html_dir, file_name))
-    return stage_endpoint.render_template('stage.mako', **TRANSLATED_STRINGS, static_url=static_dir)
+    return stage_endpoint.render_template('stage.mako', **TRANSLATED_STRINGS)
 
 
 @main_endpoint.route('')
@@ -85,7 +73,7 @@ def main_index(request):
     """
     Deliver the page for the /main url
     """
-    return stage_endpoint.render_template('main.mako', **TRANSLATED_STRINGS)
+    return main_endpoint.render_template('main.mako', **TRANSLATED_STRINGS)
 
 
 @blank_endpoint.route('')

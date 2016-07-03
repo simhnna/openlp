@@ -32,13 +32,17 @@ class Endpoint(object):
     """
     This is an endpoint for the HTTP API
     """
-    def __init__(self, url_prefix, template_dir=None, static_dir=None):
+    def __init__(self, url_prefix, template_dir=None, static_dir=None, assets_dir=None):
         """
         Create an endpoint with a URL prefix
         """
         self.url_prefix = url_prefix
         self.static_dir = static_dir
         self.template_dir = template_dir
+        if assets_dir:
+            self.assets_dir = assets_dir
+        else:
+            self.assets_dir = os.path.dirname(os.path.realpath(__file__))
         self.routes = []
 
     def add_url_route(self, url, view_func, method):
@@ -66,11 +70,9 @@ class Endpoint(object):
         if not self.template_dir:
             raise Exception('No template directory specified')
         path = os.path.abspath(os.path.join(self.template_dir, filename))
-        print(path)
-        print(self.static_dir)
-        print('/{prefix}/static'.format(prefix=self.url_prefix))
-        # if self.static_dir:
-        #     kwargs['static_url'] = '/{prefix}/static'.format(prefix=self.url_prefix)
+        if self.static_dir:
+            kwargs['static_url'] = '/{prefix}/static'.format(prefix=self.url_prefix)
+        kwargs['assets_url'] = '/assets'
         return Template(filename=path, input_encoding='utf-8').render(**kwargs)
 
 

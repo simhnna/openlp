@@ -79,9 +79,6 @@ def _make_response(view_result):
             body = json.dumps(body)
         response = Response(body=body, status=view_result[1],
                             content_type=content_type, charset='utf8')
-        response.headers.add("Cache-Control", "no-cache, no-store, must-revalidate")
-        response.headers.add("Pragma", "no-cache")
-        response.headers.add("Expires", "0")
         if len(view_result) >= 3:
             response.headers.update(view_result[2])
         return response
@@ -136,15 +133,9 @@ class WSGIApplication(object):
         """
         Find the appropriate URL and run the view function
         """
-        # We are not interested in this so discard
-        if 'favicon' in request.path:
-            return
         # First look to see if this is a static file request
         for route, static_app in self.static_routes.items():
             if re.match(route, request.path):
-                # Pop the path info twice in order to get rid of the "/<plugin>/static"
-                # request.path_info_pop()
-                request.path_info_pop()
                 return request.get_response(static_app)
         # If not a static route, try the views
         for route, views in self.route_map.items():
@@ -176,7 +167,4 @@ class WSGIApplication(object):
         """
         Shortcut for wsgi_app.
         """
-        # We are not interested in this so discard
-        if 'favicon' in environ["PATH_INFO"]:
-            return
         return self.wsgi_app(environ, start_response)

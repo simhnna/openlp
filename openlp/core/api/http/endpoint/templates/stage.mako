@@ -23,10 +23,10 @@
 <head>
   <meta charset="utf-8" />
   <title>${stage_title}</title>
-  <link rel="stylesheet" href="/static/css/stage.css" />
+  <link rel="stylesheet" href="${static_url}/css/stage.css" />
   <link rel="shortcut icon" type="image/x-icon" href="/static/images/favicon.ico">
-  <script type="text/javascript" src="/static/assets/jquery.min.js"></script>
-  <script type="text/javascript" src="/static/js/stage.js"></script>
+  <script type="text/javascript" src="${assets_url}/jquery.min.js"></script>
+  <script type="text/javascript" src="${static_url}/js/stage.js"></script>
 </head>
 <body>
 <input type="hidden" id="next-text" value="${next}" />
