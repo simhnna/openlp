@@ -89,3 +89,50 @@ def service(request, plugin_name, log):
         item_id = plugin.media_item.create_item_from_id(request_id)
         getattr(plugin.media_item, '{name}_add_to_service'.format(name=plugin_name)).emit([item_id, True])
     return []
+
+
+def display_thumbnails(request, controller_name, log, dimensions, file_name, slide):
+    """
+    Handles requests for adding a song to the service
+
+    Return an image to a web page based on a URL
+    :param request: Request object
+    :param controller_name: which controller is requesting the image
+    :param log: the logger object
+    :param dimensions: the image size eg 88x88
+    :param file_name: the file name of the image
+    :param slide: the individual image name
+    :return:
+    """
+    import os
+    import re
+    import urllib
+    from urllib.parse import urlparse
+    from webob import Response
+    from openlp.core.common import Registry, AppLocation
+    from openlp.core.lib import image_to_byte
+
+    log.debug('serve thumbnail {cname}/thumbnails{dim}/{fname}/{slide}'.format(cname=controller_name,
+                                                                               dim=dimensions,
+                                                                               fname=file_name,
+                                                                               slide=slide))
+    # -1 means use the default dimension in ImageManager
+    width = -1
+    height = -1
+    image = None
+    if dimensions:
+        match = re.search('(\d+)x(\d+)', dimensions)
+        if match:
+            # let's make sure that the dimensions are within reason
+            width = sorted([10, int(match.group(1)), 1000])[1]
+            height = sorted([10, int(match.group(2)), 1000])[1]
+    if controller_name and file_name:
+        file_name = urllib.parse.unquote(file_name)
+        if '..' not in file_name:  # no hacking please
+            full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
+                                                      'thumbnails', file_name, slide))
+            if os.path.exists(full_path):
+                path, just_file_name = os.path.split(full_path)
+                Registry().get('image_manager').add_image(full_path, just_file_name, None, width, height)
+                image = Registry().get('image_manager').get_image(full_path, just_file_name, width, height)
+    return Response(body=image_to_byte(image, False), status=200, content_type='image/png', charset='utf8')
