@@ -134,6 +134,16 @@ class Settings(QtCore.QSettings):
         'advanced/single click service preview': False,
         'advanced/x11 bypass wm': X11_BYPASS_DEFAULT,
         'advanced/search as type': True,
+
+    'remotes/twelve hour': True,
+    'remotes/port': 4316,
+    'remotes/websocket port': 4317,
+    'remotes/user id': 'openlp',
+    'remotes/password': 'password',
+    'remotes/authentication enabled': False,
+    'remotes/ip address': '0.0.0.0',
+    'remotes/thumbnails': True,
+
         'crashreport/last directory': '',
         'formattingTags/html_tags': '',
         'core/audio repeat list': False,

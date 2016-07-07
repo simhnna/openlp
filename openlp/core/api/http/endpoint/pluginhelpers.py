@@ -19,12 +19,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import os
 import json
+import re
 import urllib
-from urllib.parse import urlparse
 
-from openlp.core.common import Registry
-from openlp.core.lib import PluginStatus
+from urllib.parse import urlparse
+from webob import Response
+
+from openlp.core.common import Registry, AppLocation
+from openlp.core.lib import PluginStatus, image_to_byte
 
 
 def search(request, plugin_name, log):
@@ -104,14 +108,6 @@ def display_thumbnails(request, controller_name, log, dimensions, file_name, sli
     :param slide: the individual image name
     :return:
     """
-    import os
-    import re
-    import urllib
-    from urllib.parse import urlparse
-    from webob import Response
-    from openlp.core.common import Registry, AppLocation
-    from openlp.core.lib import image_to_byte
-
     log.debug('serve thumbnail {cname}/thumbnails{dim}/{fname}/{slide}'.format(cname=controller_name,
                                                                                dim=dimensions,
                                                                                fname=file_name,

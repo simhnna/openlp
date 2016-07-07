@@ -19,3 +19,31 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
+
+import os
+
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.endpoint.core import TRANSLATED_STRINGS
+from openlp.core.api.http import register_endpoint
+from openlp.core.common import AppLocation
+
+
+static_dir = os.path.join(AppLocation.get_section_data_path('remotes'))
+
+log = logging.getLogger(__name__)
+
+remote_endpoint = Endpoint('remote', template_dir=static_dir, static_dir=static_dir)
+
+
+@remote_endpoint.route('{view}')
+def index(request, view):
+    """
+    Handles requests for /remotes url
+
+    :param request: The http request object.
+    :param view: The view name to be servered.
+    """
+    return remote_endpoint.render_template('{view}.mako'.format(view=view), **TRANSLATED_STRINGS)
+
+register_endpoint(remote_endpoint)

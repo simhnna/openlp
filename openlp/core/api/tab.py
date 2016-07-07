@@ -79,8 +79,7 @@ class ApiTab(SettingsTab):
         self.http_setting_layout.setObjectName('http_setting_layout')
         self.port_label = QtWidgets.QLabel(self.http_settings_group_box)
         self.port_label.setObjectName('port_label')
-        self.port_spin_box = QtWidgets.QSpinBox(self.http_settings_group_box)
-        self.port_spin_box.setMaximum(32767)
+        self.port_spin_box = QtWidgets.QLabel(self.http_settings_group_box)
         self.port_spin_box.setObjectName('port_spin_box')
         self.http_setting_layout.addRow(self.port_label, self.port_spin_box)
         self.remote_url_label = QtWidgets.QLabel(self.http_settings_group_box)
@@ -154,7 +153,6 @@ class ApiTab(SettingsTab):
         self.twelve_hour_check_box.stateChanged.connect(self.on_twelve_hour_check_box_changed)
         self.thumbnails_check_box.stateChanged.connect(self.on_thumbnails_check_box_changed)
         self.address_edit.textChanged.connect(self.set_urls)
-        self.port_spin_box.valueChanged.connect(self.set_urls)
 
     def retranslateUi(self):
         self.tab_title_visible = translate('RemotePlugin.RemoteTab', 'Remote Interface')
@@ -187,14 +185,15 @@ class ApiTab(SettingsTab):
         Update the display based on the data input on the screen
         """
         ip_address = self.get_ip_address(self.address_edit.text())
-        http_url = 'http://{url}:{text}/'.format(url=ip_address, text=self.port_spin_box.value())
+        http_url = 'http://{url}:{text}/'.format(url=ip_address, text=self.port_spin_box.text())
         self.remote_url.setText('<a href="{url}">{url}</a>'.format(url=http_url))
         http_url_temp = http_url + 'stage'
         self.stage_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
         http_url_temp = http_url + 'main'
         self.live_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
 
-    def get_ip_address(self, ip_address):
+    @staticmethod
+    def get_ip_address(ip_address):
         """
         returns the IP address in dependency of the passed address
         ip_address == 0.0.0.0: return the IP address of the first valid interface
@@ -218,7 +217,7 @@ class ApiTab(SettingsTab):
         """
         Load the configuration and update the server configuration if necessary
         """
-        self.port_spin_box.setValue(Settings().value(self.settings_section + '/port'))
+        self.port_spin_box.setText(str(Settings().value(self.settings_section + '/port')))
         self.address_edit.setText(Settings().value(self.settings_section + '/ip address'))
         self.twelve_hour = Settings().value(self.settings_section + '/twelve hour')
         self.twelve_hour_check_box.setChecked(self.twelve_hour)
@@ -233,10 +232,8 @@ class ApiTab(SettingsTab):
         """
         Save the configuration and update the server configuration if necessary
         """
-        if Settings().value(self.settings_section + '/ip address') != self.address_edit.text() or \
-                Settings().value(self.settings_section + '/port') != self.port_spin_box.value():
+        if Settings().value(self.settings_section + '/ip address') != self.address_edit.text():
             self.settings_form.register_post_process('remotes_config_updated')
-        Settings().setValue(self.settings_section + '/port', self.port_spin_box.value())
         Settings().setValue(self.settings_section + '/ip address', self.address_edit.text())
         Settings().setValue(self.settings_section + '/twelve hour', self.twelve_hour)
         Settings().setValue(self.settings_section + '/thumbnails', self.thumbnails)

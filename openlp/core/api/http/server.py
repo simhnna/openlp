@@ -52,7 +52,7 @@ class HttpWorker(QtCore.QObject):
         """
         Run the thread.
         """
-        serve(application, host='0.0.0.0', port=4318)
+        serve(application, host='0.0.0.0', port=4316)
 
     def stop(self):
         pass
