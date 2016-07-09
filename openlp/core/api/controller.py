@@ -50,4 +50,3 @@ class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Registry().register('poller', self.poller)
         self.ws_server = WebSocketServer()
         self.http_server = HttpServer()
-

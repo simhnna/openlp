@@ -65,4 +65,3 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.text_strings[StringContent.VisibleName] = {
             'title': translate('RemotePlugin', 'Remote', 'container title')
         }
-

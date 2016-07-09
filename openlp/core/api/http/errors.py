@@ -63,5 +63,3 @@ class ServerError(HttpError):
         Make this a 500
         """
         super(ServerError, self).__init__(500, 'Server Error')
-
-
