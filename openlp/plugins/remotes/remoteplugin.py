@@ -29,17 +29,6 @@ from openlp.plugins.remotes.lib.endpoint import remote_endpoint
 
 log = logging.getLogger(__name__)
 
-__default_settings__ = {
-    'remotes/twelve hour': True,
-    'remotes/port': 4316,
-    'remotes/websocket port': 4317,
-    'remotes/user id': 'openlp',
-    'remotes/password': 'password',
-    'remotes/authentication enabled': False,
-    'remotes/ip address': '0.0.0.0',
-    'remotes/thumbnails': True
-}
-
 
 class RemotesPlugin(Plugin, OpenLPMixin):
     log.info('Remote Plugin loaded')
@@ -48,11 +37,10 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         remotes constructor
         """
-        super(RemotesPlugin, self).__init__('remotes', __default_settings__)
+        super(RemotesPlugin, self).__init__('remotes')
         self.icon_path = ':/plugins/plugin_remote.png'
         self.icon = build_icon(self.icon_path)
         self.weight = -1
-
 
     @staticmethod
     def about():

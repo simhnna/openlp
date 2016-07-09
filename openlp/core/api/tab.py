@@ -36,19 +36,7 @@ class ApiTab(SettingsTab):
         self.icon_path = ':/plugins/plugin_remote.png'
         advanced_translated = translate('OpenLP.AdvancedTab', 'Advanced')
         super(ApiTab, self).__init__(parent, 'remotes', advanced_translated)
-        if not hasattr(self, 'remote_server_icon'):
-            self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
-            size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-            size_policy.setHorizontalStretch(0)
-            size_policy.setVerticalStretch(0)
-            size_policy.setHeightForWidth(self.remote_server_icon.sizePolicy().hasHeightForWidth())
-            self.remote_server_icon.setSizePolicy(size_policy)
-            self.remote_server_icon.setFrameShadow(QtWidgets.QFrame.Plain)
-            self.remote_server_icon.setLineWidth(1)
-            self.remote_server_icon.setScaledContents(True)
-            self.remote_server_icon.setFixedSize(20, 20)
-            self.remote_server_icon.setObjectName('remote_server_icon')
-            self.main_window.status_bar.insertPermanentWidget(2, self.remote_server_icon)
+        self.define_main_window_icon()
         self.generate_icon()
 
     def setupUi(self):
@@ -153,6 +141,24 @@ class ApiTab(SettingsTab):
         self.twelve_hour_check_box.stateChanged.connect(self.on_twelve_hour_check_box_changed)
         self.thumbnails_check_box.stateChanged.connect(self.on_thumbnails_check_box_changed)
         self.address_edit.textChanged.connect(self.set_urls)
+
+    def define_main_window_icon(self):
+        """
+        Define an icon on the main window to show the state of the server
+        :return:
+        """
+        self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
+        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        size_policy.setHorizontalStretch(0)
+        size_policy.setVerticalStretch(0)
+        size_policy.setHeightForWidth(self.remote_server_icon.sizePolicy().hasHeightForWidth())
+        self.remote_server_icon.setSizePolicy(size_policy)
+        self.remote_server_icon.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.remote_server_icon.setLineWidth(1)
+        self.remote_server_icon.setScaledContents(True)
+        self.remote_server_icon.setFixedSize(20, 20)
+        self.remote_server_icon.setObjectName('remote_server_icon')
+        self.main_window.status_bar.insertPermanentWidget(2, self.remote_server_icon)
 
     def retranslateUi(self):
         self.tab_title_visible = translate('RemotePlugin.RemoteTab', 'Remote Interface')
