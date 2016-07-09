@@ -122,26 +122,6 @@ def plugin_search(request, search):
     return {'results': {'items': searches}}
 
 
-@stage_endpoint.route('{local_path}')
-def bespoke_file_access(request, local_path):
-    """
-    Allow Stage view to be delivered with custom views.
-
-    :param request: base path of the URL. Not used but passed by caller
-    :param local_path: path within the stages config directory
-    :return:
-    """
-    config_dir = os.path.join(AppLocation.get_data_path(), 'stages')
-    log.debug('serve file request {name}'.format(name=local_path))
-    parts = local_path.split('/')
-    if len(parts) == 1:
-        file_name = os.path.join(parts[0], 'stage.mako')
-    elif len(parts) == 3:
-        file_name = os.path.join(parts[1], parts[2])
-    path = os.path.normpath(os.path.join(config_dir, file_name))
-    #return _process_file(path)
-
-
 @main_endpoint.route('image')
 def main_image(request):
     """
