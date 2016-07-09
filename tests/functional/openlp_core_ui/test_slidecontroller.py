@@ -681,7 +681,7 @@ class TestSlideController(TestCase):
         slide_controller._process_item(mocked_media_item, 0)
 
         # THEN: Registry.execute should have been called to stop the presentation
-        self.assertEqual(3, mocked_execute.call_count, 'Execute should have been called 3 times')
+        self.assertEqual(3, mocked_execute.call_count, 'Execute should have been called 2 times')
         self.assertEqual('mocked_presentation_item_stop', mocked_execute.call_args_list[1][0][0],
                          'The presentation should have been stopped.')
 
