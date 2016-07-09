@@ -69,8 +69,8 @@ def check_auth(auth):
     :param auth: the authorisation object which needs to be tested
     :return Whether authentication have been successful
     """
-    auth_code = "{user}:{password}".format(user=Settings().value('remotes/user id'),
-                                           password=Settings().value('remotes/password'))
+    auth_code = "{user}:{password}".format(user=Settings().value('api/user id'),
+                                           password=Settings().value('api/password'))
     try:
         auth_base = base64.b64encode(auth_code)
     except TypeError:
@@ -99,7 +99,7 @@ def requires_auth(f):
     """
     @wraps(f)
     def decorated(*args, **kwargs):
-        if not Settings().value('remotes/authentication enabled'):
+        if not Settings().value('api/authentication enabled'):
             return f(*args, **kwargs)
         req = args[0]
         if not hasattr(req, 'authorization'):

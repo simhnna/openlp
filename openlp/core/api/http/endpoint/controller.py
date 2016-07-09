@@ -60,7 +60,7 @@ def controller_text(request):
                 item['text'] = str(frame['text'])
                 item['html'] = str(frame['html'])
             # Handle images, unless a custom thumbnail is given or if thumbnails is disabled
-            elif current_item.is_image() and not frame.get('image', '') and Settings().value('remotes/thumbnails'):
+            elif current_item.is_image() and not frame.get('image', '') and Settings().value('api/thumbnails'):
                 item['tag'] = str(index + 1)
                 thumbnail_path = os.path.join('images', 'thumbnails', frame['title'])
                 full_thumbnail_path = os.path.join(AppLocation.get_data_path(), thumbnail_path)
@@ -79,7 +79,7 @@ def controller_text(request):
                 if current_item.is_capable(ItemCapabilities.HasNotes):
                     item['slide_notes'] = str(frame['notes'])
                 if current_item.is_capable(ItemCapabilities.HasThumbnails) and \
-                        Settings().value('remotes/thumbnails'):
+                        Settings().value('api/thumbnails'):
                     # If the file is under our app directory tree send the portion after the match
                     data_path = AppLocation.get_data_path()
                     if frame['image'][0:len(data_path)] == data_path:

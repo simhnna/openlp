@@ -35,7 +35,7 @@ class ApiTab(SettingsTab):
     def __init__(self, parent):
         self.icon_path = ':/plugins/plugin_remote.png'
         advanced_translated = translate('OpenLP.AdvancedTab', 'Advanced')
-        super(ApiTab, self).__init__(parent, 'remotes', advanced_translated)
+        super(ApiTab, self).__init__(parent, 'api', advanced_translated)
         self.define_main_window_icon()
         self.generate_icon()
 

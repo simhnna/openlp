@@ -40,12 +40,12 @@ class Poller(RegistryProperties):
             'service': self.service_manager.service_id,
             'slide': self.live_controller.selected_row or 0,
             'item': self.live_controller.service_item.unique_identifier if self.live_controller.service_item else '',
-            'twelve': Settings().value('remotes/twelve hour'),
+            'twelve': Settings().value('api/twelve hour'),
             'blank': self.live_controller.blank_screen.isChecked(),
             'theme': self.live_controller.theme_screen.isChecked(),
             'display': self.live_controller.desktop_screen.isChecked(),
             'version': 3,
-            'isSecure': Settings().value('remotes/authentication enabled'),
+            'isSecure': Settings().value('api/authentication enabled'),
             'isAuthorised': False
         }
 

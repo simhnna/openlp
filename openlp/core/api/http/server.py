@@ -31,7 +31,7 @@ from PyQt5 import QtCore
 from waitress import serve
 
 from openlp.core.api.http import application
-from openlp.core.common import RegistryProperties, OpenLPMixin
+from openlp.core.common import RegistryProperties, OpenLPMixin, Settings
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +52,9 @@ class HttpWorker(QtCore.QObject):
         """
         Run the thread.
         """
-        serve(application, host='0.0.0.0', port=4316)
+        address = Settings().value('api/ip address')
+        port = Settings().value('api/port')
+        serve(application, host=address, port=port)
 
     def stop(self):
         pass

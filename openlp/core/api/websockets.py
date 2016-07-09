@@ -69,7 +69,7 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
         Initialise and start the WebSockets server
         """
         super(WebSocketServer, self).__init__()
-        self.settings_section = 'remotes'
+        self.settings_section = 'api'
         self.worker = WebSocketWorker(self)
         self.thread = QtCore.QThread()
         self.worker.moveToThread(self.thread)
@@ -81,7 +81,7 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
         Start the correct server and save the handler
         """
         address = Settings().value(self.settings_section + '/ip address')
-        port = '4317'
+        port = Settings().value(self.settings_section + '/websocket port')
         self.start_websocket_instance(address, port)
         # If web socket server start listening
         if hasattr(self, 'ws_server') and self.ws_server:

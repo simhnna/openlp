@@ -32,13 +32,13 @@ from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
-    'remotes/twelve hour': True,
-    'remotes/port': 4316,
-    'remotes/user id': 'openlp',
-    'remotes/password': 'password',
-    'remotes/authentication enabled': False,
-    'remotes/ip address': '0.0.0.0',
-    'remotes/thumbnails': True
+    'api/twelve hour': True,
+    'api/port': 4316,
+    'api/user id': 'openlp',
+    'api/password': 'password',
+    'api/authentication enabled': False,
+    'api/ip address': '0.0.0.0',
+    'api/thumbnails': True
 }
 
 

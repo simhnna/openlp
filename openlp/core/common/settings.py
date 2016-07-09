@@ -134,16 +134,14 @@ class Settings(QtCore.QSettings):
         'advanced/single click service preview': False,
         'advanced/x11 bypass wm': X11_BYPASS_DEFAULT,
         'advanced/search as type': True,
-
-    'remotes/twelve hour': True,
-    'remotes/port': 4316,
-    'remotes/websocket port': 4317,
-    'remotes/user id': 'openlp',
-    'remotes/password': 'password',
-    'remotes/authentication enabled': False,
-    'remotes/ip address': '0.0.0.0',
-    'remotes/thumbnails': True,
-
+        'api/twelve hour': True,
+        'api/port': 4316,
+        'api/websocket port': 4317,
+        'api/user id': 'openlp',
+        'api/password': 'password',
+        'api/authentication enabled': False,
+        'api/ip address': '0.0.0.0',
+        'api/thumbnails': True,
         'crashreport/last directory': '',
         'formattingTags/html_tags': '',
         'core/audio repeat list': False,
@@ -225,7 +223,17 @@ class Settings(QtCore.QSettings):
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
         ('advanced/default image', '/core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('remotes/https enabled', '', []),
-        ('remotes/https port', '', [])
+        ('remotes/https port', '', []),
+        ('remotes/twelve hour', 'api/twelve hour', []),
+        ('remotes/port', 'api/port', []),
+        ('remotes/websocket port', 'api/websocket port', []),
+        ('remotes/user id', 'api/user id', []),
+        ('remotes/password', 'api/password', []),
+        ('remotes/authentication enabled', 'api/authentication enabled', []),
+        ('remotes/ip address', 'api/ip address', []),
+        ('remotes/thumbnails', 'api/thumbnails', [])
+
+
     ]
 
     @staticmethod
