@@ -270,6 +270,7 @@ class OpenLyrics(object):
         if song.songbook_entries:
             songbooks = etree.SubElement(properties, 'songbooks')
             for songbook_entry in song.songbook_entries:
+                # TODO IS THIS RIGHT AS IT FAILS WITH AN ERROR SHOULD IT BE AFTER THE IF TEST
                 element = self._add_text_to_element('songbook', songbooks, None, songbook_entry.songbook.name)
                 if songbook_entry.entry:
                     element.set('entry', songbook_entry.entry)
@@ -458,7 +459,7 @@ class OpenLyrics(object):
                 self._add_tag_to_formatting(tag, tags_element)
         # Replace end tags.
         for tag in end_tags:
-            text = text.replace('{/{tag}}}'.format(tag=tag), '</tag>')
+            text = text.replace('{{/{tag}}}'.format(tag=tag), '</tag>')
         # Replace \n with <br/>.
         text = text.replace('\n', '<br/>')
         element = etree.XML('<lines>{text}</lines>'.format(text=text))
@@ -567,7 +568,7 @@ class OpenLyrics(object):
             name = tag.get('name')
             if name is None:
                 continue
-            start_tag = '{{{name}}}'.format(name=name[:5])
+            start_tag = '{{/{name}}}'.format(name=name[:5])
             # Some tags have only start tag e.g. {br}
             end_tag = '{{/{name}}}'.format(name=name[:5]) if hasattr(tag, 'close') else ''
             openlp_tag = {

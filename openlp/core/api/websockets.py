@@ -126,15 +126,14 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
         previous_poll = None
         previous_main_poll = None
         poller = Registry().get('poller')
-        # TODO: FIXME: These URLs need to be named better
-        if path == '/poll':
+        if path == '/state':
             while True:
                 current_poll = poller.poll()
                 if current_poll != previous_poll:
                     yield from request.send(current_poll)
                     previous_poll = current_poll
                 yield from asyncio.sleep(0.2)
-        elif path == '/main_poll':
+        elif path == '/live_changed':
             while True:
                 main_poll = poller.main_poll()
                 if main_poll != previous_main_poll:
