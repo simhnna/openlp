@@ -74,7 +74,7 @@ def service_direction(request, action):
     :param action: the the service slides forward or backward.
     """
     event = getattr(Registry().get('service_manager'), 'servicemanager_{action}_item'.format(action=action))
-    event.emit(None)
+    event.emit()
     return {'results': {'success': True}}
 
 
