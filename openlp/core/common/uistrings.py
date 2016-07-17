@@ -111,8 +111,6 @@ class UiStrings(object):
         self.NISs = translate('OpenLP.Ui', 'No Item Selected', 'Singular')
         self.NISp = translate('OpenLP.Ui', 'No Items Selected', 'Plural')
         self.OLP = translate('OpenLP.Ui', 'OpenLP')
-        self.OLPV2 = "{name} {version}".format(name=self.OLP, version="2")
-        self.OLPV2x = "{name} {version}".format(name=self.OLP, version="2.4")
         self.OpenLPStart = translate('OpenLP.Ui', 'OpenLP is already running. Do you wish to continue?')
         self.OpenService = translate('OpenLP.Ui', 'Open service.')
         self.PlaySlidesInLoop = translate('OpenLP.Ui', 'Play Slides in Loop')

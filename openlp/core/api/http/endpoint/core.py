@@ -54,9 +54,9 @@ stage = translate('RemotePlugin.Mobile', 'Stage View')
 live = translate('RemotePlugin.Mobile', 'Live View')
 
 TRANSLATED_STRINGS = {
-    'app_title': "{main} {remote}".format(main=UiStrings().OLPV2x, remote=remote),
-    'stage_title': "{main} {stage}".format(main=UiStrings().OLPV2x, stage=stage),
-    'live_title': "{main} {live}".format(main=UiStrings().OLPV2x, live=live),
+    'app_title': "{main} {remote}".format(main=UiStrings().OLP, remote=remote),
+    'stage_title': "{main} {stage}".format(main=UiStrings().OLP, stage=stage),
+    'live_title': "{main} {live}".format(main=UiStrings().OLP, live=live),
     'service_manager': translate('RemotePlugin.Mobile', 'Service Manager'),
     'slide_controller': translate('RemotePlugin.Mobile', 'Slide Controller'),
     'alerts': translate('RemotePlugin.Mobile', 'Alerts'),
@@ -116,6 +116,7 @@ def poll(request):
     return Registry().get('poller').raw_poll()
 
 
+@blank_endpoint.route('api/display/{display:hide|show|blank|theme|desktop}')
 @blank_endpoint.route('display/{display:hide|show|blank|theme|desktop}')
 @requires_auth
 def toggle_display(request, display):
@@ -128,13 +129,12 @@ def toggle_display(request, display):
     return {'results': {'success': True}}
 
 
-@blank_endpoint.route('api/plugin/{search:search}')
-@blank_endpoint.route('plugin/{search:search}')
-def plugin_search(request, search):
+@blank_endpoint.route('api/plugin/search')
+@blank_endpoint.route('plugin/search')
+def plugin_search_list(request):
     """
-    Deliver the functions for the /display url
+    Deliver a list of active plugins that support search
     :param request: the http request - not used
-    :param search: the display function to be triggered
     """
     searches = []
     for plugin in Registry().get('plugin_manager').plugins:

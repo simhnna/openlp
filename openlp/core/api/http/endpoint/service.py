@@ -63,6 +63,21 @@ def service_set(request):
     return {'results': {'success': True}}
 
 
+@api_service_endpoint.route('{action:next|previous}')
+@service_endpoint.route('{action:next|previous}')
+@requires_auth
+def service_direction(request, action):
+    """
+    Handles requests for setting service items in the service manager
+
+    :param request: The http request object.
+    :param action: the the service slides forward or backward.
+    """
+    event = getattr(Registry().get('service_manager'), 'servicemanager_{action}_item'.format(action=action))
+    event.emit(None)
+    return {'results': {'success': True}}
+
+
 def get_service_items():
     """
     Read the service item in use and return the data as a json object

@@ -105,7 +105,7 @@ class AlertsTab(SettingsTab):
         self.timeout_label.setText(translate('AlertsPlugin.AlertsTab', 'Alert timeout:'))
         self.timeout_spin_box.setSuffix(UiStrings().Seconds)
         self.preview_group_box.setTitle(UiStrings().Preview)
-        self.font_preview.setText(UiStrings().OLPV2x)
+        self.font_preview.setText(UiStrings().OLP)
 
     def on_background_color_changed(self, color):
         """

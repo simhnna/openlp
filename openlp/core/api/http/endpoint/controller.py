@@ -113,5 +113,22 @@ def controller_set(request):
         log.error("Endpoint controller/live/set request id not found")
     return {'results': {'success': True}}
 
+
+@api_controller_endpoint.route('/controller/{controller}/{action:next|previous}')
+@controller_endpoint.route('/{controller}/{action:next|previous}')
+@requires_auth
+def controller_direction(request, controller, action):
+    """
+    Handles requests for setting service items in the slide controller
+11
+    :param request: The http request object.
+    :param controller: the controller slides forward or backward.
+    :param action: the controller slides forward or backward.
+    """
+    event = getattr(Registry().get('live_controller'), 'slidecontroller_{controller}_{action}'.
+                    format(controller=controller, action=action))
+    event.emit()
+    return {'results': {'success': True}}
+
 register_endpoint(controller_endpoint)
 register_endpoint(api_controller_endpoint)
