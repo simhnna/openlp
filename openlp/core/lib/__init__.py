@@ -301,15 +301,13 @@ def clean_tags(text, chords=False):
     return text
 
 
-def expand_tags(text, chords=False):
+def expand_tags(text):
     """
     Expand tags HTML for display
 
     :param text: The text to be expanded.
-    :param chords: Convert ChordPro tags to html
     """
-    if chords:
-        text = expand_chords(text)
+    text = expand_chords(text)
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], tag['start html'])
         text = text.replace(tag['end tag'], tag['end html'])
@@ -328,7 +326,7 @@ def expand_chords(text):
         # If a ChordPro is detected in the line, replace it with a html-span tag and wrap the line in a span tag.
         if '[' in line and ']' in line:
             new_line = '<span class="chordline">'
-            new_line += re.sub(r'(.*?)\[(.+?)\](.*?)', r'\1<span class="chord" style="display:none">\2</span>\3', line)
+            new_line += re.sub(r'(.*?)\[(.+?)\](.*?)', r'\1<span class="chord" style="display:inline"><span><strong>\2</strong></span></span>\3', line)
             new_line += '</span>'
             expanded_text_lines.append(new_line)
         else:

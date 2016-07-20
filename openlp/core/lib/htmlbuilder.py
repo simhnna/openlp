@@ -444,6 +444,32 @@ HTML_SRC = Template("""
         position: relative;
         top: -0.3em;
     }
+    #chords {
+      /*font-size: 20pt;
+      color: gray;
+      background-color: gray;
+      color: white;
+      cursor: pointer;*/
+    }
+    .chordline {
+      line-height: 2.0;
+    }
+    .chordline1 {
+      line-height: 1.0
+    }
+    .chordline span.chord span {
+      position: relative;
+    }
+    .chordline span.chord span strong {
+      position: absolute;
+      top: -1em;
+      left: 0;
+      font-size: 75%;
+      font-weight: normal;
+      line-height: normal;
+      /*font: 30pt sans-serif;
+      color: yellow;*/
+    }
     </style>
     <script>
         var timer = null;

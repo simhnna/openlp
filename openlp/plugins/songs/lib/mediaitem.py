@@ -613,9 +613,6 @@ class SongMediaItem(MediaManagerItem):
         if song.media_files:
             service_item.add_capability(ItemCapabilities.HasBackgroundAudio)
             service_item.background_audio = [m.file_name for m in song.media_files]
-        # If chords are detected, mark the item as having chords
-        if '[' in song.lyrics:
-            service_item.add_capability(ItemCapabilities.HasChords)
         return True
 
     def generate_footer(self, item, song):

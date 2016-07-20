@@ -143,14 +143,14 @@ window.OpenLP = {
             $("#verseorder span").last().attr("id", "tag" + tags).text(tag);
           }
           else {
-            if ((slide["text"] == data.results.slides[lastChange]["text"]) &&
+            if ((slide["chords_text"] == data.results.slides[lastChange]["chords_text"]) &&
               (data.results.slides.length > idx + (idx - lastChange))) {
               // If the tag hasn't changed, check to see if the same verse
               // has been repeated consecutively. Note the verse may have been
               // split over several slides, so search through. If so, repeat the tag.
               var match = true;
               for (var idx2 = 0; idx2 < idx - lastChange; idx2++) {
-                if(data.results.slides[lastChange + idx2]["text"] != data.results.slides[idx + idx2]["text"]) {
+                if(data.results.slides[lastChange + idx2]["chords_text"] != data.results.slides[idx + idx2]["chords_text"]) {
                     match = false;
                     break;
                 }
@@ -175,13 +175,13 @@ window.OpenLP = {
     // Show the current slide on top. Any trailing slides for the same verse
     // are shown too underneath in grey.
     // Then leave a blank line between following verses
-    var transposeValue = getTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0]),
-                                           chordclass=/class="[a-z\s]*chord[a-z\s]*"\s*style="display:\s?none"/g,
-                                           chordclassshow='class="chord" style="display:inline"',
-                                           regchord=/<span class="chord" style="display:inline">([\(\w#b♭\+\*\d/\)-]+)<\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g,
-                                           replaceChords=function(mstr,$1,$2,$3,$4) {
+    var transposeValue = getTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0]);
+    var chordclass=/class="[a-z\s]*chord[a-z\s]*"\s*style="display:\s?none"/g;
+    var chordclassshow='class="chord" style="display:inline"';
+    var regchord=/<span class="chord" style="display:inline"><span><strong>([\(\w#b♭\+\*\d/\)-]+)<\/strong><\/span><\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g;
+    var replaceChords=function(mstr,$1,$2,$3,$4) {
       var v='', w='';
-      var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
+        var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
       $1 = transposeChord($1, transposeValue, OpenLP.chordNotation);
       for (var i = 0; i < $1.length; i++) if (slimchars.indexOf($1.charAt(i)) === -1) {$1len += 2;} else {$1len += 1;}
       for (var i = 0; i < $2.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
@@ -213,7 +213,7 @@ window.OpenLP = {
     if (slide["title"]) {
         text = slide["title"];
     } else {
-        text = slide["text"];
+        text = slide["chords_text"];
         if(OpenLP.showchords) {
             text = text.replace(chordclass,chordclassshow);
             text = text.replace(regchord, replaceChords);
@@ -237,7 +237,7 @@ window.OpenLP = {
         if (OpenLP.currentSlides[idx]["title"]) {
             text = text + OpenLP.currentSlides[idx]["title"];
         } else {
-            text = text + OpenLP.currentSlides[idx]["text"];
+            text = text + OpenLP.currentSlides[idx]["chords_text"];
             if(OpenLP.showchords) {
               text = text.replace(chordclass,chordclassshow);
               text = text.replace(regchord, replaceChords);
