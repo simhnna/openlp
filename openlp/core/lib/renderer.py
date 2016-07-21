@@ -26,7 +26,7 @@ from PyQt5 import QtGui, QtCore, QtWebKitWidgets
 
 from openlp.core.common import Registry, RegistryProperties, OpenLPMixin, RegistryMixin, Settings
 from openlp.core.lib import FormattingTags, ImageSource, ItemCapabilities, ScreenList, ServiceItem, expand_tags, \
-    build_lyrics_format_css, build_lyrics_outline_css
+    build_lyrics_format_css, build_lyrics_outline_css, build_chords_css
 from openlp.core.common import ThemeLevel
 from openlp.core.ui import MainDisplay
 
@@ -381,10 +381,10 @@ class Renderer(OpenLPMixin, RegistryMixin, RegistryProperties):
                 return main.offsetHeight;
             }
             </script><style>*{margin: 0; padding: 0; border: 0;}
-            #main {position: absolute; top: 0px; %s %s}</style></head><body>
+            #main {position: absolute; top: 0px; %s %s} %s</style></head><body>
             <div id="main"></div></body></html>""" % \
             (build_lyrics_format_css(theme_data, self.page_width, self.page_height),
-             build_lyrics_outline_css(theme_data))
+             build_lyrics_outline_css(theme_data), build_chords_css())
         self.web.setHtml(html)
         self.empty_height = self.web_frame.contentsSize().height()
 

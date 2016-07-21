@@ -68,15 +68,21 @@
   line-height: 1.0
 }
 
+.firstchordline {
+  line-height: 2.1em;
+}
+
 .chordline span.chord span {
   position: relative;
 }
 
 .chordline span.chord span strong {
   position: absolute;
-  top: -1em;
+  top: -0.8em;
   left: 0;
-  font: 30pt sans-serif;
+  font-size: 30pt;
+  font-weight: normal;
+  line-height: normal;
   color: yellow;
 }
 

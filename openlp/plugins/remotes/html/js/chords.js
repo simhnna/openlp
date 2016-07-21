@@ -177,8 +177,8 @@ window.OpenLP = {
     // Then leave a blank line between following verses
     var transposeValue = getTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0]);
     var chordclass=/class="[a-z\s]*chord[a-z\s]*"\s*style="display:\s?none"/g;
-    var chordclassshow='class="chord" style="display:inline"';
-    var regchord=/<span class="chord" style="display:inline"><span><strong>([\(\w#b♭\+\*\d/\)-]+)<\/strong><\/span><\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g;
+    var chordclassshow='class="chord"';
+    var regchord=/<span class="chord"><span><strong>([\(\w#b♭\+\*\d/\)-]+)<\/strong><\/span><\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g;
     var replaceChords=function(mstr,$1,$2,$3,$4) {
       var v='', w='';
         var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
@@ -203,7 +203,7 @@ window.OpenLP = {
       } else {
         if (!$2 && $3.charAt(0) == ' ') {for (c = 0; c < $1len; c++) {w += '&nbsp;';}}
       }
-      return $.grep(['<span class="chord" style="display:inline"><span><strong>', $1, '</strong></span>', $2, w, $3, '</span>', $4], Boolean).join('');
+      return $.grep(['<span class="chord"><span><strong>', $1, '</strong></span>', $2, w, $3, '</span>', $4], Boolean).join('');
     };
     $("#verseorder span").removeClass("currenttag");
     $("#tag" + OpenLP.currentTags[OpenLP.currentSlide]).addClass("currenttag");

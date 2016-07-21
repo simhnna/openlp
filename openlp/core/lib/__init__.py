@@ -282,12 +282,12 @@ def check_item_selected(list_widget, message):
     return True
 
 
-def clean_tags(text, chords=False):
+def clean_tags(text, remove_chords=False):
     """
     Remove Tags from text for display
 
     :param text: Text to be cleaned
-    :param chords: Clean ChordPro tags
+    :param remove_chords: Clean ChordPro tags
     """
     text = text.replace('<br>', '\n')
     text = text.replace('{br}', '\n')
@@ -296,7 +296,7 @@ def clean_tags(text, chords=False):
         text = text.replace(tag['start tag'], '')
         text = text.replace(tag['end tag'], '')
     # Remove ChordPro tags
-    if chords:
+    if remove_chords:
         text = re.sub(r'\[.+?\]', r'', text)
     return text
 
@@ -322,14 +322,21 @@ def expand_chords(text):
     """
     text_lines = text.split('{br}')
     expanded_text_lines = []
+    chords_on_last_line = False
     for line in text_lines:
         # If a ChordPro is detected in the line, replace it with a html-span tag and wrap the line in a span tag.
         if '[' in line and ']' in line:
-            new_line = '<span class="chordline">'
-            new_line += re.sub(r'(.*?)\[(.+?)\](.*?)', r'\1<span class="chord" style="display:inline"><span><strong>\2</strong></span></span>\3', line)
+            if chords_on_last_line:
+                new_line = '<span class="chordline">'
+            else:
+                new_line = '<span class="chordline firstchordline">'
+                chords_on_last_line = True
+            new_line += re.sub(r'(.*?)\[(.+?)\](.*?)',
+                               r'\1<span class="chord"><span><strong>\2</strong></span></span>\3', line)
             new_line += '</span>'
             expanded_text_lines.append(new_line)
         else:
+            chords_on_last_line = False
             expanded_text_lines.append(line)
     return '{br}'.join(expanded_text_lines)
 
@@ -371,7 +378,7 @@ from .plugin import PluginStatus, StringContent, Plugin
 from .pluginmanager import PluginManager
 from .settingstab import SettingsTab
 from .serviceitem import ServiceItem, ServiceItemType, ItemCapabilities
-from .htmlbuilder import build_html, build_lyrics_format_css, build_lyrics_outline_css
+from .htmlbuilder import build_html, build_lyrics_format_css, build_lyrics_outline_css, build_chords_css
 from .imagemanager import ImageManager
 from .renderer import Renderer
 from .mediamanageritem import MediaManagerItem

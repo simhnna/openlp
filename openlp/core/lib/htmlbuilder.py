@@ -444,32 +444,8 @@ HTML_SRC = Template("""
         position: relative;
         top: -0.3em;
     }
-    #chords {
-      /*font-size: 20pt;
-      color: gray;
-      background-color: gray;
-      color: white;
-      cursor: pointer;*/
-    }
-    .chordline {
-      line-height: 2.0;
-    }
-    .chordline1 {
-      line-height: 1.0
-    }
-    .chordline span.chord span {
-      position: relative;
-    }
-    .chordline span.chord span strong {
-      position: absolute;
-      top: -1em;
-      left: 0;
-      font-size: 75%;
-      font-weight: normal;
-      line-height: normal;
-      /*font: 30pt sans-serif;
-      color: yellow;*/
-    }
+    /* Chords css */${chords_css}
+
     </style>
     <script>
         var timer = null;
@@ -618,6 +594,26 @@ LYRICS_FORMAT_SRC = Template("""
     height: ${height}px;${font_style}${font_weight}
     """)
 
+CHORDS_FORMAT = Template("""
+    .chordline {
+      line-height: ${chord_line_height};
+    }
+    .chordline span.chord span {
+      position: relative;
+    }
+    .chordline span.chord span strong {
+      position: absolute;
+      top: -0.8em;
+      left: 0;
+      font-size: 75%;
+      font-weight: normal;
+      line-height: normal;
+      display: ${chords_display};
+    }
+    .firstchordline {
+        line-height: ${first_chord_line_height};
+    }""")
+
 
 def build_html(item, screen, is_live, background, image=None, plugins=None):
     """
@@ -662,7 +658,8 @@ def build_html(item, screen, is_live, background, image=None, plugins=None):
                                js_additions=js_additions,
                                bg_image=bgimage_src,
                                image=image_src,
-                               html_additions=html_additions)
+                               html_additions=html_additions,
+                               chords_css=build_chords_css())
 
 
 def webkit_version():
@@ -794,3 +791,16 @@ def build_footer_css(item, height):
     return FOOTER_SRC.substitute(left=item.footer.x(), bottom=bottom, width=item.footer.width(),
                                  family=theme.font_footer_name, size=theme.font_footer_size,
                                  color=theme.font_footer_color, space=whitespace)
+
+
+def build_chords_css():
+    if Settings().value('songs/mainview chords'):
+        chord_line_height = '2.0em'
+        chords_display = 'inline'
+        first_chord_line_height = '2.1em'
+    else:
+        chord_line_height = '1.0em'
+        chords_display = 'none'
+        first_chord_line_height = '1.0em'
+    return CHORDS_FORMAT.substitute(chord_line_height=chord_line_height, chords_display=chords_display,
+                                    first_chord_line_height=first_chord_line_height)
