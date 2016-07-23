@@ -35,12 +35,12 @@ class TestController(TestCase):
     """
     A test suite to test out the Error in the API code
     """
-    @patch('openlp.core.api.controller.Poll')
+    @patch('openlp.core.api.controller.Poller')
     @patch('openlp.core.api.controller.WebSocketServer')
-    @patch('openlp.core.api.controller.http.HttpServer')
+    @patch('openlp.core.api.controller.HttpServer')
     def test_bootstrap(self, mock_http, mock_ws, mock_poll):
         """
-        Test the Not Found error displays the correct information
+        Test the controller creates the correct objects.
         """
         # GIVEN: A controller
         Registry.create()

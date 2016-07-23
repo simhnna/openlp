@@ -27,7 +27,7 @@ from openlp.core.common import RegistryProperties, Settings
 
 class Poller(RegistryProperties):
     """
-    Access by the web layer to get status type information from the application
+    Accessed by the web layer to get status type information from the application
     """
     def __init__(self):
         """
