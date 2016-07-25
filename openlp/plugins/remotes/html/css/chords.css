@@ -43,8 +43,8 @@
 #plus,
 #minus {
   display: inline-block;
-  width: 3vw;
-  line-height: 3vw;
+  width: 1.2em;
+  line-height: 1.2em;
   vertical-align: middle;
   color: white;
   background-color: gray;

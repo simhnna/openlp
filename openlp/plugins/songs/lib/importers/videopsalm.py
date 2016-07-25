@@ -26,8 +26,9 @@ exproted from Lyrix."""
 import logging
 import json
 import os
+import re
 
-from openlp.core.common import translate
+from openlp.core.common import translate, Settings
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.db import AuthorType
 
@@ -113,7 +114,11 @@ class VideoPsalmImport(SongImport):
                 if 'Memo3' in song:
                     self.add_comment(song['Memo3'])
                 for verse in song['Verses']:
-                    self.add_verse(verse['Text'], 'v')
+                    verse_text = verse['Text']
+                    # Strip out chords if set up to
+                    if not Settings().value('songs/disable chords import'):
+                        verse_text = re.sub(r'\[\w.*?\]', '', verse_text)
+                    self.add_verse(verse_text, 'v')
                 if not self.finish():
                     self.log_error('Could not import {title}'.format(title=self.title))
         except Exception as e:

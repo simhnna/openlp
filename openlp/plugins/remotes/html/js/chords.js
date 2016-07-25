@@ -178,32 +178,43 @@ window.OpenLP = {
     var transposeValue = getTransposeValue(OpenLP.currentSlides[0].text.split("\n")[0]);
     var chordclass=/class="[a-z\s]*chord[a-z\s]*"\s*style="display:\s?none"/g;
     var chordclassshow='class="chord"';
-    var regchord=/<span class="chord"><span><strong>([\(\w#b♭\+\*\d/\)-]+)<\/strong><\/span><\/span>([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g;
-    var replaceChords=function(mstr,$1,$2,$3,$4) {
-      var v='', w='';
-        var $1len = 0, $2len = 0, slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
-      $1 = transposeChord($1, transposeValue, OpenLP.chordNotation);
-      for (var i = 0; i < $1.length; i++) if (slimchars.indexOf($1.charAt(i)) === -1) {$1len += 2;} else {$1len += 1;}
-      for (var i = 0; i < $2.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
-      for (var i = 0; i < $3.length; i++) if (slimchars.indexOf($2.charAt(i)) === -1) {$2len += 2;} else {$2len += 1;}
-      if ($1len >= $2len && !$4) {
-        if ($2.length){
-          if (!$3.length) {
-            for (c = 0; c < Math.ceil(($1len - $2len) / 2) + 1; c++) {w += '_';}
+    var regchord=/<span class="chord"><span><strong>([\(\w#b♭\+\*\d/\)-]+)<\/strong><\/span><\/span>([\u0080-\uFFFF,\w]*)(<span class="ws">.+?<\/span>)?([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g;
+    // NOTE: There is equivalent python code in openlp/core/lib/__init__.py, in the expand_and_align_chords_in_line function. Make sure to update both!
+    var replaceChords=function(mstr,$chord,$tail,$skips,$remainder,$end) {
+      var v='';
+      var w='';
+      var $chordlen = 0;
+      var $taillen = 0;
+      var slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
+      // Transpose chord as dictated by the transpose value in local storage
+      $chord = transposeChord($chord, transposeValue, OpenLP.chordNotation);
+      // Replace any padding '_' added to tail
+      $tail = $tail.replace(/_+$/, '')
+      console.log('chord: ' +$chord +', tail: ' + $tail + ', remainder: ' + $remainder +', end: ' + $end +', match: ' + mstr)
+      for (var i = 0; i < $chord.length; i++) if (slimchars.indexOf($chord.charAt(i)) === -1) {$chordlen += 2;} else {$chordlen += 1;}
+      for (var i = 0; i < $tail.length; i++) if (slimchars.indexOf($tail.charAt(i)) === -1) {$taillen += 2;} else {$taillen += 1;}
+      for (var i = 0; i < $remainder.length; i++) if (slimchars.indexOf($tail.charAt(i)) === -1) {$taillen += 2;} else {$taillen += 1;}
+      if ($chordlen >= $taillen && !$end) {
+        if ($tail.length){
+          if (!$remainder.length) {
+            for (c = 0; c < Math.ceil(($chordlen - $taillen) / 2) + 1; c++) {w += '_';}
           } else {
-            for (c = 0; c < $1len - $2len + 2; c++) {w += '&nbsp;';}
+            for (c = 0; c < $chordlen - $taillen + 2; c++) {w += '&nbsp;';}
           }
         } else {
-          if (!$3.length) {
-            for (c = 0; c < Math.floor(($1len - $2len) / 2) + 1; c++) {w += '_';}
+          if (!$remainder.length) {
+            for (c = 0; c < Math.floor(($chordlen - $taillen) / 2) + 1; c++) {w += '_';}
           } else {
-            for (c = 0; c < $1len - $2len + 1; c++) {w += '&nbsp;';}
+            for (c = 0; c < $chordlen - $taillen + 1; c++) {w += '&nbsp;';}
           }
         };
       } else {
-        if (!$2 && $3.charAt(0) == ' ') {for (c = 0; c < $1len; c++) {w += '&nbsp;';}}
+        if (!$tail && $remainder.charAt(0) == ' ') {for (c = 0; c < $chordlen; c++) {w += '&nbsp;';}}
       }
-      return $.grep(['<span class="chord"><span><strong>', $1, '</strong></span>', $2, w, $3, '</span>', $4], Boolean).join('');
+      if (w!='') {
+        w='<span class="ws">' + w + '</span>';
+      }
+      return $.grep(['<span class="chord"><span><strong>', $chord, '</strong></span></span>', $tail, w, $remainder, $end], Boolean).join('');
     };
     $("#verseorder span").removeClass("currenttag");
     $("#tag" + OpenLP.currentTags[OpenLP.currentSlide]).addClass("currenttag");

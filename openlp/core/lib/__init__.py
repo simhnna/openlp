@@ -27,6 +27,7 @@ OpenLP work.
 import logging
 import os
 import re
+import math
 from distutils.version import LooseVersion
 
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
@@ -314,6 +315,63 @@ def expand_tags(text):
     return text
 
 
+def expand_and_align_chords_in_line(match):
+    """
+    Expand the chords in the line and align them using whitespaces.
+    NOTE: There is equivalent javascript code in chords.js, in the updateSlide function. Make sure to update both!
+    
+    :param match:
+    :return: The line with expanded html-chords
+    """
+    slimchars = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
+    whitespaces = ''
+    chordlen = 0
+    taillen = 0
+    chord = match.group(1)
+    tail = match.group(2)
+    remainder = match.group(3)
+    end = match.group(4)
+    print('chord: %s, tail: %s, remainder: %s, end: %s' % (chord, tail, remainder, end))
+    for chord_char in chord:
+        if chord_char not in slimchars:
+            chordlen += 2
+        else:
+            chordlen += 1
+    for tail_char in tail:
+        if tail_char not in slimchars:
+            taillen += 2
+        else:
+            taillen += 1
+    for remainder_char in remainder:
+        if remainder_char not in slimchars:
+            taillen += 2
+        else:
+            taillen += 1
+    if chordlen >= taillen and end is None:
+        if tail:
+            if not remainder:
+                print()
+                for c in range(math.ceil((chordlen - taillen) / 2) + 1):
+                    whitespaces += '_'
+            else:
+                for c in range(chordlen - taillen + 2):
+                    whitespaces += '&nbsp;'
+        else:
+            if not remainder:
+                for c in range(math.floor((chordlen - taillen) / 2)):
+                    whitespaces += '_'
+            else:
+                for c in range(chordlen - taillen + 1):
+                    whitespaces += '&nbsp;'
+    else:
+        if not tail and remainder and remainder[0] == ' ':
+            for c in range(chordlen):
+                whitespaces += '&nbsp;'
+    if whitespaces:
+        whitespaces = '<span class="ws">' + whitespaces + '</span>'
+    return '<span class="chord"><span><strong>' + chord + '</strong></span></span>' + tail + whitespaces + remainder
+
+
 def expand_chords(text):
     """
     Expand ChordPro tags
@@ -322,21 +380,22 @@ def expand_chords(text):
     """
     text_lines = text.split('{br}')
     expanded_text_lines = []
-    chords_on_last_line = False
+    chords_on_prev_line = False
     for line in text_lines:
         # If a ChordPro is detected in the line, replace it with a html-span tag and wrap the line in a span tag.
         if '[' in line and ']' in line:
-            if chords_on_last_line:
+            if chords_on_prev_line:
                 new_line = '<span class="chordline">'
             else:
                 new_line = '<span class="chordline firstchordline">'
-                chords_on_last_line = True
-            new_line += re.sub(r'(.*?)\[(.+?)\](.*?)',
-                               r'\1<span class="chord"><span><strong>\2</strong></span></span>\3', line)
+                chords_on_prev_line = True
+            new_line += re.sub(r'\[(.+?)\]([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?', expand_and_align_chords_in_line, line)
+            #new_line += re.sub(r'(.*?)\[(.+?)\](.*?)',
+            #                   r'\1<span class="chord"><span><strong>\2</strong></span></span>\3', line)
             new_line += '</span>'
             expanded_text_lines.append(new_line)
         else:
-            chords_on_last_line = False
+            chords_on_prev_line = False
             expanded_text_lines.append(line)
     return '{br}'.join(expanded_text_lines)
 

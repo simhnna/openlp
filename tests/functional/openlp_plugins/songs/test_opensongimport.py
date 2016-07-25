@@ -42,10 +42,16 @@ class TestOpenSongFileImport(SongImportTestHelper):
         self.importer_module_name = 'opensong'
         super(TestOpenSongFileImport, self).__init__(*args, **kwargs)
 
-    def test_song_import(self):
+    @patch('openlp.plugins.songs.lib.importers.opensong.Settings')
+    def test_song_import(self, mocked_settings):
         """
         Test that loading an OpenSong file works correctly on various files
         """
+        # Mock out the settings - always return False
+        mocked_returned_settings = MagicMock()
+        mocked_returned_settings.value.return_value = False
+        mocked_settings.return_value = mocked_returned_settings
+        # Do the test import
         self.file_import([os.path.join(TEST_PATH, 'Amazing Grace')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
         self.file_import([os.path.join(TEST_PATH, 'Beautiful Garden Of Prayer')],
