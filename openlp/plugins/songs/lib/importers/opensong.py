@@ -258,8 +258,8 @@ class OpenSongImport(SongImport):
             if chords and not Settings().value('songs/disable chords import'):
                 offset = 0
                 for (column, chord) in chords:
-                    this_line =  '{pre}[{chord}]{post}'.format(pre=this_line[:offset+column], chord=chord,
-                                                               post=this_line[offset+column:])
+                    this_line = '{pre}[{chord}]{post}'.format(pre=this_line[:offset + column], chord=chord,
+                                                              post=this_line[offset + column:])
                     offset += len(chord) + 2
             # Tidy text and remove the ____s from extended words
             this_line = self.tidy_text(this_line)

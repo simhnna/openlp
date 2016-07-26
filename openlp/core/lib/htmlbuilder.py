@@ -124,6 +124,25 @@ is the function which has to be called from outside. The generated and returned 
             position: relative;
             top: -0.3em;
         }
+        /* Chords css */
+        .chordline {
+          line-height: 1.0em;
+        }
+        .chordline span.chord span {
+          position: relative;
+        }
+        .chordline span.chord span strong {
+          position: absolute;
+          top: -0.8em;
+          left: 0;
+          font-size: 75%;
+          font-weight: normal;
+          line-height: normal;
+          display: none;
+        }
+        .firstchordline {
+            line-height: 1.0em;
+        }
         </style>
         <script>
             var timer = null;
@@ -445,7 +464,6 @@ HTML_SRC = Template("""
         top: -0.3em;
     }
     /* Chords css */${chords_css}
-
     </style>
     <script>
         var timer = null;

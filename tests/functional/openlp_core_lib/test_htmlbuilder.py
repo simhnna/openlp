@@ -8,7 +8,7 @@ from PyQt5 import QtCore, QtWebKit
 
 from openlp.core.common import Settings
 from openlp.core.lib.htmlbuilder import build_html, build_background_css, build_lyrics_css, build_lyrics_outline_css, \
-    build_lyrics_format_css, build_footer_css, webkit_version
+    build_lyrics_format_css, build_footer_css, webkit_version, build_chords_css
 from openlp.core.lib.theme import HorizontalType, VerticalType
 from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
@@ -59,6 +59,25 @@ HTML = """
         vertical-align: top;
         position: relative;
         top: -0.3em;
+    }
+    /* Chords css */
+    .chordline {
+      line-height: 1.0em;
+    }
+    .chordline span.chord span {
+      position: relative;
+    }
+    .chordline span.chord span strong {
+      position: absolute;
+      top: -0.8em;
+      left: 0;
+      font-size: 75%;
+      font-weight: normal;
+      line-height: normal;
+      display: none;
+    }
+    .firstchordline {
+        line-height: 1.0em;
     }
     </style>
     <script>
@@ -211,6 +230,29 @@ FOOTER_CSS_BASE = """
 FOOTER_CSS = FOOTER_CSS_BASE % ('nowrap')
 FOOTER_CSS_WRAP = FOOTER_CSS_BASE % ('normal')
 FOOTER_CSS_INVALID = ''
+CHORD_CSS_ENABLED = """
+    .chordline {
+      line-height: 2.0em;
+    }
+    .chordline span.chord span {
+      position: relative;
+    }
+    .chordline span.chord span strong {
+      position: absolute;
+      top: -0.8em;
+      left: 0;
+      font-size: 75%;
+      font-weight: normal;
+      line-height: normal;
+      display: inline;
+    }
+    .firstchordline {
+        line-height: 2.1em;
+    }"""
+
+__default_settings__ = {
+    'songs/mainview chords': False,
+}
 
 
 class Htmbuilder(TestCase, TestMixin):
@@ -222,6 +264,7 @@ class Htmbuilder(TestCase, TestMixin):
         Create the UI
         """
         self.build_settings()
+        Settings().extend_default_settings(__default_settings__)
 
     def tearDown(self):
         """
@@ -403,3 +446,16 @@ class Htmbuilder(TestCase, TestMixin):
         # WHEN: Retrieving the webkit version
         # THEN: Webkit versions should match
         self.assertEquals(webkit_version(), webkit_ver, "The returned webkit version doesn't match the installed one")
+
+    def test_build_chords_css(self):
+        """
+        Test the build_chords_css() function
+        """
+        # GIVEN: A setting that activates chords on the mainview
+        Settings().setValue('songs/mainview chords', True)
+
+        # WHEN: Building the chord CSS
+        chord_css = build_chords_css()
+
+        # THEN: The build css should look as expected
+        self.assertEqual(CHORD_CSS_ENABLED, chord_css, 'The chord CSS should look as expected')

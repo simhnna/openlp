@@ -319,7 +319,7 @@ def expand_and_align_chords_in_line(match):
     """
     Expand the chords in the line and align them using whitespaces.
     NOTE: There is equivalent javascript code in chords.js, in the updateSlide function. Make sure to update both!
-    
+
     :param match:
     :return: The line with expanded html-chords
     """
@@ -327,30 +327,38 @@ def expand_and_align_chords_in_line(match):
     whitespaces = ''
     chordlen = 0
     taillen = 0
+    # The match could be "[G]sweet the " from a line like "A[D]mazing [D7]grace! How [G]sweet the [D]sound!"
+    # The actual chord, would be "G" in match "[G]sweet the "
     chord = match.group(1)
+    # The tailing word of the chord, would be "sweet" in match "[G]sweet the "
     tail = match.group(2)
+    # The remainder of the line, until line end or next chord. Would be " the " in match "[G]sweet the "
     remainder = match.group(3)
+    # Line end if found, else None
     end = match.group(4)
-    print('chord: %s, tail: %s, remainder: %s, end: %s' % (chord, tail, remainder, end))
+    # Based on char width calculate width of chord
     for chord_char in chord:
         if chord_char not in slimchars:
             chordlen += 2
         else:
             chordlen += 1
+    # Based on char width calculate width of tail
     for tail_char in tail:
         if tail_char not in slimchars:
             taillen += 2
         else:
             taillen += 1
+    # Based on char width calculate width of remainder
     for remainder_char in remainder:
         if remainder_char not in slimchars:
             taillen += 2
         else:
             taillen += 1
+    # If the chord is wider than the tail+remainder and the line goes on, some padding is needed
     if chordlen >= taillen and end is None:
+        # Decide if the padding should be "_" for drawing out words or spaces
         if tail:
             if not remainder:
-                print()
                 for c in range(math.ceil((chordlen - taillen) / 2) + 1):
                     whitespaces += '_'
             else:
@@ -389,9 +397,10 @@ def expand_chords(text):
             else:
                 new_line = '<span class="chordline firstchordline">'
                 chords_on_prev_line = True
-            new_line += re.sub(r'\[(.+?)\]([\u0080-\uFFFF,\w]*)([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?', expand_and_align_chords_in_line, line)
-            #new_line += re.sub(r'(.*?)\[(.+?)\](.*?)',
-            #                   r'\1<span class="chord"><span><strong>\2</strong></span></span>\3', line)
+            # Matches a chord, a tail, a remainder and a line end. See expand_and_align_chords_in_line() for more info.
+            new_line += re.sub(r'\[(\w.*?)\]([\u0080-\uFFFF,\w]*)'
+                               '([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?',
+                               expand_and_align_chords_in_line, line)
             new_line += '</span>'
             expanded_text_lines.append(new_line)
         else:

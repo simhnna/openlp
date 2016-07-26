@@ -181,7 +181,6 @@ window.OpenLP = {
     var regchord=/<span class="chord"><span><strong>([\(\w#b♭\+\*\d/\)-]+)<\/strong><\/span><\/span>([\u0080-\uFFFF,\w]*)(<span class="ws">.+?<\/span>)?([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(<br>)?/g;
     // NOTE: There is equivalent python code in openlp/core/lib/__init__.py, in the expand_and_align_chords_in_line function. Make sure to update both!
     var replaceChords=function(mstr,$chord,$tail,$skips,$remainder,$end) {
-      var v='';
       var w='';
       var $chordlen = 0;
       var $taillen = 0;
@@ -190,7 +189,6 @@ window.OpenLP = {
       $chord = transposeChord($chord, transposeValue, OpenLP.chordNotation);
       // Replace any padding '_' added to tail
       $tail = $tail.replace(/_+$/, '')
-      console.log('chord: ' +$chord +', tail: ' + $tail + ', remainder: ' + $remainder +', end: ' + $end +', match: ' + mstr)
       for (var i = 0; i < $chord.length; i++) if (slimchars.indexOf($chord.charAt(i)) === -1) {$chordlen += 2;} else {$chordlen += 1;}
       for (var i = 0; i < $tail.length; i++) if (slimchars.indexOf($tail.charAt(i)) === -1) {$taillen += 2;} else {$taillen += 1;}
       for (var i = 0; i < $remainder.length; i++) if (slimchars.indexOf($tail.charAt(i)) === -1) {$taillen += 2;} else {$taillen += 1;}
