@@ -145,5 +145,6 @@ def format_milliseconds(milliseconds):
 
 from .mediacontroller import MediaController
 from .playertab import PlayerTab
+from .endpoint import media_endpoint
 
 __all__ = ['MediaController', 'PlayerTab']
