@@ -23,7 +23,7 @@ import logging
 
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http.endpoint.pluginhelpers import search, live, service
-from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.api.http import requires_auth
 
 
 log = logging.getLogger(__name__)
@@ -65,6 +65,3 @@ def songs_service(request):
     :param request: The http request object.
     """
     return service(request, 'songs', log)
-
-register_endpoint(songs_endpoint)
-register_endpoint(api_songs_endpoint)

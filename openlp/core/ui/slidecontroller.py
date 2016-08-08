@@ -430,6 +430,10 @@ class SlideController(DisplayController, RegistryProperties):
         # NOTE: {t} used to keep line length < maxline
         getattr(self,
                 'slidecontroller_{t}_previous'.format(t=self.type_prefix)).connect(self.on_slide_selected_previous)
+        if self.is_live:
+            getattr(self, 'mediacontroller_live_play').connect(self.media_controller.on_media_play)
+            getattr(self, 'mediacontroller_live_pause').connect(self.media_controller.on_media_pause)
+            getattr(self, 'mediacontroller_live_stop').connect(self.media_controller.on_media_stop)
 
     def _slide_shortcut_activated(self):
         """
@@ -1501,6 +1505,9 @@ class LiveController(RegistryMixin, OpenLPMixin, SlideController):
     slidecontroller_live_next = QtCore.pyqtSignal()
     slidecontroller_live_previous = QtCore.pyqtSignal()
     slidecontroller_toggle_display = QtCore.pyqtSignal(str)
+    mediacontroller_live_play = QtCore.pyqtSignal()
+    mediacontroller_live_pause = QtCore.pyqtSignal()
+    mediacontroller_live_stop = QtCore.pyqtSignal()
 
     def __init__(self, parent):
         """

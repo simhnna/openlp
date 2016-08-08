@@ -34,7 +34,6 @@ from openlp.core.lib import translate
 from openlp.plugins.songs.lib.db import MediaFile, Song
 from .db import Author
 from .ui import SongStrings
-from .endpoint import songs_endpoint
 
 log = logging.getLogger(__name__)
 

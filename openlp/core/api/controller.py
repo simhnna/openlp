@@ -34,7 +34,6 @@ class ApiController(RegistryMixin, OpenLPMixin, RegistryProperties):
     The APIController handles the starting of the API middleware.
     The HTTP and Websocket servers are started
     The core endpoints are generated (just by their declaration).
-
     """
     def __init__(self, parent=None):
         """

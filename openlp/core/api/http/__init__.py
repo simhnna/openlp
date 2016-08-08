@@ -29,7 +29,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.api.http.wsgiapp import WSGIApplication
 from .errors import NotFound, ServerError, HttpError
 
-ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'endpoint')
+ROOT_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'www')
 
 application = WSGIApplication('api', ROOT_DIR)
 

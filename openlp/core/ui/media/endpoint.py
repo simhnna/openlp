@@ -67,9 +67,8 @@ def media_stop(request):
 
     :param request: The http request object.
     """
-    media = Registry().get('media_controller')
-    live = Registry().get('live_controller')
-    status = media.media_stop(live)
-    return {'results': {'success': status}}
+    event = getattr(Registry().get('live_controller'), 'mediacontroller_live_stop')
+    event.emit()
+    return {'results': {'success': True}}
 
 register_endpoint(media_endpoint)

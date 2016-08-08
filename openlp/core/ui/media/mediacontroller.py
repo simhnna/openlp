@@ -618,6 +618,14 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         self.media_play(msg[0], status)
 
+    def on_media_play(self):
+        """
+        Responds to the request to play a loaded video from the web.
+
+        :param msg: First element is the controller which should be used
+        """
+        self.media_play(Registry().get('live_controller'), False)
+
     def media_play(self, controller, first_time=True):
         """
         Responds to the request to play a loaded video
@@ -692,6 +700,14 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         self.media_pause(msg[0])
 
+    def on_media_pause(self):
+        """
+        Responds to the request to pause a loaded video from the web.
+
+        :param msg: First element is the controller which should be used
+        """
+        self.media_pause(Registry().get('live_controller'))
+
     def media_pause(self, controller):
         """
         Responds to the request to pause a loaded video
@@ -731,6 +747,14 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         :param msg: First element is the controller which should be used
         """
         self.media_stop(msg[0])
+
+    def on_media_stop(self):
+        """
+        Responds to the request to stop a loaded video from the web.
+
+        :param msg: First element is the controller which should be used
+        """
+        self.media_stop(Registry().get('live_controller'))
 
     def media_stop(self, controller, looping_background=False):
         """
