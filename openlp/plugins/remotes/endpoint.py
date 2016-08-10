@@ -21,50 +21,27 @@
 ###############################################################################
 import logging
 
-from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http.endpoint.pluginhelpers import search, live, service
-from openlp.core.api.http import register_endpoint, requires_auth
+import os
 
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.endpoint.core import TRANSLATED_STRINGS
+from openlp.core.common import AppLocation
+
+
+static_dir = os.path.join(AppLocation.get_section_data_path('remotes'))
 
 log = logging.getLogger(__name__)
 
-bibles_endpoint = Endpoint('bibles')
-api_bibles_endpoint = Endpoint('api')
+remote_endpoint = Endpoint('remote', template_dir=static_dir, static_dir=static_dir)
 
 
-@bibles_endpoint.route('search')
-@api_bibles_endpoint.route('bibles/search')
-def bibles_search(request):
+@remote_endpoint.route('{view}')
+def index(request, view):
     """
-    Handles requests for searching the bibles plugin
+    Handles requests for /remotes url
 
     :param request: The http request object.
+    :param view: The view name to be servered.
     """
-    return search(request, 'bibles', log)
+    return remote_endpoint.render_template('{view}.mako'.format(view=view), **TRANSLATED_STRINGS)
 
-
-@bibles_endpoint.route('live')
-@api_bibles_endpoint.route('bibles/live')
-@requires_auth
-def bibles_live(request):
-    """
-    Handles requests for making a song live
-
-    :param request: The http request object.
-    """
-    return live(request, 'bibles', log)
-
-
-@bibles_endpoint.route('add')
-@api_bibles_endpoint.route('bibles/add')
-@requires_auth
-def bibles_service(request):
-    """
-    Handles requests for adding a song to the service
-
-    :param request: The http request object.
-    """
-    return service(request, 'bibles', log)
-
-register_endpoint(bibles_endpoint)
-register_endpoint(api_bibles_endpoint)

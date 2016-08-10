@@ -22,49 +22,60 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http.endpoint.pluginhelpers import search, live, service
-from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.api.http.endpoint.pluginhelpers import search, live, service, display_thumbnails
+from openlp.core.api.http import requires_auth
 
 
 log = logging.getLogger(__name__)
 
-custom_endpoint = Endpoint('custom')
-api_custom_endpoint = Endpoint('api')
+presentations_endpoint = Endpoint('presentations')
+api_presentations_endpoint = Endpoint('api')
 
 
-@custom_endpoint.route('search')
-@api_custom_endpoint.route('custom/search')
-def custom_search(request):
+@presentations_endpoint.route('search')
+@api_presentations_endpoint.route('presentations/search')
+def presentations_search(request):
     """
-    Handles requests for searching the custom plugin
+    Handles requests for searching the presentations plugin
 
     :param request: The http request object.
     """
-    return search(request, 'custom', log)
+    return search(request, 'presentations', log)
 
 
-@custom_endpoint.route('live')
-@api_custom_endpoint.route('custom/live')
+@presentations_endpoint.route('live')
+@api_presentations_endpoint.route('presentations/live')
 @requires_auth
-def custom_live(request):
+def presentations_live(request):
     """
     Handles requests for making a song live
 
     :param request: The http request object.
     """
-    return live(request, 'custom', log)
+    return live(request, 'presentations', log)
 
 
-@custom_endpoint.route('add')
-@api_custom_endpoint.route('custom/add')
+@presentations_endpoint.route('add')
+@api_presentations_endpoint.route('presentations/add')
 @requires_auth
-def custom_service(request):
+def presentations_service(request):
     """
     Handles requests for adding a song to the service
 
     :param request: The http request object.
     """
-    return service(request, 'custom', log)
+    return service(request, 'presentations', log)
 
-register_endpoint(custom_endpoint)
-register_endpoint(api_custom_endpoint)
+
+# /presentations/thumbnails88x88/PA%20Rota.pdf/slide5.png
+@presentations_endpoint.route('thumbnails/{dimensions}/{file_name}/{slide}')
+def presentations_thumbnails(request, dimensions, file_name, slide):
+    """
+    Return a presentation to a web page based on a URL
+    :param request: Request object
+    :param dimensions: the image size eg 88x88
+    :param file_name: the file name of the image
+    :param slide: the individual image name
+    :return:
+    """
+    return display_thumbnails(request, 'presentations', log, dimensions, file_name, slide)

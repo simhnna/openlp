@@ -24,9 +24,11 @@ from PyQt5 import QtGui
 
 import logging
 
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import Settings, translate
 from openlp.core.lib import Plugin, StringContent, ImageSource, build_icon
 from openlp.core.lib.db import Manager
+from openlp.plugins.images.endpoint import api_images_endpoint, images_endpoint
 from openlp.plugins.images.lib import ImageMediaItem, ImageTab
 from openlp.plugins.images.lib.db import init_schema
 
@@ -51,6 +53,8 @@ class ImagePlugin(Plugin):
         self.weight = -7
         self.icon_path = ':/plugins/plugin_images.png'
         self.icon = build_icon(self.icon_path)
+        register_endpoint(images_endpoint)
+        register_endpoint(api_images_endpoint)
 
     @staticmethod
     def about():
@@ -88,7 +92,7 @@ class ImagePlugin(Plugin):
         self.text_strings[StringContent.VisibleName] = {'title': translate('ImagePlugin', 'Images', 'container title')}
         # Middle Header Bar
         tooltips = {
-            'load': translate('ImagePlugin', 'Load a new image.'),
+            'load': translate('ImagePlugin', 'Add new image(s).'),
             'import': '',
             'new': translate('ImagePlugin', 'Add a new image.'),
             'edit': translate('ImagePlugin', 'Edit the selected image.'),

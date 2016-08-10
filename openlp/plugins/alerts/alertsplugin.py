@@ -24,6 +24,7 @@ import logging
 
 from PyQt5 import QtGui
 
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import Settings, translate
 from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon
@@ -31,6 +32,7 @@ from openlp.core.lib.db import Manager
 from openlp.core.lib.theme import VerticalType
 from openlp.core.lib.ui import create_action, UiStrings
 from openlp.core.ui import AlertLocation
+from openlp.plugins.alerts.endpoint import api_alerts_endpoint, alerts_endpoint
 from openlp.plugins.alerts.forms import AlertForm
 from openlp.plugins.alerts.lib import AlertsManager, AlertsTab
 from openlp.plugins.alerts.lib.db import init_schema
@@ -140,7 +142,9 @@ class AlertsPlugin(Plugin):
         self.icon = build_icon(self.icon_path)
         AlertsManager(self)
         self.manager = Manager('alerts', init_schema)
-        self.alert_form = AlertForm(self)
+        self.alert_form = AlertForm(self)#
+        register_endpoint(alerts_endpoint)
+        register_endpoint(api_alerts_endpoint)
 
     def add_tools_menu_item(self, tools_menu):
         """

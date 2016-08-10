@@ -20,44 +20,61 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
-import json
-import urllib
-from urllib.parse import urlparse
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint, requires_auth
-from openlp.core.common import Registry
-from openlp.core.lib import PluginStatus
+from openlp.core.api.http.endpoint.pluginhelpers import search, live, service, display_thumbnails
+from openlp.core.api.http import requires_auth
 
 
 log = logging.getLogger(__name__)
 
-alert_endpoint = Endpoint('alert')
-api_alert_endpoint = Endpoint('api')
+images_endpoint = Endpoint('images')
+api_images_endpoint = Endpoint('api')
 
 
-@alert_endpoint.route('')
-@api_alert_endpoint.route('alert')
-@requires_auth
-def alert(request):
+@images_endpoint.route('search')
+@api_images_endpoint.route('images/search')
+def images_search(request):
     """
-    Handles requests for setting service items in the service manager
+    Handles requests for searching the images plugin
 
     :param request: The http request object.
     """
-    plugin = Registry().get('plugin_manager').get_plugin_by_name("alerts")
-    if plugin.status == PluginStatus.Active:
-        try:
-            json_data = request.GET.get('data')
-            text = json.loads(json_data)['request']['text']
-        except KeyError:
-            log.error("Endpoint alerts request text not found")
-            text = urllib.parse.unquote(text)
-        Registry().get('alerts_manager').alerts_text.emit([text])
-        success = True
-    else:
-        success = False
-    return {'results': {'success': success}}
+    return search(request, 'images', log)
 
-register_endpoint(alert_endpoint)
-register_endpoint(api_alert_endpoint)
+
+@images_endpoint.route('live')
+@api_images_endpoint.route('images/live')
+@requires_auth
+def images_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'images', log)
+
+
+@images_endpoint.route('add')
+@api_images_endpoint.route('images/add')
+@requires_auth
+def images_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    return service(request, 'images', log)
+
+
+@images_endpoint.route('thumbnails/{dimensions}/{file_name}/{slide}')
+def images_thumbnails(request, dimensions, file_name, slide):
+    """
+    Return an image to a web page based on a URL
+    :param request: Request object
+    :param dimensions: the image size eg 88x88
+    :param file_name: the file name of the image
+    :param slide: the individual image name
+    :return:
+    """
+    return display_thumbnails(request, 'images', log, dimensions, file_name, slide)

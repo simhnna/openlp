@@ -28,8 +28,10 @@ import logging
 
 from PyQt5 import QtCore
 
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, translate
 from openlp.core.lib import Plugin, StringContent, build_icon
+from openlp.plugins.presentations.endpoint import api_presentations_endpoint, presentations_endpoint
 from openlp.plugins.presentations.lib import PresentationController, PresentationMediaItem, PresentationTab
 
 
@@ -67,6 +69,8 @@ class PresentationPlugin(Plugin):
         self.weight = -8
         self.icon_path = ':/plugins/plugin_presentations.png'
         self.icon = build_icon(self.icon_path)
+        register_endpoint(presentations_endpoint)
+        register_endpoint(api_presentations_endpoint)
 
     def create_settings_tab(self, parent):
         """

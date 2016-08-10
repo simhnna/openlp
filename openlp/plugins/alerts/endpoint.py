@@ -20,30 +20,41 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
-
-import os
+import json
+import urllib
+from urllib.parse import urlparse
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http.endpoint.core import TRANSLATED_STRINGS
-from openlp.core.api.http import register_endpoint
-from openlp.core.common import AppLocation
+from openlp.core.api.http import requires_auth
+from openlp.core.common import Registry
+from openlp.core.lib import PluginStatus
 
-
-static_dir = os.path.join(AppLocation.get_section_data_path('remotes'))
 
 log = logging.getLogger(__name__)
 
-remote_endpoint = Endpoint('remote', template_dir=static_dir, static_dir=static_dir)
+alerts_endpoint = Endpoint('alert')
+api_alerts_endpoint = Endpoint('api')
 
 
-@remote_endpoint.route('{view}')
-def index(request, view):
+@alerts_endpoint.route('')
+@api_alerts_endpoint.route('alert')
+@requires_auth
+def alert(request):
     """
-    Handles requests for /remotes url
+    Handles requests for setting service items in the service manager
 
     :param request: The http request object.
-    :param view: The view name to be servered.
     """
-    return remote_endpoint.render_template('{view}.mako'.format(view=view), **TRANSLATED_STRINGS)
-
-register_endpoint(remote_endpoint)
+    plugin = Registry().get('plugin_manager').get_plugin_by_name("alerts")
+    if plugin.status == PluginStatus.Active:
+        try:
+            json_data = request.GET.get('data')
+            text = json.loads(json_data)['request']['text']
+        except KeyError:
+            log.error("Endpoint alerts request text not found")
+            text = urllib.parse.unquote(text)
+        Registry().get('alerts_manager').alerts_text.emit([text])
+        success = True
+    else:
+        success = False
+    return {'results': {'success': success}}

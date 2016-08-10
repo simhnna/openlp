@@ -22,10 +22,10 @@
 
 import logging
 
-
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import OpenLPMixin
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
-from openlp.plugins.remotes.lib.endpoint import remote_endpoint
+from openlp.plugins.remotes.endpoint import remote_endpoint
 
 log = logging.getLogger(__name__)
 
@@ -41,6 +41,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.icon_path = ':/plugins/plugin_remote.png'
         self.icon = build_icon(self.icon_path)
         self.weight = -1
+        register_endpoint(remote_endpoint)
 
     @staticmethod
     def about():

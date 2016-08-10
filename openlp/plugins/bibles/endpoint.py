@@ -22,63 +22,46 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http.endpoint.pluginhelpers import search, live, service, display_thumbnails
-from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.api.http.endpoint.pluginhelpers import search, live, service
+from openlp.core.api.http import requires_auth
 
 
 log = logging.getLogger(__name__)
 
-images_endpoint = Endpoint('images')
-api_images_endpoint = Endpoint('api')
+bibles_endpoint = Endpoint('bibles')
+api_bibles_endpoint = Endpoint('api')
 
 
-@images_endpoint.route('search')
-@api_images_endpoint.route('images/search')
-def images_search(request):
+@bibles_endpoint.route('search')
+@api_bibles_endpoint.route('bibles/search')
+def bibles_search(request):
     """
-    Handles requests for searching the images plugin
+    Handles requests for searching the bibles plugin
 
     :param request: The http request object.
     """
-    return search(request, 'images', log)
+    return search(request, 'bibles', log)
 
 
-@images_endpoint.route('live')
-@api_images_endpoint.route('images/live')
+@bibles_endpoint.route('live')
+@api_bibles_endpoint.route('bibles/live')
 @requires_auth
-def images_live(request):
+def bibles_live(request):
     """
     Handles requests for making a song live
 
     :param request: The http request object.
     """
-    return live(request, 'images', log)
+    return live(request, 'bibles', log)
 
 
-@images_endpoint.route('add')
-@api_images_endpoint.route('images/add')
+@bibles_endpoint.route('add')
+@api_bibles_endpoint.route('bibles/add')
 @requires_auth
-def images_service(request):
+def bibles_service(request):
     """
     Handles requests for adding a song to the service
 
     :param request: The http request object.
     """
-    return service(request, 'images', log)
-
-
-@images_endpoint.route('thumbnails/{dimensions}/{file_name}/{slide}')
-def images_thumbnails(request, dimensions, file_name, slide):
-    """
-    Return an image to a web page based on a URL
-    :param request: Request object
-    :param dimensions: the image size eg 88x88
-    :param file_name: the file name of the image
-    :param slide: the individual image name
-    :return:
-    """
-    return display_thumbnails(request, 'images', log, dimensions, file_name, slide)
-
-
-register_endpoint(images_endpoint)
-register_endpoint(api_images_endpoint)
+    return service(request, 'bibles', log)
