@@ -26,7 +26,7 @@ import urllib.error
 import json
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.api.http import requires_auth
 from openlp.core.common import Registry, AppLocation, Settings
 from openlp.core.lib import ItemCapabilities, create_thumb
 
@@ -129,6 +129,3 @@ def controller_direction(request, controller, action):
                     format(controller=controller, action=action))
     event.emit()
     return {'results': {'success': True}}
-
-register_endpoint(controller_endpoint)
-register_endpoint(api_controller_endpoint)

@@ -98,6 +98,3 @@ def get_service_items():
             'selected': (service_item.unique_identifier == current_unique_identifier)
         })
     return service_items
-
-register_endpoint(service_endpoint)
-register_endpoint(api_service_endpoint)

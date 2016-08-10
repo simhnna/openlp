@@ -167,7 +167,3 @@ def get_content_type(file_name):
     ext = os.path.splitext(file_name)[1]
     content_type = FILE_TYPES.get(ext, 'text/plain')
     return ext, content_type
-
-register_endpoint(stage_endpoint)
-register_endpoint(blank_endpoint)
-register_endpoint(main_endpoint)

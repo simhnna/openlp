@@ -76,8 +76,4 @@ class Endpoint(object):
         kwargs['assets_url'] = '/assets'
         return Template(filename=path, input_encoding='utf-8').render(**kwargs)
 
-
-from .controller import controller_endpoint
-from .core import stage_endpoint
-from .service import service_endpoint
 from .pluginhelpers import search, live, service
