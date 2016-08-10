@@ -433,4 +433,3 @@ from .versereferencelist import VerseReferenceList
 from .manager import BibleManager
 from .biblestab import BiblesTab
 from .mediaitem import BibleMediaItem
-from .endpoint import bibles_endpoint

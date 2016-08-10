@@ -23,4 +23,3 @@
 from .customxmlhandler import CustomXMLBuilder, CustomXMLParser
 from .mediaitem import CustomMediaItem
 from .customtab import CustomTab
-from .endpoint import custom_endpoint
