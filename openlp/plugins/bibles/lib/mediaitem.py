@@ -254,7 +254,7 @@ class BibleMediaItem(MediaManagerItem):
         self.quickStyleComboBox.activated.connect(self.on_quick_style_combo_box_changed)
         self.advancedStyleComboBox.activated.connect(self.on_advanced_style_combo_box_changed)
         # Buttons
-        self.advancedClearButton.clicked.connect(self.on_clear_button)
+        self.advancedClearButton.clicked.connect(self.on_clear_button_advanced)
         self.quickClearButton.clicked.connect(self.on_clear_button)
         self.advancedSearchButton.clicked.connect(self.on_advanced_search_button)
         self.quickSearchButton.clicked.connect(self.on_quick_search_button)
@@ -554,6 +554,11 @@ class BibleMediaItem(MediaManagerItem):
         self.check_search_result()
         self.quick_search_edit.clear()
         self.quick_search_edit.setFocus()
+
+    def on_clear_button_advanced(self):
+        # The same as the on_clear_button, but does not give focus to Quick search field.
+        self.list_view.clear()
+        self.check_search_result()
 
     def on_lock_button_toggled(self, checked):
         self.quick_search_edit.setFocus()
