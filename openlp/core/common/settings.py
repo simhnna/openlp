@@ -261,7 +261,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/blankScreen': [QtGui.QKeySequence(QtCore.Qt.Key_Period)],
             'shortcuts/collapse': [QtGui.QKeySequence(QtCore.Qt.Key_Minus)],
             'shortcuts/desktopScreen': [QtGui.QKeySequence(QtCore.Qt.Key_Escape),
-                                           QtGui.QKeySequence(QtCore.Qt.Key_D)],
+                                        QtGui.QKeySequence(QtCore.Qt.Key_D)],
             'shortcuts/delete': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
             'shortcuts/down': [QtGui.QKeySequence(QtCore.Qt.Key_Down)],
             'shortcuts/editSong': [],

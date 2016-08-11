@@ -234,21 +234,21 @@ class SlideController(DisplayController, RegistryProperties):
             self.hide_menu.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
             self.hide_menu.setMenu(QtWidgets.QMenu(translate('OpenLP.SlideController', 'Hide'), self.toolbar))
             self.toolbar.add_toolbar_widget(self.hide_menu)
-            self.blank_screen = create_action(self, 'blankScreen',
-                                              text=translate('OpenLP.SlideController', 'Blank Screen'),
-                                              icon=':/slides/slide_blank.png',
-                                              checked=False, can_shortcuts=True, category=self.category,
-                                              triggers=self.on_blank_display)
-            self.theme_screen = create_action(self, 'themeScreen',
-                                              text=translate('OpenLP.SlideController', 'Blank to Theme'),
-                                              icon=':/slides/slide_theme.png',
-                                              checked=False, can_shortcuts=True, category=self.category,
-                                              triggers=self.on_theme_display)
             self.desktop_screen = create_action(self, 'desktopScreen',
                                                 text=translate('OpenLP.SlideController', 'Show Desktop'),
                                                 icon=':/slides/slide_desktop.png',
                                                 checked=False, can_shortcuts=True, category=self.category,
                                                 triggers=self.on_hide_display)
+            self.theme_screen = create_action(self, 'themeScreen',
+                                              text=translate('OpenLP.SlideController', 'Blank to Theme'),
+                                              icon=':/slides/slide_theme.png',
+                                              checked=False, can_shortcuts=True, category=self.category,
+                                              triggers=self.on_theme_display)
+            self.blank_screen = create_action(self, 'blankScreen',
+                                              text=translate('OpenLP.SlideController', 'Blank Screen'),
+                                              icon=':/slides/slide_blank.png',
+                                              checked=False, can_shortcuts=True, category=self.category,
+                                              triggers=self.on_blank_display)
             self.hide_menu.setDefaultAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.theme_screen)
