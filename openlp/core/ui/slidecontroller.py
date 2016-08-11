@@ -234,6 +234,7 @@ class SlideController(DisplayController, RegistryProperties):
             self.hide_menu.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
             self.hide_menu.setMenu(QtWidgets.QMenu(translate('OpenLP.SlideController', 'Hide'), self.toolbar))
             self.toolbar.add_toolbar_widget(self.hide_menu)
+            # The order of the blank to modes in Shortcuts list comes from here.
             self.desktop_screen = create_action(self, 'desktopScreen',
                                                 text=translate('OpenLP.SlideController', 'Show Desktop'),
                                                 icon=':/slides/slide_desktop.png',

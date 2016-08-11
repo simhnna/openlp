@@ -254,7 +254,7 @@ class Settings(QtCore.QSettings):
             QtCore.QSettings.__init__(self, *args)
         # Add shortcuts here so QKeySequence has a QApplication instance to use.
         Settings.__default_settings__.update({
-            'shortcuts/aboutItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
+            'shortcuts/aboutItem': [QtGui.QKeySequence(QtCore.Qt.SHIFT + QtCore.Qt.Key_F1)],
             'shortcuts/addToService': [],
             'shortcuts/audioPauseItem': [],
             'shortcuts/displayTagItem': [],
@@ -334,8 +334,8 @@ class Settings(QtCore.QSettings):
                                            QtGui.QKeySequence(QtCore.Qt.Key_PageDown)],
             'shortcuts/nextService': [QtGui.QKeySequence(QtCore.Qt.Key_Right)],
             'shortcuts/newService': [],
-            'shortcuts/offlineHelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
-            'shortcuts/onlineHelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
+            'shortcuts/offlineHelpItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
+            'shortcuts/onlineHelpItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
             'shortcuts/openService': [],
             'shortcuts/saveService': [],
             'shortcuts/previousItem_live': [QtGui.QKeySequence(QtCore.Qt.Key_Up),
