@@ -312,7 +312,7 @@ class Ui_MainWindow(object):
         elif is_macosx():
             self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir),
                                                 '..', 'Resources', 'OpenLP.help')
-        self.on_help_item = create_action(main_window, 'onlineHelpItem',
+        self.on_help_item = create_action(main_window, 'HelpItem',
                                                icon=':/system/system_help_contents.png',
                                                can_shortcuts=True,
                                                category=UiStrings().Help, triggers=self.on_help_clicked)

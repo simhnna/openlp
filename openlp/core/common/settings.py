@@ -214,7 +214,9 @@ class Settings(QtCore.QSettings):
         ('media/players', 'media/players_temp', [(media_players_conv, None)]),  # Convert phonon to system
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
-        ('advanced/default image', '/core/logo file', [])  # Default image renamed + moved to general after 2.4.
+        ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
+        ('shortcuts/offlineHelpItem', 'shortcuts/HelpItem', []),  # There used to be separated buttons for local and
+        ('shortcuts/onlineHelpItem', 'shortcuts/HelpItem', [])  # online help buttons. Now combined into one since 2.6.
     ]
 
     @staticmethod
@@ -274,6 +276,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/fileSaveItem': [QtGui.QKeySequence(QtGui.QKeySequence.Save)],
             'shortcuts/fileOpenItem': [QtGui.QKeySequence(QtGui.QKeySequence.Open)],
             'shortcuts/goLive': [],
+            'shortcuts/HelpItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
             'shortcuts/importThemeItem': [],
             'shortcuts/importBibleItem': [],
             'shortcuts/listViewBiblesDeleteItem': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
@@ -334,8 +337,6 @@ class Settings(QtCore.QSettings):
                                            QtGui.QKeySequence(QtCore.Qt.Key_PageDown)],
             'shortcuts/nextService': [QtGui.QKeySequence(QtCore.Qt.Key_Right)],
             'shortcuts/newService': [],
-            'shortcuts/offlineHelpItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
-            'shortcuts/onlineHelpItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
             'shortcuts/openService': [],
             'shortcuts/saveService': [],
             'shortcuts/previousItem_live': [QtGui.QKeySequence(QtCore.Qt.Key_Up),
