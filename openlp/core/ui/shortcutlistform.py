@@ -430,7 +430,8 @@ class ShortcutListForm(QtWidgets.QDialog, Ui_ShortcutListDialog, RegistryPropert
                              ' use a different shortcut.'
                              ).format(key=self.get_shortcut_string(key_sequence))
             self.main_window.warning_message(translate('OpenLP.ShortcutListDialog', 'Duplicate Shortcut'),
-                                             text, for_display=True)
+                                             text)
+            for_display = True
             self.dialog_was_shown = True
         return is_valid
 
