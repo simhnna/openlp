@@ -44,4 +44,3 @@ def index(request, view):
     :param view: The view name to be servered.
     """
     return remote_endpoint.render_template('{view}.mako'.format(view=view), **TRANSLATED_STRINGS)
-
