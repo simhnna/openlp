@@ -142,7 +142,7 @@ class AlertsPlugin(Plugin):
         self.icon = build_icon(self.icon_path)
         AlertsManager(self)
         self.manager = Manager('alerts', init_schema)
-        self.alert_form = AlertForm(self)#
+        self.alert_form = AlertForm(self)
         register_endpoint(alerts_endpoint)
         register_endpoint(api_alerts_endpoint)
 
