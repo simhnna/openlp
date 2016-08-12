@@ -22,7 +22,7 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.api.http import requires_auth
 from openlp.core.common import Registry
 
 
@@ -70,5 +70,3 @@ def media_stop(request):
     event = getattr(Registry().get('live_controller'), 'mediacontroller_live_stop')
     event.emit()
     return {'results': {'success': True}}
-
-register_endpoint(media_endpoint)

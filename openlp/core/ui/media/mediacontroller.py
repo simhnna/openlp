@@ -29,10 +29,12 @@ import datetime
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties, Settings, UiStrings, translate
+from openlp.core.api.http import register_endpoint
 from openlp.core.lib import ItemCapabilities
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.common import AppLocation
 from openlp.core.ui import DisplayControllerType
+from openlp.core.ui.media.endpoint import media_endpoint
 from openlp.core.ui.media.vendor.mediainfoWrapper import MediaInfoWrapper
 from openlp.core.ui.media.mediaplayer import MediaPlayer
 from openlp.core.ui.media import MediaState, MediaInfo, MediaType, get_media_players, set_media_players,\
@@ -128,6 +130,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Registry().register_function('songs_unblank', self.media_unblank)
         Registry().register_function('mediaitem_media_rebuild', self._set_active_players)
         Registry().register_function('mediaitem_suffixes', self._generate_extensions_lists)
+        register_endpoint(media_endpoint)
 
     def _set_active_players(self):
         """
