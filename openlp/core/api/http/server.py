@@ -30,8 +30,13 @@ import logging
 from PyQt5 import QtCore
 from waitress import serve
 
+from openlp.core.api.http import register_endpoint
 from openlp.core.api.http import application
-from openlp.core.common import RegistryProperties, OpenLPMixin, Settings
+from openlp.core.common import RegistryMixin, RegistryProperties, OpenLPMixin, Settings, Registry
+from openlp.core.api.poll import Poller
+from openlp.core.api.endpoint.controller import controller_endpoint, api_controller_endpoint
+from openlp.core.api.endpoint.core import stage_endpoint, blank_endpoint, main_endpoint
+from openlp.core.api.endpoint.service import service_endpoint, api_service_endpoint
 
 log = logging.getLogger(__name__)
 
@@ -60,17 +65,31 @@ class HttpWorker(QtCore.QObject):
         pass
 
 
-class HttpServer(RegistryProperties, OpenLPMixin):
+class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
     """
     Wrapper round a server instance
     """
-    def __init__(self):
+    def __init__(self, parent=None):
         """
         Initialise the http server, and start the http server
         """
-        super(HttpServer, self).__init__()
+        super(HttpServer, self).__init__(parent)
         self.worker = HttpWorker()
         self.thread = QtCore.QThread()
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
         self.thread.start()
+
+    def bootstrap_post_set_up(self):
+        """
+        Register the poll return service and start the servers.
+        """
+        self.poller = Poller()
+        Registry().register('poller', self.poller)
+        register_endpoint(controller_endpoint)
+        register_endpoint(api_controller_endpoint)
+        register_endpoint(stage_endpoint)
+        register_endpoint(blank_endpoint)
+        register_endpoint(main_endpoint)
+        register_endpoint(service_endpoint)
+        register_endpoint(api_service_endpoint)

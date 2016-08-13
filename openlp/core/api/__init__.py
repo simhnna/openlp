@@ -23,7 +23,6 @@
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint, requires_auth
 from openlp.core.api.tab import ApiTab
-from openlp.core.api.controller import ApiController
 from openlp.core.api.poll import Poller
 
-__all__ = ['Endpoint', 'ApiController', 'ApiTab', 'register_endpoint', 'requires_auth']
+__all__ = ['Endpoint', 'ApiTab', 'register_endpoint', 'requires_auth']

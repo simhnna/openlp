@@ -34,7 +34,8 @@ from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.api import ApiController
+from openlp.core.api import websockets
+from openlp.core.api.http import server
 from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, \
     check_directory_exists, translate, is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
@@ -533,7 +534,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Settings().set_up_default_values()
         self.about_form = AboutForm(self)
         MediaController()
-        ApiController()
+        websockets.WebSocketServer()
+        server.HttpServer()
         SettingsForm(self)
         self.formatting_tag_form = FormattingTagForm(self)
         self.shortcut_form = ShortcutListForm(self)
