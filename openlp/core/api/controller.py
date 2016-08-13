@@ -23,9 +23,9 @@ import logging
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.api.http.server import HttpServer
-from openlp.core.api.http.endpoint.controller import controller_endpoint, api_controller_endpoint
-from openlp.core.api.http.endpoint.core import stage_endpoint, blank_endpoint, main_endpoint
-from openlp.core.api.http.endpoint.service import service_endpoint, api_service_endpoint
+from openlp.core.api.endpoint.controller import controller_endpoint, api_controller_endpoint
+from openlp.core.api.endpoint.core import stage_endpoint, blank_endpoint, main_endpoint
+from openlp.core.api.endpoint.service import service_endpoint, api_service_endpoint
 from openlp.core.api.websockets import WebSocketServer
 from openlp.core.api.poll import Poller
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties

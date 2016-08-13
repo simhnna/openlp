@@ -24,7 +24,7 @@ import logging
 import os
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http.endpoint.core import TRANSLATED_STRINGS
+from openlp.core.api.endpoint.core import TRANSLATED_STRINGS
 from openlp.core.common import AppLocation
 
 
