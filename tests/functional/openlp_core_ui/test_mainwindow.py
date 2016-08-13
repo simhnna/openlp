@@ -57,7 +57,9 @@ class TestMainWindow(TestCase, TestMixin):
                 patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox') as mocked_q_tool_box_class, \
                 patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget') as mocked_add_dock_method, \
                 patch('openlp.core.ui.mainwindow.ThemeManager') as mocked_theme_manager, \
-                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer:
+                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer, \
+                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer') as mocked_websocketserver, \
+                patch('openlp.core.ui.mainwindow.server.HttpServer') as mocked_httpserver:
             self.mocked_settings_form = mocked_settings_form
             self.mocked_image_manager = mocked_image_manager
             self.mocked_live_controller = mocked_live_controller

@@ -52,7 +52,9 @@ class TestServiceManager(TestCase, TestMixin):
                 patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget') as mocked_add_dock_method, \
                 patch('openlp.core.ui.mainwindow.ThemeManager') as mocked_theme_manager, \
                 patch('openlp.core.ui.mainwindow.ProjectorManager') as mocked_projector_manager, \
-                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer:
+                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer, \
+                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer') as mocked_websocketserver, \
+                patch('openlp.core.ui.mainwindow.server.HttpServer') as mocked_httpserver:
             self.main_window = MainWindow()
         self.service_manager = Registry().get('service_manager')
 
