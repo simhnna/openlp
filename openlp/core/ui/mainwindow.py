@@ -313,9 +313,9 @@ class Ui_MainWindow(object):
             self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir),
                                                 '..', 'Resources', 'OpenLP.help')
         self.on_help_item = create_action(main_window, 'HelpItem',
-                                               icon=':/system/system_help_contents.png',
-                                               can_shortcuts=True,
-                                               category=UiStrings().Help, triggers=self.on_help_clicked)
+                                          icon=':/system/system_help_contents.png',
+                                          can_shortcuts=True,
+                                          category=UiStrings().Help, triggers=self.on_help_clicked)
         self.web_site_item = create_action(main_window, 'webSiteItem', can_shortcuts=True, category=UiStrings().Help)
         # Shortcuts not connected to buttons or menu entries.
         self.search_shortcut_action = create_action(main_window,
