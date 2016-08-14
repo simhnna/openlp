@@ -215,8 +215,9 @@ class Settings(QtCore.QSettings):
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
         ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
-        ('shortcuts/offlineHelpItem', 'shortcuts/HelpItem', []),  # There used to be separated buttons for local and
-        ('shortcuts/onlineHelpItem', 'shortcuts/HelpItem', [])  # online help buttons. Now combined into one since 2.6.
+        ('shortcuts/escapeItem', 'shortcuts/desktopScreen', []),  # Default image renamed + moved to general after 2.4.
+        ('shortcuts/offlineHelpItem', 'shortcuts/HelpItem', []),  # Online and Offline help were combined in 2.6.
+        ('shortcuts/onlineHelpItem', 'shortcuts/HelpItem', [])  # Online and Offline help were combined in 2.6.
     ]
 
     @staticmethod
@@ -256,7 +257,7 @@ class Settings(QtCore.QSettings):
             QtCore.QSettings.__init__(self, *args)
         # Add shortcuts here so QKeySequence has a QApplication instance to use.
         Settings.__default_settings__.update({
-            'shortcuts/aboutItem': [QtGui.QKeySequence(QtCore.Qt.SHIFT + QtCore.Qt.Key_F1)],
+            'shortcuts/aboutItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
             'shortcuts/addToService': [],
             'shortcuts/audioPauseItem': [],
             'shortcuts/displayTagItem': [],
@@ -276,7 +277,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/fileSaveItem': [QtGui.QKeySequence(QtGui.QKeySequence.Save)],
             'shortcuts/fileOpenItem': [QtGui.QKeySequence(QtGui.QKeySequence.Open)],
             'shortcuts/goLive': [],
-            'shortcuts/HelpItem': [QtGui.QKeySequence(QtCore.Qt.CTRL + QtCore.Qt.Key_F1)],
+            'shortcuts/HelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
             'shortcuts/importThemeItem': [],
             'shortcuts/importBibleItem': [],
             'shortcuts/listViewBiblesDeleteItem': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
