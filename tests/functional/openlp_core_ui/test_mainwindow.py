@@ -151,7 +151,7 @@ class TestMainWindow(TestCase, TestMixin):
         # WHEN: you check the started functions
 
         # THEN: the following registry functions should have been registered
-        self.assertEqual(len(self.registry.service_list), 7, 'The registry should have 7 services.')
+        self.assertEqual(len(self.registry.service_list), 6, 'The registry should have 6 services.')
         self.assertEqual(len(self.registry.functions_list), 17, 'The registry should have 17 functions')
         self.assertTrue('application' in self.registry.service_list, 'The application should have been registered.')
         self.assertTrue('main_window' in self.registry.service_list, 'The main_window should have been registered.')
