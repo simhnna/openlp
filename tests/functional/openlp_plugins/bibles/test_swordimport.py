@@ -29,7 +29,7 @@ from unittest import TestCase, skipUnless
 
 from tests.functional import MagicMock, patch
 try:
-    from openlp.plugins.bibles.lib.sword import SwordBible
+    from openlp.plugins.bibles.lib.importers.sword import SwordBible
     HAS_PYSWORD = True
 except ImportError:
     HAS_PYSWORD = False
@@ -68,10 +68,10 @@ class TestSwordImport(TestCase):
         # THEN: The importer should be an instance of BibleDB
         self.assertIsInstance(importer, BibleDB)
 
-    @patch('openlp.plugins.bibles.lib.sword.SwordBible.application')
-    @patch('openlp.plugins.bibles.lib.sword.modules')
-    @patch('openlp.plugins.bibles.lib.db.BiblesResourcesDB')
-    def test_simple_import(self, mocked_bible_res_db, mocked_pysword_modules, mocked_application):
+    @patch('openlp.plugins.bibles.lib.importers.sword.SwordBible.application')
+    @patch('openlp.plugins.bibles.lib.importers.sword.modules')
+    @patch('openlp.core.common.languages')
+    def test_simple_import(self, mocked_languages, mocked_pysword_modules, mocked_application):
         """
         Test that a simple SWORD import works
         """
@@ -88,7 +88,7 @@ class TestSwordImport(TestCase):
         importer.create_verse = MagicMock()
         importer.create_book = MagicMock()
         importer.session = MagicMock()
-        mocked_bible_res_db.get_language.return_value = 'Danish'
+        mocked_languages.get_language.return_value = 'Danish'
         mocked_bible = MagicMock()
         mocked_genesis = MagicMock()
         mocked_genesis.name = 'Genesis'

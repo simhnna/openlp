@@ -50,3 +50,5 @@ class TestVideoPsalmFileImport(SongImportTestHelper):
         # Do the test import
         self.file_import(os.path.join(TEST_PATH, 'videopsalm-as-safe-a-stronghold.json'),
                          self.load_external_result_data(os.path.join(TEST_PATH, 'as-safe-a-stronghold.json')))
+        self.file_import(os.path.join(TEST_PATH, 'videopsalm-as-safe-a-stronghold2.json'),
+                         self.load_external_result_data(os.path.join(TEST_PATH, 'as-safe-a-stronghold2.json')))

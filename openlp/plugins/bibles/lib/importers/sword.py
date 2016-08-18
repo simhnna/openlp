@@ -25,23 +25,24 @@ from pysword import modules
 
 from openlp.core.common import translate
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.plugins.bibles.lib.db import BibleDB, BiblesResourcesDB
+from openlp.plugins.bibles.lib.bibleimport import BibleImport
+from openlp.plugins.bibles.lib.db import BiblesResourcesDB
 
 
 log = logging.getLogger(__name__)
 
 
-class SwordBible(BibleDB):
+class SwordBible(BibleImport):
     """
     SWORD Bible format importer class.
     """
-    def __init__(self, parent, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         Constructor to create and set up an instance of the SwordBible class. This class is used to import Bibles
         from SWORD bible modules.
         """
         log.debug(self.__class__.__name__)
-        BibleDB.__init__(self, parent, **kwargs)
+        super().__init__(*args, **kwargs)
         self.sword_key = kwargs['sword_key']
         self.sword_path = kwargs['sword_path']
         if self.sword_path == '':
@@ -59,8 +60,9 @@ class SwordBible(BibleDB):
             bible = pysword_modules.get_bible_from_module(self.sword_key)
             language = pysword_module_json['lang']
             language = language[language.find('.') + 1:]
-            language_id = BiblesResourcesDB.get_language(language)['id']
-            self.save_meta('language_id', language_id)
+            language_id = self.get_language_id(language, bible_name=self.filename)
+            if not language_id:
+                return False
             books = bible.get_structure().get_books()
             # Count number of books
             num_books = 0

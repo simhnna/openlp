@@ -243,7 +243,7 @@ class TestSlideController(TestCase):
         mocked_service_item = MagicMock()
         mocked_service_item.from_service = False
         mocked_preview_widget.current_slide_number.return_value = 1
-        mocked_preview_widget.slide_count.return_value = 2
+        mocked_preview_widget.slide_count = MagicMock(return_value=2)
         mocked_live_controller.preview_widget = MagicMock()
         Registry.create()
         Registry().register('live_controller', mocked_live_controller)
@@ -273,7 +273,7 @@ class TestSlideController(TestCase):
         mocked_service_item.from_service = True
         mocked_service_item.unique_identifier = 42
         mocked_preview_widget.current_slide_number.return_value = 1
-        mocked_preview_widget.slide_count.return_value = 2
+        mocked_preview_widget.slide_count = MagicMock(return_value=2)
         mocked_live_controller.preview_widget = MagicMock()
         Registry.create()
         Registry().register('live_controller', mocked_live_controller)
@@ -712,6 +712,52 @@ class TestSlideController(TestCase):
             slide_controller.escape_item, slide_controller.desktop_screen,
             slide_controller.theme_screen, slide_controller.blank_screen
         ])
+
+    @patch('openlp.core.ui.slidecontroller.Settings')
+    def on_preview_double_click_unblank_display_test(self, MockedSettings):
+        # GIVEN: A slide controller, actions needed, settins set to True.
+        slide_controller = SlideController(None)
+        mocked_settings = MagicMock()
+        mocked_settings.return_value = True
+        MockedSettings.return_value = mocked_settings
+        slide_controller.service_item = MagicMock()
+        slide_controller.service_item.is_media = MagicMock()
+        slide_controller.on_media_close = MagicMock()
+        slide_controller.on_go_live = MagicMock()
+        slide_controller.on_preview_add_to_service = MagicMock()
+        slide_controller.media_reset = MagicMock()
+        Registry.create()
+        Registry().set_flag('has doubleclick added item to service', True)
+
+        # WHEN: on_preview_double_click is called
+        slide_controller.on_preview_double_click()
+
+        # THEN: The call to addActions should be correct
+        self.assertEqual(1, slide_controller.on_go_live.call_count, 'on_go_live should have been called once.')
+        self.assertEqual(0, slide_controller.on_preview_add_to_service.call_count, 'Should have not been called.')
+
+    @patch('openlp.core.ui.slidecontroller.Settings')
+    def on_preview_double_click_add_to_service_test(self, MockedSettings):
+        # GIVEN: A slide controller, actions needed, settins set to False.
+        slide_controller = SlideController(None)
+        mocked_settings = MagicMock()
+        mocked_settings.value.return_value = False
+        MockedSettings.return_value = mocked_settings
+        slide_controller.service_item = MagicMock()
+        slide_controller.service_item.is_media = MagicMock()
+        slide_controller.on_media_close = MagicMock()
+        slide_controller.on_go_live = MagicMock()
+        slide_controller.on_preview_add_to_service = MagicMock()
+        slide_controller.media_reset = MagicMock()
+        Registry.create()
+        Registry().set_flag('has doubleclick added item to service', False)
+
+        # WHEN: on_preview_double_click is called
+        slide_controller.on_preview_double_click()
+
+        # THEN: The call to addActions should be correct
+        self.assertEqual(0, slide_controller.on_go_live.call_count, 'on_go_live Should have not been called.')
+        self.assertEqual(1, slide_controller.on_preview_add_to_service.call_count, 'Should have been called once.')
 
     @patch(u'openlp.core.ui.slidecontroller.SlideController.image_manager')
     @patch(u'PyQt5.QtCore.QTimer.singleShot')

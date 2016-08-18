@@ -488,6 +488,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
                                                         'You must select one or more items to preview.'))
         else:
             log.debug('%s Preview requested' % self.plugin.name)
+            Registry().set_flag('has doubleclick added item to service', False)
             service_item = self.build_service_item()
             if service_item:
                 service_item.from_plugin = True
@@ -644,6 +645,20 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         if self.list_view.count():
             return
         message = translate('OpenLP.MediaManagerItem', 'No Search Results')
+        item = QtWidgets.QListWidgetItem(message)
+        item.setFlags(QtCore.Qt.NoItemFlags)
+        font = QtGui.QFont()
+        font.setItalic(True)
+        item.setFont(font)
+        self.list_view.addItem(item)
+
+    def check_search_result_search_while_typing_short(self):
+        """
+        This is used in Bible "Search while typing" if the search is shorter than the min required len.
+        """
+        if self.list_view.count():
+            return
+        message = translate('OpenLP.MediaManagerItem', 'Search is too short to be used in: "Search while typing"')
         item = QtWidgets.QListWidgetItem(message)
         item.setFlags(QtCore.Qt.NoItemFlags)
         font = QtGui.QFont()
