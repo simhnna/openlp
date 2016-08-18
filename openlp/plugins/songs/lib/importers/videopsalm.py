@@ -124,7 +124,7 @@ class VideoPsalmImport(SongImport):
                 for verse in song['Verses']:
                     verse_text = verse['Text']
                     # Strip out chords if set up to
-                    if not Settings().value('songs/disable chords import'):
+                    if Settings().value('songs/disable chords import'):
                         verse_text = re.sub(r'\[\w.*?\]', '', verse_text)
                     self.add_verse(verse_text, 'v')
                 if not self.finish():
