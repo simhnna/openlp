@@ -575,7 +575,6 @@ class BibleMediaItem(MediaManagerItem):
         else:
             self.advanced_book_combo_box.setFocus()
 
-
     def on_quick_style_combo_box_changed(self):
         self.settings.layout_style = self.quickStyleComboBox.currentIndex()
         self.advancedStyleComboBox.setCurrentIndex(self.settings.layout_style)
