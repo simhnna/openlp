@@ -116,12 +116,12 @@ class SongBeamerImport(SongImport):
             file_name = os.path.split(import_file)[1]
             if os.path.isfile(import_file):
                 # Detect the encoding
-                self.input_file_encoding = get_file_encoding(file_name)['encoding']
+                self.input_file_encoding = get_file_encoding(import_file)['encoding']
                 # The encoding should only be ANSI (cp1251), UTF-8, Unicode, Big-Endian-Unicode.
-                # So if it doesn't start with 'u' we default to cp1251. See:
+                # So if it doesn't start with 'u' we default to cp1252. See:
                 # https://forum.songbeamer.com/viewtopic.php?p=419&sid=ca4814924e37c11e4438b7272a98b6f2
-                if self.input_file_encoding.lower().startswith('u'):
-                    self.input_file_encoding = 'cp1251'
+                if not self.input_file_encoding.lower().startswith('u'):
+                    self.input_file_encoding = 'cp1252'
                 infile = open(import_file, 'rt', encoding=self.input_file_encoding)
                 song_data = infile.readlines()
                 infile.close()
@@ -133,9 +133,10 @@ class SongBeamerImport(SongImport):
             line_number = -1
             for line in song_data:
                 line = line.rstrip()
+                stripped_line = line.strip()
                 if line.startswith('#') and not read_verses:
                     self.parse_tags(line)
-                elif line.startswith('---'):
+                elif stripped_line.startswith('---'):
                     # '---' is a verse breaker
                     if self.current_verse:
                         self.replace_html_tags()
@@ -150,19 +151,19 @@ class SongBeamerImport(SongImport):
                         if first_line:
                             self.current_verse = first_line.strip() + '\n'
                     line_number += 1
-                elif line.startswith('--'):
+                elif stripped_line.startswith('--'):
                     # '--' is a page breaker, we convert to optional page break
                     self.current_verse += '[---]\n'
                     line_number += 1
                 elif read_verses:
-                    line = self.insert_chords(line_number, line)
                     if verse_start:
                         verse_start = False
                         if not self.check_verse_marks(line):
                             self.current_verse += line.strip() + '\n'
                     else:
+                        line = self.insert_chords(line_number, line)
                         self.current_verse += line.strip() + '\n'
-                    line_number += 1
+                        line_number += 1
             if self.current_verse:
                 self.replace_html_tags()
                 self.add_verse(self.current_verse, self.current_verse_type)
