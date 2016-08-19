@@ -556,16 +556,25 @@ class BibleMediaItem(MediaManagerItem):
         self.quick_search_edit.setFocus()
 
     def on_advanced_clear_button_clicked(self):
-        # The same as the on_clear_button_clicked, but does not give focus to Quick search field.
+        # The same as the on_clear_button_clicked, but gives focus to Book name field in "Select" (advanced).
         self.list_view.clear()
         self.check_search_result()
+        self.advanced_book_combo_box.setFocus()
 
     def on_lock_button_toggled(self, checked):
-        self.quick_search_edit.setFocus()
+        """
+        Toggle the lock button, if Search tab is used, set focus to search field, if Select tab is used,
+        give focus to Bible book name field.
+        """
         if checked:
             self.sender().setIcon(self.lock_icon)
         else:
             self.sender().setIcon(self.unlock_icon)
+        if self.quickTab.isVisible():
+            self.quick_search_edit.setFocus()
+        else:
+            self.advanced_book_combo_box.setFocus()
+
 
     def on_quick_style_combo_box_changed(self):
         self.settings.layout_style = self.quickStyleComboBox.currentIndex()
