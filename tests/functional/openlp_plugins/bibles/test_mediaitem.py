@@ -150,3 +150,23 @@ class TestMediaItem(TestCase, TestMixin):
         self.assertEqual(2, self.media_item.quickSearchButton.setEnabled.call_count, 'Disable and Enable the button')
         self.assertEqual(1, self.media_item.check_search_result.call_count, 'Check results Should had been called once')
         self.assertEqual(1, self.app.set_normal_cursor.call_count, 'Normal cursor should had been called once')
+
+    def on_clear_button_clicked_test(self):
+        """
+        Test that the on_clear_button_clicked works properly. (Used by Bible search tab)
+        """
+
+        # GIVEN: Mocked list_view, check_search_results & quick_search_edit.
+        self.media_item.list_view = MagicMock()
+        self.media_item.check_search_result = MagicMock()
+        self.media_item.quick_search_edit = MagicMock()
+
+
+        # WHEN: on_clear_button_clicked is called
+        self.media_item.on_clear_button_clicked()
+
+        # THEN: Search result should be reset and search field should receive focus.
+        self.assertEqual(1, self.media_item.list_view.clear.call_count, 'List_view.clear should had been called once.')
+        self.assertEqual(1, self.media_item.check_search_result.call_count, 'Check results Should had been called once')
+        self.assertEqual(1, self.media_item.quick_search_edit.clear.call_count, 'Should had been called once')
+        self.assertEqual(1, self.media_item.quick_search_edit.setFocus.call_count, 'Should had been called once')
