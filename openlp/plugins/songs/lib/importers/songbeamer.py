@@ -215,7 +215,7 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#AddCopyrightInfo':
             pass
         elif tag_val[0] == '#AudioFile':
-            parse_audio_file(tag_val[1])
+            self.parse_audio_file(tag_val[1])
         elif tag_val[0] == '#Author':
             self.parse_author(tag_val[1])
         elif tag_val[0] == '#BackgroundImage':

@@ -105,7 +105,8 @@ class TestSongBeamerImport(TestCase):
             self.importer.import_source = source
 
             # THEN: do_import should return none and the progress bar maximum should not be set.
-            self.assertIsNone(self.importer.do_import(), 'do_import should return None when import_source is not a list')
+            self.assertIsNone(self.importer.do_import(),
+                              'do_import should return None when import_source is not a list')
             self.assertEqual(mocked_import_wizard.progress_bar.setMaximum.called, False,
                              'setMaxium on import_wizard.progress_bar should not have been called')
 
@@ -175,7 +176,8 @@ class TestSongBeamerImport(TestCase):
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back false and none as self.importer.current_verse_type
         self.assertFalse(result, 'No versemark for <Jesus my saviour> should be found, value false')
-        self.assertIsNone(self.importer.current_verse_type, '<Jesus my saviour> should be interpreted as none versemark')
+        self.assertIsNone(self.importer.current_verse_type,
+                          '<Jesus my saviour> should be interpreted as none versemark')
 
         # GIVEN: line with song-text with 2 words
         line = 'Praise him'
