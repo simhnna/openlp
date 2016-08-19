@@ -161,7 +161,6 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.check_search_result = MagicMock()
         self.media_item.quick_search_edit = MagicMock()
 
-
         # WHEN: on_clear_button_clicked is called
         self.media_item.on_clear_button_clicked()
 
