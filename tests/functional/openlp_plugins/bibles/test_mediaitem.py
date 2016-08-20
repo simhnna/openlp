@@ -114,7 +114,7 @@ class TestMediaItem(TestCase, TestMixin):
                 self.assertEqual(self.media_item.search_results, {})
                 self.assertEqual(self.media_item.second_search_results, {})
 
-    def on_quick_search_button_general_test(self):
+    def test_on_quick_search_button_general(self):
         """
         Test that general things, which should be called on all Quick searches are called.
         """
@@ -151,7 +151,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.assertEqual(1, self.media_item.check_search_result.call_count, 'Check results Should had been called once')
         self.assertEqual(1, self.app.set_normal_cursor.call_count, 'Normal cursor should had been called once')
 
-    def on_clear_button_clicked_test(self):
+    def test_on_clear_button_clicked(self):
         """
         Test that the on_clear_button_clicked works properly. (Used by Bible search tab)
         """
