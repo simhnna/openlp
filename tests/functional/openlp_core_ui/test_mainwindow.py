@@ -26,11 +26,12 @@ import os
 
 from unittest import TestCase
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui, QtCore
 
 from openlp.core.ui.mainwindow import MainWindow
 from openlp.core.lib.ui import UiStrings
 from openlp.core.common.registry import Registry
+from openlp.core.common import is_win, is_macosx, is_linux
 
 from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
