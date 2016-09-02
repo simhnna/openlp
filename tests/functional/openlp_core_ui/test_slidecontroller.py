@@ -208,29 +208,6 @@ class TestSlideController(TestCase):
         mocked_on_theme_display.assert_called_once_with(False)
         mocked_on_hide_display.assert_called_once_with(False)
 
-    def test_on_hide_display_enable(self):
-        """
-        Test that when the on_hide_display_enable() method is called, the display is set to invisible and any media is stopped
-        """
-        # GIVEN: A new SlideController instance and mocked out display and media_controller
-        mocked_display = MagicMock()
-        mocked_media_controller = MagicMock()
-        Registry.create()
-        Registry().register('media_controller', mocked_media_controller)
-        slide_controller = SlideController(None)
-        slide_controller.display = mocked_display
-        play_slides = MagicMock()
-        play_slides.isChecked.return_value = False
-        slide_controller.play_slides_loop = play_slides
-        slide_controller.play_slides_once = play_slides
-
-        # WHEN: on_hide_display_enable() is called
-        slide_controller.on_hide_display_enable()
-
-        # THEN: the display should be set to invisible and the media controller stopped
-        mocked_display.setVisible.assert_called_once_with(False)
-        mocked_media_controller.media_stop.assert_called_once_with(slide_controller)
-
     def test_on_go_live_live_controller(self):
         """
         Test that when the on_go_live() method is called the message is sent to the live controller and focus is
