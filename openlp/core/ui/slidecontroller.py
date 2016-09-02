@@ -239,7 +239,7 @@ class SlideController(DisplayController, RegistryProperties):
                                              text=translate('OpenLP.SlideController', 'Show Desktop'),
                                              can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
                                              category=self.category,
-                                             triggers=self.live_escape)
+                                             triggers=self.on_hide_display_enable)
             self.desktop_screen = create_action(self, 'desktopScreen',
                                                 text=translate('OpenLP.SlideController', 'Show or hide Desktop'),
                                                 icon=':/slides/slide_desktop.png',
@@ -955,7 +955,7 @@ class SlideController(DisplayController, RegistryProperties):
             else:
                 Registry().execute('live_display_show')
         else:
-            self.live_escape()
+            self.on_hide_display_enable()
 
     def on_slide_blank(self):
         """
@@ -1015,6 +1015,7 @@ class SlideController(DisplayController, RegistryProperties):
     def on_hide_display(self, checked=None):
         """
         Handle the Hide screen button
+        This toggles the desktop screen.
 
         :param checked: the new state of the of the widget
         """
@@ -1033,9 +1034,12 @@ class SlideController(DisplayController, RegistryProperties):
         self.update_preview()
         self.on_toggle_loop()
 
-    def live_escape(self, checked=None):
+    def on_hide_display_enable(self, checked=None):
         """
-        If you press ESC on the live screen it should close the display temporarily.
+        Handle the on_hide_display_enable
+        This only enables the desktop screen.
+
+        :param checked: the new state of the of the widget
         """
         self.blank_screen.setChecked(False)
         self.theme_screen.setChecked(False)
