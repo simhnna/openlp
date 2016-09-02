@@ -697,7 +697,7 @@ class TestSlideController(TestCase):
         slide_controller.next_item = MagicMock()
         slide_controller.previous_service = MagicMock()
         slide_controller.next_service = MagicMock()
-        slide_controller.escape_item = MagicMock()
+        slide_controller.desktop_screen_enable = MagicMock()
         slide_controller.desktop_screen = MagicMock()
         slide_controller.blank_screen = MagicMock()
         slide_controller.theme_screen = MagicMock()
@@ -709,7 +709,7 @@ class TestSlideController(TestCase):
         mocked_widget.addActions.assert_called_with([
             slide_controller.previous_item, slide_controller.next_item,
             slide_controller.previous_service, slide_controller.next_service,
-            slide_controller.escape_item, slide_controller.desktop_screen,
+            slide_controller.desktop_screen_enable, slide_controller.desktop_screen,
             slide_controller.theme_screen, slide_controller.blank_screen
         ])
 

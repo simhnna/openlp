@@ -235,7 +235,7 @@ class SlideController(DisplayController, RegistryProperties):
             self.hide_menu.setMenu(QtWidgets.QMenu(translate('OpenLP.SlideController', 'Hide'), self.toolbar))
             self.toolbar.add_toolbar_widget(self.hide_menu)
             # The order of the blank to modes in Shortcuts list comes from here.
-            self.escape_item = create_action(self, 'escapeItem',
+            self.desktop_screen_enable = create_action(self, 'escapeItem',
                                              text=translate('OpenLP.SlideController', 'Show Desktop'),
                                              can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
                                              category=self.category,
@@ -259,7 +259,7 @@ class SlideController(DisplayController, RegistryProperties):
             self.hide_menu.menu().addAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.theme_screen)
             self.hide_menu.menu().addAction(self.desktop_screen)
-            self.hide_menu.menu().addAction(self.escape_item)
+            self.hide_menu.menu().addAction(self.desktop_screen_enable)
             # Wide menu of display control buttons.
             self.blank_screen_button = QtWidgets.QToolButton(self.toolbar)
             self.blank_screen_button.setObjectName('blank_screen_button')
@@ -612,7 +612,7 @@ class SlideController(DisplayController, RegistryProperties):
         widget.addActions([
             self.previous_item, self.next_item,
             self.previous_service, self.next_service,
-            self.escape_item,
+            self.desktop_screen_enable,
             self.desktop_screen,
             self.theme_screen,
             self.blank_screen])
@@ -1043,6 +1043,8 @@ class SlideController(DisplayController, RegistryProperties):
         self.desktop_screen.setChecked(checked)
         Registry().execute('live_display_hide', HideMode.Screen)
         self.desktop_screen.setChecked(True)
+        self.update_preview()
+        self.on_toggle_loop()
 
     def blank_plugin(self):
         """
