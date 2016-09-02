@@ -235,6 +235,11 @@ class SlideController(DisplayController, RegistryProperties):
             self.hide_menu.setMenu(QtWidgets.QMenu(translate('OpenLP.SlideController', 'Hide'), self.toolbar))
             self.toolbar.add_toolbar_widget(self.hide_menu)
             # The order of the blank to modes in Shortcuts list comes from here.
+            self.escape_item = create_action(self, 'escapeItem',
+                                             text=translate('OpenLP.SlideController', 'Show Desktop'),
+                                             can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
+                                             category=self.category,
+                                             triggers=self.live_escape)
             self.desktop_screen = create_action(self, 'desktopScreen',
                                                 text=translate('OpenLP.SlideController', 'Show or hide Desktop'),
                                                 icon=':/slides/slide_desktop.png',
@@ -250,12 +255,6 @@ class SlideController(DisplayController, RegistryProperties):
                                               icon=':/slides/slide_blank.png',
                                               checked=False, can_shortcuts=True, category=self.category,
                                               triggers=self.on_blank_display)
-            self.escape_item = create_action(self, 'escapeItem',
-                                             text=translate('OpenLP.SlideController', 'Escape Item'),
-                                             can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
-                                             category=self.category,
-                                             triggers=self.live_escape)
-
             self.hide_menu.setDefaultAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.theme_screen)
@@ -274,13 +273,6 @@ class SlideController(DisplayController, RegistryProperties):
             self.desktop_screen_button.setObjectName('desktop_screen_button')
             self.toolbar.add_toolbar_widget(self.desktop_screen_button)
             self.desktop_screen_button.setDefaultAction(self.desktop_screen)
-
-            self.escape_item_button = QtWidgets.QToolButton(self.toolbar)
-            self.escape_item_button.setObjectName('escape_item_button')
-            self.toolbar.add_toolbar_widget(self.escape_item_button)
-            self.escape_item_button.setDefaultAction(self.escape_item)
-
-
             self.toolbar.add_toolbar_action('loop_separator', separator=True)
             # Play Slides Menu
             self.play_slides_menu = QtWidgets.QToolButton(self.toolbar)
