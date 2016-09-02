@@ -236,7 +236,7 @@ class SlideController(DisplayController, RegistryProperties):
             self.toolbar.add_toolbar_widget(self.hide_menu)
             # The order of the blank to modes in Shortcuts list comes from here.
             self.desktop_screen = create_action(self, 'desktopScreen',
-                                                text=translate('OpenLP.SlideController', 'Show Desktop'),
+                                                text=translate('OpenLP.SlideController', 'Show or hide Desktop'),
                                                 icon=':/slides/slide_desktop.png',
                                                 checked=False, can_shortcuts=True, category=self.category,
                                                 triggers=self.on_hide_display)
@@ -250,10 +250,17 @@ class SlideController(DisplayController, RegistryProperties):
                                               icon=':/slides/slide_blank.png',
                                               checked=False, can_shortcuts=True, category=self.category,
                                               triggers=self.on_blank_display)
+            self.escape_item = create_action(self, 'escapeItem',
+                                             text=translate('OpenLP.SlideController', 'Escape Item'),
+                                             can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
+                                             category=self.category,
+                                             triggers=self.live_escape)
+
             self.hide_menu.setDefaultAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.theme_screen)
             self.hide_menu.menu().addAction(self.desktop_screen)
+            self.hide_menu.menu().addAction(self.escape_item)
             # Wide menu of display control buttons.
             self.blank_screen_button = QtWidgets.QToolButton(self.toolbar)
             self.blank_screen_button.setObjectName('blank_screen_button')
@@ -267,6 +274,13 @@ class SlideController(DisplayController, RegistryProperties):
             self.desktop_screen_button.setObjectName('desktop_screen_button')
             self.toolbar.add_toolbar_widget(self.desktop_screen_button)
             self.desktop_screen_button.setDefaultAction(self.desktop_screen)
+
+            self.escape_item_button = QtWidgets.QToolButton(self.toolbar)
+            self.escape_item_button.setObjectName('escape_item_button')
+            self.toolbar.add_toolbar_widget(self.escape_item_button)
+            self.escape_item_button.setDefaultAction(self.escape_item)
+
+
             self.toolbar.add_toolbar_action('loop_separator', separator=True)
             # Play Slides Menu
             self.play_slides_menu = QtWidgets.QToolButton(self.toolbar)
@@ -513,23 +527,6 @@ class SlideController(DisplayController, RegistryProperties):
                                           can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
                                           category=self.category,
                                           triggers=self.service_next)
-        self.escape_item = create_action(parent, 'escapeItem',
-                                         text=translate('OpenLP.SlideController', 'Escape Item'),
-                                         can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
-                                         category=self.category,
-                                         triggers=self.live_escape)
-
-    def live_escape(self, field=None):
-        """
-        If you press ESC on the live screen it should close the display temporarily.
-        """
-        self.display.setVisible(False)
-        self.media_controller.media_stop(self)
-        # Stop looping if active
-        if self.play_slides_loop.isChecked():
-            self.on_play_slides_loop(False)
-        elif self.play_slides_once.isChecked():
-            self.on_play_slides_once(False)
 
     def toggle_display(self, action):
         """
@@ -1043,6 +1040,17 @@ class SlideController(DisplayController, RegistryProperties):
         self.hide_plugin(checked)
         self.update_preview()
         self.on_toggle_loop()
+
+    def live_escape(self, checked=None):
+        """
+        If you press ESC on the live screen it should close the display temporarily.
+        """
+        self.blank_screen.setChecked(False)
+        self.theme_screen.setChecked(False)
+        # Not sure if this line is required.
+        self.desktop_screen.setChecked(checked)
+        Registry().execute('live_display_hide', HideMode.Screen)
+        self.desktop_screen.setChecked(True)
 
     def blank_plugin(self):
         """

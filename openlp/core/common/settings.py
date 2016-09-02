@@ -215,7 +215,6 @@ class Settings(QtCore.QSettings):
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
         ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
-        ('shortcuts/escapeItem', 'shortcuts/desktopScreen', []),  # Default image renamed + moved to general after 2.4.
         ('shortcuts/offlineHelpItem', 'shortcuts/HelpItem', []),  # Online and Offline help were combined in 2.6.
         ('shortcuts/onlineHelpItem', 'shortcuts/HelpItem', [])  # Online and Offline help were combined in 2.6.
     ]
@@ -263,8 +262,8 @@ class Settings(QtCore.QSettings):
             'shortcuts/displayTagItem': [],
             'shortcuts/blankScreen': [QtGui.QKeySequence(QtCore.Qt.Key_Period)],
             'shortcuts/collapse': [QtGui.QKeySequence(QtCore.Qt.Key_Minus)],
-            'shortcuts/desktopScreen': [QtGui.QKeySequence(QtCore.Qt.Key_Escape),
-                                        QtGui.QKeySequence(QtCore.Qt.Key_D)],
+            'shortcuts/showDesktopScreen': [QtGui.QKeySequence(QtCore.Qt.Key_Escape)],
+            'shortcuts/desktopScreen': [QtGui.QKeySequence(QtCore.Qt.Key_D)],
             'shortcuts/delete': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
             'shortcuts/down': [QtGui.QKeySequence(QtCore.Qt.Key_Down)],
             'shortcuts/editSong': [],
