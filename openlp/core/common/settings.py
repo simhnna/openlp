@@ -379,6 +379,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/themeScreen': [QtGui.QKeySequence(QtCore.Qt.Key_T)],
             'shortcuts/toolsReindexItem': [],
             'shortcuts/toolsFindDuplicates': [],
+            'shortcuts/ReportSongList': [],
             'shortcuts/toolsAlertItem': [QtGui.QKeySequence(QtCore.Qt.Key_F7)],
             'shortcuts/toolsFirstTimeWizard': [],
             'shortcuts/toolsOpenDataFolder': [],
