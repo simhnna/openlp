@@ -158,26 +158,27 @@ class SongFormat(object):
     DreamBeam = 4
     EasySlides = 5
     EasyWorshipDB = 6
-    EasyWorshipService = 7
-    FoilPresenter = 8
-    Lyrix = 9
-    MediaShout = 10
-    OpenSong = 11
-    OPSPro = 12
-    PowerPraise = 13
-    PowerSong = 14
-    PresentationManager = 15
-    ProPresenter = 16
-    SongBeamer = 17
-    SongPro = 18
-    SongShowPlus = 19
-    SongsOfFellowship = 20
-    SundayPlus = 21
-    VideoPsalm = 22
-    WordsOfWorship = 23
-    WorshipAssistant = 24
-    WorshipCenterPro = 25
-    ZionWorx = 26
+    EasyWorshipSqliteDB = 7
+    EasyWorshipService = 8
+    FoilPresenter = 9
+    Lyrix = 10
+    MediaShout = 11
+    OpenSong = 12
+    OPSPro = 13
+    PowerPraise = 14
+    PowerSong = 15
+    PresentationManager = 16
+    ProPresenter = 17
+    SongBeamer = 18
+    SongPro = 19
+    SongShowPlus = 20
+    SongsOfFellowship = 21
+    SundayPlus = 22
+    VideoPsalm = 23
+    WordsOfWorship = 24
+    WorshipAssistant = 25
+    WorshipCenterPro = 26
+    ZionWorx = 27
 
     # Set optional attribute defaults
     __defaults__ = {
@@ -242,8 +243,16 @@ class SongFormat(object):
             'name': 'EasyWorship Song Database',
             'prefix': 'ew',
             'selectMode': SongFormatSelect.SingleFile,
-            'filter': '{text} (*.db)'.format(text=translate('SongsPlugin.ImportWizardForm',
+            'filter': '{text} (*.DB)'.format(text=translate('SongsPlugin.ImportWizardForm',
                                                             'EasyWorship Song Database'))
+        },
+        EasyWorshipSqliteDB: {
+            'class': EasyWorshipSongImport,
+            'name': 'EasyWorship 6 Song Database',
+            'prefix': 'ew',
+            'selectMode': SongFormatSelect.SingleFolder,
+            'filter': '{text} (*.db)'.format(text=translate('SongsPlugin.ImportWizardForm',
+                                                            'EasyWorship 6 Song Data Directory'))
         },
         EasyWorshipService: {
             'class': EasyWorshipSongImport,
@@ -430,6 +439,7 @@ class SongFormat(object):
             SongFormat.DreamBeam,
             SongFormat.EasySlides,
             SongFormat.EasyWorshipDB,
+            SongFormat.EasyWorshipSqliteDB,
             SongFormat.EasyWorshipService,
             SongFormat.FoilPresenter,
             SongFormat.Lyrix,
