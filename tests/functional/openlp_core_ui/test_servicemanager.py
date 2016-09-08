@@ -28,6 +28,7 @@ from unittest import TestCase
 import PyQt5
 
 from openlp.core.common import Registry, ThemeLevel
+from openlp.core.ui.lib.toolbar import OpenLPToolbar
 from openlp.core.lib import ServiceItem, ServiceItemType, ItemCapabilities
 from openlp.core.ui import ServiceManager
 
@@ -679,3 +680,72 @@ class TestServiceManager(TestCase):
         # THEN: The "save_as" method is called to save the service
         self.assertTrue(result)
         mocked_save_file_as.assert_called_with()
+
+    @patch(u'openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
+    def test_theme_change_global(self, mocked_regenerate_service_items):
+        """
+        Test that when a Toolbar theme combobox displays correctly
+        """
+
+        # GIVEN: A service manager, a service to save with a theme level of the renderer
+        mocked_renderer = MagicMock()
+        service_manager = ServiceManager(None)
+        Registry().register('renderer', mocked_renderer)
+        service_manager.toolbar = OpenLPToolbar(None)
+        service_manager.toolbar.add_toolbar_action('theme_combo_box', triggers=MagicMock())
+        service_manager.toolbar.add_toolbar_action('theme_label', triggers=MagicMock())
+
+        # WHEN: The service manager has a Global theme
+        mocked_renderer.theme_level = ThemeLevel.Global
+        result = service_manager.theme_change()
+
+        # THEN: The the theme toolbar should not be visible
+
+        self.assertFalse(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
+                         'The visibility should be False')
+
+    @patch(u'openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
+    def test_theme_change_service(self, mocked_regenerate_service_items):
+        """
+        Test that when a Toolbar theme combobox displays correctly
+        """
+
+        # GIVEN: A service manager, a service to save with a theme level of the renderer
+        mocked_renderer = MagicMock()
+        service_manager = ServiceManager(None)
+        Registry().register('renderer', mocked_renderer)
+        service_manager.toolbar = OpenLPToolbar(None)
+        service_manager.toolbar.add_toolbar_action('theme_combo_box', triggers=MagicMock())
+        service_manager.toolbar.add_toolbar_action('theme_label', triggers=MagicMock())
+
+        # WHEN: The service manager has a Global theme
+        mocked_renderer.theme_level = ThemeLevel.Service
+        result = service_manager.theme_change()
+
+        # THEN: The the theme toolbar should not be visible
+
+        self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
+                        'The visibility should be True')
+
+    @patch(u'openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
+    def test_theme_change_song(self, mocked_regenerate_service_items):
+        """
+        Test that when a Toolbar theme combobox displays correctly
+        """
+
+        # GIVEN: A service manager, a service to save with a theme level of the renderer
+        mocked_renderer = MagicMock()
+        service_manager = ServiceManager(None)
+        Registry().register('renderer', mocked_renderer)
+        service_manager.toolbar = OpenLPToolbar(None)
+        service_manager.toolbar.add_toolbar_action('theme_combo_box', triggers=MagicMock())
+        service_manager.toolbar.add_toolbar_action('theme_label', triggers=MagicMock())
+
+        # WHEN: The service manager has a Global theme
+        mocked_renderer.theme_level = ThemeLevel.Song
+        result = service_manager.theme_change()
+
+        # THEN: The the theme toolbar should not be visible
+
+        self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
+                        'The visibility should be True')

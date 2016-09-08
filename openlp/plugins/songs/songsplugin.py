@@ -169,7 +169,7 @@ class SongsPlugin(Plugin):
             triggers=self.on_tools_find_duplicates_triggered, can_shortcuts=True)
         self.tools_report_song_list = create_action(
             tools_menu, 'ReportSongList',
-            text=translate('SongsPlugin', 'Export List on Songs'),
+            text=translate('SongsPlugin', 'Export List of Songs'),
             statustip=translate('SongsPlugin', 'Produce a CSV file of all the songs in the database.'),
             triggers=self.on_tools_report_song_list_triggered)
 
@@ -345,13 +345,13 @@ class SongsPlugin(Plugin):
         self.manager.finalise()
         self.song_import_item.setVisible(False)
         self.song_export_item.setVisible(False)
-        self.tools_reindex_item.setVisible(False)
-        self.tools_find_duplicates.setVisible(False)
         action_list = ActionList.get_instance()
         action_list.remove_action(self.song_import_item, UiStrings().Import)
         action_list.remove_action(self.song_export_item, UiStrings().Export)
         action_list.remove_action(self.tools_reindex_item, UiStrings().Tools)
         action_list.remove_action(self.tools_find_duplicates, UiStrings().Tools)
+        action_list.add_action(self.tools_report_song_list, UiStrings().Tools)
+        self.song_tools_menu.menuAction().setVisible(False)
         super(SongsPlugin, self).finalise()
 
     def new_service_created(self):
