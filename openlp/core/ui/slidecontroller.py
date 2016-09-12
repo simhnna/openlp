@@ -1043,8 +1043,6 @@ class SlideController(DisplayController, RegistryProperties):
         """
         self.blank_screen.setChecked(False)
         self.theme_screen.setChecked(False)
-        # Not sure if this line is required.
-        self.desktop_screen.setChecked(checked)
         Registry().execute('live_display_hide', HideMode.Screen)
         self.desktop_screen.setChecked(True)
         self.update_preview()
