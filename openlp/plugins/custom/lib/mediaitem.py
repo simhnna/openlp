@@ -350,7 +350,7 @@ class CustomMediaItem(MediaManagerItem):
         :param string: The search string
         :param show_error: The error string to be show.
         """
-        search = '%{search}%'.forma(search=string.lower())
+        search = '%{search}%'.format(search=string.lower())
         search_results = self.plugin.db_manager.get_all_objects(CustomSlide,
                                                                 or_(func.lower(CustomSlide.title).like(search),
                                                                     func.lower(CustomSlide.text).like(search)),
