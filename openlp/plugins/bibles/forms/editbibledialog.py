@@ -68,14 +68,12 @@ class Ui_EditBibleDialog(object):
         self.permissions_edit.setObjectName('permissions_edit')
         self.permissions_label.setBuddy(self.permissions_edit)
         self.license_details_layout.addRow(self.permissions_label, self.permissions_edit)
-        # QTextEdit
         self.full_license_label = QtWidgets.QLabel(self.license_details_group_box)
         self.full_license_label.setObjectName('full_license_label')
         self.full_license_edit = QtWidgets.QPlainTextEdit(self.license_details_group_box)
         self.full_license_edit.setObjectName('full_license_edit')
         self.full_license_label.setBuddy(self.full_license_edit)
         self.license_details_layout.addRow(self.full_license_label, self.full_license_edit)
-
         self.meta_tab_layout.addWidget(self.license_details_group_box)
         self.language_selection_group_box = QtWidgets.QGroupBox(self.meta_tab)
         self.language_selection_group_box.setObjectName('language_selection_group_box')

@@ -61,11 +61,20 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         """
         log.debug('Load Bible')
         self.bible = bible
-        self.version_name_edit.setText(self.manager.get_meta_data(self.bible, 'name').value)
-        self.copyright_edit.setText(self.manager.get_meta_data(self.bible, 'copyright').value)
-        self.permissions_edit.setText(self.manager.get_meta_data(self.bible, 'permissions').value)
-        self.full_license_edit.setPlainText(self.manager.get_meta_data(self.bible, 'full_license').value)
-        book_name_language = self.manager.get_meta_data(self.bible, 'book_name_language')
+        """
+        Try loading the metadata, if the field does not exist in the metadata, continue executing the code,
+        missing fields will be created on "self.accept" (save). Also set "book_name_language",
+        there would otherwise be a traceback for reference before assignment.
+        """
+        try:
+            self.version_name_edit.setText(self.manager.get_meta_data(self.bible, 'name').value)
+            self.copyright_edit.setText(self.manager.get_meta_data(self.bible, 'copyright').value)
+            self.permissions_edit.setText(self.manager.get_meta_data(self.bible, 'permissions').value)
+            self.full_license_edit.setPlainText(self.manager.get_meta_data(self.bible, 'full_license').value)
+            book_name_language = self.manager.get_meta_data(self.bible, 'book_name_language')
+        except AttributeError:
+            book_name_language = self.manager.get_meta_data(self.bible, 'book_name_language')
+            pass
         if book_name_language and book_name_language.value != 'None':
             self.language_selection_combo_box.setCurrentIndex(int(book_name_language.value) + 1)
         self.books = {}
