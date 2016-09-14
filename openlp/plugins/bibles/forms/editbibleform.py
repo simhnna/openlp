@@ -64,6 +64,7 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         self.version_name_edit.setText(self.manager.get_meta_data(self.bible, 'name').value)
         self.copyright_edit.setText(self.manager.get_meta_data(self.bible, 'copyright').value)
         self.permissions_edit.setText(self.manager.get_meta_data(self.bible, 'permissions').value)
+        self.full_license_edit.setPlainText(self.manager.get_meta_data(self.bible, 'full_license').value)
         book_name_language = self.manager.get_meta_data(self.bible, 'book_name_language')
         if book_name_language and book_name_language.value != 'None':
             self.language_selection_combo_box.setCurrentIndex(int(book_name_language.value) + 1)
@@ -107,6 +108,7 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         version = self.version_name_edit.text()
         copyright = self.copyright_edit.text()
         permissions = self.permissions_edit.text()
+        full_license = self.full_license_edit.toPlainText()
         book_name_language = self.language_selection_combo_box.currentIndex() - 1
         if book_name_language == -1:
             book_name_language = None
@@ -121,7 +123,7 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
                         if not self.validate_book(custom_names[abbr], abbr):
                             return
         self.application.set_busy_cursor()
-        self.manager.save_meta_data(self.bible, version, copyright, permissions, book_name_language)
+        self.manager.save_meta_data(self.bible, version, copyright, permissions, full_license, book_name_language)
         if not self.web_bible:
             for abbr, book in self.books.items():
                 if book:

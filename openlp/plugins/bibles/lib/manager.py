@@ -376,17 +376,17 @@ class BibleManager(RegistryProperties):
         else:
             return None
 
-    def save_meta_data(self, bible, version, copyright, permissions, book_name_language=None):
+    def save_meta_data(self, bible, version, copyright, permissions, full_license, book_name_language=None):
         """
         Saves the bibles meta data.
         """
-        log.debug('save_meta data {bible}, {version}, {copyright}, {perms}'.format(bible=bible,
-                                                                                   version=version,
-                                                                                   copyright=copyright,
-                                                                                   perms=permissions))
+        log.debug('save_meta data {bible}, {version}, {copyright},'
+                  ' {perms}, {full_license}'.format(bible=bible, version=version, copyright=copyright,
+                                                    perms=permissions, full_license=full_license))
         self.db_cache[bible].save_meta('name', version)
         self.db_cache[bible].save_meta('copyright', copyright)
         self.db_cache[bible].save_meta('permissions', permissions)
+        self.db_cache[bible].save_meta('full_license', full_license)
         self.db_cache[bible].save_meta('book_name_language', book_name_language)
 
     def get_meta_data(self, bible, key):
