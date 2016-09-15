@@ -70,7 +70,7 @@ class SongsTab(SettingsTab):
         self.display_copyright_check_box.stateChanged.connect(self.on_copyright_check_box_changed)
 
     def retranslateUi(self):
-        self.mode_group_box.setTitle(translate('SongsPlugin.SongsTab', 'Songs Mode'))
+        self.mode_group_box.setTitle(translate('SongsPlugin.SongsTab', 'Song related settings'))
         self.tool_bar_active_check_box.setText(translate('SongsPlugin.SongsTab',
                                                          'Enable "Go to verse" button in Live panel'))
         self.update_on_edit_check_box.setText(translate('SongsPlugin.SongsTab', 'Update service from song edit'))
