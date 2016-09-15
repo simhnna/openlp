@@ -565,6 +565,8 @@ class BibleMediaItem(MediaManagerItem):
         """
         Toggle the lock button, if Search tab is used, set focus to search field, if Select tab is used,
         give focus to Bible book name field.
+        :param checked: The state of the toggle button. bool
+        :return: None
         """
         if checked:
             self.sender().setIcon(self.lock_icon)
