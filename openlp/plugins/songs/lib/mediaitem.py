@@ -646,7 +646,10 @@ class SongMediaItem(MediaManagerItem):
         item.raw_footer = []
         item.raw_footer.append(song.title)
         if authors_none:
-            item.raw_footer.append("{text}: {authors}".format(text=translate('OpenLP.Ui', 'Written by'),
+            if Settings().value('core/auto unblank'):
+                item.raw_footer.append("{authors}".format(authors=create_separated_list(authors_none)))
+            else:
+                item.raw_footer.append("{text}: {authors}".format(text=translate('OpenLP.Ui', 'Written by'),
                                                               authors=create_separated_list(authors_none)))
         if authors_words_music:
             item.raw_footer.append("{text}: {authors}".format(text=AuthorType.Types[AuthorType.WordsAndMusic],
