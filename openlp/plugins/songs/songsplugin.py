@@ -59,6 +59,7 @@ __default_settings__ = {
     'songs/add song from service': True,
     'songs/display songbar': True,
     'songs/display songbook': False,
+    'songs/display written by': False,
     'songs/display copyright symbol': False,
     'songs/last directory import': '',
     'songs/last directory export': '',

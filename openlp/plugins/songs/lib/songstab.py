@@ -53,6 +53,9 @@ class SongsTab(SettingsTab):
         self.display_songbook_check_box = QtWidgets.QCheckBox(self.mode_group_box)
         self.display_songbook_check_box.setObjectName('songbook_check_box')
         self.mode_layout.addWidget(self.display_songbook_check_box)
+        self.display_written_by_check_box = QtWidgets.QCheckBox(self.mode_group_box)
+        self.display_written_by_check_box.setObjectName('written_by_check_box')
+        self.mode_layout.addWidget(self.display_written_by_check_box)
         self.display_copyright_check_box = QtWidgets.QCheckBox(self.mode_group_box)
         self.display_copyright_check_box.setObjectName('copyright_check_box')
         self.mode_layout.addWidget(self.display_copyright_check_box)
@@ -63,6 +66,7 @@ class SongsTab(SettingsTab):
         self.update_on_edit_check_box.stateChanged.connect(self.on_update_on_edit_check_box_changed)
         self.add_from_service_check_box.stateChanged.connect(self.on_add_from_service_check_box_changed)
         self.display_songbook_check_box.stateChanged.connect(self.on_songbook_check_box_changed)
+        self.display_written_by_check_box.stateChanged.connect(self.on_written_by_check_box_changed)
         self.display_copyright_check_box.stateChanged.connect(self.on_copyright_check_box_changed)
 
     def retranslateUi(self):
@@ -73,6 +77,8 @@ class SongsTab(SettingsTab):
         self.add_from_service_check_box.setText(translate('SongsPlugin.SongsTab',
                                                           'Import missing songs from Service files'))
         self.display_songbook_check_box.setText(translate('SongsPlugin.SongsTab', 'Display songbook in footer'))
+        self.display_written_by_check_box.setText(translate(
+            'SongsPlugin.SongsTab', 'Show "Written by:" in footer for unspecified authors'))
         self.display_copyright_check_box.setText(translate('SongsPlugin.SongsTab',
                                                            'Display "{symbol}" symbol before copyright '
                                                            'info').format(symbol=SongStrings.CopyrightSymbol))
@@ -92,6 +98,9 @@ class SongsTab(SettingsTab):
     def on_songbook_check_box_changed(self, check_state):
         self.display_songbook = (check_state == QtCore.Qt.Checked)
 
+    def on_written_by_check_box_changed(self, check_state):
+        self.display_written_by = (check_state == QtCore.Qt.Checked)
+
     def on_copyright_check_box_changed(self, check_state):
         self.display_copyright_symbol = (check_state == QtCore.Qt.Checked)
 
@@ -102,11 +111,13 @@ class SongsTab(SettingsTab):
         self.update_edit = settings.value('update service on edit')
         self.update_load = settings.value('add song from service')
         self.display_songbook = settings.value('display songbook')
+        self.display_written_by = settings.value('display written by')
         self.display_copyright_symbol = settings.value('display copyright symbol')
         self.tool_bar_active_check_box.setChecked(self.tool_bar)
         self.update_on_edit_check_box.setChecked(self.update_edit)
         self.add_from_service_check_box.setChecked(self.update_load)
         self.display_songbook_check_box.setChecked(self.display_songbook)
+        self.display_written_by_check_box.setChecked(self.display_written_by)
         self.display_copyright_check_box.setChecked(self.display_copyright_symbol)
         settings.endGroup()
 
@@ -117,6 +128,7 @@ class SongsTab(SettingsTab):
         settings.setValue('update service on edit', self.update_edit)
         settings.setValue('add song from service', self.update_load)
         settings.setValue('display songbook', self.display_songbook)
+        settings.setValue('display written by', self.display_written_by)
         settings.setValue('display copyright symbol', self.display_copyright_symbol)
         settings.endGroup()
         if self.tab_visited:
