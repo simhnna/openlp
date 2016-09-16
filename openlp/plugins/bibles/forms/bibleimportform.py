@@ -750,9 +750,13 @@ class BibleImportForm(OpenLPWizard):
         self.setField('proxy_username', settings.value('proxy username'))
         self.setField('proxy_password', settings.value('proxy password'))
         self.setField('license_version', self.version_name_edit.text())
+        self.version_name_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
         self.setField('license_copyright', self.copyright_edit.text())
+        self.copyright_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
         self.setField('license_permissions', self.permissions_edit.text())
+        self.permissions_edit.setPlaceholderText(UiStrings().OptionalShowInFooter)
         self.setField('license_full_license', self.full_license_edit.toPlainText())
+        self.full_license_edit.setPlaceholderText(UiStrings().OptionalHideInFooter)
         self.on_web_source_combo_box_index_changed(WebDownload.Crosswalk)
         settings.endGroup()
 
