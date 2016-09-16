@@ -383,7 +383,7 @@ class BibleImportForm(OpenLPWizard):
         self.full_license_label = QtWidgets.QLabel(self.license_details_page)
         self.full_license_label.setObjectName('FullLicenseLabel')
         self.license_details_layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.full_license_label)
-        self.full_license_edit = QtWidgets.QLineEdit(self.license_details_page)
+        self.full_license_edit = QtWidgets.QPlainTextEdit(self.license_details_page)
         self.full_license_edit.setObjectName('FullLicenseEdit')
         self.license_details_layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.full_license_edit)
         self.addPage(self.license_details_page)
@@ -725,7 +725,7 @@ class BibleImportForm(OpenLPWizard):
         self.license_details_page.registerField('license_version', self.version_name_edit)
         self.license_details_page.registerField('license_copyright', self.copyright_edit)
         self.license_details_page.registerField('license_permissions', self.permissions_edit)
-        self.license_details_page.registerField('license_full_license', self.full_license_edit)
+        self.license_details_page.registerField("license_full_license", self.full_license_edit, "plainText")
 
     def set_defaults(self):
         """
@@ -752,7 +752,7 @@ class BibleImportForm(OpenLPWizard):
         self.setField('license_version', self.version_name_edit.text())
         self.setField('license_copyright', self.copyright_edit.text())
         self.setField('license_permissions', self.permissions_edit.text())
-        self.setField('license_full_license', self.full_license_edit.text())
+        self.setField('license_full_license', self.full_license_edit.toPlainText())
         self.on_web_source_combo_box_index_changed(WebDownload.Crosswalk)
         settings.endGroup()
 
