@@ -647,9 +647,10 @@ class SongMediaItem(MediaManagerItem):
         item.raw_footer = []
         item.raw_footer.append(song.title)
         if authors_none:
+            # If the setting for showing "Written by:" is enabled, show it before unspecified authors.
             if Settings().value('songs/display written by'):
                 item.raw_footer.append("{text}: {authors}".format(text=translate('OpenLP.Ui', 'Written by'),
-                                                              authors=create_separated_list(authors_none)))
+                                                                  authors=create_separated_list(authors_none)))
             else:
                 item.raw_footer.append("{authors}".format(authors=create_separated_list(authors_none)))
 
