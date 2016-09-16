@@ -68,9 +68,13 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         """
         try:
             self.version_name_edit.setText(self.manager.get_meta_data(self.bible, 'name').value)
+            self.version_name_edit.setPlaceholderText('Required, this will be displayed in footer.')
             self.copyright_edit.setText(self.manager.get_meta_data(self.bible, 'copyright').value)
+            self.copyright_edit.setPlaceholderText('Required, this will be displayed in footer.')
             self.permissions_edit.setText(self.manager.get_meta_data(self.bible, 'permissions').value)
+            self.permissions_edit.setPlaceholderText('Optional, this will be displayed in footer.')
             self.full_license_edit.setPlainText(self.manager.get_meta_data(self.bible, 'full_license').value)
+            self.full_license_edit.setPlaceholderText('Optional, this won\'t be displayed in footer.')
             book_name_language = self.manager.get_meta_data(self.bible, 'book_name_language')
         except AttributeError:
             book_name_language = self.manager.get_meta_data(self.bible, 'book_name_language')
