@@ -563,8 +563,7 @@ class BibleMediaItem(MediaManagerItem):
 
     def on_lock_button_toggled(self, checked):
         """
-        Toggle the lock button, if Search tab is used, set focus to search field, if Select tab is used,
-        give focus to Bible book name field.
+        Toggle the lock button, if Search tab is used, set focus to search field.
         :param checked: The state of the toggle button. bool
         :return: None
         """
@@ -574,8 +573,6 @@ class BibleMediaItem(MediaManagerItem):
             self.sender().setIcon(self.unlock_icon)
         if self.quickTab.isVisible():
             self.quick_search_edit.setFocus()
-        else:
-            self.advanced_book_combo_box.setFocus()
 
     def on_quick_style_combo_box_changed(self):
         self.settings.layout_style = self.quickStyleComboBox.currentIndex()

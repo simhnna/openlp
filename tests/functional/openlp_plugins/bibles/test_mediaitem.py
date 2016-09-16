@@ -168,3 +168,18 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.check_search_result.assert_called_once_with(),
         self.media_item.quick_search_edit.clear.assert_called_once_with(),
         self.media_item.quick_search_edit.setFocus.assert_called_once_with()
+
+    def test_on_lock_button_toggled_search_tab(self):
+        """
+        Test that "on_lock_button_toggled" gives focus to the right field.
+        """
+        # GIVEN: Mocked functions
+        self.media_item.sender = MagicMock()
+        self.media_item.quickTab = MagicMock()
+        self.media_item.quick_search_edit = MagicMock()
+
+        # WHEN: on_lock_button_toggled is called and quickTab.isVisible() returns = True.
+        self.media_item.on_lock_button_toggled(True)
+
+        # THEN: on_quick_search_edit should receive focus.
+        self.media_item.quick_search_edit.setFocus.assert_called_once_with()
