@@ -189,16 +189,15 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.quick_search_edit.setFocus.assert_called_once_with()
         sender_instance_mock.setIcon.assert_called_once_with('lock icon')
 
-    def test_on_lock_button_toggled_select_tab_unlock_icon(self):
+    def test_on_lock_button_toggled_unlock_icon(self):
         """
-        Test that "on_lock_button_toggled" does not give focus to Search field in Select
-         and lock toggles properly.
+         Test that lock button unlocks properly and lock toggles properly.
         """
         # GIVEN: Mocked sender & Search edit, quickTab returning value = False on isVisible.
         self.media_item.sender = MagicMock()
         self.media_item.quick_search_edit = MagicMock()
-        self.media_item.quickTab = MagicMock(**{'isVisible.return_value': False})
-
+        self.media_item.quickTab = MagicMock()
+        self.media_item.quickTab.isVisible = MagicMock()
         self.media_item.unlock_icon = 'unlock icon'
         sender_instance_mock = MagicMock()
         self.media_item.sender = MagicMock(return_value=sender_instance_mock)
@@ -206,6 +205,5 @@ class TestMediaItem(TestCase, TestMixin):
         # WHEN: on_lock_button_toggled is called and checked returns = False.
         self.media_item.on_lock_button_toggled(False)
 
-        # THEN: on_quick_search_edit should not receive focus and Unlock icon should be set.
-        self.media_item.quick_search_edit.setFocus.assert_not_called_once_with()
+        # THEN: Unlock icon should be set.
         sender_instance_mock.setIcon.assert_called_once_with('unlock icon')
