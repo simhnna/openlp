@@ -342,8 +342,8 @@ class EasyWorshipSongImport(SongImport):
 
     def import_sqlite_db(self):
         # get database handles
-        songs_conn = sqlite3.connect(self.import_source + "/Songs.db")
-        words_conn = sqlite3.connect(self.import_source + "/SongWords.db")
+        songs_conn = sqlite3.connect(self.import_source + "/Databases/Data/Songs.db")
+        words_conn = sqlite3.connect(self.import_source + "/Databases/Data/SongWords.db")
         if songs_conn is None or words_conn is None:
             self.log_error(self.import_source, translate('SongsPlugin.EasyWorshipSongImport',
                                                          'This is not a valid Easy Worship 6 database.'))

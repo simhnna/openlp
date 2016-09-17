@@ -406,6 +406,12 @@ class TestEasyWorshipSongImport(TestCase):
                 mocked_retrieve_windows_encoding.assert_any_call(encoding)
 
     def test_db_file_import(self):
+        return self._test_db_file_import(os.path.join(TEST_PATH, 'Songs.DB'))
+
+    def test_sqlite_db_file_import(self):
+        return self._test_db_file_import(os.path.join(TEST_PATH, 'ew6'))
+
+    def _test_db_file_import(self, source_path):
         """
         Test the actual import of real song database files and check that the imported data is correct.
         """
@@ -433,7 +439,7 @@ class TestEasyWorshipSongImport(TestCase):
             importer.topics = []
 
             # WHEN: Importing each file
-            importer.import_source = os.path.join(TEST_PATH, 'Songs.DB')
+            importer.import_source = source_path
             import_result = importer.do_import()
 
             # THEN: do_import should return none, the song data should be as expected, and finish should have been
