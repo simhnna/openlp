@@ -653,7 +653,6 @@ class SongMediaItem(MediaManagerItem):
                                                                   authors=create_separated_list(authors_none)))
             else:
                 item.raw_footer.append("{authors}".format(authors=create_separated_list(authors_none)))
-
         if authors_words_music:
             item.raw_footer.append("{text}: {authors}".format(text=AuthorType.Types[AuthorType.WordsAndMusic],
                                                               authors=create_separated_list(authors_words_music)))

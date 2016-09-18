@@ -295,11 +295,18 @@ class TestMediaItem(TestCase, TestMixin):
             mock_qlist_widget.setData.assert_called_once_with(MockedUserRole, mock_song.id)
             self.media_item.list_view.addItem.assert_called_once_with(mock_qlist_widget)
 
-    def test_build_song_footer_one_author(self):
+    @patch(u'openlp.plugins.songs.lib.mediaitem.Settings')
+    def test_build_song_footer_one_author_show_written_by(self, MockedSettings):
         """
         Test build songs footer with basic song and one author
         """
-        # GIVEN: A Song and a Service Item
+        # GIVEN: A Song and a Service Item, mocked settings: True for 'songs/display written by'
+        # and False for 'core/ccli number' (ccli will cause traceback if true)
+
+        mocked_settings = MagicMock()
+        mocked_settings.value.side_effect = [True, False]
+        MockedSettings.return_value = mocked_settings
+
         mock_song = MagicMock()
         mock_song.title = 'My Song'
         mock_song.authors_songs = []
