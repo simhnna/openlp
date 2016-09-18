@@ -140,6 +140,7 @@ class SongImport(QtCore.QObject):
         text = text.replace('\u2026', '...')
         text = text.replace('\u2013', '-')
         text = text.replace('\u2014', '-')
+        text = text.replace('\x0b', '\n\n')
         # Remove surplus blank lines, spaces, trailing/leading spaces
         text = re.sub(r'[ \t\v]+', ' ', text)
         text = re.sub(r' ?(\r\n?|\n) ?', '\n', text)
