@@ -155,7 +155,7 @@ class SongsPlugin(Plugin):
         self.tools_menu = tools_menu
         self.song_tools_menu = QtWidgets.QMenu(tools_menu)
         self.song_tools_menu.setObjectName('song_tools_menu')
-        self.song_tools_menu.setTitle(translate('SongsPlugin', 'Song Tools'))
+        self.song_tools_menu.setTitle(translate('SongsPlugin', 'Songs'))
         self.tools_reindex_item = create_action(
             tools_menu, 'toolsReindexItem',
             text=translate('SongsPlugin', '&Re-index Songs'),
@@ -168,8 +168,8 @@ class SongsPlugin(Plugin):
             statustip=translate('SongsPlugin', 'Find and remove duplicate songs in the song database.'),
             triggers=self.on_tools_find_duplicates_triggered, can_shortcuts=True)
         self.tools_report_song_list = create_action(
-            tools_menu, 'ReportSongList',
-            text=translate('SongsPlugin', 'Export List of Songs'),
+            tools_menu, 'toolsSongListReport',
+            text=translate('SongsPlugin', 'Song List Report'),
             statustip=translate('SongsPlugin', 'Produce a CSV file of all the songs in the database.'),
             triggers=self.on_tools_report_song_list_triggered)
 

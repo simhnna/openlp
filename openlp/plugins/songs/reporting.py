@@ -22,12 +22,12 @@
 """
 The :mod:`db` module provides the ability to provide a csv file of all songs
 """
+import csv
 import logging
-import os
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry, check_directory_exists, translate
+from openlp.core.common import Registry, translate
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songs.lib.db import Song
 
@@ -42,45 +42,47 @@ def report_song_list():
     """
     main_window = Registry().get('main_window')
     plugin = Registry().get('songs').plugin
-    path = QtWidgets.QFileDialog.getExistingDirectory(
+    report_file_name, filter_used = QtWidgets.QFileDialog.getSaveFileName(
         main_window, translate('SongPlugin.ReportSongList', 'Output File Location'))
-    if not path:
+    if not report_file_name:
         main_window.error_message(
             translate('SongPlugin.ReportSongList', 'Output Path Not Selected'),
-            translate('SongPlugin.ReportSongList', 'You have not set a valid output location for your'
+            translate('SongPlugin.ReportSongList', 'You have not set a valid output location for your '
                                                    'report. \nPlease select an existing path '
                                                    'on your computer.')
         )
         return
-    check_directory_exists(path)
-    report_file_name = os.path.join(path, 'song_index.csv')
+    if not report_file_name.endswith('csv'):
+        report_file_name += '.csv'
     file_handle = None
     try:
-        file_handle = open(report_file_name, 'wb')
+        file_handle = open(report_file_name, 'wt')
+        fieldnames = ('Title', 'Alternative Title', 'Copyright', 'Author(s)', 'Song Book', 'Topic')
+        writer = csv.DictWriter(file_handle, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+        headers = dict((n, n) for n in fieldnames)
+        writer.writerow(headers)
         song_list = plugin.manager.get_all_objects(Song)
         for song in song_list:
-            record = '\"{title}\",'.format(title=song.title)
-            record += '\"{title}\",'.format(title=song.alternate_title)
-            record += '\"{title}\",'.format(title=song.copyright)
             author_list = []
             for author_song in song.authors_songs:
                 author_list.append(author_song.author.display_name)
-            author_string = '\"{name}\"'.format(name=' | '.join(author_list))
+            author_string = '{name}'.format(name=' | '.join(author_list))
             book_list = []
             for book_song in song.songbook_entries:
                 if hasattr(book_song, 'entry') and book_song.entry:
                     book_list.append('{name} #{entry}'.format(name=book_song.songbook.name, entry=book_song.entry))
-            book_string = '\"{name}\"'.format(name=' | '.join(book_list))
+            book_string = '{name}'.format(name=' | '.join(book_list))
             topic_list = []
             for topic_song in song.topics:
                 if hasattr(topic_song, 'name'):
                     topic_list.append(topic_song.name)
-            topic_string = '\"{name}\"'.format(name=' | '.join(topic_list))
-            record += '{title},'.format(title=author_string)
-            record += '{title},'.format(title=book_string)
-            record += '{title},'.format(title=topic_string)
-            record += '\n'
-            file_handle.write(record.encode('utf-8'))
+            topic_string = '{name}'.format(name=' | '.join(topic_list))
+            writer.writerow({'Title': song.title,
+                             'Alternative Title': song.alternate_title,
+                             'Copyright': song.copyright,
+                             'Author(s)': author_string,
+                             'Song Book': book_string,
+                             'Topic': topic_string})
         main_window.information_message(
             translate('SongPlugin.ReportSongList', 'Report Creation'),
             translate('SongPlugin.ReportSongList',
