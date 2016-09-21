@@ -512,10 +512,13 @@ def strip_rtf(text, default_encoding=None):
             elif not ignorable:
                 ebytes.append(int(hex_, 16))
         elif tchar:
-            if curskip > 0:
-                curskip -= 1
-            elif not ignorable:
+            if not ignorable:
                 ebytes += tchar.encode()
+                if len(ebytes) >= curskip:
+                    ebytes = ebytes[curskip:]
+                else:
+                    curskip -= len(ebytes)
+                    ebytes = ""
     text = ''.join(out)
     return text, default_encoding
 

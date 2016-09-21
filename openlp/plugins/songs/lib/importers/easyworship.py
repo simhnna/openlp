@@ -341,6 +341,9 @@ class EasyWorshipSongImport(SongImport):
         self.memo_file.close()
 
     def import_sqlite_db(self):
+        """
+        Import the songs from an EasyWorship 6 SQLite database
+        """
         # get database handles
         songs_conn = sqlite3.connect(self.import_source + "/Databases/Data/Songs.db")
         words_conn = sqlite3.connect(self.import_source + "/Databases/Data/SongWords.db")
