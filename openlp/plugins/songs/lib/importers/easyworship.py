@@ -344,9 +344,21 @@ class EasyWorshipSongImport(SongImport):
         """
         Import the songs from an EasyWorship 6 SQLite database
         """
+        songs_db_path = self.import_source + "/Databases/Data/Songs.db"
+        song_words_db_path = self.import_source + "/Databases/Data/SongWords.db"
+        # check to see if needed files are there
+        if not os.path.isfile(songs_db_path):
+            self.log_error(songs_db_path, translate('SongsPlugin.EasyWorshipSongImport',
+                                                    'This file does not exist.'))
+            return
+        if not os.path.isfile(song_words_db_path):
+            self.log_error(song_words_db_path, translate('SongsPlugin.EasyWorshipSongImport',
+                                                         'Could not find the "Songs.MB" file. It must be in the same '
+                                                         'folder as the "Songs.DB" file.'))
+            return
         # get database handles
-        songs_conn = sqlite3.connect(self.import_source + "/Databases/Data/Songs.db")
-        words_conn = sqlite3.connect(self.import_source + "/Databases/Data/SongWords.db")
+        songs_conn = sqlite3.connect(songs_db_path)
+        words_conn = sqlite3.connect(song_words_db_path)
         if songs_conn is None or words_conn is None:
             self.log_error(self.import_source, translate('SongsPlugin.EasyWorshipSongImport',
                                                          'This is not a valid Easy Worship 6 database.'))
