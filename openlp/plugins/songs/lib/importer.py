@@ -48,6 +48,7 @@ from .importers.powerpraise import PowerPraiseImport
 from .importers.presentationmanager import PresentationManagerImport
 from .importers.lyrix import LyrixImport
 from .importers.videopsalm import VideoPsalmImport
+from .importers.chordpro import ChordProImport
 
 log = logging.getLogger(__name__)
 
@@ -155,29 +156,30 @@ class SongFormat(object):
     OpenLP2 = 1
     Generic = 2
     CCLI = 3
-    DreamBeam = 4
-    EasySlides = 5
-    EasyWorshipDB = 6
-    EasyWorshipService = 7
-    FoilPresenter = 8
-    Lyrix = 9
-    MediaShout = 10
-    OpenSong = 11
-    OPSPro = 12
-    PowerPraise = 13
-    PowerSong = 14
-    PresentationManager = 15
-    ProPresenter = 16
-    SongBeamer = 17
-    SongPro = 18
-    SongShowPlus = 19
-    SongsOfFellowship = 20
-    SundayPlus = 21
-    VideoPsalm = 22
-    WordsOfWorship = 23
-    WorshipAssistant = 24
-    WorshipCenterPro = 25
-    ZionWorx = 26
+    ChordPro = 4
+    DreamBeam = 5
+    EasySlides = 6
+    EasyWorshipDB = 7
+    EasyWorshipService = 8
+    FoilPresenter = 9
+    Lyrix = 10
+    MediaShout = 11
+    OpenSong = 12
+    OPSPro = 13
+    PowerPraise = 14
+    PowerSong = 15
+    PresentationManager = 16
+    ProPresenter = 17
+    SongBeamer = 18
+    SongPro = 19
+    SongShowPlus = 20
+    SongsOfFellowship = 21
+    SundayPlus = 22
+    VideoPsalm = 23
+    WordsOfWorship = 24
+    WorshipAssistant = 25
+    WorshipCenterPro = 26
+    ZionWorx = 27
 
     # Set optional attribute defaults
     __defaults__ = {
@@ -223,6 +225,13 @@ class SongFormat(object):
             'prefix': 'ccli',
             'filter': '{text} (*.usr *.txt *.bin)'.format(text=translate('SongsPlugin.ImportWizardForm',
                                                                          'CCLI SongSelect Files'))
+        },
+        ChordPro: {
+            'class': ChordProImport,
+            'name': 'ChordPro',
+            'prefix': 'chordPro',
+            'filter': '{text} (*.cho  *.crd *.chordpro *.chopro *.txt)'.format(text=translate('SongsPlugin.ImportWizardForm',
+                                                                                              'ChordPro Files'))
         },
         DreamBeam: {
             'class': DreamBeamImport,
@@ -427,6 +436,7 @@ class SongFormat(object):
             SongFormat.OpenLP2,
             SongFormat.Generic,
             SongFormat.CCLI,
+            SongFormat.ChordPro,
             SongFormat.DreamBeam,
             SongFormat.EasySlides,
             SongFormat.EasyWorshipDB,

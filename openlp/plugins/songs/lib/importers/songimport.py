@@ -301,12 +301,23 @@ class SongImport(QtCore.QObject):
         if verse_def not in self.verse_order_list_generated:
             self.verse_order_list_generated.append(verse_def)
 
-    def repeat_verse(self):
+    def repeat_verse(self, verse_def=None):
         """
-        Repeat the previous verse in the verse order
+        Repeat the verse with the given verse_def or default to repeating the previous verse in the verse order
+
+        :param verse_def: verse_def of the verse to be repeated
         """
         if self.verse_order_list_generated:
-            self.verse_order_list_generated.append(self.verse_order_list_generated[-1])
+            if verse_def:
+                # If the given verse_def is only one char (like 'v' or 'c'), postfix it with '1'
+                if len(verse_def) == 1:
+                    verse_def += '1'
+                if verse_def in self.verse_order_list_generated:
+                    self.verse_order_list_generated.append(verse_def)
+                else:
+                    log.warning('Trying to add unknown verse_def "%s"' % verse_def)
+            else:
+                self.verse_order_list_generated.append(self.verse_order_list_generated[-1])
             self.verse_order_list_generated_useful = True
 
     def check_complete(self):
