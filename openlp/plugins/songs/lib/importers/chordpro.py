@@ -24,26 +24,22 @@ The :mod:`chordpro` module provides the functionality for importing
 ChordPro files into the current database.
 """
 
-import os
-import re
+import logging
 
-from openlp.core.common import translate
-from openlp.core.ui.lib.wizard import WizardStrings
 from .songimport import SongImport
 
 
 log = logging.getLogger(__name__)
 
-# This importer is based on the information available on these webpages:
-# http://webchord.sourceforge.net/tech.html
-# http://www.vromans.org/johan/projects/Chordii/chordpro/
-# http://www.tenbyten.com/software/songsgen/help/HtmlHelp/files_reference.htm
-# http://linkesoft.com/songbook/chordproformat.html
-
 class ChordProImport(SongImport):
     """
     The :class:`ChordProImport` class provides OpenLP with the
     ability to import ChordPro files.
+    This importer is based on the information available on these webpages:
+    http://webchord.sourceforge.net/tech.html
+    http://www.vromans.org/johan/projects/Chordii/chordpro/
+    http://www.tenbyten.com/software/songsgen/help/HtmlHelp/files_reference.htm
+    http://linkesoft.com/songbook/chordproformat.html
     """
     def do_import(self):
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))
@@ -80,7 +76,7 @@ class ChordProImport(SongImport):
                     if tag_value.lower().startswith('chorus'):
                         if current_verse.strip():
                             # Add collected verse to the lyrics
-                            self.add_verse(current_verse.strip(), current_verse_type)
+                            self.add_verse(current_verse.rstrip(), current_verse_type)
                             current_verse_type = 'v'
                             current_verse = ''
                         self.repeat_verse('c1')
@@ -90,13 +86,13 @@ class ChordProImport(SongImport):
                     current_verse_type = 'c'
                 elif tag_name in ['end_of_chorus', 'eoc']:
                     # Add collected chorus to the lyrics
-                    self.add_verse(current_verse, current_verse_type)
+                    self.add_verse(current_verse.rstrip(), current_verse_type)
                     current_verse_type = 'v'
                     current_verse = ''
                 elif tag_name in ['start_of_tab', 'sot']:
                     if current_verse.strip():
                         # Add collected verse to the lyrics
-                        self.add_verse(current_verse.strip(), current_verse_type)
+                        self.add_verse(current_verse.rstrip(), current_verse_type)
                         current_verse_type = 'v'
                         current_verse = ''
                     skip_block = True
@@ -106,7 +102,7 @@ class ChordProImport(SongImport):
                     # A new song starts below this tag
                     if self.verses and self.title:
                         if current_verse.strip():
-                            self.add_verse(current_verse.strip(), current_verse_type)
+                            self.add_verse(current_verse.rstrip(), current_verse_type)
                         if not self.finish():
                             self.log_error(song_file.name)
                     self.set_defaults()
@@ -126,13 +122,16 @@ class ChordProImport(SongImport):
                     continue
                 elif line == '' and current_verse.strip() and current_verse_type != 'c':
                     # Add collected verse to the lyrics
-                    self.add_verse(current_verse.strip(), current_verse_type)
+                    self.add_verse(current_verse.rstrip(), current_verse_type)
                     current_verse_type = 'v'
                     current_verse = ''
                 else:
-                    current_verse += line + '\n'
+                    if current_verse.strip() == '':
+                        current_verse = line + '\n'
+                    else:
+                        current_verse += line + '\n'
         if current_verse.strip():
-            self.add_verse(current_verse.strip(), current_verse_type)
+            self.add_verse(current_verse.rstrip(), current_verse_type)
         if not self.finish():
             self.log_error(song_file.name)
 
