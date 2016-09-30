@@ -26,7 +26,7 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common import Registry, is_win
 
 
 class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
@@ -44,6 +44,7 @@ class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
         self.default_indentation = self.indentation()
         self.setIndentation(0)
         self.setAnimated(True)
+        window_flags = QtCore.Qt.FramelessWindowHint | QtCore.Qt.Tool | QtCore.Qt.WindowStaysOnTopHint
 
     def activateDnD(self):
         """
@@ -108,6 +109,11 @@ class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
 
         :param event: Handle of the event pint passed
         """
+        # If we are on Windows, OpenLP window will not be set on top. For example, user can drag images to Library and
+        # the folder stays on top of the group creation box. This piece of code fixes this issue.
+        if is_win():
+            self.setWindowState(self.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+        QtWidgets.QWidget().raise_()
         if event.mimeData().hasUrls():
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
@@ -125,8 +131,18 @@ class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
             Registry().execute('%s_dnd_internal' % self.mime_data_text, self.itemAt(event.pos()))
-        else:
-            event.ignore()
+
+        #QtWidgets.QWidget.activateWindow(self)
+        #QtWidgets.QWidget().raise_()
+        #QtWidgets.QApplication.setActiveWindow()
+
+        #self.setWindowState(self.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+
+        # this will activate the window
+        #self.activateWindow()
+
+        # this will activate the window
+
 
     # Convenience methods for emulating a QListWidget. This helps keeping MediaManagerItem simple.
     def addItem(self, item):
