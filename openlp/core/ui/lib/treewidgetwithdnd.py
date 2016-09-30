@@ -112,6 +112,7 @@ class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
         # the folder stays on top of the group creation box. This piece of code fixes this issue.
         if is_win():
             self.setWindowState(self.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+            self.setWindowState(QtCore.Qt.WindowNoState)
         if event.mimeData().hasUrls():
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
