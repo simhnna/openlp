@@ -732,8 +732,10 @@ class SlideController(DisplayController, RegistryProperties):
         # Reset the button
         self.play_slides_once.setChecked(False)
         self.play_slides_once.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
         self.play_slides_loop.setChecked(False)
         self.play_slides_loop.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_loop.setText(UiStrings().PlaySlidesInLoop)
         if item.is_text():
             if (Settings().value(self.main_window.songs_settings_section + '/display songbar') and
                     not self.song_menu.menu().isEmpty()):
@@ -1326,7 +1328,6 @@ class SlideController(DisplayController, RegistryProperties):
         else:
             self.play_slides_once.setIcon(build_icon(':/media/media_time'))
             self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
-        self.on_toggle_loop()
 
     def set_audio_items_visibility(self, visible):
         """
@@ -1385,7 +1386,6 @@ class SlideController(DisplayController, RegistryProperties):
                                        [self.service_item, self.is_live])
                 if self.service_item.is_media():
                     self.on_media_close()
-                self.on_go_live()
             # If ('advanced/double click live') is not enabled, double clicking preview adds the item to Service.
             # Prevent same item in preview from being sent to Service multiple times.
             # Changing the preview slide resets this flag to False.
