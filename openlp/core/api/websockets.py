@@ -27,6 +27,7 @@ with OpenLP. It uses JSON to communicate with the remotes.
 
 import asyncio
 import websockets
+import json
 import logging
 import time
 
@@ -130,7 +131,7 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
             while True:
                 current_poll = poller.poll()
                 if current_poll != previous_poll:
-                    yield from request.send(current_poll)
+                    yield from request.send(json.dumps(current_poll).encode())
                     previous_poll = current_poll
                 yield from asyncio.sleep(0.2)
         elif path == '/live_changed':

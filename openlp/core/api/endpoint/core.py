@@ -107,13 +107,15 @@ def index(request):
     return blank_endpoint.render_template('index.mako', **TRANSLATED_STRINGS)
 
 
+@blank_endpoint.route('api/poll')
 @blank_endpoint.route('poll')
 def poll(request):
     """
     Deliver the page for the /poll url
+
     :param request:
     """
-    return Registry().get('poller').raw_poll()
+    return Registry().get('poller').poll()
 
 
 @blank_endpoint.route('api/display/{display:hide|show|blank|theme|desktop}')

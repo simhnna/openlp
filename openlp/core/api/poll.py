@@ -53,7 +53,7 @@ class Poller(RegistryProperties):
         """
         Poll OpenLP to determine the current slide number and item name.
         """
-        return json.dumps({'results': self.raw_poll()}).encode()
+        return {'results': self.raw_poll()}
 
     def main_poll(self):
         """
