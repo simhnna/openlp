@@ -1328,6 +1328,7 @@ class SlideController(DisplayController, RegistryProperties):
         else:
             self.play_slides_once.setIcon(build_icon(':/media/media_time'))
             self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
+        self.on_toggle_loop()
 
     def set_audio_items_visibility(self, visible):
         """
@@ -1386,6 +1387,7 @@ class SlideController(DisplayController, RegistryProperties):
                                        [self.service_item, self.is_live])
                 if self.service_item.is_media():
                     self.on_media_close()
+                self.on_go_live()
             # If ('advanced/double click live') is not enabled, double clicking preview adds the item to Service.
             # Prevent same item in preview from being sent to Service multiple times.
             # Changing the preview slide resets this flag to False.
