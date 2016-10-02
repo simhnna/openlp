@@ -310,39 +310,24 @@ def expand_tags(text):
 def create_separated_list(string_list):
     """
     Returns a string that represents a join of a list of strings with a localized separator. This function corresponds
-
     to QLocale::createSeparatedList which was introduced in Qt 4.8 and implements the algorithm from
     http://www.unicode.org/reports/tr35/#ListPatterns
-
-     :param string_list: List of unicode strings
+    NOTE: translate() can change the format based on language styling (ex: Finnish not using "{} and {}" rather than
+          english style "{} , and {}").
+    :param string_list: List of unicode strings
+    :return: Formatted string
     """
-    if LooseVersion(Qt.PYQT_VERSION_STR) >= LooseVersion('4.9') and LooseVersion(Qt.qVersion()) >= LooseVersion('4.8'):
-        # Separate items with multiple same type creators with ',' and the last with ', and ' ' If we have two creators,
-        # ',' is not used by proper grammar, however in some languages ',' is not used at all before 'and'.
-        and_translated = translate('OpenLP.Ui', 'and')
-        comma_and = translate ('OpenLP.ui', ', and')
-        if len(string_list) == 2:
-            string_list = ', '.join(string_list[:-1]) + ' ' + and_translated + ' ' + string_list[-1]
-        elif len(string_list) > 2:
-            string_list = ', '.join(string_list[:-1]) + comma_and + ' ' + string_list[-1]
-        else:
-            string_list = ''.join(string_list)
-        return string_list
-    if not string_list:
-        return ''
-    elif len(string_list) == 1:
-        return string_list[0]
-    # TODO: Verify mocking of translate() test before conversion
-    elif len(string_list) == 2:
-        return translate('OpenLP.core.lib', '%s and %s',
-                         'Locale list separator: 2 items') % (string_list[0], string_list[1])
+    list_length = len(string_list)
+    if list_length == 1:
+        return_list = string_list[0]
+    elif list_length == 2:
+        return_list = translate('OpenLP.core.lib', '{one} & {two}').format(one=string_list[0], two=string_list[1])
+    elif list_length > 2:
+        return_list = translate('OpenLP.core.lib', '{first}, & {last}').format(first=', '.join(string_list[:-1]),
+                                                                               last=string_list[-1])
     else:
-        merged = translate('OpenLP.core.lib', '%s, and %s',
-                           'Locale list separator: end') % (string_list[-2], string_list[-1])
-        for index in reversed(list(range(1, len(string_list) - 2))):
-            merged = translate('OpenLP.core.lib', '%s, %s',
-                               'Locale list separator: middle') % (string_list[index], merged)
-        return translate('OpenLP.core.lib', '%s, %s', 'Locale list separator: start') % (string_list[0], merged)
+        return_list = ""
+    return return_list
 
 from .exceptions import ValidationError
 from .filedialog import FileDialog
