@@ -307,7 +307,6 @@ def expand_tags(text):
         text = text.replace(tag['end tag'], tag['end html'])
     return text
 
-
 def create_separated_list(string_list):
     """
     Returns a string that represents a join of a list of strings with a localized separator. This function corresponds
@@ -318,7 +317,13 @@ def create_separated_list(string_list):
      :param string_list: List of unicode strings
     """
     if LooseVersion(Qt.PYQT_VERSION_STR) >= LooseVersion('4.9') and LooseVersion(Qt.qVersion()) >= LooseVersion('4.8'):
-        return QtCore.QLocale().createSeparatedList(string_list)
+        # Separate items with multiple same type creators with ',' and the last with " and ".
+        and_translated = translate('OpenLP.Ui', 'and')
+        if len(string_list) > 1:
+            string_list = ', '.join(string_list[:-1]) + ' ' + and_translated + ' ' + string_list[-1]
+        else:
+            string_list = ''.join(string_list)
+        return string_list
     if not string_list:
         return ''
     elif len(string_list) == 1:
@@ -334,7 +339,6 @@ def create_separated_list(string_list):
             merged = translate('OpenLP.core.lib', '%s, %s',
                                'Locale list separator: middle') % (string_list[index], merged)
         return translate('OpenLP.core.lib', '%s, %s', 'Locale list separator: start') % (string_list[0], merged)
-
 
 from .exceptions import ValidationError
 from .filedialog import FileDialog
