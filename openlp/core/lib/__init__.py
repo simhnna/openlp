@@ -317,10 +317,14 @@ def create_separated_list(string_list):
      :param string_list: List of unicode strings
     """
     if LooseVersion(Qt.PYQT_VERSION_STR) >= LooseVersion('4.9') and LooseVersion(Qt.qVersion()) >= LooseVersion('4.8'):
-        # Separate items with multiple same type creators with ',' and the last with " and ".
+        # Separate items with multiple same type creators with ',' and the last with ', and ' ' If we have two creators,
+        # ',' is not used by proper grammar, however in some languages ',' is not used at all before 'and'.
         and_translated = translate('OpenLP.Ui', 'and')
-        if len(string_list) > 1:
+        comma_and = translate ('OpenLP.ui', ', and')
+        if len(string_list) == 2:
             string_list = ', '.join(string_list[:-1]) + ' ' + and_translated + ' ' + string_list[-1]
+        elif len(string_list) > 2:
+            string_list = ', '.join(string_list[:-1]) + comma_and + ' ' + string_list[-1]
         else:
             string_list = ''.join(string_list)
         return string_list
