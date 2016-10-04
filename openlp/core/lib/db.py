@@ -75,24 +75,20 @@ def get_db_path(plugin_name, db_file_name=None):
                                                 name=db_file_name)
 
 
-def handle_db_error(plugin_name, db_file_name):
+def handle_db_error(self, plugin_name, db_file_name):
     """
     Log and report to the user that a database cannot be loaded
 
+    :param self:
     :param plugin_name: Name of plugin
     :param db_file_name: File name of database
     :return: None
     """
-    try:
-        db_path = get_db_path(plugin_name, db_file_name)
-        log.exception('Error loading database: {db}'.format(db=db_path))
-        critical_error_message_box(translate('OpenLP.Manager', 'Database Error'),
-                                   translate('OpenLP.Manager',
-                                             'OpenLP cannot load your database.\n\nDatabase: {db}').format(db=db_path))
-    # If the path (Eg. C:/ or D:/) does not exists in the system, return.
-    # In this case def load in advancedtab.py will handle the missing database.
-    except FileNotFoundError:
-        return
+    db_path = get_db_path(plugin_name, db_file_name)
+    log.exception('Error loading database: {db}'.format(db=db_path))
+    critical_error_message_box(translate('OpenLP.Manager', 'Database Error'),
+                               translate('OpenLP.Manager',
+                                         'OpenLP cannot load your database.\n\nDatabase: {db}').format(db=db_path))
 
 
 def init_url(plugin_name, db_file_name=None):
