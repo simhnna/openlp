@@ -89,7 +89,8 @@ def handle_db_error(plugin_name, db_file_name):
         critical_error_message_box(translate('OpenLP.Manager', 'Database Error'),
                                    translate('OpenLP.Manager',
                                              'OpenLP cannot load your database.\n\nDatabase: {db}').format(db=db_path))
-    # If the path (Eg. C:/ or D:/) does not exists in the system, return and def load will handle the missing
+    # If the path (Eg. C:/ or D:/) does not exists in the system, return.
+    # In this case def load in advancedtab.py will handle the missing database.
     except FileNotFoundError:
         return
 
