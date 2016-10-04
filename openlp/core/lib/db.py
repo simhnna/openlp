@@ -90,6 +90,7 @@ def handle_db_error(self, plugin_name, db_file_name):
                                translate('OpenLP.Manager',
                                          'OpenLP cannot load your database.\n\nDatabase: {db}').format(db=db_path))
 
+
 def init_url(plugin_name, db_file_name=None):
     """
     Return the database URL.
