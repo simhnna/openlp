@@ -94,6 +94,7 @@ def handle_db_error(self, plugin_name, db_file_name):
         log.exception('Failed to find data folder path.')
         return
 
+
 def init_url(plugin_name, db_file_name=None):
     """
     Return the database URL.
