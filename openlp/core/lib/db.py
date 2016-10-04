@@ -75,7 +75,7 @@ def get_db_path(plugin_name, db_file_name=None):
                                                 name=db_file_name)
 
 
-def handle_db_error(self, plugin_name, db_file_name):
+def handle_db_error(plugin_name, db_file_name):
     """
     Log and report to the user that a database cannot be loaded
 
