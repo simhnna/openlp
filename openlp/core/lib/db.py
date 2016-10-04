@@ -84,16 +84,11 @@ def handle_db_error(self, plugin_name, db_file_name):
     :param db_file_name: File name of database
     :return: None
     """
-    try:
-        db_path = get_db_path(plugin_name, db_file_name)
-        log.exception('Error loading database: {db}'.format(db=db_path))
-        critical_error_message_box(translate('OpenLP.Manager', 'Database Error'),
-                                   translate('OpenLP.Manager',
-                                             'OpenLP cannot load your database.\n\nDatabase: {db}').format(db=db_path))
-    except TypeError or FileNotFoundError:
-        log.exception('Failed to find data folder path.')
-        return
-
+    db_path = get_db_path(plugin_name, db_file_name)
+    log.exception('Error loading database: {db}'.format(db=db_path))
+    critical_error_message_box(translate('OpenLP.Manager', 'Database Error'),
+                               translate('OpenLP.Manager',
+                                         'OpenLP cannot load your database.\n\nDatabase: {db}').format(db=db_path))
 
 def init_url(plugin_name, db_file_name=None):
     """
