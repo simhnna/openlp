@@ -208,8 +208,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         # If data_version is different from the current version ask if we should backup the data folder
         elif data_version != openlp_version:
             if QtWidgets.QMessageBox.question(None, translate('OpenLP', 'Backup'),
-                                              translate('OpenLP', 'OpenLP has been upgraded, do you want to create '
-                                                                  'a backup of OpenLPs data folder?'),
+                                              translate('OpenLP', 'OpenLP has been upgraded, do you want to create\n'
+                                                                  'a backup of the old data folder?'),
                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                               QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
@@ -223,7 +223,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                                   translate('OpenLP', 'Backup of the data folder failed!'))
                     return
                 message = translate('OpenLP',
-                                    'A backup of the data folder has been created at:/n'
+                                    'A backup of the data folder has been created in:\n\n'
                                     '{text}').format(text=data_folder_backup_path)
                 QtWidgets.QMessageBox.information(None, translate('OpenLP', 'Backup'), message)
 
