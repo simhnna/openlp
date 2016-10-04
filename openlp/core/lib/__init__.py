@@ -307,13 +307,12 @@ def expand_tags(text):
         text = text.replace(tag['end tag'], tag['end html'])
     return text
 
+
 def create_separated_list(string_list):
     """
-    Returns a string that represents a join of a list of strings with a localized separator. This function corresponds
-    to QLocale::createSeparatedList which was introduced in Qt 4.8 and implements the algorithm from
-    http://www.unicode.org/reports/tr35/#ListPatterns
-    NOTE: translate() can change the format based on language styling (ex: Finnish not using "{} and {}" rather than
-          english style "{} , and {}").
+    Returns a string that represents a join of a list of strings with a localized separator.
+    Localized separation will be done via the translate() function by the translators.
+
     :param string_list: List of unicode strings
     :return: Formatted string
     """
@@ -321,9 +320,9 @@ def create_separated_list(string_list):
     if list_length == 1:
         return_list = string_list[0]
     elif list_length == 2:
-        return_list = translate('OpenLP.core.lib', '{one} & {two}').format(one=string_list[0], two=string_list[1])
+        return_list = translate('OpenLP.core.lib', '{one} and {two}').format(one=string_list[0], two=string_list[1])
     elif list_length > 2:
-        return_list = translate('OpenLP.core.lib', '{first}, & {last}').format(first=', '.join(string_list[:-1]),
+        return_list = translate('OpenLP.core.lib', '{first}, and {last}').format(first=', '.join(string_list[:-1]),
                                                                                last=string_list[-1])
     else:
         return_list = ""
