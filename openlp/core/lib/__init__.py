@@ -323,10 +323,11 @@ def create_separated_list(string_list):
         return_list = translate('OpenLP.core.lib', '{one} and {two}').format(one=string_list[0], two=string_list[1])
     elif list_length > 2:
         return_list = translate('OpenLP.core.lib', '{first}, and {last}').format(first=', '.join(string_list[:-1]),
-                                                                               last=string_list[-1])
+                                                                                 last=string_list[-1])
     else:
         return_list = ""
     return return_list
+
 
 from .exceptions import ValidationError
 from .filedialog import FileDialog
