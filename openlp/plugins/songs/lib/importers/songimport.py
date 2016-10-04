@@ -140,10 +140,13 @@ class SongImport(QtCore.QObject):
         text = text.replace('\u2026', '...')
         text = text.replace('\u2013', '-')
         text = text.replace('\u2014', '-')
+        # Replace vertical tab with 2 linebreaks
+        text = text.replace('\v', '\n\n')
+        # Replace form feed (page break) with 2 linebreaks
+        text = text.replace('\f', '\n\n')
         # Remove surplus blank lines, spaces, trailing/leading spaces
-        text = re.sub(r'[ \t\v]+', ' ', text)
+        text = re.sub(r'[ \t]+', ' ', text)
         text = re.sub(r' ?(\r\n?|\n) ?', '\n', text)
-        text = re.sub(r' ?(\n{5}|\f)+ ?', '\f', text)
         return text
 
     def process_song_text(self, text):
