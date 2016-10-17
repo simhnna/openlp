@@ -22,15 +22,20 @@
 """
 Test the MediaShout importer
 """
-from unittest import TestCase
+from unittest import TestCase, skipUnless
 from collections import namedtuple
 
 from openlp.core.common import Registry
-from openlp.plugins.songs.lib.importers.mediashout import MediaShoutImport
+try:
+    from openlp.plugins.songs.lib.importers.mediashout import MediaShoutImport
+    CAN_RUN_TESTS = True
+except ImportError:
+    CAN_RUN_TESTS = False
 
 from tests.functional import MagicMock, patch, call
 
 
+@skipUnless(CAN_RUN_TESTS, 'Not Windows, skipping test')
 class TestMediaShoutImport(TestCase):
     """
     Test the MediaShout importer
