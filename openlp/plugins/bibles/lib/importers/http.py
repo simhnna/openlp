@@ -493,7 +493,7 @@ class CWExtract(RegistryProperties):
         for verse in verses_div:
             self.application.process_events()
             verse_number = int(verse.find('strong').contents[0])
-            verse_span = verse.find('span')
+            verse_span = verse.find('span', class_='verse-%d' % verse_number)
             tags_to_remove = verse_span.find_all(['a', 'sup'])
             for tag in tags_to_remove:
                 tag.decompose()
