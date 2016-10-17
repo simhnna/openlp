@@ -97,9 +97,9 @@ class Ui_ExceptionDialog(object):
             translate('OpenLP.ExceptionDialog', '<strong>Please describe what you were trying to do.</strong> '
                                                 '&nbsp;If possible, write in English.'))
         exception_part1 = (translate('OpenLP.ExceptionDialog',
-                                     '<strong>Oops, OpenLP hit a problem and couldn\'t recover!</strong> <br><br>'
-                                     '<strong>You can help </strong> the OpenLP developers to <strong>fix this</strong>'
-                                     ' by<br> sending them a <strong>bug report</strong> to {email}{newlines}'
+                                     '<strong>Oops, OpenLP hit a problem and couldn\'t recover!<br><br>'
+                                     'You can help </strong> the OpenLP developers to <strong>fix this</strong>'
+                                     ' by<br> sending them a <strong>bug report to {email}</strong>{newlines}'
                                      ).format(email='<a href = "mailto:bugs@openlp.org" > bugs@openlp.org</a>',
                                               newlines='<br><br>'))
         self.message_label.setText(
