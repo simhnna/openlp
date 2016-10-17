@@ -236,7 +236,6 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         """
         data_version = Settings().value('core/application version')
         openlp_version = get_application_version()['version']
-        data_folder_path = AppLocation.get_data_path()
         # New installation, no need to create backup
         if not has_run_wizard:
             Settings().setValue('core/application version', openlp_version)
@@ -248,6 +247,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                               QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
+                data_folder_path = AppLocation.get_data_path()
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 data_folder_backup_path = data_folder_path + '-' + timestamp
                 try:
@@ -257,7 +257,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                                   translate('OpenLP', 'Backup of the data folder failed!'))
                     return
                 message = translate('OpenLP',
-                                    'A backup of the data folder has been created in:\n\n'
+                                    'A backup of the data folder has been created at:\n\n'
                                     '{text}').format(text=data_folder_backup_path)
                 QtWidgets.QMessageBox.information(None, translate('OpenLP', 'Backup'), message)
 
