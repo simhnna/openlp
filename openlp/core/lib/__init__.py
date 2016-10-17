@@ -318,15 +318,15 @@ def create_separated_list(string_list):
     """
     list_length = len(string_list)
     if list_length == 1:
-        return_list = string_list[0]
+        list_to_string = string_list[0]
     elif list_length == 2:
-        return_list = translate('OpenLP.core.lib', '{one} and {two}').format(one=string_list[0], two=string_list[1])
+        list_to_string = translate('OpenLP.core.lib', '{one} and {two}').format(one=string_list[0], two=string_list[1])
     elif list_length > 2:
-        return_list = translate('OpenLP.core.lib', '{first}, and {last}').format(first=', '.join(string_list[:-1]),
+        list_to_string = translate('OpenLP.core.lib', '{first}, and {last}').format(first=', '.join(string_list[:-1]),
                                                                                  last=string_list[-1])
     else:
-        return_list = ""
-    return return_list
+        list_to_string = ''
+    return list_to_string
 
 
 from .exceptions import ValidationError
