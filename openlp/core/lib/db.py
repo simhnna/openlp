@@ -79,7 +79,6 @@ def handle_db_error(plugin_name, db_file_name):
     """
     Log and report to the user that a database cannot be loaded
 
-    :param self:
     :param plugin_name: Name of plugin
     :param db_file_name: File name of database
     :return: None

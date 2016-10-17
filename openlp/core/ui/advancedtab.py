@@ -397,36 +397,6 @@ class AdvancedTab(SettingsTab):
         self.data_directory_cancel_button.hide()
         # Since data location can be changed, make sure the path is present.
         self.current_data_path = AppLocation.get_data_path()
-        if not os.path.exists(self.current_data_path):
-            log.error('Data path not found {path}'.format(path=self.current_data_path))
-            answer = QtWidgets.QMessageBox.critical(
-                self, translate('OpenLP.AdvancedTab', 'Data Directory Error'),
-                translate('OpenLP.AdvancedTab', 'OpenLP data folder was not found in:\n\n{path}\n\n'
-                          'The location of the data folder was previously changed from the OpenLP\'s\n'
-                          'default location. If the data was stored on removable device, that device\nneeds to '
-                          'be made available.\n\n You may reset the data location '
-                                                'back to the default settings, or you can try to make the current '
-                                                'location available.\n\n'
-                                                'Do you want to reset the default data location?\n\n'
-                          'If you click "No" you can try to fix the the problem.\n'
-                          'If you click "Yes" the data will be reset to the default location. \n\n'
-                          'You will need to re-start OpenLP after this decision.').format(path=self.current_data_path),
-                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                QtWidgets.QMessageBox.No)
-            if answer == QtWidgets.QMessageBox.No:
-                log.info('User requested termination')
-                # self.main_window.clean_up() is causing tracebacks, not sure if it's required in some cases.
-                try:
-                    self.main_window.clean_up()
-                except:
-                    pass
-                sys.exit()
-            # If answer was yes, Set data location to default and shut down OpenLP.
-            if answer == QtWidgets.QMessageBox.Yes:
-                settings.remove('advanced/data path')
-                self.current_data_path = AppLocation.get_data_path()
-                log.warning('User requested data path set to default {path}'.format(path=self.current_data_path))
-                sys.exit()
         self.data_directory_label.setText(os.path.abspath(self.current_data_path))
         # Don't allow data directory move if running portable.
         if settings.value('advanced/is portable'):

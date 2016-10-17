@@ -177,6 +177,40 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             self.shared_memory.create(1)
             return False
 
+    def is_data_path_missing(self):
+        """
+        Check if the data folder path exists.
+        """
+        data_folder_path = AppLocation.get_data_path()
+        if not os.path.exists(data_folder_path):
+            log.critical('Database was not found in: {path}'.format(path=data_folder_path))
+            status = QtWidgets.QMessageBox.critical(None, translate('OpenLP', 'Data Directory Error'),
+                                                    translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}'
+                                                                        '\n\nThe location of the data folder was '
+                                                                        'previously changed from the OpenLP\'s\n'
+                                                                        'default location. If the data was stored on '
+                                                                        'removable device, that device\nneeds to be '
+                                                                        'made available.\n\n You may reset the data '
+                                                                        'location back to the default settings, '
+                                                                        'or you can try to make the current location '
+                                                                        'available.\n\n Do you want to reset the '
+                                                                        'default data location?\n\n Click "No" to close'
+                                                                        'OpenLP so you can try to fix the the problem.'
+                                                                        '\n Click "Yes" to reset the default data '
+                                                                        'location and start OpenLP.')
+                                                    .format(path=data_folder_path),
+                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
+                                                                                          QtWidgets.QMessageBox.No),
+                                                    QtWidgets.QMessageBox.No)
+            if status == QtWidgets.QMessageBox.No:
+                # If answer was "No", return "True", it will shutdown OpenLP in def main
+                log.info('User requested termination')
+                return True
+            # If answer was "Yes", remove the custom data path thus resetting the default location.
+            Settings().remove('advanced/data path')
+            log.info('Database location has been reset to the default settings.')
+            return False
+
     def hook_exception(self, exc_type, value, traceback):
         """
         Add an exception hook so that any uncaught exceptions are displayed in this window rather than somewhere where
@@ -202,6 +236,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         """
         data_version = Settings().value('core/application version')
         openlp_version = get_application_version()['version']
+        data_folder_path = AppLocation.get_data_path()
         # New installation, no need to create backup
         if not has_run_wizard:
             Settings().setValue('core/application version', openlp_version)
@@ -213,7 +248,6 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                               QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
-                data_folder_path = AppLocation.get_data_path()
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 data_folder_backup_path = data_folder_path + '-' + timestamp
                 try:
@@ -368,8 +402,8 @@ def main(args=None):
     Registry.create()
     Registry().register('application', application)
     application.setApplicationVersion(get_application_version()['version'])
-    # Instance check
-    if application.is_already_running():
+    # If user answers "No" to already running or missing db dialogue, shutdown OpenLP.
+    if application.is_already_running() or application.is_data_path_missing():
         sys.exit()
     # Remove/convert obsolete settings.
     Settings().remove_obsolete_settings()
