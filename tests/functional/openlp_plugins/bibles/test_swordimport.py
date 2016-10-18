@@ -70,8 +70,7 @@ class TestSwordImport(TestCase):
 
     @patch('openlp.plugins.bibles.lib.importers.sword.SwordBible.application')
     @patch('openlp.plugins.bibles.lib.importers.sword.modules')
-    @patch('openlp.core.common.languages')
-    def test_simple_import(self, mocked_languages, mocked_pysword_modules, mocked_application):
+    def test_simple_import(self, mocked_pysword_modules, mocked_application):
         """
         Test that a simple SWORD import works
         """
@@ -88,7 +87,7 @@ class TestSwordImport(TestCase):
         importer.create_verse = MagicMock()
         importer.create_book = MagicMock()
         importer.session = MagicMock()
-        mocked_languages.get_language.return_value = 'Danish'
+        importer.get_language = MagicMock(return_value='Danish')
         mocked_bible = MagicMock()
         mocked_genesis = MagicMock()
         mocked_genesis.name = 'Genesis'

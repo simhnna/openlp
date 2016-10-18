@@ -114,6 +114,27 @@ class TestMediaItem(TestCase, TestMixin):
                 self.assertEqual(self.media_item.search_results, {})
                 self.assertEqual(self.media_item.second_search_results, {})
 
+    def test_required_icons(self):
+        """
+        Test that all the required icons are set properly.
+        """
+        # GIVEN: Mocked icons that need to be called.
+        self.media_item.has_import_icon = MagicMock()
+        self.media_item.has_new_icon = MagicMock()
+        self.media_item.has_edit_icon = MagicMock()
+        self.media_item.has_delete_icon = MagicMock()
+        self.media_item.add_to_service_item = MagicMock()
+
+        # WHEN: self.media_item.required_icons is called
+        self.media_item.required_icons()
+
+        # THEN: On windows it should return True, on other platforms False
+        self.assertTrue(self.media_item.has_import_icon, 'Check that the icon is as True.')
+        self.assertFalse(self.media_item.has_new_icon, 'Check that the icon is called as False.')
+        self.assertTrue(self.media_item.has_edit_icon, 'Check that the icon is called as True.')
+        self.assertTrue(self.media_item.has_delete_icon, 'Check that the icon is called as True.')
+        self.assertFalse(self.media_item.add_to_service_item, 'Check that the icon is called as False')
+
     def test_on_quick_search_button_general(self):
         """
         Test that general things, which should be called on all Quick searches are called.
