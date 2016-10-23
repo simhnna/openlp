@@ -41,6 +41,7 @@ class UiAboutDialog(object):
         about_dialog.setObjectName('about_dialog')
         about_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         self.about_dialog_layout = QtWidgets.QVBoxLayout(about_dialog)
+        self.about_dialog_layout.setContentsMargins(8, 8, 8, 8)
         self.about_dialog_layout.setObjectName('about_dialog_layout')
         self.logo_label = QtWidgets.QLabel(about_dialog)
         self.logo_label.setPixmap(QtGui.QPixmap(':/graphics/openlp-about-logo.png'))
