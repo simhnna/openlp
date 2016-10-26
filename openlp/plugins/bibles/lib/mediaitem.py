@@ -254,8 +254,8 @@ class BibleMediaItem(MediaManagerItem):
         self.quickStyleComboBox.activated.connect(self.on_quick_style_combo_box_changed)
         self.advancedStyleComboBox.activated.connect(self.on_advanced_style_combo_box_changed)
         # Buttons
-        self.advancedClearButton.clicked.connect(self.on_clear_button)
-        self.quickClearButton.clicked.connect(self.on_clear_button)
+        self.advancedClearButton.clicked.connect(self.on_advanced_clear_button_clicked)
+        self.quickClearButton.clicked.connect(self.on_clear_button_clicked)
         self.advancedSearchButton.clicked.connect(self.on_advanced_search_button)
         self.quickSearchButton.clicked.connect(self.on_quick_search_button)
         # Other stuff
@@ -548,19 +548,31 @@ class BibleMediaItem(MediaManagerItem):
             self.advancedTab.setVisible(True)
             self.advanced_book_combo_box.setFocus()
 
-    def on_clear_button(self):
+    def on_clear_button_clicked(self):
         # Clear the list, then set the "No search Results" message, then clear the text field and give it focus.
         self.list_view.clear()
         self.check_search_result()
         self.quick_search_edit.clear()
         self.quick_search_edit.setFocus()
 
+    def on_advanced_clear_button_clicked(self):
+        # The same as the on_clear_button_clicked, but gives focus to Book name field in "Select" (advanced).
+        self.list_view.clear()
+        self.check_search_result()
+        self.advanced_book_combo_box.setFocus()
+
     def on_lock_button_toggled(self, checked):
-        self.quick_search_edit.setFocus()
+        """
+        Toggle the lock button, if Search tab is used, set focus to search field.
+        :param checked: The state of the toggle button. bool
+        :return: None
+        """
         if checked:
             self.sender().setIcon(self.lock_icon)
         else:
             self.sender().setIcon(self.unlock_icon)
+        if self.quickTab.isVisible():
+            self.quick_search_edit.setFocus()
 
     def on_quick_style_combo_box_changed(self):
         self.settings.layout_style = self.quickStyleComboBox.currentIndex()

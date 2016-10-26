@@ -232,9 +232,11 @@ class Settings(QtCore.QSettings):
         ('remotes/password', 'api/password', []),
         ('remotes/authentication enabled', 'api/authentication enabled', []),
         ('remotes/ip address', 'api/ip address', []),
-        ('remotes/thumbnails', 'api/thumbnails', [])
-
-
+        ('remotes/thumbnails', 'api/thumbnails', []),
+        ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
+        ('shortcuts/escapeItem', 'shortcuts/desktopScreenEnable', []),  # Escape item was removed in 2.6.
+        ('shortcuts/offlineHelpItem', 'shortcuts/HelpItem', []),  # Online and Offline help were combined in 2.6.
+        ('shortcuts/onlineHelpItem', 'shortcuts/HelpItem', [])  # Online and Offline help were combined in 2.6.
     ]
 
     @staticmethod
@@ -281,10 +283,10 @@ class Settings(QtCore.QSettings):
             'shortcuts/blankScreen': [QtGui.QKeySequence(QtCore.Qt.Key_Period)],
             'shortcuts/collapse': [QtGui.QKeySequence(QtCore.Qt.Key_Minus)],
             'shortcuts/desktopScreen': [QtGui.QKeySequence(QtCore.Qt.Key_D)],
+            'shortcuts/desktopScreenEnable': [QtGui.QKeySequence(QtCore.Qt.Key_Escape)],
             'shortcuts/delete': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
             'shortcuts/down': [QtGui.QKeySequence(QtCore.Qt.Key_Down)],
             'shortcuts/editSong': [],
-            'shortcuts/escapeItem': [QtGui.QKeySequence(QtCore.Qt.Key_Escape)],
             'shortcuts/expand': [QtGui.QKeySequence(QtCore.Qt.Key_Plus)],
             'shortcuts/exportThemeItem': [],
             'shortcuts/fileNewItem': [QtGui.QKeySequence(QtGui.QKeySequence.New)],
@@ -293,6 +295,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/fileSaveItem': [QtGui.QKeySequence(QtGui.QKeySequence.Save)],
             'shortcuts/fileOpenItem': [QtGui.QKeySequence(QtGui.QKeySequence.Open)],
             'shortcuts/goLive': [],
+            'shortcuts/HelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
             'shortcuts/importThemeItem': [],
             'shortcuts/importBibleItem': [],
             'shortcuts/listViewBiblesDeleteItem': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
@@ -353,8 +356,6 @@ class Settings(QtCore.QSettings):
                                            QtGui.QKeySequence(QtCore.Qt.Key_PageDown)],
             'shortcuts/nextService': [QtGui.QKeySequence(QtCore.Qt.Key_Right)],
             'shortcuts/newService': [],
-            'shortcuts/offlineHelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
-            'shortcuts/onlineHelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
             'shortcuts/openService': [],
             'shortcuts/saveService': [],
             'shortcuts/previousItem_live': [QtGui.QKeySequence(QtCore.Qt.Key_Up),

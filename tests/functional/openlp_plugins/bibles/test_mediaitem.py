@@ -114,7 +114,28 @@ class TestMediaItem(TestCase, TestMixin):
                 self.assertEqual(self.media_item.search_results, {})
                 self.assertEqual(self.media_item.second_search_results, {})
 
-    def on_quick_search_button_general_test(self):
+    def test_required_icons(self):
+        """
+        Test that all the required icons are set properly.
+        """
+        # GIVEN: Mocked icons that need to be called.
+        self.media_item.has_import_icon = MagicMock()
+        self.media_item.has_new_icon = MagicMock()
+        self.media_item.has_edit_icon = MagicMock()
+        self.media_item.has_delete_icon = MagicMock()
+        self.media_item.add_to_service_item = MagicMock()
+
+        # WHEN: self.media_item.required_icons is called
+        self.media_item.required_icons()
+
+        # THEN: On windows it should return True, on other platforms False
+        self.assertTrue(self.media_item.has_import_icon, 'Check that the icon is as True.')
+        self.assertFalse(self.media_item.has_new_icon, 'Check that the icon is called as False.')
+        self.assertTrue(self.media_item.has_edit_icon, 'Check that the icon is called as True.')
+        self.assertTrue(self.media_item.has_delete_icon, 'Check that the icon is called as True.')
+        self.assertFalse(self.media_item.add_to_service_item, 'Check that the icon is called as False')
+
+    def test_on_quick_search_button_general(self):
         """
         Test that general things, which should be called on all Quick searches are called.
         """
@@ -150,3 +171,60 @@ class TestMediaItem(TestCase, TestMixin):
         self.assertEqual(2, self.media_item.quickSearchButton.setEnabled.call_count, 'Disable and Enable the button')
         self.assertEqual(1, self.media_item.check_search_result.call_count, 'Check results Should had been called once')
         self.assertEqual(1, self.app.set_normal_cursor.call_count, 'Normal cursor should had been called once')
+
+    def test_on_clear_button_clicked(self):
+        """
+        Test that the on_clear_button_clicked works properly. (Used by Bible search tab)
+        """
+        # GIVEN: Mocked list_view, check_search_results & quick_search_edit.
+        self.media_item.list_view = MagicMock()
+        self.media_item.check_search_result = MagicMock()
+        self.media_item.quick_search_edit = MagicMock()
+
+        # WHEN: on_clear_button_clicked is called
+        self.media_item.on_clear_button_clicked()
+
+        # THEN: Search result should be reset and search field should receive focus.
+        self.media_item.list_view.clear.assert_called_once_with(),
+        self.media_item.check_search_result.assert_called_once_with(),
+        self.media_item.quick_search_edit.clear.assert_called_once_with(),
+        self.media_item.quick_search_edit.setFocus.assert_called_once_with()
+
+    def test_on_lock_button_toggled_search_tab_lock_icon(self):
+        """
+        Test that "on_lock_button_toggled" gives focus to the right field and toggles the lock properly.
+        """
+        # GIVEN: Mocked sender & Search edit, quickTab returning value = True on isVisible.
+        self.media_item.sender = MagicMock()
+        self.media_item.quick_search_edit = MagicMock()
+        self.media_item.quickTab = MagicMock(**{'isVisible.return_value': True})
+
+        self.media_item.lock_icon = 'lock icon'
+        sender_instance_mock = MagicMock()
+        self.media_item.sender = MagicMock(return_value=sender_instance_mock)
+
+        # WHEN: on_lock_button_toggled is called and checked returns = True.
+        self.media_item.on_lock_button_toggled(True)
+
+        # THEN: on_quick_search_edit should receive focus and Lock icon should be set.
+        self.media_item.quick_search_edit.setFocus.assert_called_once_with()
+        sender_instance_mock.setIcon.assert_called_once_with('lock icon')
+
+    def test_on_lock_button_toggled_unlock_icon(self):
+        """
+         Test that lock button unlocks properly and lock toggles properly.
+        """
+        # GIVEN: Mocked sender & Search edit, quickTab returning value = False on isVisible.
+        self.media_item.sender = MagicMock()
+        self.media_item.quick_search_edit = MagicMock()
+        self.media_item.quickTab = MagicMock()
+        self.media_item.quickTab.isVisible = MagicMock()
+        self.media_item.unlock_icon = 'unlock icon'
+        sender_instance_mock = MagicMock()
+        self.media_item.sender = MagicMock(return_value=sender_instance_mock)
+
+        # WHEN: on_lock_button_toggled is called and checked returns = False.
+        self.media_item.on_lock_button_toggled(False)
+
+        # THEN: Unlock icon should be set.
+        sender_instance_mock.setIcon.assert_called_once_with('unlock icon')
