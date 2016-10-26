@@ -43,7 +43,11 @@ def report_song_list():
     main_window = Registry().get('main_window')
     plugin = Registry().get('songs').plugin
     report_file_name, filter_used = QtWidgets.QFileDialog.getSaveFileName(
-        main_window, translate('SongPlugin.ReportSongList', 'Output File Location'))
+        main_window,
+        translate('SongPlugin.ReportSongList', 'Save File'),
+        translate('SongPlugin.ReportSongList', 'song_extract.csv'),
+        translate('SongPlugin.ReportSongList', 'CSV format (*.csv)'))
+
     if not report_file_name:
         main_window.error_message(
             translate('SongPlugin.ReportSongList', 'Output Path Not Selected'),
