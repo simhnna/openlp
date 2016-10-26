@@ -28,6 +28,7 @@ from unittest import TestCase
 import PyQt5
 
 from openlp.core.common import Registry, ThemeLevel
+from openlp.core.ui.lib.toolbar import OpenLPToolbar
 from openlp.core.lib import ServiceItem, ServiceItemType, ItemCapabilities
 from openlp.core.ui import ServiceManager
 
@@ -544,8 +545,8 @@ class TestServiceManager(TestCase):
         self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 1,
                          'Should have be called once')
 
-    @patch(u'openlp.core.ui.servicemanager.Settings')
-    @patch(u'PyQt5.QtCore.QTimer.singleShot')
+    @patch('openlp.core.ui.servicemanager.Settings')
+    @patch('PyQt5.QtCore.QTimer.singleShot')
     def test_single_click_preview_true(self, mocked_singleShot, MockedSettings):
         """
         Test that when "Preview items when clicked in Service Manager" enabled the preview timer starts
@@ -561,8 +562,8 @@ class TestServiceManager(TestCase):
         mocked_singleShot.assert_called_with(PyQt5.QtWidgets.QApplication.instance().doubleClickInterval(),
                                              service_manager.on_single_click_preview_timeout)
 
-    @patch(u'openlp.core.ui.servicemanager.Settings')
-    @patch(u'PyQt5.QtCore.QTimer.singleShot')
+    @patch('openlp.core.ui.servicemanager.Settings')
+    @patch('PyQt5.QtCore.QTimer.singleShot')
     def test_single_click_preview_false(self, mocked_singleShot, MockedSettings):
         """
         Test that when "Preview items when clicked in Service Manager" disabled the preview timer doesn't start
@@ -577,9 +578,9 @@ class TestServiceManager(TestCase):
         # THEN: timer should not be started
         self.assertEqual(mocked_singleShot.call_count, 0, 'Should not be called')
 
-    @patch(u'openlp.core.ui.servicemanager.Settings')
-    @patch(u'PyQt5.QtCore.QTimer.singleShot')
-    @patch(u'openlp.core.ui.servicemanager.ServiceManager.make_live')
+    @patch('openlp.core.ui.servicemanager.Settings')
+    @patch('PyQt5.QtCore.QTimer.singleShot')
+    @patch('openlp.core.ui.servicemanager.ServiceManager.make_live')
     def test_single_click_preview_double(self, mocked_make_live, mocked_singleShot, MockedSettings):
         """
         Test that when a double click has registered the preview timer doesn't start
@@ -596,7 +597,7 @@ class TestServiceManager(TestCase):
         mocked_make_live.assert_called_with()
         self.assertEqual(mocked_singleShot.call_count, 0, 'Should not be called')
 
-    @patch(u'openlp.core.ui.servicemanager.ServiceManager.make_preview')
+    @patch('openlp.core.ui.servicemanager.ServiceManager.make_preview')
     def test_single_click_timeout_single(self, mocked_make_preview):
         """
         Test that when a single click has been registered, the item is sent to preview
@@ -609,8 +610,8 @@ class TestServiceManager(TestCase):
         self.assertEqual(mocked_make_preview.call_count, 1,
                          'ServiceManager.make_preview() should have been called once')
 
-    @patch(u'openlp.core.ui.servicemanager.ServiceManager.make_preview')
-    @patch(u'openlp.core.ui.servicemanager.ServiceManager.make_live')
+    @patch('openlp.core.ui.servicemanager.ServiceManager.make_preview')
+    @patch('openlp.core.ui.servicemanager.ServiceManager.make_live')
     def test_single_click_timeout_double(self, mocked_make_live, mocked_make_preview):
         """
         Test that when a double click has been registered, the item does not goes to preview
@@ -623,9 +624,9 @@ class TestServiceManager(TestCase):
         # THEN: make_preview() should not have been called
         self.assertEqual(mocked_make_preview.call_count, 0, 'ServiceManager.make_preview() should not be called')
 
-    @patch(u'openlp.core.ui.servicemanager.shutil.copy')
-    @patch(u'openlp.core.ui.servicemanager.zipfile')
-    @patch(u'openlp.core.ui.servicemanager.ServiceManager.save_file_as')
+    @patch('openlp.core.ui.servicemanager.shutil.copy')
+    @patch('openlp.core.ui.servicemanager.zipfile')
+    @patch('openlp.core.ui.servicemanager.ServiceManager.save_file_as')
     def test_save_file_raises_permission_error(self, mocked_save_file_as, mocked_zipfile, mocked_shutil_copy):
         """
         Test that when a PermissionError is raised when trying to save a file, it is handled correctly
@@ -652,9 +653,9 @@ class TestServiceManager(TestCase):
         self.assertTrue(result)
         mocked_save_file_as.assert_called_with()
 
-    @patch(u'openlp.core.ui.servicemanager.shutil.copy')
-    @patch(u'openlp.core.ui.servicemanager.zipfile')
-    @patch(u'openlp.core.ui.servicemanager.ServiceManager.save_file_as')
+    @patch('openlp.core.ui.servicemanager.shutil.copy')
+    @patch('openlp.core.ui.servicemanager.zipfile')
+    @patch('openlp.core.ui.servicemanager.ServiceManager.save_file_as')
     def test_save_local_file_raises_permission_error(self, mocked_save_file_as, mocked_zipfile, mocked_shutil_copy):
         """
         Test that when a PermissionError is raised when trying to save a local file, it is handled correctly
@@ -679,3 +680,66 @@ class TestServiceManager(TestCase):
         # THEN: The "save_as" method is called to save the service
         self.assertTrue(result)
         mocked_save_file_as.assert_called_with()
+
+    @patch('openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
+    def test_theme_change_global(self, mocked_regenerate_service_items):
+        """
+        Test that when a Toolbar theme combobox displays correctly when the theme is set to Global
+        """
+        # GIVEN: A service manager, a service to display with a theme level in the renderer
+        mocked_renderer = MagicMock()
+        service_manager = ServiceManager(None)
+        Registry().register('renderer', mocked_renderer)
+        service_manager.toolbar = OpenLPToolbar(None)
+        service_manager.toolbar.add_toolbar_action('theme_combo_box', triggers=MagicMock())
+        service_manager.toolbar.add_toolbar_action('theme_label', triggers=MagicMock())
+
+        # WHEN: The service manager has a Global theme
+        mocked_renderer.theme_level = ThemeLevel.Global
+        result = service_manager.theme_change()
+
+        # THEN: The the theme toolbar should not be visible
+        self.assertFalse(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
+                         'The visibility should be False')
+
+    @patch('openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
+    def test_theme_change_service(self, mocked_regenerate_service_items):
+        """
+        Test that when a Toolbar theme combobox displays correctly when the theme is set to Theme
+        """
+        # GIVEN: A service manager, a service to display with a theme level in the renderer
+        mocked_renderer = MagicMock()
+        service_manager = ServiceManager(None)
+        Registry().register('renderer', mocked_renderer)
+        service_manager.toolbar = OpenLPToolbar(None)
+        service_manager.toolbar.add_toolbar_action('theme_combo_box', triggers=MagicMock())
+        service_manager.toolbar.add_toolbar_action('theme_label', triggers=MagicMock())
+
+        # WHEN: The service manager has a Service theme
+        mocked_renderer.theme_level = ThemeLevel.Service
+        result = service_manager.theme_change()
+
+        # THEN: The the theme toolbar should be visible
+        self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
+                        'The visibility should be True')
+
+    @patch('openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
+    def test_theme_change_song(self, mocked_regenerate_service_items):
+        """
+        Test that when a Toolbar theme combobox displays correctly when the theme is set to Song
+        """
+        # GIVEN: A service manager, a service to display with a theme level in the renderer
+        mocked_renderer = MagicMock()
+        service_manager = ServiceManager(None)
+        Registry().register('renderer', mocked_renderer)
+        service_manager.toolbar = OpenLPToolbar(None)
+        service_manager.toolbar.add_toolbar_action('theme_combo_box', triggers=MagicMock())
+        service_manager.toolbar.add_toolbar_action('theme_label', triggers=MagicMock())
+
+        # WHEN: The service manager has a Song theme
+        mocked_renderer.theme_level = ThemeLevel.Song
+        result = service_manager.theme_change()
+
+        # THEN: The the theme toolbar should  be visible
+        self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
+                        'The visibility should be True')
