@@ -23,8 +23,7 @@
     <file>topic_maintenance.png</file>
     <file>song_author_edit.png</file>
     <file>song_book_edit.png</file>
-    <file>song_delete.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="images">
     <file>image_group.png</file>
     <file>image_new_group.png</file>
@@ -95,8 +94,7 @@
   </qresource>
   <qresource prefix="wizards">
     <file>openlp-osx-wizard.png</file>
-    <file>wizard_exportsong.bmp</file>
-    <file>wizard_importsong.bmp</file>
+    <file>wizard_song.bmp</file>
     <file>wizard_importbible.bmp</file>
     <file>wizard_firsttime.bmp</file>
     <file>wizard_createtheme.bmp</file>
