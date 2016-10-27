@@ -37,7 +37,7 @@ class Ui_FileRenameDialog(object):
         Set up the UI
         """
         file_rename_dialog.setObjectName('file_rename_dialog')
-        file_rename_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        file_rename_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         file_rename_dialog.resize(300, 10)
         self.dialog_layout = QtWidgets.QGridLayout(file_rename_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

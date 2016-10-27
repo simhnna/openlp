@@ -119,7 +119,7 @@ def str_to_bool(string_value):
     return str(string_value).strip().lower() in ('true', 'yes', 'y')
 
 
-def build_icon(icon):
+def build_icon(icon, size=None):
     """
     Build a QIcon instance from an existing QIcon, a resource location, or a physical file location. If the icon is a
     QIcon instance, that icon is simply returned. If not, it builds a QIcon instance from the resource or file name.
@@ -127,18 +127,23 @@ def build_icon(icon):
     :param icon:
         The icon to build. This can be a QIcon, a resource string in the form ``:/resource/file.png``, or a file
         location like ``/path/to/file.png``. However, the **recommended** way is to specify a resource string.
+    :param size:
+        The size of the icon to generate
     :return: The build icon.
     """
-    button_icon = QtGui.QIcon()
     if isinstance(icon, QtGui.QIcon):
-        button_icon = icon
-    elif isinstance(icon, str):
+        return icon
+    button_icon = QtGui.QIcon()
+    if isinstance(icon, str):
         if icon.startswith(':/'):
-            button_icon.addPixmap(QtGui.QPixmap(icon), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            pix_map = QtGui.QPixmap(icon)
         else:
-            button_icon.addPixmap(QtGui.QPixmap.fromImage(QtGui.QImage(icon)), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            pix_map = QtGui.QPixmap.fromImage(QtGui.QImage(icon))
     elif isinstance(icon, QtGui.QImage):
-        button_icon.addPixmap(QtGui.QPixmap.fromImage(icon), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        pix_map = QtGui.QPixmap.fromImage(icon)
+    if size:
+        pix_map = pix_map.scaled(size, size, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+    button_icon.addPixmap(pix_map, QtGui.QIcon.Normal, QtGui.QIcon.Off)
     return button_icon
 
 

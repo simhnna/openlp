@@ -38,7 +38,7 @@ class Ui_SongUsageDeleteDialog(object):
         :param song_usage_delete_dialog:
         """
         song_usage_delete_dialog.setObjectName('song_usage_delete_dialog')
-        song_usage_delete_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        song_usage_delete_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         song_usage_delete_dialog.resize(291, 243)
         self.vertical_layout = QtWidgets.QVBoxLayout(song_usage_delete_dialog)
         self.vertical_layout.setSpacing(8)

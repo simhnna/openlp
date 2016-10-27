@@ -48,7 +48,7 @@ class TestSettingsForm(TestCase):
         general_tab = MagicMock()
         general_tab.tab_title = 'mock'
         general_tab.tab_title_visible = 'Mock'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
 
         # WHEN: We insert the general tab
         with patch.object(settings_form.stacked_layout, 'addWidget') as mocked_add_widget, \
@@ -86,14 +86,14 @@ class TestSettingsForm(TestCase):
         general_tab = QtWidgets.QWidget(None)
         general_tab.tab_title = 'mock-general'
         general_tab.tab_title_visible = 'Mock General'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_general_save = MagicMock()
         general_tab.save = mocked_general_save
         settings_form.insert_tab(general_tab, is_visible=True)
         themes_tab = QtWidgets.QWidget(None)
         themes_tab.tab_title = 'mock-themes'
         themes_tab.tab_title_visible = 'Mock Themes'
-        themes_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        themes_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_theme_save = MagicMock()
         themes_tab.save = mocked_theme_save
         settings_form.insert_tab(themes_tab, is_visible=False)
@@ -114,7 +114,7 @@ class TestSettingsForm(TestCase):
         general_tab = QtWidgets.QWidget(None)
         general_tab.tab_title = 'mock'
         general_tab.tab_title_visible = 'Mock'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
         settings_form.insert_tab(general_tab, is_visible=True)
 
         with patch.object(settings_form.stacked_layout, 'count') as mocked_count:
@@ -133,14 +133,14 @@ class TestSettingsForm(TestCase):
         general_tab = QtWidgets.QWidget(None)
         general_tab.tab_title = 'mock-general'
         general_tab.tab_title_visible = 'Mock General'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_general_cancel = MagicMock()
         general_tab.cancel = mocked_general_cancel
         settings_form.insert_tab(general_tab, is_visible=True)
         themes_tab = QtWidgets.QWidget(None)
         themes_tab.tab_title = 'mock-themes'
         themes_tab.tab_title_visible = 'Mock Themes'
-        themes_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        themes_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_theme_cancel = MagicMock()
         themes_tab.cancel = mocked_theme_cancel
         settings_form.insert_tab(themes_tab, is_visible=False)

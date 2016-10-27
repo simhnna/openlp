@@ -47,7 +47,7 @@ class Ui_ProjectorEditForm(object):
         Create the interface layout.
         """
         edit_projector_dialog.setObjectName('edit_projector_dialog')
-        edit_projector_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo-32x32.png'))
+        edit_projector_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         edit_projector_dialog.setMinimumWidth(400)
         edit_projector_dialog.setModal(True)
         # Define the basic layout

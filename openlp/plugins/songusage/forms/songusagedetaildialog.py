@@ -38,7 +38,7 @@ class Ui_SongUsageDetailDialog(object):
         :param song_usage_detail_dialog:
         """
         song_usage_detail_dialog.setObjectName('song_usage_detail_dialog')
-        song_usage_detail_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        song_usage_detail_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         song_usage_detail_dialog.resize(609, 413)
         self.vertical_layout = QtWidgets.QVBoxLayout(song_usage_detail_dialog)
         self.vertical_layout.setSpacing(8)
