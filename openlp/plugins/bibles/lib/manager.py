@@ -131,7 +131,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             name = bible.get_name()
             # Remove corrupted files.
             if name is None:
-                bible.session.close()
+                bible.session.close_all()
                 delete_file(os.path.join(self.path, filename))
                 continue
             log.debug('Bible Name: "{name}"'.format(name=name))
@@ -178,7 +178,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         """
         log.debug('BibleManager.delete_bible("{name}")'.format(name=name))
         bible = self.db_cache[name]
-        bible.session.close()
+        bible.session.close_all()
         bible.session = None
         return delete_file(os.path.join(bible.path, bible.file))
 
