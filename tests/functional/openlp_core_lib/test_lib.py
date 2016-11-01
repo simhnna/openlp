@@ -189,16 +189,14 @@ class TestLib(TestCase):
         """
         Test the build_icon() function with a QIcon instance
         """
-        with patch('openlp.core.lib.QtGui') as MockedQtGui:
-            # GIVEN: A mocked QIcon
-            MockedQtGui.QIcon = MagicMock
-            mocked_icon = MockedQtGui.QIcon()
+        # GIVEN: An icon QIcon
+        icon = QtGui.QIcon()
 
-            # WHEN: We pass a QIcon instance in
-            result = build_icon(mocked_icon)
+        # WHEN: We pass a QIcon instance in
+        result = build_icon(icon)
 
-            # THEN: The result should be our mocked QIcon
-            self.assertIs(mocked_icon, result, 'The result should be the mocked QIcon')
+        # THEN: The result should be the same icon as we passed in
+        self.assertIs(icon, result, 'The result should be the same icon as we passed in')
 
     def test_build_icon_with_resource(self):
         """
@@ -223,6 +221,30 @@ class TestLib(TestCase):
             self.assertIsInstance(result, MagicMock, 'The result should be a MagicMock, because we mocked it out')
 
     def test_image_to_byte(self):
+        """
+        Test the image_to_byte() function
+        """
+        with patch('openlp.core.lib.QtCore') as MockedQtCore:
+            # GIVEN: A set of mocked-out Qt classes
+            mocked_byte_array = MagicMock()
+            MockedQtCore.QByteArray.return_value = mocked_byte_array
+            mocked_buffer = MagicMock()
+            MockedQtCore.QBuffer.return_value = mocked_buffer
+            MockedQtCore.QIODevice.WriteOnly = 'writeonly'
+            mocked_image = MagicMock()
+
+            # WHEN: We convert an image to a byte array
+            result = image_to_byte(mocked_image, base_64=False)
+
+            # THEN: We should receive the mocked_buffer
+            MockedQtCore.QByteArray.assert_called_with()
+            MockedQtCore.QBuffer.assert_called_with(mocked_byte_array)
+            mocked_buffer.open.assert_called_with('writeonly')
+            mocked_image.save.assert_called_with(mocked_buffer, "PNG")
+            self.assertFalse(mocked_byte_array.toBase64.called)
+            self.assertEqual(mocked_byte_array, result, 'The mocked out byte array should be returned')
+
+    def test_image_to_byte_base_64(self):
         """
         Test the image_to_byte() function
         """

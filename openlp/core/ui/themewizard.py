@@ -40,7 +40,7 @@ class Ui_ThemeWizard(object):
         Set up the UI
         """
         theme_wizard.setObjectName('OpenLP.ThemeWizard')
-        theme_wizard.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        theme_wizard.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         theme_wizard.setModal(True)
         theme_wizard.setOptions(QtWidgets.QWizard.IndependentPages |
                                 QtWidgets.QWizard.NoBackButtonOnStartPage | QtWidgets.QWizard.HaveCustomButton1)

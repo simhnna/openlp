@@ -55,7 +55,7 @@ class UiFirstTimeWizard(object):
         :param first_time_wizard: The wizard form
         """
         first_time_wizard.setObjectName('first_time_wizard')
-        first_time_wizard.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        first_time_wizard.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         first_time_wizard.resize(550, 386)
         first_time_wizard.setModal(True)
         first_time_wizard.setOptions(QtWidgets.QWizard.IndependentPages | QtWidgets.QWizard.NoBackButtonOnStartPage |

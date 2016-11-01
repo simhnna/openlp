@@ -23,8 +23,7 @@
     <file>topic_maintenance.png</file>
     <file>song_author_edit.png</file>
     <file>song_book_edit.png</file>
-    <file>song_delete.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="images">
     <file>image_group.png</file>
     <file>image_new_group.png</file>
@@ -33,7 +32,6 @@
     <file>bibles_search_combined.png</file>
     <file>bibles_search_text.png</file>
     <file>bibles_search_reference.png</file>
-    <file>bibles_upgrade_alert.png</file>
     <file>bibles_search_clear.png</file>
     <file>bibles_search_unlock.png</file>
     <file>bibles_search_lock.png</file>
@@ -71,7 +69,6 @@
     <file>general_back.png</file>
   </qresource>
   <qresource prefix="slides">
-    <file>slide_close.png</file>
     <file>slide_next.png</file>
     <file>slide_blank.png</file>
     <file>slide_desktop.png</file>
@@ -83,12 +80,6 @@
     <file>media_playback_next.png</file>
   </qresource>
   <qresource prefix="icon">
-    <file>openlp-logo-16x16.png</file>
-    <file>openlp-logo-32x32.png</file>
-    <file>openlp-logo-48x48.png</file>
-    <file>openlp-logo-64x64.png</file>
-    <file>openlp-logo-128x128.png</file>
-    <file>openlp-logo-256x256.png</file>
     <file>openlp-logo.svg</file>
   </qresource>
   <qresource prefix="graphics">
@@ -97,24 +88,18 @@
     <file>openlp-about-logo.png</file>
   </qresource>
   <qresource prefix="imports">
-    <file>import_selectall.png</file>
-    <file>import_move_to_list.png</file>
-    <file>import_remove.png</file>
-    <file>import_load.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="exports">
     <file>export_load.png</file>
   </qresource>
   <qresource prefix="wizards">
     <file>openlp-osx-wizard.png</file>
-    <file>wizard_exportsong.bmp</file>
-    <file>wizard_importsong.bmp</file>
+    <file>wizard_song.bmp</file>
     <file>wizard_importbible.bmp</file>
     <file>wizard_firsttime.bmp</file>
     <file>wizard_createtheme.bmp</file>
     <file>wizard_duplicateremoval.bmp</file>
-    <file>wizard_createprojector.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="services">
     <file>service_collapse_all.png</file>
     <file>service_expand_all.png</file>
@@ -155,10 +140,7 @@
     <file>multimedia-player.png</file>
   </qresource>
   <qresource prefix="messagebox">
-    <file>messagebox_critical.png</file>
-    <file>messagebox_info.png</file>
-    <file>messagebox_warning.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="remote">
     <file>network_server.png</file>
     <file>network_ssl.png</file>
@@ -170,10 +152,8 @@
   </qresource>
   <qresource prefix="tools">
     <file>tools_add.png</file>
-    <file>tools_alert.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="themes">
-    <file>theme_delete.png</file>
     <file>theme_new.png</file>
     <file>theme_edit.png</file>
   </qresource>
@@ -201,10 +181,8 @@
     <file>projector_power_on_tiled.png</file>
     <file>projector_show.png</file>
     <file>projector_show_tiled.png</file>
-    <file>projector_spacer.png</file>
     <file>projector_warmup.png</file>
-    <file>projector_view.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="remotes">
     <file>android_app_qr.png</file>
     <file>ios_app_qr.png</file>
