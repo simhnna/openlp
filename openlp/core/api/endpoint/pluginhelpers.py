@@ -71,7 +71,7 @@ def live(request, plugin_name, log):
     plugin = Registry().get('plugin_manager').get_plugin_by_name(plugin_name)
     if plugin.status == PluginStatus.Active and plugin.media_item:
         getattr(plugin.media_item, '{name}_go_live'.format(name=plugin_name)).emit([request_id, True])
-    return []
+    return {'results': {'success': True}}
 
 
 def service(request, plugin_name, log):
@@ -92,7 +92,7 @@ def service(request, plugin_name, log):
     if plugin.status == PluginStatus.Active and plugin.media_item:
         item_id = plugin.media_item.create_item_from_id(request_id)
         getattr(plugin.media_item, '{name}_add_to_service'.format(name=plugin_name)).emit([item_id, True])
-    return []
+    return {'results': {'success': True}}
 
 
 def display_thumbnails(request, controller_name, log, dimensions, file_name, slide):
