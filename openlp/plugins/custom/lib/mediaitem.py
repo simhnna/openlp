@@ -131,7 +131,6 @@ class CustomMediaItem(MediaManagerItem):
         # Called to redisplay the custom list screen edith from a search
         # or from the exit of the Custom edit dialog. If remote editing is
         # active trigger it and clean up so it will not update again.
-        self.check_search_result()
 
     def on_new_click(self):
         """
@@ -268,7 +267,6 @@ class CustomMediaItem(MediaManagerItem):
                                                                     CustomSlide.theme_name.like(search_keywords),
                                                                     order_by_ref=CustomSlide.title)
             self.load_list(search_results)
-        self.check_search_result()
 
     def on_search_text_edit_changed(self, text):
         """
