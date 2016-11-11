@@ -64,7 +64,7 @@ class TestSearchEdit(TestCase, TestMixin):
         self.addCleanup(settings_patcher.stop)
         self.mocked_settings = settings_patcher.start()
 
-        self.search_edit = SearchEdit(self.main_window,'settings_section')
+        self.search_edit = SearchEdit(self.main_window, 'settings_section')
         # To complete set up we have to set the search types.
         self.search_edit.set_search_types(SEARCH_TYPES)
 
