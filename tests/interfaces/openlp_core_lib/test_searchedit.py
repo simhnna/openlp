@@ -23,6 +23,7 @@
 Module to test the EditCustomForm.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, call, patch
 
 from PyQt5 import QtCore, QtGui, QtTest, QtWidgets
 
@@ -58,7 +59,12 @@ class TestSearchEdit(TestCase, TestMixin):
         self.main_window = QtWidgets.QMainWindow()
         Registry().register('main_window', self.main_window)
 
-        self.search_edit = SearchEdit(self.main_window)
+        settings_patcher = patch(
+            'openlp.core.lib.searchedit.Settings', return_value=MagicMock(**{'value.return_value': SearchTypes.First}))
+        self.addCleanup(settings_patcher.stop)
+        self.mocked_settings = settings_patcher.start()
+
+        self.search_edit = SearchEdit(self.main_window,'settings_section')
         # To complete set up we have to set the search types.
         self.search_edit.set_search_types(SEARCH_TYPES)
 
@@ -78,8 +84,11 @@ class TestSearchEdit(TestCase, TestMixin):
 
         # WHEN:
 
-        # THEN: The first search type should be the first one in the list.
-        assert self.search_edit.current_search_type() == SearchTypes.First, "The first search type should be selected."
+        # THEN: The first search type should be the first one in the list. The selected type should be saved in the
+        #       settings
+        self.assertEqual(self.search_edit.current_search_type(), SearchTypes.First,
+                         "The first search type should be selected.")
+        self.mocked_settings().setValue.assert_called_once_with('settings_section/last search type', 0)
 
     def test_set_current_search_type(self):
         """
@@ -90,11 +99,13 @@ class TestSearchEdit(TestCase, TestMixin):
         result = self.search_edit.set_current_search_type(SearchTypes.Second)
 
         # THEN:
-        assert result, "The call should return success (True)."
-        assert self.search_edit.current_search_type() == SearchTypes.Second,\
-            "The search type should be SearchTypes.Second"
-        assert self.search_edit.placeholderText() == SECOND_PLACEHOLDER_TEXT,\
-            "The correct placeholder text should be 'Second Placeholder Text'."
+        self.assertTrue(result, "The call should return success (True).")
+        self.assertEqual(self.search_edit.current_search_type(), SearchTypes.Second,
+                         "The search type should be SearchTypes.Second")
+        self.assertEqual(self.search_edit.placeholderText(), SECOND_PLACEHOLDER_TEXT,
+                         "The correct placeholder text should be 'Second Placeholder Text'.")
+        self.mocked_settings().setValue.assert_has_calls(
+            [call('settings_section/last search type', 0), call('settings_section/last search type', 1)])
 
     def test_clear_button_visibility(self):
         """

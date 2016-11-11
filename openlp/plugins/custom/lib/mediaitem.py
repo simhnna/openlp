@@ -105,8 +105,6 @@ class CustomMediaItem(MediaManagerItem):
             [(CustomSearch.Titles, ':/songs/song_search_title.png', translate('SongsPlugin.MediaItem', 'Titles'),
               translate('SongsPlugin.MediaItem', 'Search Titles...')),
              (CustomSearch.Themes, ':/slides/slide_theme.png', UiStrings().Themes, UiStrings().SearchThemes)])
-        text = '{section}/last search type'.format(section=self.settings_section)
-        self.search_text_edit.set_current_search_type(Settings().value(text))
         self.load_list(self.plugin.db_manager.get_all_objects(CustomSlide, order_by_ref=CustomSlide.title))
         self.config_update()
 
@@ -250,9 +248,6 @@ class CustomMediaItem(MediaManagerItem):
         """
         Search the plugin database
         """
-        # Save the current search type to the configuration.
-        Settings().setValue('{section}/last search type'.format(section=self.settings_section),
-                            self.search_text_edit.current_search_type())
         # Reload the list considering the new search type.
         search_type = self.search_text_edit.current_search_type()
         search_keywords = '%{search}%'.format(search=self.whitespace.sub(' ', self.search_text_edit.displayText()))

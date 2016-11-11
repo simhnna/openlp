@@ -166,14 +166,9 @@ class SongMediaItem(MediaManagerItem):
                 translate('SongsPlugin.MediaItem', 'CCLI number'),
                 translate('SongsPlugin.MediaItem', 'Search CCLI number...'))
         ])
-        self.search_text_edit.set_current_search_type(
-            Settings().value('{section}/last search type'.format(section=self.settings_section)))
         self.config_update()
 
     def on_search_text_button_clicked(self):
-        # Save the current search type to the configuration.
-        Settings().setValue('{section}/last search type'.format(section=self.settings_section),
-                            self.search_text_edit.current_search_type())
         # Reload the list considering the new search type.
         search_keywords = str(self.search_text_edit.displayText())
         search_type = self.search_text_edit.current_search_type()

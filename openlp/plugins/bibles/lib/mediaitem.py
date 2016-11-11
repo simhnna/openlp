@@ -199,7 +199,7 @@ class BibleMediaItem(MediaManagerItem):
         self.quick_search_label = QtWidgets.QLabel(self.quickTab)
         self.quick_search_label.setObjectName('quick_search_label')
         self.quickLayout.addWidget(self.quick_search_label, 0, 0, QtCore.Qt.AlignRight)
-        self.quick_search_edit = SearchEdit(self.quickTab)
+        self.quick_search_edit = SearchEdit(self.quickTab, self.settings_section)
         self.quick_search_edit.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         self.quick_search_edit.setObjectName('quick_search_edit')
         self.quick_search_label.setBuddy(self.quick_search_edit)
@@ -333,8 +333,8 @@ class BibleMediaItem(MediaManagerItem):
                 translate('BiblesPlugin.MediaItem', 'Text Search'),
                 translate('BiblesPlugin.MediaItem', 'Search Text...'))
         ])
-        text = self.settings_section
-        self.quick_search_edit.set_current_search_type(Settings().value('{text}/last search type'.format(text=text)))
+        if Settings().value(self.settings_section + '/reset to combined quick search'):
+            self.quick_search_edit.set_current_search_type(BibleSearch.Combined)
         self.config_update()
         log.debug('bible manager initialise complete')
 
@@ -444,15 +444,7 @@ class BibleMediaItem(MediaManagerItem):
         only updated when we are doing reference or combined search, in text search the completion list is removed.
         """
         log.debug('update_auto_completer')
-        # Save the current search type to the configuration. If setting for automatically resetting the search type to
-        # Combined is enabled, use that otherwise use the currently selected search type.
-        # Note: This setting requires a restart to take effect.
-        if Settings().value(self.settings_section + '/reset to combined quick search'):
-            Settings().setValue('{section}/last search type'.format(section=self.settings_section),
-                                BibleSearch.Combined)
-        else:
-            Settings().setValue('{section}/last search type'.format(section=self.settings_section),
-                                self.quick_search_edit.current_search_type())
+        # TODO: Move this else where?
         # Save the current bible to the configuration.
         Settings().setValue('{section}/quick bible'.format(section=self.settings_section),
                             self.quickVersionComboBox.currentText())
