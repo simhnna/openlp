@@ -85,7 +85,7 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         """
         if event.mimeData().hasUrls():
             event.accept()
-        else:   
+        else:
             event.ignore()
 
     def dragMoveEvent(self, event):
