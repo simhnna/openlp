@@ -444,7 +444,6 @@ class BibleMediaItem(MediaManagerItem):
         only updated when we are doing reference or combined search, in text search the completion list is removed.
         """
         log.debug('update_auto_completer')
-        # TODO: Move this else where?
         # Save the current bible to the configuration.
         Settings().setValue('{section}/quick bible'.format(section=self.settings_section),
                             self.quickVersionComboBox.currentText())
