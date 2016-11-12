@@ -26,10 +26,7 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, translate
-
-NO_RESULTS = translate('OpenLP.ListWidgetWithDnD', 'No Search Results')
-SHORT_RESULTS = translate('OpenLP.ListWidgetWithDnD', 'Please type more text to use \'Search As You Type\'')
+from openlp.core.common import Registry, UiStrings
 
 
 class ListWidgetWithDnD(QtWidgets.QListWidget):
@@ -42,7 +39,7 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         """
         super().__init__(parent)
         self.mime_data_text = name
-        self.no_results_text = NO_RESULTS
+        self.no_results_text = UiStrings().NoResults
 
     def activateDnD(self):
         """
@@ -60,9 +57,9 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         :return: None
         """
         if search_while_typing:
-            self.no_results_text = SHORT_RESULTS
+            self.no_results_text = UiStrings().ShortResults
         else:
-            self.no_results_text = NO_RESULTS
+            self.no_results_text = UiStrings().NoResults
         super().clear()
 
     def mouseMoveEvent(self, event):
