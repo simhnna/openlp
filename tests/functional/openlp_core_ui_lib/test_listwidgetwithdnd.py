@@ -24,7 +24,8 @@ This module contains tests for the openlp.core.lib.listwidgetwithdnd module
 """
 from unittest import TestCase
 
-from openlp.core.ui.lib.listwidgetwithdnd import ListWidgetWithDnD, NO_RESULTS, SHORT_RESULTS
+from openlp.core.common.uistrings import UiStrings
+from openlp.core.ui.lib.listwidgetwithdnd import ListWidgetWithDnD
 from unittest.mock import MagicMock, patch
 
 
@@ -43,7 +44,7 @@ class TestListWidgetWithDnD(TestCase):
         widget.clear()
 
         # THEN: The results text should be the standard 'no results' text.
-        self.assertEqual(widget.no_results_text, NO_RESULTS)
+        self.assertEqual(widget.no_results_text, UiStrings().NoResults)
 
     def test_clear_search_while_typing(self):
         """
@@ -56,7 +57,7 @@ class TestListWidgetWithDnD(TestCase):
         widget.clear(search_while_typing=True)
 
         # THEN: The results text should be the 'short results' text.
-        self.assertEqual(widget.no_results_text, SHORT_RESULTS)
+        self.assertEqual(widget.no_results_text, UiStrings().ShortResults)
 
     def test_paint_event(self):
         """
