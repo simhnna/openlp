@@ -266,7 +266,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         self.search_text_layout.setObjectName('search_text_layout')
         self.search_text_label = QtWidgets.QLabel(self.search_widget)
         self.search_text_label.setObjectName('search_text_label')
-        self.search_text_edit = SearchEdit(self.search_widget)
+        self.search_text_edit = SearchEdit(self.search_widget, self.settings_section)
         self.search_text_edit.setObjectName('search_text_edit')
         self.search_text_label.setBuddy(self.search_text_edit)
         self.search_text_layout.addRow(self.search_text_label, self.search_text_edit)
