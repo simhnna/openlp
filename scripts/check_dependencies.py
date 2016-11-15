@@ -96,7 +96,8 @@ MODULES = [
     'websockets',
     'asyncio',
     'waitress',
-    'six'
+    'six',
+    'webob'
 ]
 
 
