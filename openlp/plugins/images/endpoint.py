@@ -67,14 +67,14 @@ def images_service(request):
     return service(request, 'images', log)
 
 
-@images_endpoint.route('thumbnails/{dimensions}/{file_name}/{slide}')
-def images_thumbnails(request, dimensions, file_name, slide):
+# images/thumbnails/320x240/1.jpg
+@images_endpoint.route('thumbnails/{dimensions}/{file_name}')
+def images_thumbnails(request, dimensions, file_name):
     """
     Return an image to a web page based on a URL
     :param request: Request object
     :param dimensions: the image size eg 88x88
-    :param file_name: the file name of the image
-    :param slide: the individual image name
+    :param file_name: the individual image name
     :return:
     """
-    return display_thumbnails(request, 'images', log, dimensions, file_name, slide)
+    return display_thumbnails(request, 'images', log, dimensions, file_name)

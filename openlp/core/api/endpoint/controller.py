@@ -114,8 +114,8 @@ def controller_set(request):
     return {'results': {'success': True}}
 
 
-@api_controller_endpoint.route('/controller/{controller}/{action:next|previous}')
-@controller_endpoint.route('/{controller}/{action:next|previous}')
+@api_controller_endpoint.route('controller/{controller}/{action:next|previous}')
+@controller_endpoint.route('{action:next|previous}')
 @requires_auth
 def controller_direction(request, controller, action):
     """

@@ -143,10 +143,6 @@ class WSGIApplication(object):
         """
         Find the appropriate URL and run the view function
         """
-        # First look to see if this is a static file request
-        for route, static_app in self.static_routes.items():
-            if re.match(route, request.path):
-                return request.get_response(static_app)
         # If not a static route, try the views
         for route, views in self.route_map.items():
             match = re.match(route, request.path)
@@ -155,6 +151,10 @@ class WSGIApplication(object):
                 log.debug('Found {method} {url}'.format(method=request.method, url=request.path))
                 view_func = views[request.method.upper()]
                 return _make_response(view_func(request, **kwargs))
+        # Look to see if this is a static file request
+        for route, static_app in self.static_routes.items():
+            if re.match(route, request.path):
+                return request.get_response(static_app)
         log.error('URL {url} - Not found'.format(url=request.path))
         raise NotFound()
 

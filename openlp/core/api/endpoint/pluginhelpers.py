@@ -95,7 +95,7 @@ def service(request, plugin_name, log):
     return {'results': {'success': True}}
 
 
-def display_thumbnails(request, controller_name, log, dimensions, file_name, slide):
+def display_thumbnails(request, controller_name, log, dimensions, file_name, slide=None):
     """
     Handles requests for adding a song to the service
 
@@ -125,8 +125,13 @@ def display_thumbnails(request, controller_name, log, dimensions, file_name, sli
     if controller_name and file_name:
         file_name = urllib.parse.unquote(file_name)
         if '..' not in file_name:  # no hacking please
-            full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
-                                                      'thumbnails', file_name, slide))
+            if slide:
+                full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
+                                                          'thumbnails', file_name, slide))
+            else:
+                full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
+
+                                                          'thumbnails', file_name))
             if os.path.exists(full_path):
                 path, just_file_name = os.path.split(full_path)
                 Registry().get('image_manager').add_image(full_path, just_file_name, None, width, height)
