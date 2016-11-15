@@ -26,6 +26,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_widget_action
+from openlp.core.common import Settings
 
 log = logging.getLogger(__name__)
 
@@ -37,11 +38,12 @@ class SearchEdit(QtWidgets.QLineEdit):
     searchTypeChanged = QtCore.pyqtSignal(QtCore.QVariant)
     cleared = QtCore.pyqtSignal()
 
-    def __init__(self, parent):
+    def __init__(self, parent, settings_section):
         """
         Constructor.
         """
-        super(SearchEdit, self).__init__(parent)
+        super().__init__(parent)
+        self.settings_section = settings_section
         self._current_search_type = -1
         self.clear_button = QtWidgets.QToolButton(self)
         self.clear_button.setIcon(build_icon(':/system/clear_shortcut.png'))
@@ -100,14 +102,10 @@ class SearchEdit(QtWidgets.QLineEdit):
         menu = self.menu_button.menu()
         for action in menu.actions():
             if identifier == action.data():
-                # setPlaceholderText has been implemented in Qt 4.7 and in at least PyQt 4.9 (I am not sure, if it was
-                # implemented in PyQt 4.8).
-                try:
-                    self.setPlaceholderText(action.placeholder_text)
-                except AttributeError:
-                    pass
+                self.setPlaceholderText(action.placeholder_text)
                 self.menu_button.setDefaultAction(action)
                 self._current_search_type = identifier
+                Settings().setValue('{section}/last search type'.format(section=self.settings_section), identifier)
                 self.searchTypeChanged.emit(identifier)
                 return True
 
@@ -130,14 +128,10 @@ class SearchEdit(QtWidgets.QLineEdit):
                     (2, ":/songs/authors.png", "Authors", "Search Authors...")
         """
         menu = QtWidgets.QMenu(self)
-        first = None
         for identifier, icon, title, placeholder in items:
             action = create_widget_action(
                 menu, text=title, icon=icon, data=identifier, triggers=self._on_menu_action_triggered)
             action.placeholder_text = placeholder
-            if first is None:
-                first = action
-                self._current_search_type = identifier
         if not hasattr(self, 'menu_button'):
             self.menu_button = QtWidgets.QToolButton(self)
             self.menu_button.setIcon(build_icon(':/system/clear_shortcut.png'))
@@ -146,7 +140,8 @@ class SearchEdit(QtWidgets.QLineEdit):
             self.menu_button.setStyleSheet('QToolButton { border: none; padding: 0px 10px 0px 0px; }')
             self.menu_button.resize(QtCore.QSize(28, 18))
         self.menu_button.setMenu(menu)
-        self.menu_button.setDefaultAction(first)
+        self.set_current_search_type(
+            Settings().value('{section}/last search type'.format(section=self.settings_section)))
         self.menu_button.show()
         self._update_style_sheet()
 

@@ -182,7 +182,7 @@ class SongReviewWidget(QtWidgets.QWidget):
         self.song_vertical_layout.addWidget(self.song_group_box)
         self.song_remove_button = QtWidgets.QPushButton(self)
         self.song_remove_button.setObjectName('song_remove_button')
-        self.song_remove_button.setIcon(build_icon(':/songs/song_delete.png'))
+        self.song_remove_button.setIcon(build_icon(':/general/general_delete.png'))
         self.song_remove_button.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.song_vertical_layout.addWidget(self.song_remove_button, alignment=QtCore.Qt.AlignHCenter)
 

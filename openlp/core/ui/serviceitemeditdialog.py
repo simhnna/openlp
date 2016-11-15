@@ -38,7 +38,7 @@ class Ui_ServiceItemEditDialog(object):
         Set up the UI
         """
         serviceItemEditDialog.setObjectName('serviceItemEditDialog')
-        serviceItemEditDialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        serviceItemEditDialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         self.dialog_layout = QtWidgets.QGridLayout(serviceItemEditDialog)
         self.dialog_layout.setContentsMargins(8, 8, 8, 8)
         self.dialog_layout.setSpacing(8)

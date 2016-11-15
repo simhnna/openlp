@@ -309,21 +309,13 @@ class Ui_MainWindow(object):
         self.about_item.setMenuRole(QtWidgets.QAction.AboutRole)
         if is_win():
             self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'OpenLP.chm')
-            self.offline_help_item = create_action(main_window, 'offlineHelpItem',
-                                                   icon=':/system/system_help_contents.png',
-                                                   can_shortcuts=True,
-                                                   category=UiStrings().Help, triggers=self.on_offline_help_clicked)
         elif is_macosx():
             self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir),
                                                 '..', 'Resources', 'OpenLP.help')
-            self.offline_help_item = create_action(main_window, 'offlineHelpItem',
-                                                   icon=':/system/system_help_contents.png',
-                                                   can_shortcuts=True,
-                                                   category=UiStrings().Help, triggers=self.on_offline_help_clicked)
-        self.on_line_help_item = create_action(main_window, 'onlineHelpItem',
-                                               icon=':/system/system_online_help.png',
-                                               can_shortcuts=True,
-                                               category=UiStrings().Help, triggers=self.on_online_help_clicked)
+        self.on_help_item = create_action(main_window, 'HelpItem',
+                                          icon=':/system/system_help_contents.png',
+                                          can_shortcuts=True,
+                                          category=UiStrings().Help, triggers=self.on_help_clicked)
         self.web_site_item = create_action(main_window, 'webSiteItem', can_shortcuts=True, category=UiStrings().Help)
         # Shortcuts not connected to buttons or menu entries.
         self.search_shortcut_action = create_action(main_window,
@@ -362,11 +354,7 @@ class Ui_MainWindow(object):
         add_actions(self.tools_menu, (self.tools_open_data_folder, None))
         add_actions(self.tools_menu, (self.tools_first_time_wizard, None))
         add_actions(self.tools_menu, [self.update_theme_images])
-        if (is_win() or is_macosx()) and (hasattr(sys, 'frozen') and sys.frozen == 1):
-            add_actions(self.help_menu, (self.offline_help_item, self.on_line_help_item, None, self.web_site_item,
-                        self.about_item))
-        else:
-            add_actions(self.help_menu, (self.on_line_help_item, None, self.web_site_item, self.about_item))
+        add_actions(self.help_menu, (self.on_help_item, None, self.web_site_item, self.about_item))
         add_actions(self.menu_bar, (self.file_menu.menuAction(), self.view_menu.menuAction(),
                     self.tools_menu.menuAction(), self.settings_menu.menuAction(), self.help_menu.menuAction()))
         add_actions(self, [self.search_shortcut_action])
@@ -462,9 +450,7 @@ class Ui_MainWindow(object):
                                                                                    'from here.'))
         self.about_item.setText(translate('OpenLP.MainWindow', '&About'))
         self.about_item.setStatusTip(translate('OpenLP.MainWindow', 'More information about OpenLP.'))
-        if is_win() or is_macosx():
-            self.offline_help_item.setText(translate('OpenLP.MainWindow', '&User Guide'))
-        self.on_line_help_item.setText(translate('OpenLP.MainWindow', '&Online Help'))
+        self.on_help_item.setText(translate('OpenLP.MainWindow', '&User Manual'))
         self.search_shortcut_action.setText(UiStrings().Search)
         self.search_shortcut_action.setToolTip(
             translate('OpenLP.MainWindow', 'Jump to the search box of the current active plugin.'))
@@ -778,18 +764,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         import webbrowser
         webbrowser.open_new('http://openlp.org/')
 
-    def on_offline_help_clicked(self):
+    def on_help_clicked(self):
         """
-        Load the local OpenLP help file
+        If is_macosx or is_win, open the local OpenLP help file.
+        Use the Online manual in other cases. (Linux)
         """
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl("file:///" + self.local_help_file))
-
-    def on_online_help_clicked(self):
-        """
-        Load the online OpenLP manual
-        """
-        import webbrowser
-        webbrowser.open_new('http://manual.openlp.org/')
+        if is_macosx() or is_win():
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl("file:///" + self.local_help_file))
+        else:
+            import webbrowser
+            webbrowser.open_new('http://manual.openlp.org/')
 
     def on_about_item_clicked(self):
         """

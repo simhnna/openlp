@@ -23,8 +23,8 @@
 import logging
 import os
 
-from openlp.core.common import RegistryProperties, AppLocation, Settings, translate, delete_file, UiStrings
-from openlp.plugins.bibles.lib import parse_reference, LanguageSelection
+from openlp.core.common import AppLocation, OpenLPMixin, RegistryProperties, Settings, translate, delete_file, UiStrings
+from openlp.plugins.bibles.lib import LanguageSelection, parse_reference
 from openlp.plugins.bibles.lib.db import BibleDB, BibleMeta
 from .importers.csvbible import CSVBible
 from .importers.http import HTTPBible
@@ -88,7 +88,7 @@ class BibleFormat(object):
         ]
 
 
-class BibleManager(RegistryProperties):
+class BibleManager(OpenLPMixin, RegistryProperties):
     """
     The Bible manager which holds and manages all the Bibles.
     """
@@ -131,7 +131,7 @@ class BibleManager(RegistryProperties):
             name = bible.get_name()
             # Remove corrupted files.
             if name is None:
-                bible.session.close()
+                bible.session.close_all()
                 delete_file(os.path.join(self.path, filename))
                 continue
             log.debug('Bible Name: "{name}"'.format(name=name))
@@ -178,7 +178,7 @@ class BibleManager(RegistryProperties):
         """
         log.debug('BibleManager.delete_bible("{name}")'.format(name=name))
         bible = self.db_cache[name]
-        bible.session.close()
+        bible.session.close_all()
         bible.session = None
         return delete_file(os.path.join(bible.path, bible.file))
 
@@ -367,7 +367,6 @@ class BibleManager(RegistryProperties):
             second_web_bible = self.db_cache[second_bible].get_object(BibleMeta, 'download_source')
         if web_bible or second_web_bible:
             # If either Bible is Web, cursor is reset to normal and search ends w/o any message.
-            self.check_search_result()
             self.application.set_normal_cursor()
             return None
         # Fetch the results from db. If no results are found, return None, no message is given for this.

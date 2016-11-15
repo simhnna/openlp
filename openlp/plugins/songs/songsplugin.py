@@ -36,6 +36,7 @@ from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.core.lib.ui import create_action
+from openlp.plugins.songs import reporting
 from openlp.plugins.songs.forms.duplicatesongremovalform import DuplicateSongRemovalForm
 from openlp.plugins.songs.forms.songselectform import SongSelectForm
 from openlp.plugins.songs.lib import clean_song, upgrade
@@ -105,13 +106,13 @@ class SongsPlugin(Plugin):
         self.songselect_form.initialise()
         self.song_import_item.setVisible(True)
         self.song_export_item.setVisible(True)
-        self.tools_reindex_item.setVisible(True)
-        self.tools_find_duplicates.setVisible(True)
+        self.song_tools_menu.menuAction().setVisible(True)
         action_list = ActionList.get_instance()
         action_list.add_action(self.song_import_item, UiStrings().Import)
         action_list.add_action(self.song_export_item, UiStrings().Export)
         action_list.add_action(self.tools_reindex_item, UiStrings().Tools)
         action_list.add_action(self.tools_find_duplicates, UiStrings().Tools)
+        action_list.add_action(self.tools_report_song_list, UiStrings().Tools)
 
     def add_import_menu_item(self, import_menu):
         """
@@ -154,19 +155,37 @@ class SongsPlugin(Plugin):
         :param tools_menu: The actual **Tools** menu item, so that your actions can use it as their parent.
         """
         log.info('add tools menu')
+        self.tools_menu = tools_menu
+        self.song_tools_menu = QtWidgets.QMenu(tools_menu)
+        self.song_tools_menu.setObjectName('song_tools_menu')
+        self.song_tools_menu.setTitle(translate('SongsPlugin', 'Songs'))
         self.tools_reindex_item = create_action(
             tools_menu, 'toolsReindexItem',
             text=translate('SongsPlugin', '&Re-index Songs'),
             icon=':/plugins/plugin_songs.png',
             statustip=translate('SongsPlugin', 'Re-index the songs database to improve searching and ordering.'),
-            visible=False, triggers=self.on_tools_reindex_item_triggered)
-        tools_menu.addAction(self.tools_reindex_item)
+            triggers=self.on_tools_reindex_item_triggered)
         self.tools_find_duplicates = create_action(
             tools_menu, 'toolsFindDuplicates',
             text=translate('SongsPlugin', 'Find &Duplicate Songs'),
             statustip=translate('SongsPlugin', 'Find and remove duplicate songs in the song database.'),
-            visible=False, triggers=self.on_tools_find_duplicates_triggered, can_shortcuts=True)
-        tools_menu.addAction(self.tools_find_duplicates)
+            triggers=self.on_tools_find_duplicates_triggered, can_shortcuts=True)
+        self.tools_report_song_list = create_action(
+            tools_menu, 'toolsSongListReport',
+            text=translate('SongsPlugin', 'Song List Report'),
+            statustip=translate('SongsPlugin', 'Produce a CSV file of all the songs in the database.'),
+            triggers=self.on_tools_report_song_list_triggered)
+
+        self.tools_menu.addAction(self.song_tools_menu.menuAction())
+        self.song_tools_menu.addAction(self.tools_reindex_item)
+        self.song_tools_menu.addAction(self.tools_find_duplicates)
+        self.song_tools_menu.addAction(self.tools_report_song_list)
+
+        self.song_tools_menu.menuAction().setVisible(False)
+
+    @staticmethod
+    def on_tools_report_song_list_triggered():
+        reporting.report_song_list()
 
     def on_tools_reindex_item_triggered(self):
         """
@@ -329,13 +348,13 @@ class SongsPlugin(Plugin):
         self.manager.finalise()
         self.song_import_item.setVisible(False)
         self.song_export_item.setVisible(False)
-        self.tools_reindex_item.setVisible(False)
-        self.tools_find_duplicates.setVisible(False)
         action_list = ActionList.get_instance()
         action_list.remove_action(self.song_import_item, UiStrings().Import)
         action_list.remove_action(self.song_export_item, UiStrings().Export)
         action_list.remove_action(self.tools_reindex_item, UiStrings().Tools)
         action_list.remove_action(self.tools_find_duplicates, UiStrings().Tools)
+        action_list.add_action(self.tools_report_song_list, UiStrings().Tools)
+        self.song_tools_menu.menuAction().setVisible(False)
         super(SongsPlugin, self).finalise()
 
     def new_service_created(self):

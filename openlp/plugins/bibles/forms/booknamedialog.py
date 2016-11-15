@@ -30,7 +30,7 @@ from openlp.core.lib.ui import create_button_box
 class Ui_BookNameDialog(object):
     def setupUi(self, book_name_dialog):
         book_name_dialog.setObjectName('book_name_dialog')
-        book_name_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        book_name_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         book_name_dialog.resize(400, 271)
         self.book_name_layout = QtWidgets.QVBoxLayout(book_name_dialog)
         self.book_name_layout.setSpacing(8)

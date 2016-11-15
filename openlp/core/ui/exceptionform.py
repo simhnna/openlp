@@ -208,7 +208,7 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
             self.__button_state(False)
             self.description_word_count.setText(
                 translate('OpenLP.ExceptionDialog', '<strong>Please enter a more detailed description of the situation'
-                          ))
+                                                    '</strong>'))
 
     def on_attach_file_button_clicked(self):
         """

@@ -131,16 +131,16 @@ def build_icon(icon):
         location like ``/path/to/file.png``. However, the **recommended** way is to specify a resource string.
     :return: The build icon.
     """
-    button_icon = QtGui.QIcon()
     if isinstance(icon, QtGui.QIcon):
-        button_icon = icon
-    elif isinstance(icon, str):
-        if icon.startswith(':/'):
-            button_icon.addPixmap(QtGui.QPixmap(icon), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        else:
-            button_icon.addPixmap(QtGui.QPixmap.fromImage(QtGui.QImage(icon)), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        return icon
+    pix_map = None
+    button_icon = QtGui.QIcon()
+    if isinstance(icon, str):
+        pix_map = QtGui.QPixmap(icon)
     elif isinstance(icon, QtGui.QImage):
-        button_icon.addPixmap(QtGui.QPixmap.fromImage(icon), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        pix_map = QtGui.QPixmap.fromImage(icon)
+    if pix_map:
+        button_icon.addPixmap(pix_map, QtGui.QIcon.Normal, QtGui.QIcon.Off)
     return button_icon
 
 

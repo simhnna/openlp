@@ -199,7 +199,7 @@ class BibleMediaItem(MediaManagerItem):
         self.quick_search_label = QtWidgets.QLabel(self.quickTab)
         self.quick_search_label.setObjectName('quick_search_label')
         self.quickLayout.addWidget(self.quick_search_label, 0, 0, QtCore.Qt.AlignRight)
-        self.quick_search_edit = SearchEdit(self.quickTab)
+        self.quick_search_edit = SearchEdit(self.quickTab, self.settings_section)
         self.quick_search_edit.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         self.quick_search_edit.setObjectName('quick_search_edit')
         self.quick_search_label.setBuddy(self.quick_search_edit)
@@ -254,8 +254,8 @@ class BibleMediaItem(MediaManagerItem):
         self.quickStyleComboBox.activated.connect(self.on_quick_style_combo_box_changed)
         self.advancedStyleComboBox.activated.connect(self.on_advanced_style_combo_box_changed)
         # Buttons
-        self.advancedClearButton.clicked.connect(self.on_clear_button)
-        self.quickClearButton.clicked.connect(self.on_clear_button)
+        self.advancedClearButton.clicked.connect(self.on_advanced_clear_button_clicked)
+        self.quickClearButton.clicked.connect(self.on_clear_button_clicked)
         self.advancedSearchButton.clicked.connect(self.on_advanced_search_button)
         self.quickSearchButton.clicked.connect(self.on_quick_search_button)
         # Other stuff
@@ -333,8 +333,8 @@ class BibleMediaItem(MediaManagerItem):
                 translate('BiblesPlugin.MediaItem', 'Text Search'),
                 translate('BiblesPlugin.MediaItem', 'Search Text...'))
         ])
-        text = self.settings_section
-        self.quick_search_edit.set_current_search_type(Settings().value('{text}/last search type'.format(text=text)))
+        if Settings().value(self.settings_section + '/reset to combined quick search'):
+            self.quick_search_edit.set_current_search_type(BibleSearch.Combined)
         self.config_update()
         log.debug('bible manager initialise complete')
 
@@ -444,15 +444,6 @@ class BibleMediaItem(MediaManagerItem):
         only updated when we are doing reference or combined search, in text search the completion list is removed.
         """
         log.debug('update_auto_completer')
-        # Save the current search type to the configuration. If setting for automatically resetting the search type to
-        # Combined is enabled, use that otherwise use the currently selected search type.
-        # Note: This setting requires a restart to take effect.
-        if Settings().value(self.settings_section + '/reset to combined quick search'):
-            Settings().setValue('{section}/last search type'.format(section=self.settings_section),
-                                BibleSearch.Combined)
-        else:
-            Settings().setValue('{section}/last search type'.format(section=self.settings_section),
-                                self.quick_search_edit.current_search_type())
         # Save the current bible to the configuration.
         Settings().setValue('{section}/quick bible'.format(section=self.settings_section),
                             self.quickVersionComboBox.currentText())
@@ -548,19 +539,31 @@ class BibleMediaItem(MediaManagerItem):
             self.advancedTab.setVisible(True)
             self.advanced_book_combo_box.setFocus()
 
-    def on_clear_button(self):
+    def on_clear_button_clicked(self):
         # Clear the list, then set the "No search Results" message, then clear the text field and give it focus.
         self.list_view.clear()
         self.check_search_result()
         self.quick_search_edit.clear()
         self.quick_search_edit.setFocus()
 
+    def on_advanced_clear_button_clicked(self):
+        # The same as the on_clear_button_clicked, but gives focus to Book name field in "Select" (advanced).
+        self.list_view.clear()
+        self.check_search_result()
+        self.advanced_book_combo_box.setFocus()
+
     def on_lock_button_toggled(self, checked):
-        self.quick_search_edit.setFocus()
+        """
+        Toggle the lock button, if Search tab is used, set focus to search field.
+        :param checked: The state of the toggle button. bool
+        :return: None
+        """
         if checked:
             self.sender().setIcon(self.lock_icon)
         else:
             self.sender().setIcon(self.unlock_icon)
+        if self.quickTab.isVisible():
+            self.quick_search_edit.setFocus()
 
     def on_quick_style_combo_box_changed(self):
         self.settings.layout_style = self.quickStyleComboBox.currentIndex()
