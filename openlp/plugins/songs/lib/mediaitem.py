@@ -227,7 +227,6 @@ class SongMediaItem(MediaManagerItem):
             search_results = self.plugin.manager.get_all_objects(
                 Song, and_(Song.ccli_number.like(search_string), Song.ccli_number != ''))
             self.display_results_cclinumber(search_results)
-        self.check_search_result()
 
     def search_entire(self, search_keywords):
         search_string = '%{text}%'.format(text=clean_string(search_keywords))

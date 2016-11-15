@@ -75,21 +75,16 @@ class BibleMediaItem(MediaManagerItem):
         self.has_search = True
         self.search_results = {}
         self.second_search_results = {}
-        self.check_search_result()
         Registry().register_function('bibles_load_list', self.reload_bibles)
 
     def __check_second_bible(self, bible, second_bible):
         """
         Check if the first item is a second bible item or not.
         """
-        bitem = self.list_view.item(0)
-        if not bitem.flags() & QtCore.Qt.ItemIsSelectable:
-            # The item is the "No Search Results" item.
-            self.list_view.clear()
+        if not self.list_view.count():
             self.display_results(bible, second_bible)
             return
-        else:
-            item_second_bible = self._decode_qt_object(bitem, 'second_bible')
+        item_second_bible = self._decode_qt_object(self.list_view.item(0), 'second_bible')
         if item_second_bible and second_bible or not item_second_bible and not second_bible:
             self.display_results(bible, second_bible)
         elif critical_error_message_box(
@@ -542,14 +537,12 @@ class BibleMediaItem(MediaManagerItem):
     def on_clear_button_clicked(self):
         # Clear the list, then set the "No search Results" message, then clear the text field and give it focus.
         self.list_view.clear()
-        self.check_search_result()
         self.quick_search_edit.clear()
         self.quick_search_edit.setFocus()
 
     def on_advanced_clear_button_clicked(self):
         # The same as the on_clear_button_clicked, but gives focus to Book name field in "Select" (advanced).
         self.list_view.clear()
-        self.check_search_result()
         self.advanced_book_combo_box.setFocus()
 
     def on_lock_button_toggled(self, checked):
@@ -683,7 +676,6 @@ class BibleMediaItem(MediaManagerItem):
         elif self.search_results:
             self.display_results(bible, second_bible)
         self.advancedSearchButton.setEnabled(True)
-        self.check_search_result()
         self.application.set_normal_cursor()
 
     def on_quick_reference_search(self):
@@ -877,7 +869,6 @@ class BibleMediaItem(MediaManagerItem):
         elif self.search_results:
             self.display_results(bible, second_bible)
         self.quickSearchButton.setEnabled(True)
-        self.check_search_result()
         self.application.set_normal_cursor()
 
     def on_quick_search_while_typing(self):
@@ -908,7 +899,6 @@ class BibleMediaItem(MediaManagerItem):
             self.__check_second_bible(bible, second_bible)
         elif self.search_results:
             self.display_results(bible, second_bible)
-        self.check_search_result()
         self.application.set_normal_cursor()
 
     def on_search_text_edit_changed(self):
@@ -947,17 +937,13 @@ class BibleMediaItem(MediaManagerItem):
             if len(text) == 0:
                 if not self.quickLockButton.isChecked():
                     self.list_view.clear()
-                self.check_search_result()
             else:
                 if limit == 3 and (len(text) < limit or len(count_space_digit_reference) == 0):
                     if not self.quickLockButton.isChecked():
                         self.list_view.clear()
-                    self.check_search_result()
-                elif (limit == 8 and (len(text) < limit or len(count_spaces_two_chars_text) == 0 or
-                                      len(count_two_chars_text) < 2)):
+                elif limit == 8 and (len(text) < limit or len(count_two_chars_text) < 2):
                     if not self.quickLockButton.isChecked():
-                        self.list_view.clear()
-                    self.check_search_result_search_while_typing_short()
+                        self.list_view.clear(search_while_typing=True)
                 else:
                     """
                     Start search if no chars are entered or deleted for 0.2 s
