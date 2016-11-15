@@ -230,8 +230,8 @@ class SongFormat(object):
             'class': ChordProImport,
             'name': 'ChordPro',
             'prefix': 'chordPro',
-            'filter': '{text} (*.cho  *.crd *.chordpro *.chopro *.txt)'.format(text=translate('SongsPlugin.ImportWizardForm',
-                                                                                              'ChordPro Files'))
+            'filter': '{text} (*.cho  *.crd *.chordpro *.chopro *.txt)'.format(
+                text=translate('SongsPlugin.ImportWizardForm', 'ChordPro Files'))
         },
         DreamBeam: {
             'class': DreamBeamImport,

@@ -116,6 +116,7 @@ class TestFieldDesc:
         self.field_type = field_type
         self.size = size
 
+
 TEST_DATA_ENCODING = 'cp1252'
 CODE_PAGE_MAPPINGS = [
     (852, 'cp1250'), (737, 'cp1253'), (775, 'cp1257'), (855, 'cp1251'), (857, 'cp1254'),

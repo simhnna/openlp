@@ -31,6 +31,7 @@ from .songimport import SongImport
 
 log = logging.getLogger(__name__)
 
+
 class ChordProImport(SongImport):
     """
     The :class:`ChordProImport` class provides OpenLP with the
@@ -115,7 +116,7 @@ class ChordProImport(SongImport):
                 # Found a comment line, which is ignored...
                 continue
             elif line == "['|]":
-                # Found a vertical bar 
+                # Found a vertical bar
                 continue
             else:
                 if skip_block:
@@ -148,5 +149,5 @@ class ChordProImport(SongImport):
             # strip the final '}' and return the tag name
             return line[:-1], None
         tag_name = line[:colon_idx]
-        tag_value = line[colon_idx+1:-1].strip()
+        tag_value = line[colon_idx + 1:-1].strip()
         return tag_name, tag_value

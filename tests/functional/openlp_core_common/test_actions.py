@@ -120,11 +120,11 @@ class TestCategoryActionList(TestCase):
         self.list.add(self.action2)
 
         # WHEN: Iterating over the list
-        l = [a for a in self.list]
+        list = [a for a in self.list]
         # THEN: Make sure they are returned in correct order
         self.assertEquals(len(self.list), 2)
-        self.assertIs(l[0], self.action1)
-        self.assertIs(l[1], self.action2)
+        self.assertIs(list[0], self.action1)
+        self.assertIs(list[1], self.action2)
 
     def test_remove(self):
         """

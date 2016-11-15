@@ -423,4 +423,5 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         for bible in self.db_cache:
             self.db_cache[bible].finalise()
 
+
 __all__ = ['BibleFormat']
