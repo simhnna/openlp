@@ -37,7 +37,7 @@ from openlp.core.common import AppLocation
 DEFAULT_CSS = """/*
 Edit this file to customize the service order print. Note, that not all CSS
 properties are supported. See:
-http://doc.trolltech.com/4.7/richtext-html-subset.html#css-properties
+https://doc.qt.io/qt-5/richtext-html-subset.html#css-properties
 */
 
 .serviceTitle {
@@ -172,6 +172,11 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
         self._add_element('h1', html.escape(self.title_line_edit.text()), html_data.body, classId='serviceTitle')
         for index, item in enumerate(self.service_manager.service_items):
             self._add_preview_item(html_data.body, item['service_item'], index)
+        # Remove chord span and ws span elements since printing them are not yet support
+        for chord_span in html_data.find_class('chord'):
+            chord_span.drop_tree()
+        for ws_span in html_data.find_class('ws'):
+            ws_span.drop_tree()
         # Add the custom service notes:
         if self.footer_text_edit.toPlainText():
             div = self._add_element('div', parent=html_data.body, classId='customNotes')
