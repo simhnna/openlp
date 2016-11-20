@@ -39,7 +39,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
-from openlp.core.common.versionchecker import VersionThread, get_application_version
+from openlp.core.common.versionchecker import VersionThread, get_application_version, clean_button_text
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
 from openlp.core.ui import SplashScreen
@@ -184,6 +184,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         data_folder_path = AppLocation.get_data_path()
         if not os.path.exists(data_folder_path):
             log.critical('Database was not found in: {path}'.format(path=data_folder_path))
+            yes_button = clean_button_text(self.buttonText(QtWidgets.QMessageBox.Yes))
+            no_button = clean_button_text(self.buttonText(QtWidgets.QMessageBox.Yes))
             status = QtWidgets.QMessageBox.critical(None, translate('OpenLP', 'Data Directory Error'),
                                                     translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}'
                                                                         '\n\nThe location of the data folder was '
@@ -194,11 +196,11 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                                                         'location back to the default settings, '
                                                                         'or you can try to make the current location '
                                                                         'available.\n\n Do you want to reset the '
-                                                                        'default data location?\n\n Click "No" to close'
-                                                                        'OpenLP so you can try to fix the the problem.'
-                                                                        '\n Click "Yes" to reset the default data '
-                                                                        'location and start OpenLP.')
-                                                    .format(path=data_folder_path),
+                                                                        'default data location?\n\n Click "{no}" to '
+                                                                        'close OpenLP so you can try to fix the the '
+                                                                        'problem.\n Click "{yes}" to reset the default '
+                                                                        'data location and start OpenLP.')
+                                                    .format(path=data_folder_path, yes=yes_button, no=no_button),
                                                     QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
                                                                                           QtWidgets.QMessageBox.No),
                                                     QtWidgets.QMessageBox.No)
