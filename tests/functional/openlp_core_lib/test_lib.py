@@ -666,8 +666,8 @@ class TestLib(TestCase):
             string_result = create_separated_list(string_list)
 
             # THEN: We should have "Author 1, Author 2, and Author 3"
-            assert string_result == 'Author 1, Author 2, and Author 3', 'The string should be u\'Author 1, ' \
-                'Author 2, and Author 3\'.'
+            self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
+                             'Author 2, and Author 3".')
 
     def test_create_separated_list_empty_list(self):
         """
@@ -683,7 +683,7 @@ class TestLib(TestCase):
             string_result = create_separated_list(string_list)
 
             # THEN: We shoud have an emptry string.
-            assert string_result == '', 'The string sould be empty.'
+            self.assertEqual(string_result, '', 'The string sould be empty.')
 
     def test_create_separated_list_with_one_item(self):
         """
@@ -696,7 +696,7 @@ class TestLib(TestCase):
         string_result = create_separated_list(string_list)
 
         # THEN: We should have "Author 1"
-        assert string_result == 'Author 1', 'The string should be u\'Author 1\'.'
+        self.assertEqual(string_result, 'Author 1', 'The string should be "Author 1".')
 
     def test_create_separated_list_with_two_items(self):
         """
@@ -709,7 +709,7 @@ class TestLib(TestCase):
         string_result = create_separated_list(string_list)
 
         # THEN: We should have "Author 1 and Author 2"
-        assert string_result == 'Author 1 and Author 2', 'The string should be u\'Author 1 and Author 2\'.'
+        self.assertEqual(string_result, 'Author 1 and Author 2', 'The string should be "Author 1 and Author 2".')
 
     def test_create_separated_list_with_three_items(self):
         """
@@ -721,6 +721,6 @@ class TestLib(TestCase):
         # WHEN: We get a string build from the entries it the list and a seperator.
         string_result = create_separated_list(string_list)
 
-        # THEN: We should have "Author 1, Author 2, and Author 3"
-        assert string_result == 'Author 1, Author 2, and Author 3', 'The string should be u\'Author 1, ' \
-            'Author 2, and Author 3\'.'
+        # THEN: We should have "Author 1, Author 2 and Author 3"
+        self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
+                         'Author 2, and Author 3".')
