@@ -39,7 +39,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
-from openlp.core.common.versionchecker import VersionThread, get_application_version, clean_button_text
+from openlp.core.common.versionchecker import VersionThread, get_application_version
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
 from openlp.core.ui import SplashScreen
@@ -183,24 +183,20 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         """
         data_folder_path = AppLocation.get_data_path()
         if not os.path.exists(data_folder_path):
-            log.critical('Database was not found in: {path}'.format(path=data_folder_path))
-            yes_button = clean_button_text(self.buttonText(QtWidgets.QMessageBox.Yes))
-            no_button = clean_button_text(self.buttonText(QtWidgets.QMessageBox.Yes))
+            log.critical('Database was not found in: ' + data_folder_path)
             status = QtWidgets.QMessageBox.critical(None, translate('OpenLP', 'Data Directory Error'),
                                                     translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}'
                                                                         '\n\nThe location of the data folder was '
-                                                                        'previously changed from the OpenLP\'s\n'
+                                                                        'previously changed from the OpenLP\'s '
                                                                         'default location. If the data was stored on '
-                                                                        'removable device, that device\nneeds to be '
-                                                                        'made available.\n\n You may reset the data '
-                                                                        'location back to the default settings, '
+                                                                        'removable device, that device needs to be '
+                                                                        'made available.\n\nYou may reset the data '
+                                                                        'location back to the default location, '
                                                                         'or you can try to make the current location '
-                                                                        'available.\n\n Do you want to reset the '
-                                                                        'default data location?\n\n Click "{no}" to '
-                                                                        'close OpenLP so you can try to fix the the '
-                                                                        'problem.\n Click "{yes}" to reset the default '
-                                                                        'data location and start OpenLP.')
-                                                    .format(path=data_folder_path, yes=yes_button, no=no_button),
+                                                                        'available.\n\nDo you want to reset to the '
+                                                                        'default data location? If not, OpenLP will be '
+                                                                        'closed so you can try to fix the the problem.')
+                                                    .format(path=data_folder_path),
                                                     QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
                                                                                           QtWidgets.QMessageBox.No),
                                                     QtWidgets.QMessageBox.No)
@@ -404,8 +400,12 @@ def main(args=None):
     Registry.create()
     Registry().register('application', application)
     application.setApplicationVersion(get_application_version()['version'])
-    # If user answers "No" to already running or missing db dialogue, shutdown OpenLP.
-    if application.is_already_running() or application.is_data_path_missing():
+    # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
+    if application.is_already_running():
+        sys.exit()
+    # If the custom data path is missing and the user wants to restore the data path, quit OpenLP.
+    if application.is_data_path_missing():
+        application.shared_memory.detach()
         sys.exit()
     # Remove/convert obsolete settings.
     Settings().remove_obsolete_settings()
