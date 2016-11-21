@@ -322,8 +322,8 @@ def create_separated_list(string_list):
     elif list_length == 2:
         list_to_string = translate('OpenLP.core.lib', '{one} and {two}').format(one=string_list[0], two=string_list[1])
     elif list_length > 2:
-        list_to_string = translate('OpenLP.core.lib', '{first}, and {last}').format(first=', '.join(string_list[:-1]),
-                                                                                 last=string_list[-1])
+        list_to_string = translate('OpenLP.core.lib', '{first} and {last}').format(first=', '.join(string_list[:-1]),
+                                                                                   last=string_list[-1])
     else:
         list_to_string = ''
     return list_to_string
