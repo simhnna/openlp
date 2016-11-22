@@ -722,8 +722,10 @@ class SlideController(DisplayController, RegistryProperties):
         # Reset the button
         self.play_slides_once.setChecked(False)
         self.play_slides_once.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
         self.play_slides_loop.setChecked(False)
         self.play_slides_loop.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_loop.setText(UiStrings().PlaySlidesInLoop)
         if item.is_text():
             if (Settings().value(self.main_window.songs_settings_section + '/display songbar') and
                     not self.song_menu.menu().isEmpty()):
