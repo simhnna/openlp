@@ -46,6 +46,7 @@ class WizardStrings(object):
     OSIS = 'OSIS'
     ZEF = 'Zefania'
     SWORD = 'Sword'
+    WordProject = 'WordProject'
     # These strings should need a good reason to be retranslated elsewhere.
     FinishedImport = translate('OpenLP.Ui', 'Finished import.')
     FormatLabel = translate('OpenLP.Ui', 'Format:')

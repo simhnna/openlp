@@ -125,6 +125,7 @@ class BibleImportForm(OpenLPWizard):
         self.csv_verses_button.clicked.connect(self.on_csv_verses_browse_button_clicked)
         self.open_song_browse_button.clicked.connect(self.on_open_song_browse_button_clicked)
         self.zefania_browse_button.clicked.connect(self.on_zefania_browse_button_clicked)
+        self.wordproject_browse_button.clicked.connect(self.on_wordproject_browse_button_clicked)
         self.web_update_button.clicked.connect(self.on_web_update_button_clicked)
         self.sword_browse_button.clicked.connect(self.on_sword_browse_button_clicked)
         self.sword_zipbrowse_button.clicked.connect(self.on_sword_zipbrowse_button_clicked)
@@ -143,7 +144,7 @@ class BibleImportForm(OpenLPWizard):
         self.format_label = QtWidgets.QLabel(self.select_page)
         self.format_label.setObjectName('FormatLabel')
         self.format_combo_box = QtWidgets.QComboBox(self.select_page)
-        self.format_combo_box.addItems(['', '', '', '', '', ''])
+        self.format_combo_box.addItems(['', '', '', '', '', '', ''])
         self.format_combo_box.setObjectName('FormatComboBox')
         self.format_layout.addRow(self.format_label, self.format_combo_box)
         self.spacer = QtWidgets.QSpacerItem(10, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)
@@ -355,6 +356,25 @@ class BibleImportForm(OpenLPWizard):
         self.sword_disabled_label.setObjectName('SwordDisabledLabel')
         self.sword_layout.addWidget(self.sword_disabled_label)
         self.select_stack.addWidget(self.sword_widget)
+        self.wordproject_widget = QtWidgets.QWidget(self.select_page)
+        self.wordproject_widget.setObjectName('WordProjectWidget')
+        self.wordproject_layout = QtWidgets.QFormLayout(self.wordproject_widget)
+        self.wordproject_layout.setContentsMargins(0, 0, 0, 0)
+        self.wordproject_layout.setObjectName('WordProjectLayout')
+        self.wordproject_file_label = QtWidgets.QLabel(self.wordproject_widget)
+        self.wordproject_file_label.setObjectName('WordProjectFileLabel')
+        self.wordproject_file_layout = QtWidgets.QHBoxLayout()
+        self.wordproject_file_layout.setObjectName('WordProjectFileLayout')
+        self.wordproject_file_edit = QtWidgets.QLineEdit(self.wordproject_widget)
+        self.wordproject_file_edit.setObjectName('WordProjectFileEdit')
+        self.wordproject_file_layout.addWidget(self.wordproject_file_edit)
+        self.wordproject_browse_button = QtWidgets.QToolButton(self.wordproject_widget)
+        self.wordproject_browse_button.setIcon(self.open_icon)
+        self.wordproject_browse_button.setObjectName('WordProjectBrowseButton')
+        self.wordproject_file_layout.addWidget(self.wordproject_browse_button)
+        self.wordproject_layout.addRow(self.wordproject_file_label, self.wordproject_file_layout)
+        self.wordproject_layout.setItem(5, QtWidgets.QFormLayout.LabelRole, self.spacer)
+        self.select_stack.addWidget(self.wordproject_widget)
         self.select_page_layout.addLayout(self.select_stack)
         self.addPage(self.select_page)
         # License Page
@@ -400,6 +420,7 @@ class BibleImportForm(OpenLPWizard):
         self.format_combo_box.setItemText(BibleFormat.OSIS, WizardStrings.OSIS)
         self.format_combo_box.setItemText(BibleFormat.CSV, WizardStrings.CSV)
         self.format_combo_box.setItemText(BibleFormat.OpenSong, WizardStrings.OS)
+        self.format_combo_box.setItemText(BibleFormat.WordProject, WizardStrings.WordProject)
         self.format_combo_box.setItemText(BibleFormat.WebDownload, translate('BiblesPlugin.ImportWizardForm',
                                                                              'Web Download'))
         self.format_combo_box.setItemText(BibleFormat.Zefania, WizardStrings.ZEF)
@@ -410,6 +431,7 @@ class BibleImportForm(OpenLPWizard):
         self.open_song_file_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Bible file:'))
         self.web_source_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Location:'))
         self.zefania_file_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Bible file:'))
+        self.wordproject_file_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Bible file:'))
         self.web_update_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Click to download bible list'))
         self.web_update_button.setText(translate('BiblesPlugin.ImportWizardForm', 'Download bible list'))
         self.web_source_combo_box.setItemText(WebDownload.Crosswalk, translate('BiblesPlugin.ImportWizardForm',
@@ -503,6 +525,12 @@ class BibleImportForm(OpenLPWizard):
                 if not self.field('zefania_file'):
                     critical_error_message_box(UiStrings().NFSs, WizardStrings.YouSpecifyFile % WizardStrings.ZEF)
                     self.zefania_file_edit.setFocus()
+                    return False
+            elif self.field('source_format') == BibleFormat.WordProject:
+                if not self.field('wordproject_file'):
+                    critical_error_message_box(UiStrings().NFSs,
+                            WizardStrings.YouSpecifyFile % WizardStrings.WordProject)
+                    self.wordproject_file_edit.setFocus()
                     return False
             elif self.field('source_format') == BibleFormat.WebDownload:
                 # If count is 0 the bible list has not yet been downloaded
@@ -627,6 +655,14 @@ class BibleImportForm(OpenLPWizard):
         self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.ZEF, self.zefania_file_edit,
                            'last directory import')
 
+    def on_wordproject_browse_button_clicked(self):
+        """
+        Show the file open dialog for the WordProject file.
+        """
+        # TODO: Verify format() with variable template
+        self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.WordProject, self.wordproject_file_edit,
+                           'last directory import')
+
     def on_web_update_button_clicked(self):
         """
         Download list of bibles from Crosswalk, BibleServer and BibleGateway.
@@ -707,6 +743,7 @@ class BibleImportForm(OpenLPWizard):
         self.select_page.registerField('csv_versefile', self.csv_verses_edit)
         self.select_page.registerField('opensong_file', self.open_song_file_edit)
         self.select_page.registerField('zefania_file', self.zefania_file_edit)
+        self.select_page.registerField('wordproject_file', self.wordproject_file_edit)
         self.select_page.registerField('web_location', self.web_source_combo_box)
         self.select_page.registerField('web_biblename', self.web_translation_combo_box)
         self.select_page.registerField('sword_folder_path', self.sword_folder_edit)
@@ -799,6 +836,10 @@ class BibleImportForm(OpenLPWizard):
             # Import a Zefania bible.
             importer = self.manager.import_bible(BibleFormat.Zefania, name=license_version,
                                                  filename=self.field('zefania_file'))
+        elif bible_type == BibleFormat.WordProject:
+            # Import a WordProject bible.
+            importer = self.manager.import_bible(BibleFormat.WordProject, name=license_version,
+                                                 filename=self.field('wordproject_file'))
         elif bible_type == BibleFormat.SWORD:
             # Import a SWORD bible.
             if self.sword_tab_widget.currentIndex() == self.sword_tab_widget.indexOf(self.sword_folder_tab):
