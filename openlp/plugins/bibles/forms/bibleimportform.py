@@ -538,7 +538,7 @@ class BibleImportForm(OpenLPWizard):
             elif self.field('source_format') == BibleFormat.WordProject:
                 if not self.field('wordproject_file'):
                     critical_error_message_box(UiStrings().NFSs,
-                            WizardStrings.YouSpecifyFile % WizardStrings.WordProject)
+                                               WizardStrings.YouSpecifyFile % WizardStrings.WordProject)
                     self.wordproject_file_edit.setFocus()
                     return False
             elif self.field('source_format') == BibleFormat.WebDownload:
