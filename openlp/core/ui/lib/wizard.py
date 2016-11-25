@@ -96,6 +96,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         super(OpenLPWizard, self).__init__(parent)
         self.plugin = plugin
         self.with_progress_page = add_progress_page
+        self.setFixedWidth(640)
         self.setObjectName(name)
         self.open_icon = build_icon(':/general/general_open.png')
         self.delete_icon = build_icon(':/general/general_delete.png')
