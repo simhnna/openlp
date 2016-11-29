@@ -37,7 +37,9 @@ install:
   # Download and unpack mediainfo
   - curl -O https://mediaarea.net/download/binary/mediainfo/0.7.90/MediaInfo_CLI_0.7.90_Windows_i386.zip
   - mkdir MediaInfo
-  - 7z x -o MediaInfo MediaInfo_CLI_0.7.90_Windows_i386.zip
+  - cd MediaInfo
+  - 7z x ../MediaInfo_CLI_0.7.90_Windows_i386.zip
+  - cd..
   - cp MediaInfo\\MediaInfo.exe openlp\\MediaInfo.exe
   # Disabled portable installers - can't figure out how to make them silent
   # - curl -L -O http://downloads.sourceforge.net/project/portableapps/PortableApps.com%20Installer/PortableApps.comInstaller_3.4.4.paf.exe
