@@ -72,7 +72,7 @@ def get_version():
     if code != 0:
         raise Exception('Error running bzr log')
     latest = output.decode('utf-8').split(':')[0]
-    version_string = latest == revision and tag or '%s-bzr%s' % (tag, latest)
+    version_string = latest == revision and tag or 'r%s' % latest
     # Save decimal version in case we need to do a portable build.
     version = latest == revision and tag or '%s.%s' % (tag, latest)
     return version_string, version
@@ -93,7 +93,7 @@ def hook(token, webhook_url):
     webhook_element['commit']['id'] = version_string
     request = urllib.request.Request(webhook_url)
     print(json.dumps(webhook_element))
-    request.add_header('Content-Type','application/json;charset=utf-8')
+    request.add_header('Content-Type', 'application/json;charset=utf-8')
     request.add_header('Authorization', 'Bearer ' + token)
     responce = urllib.request.urlopen(request, json.dumps(webhook_element).encode('utf-8'))
     print(responce.read().decode('utf-8'))
