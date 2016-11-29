@@ -312,10 +312,9 @@ class Ui_MainWindow(object):
         elif is_macosx():
             self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir),
                                                 '..', 'Resources', 'OpenLP.help')
-        self.on_help_item = create_action(main_window, 'HelpItem',
-                                          icon=':/system/system_help_contents.png',
-                                          can_shortcuts=True,
-                                          category=UiStrings().Help, triggers=self.on_help_clicked)
+        self.user_manual_item = create_action(main_window, 'userManualItem', icon=':/system/system_help_contents.png',
+                                              can_shortcuts=True, category=UiStrings().Help,
+                                              triggers=self.on_help_clicked)
         self.web_site_item = create_action(main_window, 'webSiteItem', can_shortcuts=True, category=UiStrings().Help)
         # Shortcuts not connected to buttons or menu entries.
         self.search_shortcut_action = create_action(main_window,
@@ -354,7 +353,7 @@ class Ui_MainWindow(object):
         add_actions(self.tools_menu, (self.tools_open_data_folder, None))
         add_actions(self.tools_menu, (self.tools_first_time_wizard, None))
         add_actions(self.tools_menu, [self.update_theme_images])
-        add_actions(self.help_menu, (self.on_help_item, None, self.web_site_item, self.about_item))
+        add_actions(self.help_menu, (self.user_manual_item, None, self.web_site_item, self.about_item))
         add_actions(self.menu_bar, (self.file_menu.menuAction(), self.view_menu.menuAction(),
                     self.tools_menu.menuAction(), self.settings_menu.menuAction(), self.help_menu.menuAction()))
         add_actions(self, [self.search_shortcut_action])
@@ -450,7 +449,7 @@ class Ui_MainWindow(object):
                                                                                    'from here.'))
         self.about_item.setText(translate('OpenLP.MainWindow', '&About'))
         self.about_item.setStatusTip(translate('OpenLP.MainWindow', 'More information about OpenLP.'))
-        self.on_help_item.setText(translate('OpenLP.MainWindow', '&User Manual'))
+        self.user_manual_item.setText(translate('OpenLP.MainWindow', '&User Manual'))
         self.search_shortcut_action.setText(UiStrings().Search)
         self.search_shortcut_action.setToolTip(
             translate('OpenLP.MainWindow', 'Jump to the search box of the current active plugin.'))
