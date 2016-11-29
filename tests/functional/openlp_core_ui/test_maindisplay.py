@@ -271,7 +271,7 @@ class TestMainDisplay(TestCase, TestMixin):
         service_item.theme_data = MagicMock()
         service_item.theme_data.background_type = 'video'
         service_item.theme_data.theme_name = 'name'
-        service_item._raw_frames = []
+        service_item.theme_data.background_filename = 'background_filename'
         mocked_plugin = MagicMock()
         display.plugin_manager = PluginManager()
         display.plugin_manager.plugins = [mocked_plugin]
