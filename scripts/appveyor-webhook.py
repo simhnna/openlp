@@ -21,34 +21,40 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
+"""
+This script is used to trigger a build at appveyor. Since the code is not hosted
+on github the normal triggering mechanisms can't be use. The project is
+registered as subversion repository. A webhook is used to trigger new builds.
+The appveyor.yml used for the build is send to appveyor when calling the hook.
+"""
 import json
 import urllib
 import urllib.request
 import datetime
 import sys
+import time
 from subprocess import Popen, PIPE
 
-token = 'xx'
-webhook_url = 'https://ci.appveyor.com/api/subversion/webhook?id=x'
-branch = 'lp:openlp'
+appveyor_build_url = 'https://ci.appveyor.com/project/TomasGroth/openlp/build'
+appveyor_api_url = 'https://ci.appveyor.com/api/projects/TomasGroth/openlp'
 
 webhook_element = \
-{
-    "commit": {
-        "author": {
-            "email": "open@contributer",
-            "name": "OpenLP Contributor"
+    {
+        'commit': {
+            'author': {
+                'email': 'open@contributer',
+                'name': 'OpenLP Contributor'
+            },
+            'id': None,
+            'message': None,
+            'timestamp': datetime.datetime.now().isoformat()
         },
-        "id": None,
-        "message": "Building " + branch,
-        "timestamp": datetime.datetime.now().isoformat()
-    },
-    "config": None,
-    "repository": {
-        "name": "repo_name",
-        "url": "repo_url"
+        'config': None,
+        'repository': {
+            'name': 'repo_name',
+            'url': 'repo_url'
+        }
     }
-}
 
 
 def get_version():
@@ -78,7 +84,10 @@ def get_version():
     return version_string, version
 
 
-def get_yml():
+def get_yml(branch):
+    """
+    Returns the content of appveyor.yml and inserts the branch to be build
+    """
     f = open('appveyor.yml')
     yml_text = f.read()
     f.close()
@@ -86,17 +95,39 @@ def get_yml():
     return yml_text
 
 
-def hook(token, webhook_url):
-    webhook_element['config'] = get_yml()
+def hook(webhook_url, yml):
+    """
+    Activate the webhook to start the build
+    """
+    webhook_element['config'] = yml
     webhook_element['commit']['message'] = 'Building ' + branch
     version_string, version = get_version()
     webhook_element['commit']['id'] = version_string
     request = urllib.request.Request(webhook_url)
-    print(json.dumps(webhook_element))
     request.add_header('Content-Type', 'application/json;charset=utf-8')
-    request.add_header('Authorization', 'Bearer ' + token)
     responce = urllib.request.urlopen(request, json.dumps(webhook_element).encode('utf-8'))
-    print(responce.read().decode('utf-8'))
+    if responce.getcode() != 204:
+        print('An error happened when calling the webhook! Return code: %d' % responce.getcode())
+        print(responce.read().decode('utf-8'))
 
 
-hook(token, webhook_url)
+def get_appveyor_build_url(branch):
+    """
+    Get the url of the build.
+    """
+    # Wait 10 seconds to make sure the hook has been triggered
+    time.sleep(10)
+    responce = urllib.request.urlopen(appveyor_api_url)
+    json_str = responce.read().decode('utf-8')
+    build_json = json.loads(json_str)
+    build_url = '%s/%s' % (appveyor_build_url, build_json['build']['version'])
+    print('Check this URL for build status: %s' % build_url)
+
+
+if len(sys.argv) != 3:
+    print('Usage: %s <webhook-url> <branch>' % sys.argv[0])
+else:
+    webhook_url = sys.argv[1]
+    branch = sys.argv[2]
+    hook(webhook_url, get_yml(branch))
+    get_appveyor_build_url(branch)
