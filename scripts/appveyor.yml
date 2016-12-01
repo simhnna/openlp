@@ -62,7 +62,7 @@ after_test:
   # - curl -L -O http://downloads.sourceforge.net/project/portableapps/NSIS%20Portable/NSISPortable_3.0_English.paf.exe
   # - NSISPortable_3.0_English.paf.exe /S
   # Get the packaging code
-  - bzr checkout --lightweight lp:~tomasgroth/openlp/packaging-appveyor packaging
+  - bzr checkout --lightweight lp:openlp/packaging packaging
   # Build the bundle
   - cd packaging
   - "%PYTHON%\\python.exe windows/windows-builder.py -v -u -t -c windows/config-appveyor.ini -b ../openlp-branch"
