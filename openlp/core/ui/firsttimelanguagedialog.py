@@ -38,7 +38,7 @@ class Ui_FirstTimeLanguageDialog(object):
         Set up the UI.
         """
         language_dialog.setObjectName('language_dialog')
-        language_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        language_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         language_dialog.resize(300, 50)
         self.dialog_layout = QtWidgets.QVBoxLayout(language_dialog)
         self.dialog_layout.setContentsMargins(8, 8, 8, 8)

@@ -397,27 +397,6 @@ class AdvancedTab(SettingsTab):
         self.data_directory_cancel_button.hide()
         # Since data location can be changed, make sure the path is present.
         self.current_data_path = AppLocation.get_data_path()
-        if not os.path.exists(self.current_data_path):
-            log.error('Data path not found {path}'.format(path=self.current_data_path))
-            answer = QtWidgets.QMessageBox.critical(
-                self, translate('OpenLP.AdvancedTab', 'Data Directory Error'),
-                translate('OpenLP.AdvancedTab', 'OpenLP data directory was not found\n\n{path}\n\n'
-                          'This data directory was previously changed from the OpenLP '
-                          'default location.  If the new location was on removable '
-                          'media, that media needs to be made available.\n\n'
-                          'Click "No" to stop loading OpenLP. allowing you to fix the the problem.\n\n'
-                          'Click "Yes" to reset the data directory to the default '
-                          'location.').format(path=self.current_data_path),
-                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                QtWidgets.QMessageBox.No)
-            if answer == QtWidgets.QMessageBox.No:
-                log.info('User requested termination')
-                self.main_window.clean_up()
-                sys.exit()
-            # Set data location to default.
-            settings.remove('advanced/data path')
-            self.current_data_path = AppLocation.get_data_path()
-            log.warning('User requested data path set to default {path}'.format(path=self.current_data_path))
         self.data_directory_label.setText(os.path.abspath(self.current_data_path))
         # Don't allow data directory move if running portable.
         if settings.value('advanced/is portable'):

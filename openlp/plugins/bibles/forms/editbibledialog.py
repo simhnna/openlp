@@ -32,7 +32,7 @@ from openlp.plugins.bibles.lib.db import BiblesResourcesDB
 class Ui_EditBibleDialog(object):
     def setupUi(self, edit_bible_dialog):
         edit_bible_dialog.setObjectName('edit_bible_dialog')
-        edit_bible_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        edit_bible_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         edit_bible_dialog.resize(520, 400)
         edit_bible_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(edit_bible_dialog)
