@@ -137,7 +137,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
                 instance.goto_slide(42)
 
                 # THEN: mocked_critical_error_message_box should have been called
-                mocked_critical_error_message_box.assert_called_with('Error', 'An error occurred in the Powerpoint '
+                mocked_critical_error_message_box.assert_called_with('Error', 'An error occurred in the PowerPoint '
                                                                      'integration and the presentation will be stopped.'
                                                                      ' Restart the presentation if you wish to '
                                                                      'present it.')
