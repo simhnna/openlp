@@ -327,6 +327,39 @@ class TestMediaItem(TestCase, TestMixin):
         self.assertEqual(author_list, ['my author'],
                          'The author list should be returned correctly with one author')
 
+    @patch(u'openlp.plugins.songs.lib.mediaitem.Settings')
+    def test_build_song_footer_one_author_hide_written_by(self, MockedSettings):
+        """
+        Test build songs footer with basic song and one author
+        """
+        # GIVEN: A Song and a Service Item, mocked settings: False for 'songs/display written by'
+        # and False for 'core/ccli number' (ccli will cause traceback if true)
+
+        mocked_settings = MagicMock()
+        mocked_settings.value.side_effect = [False, False]
+        MockedSettings.return_value = mocked_settings
+
+        mock_song = MagicMock()
+        mock_song.title = 'My Song'
+        mock_song.authors_songs = []
+        mock_author = MagicMock()
+        mock_author.display_name = 'my author'
+        mock_author_song = MagicMock()
+        mock_author_song.author = mock_author
+        mock_song.authors_songs.append(mock_author_song)
+        mock_song.copyright = 'My copyright'
+        service_item = ServiceItem(None)
+
+        # WHEN: I generate the Footer with default settings
+        author_list = self.media_item.generate_footer(service_item, mock_song)
+
+        # THEN: I get the following Array returned
+        self.assertEqual(service_item.raw_footer, ['My Song', 'my author', 'My copyright'],
+                         'The array should be returned correctly with a song, one author and copyright,'
+                         'text Written by should not be part of the text.')
+        self.assertEqual(author_list, ['my author'],
+                         'The author list should be returned correctly with one author')
+
     def test_build_song_footer_two_authors(self):
         """
         Test build songs footer with basic song and two authors

@@ -654,7 +654,7 @@ class BibleMediaItem(MediaManagerItem):
         self.application.process_events()
         bible = self.advancedVersionComboBox.currentText()
         second_bible = self.advancedSecondComboBox.currentText()
-        book = self.advanced_book_combo_box.currentText()
+        book = self.advanced_book_combo_box.currentTextå()
         book_ref_id = self.advanced_book_combo_box.itemData(int(self.advanced_book_combo_box.currentIndex()))
         chapter_from = self.advanced_from_chapter.currentText()
         chapter_to = self.advanced_to_chapter.currentText()
