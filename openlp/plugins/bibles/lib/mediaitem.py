@@ -425,6 +425,7 @@ class BibleMediaItem(MediaManagerItem):
         verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(bible, book_ref_id, 1)
         if verse_count == 0:
             self.advancedSearchButton.setEnabled(False)
+            log.warning('Not enough chapters in %s', book_ref_id)
             critical_error_message_box(message=translate('BiblesPlugin.MediaItem', 'Bible not fully loaded.'))
         else:
             self.advancedSearchButton.setEnabled(True)
