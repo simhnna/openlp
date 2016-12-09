@@ -37,17 +37,19 @@ build: off
 
 test_script:
   - cd openlp-branch
-  - "%PYTHON%\\python.exe -m nose -v tests"
+  #- "%PYTHON%\\python.exe -m nose -v tests"
   # Go back to the user root folder
   - cd..
 
 after_test:
   # This is where we create a package using PyInstaller
   # First get PyInstaller
-  - curl -L -O https://github.com/pyinstaller/pyinstaller/archive/develop.zip
-  - 7z x develop.zip
+  #- curl -L -O https://github.com/pyinstaller/pyinstaller/archive/develop.zip
+  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v3.2/PyInstaller-3.2.zip
+  - 7z x PyInstaller-3.2.zip
+  #- mv pyinstaller-develop PyInstaller-3.2
   # Install PyInstaller dependencies
-  - "%PYTHON%\\python.exe -m pip install future"
+  - "%PYTHON%\\python.exe -m pip install future pefile"
   # Download and install Inno Setup - used for packaging
   - curl -L -O http://www.jrsoftware.org/download.php/is-unicode.exe
   - is-unicode.exe /VERYSILENT /SUPPRESSMSGBOXES /SP-
@@ -62,10 +64,28 @@ after_test:
   # - curl -L -O http://downloads.sourceforge.net/project/portableapps/NSIS%20Portable/NSISPortable_3.0_English.paf.exe
   # - NSISPortable_3.0_English.paf.exe /S
   # Get the packaging code
-  - bzr checkout --lightweight lp:openlp/packaging packaging
+  #- bzr checkout --lightweight lp:openlp/packaging packaging
+  - bzr checkout --lightweight lp:~raoul-snyman/openlp/pyinstaller-change packaging
+  #- curl -L http://bazaar.launchpad.net/~openlp-core/openlp/packaging/tarball -o packaging.tar.gz
+  #- 7z e packaging.tar.gz
+  #- 7z x packaging.tar
+  #- mv ~openlp-core/openlp/packaging packaging
+  # If this is trunk we should also build the manual
+  # Download and install HTML Help Workshop
+  #- curl -L "http://go.microsoft.com/fwlink/p/?linkid=14188" -o htmlhelp.exe
+  #- htmlhelp.exe /Q
+  # Install sphinx
+  - "%PYTHON%\\python.exe -m pip install sphinx"
+  # Get the documentation code
+  #- bzr checkout --lightweight lp:openlp/documentation documentation
+  - curl -L http://bazaar.launchpad.net/~openlp-core/openlp/documentation/tarball -o documentation.tar.gz
+  - 7z e documentation.tar.gz
+  - 7z x documentation.tar
+  - mv ~openlp-core/openlp/documentation documentation
   # Build the bundle
   - cd packaging
-  - "%PYTHON%\\python.exe windows/windows-builder.py -v -u -t -c windows/config-appveyor.ini -b ../openlp-branch"
+  #- "%PYTHON%\\python.exe windows/windows-builder.py -v -u -t -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation"
+  - "%PYTHON%\\python.exe builders/windows-builder.py -v --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable"
 
 artifacts:
   - path: openlp-branch\dist\*.exe
