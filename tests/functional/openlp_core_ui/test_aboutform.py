@@ -32,16 +32,30 @@ from tests.helpers.testmixin import TestMixin
 
 class TestFirstTimeForm(TestCase, TestMixin):
 
-    def test_on_volunteer_button_clicked(self):
+    @patch('openlp.core.ui.aboutform.webbrowser')
+    def test_on_volunteer_button_clicked(self, mocked_webbrowser):
         """
         Test that clicking on the "Volunteer" button opens a web page.
         """
         # GIVEN: A new About dialog and a mocked out webbrowser module
-        with patch('openlp.core.ui.aboutform.webbrowser') as mocked_webbrowser:
-            about_form = AboutForm(None)
+        about_form = AboutForm(None)
 
-            # WHEN: The "Volunteer" button is "clicked"
-            about_form.on_volunteer_button_clicked()
+        # WHEN: The "Volunteer" button is "clicked"
+        about_form.on_volunteer_button_clicked()
 
-            # THEN: A web browser is opened
-            mocked_webbrowser.open_new.assert_called_with('http://openlp.org/en/contribute')
+        # THEN: A web browser is opened
+        mocked_webbrowser.open_new.assert_called_with('http://openlp.org/en/contribute')
+
+    @patch('openlp.core.ui.aboutform.get_application_version')
+    def test_about_form_build_number(self, mocked_get_application_version):
+        """
+        Test that the build number is added to the about form
+        """
+        # GIVEN: A mocked out get_application_version function
+        mocked_get_application_version.return_value = {'version': '3.1.5', 'build': '3000'}
+
+        # WHEN: The about form is created
+        about_form = AboutForm(None)
+
+        # THEN: The build number should be in the text
+        assert about_form.about_text_edit.plainText().split('\n')[0] == ''
