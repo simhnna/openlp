@@ -55,14 +55,13 @@ MEDIA_MANAGER_STYLE = """
 ::tab {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
         stop: 0 palette(button), stop: 1.0 palette(mid));
-    border: 1px solid palette(mid);
+    border: 0;
+    border-radius: 2px;
     margin-top: 0;
     margin-bottom: 0;
     text-align: left;
 }
 ::tab:selected {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 palette(light), stop: 1.0 palette(button));
     border: 1px solid palette(highlight);
     font-weight: bold;
 }
