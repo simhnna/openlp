@@ -58,4 +58,4 @@ class TestFirstTimeForm(TestCase, TestMixin):
         about_form = AboutForm(None)
 
         # THEN: The build number should be in the text
-        assert about_form.about_text_edit.plainText().split('\n')[0] == ''
+        assert about_form.about_text_edit.toPlainText().split('\n')[0] == ''
