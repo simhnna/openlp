@@ -129,16 +129,16 @@ def build_icon(icon):
         location like ``/path/to/file.png``. However, the **recommended** way is to specify a resource string.
     :return: The build icon.
     """
-    button_icon = QtGui.QIcon()
     if isinstance(icon, QtGui.QIcon):
-        button_icon = icon
-    elif isinstance(icon, str):
-        if icon.startswith(':/'):
-            button_icon.addPixmap(QtGui.QPixmap(icon), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        else:
-            button_icon.addPixmap(QtGui.QPixmap.fromImage(QtGui.QImage(icon)), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        return icon
+    pix_map = None
+    button_icon = QtGui.QIcon()
+    if isinstance(icon, str):
+        pix_map = QtGui.QPixmap(icon)
     elif isinstance(icon, QtGui.QImage):
-        button_icon.addPixmap(QtGui.QPixmap.fromImage(icon), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        pix_map = QtGui.QPixmap.fromImage(icon)
+    if pix_map:
+        button_icon.addPixmap(pix_map, QtGui.QIcon.Normal, QtGui.QIcon.Off)
     return button_icon
 
 
@@ -310,30 +310,23 @@ def expand_tags(text):
 
 def create_separated_list(string_list):
     """
-    Returns a string that represents a join of a list of strings with a localized separator. This function corresponds
+    Returns a string that represents a join of a list of strings with a localized separator.
+    Localized separation will be done via the translate() function by the translators.
 
-    to QLocale::createSeparatedList which was introduced in Qt 4.8 and implements the algorithm from
-    http://www.unicode.org/reports/tr35/#ListPatterns
-
-     :param string_list: List of unicode strings
+    :param string_list: List of unicode strings
+    :return: Formatted string
     """
-    if LooseVersion(Qt.PYQT_VERSION_STR) >= LooseVersion('4.9') and LooseVersion(Qt.qVersion()) >= LooseVersion('4.8'):
-        return QtCore.QLocale().createSeparatedList(string_list)
-    if not string_list:
-        return ''
-    elif len(string_list) == 1:
-        return string_list[0]
-    # TODO: Verify mocking of translate() test before conversion
-    elif len(string_list) == 2:
-        return translate('OpenLP.core.lib', '%s and %s',
-                         'Locale list separator: 2 items') % (string_list[0], string_list[1])
+    list_length = len(string_list)
+    if list_length == 1:
+        list_to_string = string_list[0]
+    elif list_length == 2:
+        list_to_string = translate('OpenLP.core.lib', '{one} and {two}').format(one=string_list[0], two=string_list[1])
+    elif list_length > 2:
+        list_to_string = translate('OpenLP.core.lib', '{first} and {last}').format(first=', '.join(string_list[:-1]),
+                                                                                   last=string_list[-1])
     else:
-        merged = translate('OpenLP.core.lib', '%s, and %s',
-                           'Locale list separator: end') % (string_list[-2], string_list[-1])
-        for index in reversed(list(range(1, len(string_list) - 2))):
-            merged = translate('OpenLP.core.lib', '%s, %s',
-                               'Locale list separator: middle') % (string_list[index], merged)
-        return translate('OpenLP.core.lib', '%s, %s', 'Locale list separator: start') % (string_list[0], merged)
+        list_to_string = ''
+    return list_to_string
 
 
 from .exceptions import ValidationError

@@ -317,7 +317,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 self.song.verse_order = re.sub('([' + verse.upper() + verse.lower() + '])(\W|$)',
                                                r'\g<1>1\2', self.song.verse_order)
         except:
-            log.exception('Problem processing song Lyrics \n{xml}'.forma(xml=sxml.dump_xml()))
+            log.exception('Problem processing song Lyrics \n{xml}'.format(xml=sxml.dump_xml()))
             raise
 
     def keyPressEvent(self, event):

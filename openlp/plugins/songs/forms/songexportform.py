@@ -51,7 +51,7 @@ class SongExportForm(OpenLPWizard):
         :param parent: The QWidget-derived parent of the wizard.
         :param plugin: The songs plugin.
         """
-        super(SongExportForm, self).__init__(parent, plugin, 'song_export_wizard', ':/wizards/wizard_exportsong.bmp')
+        super(SongExportForm, self).__init__(parent, plugin, 'song_export_wizard', ':/wizards/wizard_song.bmp')
         self.stop_export_flag = False
         Registry().register_function('openlp_stop_wizard', self.stop_export)
 

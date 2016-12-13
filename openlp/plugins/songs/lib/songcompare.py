@@ -46,13 +46,13 @@ MIN_BLOCK_SIZE = 70
 MAX_TYPO_SIZE = 3
 
 
-def songs_probably_equal(song_tupel):
+def songs_probably_equal(song_tuple):
     """
     Calculate and return whether two songs are probably equal.
 
-    :param song_tupel: A tuple of two songs to compare.
+    :param song_tuple: A tuple of two songs to compare.
     """
-    song1, song2 = song_tupel
+    song1, song2 = song_tuple
     pos1, lyrics1 = song1
     pos2, lyrics2 = song2
     if len(lyrics1) < len(lyrics2):

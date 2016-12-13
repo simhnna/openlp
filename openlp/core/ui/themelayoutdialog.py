@@ -38,7 +38,7 @@ class Ui_ThemeLayoutDialog(object):
         Set up the UI
         """
         themeLayoutDialog.setObjectName('themeLayoutDialogDialog')
-        themeLayoutDialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        themeLayoutDialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         self.preview_layout = QtWidgets.QVBoxLayout(themeLayoutDialog)
         self.preview_layout.setObjectName('preview_layout')
         self.preview_area = QtWidgets.QWidget(themeLayoutDialog)

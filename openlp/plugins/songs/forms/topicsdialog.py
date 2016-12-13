@@ -35,7 +35,7 @@ class Ui_TopicsDialog(object):
         Set up the user interface for the topics dialog.
         """
         topics_dialog.setObjectName('topics_dialog')
-        topics_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        topics_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         topics_dialog.resize(300, 10)
         self.dialog_layout = QtWidgets.QVBoxLayout(topics_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

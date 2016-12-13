@@ -458,7 +458,7 @@ class OpenLyrics(object):
                 self._add_tag_to_formatting(tag, tags_element)
         # Replace end tags.
         for tag in end_tags:
-            text = text.replace('{{{tag}}}'.format(tag=tag), '</tag>')
+            text = text.replace('{{/{tag}}}'.format(tag=tag), '</tag>')
         # Replace \n with <br/>.
         text = text.replace('\n', '<br/>')
         element = etree.XML('<lines>{text}</lines>'.format(text=text))
