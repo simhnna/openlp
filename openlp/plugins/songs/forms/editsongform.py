@@ -118,13 +118,13 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         objects = self.manager.get_all_objects(cls)
         objects.sort(key=get_key)
         combo.clear()
-        combo.addItem('')
         for obj in objects:
             row = combo.count()
             combo.addItem(obj.name)
             cache.append(obj.name)
             combo.setItemData(row, obj.id)
         set_case_insensitive_completer(cache, combo)
+        combo.setEditText('')
 
     def _add_author_to_list(self, author, author_type):
         """
@@ -360,7 +360,6 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         authors = self.manager.get_all_objects(Author)
         authors.sort(key=get_author_key)
         self.authors_combo_box.clear()
-        self.authors_combo_box.addItem('')
         self.authors = []
         for author in authors:
             row = self.authors_combo_box.count()
@@ -368,6 +367,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
             self.authors_combo_box.setItemData(row, author.id)
             self.authors.append(author.display_name)
         set_case_insensitive_completer(self.authors, self.authors_combo_box)
+        self.authors_combo_box.setEditText('')
 
         # Types
         self.author_types_combo_box.clear()
@@ -398,11 +398,11 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
             return get_natural_key(theme)
 
         self.theme_combo_box.clear()
-        self.theme_combo_box.addItem('')
         self.themes = theme_list
         self.themes.sort(key=get_theme_key)
         self.theme_combo_box.addItems(theme_list)
         set_case_insensitive_completer(self.themes, self.theme_combo_box)
+        self.theme_combo_box.setEditText('')
 
     def load_media_files(self):
         """
@@ -442,7 +442,6 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         self.load_songbooks()
         self.load_media_files()
         self.theme_combo_box.setEditText('')
-        self.theme_combo_box.setCurrentIndex(0)
         # it's a new song to preview is not possible
         self.preview_button.setVisible(False)
 
@@ -591,7 +590,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 self.manager.save_object(author)
                 self._add_author_to_list(author, author_type)
                 self.load_authors()
-                self.authors_combo_box.setCurrentIndex(0)
+                self.authors_combo_box.setEditText('')
             else:
                 return
         elif item > 0:
@@ -602,7 +601,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                     message=translate('SongsPlugin.EditSongForm', 'This author is already in the list.'))
             else:
                 self._add_author_to_list(author, author_type)
-            self.authors_combo_box.setCurrentIndex(0)
+            self.authors_combo_box.setEditText('')
         else:
             QtWidgets.QMessageBox.warning(
                 self, UiStrings().NISs,
@@ -666,7 +665,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 topic_item.setData(QtCore.Qt.UserRole, topic.id)
                 self.topics_list_view.addItem(topic_item)
                 self.load_topics()
-                self.topics_combo_box.setCurrentIndex(0)
+                self.topics_combo_box.setEditText('')
             else:
                 return
         elif item > 0:
@@ -679,7 +678,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 topic_item = QtWidgets.QListWidgetItem(str(topic.name))
                 topic_item.setData(QtCore.Qt.UserRole, topic.id)
                 self.topics_list_view.addItem(topic_item)
-            self.topics_combo_box.setCurrentIndex(0)
+            self.topics_combo_box.setEditText('')
         else:
             QtWidgets.QMessageBox.warning(
                 self, UiStrings().NISs,
@@ -709,7 +708,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 self.manager.save_object(songbook)
                 self.add_songbook_entry_to_list(songbook.id, songbook.name, self.songbook_entry_edit.text())
                 self.load_songbooks()
-                self.songbooks_combo_box.setCurrentIndex(0)
+                self.songbooks_combo_box.setEditText('')
                 self.songbook_entry_edit.clear()
             else:
                 return
@@ -721,7 +720,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                     message=translate('SongsPlugin.EditSongForm', 'This Songbook is already in the list.'))
             else:
                 self.add_songbook_entry_to_list(songbook.id, songbook.name, self.songbook_entry_edit.text())
-            self.songbooks_combo_box.setCurrentIndex(0)
+            self.songbooks_combo_box.setEditText('')
             self.songbook_entry_edit.clear()
         else:
             QtWidgets.QMessageBox.warning(
