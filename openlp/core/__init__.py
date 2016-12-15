@@ -129,21 +129,21 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             application_stylesheet += WIN_REPAIR_STYLESHEET
         if application_stylesheet:
             self.setStyleSheet(application_stylesheet)
-        show_splash = Settings().value('core/show splash')
-        if show_splash:
+        can_show_splash = Settings().value('core/show splash')
+        if can_show_splash:
             self.splash = SplashScreen()
             self.splash.show()
         # make sure Qt really display the splash screen
         self.processEvents()
         # Check if OpenLP has been upgrade and if a backup of data should be created
-        self.backup_on_upgrade(has_run_wizard)
+        self.backup_on_upgrade(has_run_wizard, can_show_splash)
         # start the main app window
         self.main_window = MainWindow()
         Registry().execute('bootstrap_initialise')
         Registry().execute('bootstrap_post_set_up')
         Registry().initialise = False
         self.main_window.show()
-        if show_splash:
+        if can_show_splash:
             # now kill the splashscreen
             self.splash.finish(self.main_window)
             log.debug('Splashscreen closed')
@@ -224,13 +224,20 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             self.exception_form = ExceptionForm()
         self.exception_form.exception_text_edit.setPlainText(''.join(format_exception(exc_type, value, traceback)))
         self.set_normal_cursor()
+        is_splash_visible = False
+        if hasattr(self, 'splash') and self.splash.isVisible():
+            is_splash_visible = True
+            self.splash.hide()
         self.exception_form.exec()
+        if is_splash_visible:
+            self.splash.show()
 
-    def backup_on_upgrade(self, has_run_wizard):
+    def backup_on_upgrade(self, has_run_wizard, can_show_splash):
         """
         Check if OpenLP has been upgraded, and ask if a backup of data should be made
 
         :param has_run_wizard: OpenLP has been run before
+        :param can_show_splash: Should OpenLP show the splash screen
         """
         data_version = Settings().value('core/application version')
         openlp_version = get_application_version()['version']
@@ -239,6 +246,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             Settings().setValue('core/application version', openlp_version)
         # If data_version is different from the current version ask if we should backup the data folder
         elif data_version != openlp_version:
+            if self.splash.isVisible():
+                self.splash.hide()
             if QtWidgets.QMessageBox.question(None, translate('OpenLP', 'Backup'),
                                               translate('OpenLP', 'OpenLP has been upgraded, do you want to create\n'
                                                                   'a backup of the old data folder?'),
@@ -261,6 +270,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
 
             # Update the version in the settings
             Settings().setValue('core/application version', openlp_version)
+            if can_show_splash:
+                self.splash.show()
 
     def process_events(self):
         """
