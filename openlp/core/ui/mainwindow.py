@@ -52,7 +52,7 @@ from openlp.core.ui.lib.mediadockmanager import MediaDockManager
 log = logging.getLogger(__name__)
 
 MEDIA_MANAGER_STYLE = """
-::tab {
+::tab#media_tool_box {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
         stop: 0 palette(button), stop: 1.0 palette(mid));
     border: 0;
@@ -61,10 +61,8 @@ MEDIA_MANAGER_STYLE = """
     margin-bottom: 0;
     text-align: left;
 }
-::tab:selected {
-    border: 1px solid palette(highlight);
-    font-weight: bold;
-}
+/* This is here to make the tabs on KDE with the Breeze theme work */
+::tab:selected {}
 """
 
 PROGRESSBAR_STYLE = """
