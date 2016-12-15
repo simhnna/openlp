@@ -3,7 +3,6 @@ version: OpenLP-win-ci-b{build}
 init:
   - choco install -y --force bzr
   - set PATH=C:\Program Files (x86)\Bazaar;%PATH%
-  - bzr --version
 
 clone_script:
   - bzr checkout --lightweight BRANCHNAME openlp-branch
@@ -31,7 +30,6 @@ install:
   - mkdir MediaInfo
   - 7z x -oMediaInfo MediaInfo_CLI_0.7.90_Windows_i386.zip
   - cp MediaInfo\\MediaInfo.exe openlp-branch\\MediaInfo.exe
-
 
 build: off
 
@@ -67,10 +65,6 @@ after_test:
   - 7z x packaging.tar
   - mv ~openlp-core/openlp/packaging packaging
   # If this is trunk we should also build the manual
-  # Download and install HTML Help Workshop
-  #- curl -L "http://go.microsoft.com/fwlink/p/?linkid=14188" -o htmlhelp.exe
-  #- htmlhelp.exe /Q
-  # Install sphinx
   - ps: >-
       If (BUILD_DOCS) {
         &"$env:PYTHON\python.exe" -m pip install sphinx
@@ -84,16 +78,6 @@ after_test:
         cd packaging
         &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch --portable
       }
-  # Get the documentation code
-  #- bzr checkout --lightweight lp:openlp/documentation documentation
-  #- curl -L http://bazaar.launchpad.net/~openlp-core/openlp/documentation/tarball -o documentation.tar.gz
-  #- 7z e documentation.tar.gz
-  #- 7z x documentation.tar
-  #- mv ~openlp-core/openlp/documentation documentation
-  # Build the bundle
-  #- cd packaging
-  #- "%PYTHON%\\python.exe windows/windows-builder.py -v -u -t -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation"
-  #- "%PYTHON%\\python.exe builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable"
 
 artifacts:
   - path: openlp-branch\dist\*.exe
