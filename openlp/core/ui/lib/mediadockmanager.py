@@ -54,7 +54,7 @@ class MediaDockManager(object):
                 match = True
                 break
         if not match:
-            self.media_dock.addItem(media_item, visible_title['title'])
+            self.media_dock.addItem(media_item, media_item.plugin.icon, visible_title['title'])
 
     def remove_dock(self, media_item):
         """

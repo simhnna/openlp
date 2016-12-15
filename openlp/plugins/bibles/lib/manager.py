@@ -31,6 +31,7 @@ from .importers.http import HTTPBible
 from .importers.opensong import OpenSongBible
 from .importers.osis import OSISBible
 from .importers.zefania import ZefaniaBible
+from .importers.wordproject import WordProjectBible
 try:
     from .importers.sword import SwordBible
 except:
@@ -50,6 +51,7 @@ class BibleFormat(object):
     WebDownload = 3
     Zefania = 4
     SWORD = 5
+    WordProject = 6
 
     @staticmethod
     def get_class(bible_format):
@@ -70,6 +72,8 @@ class BibleFormat(object):
             return ZefaniaBible
         elif bible_format == BibleFormat.SWORD:
             return SwordBible
+        elif bible_format == BibleFormat.WordProject:
+            return WordProjectBible
         else:
             return None
 
@@ -84,7 +88,8 @@ class BibleFormat(object):
             BibleFormat.OpenSong,
             BibleFormat.WebDownload,
             BibleFormat.Zefania,
-            BibleFormat.SWORD
+            BibleFormat.SWORD,
+            BibleFormat.WordProject
         ]
 
 
