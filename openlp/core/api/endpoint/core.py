@@ -23,13 +23,13 @@ import logging
 import os
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint, requires_auth, ROOT_DIR
+from openlp.core.api.http import requires_auth
 from openlp.core.common import Registry, UiStrings, translate
 from openlp.core.lib import image_to_byte, PluginStatus, StringContent
 
 
-template_dir = os.path.join(ROOT_DIR, 'templates')
-static_dir = os.path.join(ROOT_DIR, 'static')
+template_dir = 'templates'
+static_dir = 'static'
 blank_dir = os.path.join(static_dir, 'index')
 
 

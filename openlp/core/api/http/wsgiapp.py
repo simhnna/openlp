@@ -31,6 +31,7 @@ import re
 from webob import Request, Response
 from webob.static import DirectoryApp
 
+from openlp.core.common import AppLocation
 from openlp.core.api.http.errors import HttpError, NotFound, ServerError
 
 
@@ -106,22 +107,22 @@ class WSGIApplication(object):
     """
     This is the core of the API, the WSGI app
     """
-    def __init__(self, name, root_dir):
+    def __init__(self, name):
         """
         Create the app object
         """
         self.name = name
         self.static_routes = {}
         self.route_map = {}
-        self.initialise(root_dir)
 
-    def initialise(self, root_dir):
+    def initialise(self):
         """
         Set up generic roots for the whole application
         :return: None
         """
-        self.add_static_route('/assets(.*)', root_dir)
-        self.add_static_route('/images(.*)', root_dir)
+        self.add_static_route('/assets(.*)', '')
+        self.add_static_route('/images(.*)', '')
+        pass
 
     def add_route(self, route, view_func, method):
         """
@@ -137,7 +138,8 @@ class WSGIApplication(object):
         Add a static directory as a route
         """
         if route not in self.static_routes:
-            self.static_routes[route] = DirectoryApp(os.path.abspath(static_dir))
+            root = os.path.join(os.path.join(AppLocation.get_section_data_path('remotes')), 'www')
+            self.static_routes[route] = DirectoryApp(os.path.abspath(os.path.join(root, static_dir)))
 
     def dispatch(self, request):
         """

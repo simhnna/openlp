@@ -25,6 +25,7 @@ The Endpoint class, which provides plugins with a way to serve their own portion
 
 import os
 
+from openlp.core.common import AppLocation
 from mako.template import Template
 
 
@@ -42,7 +43,7 @@ class Endpoint(object):
         if assets_dir:
             self.assets_dir = assets_dir
         else:
-            self.assets_dir = os.path.dirname(os.path.realpath(__file__))
+            self.assets_dir = None
         self.routes = []
 
     def add_url_route(self, url, view_func, method):
@@ -67,9 +68,11 @@ class Endpoint(object):
         """
         Render a mako template
         """
+        root = os.path.join(os.path.join(AppLocation.get_section_data_path('remotes')), 'www')
         if not self.template_dir:
             raise Exception('No template directory specified')
-        path = os.path.abspath(os.path.join(self.template_dir, filename))
+        path = os.path.join(root, self.template_dir, filename)
+        # path = os.path.abspath(os.path.join(self.template_dir, filename))
         if self.static_dir:
             kwargs['static_url'] = '/{prefix}/static'.format(prefix=self.url_prefix)
             kwargs['static_url'] = kwargs['static_url'].replace('//', '/')

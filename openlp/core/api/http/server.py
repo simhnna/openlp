@@ -86,6 +86,7 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         """
         self.poller = Poller()
         Registry().register('poller', self.poller)
+        application.initialise()
         register_endpoint(controller_endpoint)
         register_endpoint(api_controller_endpoint)
         register_endpoint(stage_endpoint)
