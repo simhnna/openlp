@@ -504,7 +504,7 @@ class BibleMediaItem(MediaManagerItem):
                     self.second_combo_box.setCurrentIndex(self.second_combo_box.findData(self.second_bible))
                     return
         self.second_bible = new_selection
-        if new_selection == None:
+        if new_selection is None:
             self.style_combo_box.setEnabled(True)
         else:
             self.style_combo_box.setEnabled(False)
@@ -669,8 +669,8 @@ class BibleMediaItem(MediaManagerItem):
                     translate('BiblesPlugin.MediaItem',
                               'The second Bible "{second_name}" does not contain all the verses that are in the main '
                               'Bible "{name}".\nOnly verses found in both Bibles will be shown.\n\n'
-                              '{count:d} verses have not been included in the results.')
-                        .format(second_name=self.second_bible.name, name=self.bible.name, count=not_found_count))
+                              '{count:d} verses have not been included in the results.'
+                              ).format(second_name=self.second_bible.name, name=self.bible.name, count=not_found_count))
         self.display_results()
 
     def text_search(self, search_while_type=False):
@@ -706,7 +706,6 @@ class BibleMediaItem(MediaManagerItem):
             elif VALID_TEXT_SEARCH.search(text):
                 self.on_text_search(text)
                 self.display_results()
-
 
     def on_search_edit_text_changed(self):
         """

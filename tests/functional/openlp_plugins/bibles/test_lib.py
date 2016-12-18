@@ -66,7 +66,7 @@ class TestLib(TestCase, TestMixin):
         Test that the 'full' regex parses bible verse references correctly.
         """
         # GIVEN: Some test data which contains different references to parse, with the expected results.
-        with patch('openlp.plugins.bibles.lib.Settings', return_value=MagicMock(**{'value.return_value':''})):
+        with patch('openlp.plugins.bibles.lib.Settings', return_value=MagicMock(**{'value.return_value': ''})):
             # The following test data tests with 222 variants when using the default 'separators'
             test_data = [
                 # Input reference, book name, chapter + verse reference
@@ -99,7 +99,7 @@ class TestLib(TestCase, TestMixin):
                 verse_separators = [':', ' : ', 'v', ' v ', 'V', ' V ', 'verse', ' verse ', 'verses', ' verses '] \
                     if '{verse}' in reference_text else ['']
                 and_separators = [',', ' , ', 'and', ' and '] if '{_and}' in reference_text else ['']
-                end_separators = ['end', ' end '] if '{end}' in reference_text else [''];
+                end_separators = ['end', ' end '] if '{end}' in reference_text else ['']
 
                 for to in to_separators:
                     for verse in verse_separators:
@@ -127,7 +127,7 @@ class TestLib(TestCase, TestMixin):
         see https://bugs.launchpad.net/openlp/+bug/1638620
         """
         # GIVEN: Some test data which contains different references to parse, with the expected results.
-        with patch('openlp.plugins.bibles.lib.Settings', return_value=MagicMock(**{'value.return_value':''})):
+        with patch('openlp.plugins.bibles.lib.Settings', return_value=MagicMock(**{'value.return_value': ''})):
             # The following test data tests with 45 variants when using the default 'separators'
             test_data = [
                 ('23', None, '23', None, None, None),
@@ -141,7 +141,7 @@ class TestLib(TestCase, TestMixin):
                 verse_separators = [':', ' : ', 'v', ' v ', 'V', ' V ', 'verse', ' verse ', 'verses', ' verses '] \
                     if '{verse}' in reference_text else ['']
                 and_separators = [',', ' , ', 'and', ' and '] if '{_and}' in reference_text else ['']
-                end_separators = ['end', ' end '] if '{end}' in reference_text else [''];
+                end_separators = ['end', ' end '] if '{end}' in reference_text else ['']
 
                 for to in to_separators:
                     for verse in verse_separators:
@@ -167,8 +167,8 @@ class TestLib(TestCase, TestMixin):
             # The following test data tests with 111 variants when using the default 'separators'
             # The regex for handling ranges is a bit screwy, see https://bugs.launchpad.net/openlp/+bug/1638620
             test_data = [
-                ('23',['23']),
-                ('23{to}24',['23-24']),
+                ('23', ['23']),
+                ('23{to}24', ['23-24']),
                 ('23{verse}1{to}2', ['23:1-2']),
                 ('23{verse}1{to}{end}', ['23:1-end']),
                 ('23{verse}1{to}2{_and}5{to}6', ['23:1-2', '5-6']),
@@ -183,7 +183,7 @@ class TestLib(TestCase, TestMixin):
                 verse_separators = [':', ' : ', 'v', ' v ', 'V', ' V ', 'verse', ' verse ', 'verses', ' verses '] \
                     if '{verse}' in reference_text else ['']
                 and_separators = [',', ' , ', 'and', ' and '] if '{_and}' in reference_text else ['']
-                end_separators = ['end', ' end '] if '{end}' in reference_text else [''];
+                end_separators = ['end', ' end '] if '{end}' in reference_text else ['']
 
                 for to in to_separators:
                     for verse in verse_separators:

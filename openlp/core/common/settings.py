@@ -218,8 +218,8 @@ class Settings(QtCore.QSettings):
         ('shortcuts/escapeItem', 'shortcuts/desktopScreenEnable', []),  # Escape item was removed in 2.6.
         ('shortcuts/offlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
         ('shortcuts/onlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
-        ('bibles/advanced bible', '', []), # Common bible search widgets combined in 2.6
-        ('bibles/quick bible', 'bibles/primary bible', []) # Common bible search widgets combined in 2.6
+        ('bibles/advanced bible', '', []),  # Common bible search widgets combined in 2.6
+        ('bibles/quick bible', 'bibles/primary bible', [])  # Common bible search widgets combined in 2.6
     ]
 
     @staticmethod

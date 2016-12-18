@@ -68,7 +68,7 @@ class TestBibleMediaItemModulefunctions(TestCase):
 
             # THEN: The result should contain the 'verse', 'range', 'list' keys and get_reference_separator should have
             #       been called with the expected values.
-            self.assertTrue(all (key in result for key in ('verse', 'range', 'list')))
+            self.assertTrue(all(key in result for key in ('verse', 'range', 'list')))
             mocked_get_reference_separator.assert_has_calls(
                 [call('sep_v_display'), call('sep_r_display'), call('sep_l_display')])
 
@@ -130,7 +130,7 @@ class TestMediaItem(TestCase, TestMixin):
 
         Registry.create()
 
-        #self.setup_application()
+        # self.setup_application()
         self.mocked_application = MagicMock()
         Registry().register('application', self.mocked_application)
         self.mocked_main_window = MagicMock()
@@ -138,8 +138,8 @@ class TestMediaItem(TestCase, TestMixin):
 
         self.mocked_plugin = MagicMock()
         with patch('openlp.plugins.bibles.lib.mediaitem.build_icon'), \
-             patch('openlp.plugins.bibles.lib.mediaitem.MediaManagerItem._setup'), \
-             patch('openlp.plugins.bibles.lib.mediaitem.BibleMediaItem.setup_item'):
+            patch('openlp.plugins.bibles.lib.mediaitem.MediaManagerItem._setup'), \
+            patch('openlp.plugins.bibles.lib.mediaitem.BibleMediaItem.setup_item'):
             self.media_item = BibleMediaItem(None, self.mocked_plugin)
 
         self.media_item.settings_section = 'bibles'
@@ -155,8 +155,6 @@ class TestMediaItem(TestCase, TestMixin):
         self.mocked_bible_1.name = 'Bible 1'
         self.mocked_bible_2 = MagicMock(**{'get_books.return_value': self.book_list_2})
         self.mocked_bible_2.name = 'Bible 2'
-
-
 
     def test_media_item_instance(self):
         """
@@ -266,7 +264,8 @@ class TestMediaItem(TestCase, TestMixin):
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and mocked out settings class with known values
         self.setting_values = {'bibles/reset to combined quick search': False}
-        with patch.object(self.media_item, 'populate_bible_combo_boxes'), patch.object(self.media_item, 'config_update'):
+        with patch.object(self.media_item, 'populate_bible_combo_boxes'), \
+                patch.object(self.media_item, 'config_update'):
             self.media_item.search_edit = MagicMock()
 
             # WHEN: Calling initialise()
@@ -282,7 +281,8 @@ class TestMediaItem(TestCase, TestMixin):
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and mocked out settings class with known values
         self.setting_values = {'bibles/reset to combined quick search': True}
-        with patch.object(self.media_item, 'populate_bible_combo_boxes'), patch.object(self.media_item, 'config_update'):
+        with patch.object(self.media_item, 'populate_bible_combo_boxes'), \
+                patch.object(self.media_item, 'config_update'):
             self.media_item.search_edit = MagicMock()
 
             # WHEN: Calling initialise()
@@ -307,7 +307,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.mocked_plugin.manager.get_bibles.return_value = \
             {'Bible 2': bible_2, 'Bible 1': bible_1, 'Bible 3': bible_3}
         with patch('openlp.plugins.bibles.lib.mediaitem.get_locale_key', side_effect=lambda x: x), \
-             patch('openlp.plugins.bibles.lib.mediaitem.find_and_set_in_combo_box'):
+                patch('openlp.plugins.bibles.lib.mediaitem.find_and_set_in_combo_box'):
 
             # WHEN: Calling populate_bible_combo_boxes
             self.media_item.populate_bible_combo_boxes()
@@ -375,7 +375,7 @@ class TestMediaItem(TestCase, TestMixin):
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and a mocked_book_combo_box which simulates data being found
         #        in the list
-        self.media_item.select_book_combo_box = MagicMock(**{'findData.return_value':2})
+        self.media_item.select_book_combo_box = MagicMock(**{'findData.return_value': 2})
         with patch.object(self.media_item, 'get_common_books', return_value=self.book_list_1), \
              patch.object(self.media_item, 'on_advanced_book_combo_box'):
 
@@ -394,9 +394,9 @@ class TestMediaItem(TestCase, TestMixin):
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and a mocked_book_combo_box which simulates data not being
         #          found in the list
-        self.media_item.select_book_combo_box = MagicMock(**{'findData.return_value':-1})
+        self.media_item.select_book_combo_box = MagicMock(**{'findData.return_value': -1})
         with patch.object(self.media_item, 'get_common_books', return_value=self.book_list_1), \
-             patch.object(self.media_item, 'on_advanced_book_combo_box'):
+                patch.object(self.media_item, 'on_advanced_book_combo_box'):
 
             # WHEN: Calling initialise_advanced_bible() with the last_id argument set
             self.media_item.bible = MagicMock()
@@ -457,9 +457,10 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.search_edit = mocked_search_edit
         self.media_item.bible = MagicMock()
         with patch.object(self.media_item, 'get_common_books', return_value=self.book_list_1), \
-             patch('openlp.plugins.bibles.lib.mediaitem.get_locale_key', side_effect=lambda x: x), \
-             patch('openlp.plugins.bibles.lib.mediaitem.set_case_insensitive_completer') \
+                patch('openlp.plugins.bibles.lib.mediaitem.get_locale_key', side_effect=lambda x: x), \
+                patch('openlp.plugins.bibles.lib.mediaitem.set_case_insensitive_completer') \
                 as mocked_set_case_insensitive_completer:
+
             # WHEN: Calling update_auto_completer
             self.media_item.update_auto_completer()
 
@@ -525,7 +526,7 @@ class TestMediaItem(TestCase, TestMixin):
         mocked_edit_bible_form_instance = MagicMock(**{'exec.return_value': False})
         with patch('openlp.plugins.bibles.lib.mediaitem.EditBibleForm', return_value=mocked_edit_bible_form_instance) \
                 as mocked_edit_bible_form, \
-            patch.object(self.media_item, 'reload_bibles') as mocked_reload_bibles:
+                patch.object(self.media_item, 'reload_bibles') as mocked_reload_bibles:
 
             # WHEN: on_edit_click is called, and the user cancels the EditBibleForm
             self.media_item.on_edit_click()
@@ -591,8 +592,8 @@ class TestMediaItem(TestCase, TestMixin):
         # GIVEN: An instance of :class:`MediaManagerItem` and a QMessageBox which reutrns QtWidgets.QMessageBox.Yes
         self.media_item.bible = MagicMock()
         with patch('openlp.plugins.bibles.lib.mediaitem.QtWidgets.QMessageBox.question',
-                   return_value=QtWidgets.QMessageBox.Yes) as mocked_qmessage_box, \
-            patch.object(self.media_item, 'reload_bibles'):
+                return_value=QtWidgets.QMessageBox.Yes) as mocked_qmessage_box, \
+                patch.object(self.media_item, 'reload_bibles'):
 
             # WHEN: on_delete_click is called
             self.media_item.on_delete_click()
@@ -637,7 +638,7 @@ class TestMediaItem(TestCase, TestMixin):
         """
         Test that 'on_book_order_button_toggled' changes the order of the book list
         """
-        self.media_item.select_book_combo_box =  MagicMock()
+        self.media_item.select_book_combo_box = MagicMock()
 
         # WHEN: When the book_order_button is checked
         self.media_item.on_book_order_button_toggled(True)
@@ -649,7 +650,7 @@ class TestMediaItem(TestCase, TestMixin):
         """
         Test that 'on_book_order_button_toggled' changes the order of the book list
         """
-        self.media_item.select_book_combo_box =  MagicMock()
+        self.media_item.select_book_combo_box = MagicMock()
 
         # WHEN: When the book_order_button is un-checked
         self.media_item.on_book_order_button_toggled(False)
@@ -723,7 +724,6 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.settings.layout_style_combo_box.setCurrentIndex.assert_called_once_with(2)
         self.mocked_settings_instance.setValue.assert_called_once_with('bibles/verse layout style', 2)
 
-
     def test_on_version_combo_box_index_changed_no_bible(self):
         """
         Test on_version_combo_box_index_changed when there is no main bible.
@@ -746,7 +746,7 @@ class TestMediaItem(TestCase, TestMixin):
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and mocked media_item.settings and select_book_combo_box
         mocked_bible_db = MagicMock()
-        mocked_bible_db.name='ABC'
+        mocked_bible_db.name = 'ABC'
         self.media_item.version_combo_box = MagicMock(**{'currentData.return_value': mocked_bible_db})
         self.media_item.select_book_combo_box = MagicMock()
         with patch.object(self.media_item, 'initialise_advanced_bible') as mocked_initialise_advanced_bible:
@@ -769,7 +769,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.select_book_combo_box = MagicMock()
         with patch.object(self.media_item, 'initialise_advanced_bible') as mocked_initialise_advanced_bible, \
                 patch('openlp.plugins.bibles.lib.mediaitem.critical_error_message_box') \
-                        as mocked_critical_error_message_box:
+                as mocked_critical_error_message_box:
 
             # WHEN: The previously selected bible is one bible and the new selection is annother bible
             self.media_item.second_bible = self.mocked_bible_1
@@ -780,7 +780,6 @@ class TestMediaItem(TestCase, TestMixin):
             self.assertFalse(mocked_critical_error_message_box.called)
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(False)
             self.assertEqual(self.media_item.second_bible, self.mocked_bible_2)
-
 
     def test_on_second_combo_box_index_changed_single_to_dual_user_abort(self):
         """
