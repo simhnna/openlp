@@ -21,28 +21,36 @@
 ###############################################################################
 
 import logging
+import re
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, Settings, UiStrings, translate
-from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext, create_separated_list
+from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext
 from openlp.core.lib.searchedit import SearchEdit
 from openlp.core.lib.ui import set_case_insensitive_completer, create_horizontal_adjusting_combo_box, \
     critical_error_message_box, find_and_set_in_combo_box, build_icon
 from openlp.core.common.languagemanager import get_locale_key
 from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm
 from openlp.plugins.bibles.forms.editbibleform import EditBibleForm
-from openlp.plugins.bibles.lib import LayoutStyle, DisplayStyle, VerseReferenceList, get_reference_separator, \
-    LanguageSelection, BibleStrings
-from openlp.plugins.bibles.lib.db import BiblesResourcesDB
-import re
+from openlp.plugins.bibles.lib import DisplayStyle, LayoutStyle, VerseReferenceList, \
+    get_reference_match, get_reference_separator
 
 log = logging.getLogger(__name__)
 
 
+VALID_TEXT_SEARCH = re.compile('\w\w\w')
+
+
+def get_reference_separators():
+    return {'verse': get_reference_separator('sep_v_display'),
+            'range': get_reference_separator('sep_r_display'),
+            'list': get_reference_separator('sep_l_display')}
+
+
 class BibleSearch(object):
     """
-    Enumeration class for the different search methods for the "quick search".
+    Enumeration class for the different search methods for the "Search" tab.
     """
     Reference = 1
     Text = 2
@@ -57,15 +65,31 @@ class BibleMediaItem(MediaManagerItem):
     bibles_add_to_service = QtCore.pyqtSignal(list)
     log.info('Bible Media Item loaded')
 
-    def __init__(self, parent, plugin):
+    def __init__(self, *args, **kwargs):
+        """
+        Constructor
+
+        :param args: Positional arguments to pass to the super method. (tuple)
+        :param kwargs: Keyword arguments to pass to the super method. (dict)
+        """
         self.clear_icon = build_icon(':/bibles/bibles_search_clear.png')
         self.lock_icon = build_icon(':/bibles/bibles_search_lock.png')
         self.unlock_icon = build_icon(':/bibles/bibles_search_unlock.png')
-        MediaManagerItem.__init__(self, parent, plugin)
+        self.sort_icon = build_icon(':/bibles/bibles_book_sort.png')
+        self.bible = None
+        self.second_bible = None
+        # TODO: Make more central and clean up after!
+        self.search_timer = QtCore.QTimer()
+        self.search_timer.setInterval(200)
+        self.search_timer.setSingleShot(True)
+        self.search_timer.timeout.connect(self.on_search_timer_timeout)
+        super().__init__(*args, **kwargs)
 
     def setup_item(self):
         """
         Do some additional setup.
+
+        :return: None
         """
         self.bibles_go_live.connect(self.go_live_remote)
         self.bibles_add_to_service.connect(self.add_to_service_remote)
@@ -73,251 +97,174 @@ class BibleMediaItem(MediaManagerItem):
         self.settings = self.plugin.settings_tab
         self.quick_preview_allowed = True
         self.has_search = True
-        self.search_results = {}
-        self.second_search_results = {}
+        self.search_results = []
+        self.second_search_results = []
         Registry().register_function('bibles_load_list', self.reload_bibles)
-
-    def __check_second_bible(self, bible, second_bible):
-        """
-        Check if the first item is a second bible item or not.
-        """
-        if not self.list_view.count():
-            self.display_results(bible, second_bible)
-            return
-        item_second_bible = self._decode_qt_object(self.list_view.item(0), 'second_bible')
-        if item_second_bible and second_bible or not item_second_bible and not second_bible:
-            self.display_results(bible, second_bible)
-        elif critical_error_message_box(
-            message=translate('BiblesPlugin.MediaItem',
-                              'You cannot combine single and dual Bible verse search results. '
-                              'Do you want to delete your search results and start a new search?'),
-                parent=self, question=True) == QtWidgets.QMessageBox.Yes:
-            self.list_view.clear()
-            self.display_results(bible, second_bible)
-
-    def _decode_qt_object(self, bitem, key):
-        reference = bitem.data(QtCore.Qt.UserRole)
-        obj = reference[str(key)]
-        return str(obj).strip()
 
     def required_icons(self):
         """
         Set which icons the media manager tab should show
+
+        :return: None
         """
-        MediaManagerItem.required_icons(self)
+        super().required_icons()
         self.has_import_icon = True
         self.has_new_icon = False
         self.has_edit_icon = True
         self.has_delete_icon = True
         self.add_to_service_item = False
 
-    def add_search_tab(self, prefix, name):
-        self.search_tab_bar.addTab(name)
-        tab = QtWidgets.QWidget()
-        tab.setObjectName(prefix + 'Tab')
-        tab.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
-        layout = QtWidgets.QGridLayout(tab)
-        layout.setObjectName(prefix + 'Layout')
-        setattr(self, prefix + 'Tab', tab)
-        setattr(self, prefix + 'Layout', layout)
-
-    def add_search_fields(self, prefix, name):
-        """
-        Creates and adds generic search tab.
-
-        :param prefix: The prefix of the tab, this is either ``quick`` or ``advanced``.
-        :param name: The translated string to display.
-        """
-        if prefix == 'quick':
-            idx = 2
-        else:
-            idx = 5
-        tab = getattr(self, prefix + 'Tab')
-        layout = getattr(self, prefix + 'Layout')
-        version_label = QtWidgets.QLabel(tab)
-        version_label.setObjectName(prefix + 'VersionLabel')
-        layout.addWidget(version_label, idx, 0, QtCore.Qt.AlignRight)
-        version_combo_box = create_horizontal_adjusting_combo_box(tab, prefix + 'VersionComboBox')
-        version_label.setBuddy(version_combo_box)
-        layout.addWidget(version_combo_box, idx, 1, 1, 2)
-        second_label = QtWidgets.QLabel(tab)
-        second_label.setObjectName(prefix + 'SecondLabel')
-        layout.addWidget(second_label, idx + 1, 0, QtCore.Qt.AlignRight)
-        second_combo_box = create_horizontal_adjusting_combo_box(tab, prefix + 'SecondComboBox')
-        version_label.setBuddy(second_combo_box)
-        layout.addWidget(second_combo_box, idx + 1, 1, 1, 2)
-        style_label = QtWidgets.QLabel(tab)
-        style_label.setObjectName(prefix + 'StyleLabel')
-        layout.addWidget(style_label, idx + 2, 0, QtCore.Qt.AlignRight)
-        style_combo_box = create_horizontal_adjusting_combo_box(tab, prefix + 'StyleComboBox')
-        style_combo_box.addItems(['', '', ''])
-        layout.addWidget(style_combo_box, idx + 2, 1, 1, 2)
-        search_button_layout = QtWidgets.QHBoxLayout()
-        search_button_layout.setObjectName(prefix + 'search_button_layout')
-        search_button_layout.addStretch()
-        # Note: If we use QPushButton instead of the QToolButton, the icon will be larger than the Lock icon.
-        clear_button = QtWidgets.QToolButton(tab)
-        clear_button.setIcon(self.clear_icon)
-        clear_button.setObjectName(prefix + 'ClearButton')
-        lock_button = QtWidgets.QToolButton(tab)
-        lock_button.setIcon(self.unlock_icon)
-        lock_button.setCheckable(True)
-        lock_button.setObjectName(prefix + 'LockButton')
-        search_button_layout.addWidget(clear_button)
-        search_button_layout.addWidget(lock_button)
-        search_button = QtWidgets.QPushButton(tab)
-        search_button.setObjectName(prefix + 'SearchButton')
-        search_button_layout.addWidget(search_button)
-        layout.addLayout(search_button_layout, idx + 3, 1, 1, 2)
-        self.page_layout.addWidget(tab)
-        tab.setVisible(False)
-        lock_button.toggled.connect(self.on_lock_button_toggled)
-        second_combo_box.currentIndexChanged.connect(self.on_second_bible_combobox_index_changed)
-        setattr(self, prefix + 'VersionLabel', version_label)
-        setattr(self, prefix + 'VersionComboBox', version_combo_box)
-        setattr(self, prefix + 'SecondLabel', second_label)
-        setattr(self, prefix + 'SecondComboBox', second_combo_box)
-        setattr(self, prefix + 'StyleLabel', style_label)
-        setattr(self, prefix + 'StyleComboBox', style_combo_box)
-        setattr(self, prefix + 'ClearButton', clear_button)
-        setattr(self, prefix + 'LockButton', lock_button)
-        setattr(self, prefix + 'SearchButtonLayout', search_button_layout)
-        setattr(self, prefix + 'SearchButton', search_button)
-
     def add_end_header_bar(self):
         self.search_tab_bar = QtWidgets.QTabBar(self)
         self.search_tab_bar.setExpanding(False)
-        self.search_tab_bar.setObjectName('search_tab_bar')
         self.page_layout.addWidget(self.search_tab_bar)
-        # Add the Quick Search tab.
-        self.add_search_tab('quick', translate('BiblesPlugin.MediaItem', 'Search'))
-        self.quick_search_label = QtWidgets.QLabel(self.quickTab)
-        self.quick_search_label.setObjectName('quick_search_label')
-        self.quickLayout.addWidget(self.quick_search_label, 0, 0, QtCore.Qt.AlignRight)
-        self.quick_search_edit = SearchEdit(self.quickTab, self.settings_section)
-        self.quick_search_edit.setSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
-        self.quick_search_edit.setObjectName('quick_search_edit')
-        self.quick_search_label.setBuddy(self.quick_search_edit)
-        self.quickLayout.addWidget(self.quick_search_edit, 0, 1, 1, 2)
-        self.add_search_fields('quick', translate('BiblesPlugin.MediaItem', 'Search'))
-        self.quickTab.setVisible(True)
-        # Add the Advanced Search tab.
-        self.add_search_tab('advanced', translate('BiblesPlugin.MediaItem', 'Select'))
-        self.advanced_book_label = QtWidgets.QLabel(self.advancedTab)
-        self.advanced_book_label.setObjectName('advanced_book_label')
-        self.advancedLayout.addWidget(self.advanced_book_label, 0, 0, QtCore.Qt.AlignRight)
-        self.advanced_book_combo_box = create_horizontal_adjusting_combo_box(self.advancedTab,
-                                                                             'advanced_book_combo_box')
-        self.advanced_book_label.setBuddy(self.advanced_book_combo_box)
-        self.advancedLayout.addWidget(self.advanced_book_combo_box, 0, 1, 1, 2)
-        self.advanced_chapter_label = QtWidgets.QLabel(self.advancedTab)
-        self.advanced_chapter_label.setObjectName('advanced_chapter_label')
-        self.advancedLayout.addWidget(self.advanced_chapter_label, 1, 1, 1, 2)
-        self.advanced_verse_label = QtWidgets.QLabel(self.advancedTab)
-        self.advanced_verse_label.setObjectName('advanced_verse_label')
-        self.advancedLayout.addWidget(self.advanced_verse_label, 1, 2)
-        self.advanced_from_label = QtWidgets.QLabel(self.advancedTab)
-        self.advanced_from_label.setObjectName('advanced_from_label')
-        self.advancedLayout.addWidget(self.advanced_from_label, 3, 0, QtCore.Qt.AlignRight)
-        self.advanced_from_chapter = QtWidgets.QComboBox(self.advancedTab)
-        self.advanced_from_chapter.setObjectName('advanced_from_chapter')
-        self.advancedLayout.addWidget(self.advanced_from_chapter, 3, 1)
-        self.advanced_from_verse = QtWidgets.QComboBox(self.advancedTab)
-        self.advanced_from_verse.setObjectName('advanced_from_verse')
-        self.advancedLayout.addWidget(self.advanced_from_verse, 3, 2)
-        self.advanced_to_label = QtWidgets.QLabel(self.advancedTab)
-        self.advanced_to_label.setObjectName('advanced_to_label')
-        self.advancedLayout.addWidget(self.advanced_to_label, 4, 0, QtCore.Qt.AlignRight)
-        self.advanced_to_chapter = QtWidgets.QComboBox(self.advancedTab)
-        self.advanced_to_chapter.setObjectName('advanced_to_chapter')
-        self.advancedLayout.addWidget(self.advanced_to_chapter, 4, 1)
-        self.advanced_to_verse = QtWidgets.QComboBox(self.advancedTab)
-        self.advanced_to_verse.setObjectName('advanced_to_verse')
-        self.advancedLayout.addWidget(self.advanced_to_verse, 4, 2)
-        self.add_search_fields('advanced', UiStrings().Advanced)
+        # Add the Search tab.
+        self.search_tab = QtWidgets.QWidget()
+        self.search_tab.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        self.search_tab_bar.addTab(translate('BiblesPlugin.MediaItem', 'Find'))
+        self.search_layout = QtWidgets.QFormLayout(self.search_tab)
+        self.search_edit = SearchEdit(self.search_tab, self.settings_section)
+        self.search_layout.addRow(translate('BiblesPlugin.MediaItem', 'Find:'), self.search_edit)
+        self.search_tab.setVisible(True)
+        self.page_layout.addWidget(self.search_tab)
+        # Add the Select tab.
+        self.select_tab = QtWidgets.QWidget()
+        self.select_tab.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        self.search_tab_bar.addTab(translate('BiblesPlugin.MediaItem', 'Select'))
+        self.select_layout = QtWidgets.QFormLayout(self.select_tab)
+        self.book_layout = QtWidgets.QHBoxLayout(self.select_tab)
+        self.select_book_combo_box = create_horizontal_adjusting_combo_box(self.select_tab, 'select_book_combo_box')
+        self.book_layout.addWidget(self.select_book_combo_box)
+        self.book_order_button = QtWidgets.QToolButton()
+        self.book_order_button.setIcon(self.sort_icon)
+        self.book_order_button.setCheckable(True)
+        self.book_layout.addWidget(self.book_order_button)
+        self.select_layout.addRow(translate('BiblesPlugin.MediaItem', 'Book:'), self.book_layout)
+        self.verse_title_layout = QtWidgets.QHBoxLayout(self.select_tab)
+        self.chapter_label = QtWidgets.QLabel(self.select_tab)
+        self.verse_title_layout.addWidget(self.chapter_label)
+        self.verse_label = QtWidgets.QLabel(self.select_tab)
+        self.verse_title_layout.addWidget(self.verse_label)
+        self.select_layout.addRow('', self.verse_title_layout)
+        self.from_layout = QtWidgets.QHBoxLayout(self.select_tab)
+        self.from_chapter = QtWidgets.QComboBox(self.select_tab)
+        self.from_layout.addWidget(self.from_chapter)
+        self.from_verse = QtWidgets.QComboBox(self.select_tab)
+        self.from_layout.addWidget(self.from_verse)
+        self.select_layout.addRow(translate('BiblesPlugin.MediaItem', 'From:'), self.from_layout)
+        self.to_layout = QtWidgets.QHBoxLayout(self.select_tab)
+        self.to_chapter = QtWidgets.QComboBox(self.select_tab)
+        self.to_layout.addWidget(self.to_chapter)
+        self.to_verse = QtWidgets.QComboBox(self.select_tab)
+        self.to_layout.addWidget(self.to_verse)
+        self.select_layout.addRow(translate('BiblesPlugin.MediaItem', 'To:'), self.to_layout)
+        self.select_tab.setVisible(False)
+        self.page_layout.addWidget(self.select_tab)
+        # General Search Opions
+        self.options_widget = QtWidgets.QGroupBox(translate('BiblesPlugin.MediaItem', 'Options'), self)
+        self.general_bible_layout = QtWidgets.QFormLayout(self.options_widget)
+        self.version_combo_box = create_horizontal_adjusting_combo_box(self, 'version_combo_box')
+        self.general_bible_layout.addRow('{version}:'.format(version=UiStrings().Version), self.version_combo_box)
+        self.second_combo_box = create_horizontal_adjusting_combo_box(self, 'second_combo_box')
+        self.general_bible_layout.addRow(translate('BiblesPlugin.MediaItem', 'Second:'), self.second_combo_box)
+        self.style_combo_box = create_horizontal_adjusting_combo_box(self, 'style_combo_box')
+        self.style_combo_box.addItems(['', '', ''])
+        self.general_bible_layout.addRow(UiStrings().LayoutStyle, self.style_combo_box)
+        self.search_button_layout = QtWidgets.QHBoxLayout(self.options_widget)
+        self.search_button_layout.addStretch()
+        # Note: If we use QPushButton instead of the QToolButton, the icon will be larger than the Lock icon.
+        self.clear_button = QtWidgets.QToolButton(self)
+        self.clear_button.setIcon(self.clear_icon)
+        self.lock_button = QtWidgets.QToolButton(self)
+        self.lock_button.setIcon(self.unlock_icon)
+        self.lock_button.setCheckable(True)
+        self.search_button_layout.addWidget(self.clear_button)
+        self.search_button_layout.addWidget(self.lock_button)
+        self.search_button = QtWidgets.QPushButton(self)
+        self.search_button_layout.addWidget(self.search_button)
+        self.general_bible_layout.addRow(self.search_button_layout)
+        self.page_layout.addWidget(self.options_widget)
+
+    def setupUi(self):
+        super().setupUi()
+
+        sort_model = QtCore.QSortFilterProxyModel(self.select_book_combo_box)
+        model = self.select_book_combo_box.model()
+        # Reparent the combo box model to the sort proxy, otherwise it will be deleted when we change the comobox's
+        # model
+        model.setParent(sort_model)
+        sort_model.setSourceModel(model)
+        self.select_book_combo_box.setModel(sort_model)
+
+        # Signals & Slots
         # Combo Boxes
-        self.quickVersionComboBox.activated.connect(self.update_auto_completer)
-        self.quickSecondComboBox.activated.connect(self.update_auto_completer)
-        self.advancedVersionComboBox.activated.connect(self.on_advanced_version_combo_box)
-        self.advancedSecondComboBox.activated.connect(self.on_advanced_second_combo_box)
-        self.advanced_book_combo_box.activated.connect(self.on_advanced_book_combo_box)
-        self.advanced_from_chapter.activated.connect(self.on_advanced_from_chapter)
-        self.advanced_from_verse.activated.connect(self.on_advanced_from_verse)
-        self.advanced_to_chapter.activated.connect(self.on_advanced_to_chapter)
-        self.quick_search_edit.searchTypeChanged.connect(self.update_auto_completer)
-        self.quickVersionComboBox.activated.connect(self.update_auto_completer)
-        self.quickStyleComboBox.activated.connect(self.on_quick_style_combo_box_changed)
-        self.advancedStyleComboBox.activated.connect(self.on_advanced_style_combo_box_changed)
+        self.select_book_combo_box.activated.connect(self.on_advanced_book_combo_box)
+        self.from_chapter.activated.connect(self.on_from_chapter_activated)
+        self.from_verse.activated.connect(self.on_from_verse)
+        self.to_chapter.activated.connect(self.on_to_chapter)
+        self.version_combo_box.currentIndexChanged.connect(self.on_version_combo_box_index_changed)
+        self.version_combo_box.currentIndexChanged.connect(self.update_auto_completer)
+        self.second_combo_box.currentIndexChanged.connect(self.on_second_combo_box_index_changed)
+        self.second_combo_box.currentIndexChanged.connect(self.update_auto_completer)
+        self.style_combo_box.currentIndexChanged.connect(self.on_style_combo_box_index_changed)
+        self.search_edit.searchTypeChanged.connect(self.update_auto_completer)
         # Buttons
-        self.advancedClearButton.clicked.connect(self.on_advanced_clear_button_clicked)
-        self.quickClearButton.clicked.connect(self.on_clear_button_clicked)
-        self.advancedSearchButton.clicked.connect(self.on_advanced_search_button)
-        self.quickSearchButton.clicked.connect(self.on_quick_search_button)
+        self.book_order_button.toggled.connect(self.on_book_order_button_toggled)
+        self.clear_button.clicked.connect(self.on_clear_button_clicked)
+        self.lock_button.toggled.connect(self.on_lock_button_toggled)
+        self.search_button.clicked.connect(self.on_search_button_clicked)
         # Other stuff
-        self.quick_search_edit.returnPressed.connect(self.on_quick_search_button)
+        self.search_edit.returnPressed.connect(self.on_search_button_clicked)
         self.search_tab_bar.currentChanged.connect(self.on_search_tab_bar_current_changed)
-        self.quick_search_edit.textChanged.connect(self.on_search_text_edit_changed)
-
-    def on_focus(self):
-        if self.quickTab.isVisible():
-            self.quick_search_edit.setFocus()
-            self.quick_search_edit.selectAll()
-        else:
-            self.advanced_book_combo_box.setFocus()
-
-    def config_update(self):
-        log.debug('config_update')
-        if Settings().value(self.settings_section + '/second bibles'):
-            self.quickSecondLabel.setVisible(True)
-            self.quickSecondComboBox.setVisible(True)
-            self.advancedSecondLabel.setVisible(True)
-            self.advancedSecondComboBox.setVisible(True)
-            self.quickSecondLabel.setVisible(True)
-            self.quickSecondComboBox.setVisible(True)
-        else:
-            self.quickSecondLabel.setVisible(False)
-            self.quickSecondComboBox.setVisible(False)
-            self.advancedSecondLabel.setVisible(False)
-            self.advancedSecondComboBox.setVisible(False)
-            self.quickSecondLabel.setVisible(False)
-            self.quickSecondComboBox.setVisible(False)
-        self.quickStyleComboBox.setCurrentIndex(self.settings.layout_style)
-        self.advancedStyleComboBox.setCurrentIndex(self.settings.layout_style)
+        self.search_edit.textChanged.connect(self.on_search_edit_text_changed)
 
     def retranslateUi(self):
         log.debug('retranslateUi')
-        self.quick_search_label.setText(translate('BiblesPlugin.MediaItem', 'Find:'))
-        self.quickVersionLabel.setText('{version}:'.format(version=UiStrings().Version))
-        self.quickSecondLabel.setText(translate('BiblesPlugin.MediaItem', 'Second:'))
-        self.quickStyleLabel.setText(UiStrings().LayoutStyle)
-        self.quickStyleComboBox.setItemText(LayoutStyle.VersePerSlide, UiStrings().VersePerSlide)
-        self.quickStyleComboBox.setItemText(LayoutStyle.VersePerLine, UiStrings().VersePerLine)
-        self.quickStyleComboBox.setItemText(LayoutStyle.Continuous, UiStrings().Continuous)
-        self.quickClearButton.setToolTip(translate('BiblesPlugin.MediaItem', 'Clear the search results.'))
-        self.quickLockButton.setToolTip(translate('BiblesPlugin.MediaItem',
-                                                  'Toggle to keep or clear the previous results.'))
-        self.quickSearchButton.setText(UiStrings().Search)
-        self.advanced_book_label.setText(translate('BiblesPlugin.MediaItem', 'Book:'))
-        self.advanced_chapter_label.setText(translate('BiblesPlugin.MediaItem', 'Chapter:'))
-        self.advanced_verse_label.setText(translate('BiblesPlugin.MediaItem', 'Verse:'))
-        self.advanced_from_label.setText(translate('BiblesPlugin.MediaItem', 'From:'))
-        self.advanced_to_label.setText(translate('BiblesPlugin.MediaItem', 'To:'))
-        self.advancedVersionLabel.setText('{version}:'.format(version=UiStrings().Version))
-        self.advancedSecondLabel.setText(translate('BiblesPlugin.MediaItem', 'Second:'))
-        self.advancedStyleLabel.setText(UiStrings().LayoutStyle)
-        self.advancedStyleComboBox.setItemText(LayoutStyle.VersePerSlide, UiStrings().VersePerSlide)
-        self.advancedStyleComboBox.setItemText(LayoutStyle.VersePerLine, UiStrings().VersePerLine)
-        self.advancedStyleComboBox.setItemText(LayoutStyle.Continuous, UiStrings().Continuous)
-        self.advancedClearButton.setToolTip(translate('BiblesPlugin.MediaItem', 'Clear the search results.'))
-        self.advancedLockButton.setToolTip(translate('BiblesPlugin.MediaItem',
-                                                     'Toggle to keep or clear the previous results.'))
-        self.advancedSearchButton.setText(UiStrings().Search)
+        self.chapter_label.setText(translate('BiblesPlugin.MediaItem', 'Chapter:'))
+        self.verse_label.setText(translate('BiblesPlugin.MediaItem', 'Verse:'))
+        self.style_combo_box.setItemText(LayoutStyle.VersePerSlide, UiStrings().VersePerSlide)
+        self.style_combo_box.setItemText(LayoutStyle.VersePerLine, UiStrings().VersePerLine)
+        self.style_combo_box.setItemText(LayoutStyle.Continuous, UiStrings().Continuous)
+        self.clear_button.setToolTip(translate('BiblesPlugin.MediaItem', 'Clear the search results.'))
+        self.lock_button.setToolTip(
+            translate('BiblesPlugin.MediaItem', 'Toggle to keep or clear the previous results.'))
+        self.search_button.setText(UiStrings().Search)
+
+    def on_focus(self):
+        """
+        Set focus on the appropriate widget when BibleMediaItem receives focus
+
+        Reimplements MediaManagerItem.on_focus()
+
+        :return: None
+        """
+        if self.search_tab.isVisible():
+            self.search_edit.setFocus()
+            self.search_edit.selectAll()
+        else:
+            self.select_book_combo_box.setFocus()
+
+    def config_update(self):
+        """
+        Change the visible widgets when the config changes
+
+        :return: None
+        """
+        log.debug('config_update')
+        visible = Settings().value('{settings_section}/second bibles'.format(settings_section=self.settings_section))
+        self.general_bible_layout.labelForField(self.second_combo_box).setVisible(visible)
+        self.second_combo_box.setVisible(visible)
 
     def initialise(self):
+        """
+        Called to complete initialisation that could not be completed in the constructor.
+
+        :return: None
+        """
         log.debug('bible manager initialise')
         self.plugin.manager.media = self
-        self.load_bibles()
-        self.quick_search_edit.set_search_types([
+        self.populate_bible_combo_boxes()
+        self.search_edit.set_search_types([
             (BibleSearch.Combined, ':/bibles/bibles_search_combined.png',
                 translate('BiblesPlugin.MediaItem', 'Text or Reference'),
                 translate('BiblesPlugin.MediaItem', 'Text or Reference...')),
@@ -328,164 +275,107 @@ class BibleMediaItem(MediaManagerItem):
                 translate('BiblesPlugin.MediaItem', 'Text Search'),
                 translate('BiblesPlugin.MediaItem', 'Search Text...'))
         ])
-        if Settings().value(self.settings_section + '/reset to combined quick search'):
-            self.quick_search_edit.set_current_search_type(BibleSearch.Combined)
+        if Settings().value(
+                '{settings_section}/reset to combined quick search'.format(settings_section=self.settings_section)):
+            self.search_edit.set_current_search_type(BibleSearch.Combined)
         self.config_update()
         log.debug('bible manager initialise complete')
 
-    def load_bibles(self):
-        log.debug('Loading Bibles')
-        self.quickVersionComboBox.clear()
-        self.quickSecondComboBox.clear()
-        self.advancedVersionComboBox.clear()
-        self.advancedSecondComboBox.clear()
-        self.quickSecondComboBox.addItem('')
-        self.advancedSecondComboBox.addItem('')
-        # Get all bibles and sort the list.
-        bibles = list(self.plugin.manager.get_bibles().keys())
-        bibles = [_f for _f in bibles if _f]
-        bibles.sort(key=get_locale_key)
-        # Load the bibles into the combo boxes.
-        self.quickVersionComboBox.addItems(bibles)
-        self.quickSecondComboBox.addItems(bibles)
-        self.advancedVersionComboBox.addItems(bibles)
-        self.advancedSecondComboBox.addItems(bibles)
-        # set the default value
-        bible = Settings().value(self.settings_section + '/advanced bible')
-        if bible in bibles:
-            find_and_set_in_combo_box(self.advancedVersionComboBox, bible)
-            self.initialise_advanced_bible(str(bible))
-        elif bibles:
-            self.initialise_advanced_bible(bibles[0])
-        bible = Settings().value(self.settings_section + '/quick bible')
-        find_and_set_in_combo_box(self.quickVersionComboBox, bible)
+    def populate_bible_combo_boxes(self):
+        """
+        Populate the bible combo boxes with the list of bibles that have been loaded
 
-    def reload_bibles(self, process=False):
+        :return: None
+        """
+        log.debug('Loading Bibles')
+        self.version_combo_box.clear()
+        self.second_combo_box.clear()
+        self.second_combo_box.addItem('', None)
+        # Get all bibles and sort the list.
+        bibles = self.plugin.manager.get_bibles()
+        bibles = [(_f, bibles[_f]) for _f in bibles if _f]
+        bibles.sort(key=lambda k: get_locale_key(k[0]))
+        for bible in bibles:
+            self.version_combo_box.addItem(bible[0], bible[1])
+            self.second_combo_box.addItem(bible[0], bible[1])
+        # set the default value
+        bible = Settings().value('{settings_section}/primary bible'.format(settings_section=self.settings_section))
+        find_and_set_in_combo_box(self.version_combo_box, bible)
+
+    def reload_bibles(self):
+        """
+        Reload the bibles and update the combo boxes
+
+        :return: None
+        """
         log.debug('Reloading Bibles')
         self.plugin.manager.reload_bibles()
-        self.load_bibles()
-        # If called from first time wizard re-run, process any new bibles.
-        if process:
-            self.plugin.app_startup()
-        self.update_auto_completer()
+        self.populate_bible_combo_boxes()
 
-    def initialise_advanced_bible(self, bible, last_book_id=None):
+    def get_common_books(self, first_bible, second_bible=None):
+        """
+        Return a list of common books between two bibles.
+
+        :param first_bible: The first bible (BibleDB)
+        :param second_bible: The second bible. (Optional, BibleDB
+        :return: A list of common books between the two bibles. Or if only one bible is supplied a list of that bibles
+                books (list of Book objects)
+        """
+        if not second_bible:
+            return first_bible.get_books()
+        book_data = []
+        for book in first_bible.get_books():
+            for second_book in second_bible.get_books():
+                if book.book_reference_id == second_book.book_reference_id:
+                    book_data.append(book)
+        return book_data
+
+    def initialise_advanced_bible(self, last_book=None):
         """
         This initialises the given bible, which means that its book names and their chapter numbers is added to the
-        combo boxes on the 'Advanced Search' Tab. This is not of any importance of the 'Quick Search' Tab.
+        combo boxes on the 'Select' Tab. This is not of any importance of the 'Search' Tab.
 
-        :param bible: The bible to initialise (unicode).
         :param last_book_id: The "book reference id" of the book which is chosen at the moment. (int)
+        :return: None
         """
-        log.debug('initialise_advanced_bible {bible}, {ref}'.format(bible=bible, ref=last_book_id))
-        book_data = self.plugin.manager.get_books(bible)
-        second_bible = self.advancedSecondComboBox.currentText()
-        if second_bible != '':
-            second_book_data = self.plugin.manager.get_books(second_bible)
-            book_data_temp = []
-            for book in book_data:
-                for second_book in second_book_data:
-                    if book['book_reference_id'] == second_book['book_reference_id']:
-                        book_data_temp.append(book)
-            book_data = book_data_temp
-        self.advanced_book_combo_box.clear()
-        first = True
-        initialise_chapter_verse = False
-        language_selection = self.plugin.manager.get_language_selection(bible)
-        book_names = BibleStrings().BookNames
+        log.debug('initialise_advanced_bible {bible}, {ref}'.format(bible=self.bible, ref=last_book))
+        self.select_book_combo_box.clear()
+        if self.bible is None:
+            return
+        book_data = self.get_common_books(self.bible, self.second_bible)
+        language_selection = self.plugin.manager.get_language_selection(self.bible.name)
+        self.select_book_combo_box.model().setDynamicSortFilter(False)
         for book in book_data:
-            row = self.advanced_book_combo_box.count()
-            if language_selection == LanguageSelection.Bible:
-                self.advanced_book_combo_box.addItem(book['name'])
-            elif language_selection == LanguageSelection.Application:
-                data = BiblesResourcesDB.get_book_by_id(book['book_reference_id'])
-                self.advanced_book_combo_box.addItem(book_names[data['abbreviation']])
-            elif language_selection == LanguageSelection.English:
-                data = BiblesResourcesDB.get_book_by_id(book['book_reference_id'])
-                self.advanced_book_combo_box.addItem(data['name'])
-            self.advanced_book_combo_box.setItemData(row, book['book_reference_id'])
-            if first:
-                first = False
-                first_book = book
-                initialise_chapter_verse = True
-            if last_book_id and last_book_id == int(book['book_reference_id']):
-                index = self.advanced_book_combo_box.findData(book['book_reference_id'])
-                if index == -1:
-                    # Not Found.
-                    index = 0
-                self.advanced_book_combo_box.setCurrentIndex(index)
-                initialise_chapter_verse = False
-        if initialise_chapter_verse:
-            self.initialise_chapter_verse(bible, first_book['name'], first_book['book_reference_id'])
-
-    def initialise_chapter_verse(self, bible, book, book_ref_id):
-        log.debug('initialise_chapter_verse {bible}, {book}, {ref}'.format(bible=bible, book=book, ref=book_ref_id))
-        book = self.plugin.manager.get_book_by_id(bible, book_ref_id)
-        self.chapter_count = self.plugin.manager.get_chapter_count(bible, book)
-        verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(bible, book_ref_id, 1)
-        if verse_count == 0:
-            self.advancedSearchButton.setEnabled(False)
-            log.warning('Not enough chapters in %s', book_ref_id)
-            critical_error_message_box(message=translate('BiblesPlugin.MediaItem', 'Bible not fully loaded.'))
-        else:
-            self.advancedSearchButton.setEnabled(True)
-            self.adjust_combo_box(1, self.chapter_count, self.advanced_from_chapter)
-            self.adjust_combo_box(1, self.chapter_count, self.advanced_to_chapter)
-            self.adjust_combo_box(1, verse_count, self.advanced_from_verse)
-            self.adjust_combo_box(1, verse_count, self.advanced_to_verse)
+            self.select_book_combo_box.addItem(book.get_name(language_selection), book.book_reference_id)
+        self.select_book_combo_box.model().setDynamicSortFilter(True)
+        if last_book:
+            index = self.select_book_combo_box.findData(last_book)
+            self.select_book_combo_box.setCurrentIndex(index if index != -1 else 0)
+        self.on_advanced_book_combo_box()
 
     def update_auto_completer(self):
         """
         This updates the bible book completion list for the search field. The completion depends on the bible. It is
         only updated when we are doing reference or combined search, in text search the completion list is removed.
+
+        :return: None
         """
-        log.debug('update_auto_completer')
-        # Save the current bible to the configuration.
-        Settings().setValue('{section}/quick bible'.format(section=self.settings_section),
-                            self.quickVersionComboBox.currentText())
         books = []
         # We have to do a 'Reference Search' (Or as part of Combined Search).
-        if self.quick_search_edit.current_search_type() is not BibleSearch.Text:
-            bibles = self.plugin.manager.get_bibles()
-            bible = self.quickVersionComboBox.currentText()
-            if bible:
-                book_data = bibles[bible].get_books()
-                second_bible = self.quickSecondComboBox.currentText()
-                if second_bible != '':
-                    second_book_data = bibles[second_bible].get_books()
-                    book_data_temp = []
-                    for book in book_data:
-                        for second_book in second_book_data:
-                            if book.book_reference_id == second_book.book_reference_id:
-                                book_data_temp.append(book)
-                    book_data = book_data_temp
-                language_selection = self.plugin.manager.get_language_selection(bible)
-                if language_selection == LanguageSelection.Bible:
-                    books = [book.name + ' ' for book in book_data]
-                elif language_selection == LanguageSelection.Application:
-                    book_names = BibleStrings().BookNames
-                    for book in book_data:
-                        data = BiblesResourcesDB.get_book_by_id(book.book_reference_id)
-                        books.append(str(book_names[data['abbreviation']]) + ' ')
-                elif language_selection == LanguageSelection.English:
-                    for book in book_data:
-                        data = BiblesResourcesDB.get_book_by_id(book.book_reference_id)
-                        books.append(data['name'] + ' ')
+        if self.search_edit.current_search_type() is not BibleSearch.Text:
+            if self.bible:
+                book_data = self.get_common_books(self.bible, self.second_bible)
+                language_selection = self.plugin.manager.get_language_selection(self.bible.name)
+                books = [book.get_name(language_selection) for book in book_data]
                 books.sort(key=get_locale_key)
-        set_case_insensitive_completer(books, self.quick_search_edit)
-
-    def on_second_bible_combobox_index_changed(self, selection):
-        """
-        Activate the style combobox only when no second bible is selected
-        """
-        if selection == 0:
-            self.quickStyleComboBox.setEnabled(True)
-            self.advancedStyleComboBox.setEnabled(True)
-        else:
-            self.quickStyleComboBox.setEnabled(False)
-            self.advancedStyleComboBox.setEnabled(False)
+        set_case_insensitive_completer(books, self.search_edit)
 
     def on_import_click(self):
+        """
+        Create, if not already, the `BibleImportForm` and execute it
+
+        :return: None
+        """
         if not hasattr(self, 'import_wizard'):
             self.import_wizard = BibleImportForm(self, self.plugin.manager, self.plugin)
         # If the import was not cancelled then reload.
@@ -493,141 +383,199 @@ class BibleMediaItem(MediaManagerItem):
             self.reload_bibles()
 
     def on_edit_click(self):
-        if self.quickTab.isVisible():
-            bible = self.quickVersionComboBox.currentText()
-        elif self.advancedTab.isVisible():
-            bible = self.advancedVersionComboBox.currentText()
-        if bible:
+        """
+        Load the EditBibleForm and reload the bibles if the user accepts it
+
+        :return: None
+        """
+        if self.bible:
             self.edit_bible_form = EditBibleForm(self, self.main_window, self.plugin.manager)
-            self.edit_bible_form.load_bible(bible)
+            self.edit_bible_form.load_bible(self.bible.name)
             if self.edit_bible_form.exec():
                 self.reload_bibles()
 
     def on_delete_click(self):
         """
-        When the delete button is pressed
+        Confirm that the user wants to delete the main bible
+
+        :return: None
         """
-        bible = None
-        if self.quickTab.isVisible():
-            bible = self.quickVersionComboBox.currentText()
-        elif self.advancedTab.isVisible():
-            bible = self.advancedVersionComboBox.currentText()
-        if bible:
+        if self.bible:
             if QtWidgets.QMessageBox.question(
-                    self, UiStrings().ConfirmDelete,
-                    translate('BiblesPlugin.MediaItem',
-                              'Are you sure you want to completely delete "{bible}" Bible '
-                              'from OpenLP?\n\nYou will need to re-import this Bible to use it '
-                              'again.').format(bible=bible),
-                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                    QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.No:
+                self, UiStrings().ConfirmDelete,
+                translate('BiblesPlugin.MediaItem',
+                          'Are you sure you want to completely delete "{bible}" Bible from OpenLP?\n\n'
+                          'You will need to re-import this Bible to use it again.').format(bible=self.bible.name),
+                    defaultButton=QtWidgets.QMessageBox.No) == QtWidgets.QMessageBox.No:
                 return
-            self.plugin.manager.delete_bible(bible)
+            self.plugin.manager.delete_bible(self.bible.name)
             self.reload_bibles()
 
     def on_search_tab_bar_current_changed(self, index):
-        if index == 0:
-            self.advancedTab.setVisible(False)
-            self.quickTab.setVisible(True)
-            self.quick_search_edit.setFocus()
+        """
+        Show the selected tab and set focus to it
+
+        :param index: The tab selected (int)
+        :return: None
+        """
+        search_tab = index == 0
+        self.search_tab.setVisible(search_tab)
+        self.select_tab.setVisible(not search_tab)
+        self.on_focus()
+
+    def on_book_order_button_toggled(self, checked):
+        """
+        Change the sort order of the book names
+
+        :param checked: Indicates if the button is checked or not (Bool)
+        :return: None
+        """
+        if checked:
+            self.select_book_combo_box.model().sort(0)
         else:
-            self.quickTab.setVisible(False)
-            self.advancedTab.setVisible(True)
-            self.advanced_book_combo_box.setFocus()
+            # -1 Removes the sorting, and returns the items to the order they were added in
+            self.select_book_combo_box.model().sort(-1)
 
     def on_clear_button_clicked(self):
-        # Clear the list, then set the "No search Results" message, then clear the text field and give it focus.
-        self.list_view.clear()
-        self.quick_search_edit.clear()
-        self.quick_search_edit.setFocus()
+        """
+        Clear the list_view and the search_edit
 
-    def on_advanced_clear_button_clicked(self):
-        # The same as the on_clear_button_clicked, but gives focus to Book name field in "Select" (advanced).
+        :return: None
+        """
         self.list_view.clear()
-        self.advanced_book_combo_box.setFocus()
+        self.search_edit.clear()
+        self.on_focus()
 
     def on_lock_button_toggled(self, checked):
         """
         Toggle the lock button, if Search tab is used, set focus to search field.
-        :param checked: The state of the toggle button. bool
+
+        :param checked: The state of the toggle button. (bool)
         :return: None
         """
+        self.list_view.locked = checked
         if checked:
             self.sender().setIcon(self.lock_icon)
         else:
             self.sender().setIcon(self.unlock_icon)
-        if self.quickTab.isVisible():
-            self.quick_search_edit.setFocus()
 
-    def on_quick_style_combo_box_changed(self):
-        self.settings.layout_style = self.quickStyleComboBox.currentIndex()
-        self.advancedStyleComboBox.setCurrentIndex(self.settings.layout_style)
-        self.settings.layout_style_combo_box.setCurrentIndex(self.settings.layout_style)
-        Settings().setValue(self.settings_section + '/verse layout style', self.settings.layout_style)
+    def on_style_combo_box_index_changed(self, index):
+        """
+        Change the layout style and save the setting
 
-    def on_advanced_style_combo_box_changed(self):
-        self.settings.layout_style = self.advancedStyleComboBox.currentIndex()
-        self.quickStyleComboBox.setCurrentIndex(self.settings.layout_style)
-        self.settings.layout_style_combo_box.setCurrentIndex(self.settings.layout_style)
-        Settings().setValue(self.settings_section + '/verse layout style', self.settings.layout_style)
+        :param index: The index of the current item in the combobox (int)
+        :return: None
+        """
+        # TODO: Change layout_style to a property
+        self.settings.layout_style = index
+        self.settings.layout_style_combo_box.setCurrentIndex(index)
+        Settings().setValue('{section}/verse layout style'.format(section=self.settings_section), index)
 
-    def on_advanced_version_combo_box(self):
-        Settings().setValue(self.settings_section + '/advanced bible', self.advancedVersionComboBox.currentText())
-        self.initialise_advanced_bible(
-            self.advancedVersionComboBox.currentText(),
-            self.advanced_book_combo_box.itemData(int(self.advanced_book_combo_box.currentIndex())))
+    def on_version_combo_box_index_changed(self):
+        """
+        Update the main bible and save it to settings
 
-    def on_advanced_second_combo_box(self):
-        self.initialise_advanced_bible(
-            self.advancedVersionComboBox.currentText(),
-            self.advanced_book_combo_box.itemData(int(self.advanced_book_combo_box.currentIndex())))
+        :return: None
+        """
+        self.bible = self.version_combo_box.currentData()
+        if self.bible is not None:
+            Settings().setValue('{section}/primary bible'.format(section=self.settings_section), self.bible.name)
+        self.initialise_advanced_bible(self.select_book_combo_box.currentData())
+
+    def on_second_combo_box_index_changed(self, selection):
+        """
+        Update the second bible. If changing from single to dual bible modes as if the user wants to clear the search
+        results, if not revert to the previously selected bible
+
+        :return: None
+        """
+        new_selection = self.second_combo_box.currentData()
+        if self.list_view.count():
+            # Exclusive or (^) the new and previous selections to detect if the user has switched between single and
+            # dual bible mode
+            if (new_selection is None) ^ (self.second_bible is None):
+                if critical_error_message_box(
+                    message=translate('BiblesPlugin.MediaItem',
+                                      'OpenLP cannot combine single and dual Bible verse search results. '
+                                      'Do you want to clear your search results and start a new search?'),
+                        parent=self, question=True) == QtWidgets.QMessageBox.Yes:
+                    self.list_view.clear(override_lock=True)
+                else:
+                    self.second_combo_box.setCurrentIndex(self.second_combo_box.findData(self.second_bible))
+                    return
+        self.second_bible = new_selection
+        if new_selection == None:
+            self.style_combo_box.setEnabled(True)
+        else:
+            self.style_combo_box.setEnabled(False)
+            self.initialise_advanced_bible(self.select_book_combo_box.currentData())
 
     def on_advanced_book_combo_box(self):
-        item = int(self.advanced_book_combo_box.currentIndex())
-        self.initialise_chapter_verse(
-            self.advancedVersionComboBox.currentText(),
-            self.advanced_book_combo_box.currentText(),
-            self.advanced_book_combo_box.itemData(item))
+        """
+        Update the verse selection boxes
 
-    def on_advanced_from_verse(self):
-        chapter_from = int(self.advanced_from_chapter.currentText())
-        chapter_to = int(self.advanced_to_chapter.currentText())
+        :return: None
+        """
+        book_ref_id = self.select_book_combo_box.currentData()
+        book = self.plugin.manager.get_book_by_id(self.bible.name, book_ref_id)
+        self.chapter_count = self.plugin.manager.get_chapter_count(self.bible.name, book)
+        verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(self.bible.name, book_ref_id, 1)
+        if verse_count == 0:
+            self.search_button.setEnabled(False)
+            log.warning('Not enough chapters in %s', book_ref_id)
+            critical_error_message_box(message=translate('BiblesPlugin.MediaItem', 'Bible not fully loaded.'))
+        else:
+            self.search_button.setEnabled(True)
+            self.adjust_combo_box(1, self.chapter_count, self.from_chapter)
+            self.adjust_combo_box(1, self.chapter_count, self.to_chapter)
+            self.adjust_combo_box(1, verse_count, self.from_verse)
+            self.adjust_combo_box(1, verse_count, self.to_verse)
+
+    def on_from_chapter_activated(self):
+        """
+        Update the verse selection boxes
+
+        :return: None
+        """
+        book_ref_id = self.select_book_combo_box.currentData()
+        chapter_from = self.from_chapter.currentData()
+        chapter_to = self.to_chapter.currentData()
+        verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(self.bible.name, book_ref_id, chapter_from)
+        self.adjust_combo_box(1, verse_count, self.from_verse)
+        if chapter_from >= chapter_to:
+            self.adjust_combo_box(1, verse_count, self.to_verse, chapter_from == chapter_to)
+        self.adjust_combo_box(chapter_from, self.chapter_count, self.to_chapter, chapter_from < chapter_to)
+
+    def on_from_verse(self):
+        """
+        Update the verse selection boxes
+
+        :return: None
+        """
+        chapter_from = self.from_chapter.currentData()
+        chapter_to = self.to_chapter.currentData()
         if chapter_from == chapter_to:
-            bible = self.advancedVersionComboBox.currentText()
-            book_ref_id = self.advanced_book_combo_box.itemData(int(self.advanced_book_combo_box.currentIndex()))
-            verse_from = int(self.advanced_from_verse.currentText())
-            verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(bible, book_ref_id, chapter_to)
-            self.adjust_combo_box(verse_from, verse_count, self.advanced_to_verse, True)
+            book_ref_id = self.select_book_combo_box.currentData()
+            verse_from = self.from_verse.currentData()
+            verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(self.bible.name, book_ref_id, chapter_to)
+            self.adjust_combo_box(verse_from, verse_count, self.to_verse, True)
 
-    def on_advanced_to_chapter(self):
-        bible = self.advancedVersionComboBox.currentText()
-        book_ref_id = self.advanced_book_combo_box.itemData(int(self.advanced_book_combo_box.currentIndex()))
-        chapter_from = int(self.advanced_from_chapter.currentText())
-        chapter_to = int(self.advanced_to_chapter.currentText())
-        verse_from = int(self.advanced_from_verse.currentText())
-        verse_to = int(self.advanced_to_verse.currentText())
-        verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(bible, book_ref_id, chapter_to)
+    def on_to_chapter(self):
+        """
+        Update the verse selection boxes
+
+        :return: None
+        """
+        book_ref_id = self.select_book_combo_box.currentData()
+        chapter_from = self.from_chapter.currentData()
+        chapter_to = self.to_chapter.currentData()
+        verse_from = self.from_verse.currentData()
+        verse_to = self.to_verse.currentData()
+        verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(self.bible.name, book_ref_id, chapter_to)
         if chapter_from == chapter_to and verse_from > verse_to:
-            self.adjust_combo_box(verse_from, verse_count, self.advanced_to_verse)
+            self.adjust_combo_box(verse_from, verse_count, self.to_verse)
         else:
-            self.adjust_combo_box(1, verse_count, self.advanced_to_verse)
-
-    def on_advanced_from_chapter(self):
-        bible = self.advancedVersionComboBox.currentText()
-        book_ref_id = self.advanced_book_combo_box.itemData(
-            int(self.advanced_book_combo_box.currentIndex()))
-        chapter_from = int(self.advanced_from_chapter.currentText())
-        chapter_to = int(self.advanced_to_chapter.currentText())
-        verse_count = self.plugin.manager.get_verse_count_by_book_ref_id(bible, book_ref_id, chapter_from)
-        self.adjust_combo_box(1, verse_count, self.advanced_from_verse)
-        if chapter_from > chapter_to:
-            self.adjust_combo_box(1, verse_count, self.advanced_to_verse)
-            self.adjust_combo_box(chapter_from, self.chapter_count, self.advanced_to_chapter)
-        elif chapter_from == chapter_to:
-            self.adjust_combo_box(chapter_from, self.chapter_count, self.advanced_to_chapter)
-            self.adjust_combo_box(1, verse_count, self.advanced_to_verse, True)
-        else:
-            self.adjust_combo_box(chapter_from, self.chapter_count, self.advanced_to_chapter, True)
+            self.adjust_combo_box(1, verse_count, self.to_verse)
 
     def adjust_combo_box(self, range_from, range_to, combo, restore=False):
         """
@@ -640,380 +588,196 @@ class BibleMediaItem(MediaManagerItem):
         """
         log.debug('adjust_combo_box {box}, {start}, {end}'.format(box=combo, start=range_from, end=range_to))
         if restore:
-            old_text = combo.currentText()
+            old_selection = combo.currentData()
         combo.clear()
-        combo.addItems(list(map(str, list(range(range_from, range_to + 1)))))
-        if restore and combo.findText(old_text) != -1:
-            combo.setCurrentIndex(combo.findText(old_text))
+        for item in range(range_from, range_to + 1):
+            combo.addItem(str(item), item)
+        if restore:
+            index = combo.findData(old_selection)
+            combo.setCurrentIndex(index if index != -1 else 0)
 
-    def on_advanced_search_button(self):
+    def on_search_button_clicked(self):
         """
-        Does an advanced search and saves the search results.
+        Call the correct search function depending on which tab the user is using
+
+        :return: None
         """
-        log.debug('Advanced Search Button clicked')
-        self.advancedSearchButton.setEnabled(False)
-        self.application.process_events()
-        bible = self.advancedVersionComboBox.currentText()
-        second_bible = self.advancedSecondComboBox.currentText()
-        book = self.advanced_book_combo_box.currentText()
-        book_ref_id = self.advanced_book_combo_box.itemData(int(self.advanced_book_combo_box.currentIndex()))
-        chapter_from = self.advanced_from_chapter.currentText()
-        chapter_to = self.advanced_to_chapter.currentText()
-        verse_from = self.advanced_from_verse.currentText()
-        verse_to = self.advanced_to_verse.currentText()
-        verse_separator = get_reference_separator('sep_v_display')
-        range_separator = get_reference_separator('sep_r_display')
-        verse_range = chapter_from + verse_separator + verse_from + range_separator + chapter_to + \
-            verse_separator + verse_to
-        verse_text = '{book} {verse}'.format(book=book, verse=verse_range)
+        if not self.bible:
+            self.main_window.information_message(UiStrings().BibleNoBiblesTitle, UiStrings().BibleNoBibles)
+            return
+        self.search_button.setEnabled(False)
         self.application.set_busy_cursor()
-        self.search_results = self.plugin.manager.get_verses(bible, verse_text, book_ref_id)
-        if second_bible:
-            self.second_search_results = self.plugin.manager.get_verses(second_bible, verse_text, book_ref_id)
-        if not self.advancedLockButton.isChecked():
-            self.list_view.clear()
-        if self.list_view.count() != 0:
-            self.__check_second_bible(bible, second_bible)
-        elif self.search_results:
-            self.display_results(bible, second_bible)
-        self.advancedSearchButton.setEnabled(True)
+        self.application.process_events()
+        if self.search_tab.isVisible():
+            self.text_search()
+        elif self.select_tab.isVisible():
+            self.select_search()
+        self.search_button.setEnabled(True)
         self.application.set_normal_cursor()
 
-    def on_quick_reference_search(self):
+    def select_search(self):
+        """
+        Preform a search using the passage selected on the `Select` tab
+
+        :return: None
+        """
+        verse_range = self.plugin.manager.process_verse_range(
+            self.select_book_combo_box.currentData(), self.from_chapter.currentData(), self.from_verse.currentData(),
+            self.to_chapter.currentData(), self.to_verse.currentData())
+        self.search_results = self.plugin.manager.get_verses(self.bible.name, verse_range, False)
+        if self.second_bible:
+            self.second_search_results = self.plugin.manager.get_verses(self.second_bible.name, verse_range, False)
+        self.display_results()
+
+    def text_reference_search(self, search_text):
         """
         We are doing a 'Reference Search'.
-        This search is called on def on_quick_search_button by Quick Reference and Combined Searches.
-        """
-        # Set Bibles to use the text input from Quick search field.
-        bible = self.quickVersionComboBox.currentText()
-        second_bible = self.quickSecondComboBox.currentText()
-        """
-        Get input from field and replace 'A-Z + . ' with ''
-        This will check if field has any '.' after A-Z and removes them. Eg. Gen. 1 = Ge 1 = Genesis 1
-        If Book name has '.' after number. eg. 1. Genesis, the search fails without the dot, and vice versa.
-        A better solution would be to make '.' optional in the search results. Current solution was easier to code.
-        """
-        text = self.quick_search_edit.text()
-        text = re.sub('\D[.]\s', ' ', text)
-        # This is triggered on reference search, use the search from manager.py
-        if self.quick_search_edit.current_search_type() != BibleSearch.Text:
-            self.search_results = self.plugin.manager.get_verses(bible, text)
-        if second_bible and self.search_results:
-            self.second_search_results = \
-                self.plugin.manager.get_verses(second_bible, text, self.search_results[0].book.book_reference_id)
+        This search is called on def text_search by Reference and Combined Searches.
 
-    def on_quick_text_search(self):
+        :return: None
+        """
+        verse_refs = self.plugin.manager.parse_ref(self.bible.name, search_text)
+        self.search_results = self.plugin.manager.get_verses(self.bible.name, verse_refs, True)
+        if self.second_bible and self.search_results:
+            self.search_results = self.plugin.manager.get_verses(self.second_bible.name, verse_refs, True)
+        self.display_results()
+
+    def on_text_search(self, text, search_while_type=False):
         """
         We are doing a 'Text Search'.
-        This search is called on def on_quick_search_button by Quick Text and Combined Searches.
+        This search is called on def text_search by 'Search' Text and Combined Searches.
         """
-        # Set Bibles to use the text input from Quick search field.
-        bible = self.quickVersionComboBox.currentText()
-        second_bible = self.quickSecondComboBox.currentText()
-        text = self.quick_search_edit.text()
-        # If Text search ends with "," OpenLP will crash, prevent this from happening by removing all ","s.
-        text = re.sub('[,]', '', text)
-        self.application.set_busy_cursor()
-        # Get Bibles list
-        bibles = self.plugin.manager.get_bibles()
-        # Add results to "search_results"
-        self.search_results = self.plugin.manager.verse_search(bible, second_bible, text)
-        if second_bible and self.search_results:
-            # new_search_results is needed to make sure 2nd bible contains all verses. (And counting them on error)
-            text = []
-            new_search_results = []
-            count = 0
-            passage_not_found = False
-            # Search second bible for results of search_results to make sure everythigns there.
-            # Count all the unfound passages.
+        self.search_results = self.plugin.manager.verse_search(self.bible.name, text)
+        if self.second_bible and self.search_results:
+            filtered_search_results = []
+            not_found_count = 0
             for verse in self.search_results:
-                db_book = bibles[second_bible].get_book_by_book_ref_id(verse.book.book_reference_id)
-                if not db_book:
-                    log.debug('Passage "{name} {chapter:d}:{verse:d}" not found in '
-                              'Second Bible'.format(name=verse.book.name, chapter=verse.chapter, verse=verse.verse))
-                    passage_not_found = True
-                    count += 1
-                    continue
-                new_search_results.append(verse)
-                text.append((verse.book.book_reference_id, verse.chapter, verse.verse, verse.verse))
-            if passage_not_found:
-                # This is for the 2nd Bible.
+                second_verse = self.second_bible.get_verses(
+                    [(verse.book.book_reference_id, verse.chapter, verse.verse, verse.verse)], False)
+                if second_verse:
+                    filtered_search_results.append(verse)
+                    self.second_search_results += second_verse
+                else:
+                    log.debug('Verse "{name} {chapter:d}:{verse:d}" not found in Second Bible "{bible_name}"'.format(
+                        name=verse.book.name, chapter=verse.chapter,
+                        verse=verse.verse, bible_name=self.second_bible.name))
+                    not_found_count += 1
+            self.search_results = filtered_search_results
+            if not_found_count != 0 and not search_while_type:
                 self.main_window.information_message(
-                    translate('BiblesPlugin.MediaItem', 'Information'),
-                    translate('BiblesPlugin.MediaItem', 'The second Bible does not contain all the verses '
-                                                        'that are in the main Bible.\nOnly verses found in both Bibles'
-                                                        ' will be shown.\n\n{count:d} verses have not been included '
-                                                        'in the results.').format(count=count))
-            # Join the searches so only verses that are found on both Bibles are shown.
-            self.search_results = new_search_results
-            self.second_search_results = bibles[second_bible].get_verses(text)
+                    translate('BiblesPlugin.MediaItem', 'Verses not found'),
+                    translate('BiblesPlugin.MediaItem',
+                              'The second Bible "{second_name}" does not contain all the verses that are in the main '
+                              'Bible "{name}".\nOnly verses found in both Bibles will be shown.\n\n'
+                              '{count:d} verses have not been included in the results.')
+                        .format(second_name=self.second_bible.name, name=self.bible.name, count=not_found_count))
+        self.display_results()
 
-    def on_quick_text_search_while_typing(self):
+    def text_search(self, search_while_type=False):
         """
-        We are doing a 'Text Search' while typing
-        Call the verse_search_while_typing from manager.py
-        It does not show web bible errors while typing.
-        (It would result in the error popping every time a char is entered or removed)
-        """
-        # Set Bibles to use the text input from Quick search field.
-        bible = self.quickVersionComboBox.currentText()
-        second_bible = self.quickSecondComboBox.currentText()
-        text = self.quick_search_edit.text()
-        # If Text search ends with "," OpenLP will crash, prevent this from happening by removing all ","s.
-        text = re.sub('[,]', '', text)
-        self.application.set_busy_cursor()
-        # Get Bibles list
-        bibles = self.plugin.manager.get_bibles()
-        # Add results to "search_results"
-        self.search_results = self.plugin.manager.verse_search_while_typing(bible, second_bible, text)
-        if second_bible and self.search_results:
-            # new_search_results is needed to make sure 2nd bible contains all verses. (And counting them on error)
-            text = []
-            new_search_results = []
-            count = 0
-            passage_not_found = False
-            # Search second bible for results of search_results to make sure everythigns there.
-            # Count all the unfound passages. Even thou no error is shown, this needs to be done or
-            # the code breaks later on.
-            for verse in self.search_results:
-                db_book = bibles[second_bible].get_book_by_book_ref_id(verse.book.book_reference_id)
-                if not db_book:
-                    log.debug('Passage ("{versebookname}","{versechapter}","{verseverse}") not found in Second Bible'
-                              .format(versebookname=verse.book.name, versechapter='verse.chapter',
-                                      verseverse=verse.verse))
-                    count += 1
-                    continue
-                new_search_results.append(verse)
-                text.append((verse.book.book_reference_id, verse.chapter, verse.verse, verse.verse))
-            # Join the searches so only verses that are found on both Bibles are shown.
-            self.search_results = new_search_results
-            self.second_search_results = bibles[second_bible].get_verses(text)
-
-    def on_quick_search_button(self):
-        """
-        This triggers the proper Quick search based on which search type is used.
+        This triggers the proper 'Search' search based on which search type is used.
         "Eg. "Reference Search", "Text Search" or "Combined search".
         """
-        log.debug('Quick Search Button clicked')
-        self.quickSearchButton.setEnabled(False)
-        self.application.process_events()
-        bible = self.quickVersionComboBox.currentText()
-        second_bible = self.quickSecondComboBox.currentText()
-        text = self.quick_search_edit.text()
-        if self.quick_search_edit.current_search_type() == BibleSearch.Reference:
-            # We are doing a 'Reference Search'. (Get script from def on_quick_reference_search)
-            self.on_quick_reference_search()
-            # Get reference separators from settings.
-            if not self.search_results:
-                reference_separators = {
-                    'verse': get_reference_separator('sep_v_display'),
-                    'range': get_reference_separator('sep_r_display'),
-                    'list': get_reference_separator('sep_l_display')}
+        log.debug('text_search called')
+        text = self.search_edit.text()
+        if text == '':
+            self.list_view.clear()
+            return
+        self.list_view.clear(search_while_typing=search_while_type)
+        if self.search_edit.current_search_type() == BibleSearch.Reference:
+            if get_reference_match('full').match(text):
+                # Valid reference found. Do reference search.
+                self.text_reference_search(text)
+            elif not search_while_type:
                 self.main_window.information_message(
                     translate('BiblesPlugin.BibleManager', 'Scripture Reference Error'),
-                    translate('BiblesPlugin.BibleManager', '<strong>OpenLP couldn’t find anything '
-                                                           'with your search.<br><br>'
-                                                           'Please make sure that your reference follows '
-                                                           'one of these patterns:</strong><br><br>%s'
-                              % UiStrings().BibleScriptureError % reference_separators))
-        elif self.quick_search_edit.current_search_type() == BibleSearch.Text:
-            # We are doing a 'Text Search'. (Get script from def on_quick_text_search)
-            self.on_quick_text_search()
-            if not self.search_results and len(text) - text.count(' ') < 3 and bible:
-                self.main_window.information_message(
-                    UiStrings().BibleShortSearchTitle,
-                    UiStrings().BibleShortSearch)
-        elif self.quick_search_edit.current_search_type() == BibleSearch.Combined:
-            # We are doing a 'Combined search'. Starting with reference search.
-            # Perform only if text contains any numbers
-            if (char.isdigit() for char in text):
-                self.on_quick_reference_search()
-            """
-            If results are found, search will be finalized.
-            This check needs to be here in order to avoid duplicate errors.
-            If keyword is shorter than 3 (not including spaces), message is given. It's actually possible to find
-            verses with less than 3 chars (Eg. G1 = Genesis 1) thus this error is not shown if any results are found.
-            if no Bibles are installed, this message is not shown - "No bibles" message is shown instead.
-            """
-            if not self.search_results and len(text) - text.count(' ') < 3 and bible:
-                self.main_window.information_message(
-                    UiStrings().BibleShortSearchTitle,
-                    UiStrings().BibleShortSearch)
-            if not self.search_results and len(text) - text.count(' ') > 2 and bible:
-                # Text search starts here if no reference was found and keyword is longer than 2.
-                #  > 2 check is required in order to avoid duplicate error messages for short keywords.
-                self.on_quick_text_search()
-                if not self.search_results and not \
-                        Settings().value(self.settings_section + '/hide combined quick error'):
-                        self.application.set_normal_cursor()
-                        # Reference separators need to be defined both, in here and on reference search,
-                        # error won't work if they are left out from one.
-                        reference_separators = {
-                            'verse': get_reference_separator('sep_v_display'),
-                            'range': get_reference_separator('sep_r_display'),
-                            'list': get_reference_separator('sep_l_display')}
-                        self.main_window.information_message(translate('BiblesPlugin.BibleManager', 'Nothing found'),
-                                                             translate('BiblesPlugin.BibleManager',
-                                                                       '<strong>OpenLP couldn’t find anything with your'
-                                                                       ' search.</strong><br><br>If you tried to search'
-                                                                       ' with Scripture Reference, please make<br> sure'
-                                                                       ' that your reference follows one of these'
-                                                                       ' patterns: <br><br>%s'
-                                                                       % UiStrings().BibleScriptureError %
-                                                                       reference_separators))
-        # Finalizing the search
-        # List is cleared if not locked, results are listed, button is set available, cursor is set to normal.
-        if not self.quickLockButton.isChecked():
-            self.list_view.clear()
-        if self.list_view.count() != 0 and self.search_results:
-            self.__check_second_bible(bible, second_bible)
-        elif self.search_results:
-            self.display_results(bible, second_bible)
-        self.quickSearchButton.setEnabled(True)
-        self.application.set_normal_cursor()
+                    translate('BiblesPlugin.BibleManager',
+                              '<strong>The reference you typed is invalid!<br><br>'
+                              'Please make sure that your reference follows one of these patterns:</strong><br><br>%s')
+                    % UiStrings().BibleScriptureError % get_reference_separators())
+        elif self.search_edit.current_search_type() == BibleSearch.Combined and get_reference_match('full').match(text):
+                # Valid reference found. Do reference search.
+                self.text_reference_search(text)
+        else:
+            # It can only be a 'Combined' search without a valid reference, or a 'Text' search
+            if search_while_type:
+                if len(text) > 8 and VALID_TEXT_SEARCH.search(text):
+                    self.on_text_search(text, True)
+            elif VALID_TEXT_SEARCH.search(text):
+                self.on_text_search(text)
+                self.display_results()
 
-    def on_quick_search_while_typing(self):
-        """
-        This function is called when "Search as you type" is enabled for Bibles.
-        It is basically the same thing as "on_quick_search_search" but all the error messages are removed.
-        This also has increased min len for text search for performance reasons.
-        For commented version, please visit def on_quick_search_button.
-        """
-        bible = self.quickVersionComboBox.currentText()
-        second_bible = self.quickSecondComboBox.currentText()
-        text = self.quick_search_edit.text()
-        if self.quick_search_edit.current_search_type() == BibleSearch.Combined:
-            # If text has no numbers, auto search limit is min 8 characters for performance reasons.
-            # If you change this value, also change it in biblestab.py (Count) in enabling search while typing.
-            if (char.isdigit() for char in text) and len(text) > 2:
-                self.on_quick_reference_search()
-            if not self.search_results and len(text) > 7:
-                self.on_quick_text_search_while_typing()
-        elif self.quick_search_edit.current_search_type() == BibleSearch.Reference:
-            self.on_quick_reference_search()
-        elif self.quick_search_edit.current_search_type() == BibleSearch.Text:
-            if len(text) > 7:
-                self.on_quick_text_search_while_typing()
-        if not self.quickLockButton.isChecked():
-            self.list_view.clear()
-        if self.list_view.count() != 0 and self.search_results:
-            self.__check_second_bible(bible, second_bible)
-        elif self.search_results:
-            self.display_results(bible, second_bible)
-        self.application.set_normal_cursor()
 
-    def on_search_text_edit_changed(self):
+    def on_search_edit_text_changed(self):
         """
-        If search automatically while typing is enabled, perform the search and list results when conditions are met.
+        If 'search_as_you_type' is enabled, start a timer when the search_edit emits a textChanged signal. This is to
+        prevent overloading the system by submitting too many search requests in a short space of time.
+
+        :return: None
         """
         if Settings().value('bibles/is search while typing enabled'):
-            text = self.quick_search_edit.text()
-            """
-            Use Regex for finding space + number in reference search and space + 2 characters in text search.
-            Also search for two characters (Searches require at least two sets of two characters)
-            These are used to prevent bad search queries from starting. (Long/crashing queries)
-            """
-            space_and_digit_reference = re.compile(' \d')
-            two_chars_text = re.compile('\S\S')
-            space_and_two_chars_text = re.compile(' \S\S')
-            # Turn this into a format that may be used in if statement.
-            count_space_digit_reference = space_and_digit_reference.findall(text)
-            count_two_chars_text = two_chars_text.findall(text)
-            count_spaces_two_chars_text = space_and_two_chars_text.findall(text)
-            """
-            The Limit is required for setting the proper "No items found" message.
-            "Limit" is also hard coded to on_quick_search_while_typing, it must be there to avoid bad search
-            performance. Limit 8 = Text search, 3 = Reference search.
-            """
-            limit = 8
-            if self.quick_search_edit.current_search_type() == BibleSearch.Combined:
-                if len(count_space_digit_reference) != 0:
-                    limit = 3
-            elif self.quick_search_edit.current_search_type() == BibleSearch.Reference:
-                limit = 3
-            """
-            If text is empty, clear the list.
-            else: Start by checking if the search is suitable for "Search while typing"
-            """
-            if len(text) == 0:
-                if not self.quickLockButton.isChecked():
-                    self.list_view.clear()
-            else:
-                if limit == 3 and (len(text) < limit or len(count_space_digit_reference) == 0):
-                    if not self.quickLockButton.isChecked():
-                        self.list_view.clear()
-                elif limit == 8 and (len(text) < limit or len(count_two_chars_text) < 2):
-                    if not self.quickLockButton.isChecked():
-                        self.list_view.clear(search_while_typing=True)
-                else:
-                    """
-                    Start search if no chars are entered or deleted for 0.2 s
-                    If no Timer is set, Text search will break the search by sending repeative search Quaries on
-                    all chars. Use the self.on_quick_search_while_typing, this does not contain any error messages.
-                    """
-                    self.search_timer = ()
-                    if self.search_timer:
-                        self.search_timer.stop()
-                        self.search_timer.deleteLater()
-                    self.search_timer = QtCore.QTimer()
-                    self.search_timer.timeout.connect(self.on_quick_search_while_typing)
-                    self.search_timer.setSingleShot(True)
-                    self.search_timer.start(200)
+            if not self.search_timer.isActive():
+                self.search_timer.start()
 
-    def display_results(self, bible, second_bible=''):
+    def on_search_timer_timeout(self):
         """
-        Displays the search results in the media manager. All data needed for further action is saved for/in each row.
+        Perform a search when the search timer timeouts. The search timer is used for 'search_as_you_type' so that we
+        don't overload the system buy submitting too many search requests in a short space of time.
+
+        :return: None
         """
-        items = self.build_display_results(bible, second_bible, self.search_results)
-        for bible_verse in items:
-            self.list_view.addItem(bible_verse)
+        self.text_search(True)
+
+    def display_results(self):
+        """
+        Add the search results to the media manager list.
+
+        :return: None
+        """
+        self.list_view.clear()
+        items = self.build_display_results(self.bible, self.second_bible, self.search_results)
+        for item in items:
+            self.list_view.addItem(item)
         self.list_view.selectAll()
-        self.search_results = {}
-        self.second_search_results = {}
+        self.search_results = []
+        self.second_search_results = []
 
     def build_display_results(self, bible, second_bible, search_results):
         """
         Displays the search results in the media manager. All data needed for further action is saved for/in each row.
         """
-        verse_separator = get_reference_separator('sep_v_display')
-        version = self.plugin.manager.get_meta_data(bible, 'name').value
-        copyright = self.plugin.manager.get_meta_data(bible, 'copyright').value
-        permissions = self.plugin.manager.get_meta_data(bible, 'permissions').value
+        verse_separator = get_reference_separators()['verse']
+        version = self.plugin.manager.get_meta_data(self.bible.name, 'name').value
+        copyright = self.plugin.manager.get_meta_data(self.bible.name, 'copyright').value
+        permissions = self.plugin.manager.get_meta_data(self.bible.name, 'permissions').value
+        second_name = ''
         second_version = ''
         second_copyright = ''
         second_permissions = ''
         if second_bible:
-            second_version = self.plugin.manager.get_meta_data(second_bible, 'name').value
-            second_copyright = self.plugin.manager.get_meta_data(second_bible, 'copyright').value
-            second_permissions = self.plugin.manager.get_meta_data(second_bible, 'permissions').value
+            second_name = second_bible.name
+            second_version = self.plugin.manager.get_meta_data(self.second_bible.name, 'name').value
+            second_copyright = self.plugin.manager.get_meta_data(self.second_bible.name, 'copyright').value
+            second_permissions = self.plugin.manager.get_meta_data(self.second_bible.name, 'permissions').value
         items = []
-        language_selection = self.plugin.manager.get_language_selection(bible)
+        language_selection = self.plugin.manager.get_language_selection(self.bible.name)
         for count, verse in enumerate(search_results):
-            book = None
-            if language_selection == LanguageSelection.Bible:
-                book = verse.book.name
-            elif language_selection == LanguageSelection.Application:
-                book_names = BibleStrings().BookNames
-                data = BiblesResourcesDB.get_book_by_id(verse.book.book_reference_id)
-                book = str(book_names[data['abbreviation']])
-            elif language_selection == LanguageSelection.English:
-                data = BiblesResourcesDB.get_book_by_id(verse.book.book_reference_id)
-                book = data['name']
             data = {
-                'book': book,
+                'book': verse.book.get_name(language_selection),
                 'chapter': verse.chapter,
                 'verse': verse.verse,
-                'bible': bible,
+                'bible': self.bible.name,
                 'version': version,
                 'copyright': copyright,
                 'permissions': permissions,
                 'text': verse.text,
-                'second_bible': second_bible,
+                'second_bible': second_name,
                 'second_version': second_version,
                 'second_copyright': second_copyright,
                 'second_permissions': second_permissions,
                 'second_text': ''
             }
+
             if second_bible:
                 try:
                     data['second_text'] = self.second_search_results[count].text
@@ -1023,20 +787,10 @@ class BibleMediaItem(MediaManagerItem):
                 except TypeError:
                     log.exception('The second_search_results does not have this book.')
                     break
-                bible_text = ('{book} {chapter:d}{sep}{verse:d} '
-                              '({version1}, {version2})').format(book=book,
-                                                                 chapter=verse.chapter,
-                                                                 sep=verse_separator,
-                                                                 verse=verse.verse,
-                                                                 version1=version,
-                                                                 version2=second_version)
+                bible_text = '{book} {chapter:d}{sep}{verse:d} ({version}, {second_version})'
             else:
-                bible_text = '{book} {chapter:d}{sep}{verse:d} ({version})'.format(book=book,
-                                                                                   chapter=verse.chapter,
-                                                                                   sep=verse_separator,
-                                                                                   verse=verse.verse,
-                                                                                   version=version)
-            bible_verse = QtWidgets.QListWidgetItem(bible_text)
+                bible_text = '{book} {chapter:d}{sep}{verse:d} ({version})'
+            bible_verse = QtWidgets.QListWidgetItem(bible_text.format(sep=verse_separator, **data))
             bible_verse.setData(QtCore.Qt.UserRole, data)
             items.append(bible_verse)
         return items
@@ -1060,63 +814,42 @@ class BibleMediaItem(MediaManagerItem):
         if not items:
             return False
         bible_text = ''
-        old_item = None
         old_chapter = -1
-        raw_slides = []
-        raw_title = []
+        raw_slides = ['']
         verses = VerseReferenceList()
         for bitem in items:
-            book = self._decode_qt_object(bitem, 'book')
-            chapter = int(self._decode_qt_object(bitem, 'chapter'))
-            verse = int(self._decode_qt_object(bitem, 'verse'))
-            bible = self._decode_qt_object(bitem, 'bible')
-            version = self._decode_qt_object(bitem, 'version')
-            copyright = self._decode_qt_object(bitem, 'copyright')
-            permissions = self._decode_qt_object(bitem, 'permissions')
-            text = self._decode_qt_object(bitem, 'text')
-            second_bible = self._decode_qt_object(bitem, 'second_bible')
-            second_version = self._decode_qt_object(bitem, 'second_version')
-            second_copyright = self._decode_qt_object(bitem, 'second_copyright')
-            second_permissions = self._decode_qt_object(bitem, 'second_permissions')
-            second_text = self._decode_qt_object(bitem, 'second_text')
-            verses.add(book, chapter, verse, version, copyright, permissions)
-            verse_text = self.format_verse(old_chapter, chapter, verse)
-            if second_bible:
-                bible_text = '{verse}{text1}\n\n{verse}&nbsp;{text2}'.format(verse=verse_text,
-                                                                             text1=text,
-                                                                             text2=second_text)
+            data = bitem.data(QtCore.Qt.UserRole)
+            verses.add(
+                data['book'], data['chapter'], data['verse'], data['version'], data['copyright'], data['permissions'])
+            verse_text = self.format_verse(old_chapter, data['chapter'], data['verse'])
+            # We only support 'Verse Per Slide' when using a scond bible
+            if data['second_bible']:
+                bible_text = '{data[verse]}{data[text]}\n\n{data[verse]}{data[second_text]}'.format(data=data)
                 raw_slides.append(bible_text.rstrip())
                 bible_text = ''
             # If we are 'Verse Per Slide' then create a new slide.
             elif self.settings.layout_style == LayoutStyle.VersePerSlide:
-                bible_text = '{verse}{text}'.format(verse=verse_text, text=text)
+                bible_text = '{data[verse]}{data[text]}'.format(data=data)
                 raw_slides.append(bible_text.rstrip())
                 bible_text = ''
             # If we are 'Verse Per Line' then force a new line.
             elif self.settings.layout_style == LayoutStyle.VersePerLine:
-                bible_text = '{bible}{verse}{text}\n'.format(bible=bible_text, verse=verse_text, text=text)
+                bible_text = '{bible} {verse}{data[text]}\n'.format(bible=bible_text, verse=verse_text, data=data)
             # We have to be 'Continuous'.
             else:
-                bible_text = '{bible} {verse}{text}\n'.format(bible=bible_text, verse=verse_text, text=text)
+                bible_text = '{bible} {verse}{data[text]}'.format(bible=bible_text, verse=verse_text, data=data)
             bible_text = bible_text.strip(' ')
-            if not old_item:
-                start_item = bitem
-            elif self.check_title(bitem, old_item):
-                raw_title.append(self.format_title(start_item, old_item))
-                start_item = bitem
-            old_item = bitem
-            old_chapter = chapter
+            old_chapter = data['chapter']
         # Add footer
         service_item.raw_footer.append(verses.format_verses())
-        if second_bible:
-            verses.add_version(second_version, second_copyright, second_permissions)
+        if data['second_bible']:
+            verses.add_version(data['second_version'], data['second_copyright'], data['second_permissions'])
         service_item.raw_footer.append(verses.format_versions())
-        raw_title.append(self.format_title(start_item, bitem))
         # If there are no more items we check whether we have to add bible_text.
         if bible_text:
             raw_slides.append(bible_text.lstrip())
         # Service Item: Capabilities
-        if self.settings.layout_style == LayoutStyle.Continuous and not second_bible:
+        if self.settings.layout_style == LayoutStyle.Continuous and not data['second_bible']:
             # Split the line but do not replace line breaks in renderer.
             service_item.add_capability(ItemCapabilities.NoLineBreaks)
         service_item.add_capability(ItemCapabilities.CanPreview)
@@ -1126,76 +859,11 @@ class BibleMediaItem(MediaManagerItem):
         # Service Item: Title
         service_item.title = '{verse} {version}'.format(verse=verses.format_verses(), version=verses.format_versions())
         # Service Item: Theme
-        if not self.settings.bible_theme:
-            service_item.theme = None
-        else:
+        if self.settings.bible_theme:
             service_item.theme = self.settings.bible_theme
         for slide in raw_slides:
             service_item.add_from_text(slide)
         return True
-
-    def format_title(self, start_bitem, old_bitem):
-        """
-        This method is called, when we have to change the title, because we are at the end of a verse range. E. g. if we
-        want to add Genesis 1:1-6 as well as Daniel 2:14.
-
-        :param start_bitem: The first item of a range.
-        :param old_bitem: The last item of a range.
-        """
-        verse_separator = get_reference_separator('sep_v_display')
-        range_separator = get_reference_separator('sep_r_display')
-        old_chapter = self._decode_qt_object(old_bitem, 'chapter')
-        old_verse = self._decode_qt_object(old_bitem, 'verse')
-        start_book = self._decode_qt_object(start_bitem, 'book')
-        start_chapter = self._decode_qt_object(start_bitem, 'chapter')
-        start_verse = self._decode_qt_object(start_bitem, 'verse')
-        start_bible = self._decode_qt_object(start_bitem, 'bible')
-        start_second_bible = self._decode_qt_object(start_bitem, 'second_bible')
-        if start_second_bible:
-            bibles = '{bible1}, {bible2}'.format(bible1=start_bible, bible2=start_second_bible)
-        else:
-            bibles = start_bible
-        if start_chapter == old_chapter:
-            if start_verse == old_verse:
-                verse_range = start_chapter + verse_separator + start_verse
-            else:
-                verse_range = start_chapter + verse_separator + start_verse + range_separator + old_verse
-        else:
-            verse_range = start_chapter + verse_separator + start_verse + \
-                range_separator + old_chapter + verse_separator + old_verse
-        return '{book} {verse} ({bible})'.format(book=start_book, verse=verse_range, bible=bibles)
-
-    def check_title(self, bitem, old_bitem):
-        """
-        This method checks if we are at the end of an verse range. If that is the case, we return True, otherwise False.
-        E. g. if we added Genesis 1:1-6, but the next verse is Daniel 2:14, we return True.
-
-        :param bitem: The item we are dealing with at the moment.
-        :param old_bitem: The item we were previously dealing with.
-        """
-        # Get all the necessary meta data.
-        book = self._decode_qt_object(bitem, 'book')
-        chapter = int(self._decode_qt_object(bitem, 'chapter'))
-        verse = int(self._decode_qt_object(bitem, 'verse'))
-        bible = self._decode_qt_object(bitem, 'bible')
-        second_bible = self._decode_qt_object(bitem, 'second_bible')
-        old_book = self._decode_qt_object(old_bitem, 'book')
-        old_chapter = int(self._decode_qt_object(old_bitem, 'chapter'))
-        old_verse = int(self._decode_qt_object(old_bitem, 'verse'))
-        old_bible = self._decode_qt_object(old_bitem, 'bible')
-        old_second_bible = self._decode_qt_object(old_bitem, 'second_bible')
-        if old_bible != bible or old_second_bible != second_bible or old_book != book:
-            # The bible, second bible or book has changed.
-            return True
-        elif old_verse + 1 != verse and old_chapter == chapter:
-            # We are still in the same chapter, but a verse has been skipped.
-            return True
-        elif old_chapter + 1 == chapter and (verse != 1 or old_verse !=
-                                             self.plugin.manager.get_verse_count(old_bible, old_book, old_chapter)):
-            # We are in the following chapter, but the last verse was not the last verse of the chapter or the current
-            # verse is not the first one of the chapter.
-            return True
-        return False
 
     def format_verse(self, old_chapter, chapter, verse):
         """
@@ -1207,28 +875,29 @@ class BibleMediaItem(MediaManagerItem):
         :param old_chapter: The previous verse's chapter number (int).
         :param chapter: The chapter number (int).
         :param verse: The verse number (int).
+        :return: An empty or formatted string
         """
-        verse_separator = get_reference_separator('sep_v_display')
         if not self.settings.is_verse_number_visible:
             return ''
+        verse_separator = get_reference_separators()['verse']
         if not self.settings.show_new_chapters or old_chapter != chapter:
-            verse_text = str(chapter) + verse_separator + str(verse)
+            verse_text = '{chapter}{sep}{verse}'.format(chapter=chapter, sep=verse_separator, verse=verse)
         else:
-            verse_text = str(verse)
-        if self.settings.display_style == DisplayStyle.Round:
-            return '{{su}}({verse}){{/su}}&nbsp;'.format(verse=verse_text)
-        if self.settings.display_style == DisplayStyle.Curly:
-            return '{{su}}{{{verse}}}{{/su}}&nbsp;'.format(verse=verse_text)
-        if self.settings.display_style == DisplayStyle.Square:
-            return '{{su}}[{verse}]{{/su}}&nbsp;'.format(verse=verse_text)
-        return '{{su}}{verse}{{/su}}&nbsp;'.format(verse=verse_text)
+            verse_text = verse
+        bracket = {
+            DisplayStyle.NoBrackets: ('', ''),
+            DisplayStyle.Round: ('(', ')'),
+            DisplayStyle.Curly: ('{', '}'),
+            DisplayStyle.Square: ('[', ']')
+        }[self.settings.display_style]
+        return '{{su}}{bracket[0]}{verse_text}{bracket[1]}{{/su}}&nbsp;'.format(verse_text=verse_text, bracket=bracket)
 
     def search(self, string, showError):
         """
         Search for some Bible verses (by reference).
         """
-        bible = self.quickVersionComboBox.currentText()
-        search_results = self.plugin.manager.get_verses(bible, string, False, showError)
+        reference = self.plugin.manager.parse_ref(self.bible.name, string)
+        search_results = self.plugin.manager.get_verses(self.bible.name, reference, showError)
         if search_results:
             verse_text = ' '.join([verse.text for verse in search_results])
             return [[string, verse_text]]
@@ -1238,7 +907,6 @@ class BibleMediaItem(MediaManagerItem):
         """
         Create a media item from an item id.
         """
-        bible = self.quickVersionComboBox.currentText()
-        search_results = self.plugin.manager.get_verses(bible, item_id, False)
-        items = self.build_display_results(bible, '', search_results)
-        return items
+        reference = self.plugin.manager.parse_ref(self.bible.name, item_id)
+        search_results = self.plugin.manager.get_verses(self.bible.name, reference, False)
+        return self.build_display_results(self.bible, None, search_results)
