@@ -138,8 +138,8 @@ class TestMediaItem(TestCase, TestMixin):
 
         self.mocked_plugin = MagicMock()
         with patch('openlp.plugins.bibles.lib.mediaitem.build_icon'), \
-            patch('openlp.plugins.bibles.lib.mediaitem.MediaManagerItem._setup'), \
-            patch('openlp.plugins.bibles.lib.mediaitem.BibleMediaItem.setup_item'):
+                patch('openlp.plugins.bibles.lib.mediaitem.MediaManagerItem._setup'), \
+                patch('openlp.plugins.bibles.lib.mediaitem.BibleMediaItem.setup_item'):
             self.media_item = BibleMediaItem(None, self.mocked_plugin)
 
         self.media_item.settings_section = 'bibles'
@@ -377,7 +377,7 @@ class TestMediaItem(TestCase, TestMixin):
         #        in the list
         self.media_item.select_book_combo_box = MagicMock(**{'findData.return_value': 2})
         with patch.object(self.media_item, 'get_common_books', return_value=self.book_list_1), \
-             patch.object(self.media_item, 'on_advanced_book_combo_box'):
+                patch.object(self.media_item, 'on_advanced_book_combo_box'):
 
             # WHEN: Calling initialise_advanced_bible() with the last_id argument set
             self.media_item.bible = MagicMock()
@@ -592,7 +592,7 @@ class TestMediaItem(TestCase, TestMixin):
         # GIVEN: An instance of :class:`MediaManagerItem` and a QMessageBox which reutrns QtWidgets.QMessageBox.Yes
         self.media_item.bible = MagicMock()
         with patch('openlp.plugins.bibles.lib.mediaitem.QtWidgets.QMessageBox.question',
-                return_value=QtWidgets.QMessageBox.Yes) as mocked_qmessage_box, \
+                   return_value=QtWidgets.QMessageBox.Yes) as mocked_qmessage_box, \
                 patch.object(self.media_item, 'reload_bibles'):
 
             # WHEN: on_delete_click is called
