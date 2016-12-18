@@ -40,6 +40,11 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         super().__init__(parent)
         self.mime_data_text = name
         self.no_results_text = UiStrings().NoResults
+        self.setSpacing(1)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.setAlternatingRowColors(True)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.locked = False
 
     def activateDnD(self):
         """
@@ -49,13 +54,15 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         Registry().register_function(('%s_dnd' % self.mime_data_text), self.parent().load_file)
 
-    def clear(self, search_while_typing=False):
+    def clear(self, search_while_typing=False, override_lock=False):
         """
         Re-implement clear, so that we can customise feedback when using 'Search as you type'
 
         :param search_while_typing: True if we want to display the customised message
         :return: None
         """
+        if self.locked and not override_lock:
+            return
         if search_while_typing:
             self.no_results_text = UiStrings().ShortResults
         else:
