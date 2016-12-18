@@ -725,7 +725,7 @@ class BibleImportForm(OpenLPWizard):
         self.license_details_page.registerField('license_version', self.version_name_edit)
         self.license_details_page.registerField('license_copyright', self.copyright_edit)
         self.license_details_page.registerField('license_permissions', self.permissions_edit)
-        self.license_details_page.registerField("license_full_license", self.full_license_edit, "plainText")
+        self.license_details_page.registerField("license_full_license", self.full_license_edit, 'plainText')
 
     def set_defaults(self):
         """

@@ -66,22 +66,18 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         Try loading the metadata, if the field does not exist in the metadata, continue executing the code,
         missing fields will be created on "self.accept" (save).
         """
-        try:
-            self.version_name_edit.setText(self.manager.get_meta_data(self.bible, 'name').value)
-        except AttributeError:
-            pass
-        try:
-            self.copyright_edit.setText(self.manager.get_meta_data(self.bible, 'copyright').value)
-        except AttributeError:
-            pass
-        try:
-            self.permissions_edit.setText(self.manager.get_meta_data(self.bible, 'permissions').value)
-        except AttributeError:
-            pass
-        try:
-            self.full_license_edit.setPlainText(self.manager.get_meta_data(self.bible, 'full_license').value)
-        except AttributeError:
-            pass
+        meta = self.manager.get_meta_data(self.bible, 'name')
+        copyright = self.manager.get_meta_data(self.bible, 'copyright')
+        permission = self.manager.get_meta_data(self.bible, 'permissions')
+        full_license = self.manager.get_meta_data(self.bible, 'full_license')
+        if meta:
+            self.version_name_edit.setText(meta.value)
+        if copyright:
+            self.copyright_edit.setText(copyright.value)
+        if permission:
+            self.permissions_edit.setText(permission.value)
+        if full_license:
+            self.full_license_edit.setPlainText(full_license.value)
         # Set placeholder texts for the fields.
         self.version_name_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
         self.copyright_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
