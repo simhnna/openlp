@@ -250,7 +250,13 @@ class BibleManager(OpenLPMixin, RegistryProperties):
                   '"{book}", "{chapter}")'.format(bible=bible, book=book_ref_id, chapter=chapter))
         return self.db_cache[bible].get_verse_count(book_ref_id, chapter)
 
-    def get_verses(self, bible, verse_text, book_ref_id=False, show_error=True):
+    def parse_ref(self, bible, reference_text, book_ref_id=False):
+        if not bible:
+            return
+        language_selection = self.get_language_selection(bible)
+        return parse_reference(reference_text, self.db_cache[bible], language_selection, book_ref_id)
+
+    def get_verses(self, bible, ref_list, show_error=True):
         """
         Parses a scripture reference, fetches the verses from the Bible
         specified, and returns a list of ``Verse`` objects.
@@ -271,22 +277,9 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             For second bible this is necessary.
         :param show_error:
         """
-        # If no bibles are installed, message is given.
-        log.debug('BibleManager.get_verses("{bible}", "{verse}")'.format(bible=bible, verse=verse_text))
-        if not bible:
-            if show_error:
-                self.main_window.information_message(
-                    UiStrings().BibleNoBiblesTitle,
-                    UiStrings().BibleNoBibles)
+        if not bible or not ref_list:
             return None
-        # Get the language for books.
-        language_selection = self.get_language_selection(bible)
-        ref_list = parse_reference(verse_text, self.db_cache[bible], language_selection, book_ref_id)
-        if ref_list:
-            return self.db_cache[bible].get_verses(ref_list, show_error)
-        # If nothing is found. Message is given if this is not combined search. (defined in mediaitem.py)
-        else:
-            return None
+        return self.db_cache[bible].get_verses(ref_list, show_error)
 
     def get_language_selection(self, bible):
         """
@@ -308,7 +301,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             language_selection = LanguageSelection.Application
         return language_selection
 
-    def verse_search(self, bible, second_bible, text):
+    def verse_search(self, bible, text):
         """
         Does a verse search for the given bible and text.
 
@@ -325,20 +318,14 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             return None
         # Check if the bible or second_bible is a web bible.
         web_bible = self.db_cache[bible].get_object(BibleMeta, 'download_source')
-        second_web_bible = ''
-        if second_bible:
-            second_web_bible = self.db_cache[second_bible].get_object(BibleMeta, 'download_source')
-        if web_bible or second_web_bible:
+        if web_bible:
             # If either Bible is Web, cursor is reset to normal and message is given.
             self.application.set_normal_cursor()
             self.main_window.information_message(
                 translate('BiblesPlugin.BibleManager', 'Web Bible cannot be used in Text Search'),
                 translate('BiblesPlugin.BibleManager', 'Text Search is not available with Web Bibles.\n'
                                                        'Please use the Scripture Reference Search instead.\n\n'
-                                                       'This means that the currently used Bible\nor Second Bible '
-                                                       'is installed as Web Bible.\n\n'
-                                                       'If you were trying to perform a Reference search\nin Combined '
-                                                       'Search, your reference is invalid.')
+                                                       'This means that the currently selected Bible is a Web Bible.')
             )
             return None
         # Shorter than 3 char searches break OpenLP with very long search times, thus they are blocked.
@@ -379,6 +366,20 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             return self.db_cache[bible].verse_search(text)
         else:
             return None
+
+    def process_verse_range(self, book_ref_id, chapter_from, verse_from, chapter_to, verse_to):
+        verse_ranges = []
+        for chapter in range(chapter_from, chapter_to + 1):
+            if chapter == chapter_from:
+                start_verse = verse_from
+            else:
+                start_verse = 1
+            if chapter == chapter_to:
+                end_verse = verse_to
+            else:
+                end_verse = -1
+            verse_ranges.append((book_ref_id, chapter, start_verse, end_verse))
+        return verse_ranges
 
     def save_meta_data(self, bible, version, copyright, permissions, book_name_language=None):
         """
