@@ -42,7 +42,7 @@ webhook_element = \
     {
         'commit': {
             'author': {
-                'email': 'open@contributer',
+                'email': 'contributer@openlp',
                 'name': 'OpenLP Contributor'
             },
             'id': None,
@@ -92,6 +92,10 @@ def get_yml(branch):
     yml_text = f.read()
     f.close()
     yml_text = yml_text.replace('BRANCHNAME', branch)
+    if 'openlp-core/openlp/trunk' in branch:
+        yml_text = yml_text.replace('BUILD_DOCS', '$TRUE')
+    else:
+        yml_text = yml_text.replace('BUILD_DOCS', '$FALSE')
     return yml_text
 
 
@@ -115,8 +119,6 @@ def get_appveyor_build_url(branch):
     """
     Get the url of the build.
     """
-    # Wait 10 seconds to make sure the hook has been triggered
-    time.sleep(10)
     responce = urllib.request.urlopen(appveyor_api_url)
     json_str = responce.read().decode('utf-8')
     build_json = json.loads(json_str)
@@ -130,4 +132,6 @@ else:
     webhook_url = sys.argv[1]
     branch = sys.argv[2]
     hook(webhook_url, get_yml(branch))
+    # Wait 5 seconds to make sure the hook has been triggered
+    time.sleep(5)
     get_appveyor_build_url(branch)
