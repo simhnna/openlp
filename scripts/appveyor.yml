@@ -3,7 +3,6 @@ version: OpenLP-win-ci-b{build}
 init:
   - choco install -y --force bzr
   - set PATH=C:\Program Files (x86)\Bazaar;%PATH%
-  - bzr --version
 
 clone_script:
   - bzr checkout --lightweight BRANCHNAME openlp-branch
@@ -32,11 +31,11 @@ install:
   - 7z x -oMediaInfo MediaInfo_CLI_0.7.90_Windows_i386.zip
   - cp MediaInfo\\MediaInfo.exe openlp-branch\\MediaInfo.exe
 
-
 build: off
 
 test_script:
   - cd openlp-branch
+  # Run the tests
   - "%PYTHON%\\python.exe -m nose -v tests"
   # Go back to the user root folder
   - cd..
@@ -44,10 +43,10 @@ test_script:
 after_test:
   # This is where we create a package using PyInstaller
   # First get PyInstaller
-  - curl -L -O https://github.com/pyinstaller/pyinstaller/archive/develop.zip
-  - 7z x develop.zip
+  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v3.2/PyInstaller-3.2.zip
+  - 7z x PyInstaller-3.2.zip
   # Install PyInstaller dependencies
-  - "%PYTHON%\\python.exe -m pip install future"
+  - "%PYTHON%\\python.exe -m pip install future pefile"
   # Download and install Inno Setup - used for packaging
   - curl -L -O http://www.jrsoftware.org/download.php/is-unicode.exe
   - is-unicode.exe /VERYSILENT /SUPPRESSMSGBOXES /SP-
@@ -62,10 +61,24 @@ after_test:
   # - curl -L -O http://downloads.sourceforge.net/project/portableapps/NSIS%20Portable/NSISPortable_3.0_English.paf.exe
   # - NSISPortable_3.0_English.paf.exe /S
   # Get the packaging code
-  - bzr checkout --lightweight lp:openlp/packaging packaging
-  # Build the bundle
-  - cd packaging
-  - "%PYTHON%\\python.exe windows/windows-builder.py -v -u -t -c windows/config-appveyor.ini -b ../openlp-branch"
+  - curl -L http://bazaar.launchpad.net/~openlp-core/openlp/packaging/tarball -o packaging.tar.gz
+  - 7z e packaging.tar.gz
+  - 7z x packaging.tar
+  - mv ~openlp-core/openlp/packaging packaging
+  # If this is trunk we should also build the manual
+  - ps: >-
+      If (BUILD_DOCS) {
+        &"$env:PYTHON\python.exe" -m pip install sphinx
+        Invoke-WebRequest -Uri "http://bazaar.launchpad.net/~openlp-core/openlp/documentation/tarball" -OutFile documentation.tar.gz
+        7z e documentation.tar.gz
+        7z x documentation.tar
+        mv ~openlp-core/openlp/documentation documentation
+        cd packaging
+        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable
+      } else {
+        cd packaging
+        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch --portable
+      }
 
 artifacts:
   - path: openlp-branch\dist\*.exe
