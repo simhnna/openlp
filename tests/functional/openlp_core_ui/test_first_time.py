@@ -31,7 +31,7 @@ import urllib.parse
 from tests.functional import patch
 from tests.helpers.testmixin import TestMixin
 
-from openlp.core.lib.webpagereader import CONNECTION_RETRIES, get_web_page
+from openlp.core.common.httputils import CONNECTION_RETRIES, get_web_page
 
 
 class TestFirstTimeWizard(TestMixin, TestCase):

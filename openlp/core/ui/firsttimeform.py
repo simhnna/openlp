@@ -39,7 +39,7 @@ from openlp.core.common import Registry, RegistryProperties, AppLocation, Settin
     translate, clean_button_text, trace_error_handler
 from openlp.core.lib import PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.lib.webpagereader import get_web_page, CONNECTION_RETRIES, CONNECTION_TIMEOUT
+from openlp.core.common.httputils import get_web_page, get_url_file_size, CONNECTION_RETRIES, CONNECTION_TIMEOUT
 from .firsttimewizard import UiFirstTimeWizard, FirstTimePage
 
 log = logging.getLogger(__name__)
@@ -455,26 +455,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
             if item:
                 item.setIcon(build_icon(os.path.join(gettempdir(), 'openlp', screenshot)))
 
-    def _get_file_size(self, url):
-        """
-        Get the size of a file.
-
-        :param url: The URL of the file we want to download.
-        """
-        retries = 0
-        while True:
-            try:
-                site = urllib.request.urlopen(url, timeout=CONNECTION_TIMEOUT)
-                meta = site.info()
-                return int(meta.get("Content-Length"))
-            except urllib.error.URLError:
-                if retries > CONNECTION_RETRIES:
-                    raise
-                else:
-                    retries += 1
-                    time.sleep(0.1)
-                    continue
-
     def _download_progress(self, count, block_size):
         """
         Calculate and display the download progress.
@@ -510,7 +490,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 item = self.songs_list_widget.item(i)
                 if item.checkState() == QtCore.Qt.Checked:
                     filename, sha256 = item.data(QtCore.Qt.UserRole)
-                    size = self._get_file_size('{path}{name}'.format(path=self.songs_url, name=filename))
+                    size = get_url_file_size('{path}{name}'.format(path=self.songs_url, name=filename))
                     self.max_progress += size
             # Loop through the Bibles list and increase for each selected item
             iterator = QtWidgets.QTreeWidgetItemIterator(self.bibles_tree_widget)
@@ -519,7 +499,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 item = iterator.value()
                 if item.parent() and item.checkState(0) == QtCore.Qt.Checked:
                     filename, sha256 = item.data(0, QtCore.Qt.UserRole)
-                    size = self._get_file_size('{path}{name}'.format(path=self.bibles_url, name=filename))
+                    size = get_url_file_size('{path}{name}'.format(path=self.bibles_url, name=filename))
                     self.max_progress += size
                 iterator += 1
             # Loop through the themes list and increase for each selected item
@@ -528,7 +508,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 item = self.themes_list_widget.item(i)
                 if item.checkState() == QtCore.Qt.Checked:
                     filename, sha256 = item.data(QtCore.Qt.UserRole)
-                    size = self._get_file_size('{path}{name}'.format(path=self.themes_url, name=filename))
+                    size = get_url_file_size('{path}{name}'.format(path=self.themes_url, name=filename))
                     self.max_progress += size
         except urllib.error.URLError:
             trace_error_handler(log)
