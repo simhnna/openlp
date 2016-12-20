@@ -22,7 +22,6 @@
 """
 This module contains the first time wizard.
 """
-import hashlib
 import logging
 import os
 import socket
@@ -39,7 +38,7 @@ from openlp.core.common import Registry, RegistryProperties, AppLocation, Settin
     translate, clean_button_text, trace_error_handler
 from openlp.core.lib import PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.common.httputils import get_web_page, get_url_file_size, CONNECTION_RETRIES, CONNECTION_TIMEOUT
+from openlp.core.common.httputils import get_web_page, get_url_file_size, url_get_file, CONNECTION_TIMEOUT
 from .firsttimewizard import UiFirstTimeWizard, FirstTimePage
 
 log = logging.getLogger(__name__)
@@ -395,54 +394,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self.was_cancelled = True
         self.close()
 
-    def url_get_file(self, url, f_path, sha256=None):
-        """"
-        Download a file given a URL.  The file is retrieved in chunks, giving the ability to cancel the download at any
-        point. Returns False on download error.
-
-        :param url: URL to download
-        :param f_path: Destination file
-        """
-        block_count = 0
-        block_size = 4096
-        retries = 0
-        while True:
-            try:
-                filename = open(f_path, "wb")
-                url_file = urllib.request.urlopen(url, timeout=CONNECTION_TIMEOUT)
-                if sha256:
-                    hasher = hashlib.sha256()
-                # Download until finished or canceled.
-                while not self.was_cancelled:
-                    data = url_file.read(block_size)
-                    if not data:
-                        break
-                    filename.write(data)
-                    if sha256:
-                        hasher.update(data)
-                    block_count += 1
-                    self._download_progress(block_count, block_size)
-                filename.close()
-                if sha256 and hasher.hexdigest() != sha256:
-                    log.error('sha256 sums did not match for file: {file}'.format(file=f_path))
-                    os.remove(f_path)
-                    return False
-            except (urllib.error.URLError, socket.timeout) as err:
-                trace_error_handler(log)
-                filename.close()
-                os.remove(f_path)
-                if retries > CONNECTION_RETRIES:
-                    return False
-                else:
-                    retries += 1
-                    time.sleep(0.1)
-                    continue
-            break
-        # Delete file if cancelled, it may be a partial file.
-        if self.was_cancelled:
-            os.remove(f_path)
-        return True
-
     def _build_theme_screenshots(self):
         """
         This method builds the theme screenshots' icons for all items in the ``self.themes_list_widget``.
@@ -616,7 +567,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=filename), 0)
                 self.previous_size = 0
                 destination = os.path.join(songs_destination, str(filename))
-                if not self.url_get_file('{path}{name}'.format(path=self.songs_url, name=filename),
+                if not url_get_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
                                          destination, sha256):
                     missed_files.append('Song: {name}'.format(name=filename))
         # Download Bibles
@@ -628,7 +579,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 # TODO: Tested at home
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
-                if not self.url_get_file('{path}{name}'.format(path=self.bibles_url, name=bible),
+                if not url_get_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
                                          os.path.join(bibles_destination, bible),
                                          sha256):
                     missed_files.append('Bible: {name}'.format(name=bible))
@@ -643,7 +594,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self.previous_size = 0
                 if not self.url_get_file('{path}{name}'.format(path=self.themes_url, name=theme),
                                          os.path.join(themes_destination, theme),
-                                         sha256):
+                                         sha256, self):
                     missed_files.append('Theme: {name}'.format(name=theme))
         if missed_files:
             file_list = ''

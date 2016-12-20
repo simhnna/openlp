@@ -22,7 +22,9 @@
 """
 The :mod:`openlp.core.utils` module provides the utility libraries for OpenLP.
 """
+import hashlib
 import logging
+import os
 import socket
 import sys
 import time
@@ -32,7 +34,7 @@ import urllib.request
 from http.client import HTTPException
 from random import randint
 
-from openlp.core.common import Registry
+from openlp.core.common import Registry, trace_error_handler
 
 log = logging.getLogger(__name__ + '.__init__')
 
@@ -199,5 +201,53 @@ def get_url_file_size(url):
                 time.sleep(0.1)
                 continue
 
+
+def url_get_file(callback, url, f_path, sha256=None):
+    """"
+    Download a file given a URL.  The file is retrieved in chunks, giving the ability to cancel the download at any
+    point. Returns False on download error.
+
+    :param url: URL to download
+    :param f_path: Destination file
+    """
+    block_count = 0
+    block_size = 4096
+    retries = 0
+    while True:
+        try:
+            filename = open(f_path, "wb")
+            url_file = urllib.request.urlopen(url, timeout=CONNECTION_TIMEOUT)
+            if sha256:
+                hasher = hashlib.sha256()
+            # Download until finished or canceled.
+            while not callback.was_cancelled:
+                data = url_file.read(block_size)
+                if not data:
+                    break
+                filename.write(data)
+                if sha256:
+                    hasher.update(data)
+                block_count += 1
+                callback._download_progress(block_count, block_size)
+            filename.close()
+            if sha256 and hasher.hexdigest() != sha256:
+                log.error('sha256 sums did not match for file: {file}'.format(file=f_path))
+                os.remove(f_path)
+                return False
+        except (urllib.error.URLError, socket.timeout) as err:
+            trace_error_handler(log)
+            filename.close()
+            os.remove(f_path)
+            if retries > CONNECTION_RETRIES:
+                return False
+            else:
+                retries += 1
+                time.sleep(0.1)
+                continue
+        break
+    # Delete file if cancelled, it may be a partial file.
+    if callback.was_cancelled:
+        os.remove(f_path)
+    return True
 
 __all__ = ['get_web_page']
