@@ -592,9 +592,9 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 # TODO: Tested at home
                 self._increment_progress_bar(self.downloading.format(name=theme), 0)
                 self.previous_size = 0
-                if not self.url_get_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
-                                         os.path.join(themes_destination, theme),
-                                         sha256):
+                if not url_get_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
+                                    os.path.join(themes_destination, theme),
+                                    sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
         if missed_files:
             file_list = ''
