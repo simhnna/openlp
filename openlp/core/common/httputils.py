@@ -207,8 +207,10 @@ def url_get_file(callback, url, f_path, sha256=None):
     Download a file given a URL.  The file is retrieved in chunks, giving the ability to cancel the download at any
     point. Returns False on download error.
 
+    :param callback: the class which needs to be updated
     :param url: URL to download
     :param f_path: Destination file
+    :param sha256: The check sum value to be checked against the download value
     """
     block_count = 0
     block_size = 4096

@@ -22,9 +22,11 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
+import socket
+import os
 from unittest import TestCase
 
-from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size
+from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file
 
 from tests.functional import MagicMock, patch
 
@@ -245,3 +247,18 @@ class TestHttpUtils(TestCase):
 
             # THEN: The correct methods are called with the correct arguments and a web page is returned
             mock_urlopen.assert_called_with(fake_url, timeout=30)
+
+    @patch('openlp.core.ui.firsttimeform.urllib.request.urlopen')
+    def test_socket_timeout(self, mocked_urlopen):
+        """
+        Test socket timeout gets caught
+        """
+        # GIVEN: Mocked urlopen to fake a network disconnect in the middle of a download
+        mocked_urlopen.side_effect = socket.timeout()
+
+        # WHEN: Attempt to retrieve a file
+        url_get_file(url='http://localhost/test', f_path=self.tempfile)
+
+        # THEN: socket.timeout should have been caught
+        # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
+        self.assertFalse(os.path.exists(self.tempfile), 'FTW url_get_file should have caught socket.timeout')
