@@ -22,28 +22,40 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
+import os
+import tempfile
+import socket
 from unittest import TestCase
 
-from openlp.core.lib.webpagereader import _get_user_agent, get_web_page
+from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file
 
 from tests.functional import MagicMock, patch
+from tests.helpers.testmixin import TestMixin
 
 
-class TestUtils(TestCase):
+class TestHttpUtils(TestCase, TestMixin):
+
     """
-    A test suite to test out various methods around the AppLocation class.
+    A test suite to test out various http helper functions.
     """
+    def setUp(self):
+        self.tempfile = os.path.join(tempfile.gettempdir(), 'testfile')
+
+    def tearDown(self):
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
+
     def test_get_user_agent_linux(self):
         """
         Test that getting a user agent on Linux returns a user agent suitable for Linux
         """
-        with patch('openlp.core.lib.webpagereader.sys') as mocked_sys:
+        with patch('openlp.core.common.httputils.sys') as mocked_sys:
 
             # GIVEN: The system is Linux
             mocked_sys.platform = 'linux2'
 
-            # WHEN: We call _get_user_agent()
-            user_agent = _get_user_agent()
+            # WHEN: We call get_user_agent()
+            user_agent = get_user_agent()
 
             # THEN: The user agent is a Linux (or ChromeOS) user agent
             result = 'Linux' in user_agent or 'CrOS' in user_agent
@@ -53,13 +65,13 @@ class TestUtils(TestCase):
         """
         Test that getting a user agent on Windows returns a user agent suitable for Windows
         """
-        with patch('openlp.core.lib.webpagereader.sys') as mocked_sys:
+        with patch('openlp.core.common.httputils.sys') as mocked_sys:
 
             # GIVEN: The system is Linux
             mocked_sys.platform = 'win32'
 
-            # WHEN: We call _get_user_agent()
-            user_agent = _get_user_agent()
+            # WHEN: We call get_user_agent()
+            user_agent = get_user_agent()
 
             # THEN: The user agent is a Linux (or ChromeOS) user agent
             self.assertIn('Windows', user_agent, 'The user agent should be a valid Windows user agent')
@@ -68,13 +80,13 @@ class TestUtils(TestCase):
         """
         Test that getting a user agent on OS X returns a user agent suitable for OS X
         """
-        with patch('openlp.core.lib.webpagereader.sys') as mocked_sys:
+        with patch('openlp.core.common.httputils.sys') as mocked_sys:
 
             # GIVEN: The system is Linux
             mocked_sys.platform = 'darwin'
 
-            # WHEN: We call _get_user_agent()
-            user_agent = _get_user_agent()
+            # WHEN: We call get_user_agent()
+            user_agent = get_user_agent()
 
             # THEN: The user agent is a Linux (or ChromeOS) user agent
             self.assertIn('Mac OS X', user_agent, 'The user agent should be a valid OS X user agent')
@@ -83,13 +95,13 @@ class TestUtils(TestCase):
         """
         Test that getting a user agent on a non-Linux/Windows/OS X platform returns the default user agent
         """
-        with patch('openlp.core.lib.webpagereader.sys') as mocked_sys:
+        with patch('openlp.core.common.httputils.sys') as mocked_sys:
 
             # GIVEN: The system is Linux
             mocked_sys.platform = 'freebsd'
 
-            # WHEN: We call _get_user_agent()
-            user_agent = _get_user_agent()
+            # WHEN: We call get_user_agent()
+            user_agent = get_user_agent()
 
             # THEN: The user agent is a Linux (or ChromeOS) user agent
             self.assertIn('NetBSD', user_agent, 'The user agent should be the default user agent')
@@ -111,9 +123,9 @@ class TestUtils(TestCase):
         """
         Test that the get_web_page method works correctly
         """
-        with patch('openlp.core.lib.webpagereader.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.lib.webpagereader.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.lib.webpagereader._get_user_agent') as mock_get_user_agent, \
+        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
+                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
+                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent, \
                 patch('openlp.core.common.Registry') as MockRegistry:
             # GIVEN: Mocked out objects and a fake URL
             mocked_request_object = MagicMock()
@@ -141,9 +153,9 @@ class TestUtils(TestCase):
         """
         Test that adding a header to the call to get_web_page() adds the header to the request
         """
-        with patch('openlp.core.lib.webpagereader.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.lib.webpagereader.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.lib.webpagereader._get_user_agent') as mock_get_user_agent:
+        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
+                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
+                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent:
             # GIVEN: Mocked out objects, a fake URL and a fake header
             mocked_request_object = MagicMock()
             MockRequest.return_value = mocked_request_object
@@ -170,9 +182,9 @@ class TestUtils(TestCase):
         """
         Test that adding a user agent in the header when calling get_web_page() adds that user agent to the request
         """
-        with patch('openlp.core.lib.webpagereader.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.lib.webpagereader.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.lib.webpagereader._get_user_agent') as mock_get_user_agent:
+        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
+                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
+                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent:
             # GIVEN: Mocked out objects, a fake URL and a fake header
             mocked_request_object = MagicMock()
             MockRequest.return_value = mocked_request_object
@@ -189,7 +201,7 @@ class TestUtils(TestCase):
             mocked_request_object.add_header.assert_called_with(user_agent_header[0], user_agent_header[1])
             self.assertEqual(1, mocked_request_object.add_header.call_count,
                              'There should only be 1 call to add_header')
-            self.assertEqual(0, mock_get_user_agent.call_count, '_get_user_agent should not have been called')
+            self.assertEqual(0, mock_get_user_agent.call_count, 'get_user_agent should not have been called')
             mock_urlopen.assert_called_with(mocked_request_object, timeout=30)
             mocked_page_object.geturl.assert_called_with()
             self.assertEqual(mocked_page_object, returned_page, 'The returned page should be the mock object')
@@ -198,10 +210,10 @@ class TestUtils(TestCase):
         """
         Test that passing "update_openlp" as true to get_web_page calls Registry().get('app').process_events()
         """
-        with patch('openlp.core.lib.webpagereader.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.lib.webpagereader.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.lib.webpagereader._get_user_agent') as mock_get_user_agent, \
-                patch('openlp.core.lib.webpagereader.Registry') as MockRegistry:
+        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
+                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
+                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent, \
+                patch('openlp.core.common.httputils.Registry') as MockRegistry:
             # GIVEN: Mocked out objects, a fake URL
             mocked_request_object = MagicMock()
             MockRequest.return_value = mocked_request_object
@@ -227,3 +239,36 @@ class TestUtils(TestCase):
             mocked_registry_object.get.assert_called_with('application')
             mocked_application_object.process_events.assert_called_with()
             self.assertEqual(mocked_page_object, returned_page, 'The returned page should be the mock object')
+
+    def test_get_url_file_size(self):
+        """
+        Test that passing "update_openlp" as true to get_web_page calls Registry().get('app').process_events()
+        """
+        with patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
+                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent:
+            # GIVEN: Mocked out objects, a fake URL
+            mocked_page_object = MagicMock()
+            mock_urlopen.return_value = mocked_page_object
+            mock_get_user_agent.return_value = 'user_agent'
+            fake_url = 'this://is.a.fake/url'
+
+            # WHEN: The get_url_file_size() method is called
+            size = get_url_file_size(fake_url)
+
+            # THEN: The correct methods are called with the correct arguments and a web page is returned
+            mock_urlopen.assert_called_with(fake_url, timeout=30)
+
+    @patch('openlp.core.ui.firsttimeform.urllib.request.urlopen')
+    def test_socket_timeout(self, mocked_urlopen):
+        """
+        Test socket timeout gets caught
+        """
+        # GIVEN: Mocked urlopen to fake a network disconnect in the middle of a download
+        mocked_urlopen.side_effect = socket.timeout()
+
+        # WHEN: Attempt to retrieve a file
+        url_get_file(MagicMock(), url='http://localhost/test', f_path=self.tempfile)
+
+        # THEN: socket.timeout should have been caught
+        # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
+        self.assertFalse(os.path.exists(self.tempfile), 'FTW url_get_file should have caught socket.timeout')
