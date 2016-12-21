@@ -224,7 +224,8 @@ class TestFirstTimeForm(TestCase, TestMixin):
         # GIVEN: Initial setup and mocks
         first_time_form = FirstTimeForm(None)
         first_time_form.initialize(MagicMock())
-        mocked_get_web_page.side_effect = urllib.error.HTTPError(url='http//localhost',
+        mocked_get_web_page.side_effect = urllib.error.HTTPError(MagicMock(),
+                                                                 url='http//localhost',
                                                                  code=407,
                                                                  msg='Network proxy error',
                                                                  hdrs=None,

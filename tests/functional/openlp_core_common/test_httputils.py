@@ -22,19 +22,29 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
-import socket
 import os
+import tempfile
+import socket
 from unittest import TestCase
 
 from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file
 
 from tests.functional import MagicMock, patch
+from tests.helpers.testmixin import TestMixin
 
 
-class TestHttpUtils(TestCase):
+class TestHttpUtils(TestCase, TestMixin):
+
     """
-    A test suite to test out various methods around the AppLocation class.
+    A test suite to test out various http helper functions.
     """
+    def setUp(self):
+        self.tempfile = os.path.join(tempfile.gettempdir(), 'testfile')
+
+    def tearDown(self):
+        if os.path.isfile(self.tempfile):
+            os.remove(self.tempfile)
+
     def test_get_user_agent_linux(self):
         """
         Test that getting a user agent on Linux returns a user agent suitable for Linux
@@ -257,7 +267,7 @@ class TestHttpUtils(TestCase):
         mocked_urlopen.side_effect = socket.timeout()
 
         # WHEN: Attempt to retrieve a file
-        url_get_file(url='http://localhost/test', f_path=self.tempfile)
+        url_get_file(MagicMock(), url='http://localhost/test', f_path=self.tempfile)
 
         # THEN: socket.timeout should have been caught
         # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
