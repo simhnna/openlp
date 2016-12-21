@@ -568,7 +568,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self.previous_size = 0
                 destination = os.path.join(songs_destination, str(filename))
                 if not url_get_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
-                                         destination, sha256):
+                                    destination, sha256):
                     missed_files.append('Song: {name}'.format(name=filename))
         # Download Bibles
         bibles_iterator = QtWidgets.QTreeWidgetItemIterator(self.bibles_tree_widget)
@@ -580,8 +580,8 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
                 if not url_get_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
-                                         os.path.join(bibles_destination, bible),
-                                         sha256):
+                                    os.path.join(bibles_destination, bible),
+                                    sha256):
                     missed_files.append('Bible: {name}'.format(name=bible))
             bibles_iterator += 1
         # Download themes
