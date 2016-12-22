@@ -38,7 +38,7 @@ class Ui_StartTimeDialog(object):
         Set up the UI
         """
         StartTimeDialog.setObjectName('StartTimeDialog')
-        StartTimeDialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        StartTimeDialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         StartTimeDialog.resize(350, 10)
         self.dialog_layout = QtWidgets.QGridLayout(StartTimeDialog)
         self.dialog_layout.setObjectName('dialog_layout')

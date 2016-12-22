@@ -72,7 +72,7 @@ class Ui_ShortcutListDialog(object):
         Set up the UI
         """
         shortcutListDialog.setObjectName('shortcutListDialog')
-        shortcutListDialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        shortcutListDialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         shortcutListDialog.resize(500, 438)
         self.shortcut_list_layout = QtWidgets.QVBoxLayout(shortcutListDialog)
         self.shortcut_list_layout.setObjectName('shortcut_list_layout')

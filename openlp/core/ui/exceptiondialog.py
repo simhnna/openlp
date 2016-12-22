@@ -38,7 +38,7 @@ class Ui_ExceptionDialog(object):
         Set up the UI.
         """
         exception_dialog.setObjectName('exception_dialog')
-        exception_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        exception_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         self.exception_layout = QtWidgets.QVBoxLayout(exception_dialog)
         self.exception_layout.setObjectName('exception_layout')
         self.message_layout = QtWidgets.QHBoxLayout()

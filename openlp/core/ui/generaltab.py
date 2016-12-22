@@ -44,7 +44,7 @@ class GeneralTab(SettingsTab):
         self.logo_file = ':/graphics/openlp-splash-screen.png'
         self.logo_background_color = '#ffffff'
         self.screens = ScreenList()
-        self.icon_path = ':/icon/openlp-logo-16x16.png'
+        self.icon_path = ':/icon/openlp-logo.svg'
         general_translated = translate('OpenLP.GeneralTab', 'General')
         super(GeneralTab, self).__init__(parent, 'Core', general_translated)
 

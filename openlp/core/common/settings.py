@@ -235,8 +235,8 @@ class Settings(QtCore.QSettings):
         ('remotes/thumbnails', 'api/thumbnails', []),
         ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('shortcuts/escapeItem', 'shortcuts/desktopScreenEnable', []),  # Escape item was removed in 2.6.
-        ('shortcuts/offlineHelpItem', 'shortcuts/HelpItem', []),  # Online and Offline help were combined in 2.6.
-        ('shortcuts/onlineHelpItem', 'shortcuts/HelpItem', [])  # Online and Offline help were combined in 2.6.
+        ('shortcuts/offlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
+        ('shortcuts/onlineHelpItem', 'shortcuts/userManualItem', [])  # Online and Offline help were combined in 2.6.
     ]
 
     @staticmethod
@@ -295,7 +295,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/fileSaveItem': [QtGui.QKeySequence(QtGui.QKeySequence.Save)],
             'shortcuts/fileOpenItem': [QtGui.QKeySequence(QtGui.QKeySequence.Open)],
             'shortcuts/goLive': [],
-            'shortcuts/HelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
+            'shortcuts/userManualItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
             'shortcuts/importThemeItem': [],
             'shortcuts/importBibleItem': [],
             'shortcuts/listViewBiblesDeleteItem': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],

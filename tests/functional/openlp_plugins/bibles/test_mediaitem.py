@@ -155,7 +155,6 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.list_view = MagicMock()
         self.media_item.search_results = MagicMock()
         self.media_item.display_results = MagicMock()
-        self.media_item.check_search_result = MagicMock()
         self.app.set_normal_cursor = MagicMock()
 
         # WHEN: on_quick_search_button is called
@@ -169,7 +168,6 @@ class TestMediaItem(TestCase, TestMixin):
         self.assertEqual(1, self.media_item.quickLockButton.isChecked.call_count, 'Lock Should had been called once')
         self.assertEqual(1, self.media_item.display_results.call_count, 'Display results Should had been called once')
         self.assertEqual(2, self.media_item.quickSearchButton.setEnabled.call_count, 'Disable and Enable the button')
-        self.assertEqual(1, self.media_item.check_search_result.call_count, 'Check results Should had been called once')
         self.assertEqual(1, self.app.set_normal_cursor.call_count, 'Normal cursor should had been called once')
 
     def test_on_clear_button_clicked(self):
@@ -178,7 +176,6 @@ class TestMediaItem(TestCase, TestMixin):
         """
         # GIVEN: Mocked list_view, check_search_results & quick_search_edit.
         self.media_item.list_view = MagicMock()
-        self.media_item.check_search_result = MagicMock()
         self.media_item.quick_search_edit = MagicMock()
 
         # WHEN: on_clear_button_clicked is called
@@ -186,7 +183,6 @@ class TestMediaItem(TestCase, TestMixin):
 
         # THEN: Search result should be reset and search field should receive focus.
         self.media_item.list_view.clear.assert_called_once_with(),
-        self.media_item.check_search_result.assert_called_once_with(),
         self.media_item.quick_search_edit.clear.assert_called_once_with(),
         self.media_item.quick_search_edit.setFocus.assert_called_once_with()
 

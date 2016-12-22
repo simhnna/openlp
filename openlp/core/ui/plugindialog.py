@@ -38,7 +38,7 @@ class Ui_PluginViewDialog(object):
         Set up the UI
         """
         plugin_view_dialog.setObjectName('plugin_view_dialog')
-        plugin_view_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        plugin_view_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         plugin_view_dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         self.plugin_layout = QtWidgets.QVBoxLayout(plugin_view_dialog)
         self.plugin_layout.setObjectName('plugin_layout')

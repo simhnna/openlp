@@ -102,7 +102,7 @@ class TestInit(TestCase, TestMixin):
             mocked_question.return_value = QtWidgets.QMessageBox.No
 
             # WHEN: We check if a backup should be created
-            self.openlp.backup_on_upgrade(old_install)
+            self.openlp.backup_on_upgrade(old_install, False)
 
             # THEN: It should not ask if we want to create a backup
             self.assertEqual(Settings().value('core/application version'), '2.2.0', 'Version should be the same!')
@@ -120,14 +120,18 @@ class TestInit(TestCase, TestMixin):
             'build': 'bzr000'
         }
         Settings().setValue('core/application version', '2.0.5')
+        self.openlp.splash = MagicMock()
+        self.openlp.splash.isVisible.return_value = True
         with patch('openlp.core.get_application_version') as mocked_get_application_version,\
                 patch('openlp.core.QtWidgets.QMessageBox.question') as mocked_question:
             mocked_get_application_version.return_value = MOCKED_VERSION
             mocked_question.return_value = QtWidgets.QMessageBox.No
 
             # WHEN: We check if a backup should be created
-            self.openlp.backup_on_upgrade(old_install)
+            self.openlp.backup_on_upgrade(old_install, True)
 
             # THEN: It should ask if we want to create a backup
             self.assertEqual(Settings().value('core/application version'), '2.2.0', 'Version should be upgraded!')
             self.assertEqual(mocked_question.call_count, 1, 'A question should have been asked!')
+            self.openlp.splash.hide.assert_called_once_with()
+            self.openlp.splash.show.assert_called_once_with()
