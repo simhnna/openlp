@@ -23,13 +23,17 @@
 import os
 import zipfile
 
-file_name = "/home/tim/Projects/OpenLP/openlp/remoteweb/deploy.zip"
 
+def deploy_zipfile(zip_file, app_root):
+    """
+    Process the downloaded zip file and add to the correct directory
 
-def deploy_zipfile(file_name):
+    :param zip_file: the zip file to be processed
+    :param app_root: the directory where the zip get expanded to
 
-    app_root = "/home/tim/.openlp/data/remotes/"
-    web_zip = zipfile.ZipFile(file_name)
+    :return: None
+    """
+    web_zip = zipfile.ZipFile(zip_file)
     for web_file in web_zip.namelist():
         (dir_name, filename) = os.path.split(web_file)
         real_path = os.path.join(app_root, web_file[4:])
@@ -37,14 +41,20 @@ def deploy_zipfile(file_name):
             if not os.path.exists(real_path):
                 os.makedirs(real_path)
         else:
-            file_web = str(web_zip.read(web_file))
+            file_web = web_zip.read(web_file)
             out_file = open(real_path, 'w')
-            out_file.write(file_web)
+            # extract the file from the zip.  If an image then the exception will be used.
+            try:
+                out_file.write(file_web.decode("utf-8"))
+            except UnicodeDecodeError as ude:
+                out_file.close()
+                out_file = open(real_path, 'wb')
+                out_file.write(file_web)
+            out_file.close()
     web_zip.close()
 
 
-def check_for_previous_deployment(create=False):
-    app_root = "/home/tim/.openlp/data/remotes/"
+def check_for_previous_deployment(app_root, create=False):
     marker_file = os.path.join(app_root, "marker.txt")
     if os.path.isfile(marker_file):
         return True
@@ -52,24 +62,12 @@ def check_for_previous_deployment(create=False):
         if create:
             os.mknod(marker_file)
         return False
-    a=1
 
 
-deploy_zipfile(file_name)
-#print(check_for_previous_deployment())
-#print(check_for_previous_deployment(True))
-#print(check_for_previous_deployment())
+#file_name = "/home/tim/Projects/OpenLP/openlp/remoteweb/deploy.zip"
+#app_root = "/home/tim/.openlp/data/remotes/"
 
-
-    #        xml_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.xml']
-    #        if len(xml_file) != 1:
-    #            self.log_error('Theme contains "{val:d}" XML files'.format(val=len(xml_file)))
-     #           raise ValidationError
-     #       xml_tree = ElementTree(element=XML(theme_zip.read(xml_file[0]))).getroot()
-     #       theme_version = xml_tree.get('version', default=None)
-     #       if not theme_version or float(theme_version) < 2.0:
-     #           self.log_error('Theme version is less than 2.0')
-     #           raise ValidationError
-     #       theme_name = xml_tree.find('name').text.strip()
-     #       theme_folder = os.path.join(directory, theme_name)
-      #      theme_exists = os.path.exists(theme_folder)
+#deploy_zipfile(file_name)
+#print(check_for_previous_deployment(app_root))
+#print(check_for_previous_deployment(app_root, True))
+#print(check_for_previous_deployment(app_root))
