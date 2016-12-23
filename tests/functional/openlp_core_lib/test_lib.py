@@ -688,8 +688,8 @@ class TestLib(TestCase):
             string_result = create_separated_list(string_list)
 
             # THEN: We should have "Author 1, Author 2, and Author 3"
-            assert string_result == 'Author 1, Author 2, and Author 3', 'The string should be u\'Author 1, ' \
-                'Author 2, and Author 3\'.'
+            self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
+                             'Author 2, and Author 3".')
 
     def test_create_separated_list_empty_list(self):
         """
@@ -705,56 +705,44 @@ class TestLib(TestCase):
             string_result = create_separated_list(string_list)
 
             # THEN: We shoud have an emptry string.
-            assert string_result == '', 'The string sould be empty.'
+            self.assertEqual(string_result, '', 'The string sould be empty.')
 
     def test_create_separated_list_with_one_item(self):
         """
         Test the create_separated_list function with a list consisting of only one entry
         """
-        with patch('openlp.core.lib.Qt') as mocked_qt:
-            # GIVEN: A list with a string and the mocked Qt module.
-            mocked_qt.PYQT_VERSION_STR = '4.8'
-            mocked_qt.qVersion.return_value = '4.7'
-            string_list = ['Author 1']
+        # GIVEN: A list with a string.
+        string_list = ['Author 1']
 
-            # WHEN: We get a string build from the entries it the list and a separator.
-            string_result = create_separated_list(string_list)
+        # WHEN: We get a string build from the entries it the list and a separator.
+        string_result = create_separated_list(string_list)
 
-            # THEN: We should have "Author 1"
-            assert string_result == 'Author 1', 'The string should be u\'Author 1\'.'
+        # THEN: We should have "Author 1"
+        self.assertEqual(string_result, 'Author 1', 'The string should be "Author 1".')
 
     def test_create_separated_list_with_two_items(self):
         """
         Test the create_separated_list function with a list of two entries
         """
-        with patch('openlp.core.lib.Qt') as mocked_qt, patch('openlp.core.lib.translate') as mocked_translate:
-            # GIVEN: A list of strings and the mocked Qt module.
-            mocked_qt.PYQT_VERSION_STR = '4.8'
-            mocked_qt.qVersion.return_value = '4.7'
-            mocked_translate.return_value = '%s and %s'
-            string_list = ['Author 1', 'Author 2']
+        # GIVEN: A list with two strings.
+        string_list = ['Author 1', 'Author 2']
 
-            # WHEN: We get a string build from the entries it the list and a seperator.
-            string_result = create_separated_list(string_list)
+        # WHEN: We get a string build from the entries it the list and a seperator.
+        string_result = create_separated_list(string_list)
 
-            # THEN: We should have "Author 1 and Author 2"
-            assert string_result == 'Author 1 and Author 2', 'The string should be u\'Author 1 and Author 2\'.'
+        # THEN: We should have "Author 1 and Author 2"
+        self.assertEqual(string_result, 'Author 1 and Author 2', 'The string should be "Author 1 and Author 2".')
 
     def test_create_separated_list_with_three_items(self):
         """
         Test the create_separated_list function with a list of three items
         """
-        with patch('openlp.core.lib.Qt') as mocked_qt, patch('openlp.core.lib.translate') as mocked_translate:
-            # GIVEN: A list with a string and the mocked Qt module.
-            mocked_qt.PYQT_VERSION_STR = '4.8'
-            mocked_qt.qVersion.return_value = '4.7'
-            # Always return the untranslated string.
-            mocked_translate.side_effect = lambda module, string_to_translate, comment: string_to_translate
-            string_list = ['Author 1', 'Author 2', 'Author 3']
+        # GIVEN: A list with three strings.
+        string_list = ['Author 1', 'Author 2', 'Author 3']
 
-            # WHEN: We get a string build from the entries it the list and a seperator.
-            string_result = create_separated_list(string_list)
+        # WHEN: We get a string build from the entries it the list and a seperator.
+        string_result = create_separated_list(string_list)
 
-            # THEN: We should have "Author 1, Author 2, and Author 3"
-            assert string_result == 'Author 1, Author 2, and Author 3', 'The string should be u\'Author 1, ' \
-                'Author 2, and Author 3\'.'
+        # THEN: We should have "Author 1, Author 2 and Author 3"
+        self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
+                         'Author 2, and Author 3".')

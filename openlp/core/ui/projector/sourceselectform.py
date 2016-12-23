@@ -243,7 +243,7 @@ class SourceSelectTabs(QtWidgets.QDialog):
             title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
         self.setWindowTitle(title)
         self.setObjectName('source_select_tabs')
-        self.setWindowIcon(build_icon(':/icon/openlp-log-32x32.png'))
+        self.setWindowIcon(build_icon(':/icon/openlp-log.svg'))
         self.setModal(True)
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.setObjectName('source_select_tabs_layout')
@@ -395,7 +395,7 @@ class SourceSelectSingle(QtWidgets.QDialog):
         else:
             title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
         self.setObjectName('source_select_single')
-        self.setWindowIcon(build_icon(':/icon/openlp-log-32x32.png'))
+        self.setWindowIcon(build_icon(':/icon/openlp-log.svg'))
         self.setModal(True)
         self.edit = edit
 
