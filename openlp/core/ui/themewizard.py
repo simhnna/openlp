@@ -44,9 +44,9 @@ class Ui_ThemeWizard(object):
         theme_wizard.setModal(True)
         theme_wizard.setOptions(QtWidgets.QWizard.IndependentPages |
                                 QtWidgets.QWizard.NoBackButtonOnStartPage | QtWidgets.QWizard.HaveCustomButton1)
+        theme_wizard.setFixedWidth(640)
         if is_macosx():
             theme_wizard.setPixmap(QtWidgets.QWizard.BackgroundPixmap, QtGui.QPixmap(':/wizards/openlp-osx-wizard.png'))
-            theme_wizard.resize(646, 400)
         else:
             theme_wizard.setWizardStyle(QtWidgets.QWizard.ModernStyle)
         self.spacer = QtWidgets.QSpacerItem(10, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)

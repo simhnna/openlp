@@ -76,3 +76,34 @@ class TestEditSongForm(TestCase, TestMixin):
 
         # THEN they should be valid
         self.assertTrue(valid, "The tags list should be valid")
+
+    @patch('openlp.plugins.songs.forms.editsongform.set_case_insensitive_completer')
+    def test_load_objects(self, mocked_set_case_insensitive_completer):
+        """
+        Test the _load_objects() method
+        """
+        # GIVEN: A song edit form and some mocked stuff
+        mocked_class = MagicMock()
+        mocked_class.name = 'Author'
+        mocked_combo = MagicMock()
+        mocked_combo.count.return_value = 0
+        mocked_cache = MagicMock()
+        mocked_object = MagicMock()
+        mocked_object.name = 'Charles'
+        mocked_object.id = 1
+        mocked_manager = MagicMock()
+        mocked_manager.get_all_objects.return_value = [mocked_object]
+        self.edit_song_form.manager = mocked_manager
+
+        # WHEN: _load_objects() is called
+        self.edit_song_form._load_objects(mocked_class, mocked_combo, mocked_cache)
+
+        # THEN: All the correct methods should have been called
+        self.edit_song_form.manager.get_all_objects.assert_called_once_with(mocked_class)
+        mocked_combo.clear.assert_called_once_with()
+        mocked_combo.count.assert_called_once_with()
+        mocked_combo.addItem.assert_called_once_with('Charles')
+        mocked_cache.append.assert_called_once_with('Charles')
+        mocked_combo.setItemData.assert_called_once_with(0, 1)
+        mocked_set_case_insensitive_completer.assert_called_once_with(mocked_cache, mocked_combo)
+        mocked_combo.setEditText.assert_called_once_with('')
