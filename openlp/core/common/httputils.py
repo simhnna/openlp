@@ -215,6 +215,7 @@ def url_get_file(callback, url, f_path, sha256=None):
     block_count = 0
     block_size = 4096
     retries = 0
+    log.debug("url_get_file: " + url)
     while True:
         try:
             filename = open(f_path, "wb")

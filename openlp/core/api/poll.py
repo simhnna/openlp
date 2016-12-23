@@ -46,7 +46,9 @@ class Poller(RegistryProperties):
             'display': self.live_controller.desktop_screen.isChecked(),
             'version': 3,
             'isSecure': Settings().value('api/authentication enabled'),
-            'isAuthorised': False
+            'isAuthorised': False,
+            'isStagedActive': self.plugin_manager.get_plugin_by_name('remotes').is_stage_active(),
+            'isLiveActive': self.plugin_manager.get_plugin_by_name('remotes').is_live_active()
         }
 
     def poll(self):
