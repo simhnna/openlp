@@ -202,7 +202,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self.themes_url = self.web + self.config.get('themes', 'directory') + '/'
                 self.web_access = True
             except (NoSectionError, NoOptionError, MissingSectionHeaderError):
-                log.debug('A problem occured while parsing the downloaded config file')
+                log.debug('A problem occurred while parsing the downloaded config file')
                 trace_error_handler(log)
         self.update_screen_list_combo()
         self.application.process_events()

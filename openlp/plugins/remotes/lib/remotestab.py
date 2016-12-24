@@ -104,5 +104,5 @@ class RemotesTab(SettingsTab):
         font.setPointSize(self.web_size)
         self.web_preview.setFont(font)
         self.web_preview.setStyleSheet('background-color: {back}; color: {front}'.format(back=self.background_color,
-                                                                                          front=self.web_color))
+                                                                                         front=self.web_color))
         self.changed = True

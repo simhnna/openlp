@@ -23,6 +23,8 @@
 import os
 import zipfile
 
+from openlp.core.common.httputils import url_get_file
+
 
 def deploy_zipfile(zip_file, app_root):
     """
@@ -62,6 +64,13 @@ def check_for_previous_deployment(app_root, create=False):
         if create:
             os.mknod(marker_file)
         return False
+
+
+#def download_and_check():
+#    f = url_get_file(None, 'https://get.openlp.org/webclient', 'download.cfg')
+#    print(f)
+
+#download_and_check()
 
 
 #file_name = "/home/tim/Projects/OpenLP/openlp/remoteweb/deploy.zip"

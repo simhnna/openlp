@@ -103,6 +103,9 @@ class TestRemoteDeploy(TestCase):
 
     @patch('openlp.plugins.remotes.deploy.open')
     def test_deploy_zipfile(self, mocked_open):
+        """
+        Remote Deploy tests - test the dummy zip file is processed correctly
+        """
         # GIVEN: A new downloaded zip file
         zip_file = os.path.join(TEST_PATH, "remotes", "deploy.zip")
         # WHEN: I process the zipfile
