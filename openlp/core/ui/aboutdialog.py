@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -307,8 +307,8 @@ class UiAboutDialog(object):
                      'Martin Thompson, Jon Tibble, Dave Warnock, Frode Woldsund, '
                      'Martin Zibricky, Patrick Zimmermann')
         copyright_note = translate('OpenLP.AboutForm',
-                                   'Copyright \xa9 2004-2016 {cr}\n\n'
-                                   'Portions copyright \xa9 2004-2016 {others}').format(cr='Raoul Snyman',
+                                   'Copyright \xa9 2004-2017 {cr}\n\n'
+                                   'Portions copyright \xa9 2004-2017 {others}').format(cr='Raoul Snyman',
                                                                                         others=cr_others)
         licence = translate('OpenLP.AboutForm',
                             'This program is free software; you can redistribute it and/or '
