@@ -43,3 +43,5 @@ class TestEasySlidesFileImport(SongImportTestHelper):
         """
         self.file_import(os.path.join(TEST_PATH, 'amazing-grace.xml'),
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+        self.file_import(os.path.join(TEST_PATH, 'Export_2017-01-12_BB.xml'),
+                         self.load_external_result_data(os.path.join(TEST_PATH, 'Export_2017-01-12_BB.json')))
