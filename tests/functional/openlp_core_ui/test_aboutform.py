@@ -22,6 +22,7 @@
 """
 Package to test the openlp.core.ui.firsttimeform package.
 """
+import datetime
 from unittest import TestCase
 
 from openlp.core.ui.aboutform import AboutForm
@@ -58,4 +59,20 @@ class TestFirstTimeForm(TestCase, TestMixin):
         about_form = AboutForm(None)
 
         # THEN: The build number should be in the text
-        assert 'OpenLP 3.1.5 build 3000' in about_form.about_text_edit.toPlainText()
+        self.assertTrue('OpenLP 3.1.5 build 3000' in about_form.about_text_edit.toPlainText(),
+                        "The build number should be set correctly")
+
+    def test_about_form_date_test(self):
+        """
+        Test that the copyright date is included correctly
+        """
+        # GIVEN: A correct application date
+        date_string = "2004-%s" % datetime.date.today().year
+
+        # WHEN: The about form is created
+        about_form = AboutForm(None)
+        license_text = about_form.license_text_edit.toPlainText()
+
+        # THEN: The date should be in the text twice.
+        self.assertTrue(license_text.count(date_string, 0) == 2,
+                        "The text string should be added twice to the license string")
