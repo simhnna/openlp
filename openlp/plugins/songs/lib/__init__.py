@@ -30,7 +30,7 @@ import re
 from PyQt5 import QtWidgets
 
 from openlp.core.common import AppLocation, CONTROL_CHARS
-from openlp.core.lib import translate
+from openlp.core.lib import translate, clean_tags
 from openlp.plugins.songs.lib.db import Author, MediaFile, Song, Topic
 from openlp.plugins.songs.lib.ui import SongStrings
 
@@ -380,7 +380,7 @@ def clean_song(manager, song):
     if isinstance(song.lyrics, bytes):
         song.lyrics = str(song.lyrics, encoding='utf8')
     verses = SongXML().get_verses(song.lyrics)
-    song.search_lyrics = ' '.join([clean_string(verse[1]) for verse in verses])
+    song.search_lyrics = ' '.join([clean_string(clean_tags(verse[1])) for verse in verses])
     # The song does not have any author, add one.
     if not song.authors_songs:
         name = SongStrings.AuthorUnknown
