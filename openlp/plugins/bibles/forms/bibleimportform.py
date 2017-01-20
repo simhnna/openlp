@@ -408,6 +408,12 @@ class BibleImportForm(OpenLPWizard):
         self.permissions_edit = QtWidgets.QLineEdit(self.license_details_page)
         self.permissions_edit.setObjectName('PermissionsEdit')
         self.license_details_layout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.permissions_edit)
+        self.full_license_label = QtWidgets.QLabel(self.license_details_page)
+        self.full_license_label.setObjectName('FullLicenseLabel')
+        self.license_details_layout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.full_license_label)
+        self.full_license_edit = QtWidgets.QPlainTextEdit(self.license_details_page)
+        self.full_license_edit.setObjectName('FullLicenseEdit')
+        self.license_details_layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.full_license_edit)
         self.addPage(self.license_details_page)
 
     def retranslateUi(self):
@@ -480,6 +486,7 @@ class BibleImportForm(OpenLPWizard):
         self.version_name_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Version name:'))
         self.copyright_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Copyright:'))
         self.permissions_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Permissions:'))
+        self.full_license_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Full license:'))
         self.progress_page.setTitle(WizardStrings.Importing)
         self.progress_page.setSubTitle(translate('BiblesPlugin.ImportWizardForm',
                                                  'Please wait while your Bible is imported.'))
@@ -504,6 +511,7 @@ class BibleImportForm(OpenLPWizard):
         elif self.currentPage() == self.select_page:
             self.version_name_edit.clear()
             self.permissions_edit.clear()
+            self.full_license_edit.clear()
             self.copyright_edit.clear()
             if self.field('source_format') == BibleFormat.OSIS:
                 if not self.field('osis_location'):
@@ -763,6 +771,7 @@ class BibleImportForm(OpenLPWizard):
         self.license_details_page.registerField('license_version', self.version_name_edit)
         self.license_details_page.registerField('license_copyright', self.copyright_edit)
         self.license_details_page.registerField('license_permissions', self.permissions_edit)
+        self.license_details_page.registerField("license_full_license", self.full_license_edit, 'plainText')
 
     def set_defaults(self):
         """
@@ -787,8 +796,13 @@ class BibleImportForm(OpenLPWizard):
         self.setField('proxy_username', settings.value('proxy username'))
         self.setField('proxy_password', settings.value('proxy password'))
         self.setField('license_version', self.version_name_edit.text())
+        self.version_name_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
         self.setField('license_copyright', self.copyright_edit.text())
+        self.copyright_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
         self.setField('license_permissions', self.permissions_edit.text())
+        self.permissions_edit.setPlaceholderText(UiStrings().OptionalShowInFooter)
+        self.setField('license_full_license', self.full_license_edit.toPlainText())
+        self.full_license_edit.setPlaceholderText(UiStrings().OptionalHideInFooter)
         self.on_web_source_combo_box_index_changed(WebDownload.Crosswalk)
         settings.endGroup()
 
@@ -812,6 +826,7 @@ class BibleImportForm(OpenLPWizard):
         license_version = self.field('license_version')
         license_copyright = self.field('license_copyright')
         license_permissions = self.field('license_permissions')
+        license_full_license = self.field('license_full_license')
         importer = None
         if bible_type == BibleFormat.OSIS:
             # Import an OSIS bible.
@@ -861,10 +876,10 @@ class BibleImportForm(OpenLPWizard):
                                                      sword_path=self.field('sword_zip_path'),
                                                      sword_key=self.sword_zipbible_combo_box.itemData(
                                                          self.sword_zipbible_combo_box.currentIndex()))
-
         try:
             if importer.do_import(license_version) and not importer.stop_import_flag:
-                self.manager.save_meta_data(license_version, license_version, license_copyright, license_permissions)
+                self.manager.save_meta_data(license_version, license_version,
+                                            license_copyright, license_permissions, license_full_license)
                 self.manager.reload_bibles()
                 if bible_type == BibleFormat.WebDownload:
                     self.progress_label.setText(
