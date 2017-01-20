@@ -180,7 +180,7 @@ class EasySlidesImport(SongImport):
         reg = default_region
         verses[reg] = {}
         # instance differentiates occurrences of same verse tag
-        vt = 'V'
+        vt = 'v'
         vn = '1'
         inst = 1
         for line in lines:
@@ -193,14 +193,14 @@ class EasySlidesImport(SongImport):
                         inst += 1
                 else:
                     # separators are not used, so empty line starts a new verse
-                    vt = 'V'
+                    vt = 'v'
                     vn = len(verses[reg].get(vt, {})) + 1
                     inst = 1
             elif line[0:7] == '[region':
                 reg = self._extract_region(line)
                 verses.setdefault(reg, {})
                 if not regions_in_verses:
-                    vt = 'V'
+                    vt = 'v'
                     vn = '1'
                     inst = 1
             elif line[0] == '[':
@@ -213,7 +213,7 @@ class EasySlidesImport(SongImport):
                 if match:
                     marker = match.group(1).strip()
                     vn = match.group(2)
-                vt = MarkTypes.get(marker, 'O') if marker else 'V'
+                vt = MarkTypes.get(marker, 'o') if marker else 'v'
                 if regions_in_verses:
                     region = default_region
                 inst = 1
@@ -238,13 +238,13 @@ class EasySlidesImport(SongImport):
                 lines = '\n'.join(verses[reg][vt][vn][inst])
                 self.add_verse(lines, versetag)
         SeqTypes = {
-            'p': 'P1',
-            'q': 'P2',
-            'c': 'C1',
-            't': 'C2',
-            'b': 'B1',
-            'w': 'B2',
-            'e': 'E1'}
+            'p': 'p1',
+            'q': 'p2',
+            'c': 'c1',
+            't': 'c2',
+            'b': 'b1',
+            'w': 'b2',
+            'e': 'e1'}
         # Make use of Sequence data, determining the order of verses
         try:
             order = str(song.Sequence).strip().split(',')
@@ -252,7 +252,7 @@ class EasySlidesImport(SongImport):
                 if not tag:
                     continue
                 elif tag[0].isdigit():
-                    tag = 'V' + tag
+                    tag = 'v' + tag
                 elif tag.lower() in SeqTypes:
                     tag = SeqTypes[tag.lower()]
                 else:
