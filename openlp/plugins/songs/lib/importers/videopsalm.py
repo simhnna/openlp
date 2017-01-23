@@ -65,8 +65,8 @@ class VideoPsalmImport(SongImport):
                 if c == '\n':
                     if inside_quotes:
                         processed_content += '\\n'
-                # Put keys in quotes
-                elif c.isalnum() and not inside_quotes:
+                # Put keys in quotes. The '-' is for handling nagative numbers
+                elif (c.isalnum() or c == '-') and not inside_quotes:
                     processed_content += '"' + c
                     c = next(file_content_it)
                     while c.isalnum():
@@ -121,6 +121,8 @@ class VideoPsalmImport(SongImport):
                 if 'Memo3' in song:
                     self.add_comment(song['Memo3'])
                 for verse in song['Verses']:
+                    if 'Text' not in verse:
+                        continue
                     self.add_verse(verse['Text'], 'v')
                 if not self.finish():
                     self.log_error('Could not import {title}'.format(title=self.title))
