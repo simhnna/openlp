@@ -312,10 +312,11 @@ class UiAboutDialog(object):
                      'Martin Thompson, Jon Tibble, Dave Warnock, Frode Woldsund, '
                      'Martin Zibricky, Patrick Zimmermann')
         copyright_note = translate('OpenLP.AboutForm',
-                                   'Copyright \xa9 2004-{yr} {cr}\n\n'
-                                   'Portions copyright \xa9 2004-{yr} {others}').format(cr='Raoul Snyman',
-                                                                                        yr=datetime.date.today().year,
-                                                                                        others=cr_others)
+                                   'Copyright {crs} 2004-{yr} {cr}\n\n'
+                                   'Portions copyright {crs} 2004-{yr} {others}').format(cr='Raoul Snyman',
+                                                                                         yr=datetime.date.today().year,
+                                                                                         others=cr_others,
+                                                                                         crs='\xa9')
         licence = translate('OpenLP.AboutForm',
                             'This program is free software; you can redistribute it and/or '
                             'modify it under the terms of the GNU General Public License as '
