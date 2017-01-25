@@ -583,6 +583,12 @@ LYRICS_SRC = Template("""
     .lyricsmain {
        ${main}
     }
+    table.line {}
+    table.segment {
+      float: left;
+    }
+    td.note {}
+    td.lyrics {}
     """)
 
 FOOTER_SRC = Template("""

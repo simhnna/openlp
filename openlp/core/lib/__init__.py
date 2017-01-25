@@ -386,26 +386,61 @@ def expand_chords(text):
 
     :param text:
     """
+    if '[' not in text and ']' not in text:
+        return text
     text_lines = text.split('{br}')
     expanded_text_lines = []
-    chords_on_prev_line = False
     for line in text_lines:
-        # If a ChordPro is detected in the line, replace it with a html-span tag and wrap the line in a span tag.
-        if '[' in line and ']' in line:
-            if chords_on_prev_line:
-                new_line = '<span class="chordline">'
-            else:
-                new_line = '<span class="chordline firstchordline">'
-                chords_on_prev_line = True
-            # Matches a chord, a tail, a remainder and a line end. See expand_and_align_chords_in_line() for more info.
-            new_line += re.sub(r'\[(\w.*?)\]([\u0080-\uFFFF,\w]*)'
-                               '([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?',
-                               expand_and_align_chords_in_line, line)
-            new_line += '</span>'
-            expanded_text_lines.append(new_line)
+        # If a ChordPro is detected in the line, build html tables.
+        new_line = '<table class="line" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>'
+        if '[' in text and ']' in line:
+            words = line.split(' ')
+            in_note = False
+            for word in words:
+                notes = []
+                lyrics = []
+                new_line += '<table class="segment" cellpadding="0" cellspacing="0" border="0" align="left">'
+                note = ''
+                lyric = ''
+                if '[' in word and ']' in word:
+                    for char in word:
+                        if char == '[':
+                            in_note = True
+                            if lyric != '':
+                                if note == '':
+                                    note = '&nbsp;'
+                                notes.append(note)
+                                lyrics.append(lyric)
+                                note = ''
+                                lyric = ''
+                        elif char == ']' and in_note:
+                            in_note = False
+                        elif in_note:
+                            note += char
+                        else:
+                            lyric += char
+                    if lyric != '' or note != '':
+                        if note == '':
+                            note = '&nbsp;'
+                        if lyric == '':
+                            lyric = '&nbsp;'
+                        notes.append(note)
+                        lyrics.append(lyric)
+                    new_line += '<tr>'
+                    for note in notes:
+                        new_line += '<td class="note">%s</td>' % note
+                    new_line += '</tr><tr>'
+                    for lyric in lyrics:
+                        new_line += '<td class="lyrics">%s&nbsp;</td>' % lyric
+                    new_line += '</tr>'
+                else:
+                    new_line += '<tr><td class="note">&nbsp;</td></tr><tr><td class="lyrics">%s&nbsp;</td></tr>' % word
+                new_line += '</table>'
         else:
-            chords_on_prev_line = False
-            expanded_text_lines.append(line)
+            new_line += line
+        new_line += '</td></tr></table>'
+        expanded_text_lines.append(new_line)
+        print('{br}'.join(expanded_text_lines))
     return '{br}'.join(expanded_text_lines)
 
 

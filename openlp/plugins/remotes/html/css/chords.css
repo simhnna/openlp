@@ -89,3 +89,13 @@
 #nextslide .chordline span.chord span strong {
   color: gray;
 }
+
+table.line {}
+
+table.segment {
+  float: left;
+}
+
+td.note {}
+
+td.lyrics {}
