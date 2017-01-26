@@ -292,7 +292,7 @@ def clean_tags(text, remove_chords=False):
     """
     text = text.replace('<br>', '\n')
     text = text.replace('{br}', '\n')
-    text = text.replace('&nbsp;', ' ')
+    #text = text.replace('&nbsp;', ' ')
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], '')
         text = text.replace(tag['end tag'], '')
@@ -430,8 +430,11 @@ def expand_chords(text):
                     for note in notes:
                         new_line += '<td class="note">%s</td>' % note
                     new_line += '</tr><tr>'
-                    for lyric in lyrics:
-                        new_line += '<td class="lyrics">%s&nbsp;</td>' % lyric
+                    for i in range(len(lyrics)):
+                        end_space = ''
+                        if i + 1 == len(lyrics):
+                            end_space = '&nbsp;'
+                        new_line += '<td class="lyrics">%s%s</td>' % (lyrics[i], end_space)
                     new_line += '</tr>'
                 else:
                     new_line += '<tr><td class="note">&nbsp;</td></tr><tr><td class="lyrics">%s&nbsp;</td></tr>' % word

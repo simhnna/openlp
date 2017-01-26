@@ -246,7 +246,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             Settings().setValue('core/application version', openlp_version)
         # If data_version is different from the current version ask if we should backup the data folder
         elif data_version != openlp_version:
-            if self.splash.isVisible():
+            if can_show_splash and self.splash.isVisible():
                 self.splash.hide()
             if QtWidgets.QMessageBox.question(None, translate('OpenLP', 'Backup'),
                                               translate('OpenLP', 'OpenLP has been upgraded, do you want to create\n'
