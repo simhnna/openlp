@@ -343,9 +343,11 @@ class TestProjectorDB(TestCase):
         results = self.projector.get_projector_all()
 
         # THEN: We should have a list with three entries
-        self.assertEqual(len(results), len(projector_list), 'Returned results should have returned a list with three entries')
+        self.assertEqual(len(results), len(projector_list),
+                         'Returned results should have returned a list with three entries')
         for projector in results:
-            self.assertTrue((projector in projector_list), 'Projector DB entry should have been in expected list')
+            self.assertTrue((projector in projector_list),
+                            'Projector DB entry should have been in expected list')
 
     def test_get_projector_by_name_fail(self):
         """
