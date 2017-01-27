@@ -298,16 +298,15 @@ class TestProjectorDB(TestCase):
         # THEN: Verify return was None
         self.assertEqual(results, None, 'Returned results should have equaled None')
 
-    @patch.object(ProjectorDB, 'get_all_objects')
-    def test_get_projector_all_none(self, mocked_get_all_objects):
+    def test_get_projector_all_none(self):
         """
         Test get_projector_all() with no projectors in db
         """
         # GIVEN: Test object with no data
-        mocked_get_all_objects.return_value = None
+        projector = self.projector
 
         # WHEN: We retrieve the database entries
-        results = self.projector.get_projector_all()
+        results = projector.get_projector_all()
 
         # THEN: Verify results is None
         self.assertEqual(results, [], 'Returned results should have returned an empty list')
