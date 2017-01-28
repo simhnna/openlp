@@ -587,8 +587,12 @@ LYRICS_SRC = Template("""
     table.segment {
       float: left;
     }
-    td.note {}
-    td.lyrics {}
+    td.note {
+        text-align: left;
+    }
+    td.lyrics {
+        text-align: left;
+    }
     """)
 
 FOOTER_SRC = Template("""

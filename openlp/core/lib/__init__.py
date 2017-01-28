@@ -315,69 +315,32 @@ def expand_tags(text):
     return text
 
 
-def expand_and_align_chords_in_line(match):
+def compare_chord_lyric(chord, lyric):
     """
-    Expand the chords in the line and align them using whitespaces.
-    NOTE: There is equivalent javascript code in chords.js, in the updateSlide function. Make sure to update both!
 
-    :param match:
-    :return: The line with expanded html-chords
+    :param chord:
+    :param lyric:
+    :return:
     """
-    slimchars = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
-    whitespaces = ''
+    SLIMCHARS = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
     chordlen = 0
-    taillen = 0
-    # The match could be "[G]sweet the " from a line like "A[D]mazing [D7]grace! How [G]sweet the [D]sound!"
-    # The actual chord, would be "G" in match "[G]sweet the "
-    chord = match.group(1)
-    # The tailing word of the chord, would be "sweet" in match "[G]sweet the "
-    tail = match.group(2)
-    # The remainder of the line, until line end or next chord. Would be " the " in match "[G]sweet the "
-    remainder = match.group(3)
-    # Line end if found, else None
-    end = match.group(4)
-    # Based on char width calculate width of chord
+    if chord == '&nbsp;':
+        return 0
     for chord_char in chord:
-        if chord_char not in slimchars:
+        if chord_char not in SLIMCHARS:
             chordlen += 2
         else:
             chordlen += 1
-    # Based on char width calculate width of tail
-    for tail_char in tail:
-        if tail_char not in slimchars:
-            taillen += 2
+    lyriclen = 0
+    for lyric_char in lyric:
+        if lyric_char not in SLIMCHARS:
+            lyriclen += 2
         else:
-            taillen += 1
-    # Based on char width calculate width of remainder
-    for remainder_char in remainder:
-        if remainder_char not in slimchars:
-            taillen += 2
-        else:
-            taillen += 1
-    # If the chord is wider than the tail+remainder and the line goes on, some padding is needed
-    if chordlen >= taillen and end is None:
-        # Decide if the padding should be "_" for drawing out words or spaces
-        if tail:
-            if not remainder:
-                for c in range(math.ceil((chordlen - taillen) / 2) + 1):
-                    whitespaces += '_'
-            else:
-                for c in range(chordlen - taillen + 2):
-                    whitespaces += '&nbsp;'
-        else:
-            if not remainder:
-                for c in range(math.floor((chordlen - taillen) / 2)):
-                    whitespaces += '_'
-            else:
-                for c in range(chordlen - taillen + 1):
-                    whitespaces += '&nbsp;'
+            lyriclen += 1
+    if chordlen > lyriclen:
+        return chordlen - lyriclen
     else:
-        if not tail and remainder and remainder[0] == ' ':
-            for c in range(chordlen):
-                whitespaces += '&nbsp;'
-    if whitespaces:
-        whitespaces = '<span class="ws">' + whitespaces + '</span>'
-    return '<span class="chord"><span><strong>' + chord + '</strong></span></span>' + tail + whitespaces + remainder
+        return 0
 
 
 def expand_chords(text):
@@ -397,45 +360,49 @@ def expand_chords(text):
             words = line.split(' ')
             in_note = False
             for word in words:
-                notes = []
+                chords = []
                 lyrics = []
                 new_line += '<table class="segment" cellpadding="0" cellspacing="0" border="0" align="left">'
-                note = ''
+                chord = ''
                 lyric = ''
                 if '[' in word and ']' in word:
                     for char in word:
                         if char == '[':
                             in_note = True
                             if lyric != '':
-                                if note == '':
-                                    note = '&nbsp;'
-                                notes.append(note)
+                                if chord == '':
+                                    chord = '&nbsp;'
+                                chords.append(chord)
                                 lyrics.append(lyric)
-                                note = ''
+                                chord = ''
                                 lyric = ''
                         elif char == ']' and in_note:
                             in_note = False
                         elif in_note:
-                            note += char
+                            chord += char
                         else:
                             lyric += char
-                    if lyric != '' or note != '':
-                        if note == '':
-                            note = '&nbsp;'
+                    if lyric != '' or chord != '':
+                        if chord == '':
+                            chord = '&nbsp;'
                         if lyric == '':
                             lyric = '&nbsp;'
-                        notes.append(note)
+                        chords.append(chord)
                         lyrics.append(lyric)
-                    new_line += '<tr>'
-                    for note in notes:
-                        new_line += '<td class="note">%s</td>' % note
-                    new_line += '</tr><tr>'
+                    new_chord_line = '<tr>'
+                    new_lyric_line = '</tr><tr>'
                     for i in range(len(lyrics)):
-                        end_space = ''
+                        spacer = compare_chord_lyric(chords[i], lyrics[i])
+                        new_chord_line += '<td class="note">%s</td>' % chords[i]
                         if i + 1 == len(lyrics):
-                            end_space = '&nbsp;'
-                        new_line += '<td class="lyrics">%s%s</td>' % (lyrics[i], end_space)
-                    new_line += '</tr>'
+                            new_lyric_line += '<td class="lyrics">%s&nbsp;</td>' % lyrics[i]
+                        else:
+                            if spacer > 0:
+                                space = '&nbsp;' * int(math.ceil(spacer / 2))
+                                new_lyric_line += '<td class="lyrics">%s%s-%s</td>' % (lyrics[i], space, space)
+                            else:
+                                new_lyric_line += '<td class="lyrics">%s</td>' % lyrics[i]
+                    new_line += new_chord_line + new_lyric_line + '</tr>'
                 else:
                     new_line += '<tr><td class="note">&nbsp;</td></tr><tr><td class="lyrics">%s&nbsp;</td></tr>' % word
                 new_line += '</table>'
@@ -443,7 +410,6 @@ def expand_chords(text):
             new_line += line
         new_line += '</td></tr></table>'
         expanded_text_lines.append(new_line)
-        print('{br}'.join(expanded_text_lines))
     return '{br}'.join(expanded_text_lines)
 
 
