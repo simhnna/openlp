@@ -60,33 +60,7 @@
   vertical-align: middle;
 }
 
-.chordline {
-  line-height: 2.0;
-}
-
-.chordline1 {
-  line-height: 1.0
-}
-
-.firstchordline {
-  line-height: 2.1em;
-}
-
-.chordline span.chord span {
-  position: relative;
-}
-
-.chordline span.chord span strong {
-  position: absolute;
-  top: -0.8em;
-  left: 0;
-  font-size: 30pt;
-  font-weight: normal;
-  line-height: normal;
-  color: yellow;
-}
-
-#nextslide .chordline span.chord span strong {
+#nextslide td.note {
   color: gray;
 }
 
@@ -96,6 +70,9 @@ table.segment {
   float: left;
 }
 
-td.note {}
+td.note {
+  font-size: 30pt;
+  color: yellow;
+}
 
 td.lyrics {}

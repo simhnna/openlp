@@ -265,7 +265,6 @@ window.OpenLP = {
       text = "<p class=\"nextslide\">" + $("#next-text").val() + ": " + OpenLP.nextSong + "</p>";
       $("#nextslide").html(text);
     }
-  if(!OpenLP.showchords) $(".chordline").toggleClass('chordline1');
   },
   updateClock: function(data) {
     var div = $("#clock");

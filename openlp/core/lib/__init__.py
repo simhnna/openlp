@@ -292,7 +292,7 @@ def clean_tags(text, remove_chords=False):
     """
     text = text.replace('<br>', '\n')
     text = text.replace('{br}', '\n')
-    #text = text.replace('&nbsp;', ' ')
+    text = text.replace('&nbsp;', ' ')
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], '')
         text = text.replace(tag['end tag'], '')
@@ -410,7 +410,8 @@ def expand_chords(text):
             new_line += line
         new_line += '</td></tr></table>'
         expanded_text_lines.append(new_line)
-    return '{br}'.join(expanded_text_lines)
+    # the {br} tag used to split lines is not inserted again since the line-tables style make them redundant.
+    return ''.join(expanded_text_lines)
 
 
 def create_separated_list(string_list):
