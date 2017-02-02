@@ -17,14 +17,6 @@
 * Temple Place, Suite 330, Boston, MA 02111-1307 USA                          *
 ******************************************************************************/
 
-#chords {
-  font-size: 20pt;
-  color: gray;
-  background-color: gray;
-  color: white;
-  cursor: pointer;
-}
-
 #header {
   padding-bottom: 1em;
 
@@ -60,7 +52,7 @@
   vertical-align: middle;
 }
 
-#nextslide td.note {
+#nextslide td.chord {
   color: gray;
 }
 
@@ -70,7 +62,7 @@ table.segment {
   float: left;
 }
 
-td.note {
+td.chord {
   font-size: 30pt;
   color: yellow;
 }

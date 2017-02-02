@@ -583,16 +583,6 @@ LYRICS_SRC = Template("""
     .lyricsmain {
        ${main}
     }
-    table.line {}
-    table.segment {
-      float: left;
-    }
-    td.note {
-        text-align: left;
-    }
-    td.lyrics {
-        text-align: left;
-    }
     """)
 
 FOOTER_SRC = Template("""
@@ -623,24 +613,20 @@ LYRICS_FORMAT_SRC = Template("""
     """)
 
 CHORDS_FORMAT = Template("""
-    .chordline {
-      line-height: ${chord_line_height};
+    table.line {}
+    table.segment {
+      float: left;
     }
-    .chordline span.chord span {
-      position: relative;
+    td.chord {
+        font-size: 80%;
+        display: ${chords_display};
     }
-    .chordline span.chord span strong {
-      position: absolute;
-      top: -0.8em;
-      left: 0;
-      font-size: 75%;
-      font-weight: normal;
-      line-height: normal;
-      display: ${chords_display};
+    td.lyrics {
     }
-    .firstchordline {
-        line-height: ${first_chord_line_height};
-    }""")
+    .chordspacing {
+        display: ${chords_display};
+    }
+    """)
 
 
 def build_html(item, screen, is_live, background, image=None, plugins=None):
@@ -823,12 +809,7 @@ def build_footer_css(item, height):
 
 def build_chords_css():
     if Settings().value('songs/mainview chords'):
-        chord_line_height = '2.0em'
-        chords_display = 'inline'
-        first_chord_line_height = '2.1em'
+        chords_display = 'table-cell'
     else:
-        chord_line_height = '1.0em'
         chords_display = 'none'
-        first_chord_line_height = '1.0em'
-    return CHORDS_FORMAT.substitute(chord_line_height=chord_line_height, chords_display=chords_display,
-                                    first_chord_line_height=first_chord_line_height)
+    return CHORDS_FORMAT.substitute(chords_display=chords_display)
