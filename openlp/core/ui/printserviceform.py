@@ -101,6 +101,19 @@ https://doc.qt.io/qt-5/richtext-html-subset.html#css-properties
 .newPage {
     page-break-before: always;
 }
+
+table.line {}
+
+table.segment {
+  float: left;
+}
+
+td.chord {
+    font-size: 80%;
+}
+
+td.lyrics {
+}
 """
 
 
@@ -172,11 +185,12 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
         self._add_element('h1', html.escape(self.title_line_edit.text()), html_data.body, classId='serviceTitle')
         for index, item in enumerate(self.service_manager.service_items):
             self._add_preview_item(html_data.body, item['service_item'], index)
-        # Remove chord span and ws span elements since printing them are not yet support
-        for chord_span in html_data.find_class('chord'):
-            chord_span.drop_tree()
-        for ws_span in html_data.find_class('ws'):
-            ws_span.drop_tree()
+        if not self.show_chords_check_box.isChecked():
+            # Remove chord row and spacing span elements when not printing chords
+            for chord_row in html_data.find_class('chordrow'):
+                chord_row.drop_tree()
+            for spacing_span in html_data.find_class('spacing'):
+                spacing_span.drop_tree()
         # Add the custom service notes:
         if self.footer_text_edit.toPlainText():
             div = self._add_element('div', parent=html_data.body, classId='customNotes')

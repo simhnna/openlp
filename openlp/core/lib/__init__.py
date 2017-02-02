@@ -430,7 +430,7 @@ def expand_chords(text, line_split):
                             lyric = '&nbsp;'
                         chords.append(chord)
                         lyrics.append(lyric)
-                    new_chord_line = '<tr>'
+                    new_chord_line = '<tr class="chordrow">'
                     new_lyric_line = '</tr><tr>'
                     for i in range(len(lyrics)):
                         spacer = compare_chord_lyric(chords[i], lyrics[i])
@@ -461,9 +461,8 @@ def expand_chords(text, line_split):
                     end_formatting_tags = ''
                     if active_formatting_tags:
                         end_formatting_tags = '{/' + '}{/'.join(active_formatting_tags) + '}'
-                    new_line += '<tr><td class="chord">&nbsp;</td></tr><tr><td class="lyrics">{starttags}{lyrics}&nbsp;{endtags}</td></tr>'.format(starttags=start_formatting_tags, lyrics=word, endtags=end_formatting_tags)
+                    new_line += '<tr class="chordrow"><td class="chord">&nbsp;</td></tr><tr><td class="lyrics">{starttags}{lyrics}&nbsp;{endtags}</td></tr>'.format(starttags=start_formatting_tags, lyrics=word, endtags=end_formatting_tags)
                 new_line += '</table>'
-                #print(new_line)
         else:
             new_line += line
         new_line += '</td></tr></table>'
