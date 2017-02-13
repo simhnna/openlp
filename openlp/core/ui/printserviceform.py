@@ -189,7 +189,7 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
             # Remove chord row and spacing span elements when not printing chords
             for chord_row in html_data.find_class('chordrow'):
                 chord_row.drop_tree()
-            for spacing_span in html_data.find_class('spacing'):
+            for spacing_span in html_data.find_class('chordspacing'):
                 spacing_span.drop_tree()
         # Add the custom service notes:
         if self.footer_text_edit.toPlainText():
@@ -217,7 +217,7 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
                 for slide in item.get_frames():
                     if not verse_def or verse_def != slide['verseTag'] or verse_html == slide['html']:
                         text_div = self._add_element('div', parent=div, classId='itemText')
-                    else:
+                    elif 'chordspacing' not in slide['html']:
                         self._add_element('br', parent=text_div)
                     self._add_element('span', slide['html'], text_div)
                     verse_def = slide['verseTag']
