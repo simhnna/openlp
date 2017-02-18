@@ -704,7 +704,6 @@ class BibleMediaItem(MediaManagerItem):
                     self.on_text_search(text, True)
             elif VALID_TEXT_SEARCH.search(text):
                 self.on_text_search(text)
-                self.display_results()
 
     def on_search_edit_text_changed(self):
         """
