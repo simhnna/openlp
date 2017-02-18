@@ -187,7 +187,6 @@ class BibleMediaItem(MediaManagerItem):
 
     def setupUi(self):
         super().setupUi()
-
         sort_model = QtCore.QSortFilterProxyModel(self.select_book_combo_box)
         model = self.select_book_combo_box.model()
         # Reparent the combo box model to the sort proxy, otherwise it will be deleted when we change the comobox's
@@ -814,7 +813,7 @@ class BibleMediaItem(MediaManagerItem):
             return False
         bible_text = ''
         old_chapter = -1
-        raw_slides = ['']
+        raw_slides = []
         verses = VerseReferenceList()
         for bitem in items:
             data = bitem.data(QtCore.Qt.UserRole)
@@ -823,12 +822,14 @@ class BibleMediaItem(MediaManagerItem):
             verse_text = self.format_verse(old_chapter, data['chapter'], data['verse'])
             # We only support 'Verse Per Slide' when using a scond bible
             if data['second_bible']:
-                bible_text = '{data[verse]}{data[text]}\n\n{data[verse]}{data[second_text]}'.format(data=data)
+                second_text = self.format_verse(old_chapter, data['chapter'], data['verse'])
+                bible_text = '{first_version}{data[text]}\n\n{second_version}{data[second_text]}'\
+                    .format(first_version=verse_text, second_version=second_text, data=data)
                 raw_slides.append(bible_text.rstrip())
                 bible_text = ''
             # If we are 'Verse Per Slide' then create a new slide.
             elif self.settings.layout_style == LayoutStyle.VersePerSlide:
-                bible_text = '{data[verse]}{data[text]}'.format(data=data)
+                bible_text = '{first_version}{data[text]}'.format(first_version=verse_text, data=data)
                 raw_slides.append(bible_text.rstrip())
                 bible_text = ''
             # If we are 'Verse Per Line' then force a new line.
