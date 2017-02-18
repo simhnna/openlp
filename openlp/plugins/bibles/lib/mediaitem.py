@@ -732,10 +732,11 @@ class BibleMediaItem(MediaManagerItem):
         :return: None
         """
         self.list_view.clear()
-        items = self.build_display_results(self.bible, self.second_bible, self.search_results)
-        for item in items:
-            self.list_view.addItem(item)
-        self.list_view.selectAll()
+        if self.search_results:
+            items = self.build_display_results(self.bible, self.second_bible, self.search_results)
+            for item in items:
+                self.list_view.addItem(item)
+            self.list_view.selectAll()
         self.search_results = []
         self.second_search_results = []
 
