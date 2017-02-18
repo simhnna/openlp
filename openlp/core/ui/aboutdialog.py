@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -19,6 +19,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import datetime
 
 from PyQt5 import QtGui, QtWidgets
 
@@ -112,9 +113,12 @@ class UiAboutDialog(object):
                       'Jonathan "springermac" Springer', 'Philip "Phill" Ridout']
         contributors = ['Stuart "sibecker" Becker', 'Gerald "jerryb" Britton', 'Jonathan "gushie" Corwin',
                         'Samuel "MrGamgee" Findlay', 'Michael "cocooncrash" Gorven', 'Scott "sguerrieri" Guerrieri',
-                        'Matthias "matthub" Hub', 'Meinert "m2j" Jordan', 'Armin "orangeshirt" K\xf6hler',
-                        'Rafael "rafaellerm" Lerm', 'Erik "luen" Lundin', 'Edwin "edwinlunando" Lunando',
+                        'Simon Hanna', 'Chris Hill',
+                        'Matthias "matthub" Hub', 'Meinert "m2j" Jordan', 'Ian Knightly'
+                        'Armin "orangeshirt" K\xf6hler',
+                        'Rafael "rafaellerm" Lerm', 'Gabriel loo', 'Erik "luen" Lundin', 'Edwin "edwinlunando" Lunando',
                         'Dmitriy Marmyshev', 'Brian "brianmeyer" Meyer', 'Joshua "milleja46" Miller',
+                        'Suutari "Azaziah" Olli',
                         'Stevan "ElderP" Pettit', 'Mattias "mahfiaz" P\xf5ldaru', 'Felipe Polo-Wood',
                         'Christian "crichter" Richter', 'Arjan "arjans" Schrijver', 'Simon "samscudder" Scudder',
                         'Jeffrey "whydoubt" Smith', 'Stefan Strasser', 'Maikel Stuivenberg', 'Martin "mijiti" Thompson',
@@ -189,7 +193,8 @@ class UiAboutDialog(object):
                                '    Qt5: http://qt.io\n'
                                '    PyQt5: http://www.riverbankcomputing.co.uk/software/pyqt/intro\n'
                                '    Oxygen Icons: http://techbase.kde.org/Projects/Oxygen/\n'
-                               '    MuPDF: http://www.mupdf.com/\n')
+                               '    MuPDF: http://www.mupdf.com/\n'
+                               '    MediaInfo: https://mediaarea.net/en/MediaInfo\n')
         final_credit = translate('OpenLP.AboutForm', 'Final Credit\n'
                                  '    "For God so loved the world that He gave\n'
                                  '    His one and only Son, so that whoever\n'
@@ -299,17 +304,19 @@ class UiAboutDialog(object):
         self.about_notebook.setTabText(self.about_notebook.indexOf(self.credits_tab),
                                        translate('OpenLP.AboutForm', 'Credits'))
         cr_others = ('Tim Bentley, Gerald Britton, Jonathan Corwin, Samuel Findlay, '
-                     'Michael Gorven, Scott Guerrieri, Matthias Hub, Meinert Jordan, '
-                     'Armin K\xf6hler, Erik Lundin, Edwin Lunando, Joshua Miller, '
-                     'Brian T. Meyer, Stevan Pettit, Andreas Preikschat, '
+                     'Michael Gorven, Scott Guerrieri, Simon Hanna, Chris, Hill Matthias Hub, Meinert Jordan, '
+                     'Ian Knightley, Armin K\xf6hler, Gabriel Loo, Erik Lundin, Edwin Lunando, Joshua Miller, '
+                     'Brian T. Meyer, Suutari Olli, Stevan Pettit, Andreas Preikschat, '
                      'Mattias P\xf5ldaru, Christian Richter, Philip Ridout, '
                      'Ken Roberts, Simon Scudder, Jeffrey Smith, Maikel Stuivenberg, '
                      'Martin Thompson, Jon Tibble, Dave Warnock, Frode Woldsund, '
                      'Martin Zibricky, Patrick Zimmermann')
         copyright_note = translate('OpenLP.AboutForm',
-                                   'Copyright \xa9 2004-2016 {cr}\n\n'
-                                   'Portions copyright \xa9 2004-2016 {others}').format(cr='Raoul Snyman',
-                                                                                        others=cr_others)
+                                   'Copyright {crs} 2004-{yr} {cr}\n\n'
+                                   'Portions copyright {crs} 2004-{yr} {others}').format(cr='Raoul Snyman',
+                                                                                         yr=datetime.date.today().year,
+                                                                                         others=cr_others,
+                                                                                         crs='\xa9')
         licence = translate('OpenLP.AboutForm',
                             'This program is free software; you can redistribute it and/or '
                             'modify it under the terms of the GNU General Public License as '

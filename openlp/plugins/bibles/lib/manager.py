@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -263,7 +263,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
 
         :param bible: Unicode. The Bible to use.
         :param verse_text:
-             Unicode. The scripture reference. Valid scripture references are:
+             String. The scripture reference. Valid scripture references are:
 
                 - Genesis 1
                 - Genesis 1-2
@@ -381,17 +381,17 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             verse_ranges.append((book_ref_id, chapter, start_verse, end_verse))
         return verse_ranges
 
-    def save_meta_data(self, bible, version, copyright, permissions, book_name_language=None):
+    def save_meta_data(self, bible, version, copyright, permissions, full_license, book_name_language=None):
         """
         Saves the bibles meta data.
         """
-        log.debug('save_meta data {bible}, {version}, {copyright}, {perms}'.format(bible=bible,
-                                                                                   version=version,
-                                                                                   copyright=copyright,
-                                                                                   perms=permissions))
+        log.debug('save_meta data {bible}, {version}, {copyright},'
+                  ' {perms}, {full_license}'.format(bible=bible, version=version, copyright=copyright,
+                                                    perms=permissions, full_license=full_license))
         self.db_cache[bible].save_meta('name', version)
         self.db_cache[bible].save_meta('copyright', copyright)
         self.db_cache[bible].save_meta('permissions', permissions)
+        self.db_cache[bible].save_meta('full_license', full_license)
         self.db_cache[bible].save_meta('book_name_language', book_name_language)
 
     def get_meta_data(self, bible, key):

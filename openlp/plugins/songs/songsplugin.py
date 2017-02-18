@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -60,6 +60,7 @@ __default_settings__ = {
     'songs/add song from service': True,
     'songs/display songbar': True,
     'songs/display songbook': False,
+    'songs/display written by': True,
     'songs/display copyright symbol': False,
     'songs/last directory import': '',
     'songs/last directory export': '',

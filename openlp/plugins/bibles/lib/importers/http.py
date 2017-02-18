@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -32,7 +32,7 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 
 from openlp.core.common import Registry, RegistryProperties, translate
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.lib.webpagereader import get_web_page
+from openlp.core.common.httputils import get_web_page
 from openlp.plugins.bibles.lib import SearchResults
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB, BiblesResourcesDB, Book
