@@ -196,7 +196,7 @@ class TestProjectorDB(TestCase):
 
     def test_manufacturer_repr(self):
         """
-        Test Manufacturer.__repr__ text
+        Test Manufacturer.__repr__() text
         """
         # GIVEN: Test object
         manufacturer = Manufacturer()
@@ -210,7 +210,7 @@ class TestProjectorDB(TestCase):
 
     def test_model_repr(self):
         """
-        Test Model.__repr__ text
+        Test Model.__repr__() text
         """
         # GIVEN: Test object
         model = Model()
@@ -224,7 +224,7 @@ class TestProjectorDB(TestCase):
 
     def test_source_repr(self):
         """
-        Test Source.__repr__ text
+        Test Source.__repr__() text
         """
         # GIVEN: Test object
         source = Source()
@@ -287,7 +287,7 @@ class TestProjectorDB(TestCase):
 
     def test_get_projector_by_id_none(self):
         """
-        Test get_projector_by_id returns None if no db entry
+        Test get_projector_by_id() returns None if no db entry
         """
         # GIVEN: Test object and data
         projector = self.projector
@@ -297,3 +297,119 @@ class TestProjectorDB(TestCase):
 
         # THEN: Verify return was None
         self.assertEqual(results, None, 'Returned results should have equaled None')
+
+    def test_get_projector_all_none(self):
+        """
+        Test get_projector_all() with no projectors in db
+        """
+        # GIVEN: Test object with no data
+        projector = self.projector
+
+        # WHEN: We retrieve the database entries
+        results = projector.get_projector_all()
+
+        # THEN: Verify results is None
+        self.assertEqual(results, [], 'Returned results should have returned an empty list')
+
+    def test_get_projector_all_one(self):
+        """
+        Test get_projector_all() with one entry in db
+        """
+        # GIVEN: One entry in database
+        projector = Projector(**TEST1_DATA)
+        self.projector.add_projector(projector)
+
+        # WHEN: We retrieve the database entries
+        results = self.projector.get_projector_all()
+
+        # THEN: We should have a list with one entry
+        self.assertEqual(len(results), 1, 'Returned results should have returned a list with one entry')
+        self.assertTrue((projector in results), 'Result should have been equal to TEST1_DATA')
+
+    def test_get_projector_all_many(self):
+        """
+        Test get_projector_all() with multiple entries in db
+        """
+        # GIVEN: multiple entries in database
+        projector_list = []
+        projector_list.append(Projector(**TEST1_DATA))
+        projector_list.append(Projector(**TEST2_DATA))
+        projector_list.append(Projector(**TEST3_DATA))
+        for projector in projector_list:
+            self.projector.add_projector(projector)
+
+        # WHEN: We retrieve the database entries
+        results = self.projector.get_projector_all()
+
+        # THEN: We should have a list with three entries
+        self.assertEqual(len(results), len(projector_list),
+                         'Returned results should have returned a list with three entries')
+        for projector in results:
+            self.assertTrue((projector in projector_list),
+                            'Projector DB entry should have been in expected list')
+
+    def test_get_projector_by_name_fail(self):
+        """
+        Test get_projector_by_name() fail
+        """
+        # GIVEN: Test entry in database
+        self.projector.add_projector(Projector(**TEST1_DATA))
+
+        # WHEN: We attempt to get a projector that's not in database
+        results = self.projector.get_projector_by_name(name=TEST2_DATA['name'])
+
+        # THEN: We should have None
+        self.assertEqual(results, None, 'projector.get_projector_by_name() should have returned None')
+
+    def test_add_projector_fail(self):
+        """
+        Test add_projector() fail
+        """
+        # GIVEN: Test entry in the database
+        ignore_result = self.projector.add_projector(Projector(**TEST1_DATA))
+
+        # WHEN: Attempt to add same projector entry
+        results = self.projector.add_projector(Projector(**TEST1_DATA))
+
+        # THEN: We should have failed to add new entry
+        self.assertFalse(results, 'add_projector() should have failed')
+
+    def test_update_projector_default_fail(self):
+        """
+        Test update_projector() with no options fails
+        """
+        # GIVEN: projector instance
+        projector = self.projector
+
+        # WHEN: attempt to update a projector entry with no options
+        results = projector.update_projector()
+
+        # THEN: We should have failed
+        self.assertFalse(results, 'update_projector(projector=None) should have returned False')
+
+    def test_update_projector_not_in_db_fail(self):
+        """
+        Test update_projector() when entry not in database
+        """
+        # GIVEN: Projector entry in database
+        ignore_result = self.projector.add_projector(Projector(**TEST1_DATA))
+        projector = Projector(**TEST2_DATA)
+
+        # WHEN: Attempt to update data with a different ID
+        results = self.projector.update_projector(projector)
+
+        # THEN: Results should be False
+        self.assertFalse(results, 'update_projector(projector=projector) should have returned False')
+
+    def test_delete_projector_fail(self):
+        """
+        Test delete_projector(projector) fails to delete record
+        """
+        # GIVEN: Test entry in db
+        self.projector.add_projector(Projector(**TEST1_DATA))
+
+        # wHEN: Attempting to delete an entry not in the databae
+        results = self.projector.delete_projector(Projector(**TEST2_DATA))
+
+        # THEN: Results should be False
+        self.assertFalse(results, 'delete_projector() should have returned False')
