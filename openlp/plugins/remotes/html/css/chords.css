@@ -17,6 +17,14 @@
 * Temple Place, Suite 330, Boston, MA 02111-1307 USA                          *
 ******************************************************************************/
 
+#chords {
+  font-size: 20pt;
+  color: gray;
+  background-color: gray;
+  color: white;
+  cursor: pointer;
+}
+
 #header {
   padding-bottom: 1em;
 
@@ -45,6 +53,14 @@
   cursor: pointer;
 }
 
+#chords {
+  line-height: 1.2em;
+  color: gray;
+  background-color: gray;
+  color: white;
+  cursor: pointer;
+}
+
 /* Extending exiting definition in stage.css */
 #verseorder {
   line-height: 1.5;
@@ -52,19 +68,32 @@
   vertical-align: middle;
 }
 
-#nextslide td.chord {
-  color: gray;
+.chordline {
+  line-height: 2.0;
 }
 
-table.line {}
-
-table.segment {
-  float: left;
+.chordline1 {
+  line-height: 1.0
 }
 
-td.chord {
+.firstchordline {
+  line-height: 2.1em;
+}
+
+.chordline span.chord span {
+  position: relative;
+}
+
+.chordline span.chord span strong {
+  position: absolute;
+  top: -0.8em;
+  left: 0;
   font-size: 30pt;
+  font-weight: normal;
+  line-height: normal;
   color: yellow;
 }
 
-td.lyrics {}
+#nextslide .chordline span.chord span strong {
+  color: gray;
+}

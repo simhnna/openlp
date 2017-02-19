@@ -215,13 +215,13 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
                 verse_def = None
                 verse_html = None
                 for slide in item.get_frames():
-                    if not verse_def or verse_def != slide['verseTag'] or verse_html == slide['html']:
+                    if not verse_def or verse_def != slide['verseTag'] or verse_html == slide['printing_html']:
                         text_div = self._add_element('div', parent=div, classId='itemText')
-                    elif 'chordspacing' not in slide['html']:
+                    elif 'chordspacing' not in slide['printing_html']:
                         self._add_element('br', parent=text_div)
-                    self._add_element('span', slide['html'], text_div)
+                    self._add_element('span', slide['printing_html'], text_div)
                     verse_def = slide['verseTag']
-                    verse_html = slide['html']
+                    verse_html = slide['printing_html']
                 # Break the page before the div element.
                 if index != 0 and self.page_break_after_text.isChecked():
                     div.set('class', 'item newPage')
