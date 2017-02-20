@@ -76,10 +76,6 @@
   line-height: 1.0
 }
 
-.firstchordline {
-  line-height: 2.1em;
-}
-
 .chordline span.chord span {
   position: relative;
 }
@@ -92,6 +88,10 @@
   font-weight: normal;
   line-height: normal;
   color: yellow;
+}
+
+.ws {
+  white-space: pre-wrap;
 }
 
 #nextslide .chordline span.chord span strong {

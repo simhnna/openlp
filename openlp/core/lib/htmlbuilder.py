@@ -630,6 +630,10 @@ CHORDS_FORMAT = Template("""
     }
     .firstchordline {
         line-height: ${first_chord_line_height};
+    }
+    .ws {
+        display: ${chords_display};
+        white-space: pre-wrap;
     }""")
 
 

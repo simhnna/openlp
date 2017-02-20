@@ -210,6 +210,16 @@ window.OpenLP = {
         if (!$tail && $remainder.charAt(0) == ' ') {for (c = 0; c < $chordlen; c++) {w += '&nbsp;';}}
       }
       if (w!='') {
+        if (w[0] == '_') {
+          ws_length = w.length;
+          if (ws_length==1) {
+            w = '-';
+          } else {
+            wsl_mod = Math.floor(ws_length / 2);
+            ws_right = ws_left = new Array(wsl_mod +1).join(' ');
+            w = ws_left + '-' + ws_right;
+          }
+        }
         w='<span class="ws">' + w + '</span>';
       }
       return $.grep(['<span class="chord"><span><strong>', $chord, '</strong></span></span>', $tail, w, $remainder, $end], Boolean).join('');
@@ -259,13 +269,16 @@ window.OpenLP = {
       }
       text = text.replace(/\n/g, "<br />");
       $("#nextslide").html(text);
-      $("#nextslide").class("nextslide");
     }
     else {
       text = "<p class=\"nextslide\">" + $("#next-text").val() + ": " + OpenLP.nextSong + "</p>";
       $("#nextslide").html(text);
     }
-    if(!OpenLP.showchords) $(".chordline").toggleClass('chordline1');
+    if(!OpenLP.showchords) {
+      $(".chordline").toggleClass('chordline1');
+      $(".chord").toggle();
+      $(".ws").toggle();
+    }
   },
   updateClock: function(data) {
     var div = $("#clock");
@@ -314,6 +327,7 @@ $(document).ready(function() {
   });
   $('#chords').click(function () {
     OpenLP.showchords = OpenLP.showchords ? false : true;
-    OpenLP.updateSlide();
+    OpenLP.loadSlides();
+    $
   });
 });

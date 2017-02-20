@@ -379,6 +379,14 @@ def expand_and_align_chords_in_line(match):
             for c in range(chordlen):
                 whitespaces += '&nbsp;'
     if whitespaces:
+        if '_' in whitespaces:
+            ws_length = len(whitespaces)
+            if ws_length == 1:
+                whitespaces = '-'
+            else:
+                wsl_mod = ws_length // 2
+                ws_right = ws_left = ' ' * wsl_mod
+                whitespaces = ws_left + '-' + ws_right
         whitespaces = '<span class="ws">' + whitespaces + '</span>'
     return '<span class="chord"><span><strong>' + chord + '</strong></span></span>' + tail + whitespaces + remainder
 
@@ -414,6 +422,7 @@ def expand_chords(text):
 
 def compare_chord_lyric(chord, lyric):
     """
+    Compare the width of chord and lyrics. If chord width is greater than the lyric width the diff is returned.
 
     :param chord:
     :param lyric:
