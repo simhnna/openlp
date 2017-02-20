@@ -248,6 +248,10 @@ CHORD_CSS_ENABLED = """
     }
     .firstchordline {
         line-height: 2.1em;
+    }
+    .ws {
+        display: inline;
+        white-space: pre-wrap;
     }"""
 
 __default_settings__ = {
