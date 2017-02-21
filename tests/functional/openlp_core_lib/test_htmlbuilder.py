@@ -79,6 +79,10 @@ HTML = """
     .firstchordline {
         line-height: 1.0em;
     }
+    .ws {
+        display: none;
+        white-space: pre-wrap;
+    }
     </style>
     <script>
         var timer = null;
