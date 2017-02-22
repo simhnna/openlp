@@ -26,6 +26,8 @@ import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.plugins.songs.lib import VerseType, transpose_lyrics
+from openlp.core.lib.ui import critical_error_message_box
+from openlp.core.common import translate
 from .editversedialog import Ui_EditVerseDialog
 
 log = logging.getLogger(__name__)
@@ -101,8 +103,16 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         The transpose up button clicked
         """
-        transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
-        self.verse_text_edit.setPlainText(transposed_lyrics)
+        try:
+            transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
+            self.verse_text_edit.setPlainText(transposed_lyrics)
+        except ValueError as ve:
+            # Transposing failed
+            critical_error_message_box(title=translate('SongsPlugin.EditVerseForm', 'Transposing failed'),
+                                       message=translate('SongsPlugin.EditVerseForm',
+                                                         'Transposing failed because of invalid chord:\n{err_msg}'
+                                                         .format(err_msg=ve)))
+            return
         self.verse_text_edit.setFocus()
         self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)
 
@@ -110,7 +120,16 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         The transpose down button clicked
         """
-        transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), -1)
+        try:
+            transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), -1)
+            self.verse_text_edit.setPlainText(transposed_lyrics)
+        except ValueError as ve:
+            # Transposing failed
+            critical_error_message_box(title=translate('SongsPlugin.EditVerseForm', 'Transposing failed'),
+                                       message=translate('SongsPlugin.EditVerseForm',
+                                                         'Transposing failed because of invalid chord:\n{err_msg}'
+                                                         .format(err_msg=ve)))
+            return
         self.verse_text_edit.setPlainText(transposed_lyrics)
         self.verse_text_edit.setFocus()
         self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)

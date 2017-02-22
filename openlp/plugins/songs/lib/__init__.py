@@ -380,7 +380,7 @@ def clean_song(manager, song):
     if isinstance(song.lyrics, bytes):
         song.lyrics = str(song.lyrics, encoding='utf8')
     verses = SongXML().get_verses(song.lyrics)
-    song.search_lyrics = ' '.join([clean_string(clean_tags(verse[1])) for verse in verses])
+    song.search_lyrics = ' '.join([clean_string(clean_tags(verse[1], True)) for verse in verses])
     # The song does not have any author, add one.
     if not song.authors_songs:
         name = SongStrings.AuthorUnknown
