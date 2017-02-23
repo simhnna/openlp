@@ -1,7 +1,7 @@
 /******************************************************************************
  * OpenLP - Open Source Lyrics Projection                                      *
  * --------------------------------------------------------------------------- *
- * Copyright (c) 2008-2016 OpenLP Developers                                   *
+ * Copyright (c) 2008-2017 OpenLP Developers                                   *
  * --------------------------------------------------------------------------- *
  * This program is free software; you can redistribute it and/or modify it     *
  * under the terms of the GNU General Public License as published by the Free  *
@@ -73,7 +73,7 @@ function transposeChord(chord, transposeValue, notation) {
         rest = "";
       }
       notenumber = (notesSharp.indexOf(note) === -1 ? notesFlat.indexOf(note) : notesSharp.indexOf(note));
-      notenumber -= parseInt(transposeValue);
+      notenumber += parseInt(transposeValue);
       while (notenumber > 11) {
         notenumber -= 12;
       }
@@ -213,11 +213,11 @@ window.OpenLP = {
         if (w[0] == '_') {
           ws_length = w.length;
           if (ws_length==1) {
-            w = '-';
+            w = '&ndash;';
           } else {
             wsl_mod = Math.floor(ws_length / 2);
             ws_right = ws_left = new Array(wsl_mod +1).join(' ');
-            w = ws_left + '-' + ws_right;
+            w = ws_left + '&ndash;' + ws_right;
           }
         }
         w='<span class="ws">' + w + '</span>';
@@ -328,6 +328,5 @@ $(document).ready(function() {
   $('#chords').click(function () {
     OpenLP.showchords = OpenLP.showchords ? false : true;
     OpenLP.loadSlides();
-    $
   });
 });

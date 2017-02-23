@@ -382,11 +382,11 @@ def expand_and_align_chords_in_line(match):
         if '_' in whitespaces:
             ws_length = len(whitespaces)
             if ws_length == 1:
-                whitespaces = '-'
+                whitespaces = '&ndash;'
             else:
                 wsl_mod = ws_length // 2
                 ws_right = ws_left = ' ' * wsl_mod
-                whitespaces = ws_left + '-' + ws_right
+                whitespaces = ws_left + '&ndash;' + ws_right
         whitespaces = '<span class="ws">' + whitespaces + '</span>'
     return '<span class="chord"><span><strong>' + chord + '</strong></span></span>' + tail + whitespaces + remainder
 
