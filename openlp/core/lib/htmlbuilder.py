@@ -816,7 +816,7 @@ def build_footer_css(item, height):
 
 
 def build_chords_css():
-    if Settings().value('songs/mainview chords'):
+    if Settings().value('songs/enable chords') and Settings().value('songs/mainview chords'):
         chord_line_height = '2.0em'
         chords_display = 'inline'
         first_chord_line_height = '2.1em'

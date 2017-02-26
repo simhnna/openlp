@@ -60,19 +60,22 @@ class SongsTab(SettingsTab):
         self.display_copyright_check_box.setObjectName('copyright_check_box')
         self.mode_layout.addWidget(self.display_copyright_check_box)
         self.left_layout.addWidget(self.mode_group_box)
-
+        # Chords group box
         self.chords_group_box = QtWidgets.QGroupBox(self.left_column)
         self.chords_group_box.setObjectName('chords_group_box')
+        self.chords_group_box.setCheckable(True)
         self.chords_layout = QtWidgets.QVBoxLayout(self.chords_group_box)
         self.chords_layout.setObjectName('chords_layout')
+        self.chords_info_label = QtWidgets.QLabel(self.chords_group_box)
+        self.chords_info_label.setWordWrap(True)
+        self.chords_layout.addWidget(self.chords_info_label)
         self.mainview_chords_check_box = QtWidgets.QCheckBox(self.mode_group_box)
-        self.mainview_chords_check_box.setObjectName('tool_bar_active_check_box')
+        self.mainview_chords_check_box.setObjectName('mainview_chords_check_box')
         self.chords_layout.addWidget(self.mainview_chords_check_box)
         self.disable_chords_import_check_box = QtWidgets.QCheckBox(self.mode_group_box)
-        self.disable_chords_import_check_box.setObjectName('tool_bar_active_check_box')
+        self.disable_chords_import_check_box.setObjectName('disable_chords_import_check_box')
         self.chords_layout.addWidget(self.disable_chords_import_check_box)
-
-        # Chords notation
+        # Chords notation group box
         self.chord_notation_label = QtWidgets.QLabel(self.chords_group_box)
         self.chord_notation_label.setWordWrap(True)
         self.chords_layout.addWidget(self.chord_notation_label)
@@ -85,9 +88,7 @@ class SongsTab(SettingsTab):
         self.neolatin_notation_radio_button = QtWidgets.QRadioButton(self.chords_group_box)
         self.neolatin_notation_radio_button.setObjectName('neolatin_notation_radio_button')
         self.chords_layout.addWidget(self.neolatin_notation_radio_button)
-
         self.left_layout.addWidget(self.chords_group_box)
-
         self.left_layout.addStretch()
         self.right_layout.addStretch()
         self.tool_bar_active_check_box.stateChanged.connect(self.on_tool_bar_active_check_box_changed)
@@ -115,6 +116,8 @@ class SongsTab(SettingsTab):
         self.display_copyright_check_box.setText(translate('SongsPlugin.SongsTab',
                                                            'Display "{symbol}" symbol before copyright '
                                                            'info').format(symbol=SongStrings.CopyrightSymbol))
+        self.chords_info_label.setText(translate('SongsPlugin.SongsTab', 'If enabled all text between "[" and "]" will '
+                                                                         'be regarded as chords.'))
         self.chords_group_box.setTitle(translate('SongsPlugin.SongsTab', 'Chords'))
         self.mainview_chords_check_box.setText(translate('SongsPlugin.SongsTab', 'Display chords in the main view'))
         self.disable_chords_import_check_box.setText(translate('SongsPlugin.SongsTab',
@@ -170,6 +173,7 @@ class SongsTab(SettingsTab):
         self.display_songbook = settings.value('display songbook')
         self.display_written_by = settings.value('display written by')
         self.display_copyright_symbol = settings.value('display copyright symbol')
+        self.enable_chords = settings.value('enable chords')
         self.chord_notation = settings.value('chord notation')
         self.mainview_chords = settings.value('mainview chords')
         self.disable_chords_import = settings.value('disable chords import')
@@ -179,6 +183,7 @@ class SongsTab(SettingsTab):
         self.display_songbook_check_box.setChecked(self.display_songbook)
         self.display_written_by_check_box.setChecked(self.display_written_by)
         self.display_copyright_check_box.setChecked(self.display_copyright_symbol)
+        self.chords_group_box.setChecked(self.enable_chords)
         self.mainview_chords_check_box.setChecked(self.mainview_chords)
         self.disable_chords_import_check_box.setChecked(self.disable_chords_import)
         if self.chord_notation == 'german':
@@ -198,6 +203,7 @@ class SongsTab(SettingsTab):
         settings.setValue('display songbook', self.display_songbook)
         settings.setValue('display written by', self.display_written_by)
         settings.setValue('display copyright symbol', self.display_copyright_symbol)
+        settings.setValue('enable chords', self.chords_group_box.isChecked())
         settings.setValue('mainview chords', self.mainview_chords)
         settings.setValue('disable chords import', self.disable_chords_import)
         settings.setValue('chord notation', self.chord_notation)

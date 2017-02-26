@@ -260,6 +260,7 @@ CHORD_CSS_ENABLED = """
 
 __default_settings__ = {
     'songs/mainview chords': False,
+    'songs/enable chords': True
 }
 
 
@@ -460,6 +461,7 @@ class Htmbuilder(TestCase, TestMixin):
         Test the build_chords_css() function
         """
         # GIVEN: A setting that activates chords on the mainview
+        Settings().setValue('songs/enable chords', True)
         Settings().setValue('songs/mainview chords', True)
 
         # WHEN: Building the chord CSS

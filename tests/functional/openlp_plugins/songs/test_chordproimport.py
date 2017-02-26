@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -38,14 +38,14 @@ class TestChordProFileImport(SongImportTestHelper):
         self.importer_module_name = 'chordpro'
         super(TestChordProFileImport, self).__init__(*args, **kwargs)
 
-    @patch('openlp.plugins.songs.lib.importers.opensong.Settings')
+    @patch('openlp.plugins.songs.lib.importers.chordpro.Settings')
     def test_song_import(self, mocked_settings):
         """
         Test that loading an ChordPro file works correctly on various files
         """
         # Mock out the settings - always return False
         mocked_returned_settings = MagicMock()
-        mocked_returned_settings.value.return_value = False
+        mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
         # Do the test import
         self.file_import([os.path.join(TEST_PATH, 'swing-low.chordpro')],

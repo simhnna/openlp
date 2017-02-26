@@ -49,7 +49,7 @@ class TestOpenSongFileImport(SongImportTestHelper):
         """
         # Mock out the settings - always return False
         mocked_returned_settings = MagicMock()
-        mocked_returned_settings.value.return_value = False
+        mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
         # Do the test import
         self.file_import([os.path.join(TEST_PATH, 'Amazing Grace')],

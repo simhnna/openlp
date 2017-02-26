@@ -25,6 +25,9 @@ ChordPro files into the current database.
 """
 
 import logging
+import re
+
+from openlp.core.common import Settings
 
 from .songimport import SongImport
 
@@ -77,6 +80,10 @@ class ChordProImport(SongImport):
                     if tag_value.lower().startswith('chorus'):
                         if current_verse.strip():
                             # Add collected verse to the lyrics
+                            # Strip out chords if set up to
+                            if not Settings().value('songs/enable chords') or Settings().value(
+                                    'songs/disable chords import'):
+                                current_verse = re.sub(r'\[.*?\]', '', current_verse)
                             self.add_verse(current_verse.rstrip(), current_verse_type)
                             current_verse_type = 'v'
                             current_verse = ''
@@ -87,12 +94,19 @@ class ChordProImport(SongImport):
                     current_verse_type = 'c'
                 elif tag_name in ['end_of_chorus', 'eoc']:
                     # Add collected chorus to the lyrics
+                    # Strip out chords if set up to
+                    if not Settings().value('songs/enable chords') or Settings().value('songs/disable chords import'):
+                        current_verse = re.sub(r'\[.*?\]', '', current_verse)
                     self.add_verse(current_verse.rstrip(), current_verse_type)
                     current_verse_type = 'v'
                     current_verse = ''
                 elif tag_name in ['start_of_tab', 'sot']:
                     if current_verse.strip():
                         # Add collected verse to the lyrics
+                        # Strip out chords if set up to
+                        if not Settings().value('songs/enable chords') or Settings().value(
+                                'songs/disable chords import'):
+                            current_verse = re.sub(r'\[.*?\]', '', current_verse)
                         self.add_verse(current_verse.rstrip(), current_verse_type)
                         current_verse_type = 'v'
                         current_verse = ''
@@ -103,6 +117,10 @@ class ChordProImport(SongImport):
                     # A new song starts below this tag
                     if self.verses and self.title:
                         if current_verse.strip():
+                            # Strip out chords if set up to
+                            if not Settings().value('songs/enable chords') or Settings().value(
+                                    'songs/disable chords import'):
+                                current_verse = re.sub(r'\[.*?\]', '', current_verse)
                             self.add_verse(current_verse.rstrip(), current_verse_type)
                         if not self.finish():
                             self.log_error(song_file.name)
@@ -123,6 +141,9 @@ class ChordProImport(SongImport):
                     continue
                 elif line == '' and current_verse.strip() and current_verse_type != 'c':
                     # Add collected verse to the lyrics
+                    # Strip out chords if set up to
+                    if not Settings().value('songs/enable chords') or Settings().value('songs/disable chords import'):
+                        current_verse = re.sub(r'\[.*?\]', '', current_verse)
                     self.add_verse(current_verse.rstrip(), current_verse_type)
                     current_verse_type = 'v'
                     current_verse = ''
@@ -132,6 +153,10 @@ class ChordProImport(SongImport):
                     else:
                         current_verse += line + '\n'
         if current_verse.strip():
+            # Strip out chords if set up to
+            if not Settings().value('songs/enable chords') or Settings().value(
+                    'songs/disable chords import'):
+                current_verse = re.sub(r'\[.*?\]', '', current_verse)
             self.add_verse(current_verse.rstrip(), current_verse_type)
         if not self.finish():
             self.log_error(song_file.name)

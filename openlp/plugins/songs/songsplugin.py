@@ -67,6 +67,7 @@ __default_settings__ = {
     'songs/songselect username': '',
     'songs/songselect password': '',
     'songs/songselect searches': '',
+    'songs/enable chords': True,
     'songs/chord notation': 'english',  # Can be english, german or neo-latin
     'songs/mainview chords': False,
     'songs/disable chords import': False,

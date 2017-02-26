@@ -22,14 +22,12 @@
 """
 The :mod:`songbeamer` module provides the functionality for importing SongBeamer songs into the OpenLP database.
 """
-import chardet
 import logging
 import os
 import re
 import base64
 import math
 
-from openlp.core.common import get_file_encoding
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.core.common import Settings, is_win, is_macosx, get_file_encoding
@@ -177,7 +175,8 @@ class SongBeamerImport(SongImport):
         :param linenumber: Number of the current line
         :param line: The line of lyrics to insert chords
         """
-        if self.chord_table and not Settings().value('songs/disable chords import') and line_number in self.chord_table:
+        if self.chord_table and Settings().value('songs/enable chords') and not Settings().value(
+                'songs/disable chords import') and line_number in self.chord_table:
             line_idx = sorted(self.chord_table[line_number].keys(), reverse=True)
             for idx in line_idx:
                 # In SongBeamer the column position of the chord can be a decimal, we just round it up.

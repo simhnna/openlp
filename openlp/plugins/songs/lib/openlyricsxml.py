@@ -625,7 +625,7 @@ class OpenLyrics(object):
         # Convert chords to ChordPro format which OpenLP uses internally
         # TODO: Verify format() with template variables
         elif element.tag == NSMAP % 'chord':
-            if not Settings().value('songs/disable chords import'):
+            if Settings().value('songs/enable chords') and not Settings().value('songs/disable chords import'):
                 text += '[{chord}]'.format(chord=element.get('name'))
             if element.tail:
                 # Append tail text at chord element.

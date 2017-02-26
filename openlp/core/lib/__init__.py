@@ -409,7 +409,7 @@ def expand_chords(text):
                 new_line = '<span class="chordline firstchordline">'
                 chords_on_prev_line = True
             # Matches a chord, a tail, a remainder and a line end. See expand_and_align_chords_in_line() for more info.
-            new_line += re.sub(r'\[(\w.*?)\]([\u0080-\uFFFF,\w]*)'
+            new_line += re.sub(r'\[(.*?)\]([\u0080-\uFFFF,\w]*)'
                                '([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?',
                                expand_and_align_chords_in_line, line)
             new_line += '</span>'
@@ -493,7 +493,7 @@ def expand_chords_for_printing(text, line_split):
     :param text:
     :param line_split:
     """
-    if not re.search(r'\[\w+.*?\]', text):
+    if not re.search(r'\[.*?\]', text):
         return text
     text_lines = text.split(line_split)
     expanded_text_lines = []
@@ -501,7 +501,7 @@ def expand_chords_for_printing(text, line_split):
         # If a ChordPro is detected in the line, build html tables.
         new_line = '<table class="line" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>'
         active_formatting_tags = []
-        if re.search(r'\[\w+.*?\]', line):
+        if re.search(r'\[.*?\]', line):
             words = line.split(' ')
             in_chord = False
             for word in words:
@@ -509,7 +509,7 @@ def expand_chords_for_printing(text, line_split):
                 lyrics = []
                 new_line += '<table class="segment" cellpadding="0" cellspacing="0" border="0" align="left">'
                 # If the word contains a chord, we need to handle it.
-                if re.search(r'\[\w+.*?\]', word):
+                if re.search(r'\[.*?\]', word):
                     chord = ''
                     lyric = ''
                     # Loop over each character of the word

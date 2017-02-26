@@ -255,7 +255,8 @@ class OpenSongImport(SongImport):
                 verses[verse_tag][verse_num][inst] = []
                 our_verse_order.append([verse_tag, verse_num, inst])
             # If chords exists insert them
-            if chords and not Settings().value('songs/disable chords import'):
+            if chords and Settings().value('songs/enable chords') and not Settings().value(
+                    'songs/disable chords import'):
                 offset = 0
                 for (column, chord) in chords:
                     this_line = '{pre}[{chord}]{post}'.format(pre=this_line[:offset + column], chord=chord,

@@ -263,7 +263,6 @@ class ServiceItem(RegistryProperties):
                     new_frame = {
                         'title': clean_tags(page),
                         'text': clean_tags(page.rstrip(), True),
-                        # 'chords_text': expand_chords(clean_tags(page.rstrip(), False), '\n'),
                         'chords_text': expand_chords(clean_tags(page.rstrip(), False)),
                         'html': html_data.replace('&amp;nbsp;', '&nbsp;'),
                         'printing_html': expand_tags(html.escape(page.rstrip()), True),
