@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -197,14 +197,9 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         """
         # Add the List widget
         self.list_view = ListWidgetWithDnD(self, self.plugin.name)
-        self.list_view.setSpacing(1)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.list_view.setAlternatingRowColors(True)
         self.list_view.setObjectName('{name}ListView'.format(name=self.plugin.name))
         # Add to page_layout
         self.page_layout.addWidget(self.list_view)
-        # define and add the context menu
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         if self.has_edit_icon:
             create_widget_action(self.list_view,
                                  text=self.plugin.get_string(StringContent.Edit)['title'],

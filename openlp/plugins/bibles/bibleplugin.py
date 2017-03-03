@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -48,8 +48,7 @@ __default_settings__ = {
     'bibles/is verse number visible': True,
     'bibles/display new chapter': False,
     'bibles/second bibles': True,
-    'bibles/advanced bible': '',
-    'bibles/quick bible': '',
+    'bibles/primary bible': '',
     'bibles/proxy name': '',
     'bibles/proxy address': '',
     'bibles/proxy username': '',

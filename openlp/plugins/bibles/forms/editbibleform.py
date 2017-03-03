@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -61,10 +61,28 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         """
         log.debug('Load Bible')
         self.bible = bible
-        self.version_name_edit.setText(self.manager.get_meta_data(self.bible, 'name').value)
-        self.copyright_edit.setText(self.manager.get_meta_data(self.bible, 'copyright').value)
-        self.permissions_edit.setText(self.manager.get_meta_data(self.bible, 'permissions').value)
         book_name_language = self.manager.get_meta_data(self.bible, 'book_name_language')
+        """
+        Try loading the metadata, if the field does not exist in the metadata, continue executing the code,
+        missing fields will be created on "self.accept" (save).
+        """
+        meta = self.manager.get_meta_data(self.bible, 'name')
+        copyright = self.manager.get_meta_data(self.bible, 'copyright')
+        permission = self.manager.get_meta_data(self.bible, 'permissions')
+        full_license = self.manager.get_meta_data(self.bible, 'full_license')
+        if meta:
+            self.version_name_edit.setText(meta.value)
+        if copyright:
+            self.copyright_edit.setText(copyright.value)
+        if permission:
+            self.permissions_edit.setText(permission.value)
+        if full_license:
+            self.full_license_edit.setPlainText(full_license.value)
+        # Set placeholder texts for the fields.
+        self.version_name_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
+        self.copyright_edit.setPlaceholderText(UiStrings().RequiredShowInFooter)
+        self.permissions_edit.setPlaceholderText(UiStrings().OptionalShowInFooter)
+        self.full_license_edit.setPlaceholderText(UiStrings().OptionalHideInFooter)
         if book_name_language and book_name_language.value != 'None':
             self.language_selection_combo_box.setCurrentIndex(int(book_name_language.value) + 1)
         self.books = {}
@@ -107,6 +125,7 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         version = self.version_name_edit.text()
         copyright = self.copyright_edit.text()
         permissions = self.permissions_edit.text()
+        full_license = self.full_license_edit.toPlainText()
         book_name_language = self.language_selection_combo_box.currentIndex() - 1
         if book_name_language == -1:
             book_name_language = None
@@ -121,7 +140,7 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
                         if not self.validate_book(custom_names[abbr], abbr):
                             return
         self.application.set_busy_cursor()
-        self.manager.save_meta_data(self.bible, version, copyright, permissions, book_name_language)
+        self.manager.save_meta_data(self.bible, version, copyright, permissions, full_license, book_name_language)
         if not self.web_bible:
             for abbr, book in self.books.items():
                 if book:

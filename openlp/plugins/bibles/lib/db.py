@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -36,7 +36,7 @@ from sqlalchemy.orm.exc import UnmappedClassError
 from openlp.core.common import AppLocation, translate, clean_filename
 from openlp.core.lib.db import BaseModel, init_db, Manager
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.plugins.bibles.lib import upgrade
+from openlp.plugins.bibles.lib import BibleStrings, LanguageSelection, upgrade
 
 log = logging.getLogger(__name__)
 
@@ -52,9 +52,15 @@ class BibleMeta(BaseModel):
 
 class Book(BaseModel):
     """
-    Song model
+    Bible Book model
     """
-    pass
+    def get_name(self, language_selection=LanguageSelection.Bible):
+        if language_selection == LanguageSelection.Bible:
+            return self.name
+        elif language_selection == LanguageSelection.Application:
+            return BibleStrings().BookNames[BiblesResourcesDB.get_book_by_id(self.book_reference_id)['abbreviation']]
+        elif language_selection == LanguageSelection.English:
+            return BiblesResourcesDB.get_book_by_id(self.book_reference_id)['name']
 
 
 class Verse(BaseModel):
@@ -380,13 +386,12 @@ class BibleDB(Manager):
         """
         log.debug('BibleDB.verse_search("{text}")'.format(text=text))
         verses = self.session.query(Verse)
-        # TODO: Find out what this is doing before converting to format()
         if text.find(',') > -1:
-            keywords = ['%%%s%%' % keyword.strip() for keyword in text.split(',')]
+            keywords = ['%{keyword}%'.format(keyword=keyword.strip()) for keyword in text.split(',') if keyword.strip()]
             or_clause = [Verse.text.like(keyword) for keyword in keywords]
             verses = verses.filter(or_(*or_clause))
         else:
-            keywords = ['%%%s%%' % keyword.strip() for keyword in text.split(' ')]
+            keywords = ['%{keyword}%'.format(keyword=keyword.strip()) for keyword in text.split(' ') if keyword.strip()]
             for keyword in keywords:
                 verses = verses.filter(Verse.text.like(keyword))
         verses = verses.all()

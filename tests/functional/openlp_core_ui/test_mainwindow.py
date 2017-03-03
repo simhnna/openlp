@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -159,6 +159,15 @@ class TestMainWindow(TestCase, TestMixin):
                                                                           'registered.')
         self.assertTrue('plugin_manager' in self.registry.service_list,
                         'The plugin_manager should have been registered.')
+
+    def test_projector_manager_hidden_on_startup(self):
+        """
+        Test that the projector manager is hidden on startup
+        """
+        # GIVEN: A built main window
+        # WHEN: OpenLP is started
+        # THEN: The projector manager should be hidden
+        self.main_window.projector_manager_dock.setVisible.assert_called_once_with(False)
 
     def test_on_search_shortcut_triggered_shows_media_manager(self):
         """

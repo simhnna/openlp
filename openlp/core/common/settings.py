@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -236,7 +236,9 @@ class Settings(QtCore.QSettings):
         ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('shortcuts/escapeItem', 'shortcuts/desktopScreenEnable', []),  # Escape item was removed in 2.6.
         ('shortcuts/offlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
-        ('shortcuts/onlineHelpItem', 'shortcuts/userManualItem', [])  # Online and Offline help were combined in 2.6.
+        ('shortcuts/onlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
+        ('bibles/advanced bible', '', []),  # Common bible search widgets combined in 2.6
+        ('bibles/quick bible', 'bibles/primary bible', [])  # Common bible search widgets combined in 2.6
     ]
 
     @staticmethod

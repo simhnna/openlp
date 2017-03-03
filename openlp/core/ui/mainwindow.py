@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -179,6 +179,7 @@ class Ui_MainWindow(object):
         self.projector_manager_contents = ProjectorManager(self.projector_manager_dock)
         self.projector_manager_contents.setObjectName('projector_manager_contents')
         self.projector_manager_dock.setWidget(self.projector_manager_contents)
+        self.projector_manager_dock.setVisible(False)
         main_window.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.projector_manager_dock)
         # Create the menu items
         action_list = ActionList.get_instance()

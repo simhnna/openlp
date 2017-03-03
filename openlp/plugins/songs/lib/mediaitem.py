@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -126,6 +126,7 @@ class SongMediaItem(MediaManagerItem):
         self.update_service_on_edit = Settings().value(self.settings_section + '/update service on edit')
         self.add_song_from_service = Settings().value(self.settings_section + '/add song from service')
         self.display_songbook = Settings().value(self.settings_section + '/display songbook')
+        self.display_written_by_text = Settings().value(self.settings_section + '/display written by')
         self.display_copyright_symbol = Settings().value(self.settings_section + '/display copyright symbol')
 
     def retranslateUi(self):
@@ -640,8 +641,12 @@ class SongMediaItem(MediaManagerItem):
         item.raw_footer = []
         item.raw_footer.append(song.title)
         if authors_none:
-            item.raw_footer.append("{text}: {authors}".format(text=translate('OpenLP.Ui', 'Written by'),
-                                                              authors=create_separated_list(authors_none)))
+            # If the setting for showing "Written by:" is enabled, show it before unspecified authors.
+            if Settings().value('songs/display written by'):
+                item.raw_footer.append("{text}: {authors}".format(text=translate('OpenLP.Ui', 'Written by'),
+                                                                  authors=create_separated_list(authors_none)))
+            else:
+                item.raw_footer.append("{authors}".format(authors=create_separated_list(authors_none)))
         if authors_words_music:
             item.raw_footer.append("{text}: {authors}".format(text=AuthorType.Types[AuthorType.WordsAndMusic],
                                                               authors=create_separated_list(authors_words_music)))
