@@ -27,7 +27,6 @@ from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, OpenLPMixin, check_directory_exists
 from openlp.core.common.httputils import get_web_page
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
-from openlp.plugins.remotes.lib import RemotesTab
 from openlp.plugins.remotes.endpoint import remote_endpoint
 
 log = logging.getLogger(__name__)

@@ -20,4 +20,52 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from .remotestab import RemotesTab
+import os
+import shutil
+
+from tempfile import mkdtemp
+from unittest import TestCase
+
+from openlp.core.common.httputils import url_get_file, get_web_page
+
+from tests.functional import MagicMock
+
+
+TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
+
+
+class TestRemoteDeploy(TestCase):
+    """
+    Test the Remote plugin deploy functions
+    """
+
+    def setUp(self):
+        """
+        Setup for tests
+        """
+        self.app_root = mkdtemp()
+
+    def tearDown(self):
+        """
+        Clean up after tests
+        """
+        shutil.rmtree(self.app_root)
+
+    def test_download_and_check_size(self):
+        """
+        Remote Deploy tests - Test hosted sites file matches the config file
+        """
+        # GIVEN: a hosted configuration file
+        user_agent = 'OpenLP/2.4.4'
+        web = 'https://get.openlp.org/webclient/'
+        web_config = get_web_page('{host}{name}'.format(host=web, name='download.cfg'),
+                                  header=('User-Agent', user_agent))
+        sha = web_config.read().decode('utf-8').split()[0]
+        callback = MagicMock()
+        callback.was_cancelled = False
+        f = os.path.join(self.app_root, 'sites.zip')
+        # WHEN: I download the sites file
+        # THEN: the file will download and match the sha256 from the config file
+        url_get_file(callback, web + 'site.zip', f, sha256=sha)
+
+
