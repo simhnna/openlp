@@ -85,7 +85,6 @@ class TestApiTab(TestCase, TestMixin):
         """
         Test the get_ip_address function with given ip address
         """
-        # GIVEN: A mocked location
         # GIVEN: An ip address
         given_ip = '192.168.1.1'
         # WHEN: the default ip address is given
@@ -116,3 +115,22 @@ class TestApiTab(TestCase, TestMixin):
             self.assertEqual(self.form.address_edit.text(), ZERO_URL, 'The default URL should be set on the screen')
             self.assertEqual(self.form.user_login_group_box.isChecked(), False,
                              'The authentication box should not be enabled')
+
+    def test_set_urls(self):
+        """
+        Test the set_url function to generate correct url links
+        """
+        # GIVEN: An ip address
+        self.form.address_edit.setText('192.168.1.1')
+        # WHEN: the urls are generated
+        self.form.set_urls()
+        # THEN: the following links are returned
+        self.assertEqual(self.form.remote_url.text(),
+                         "<a href=\"http://192.168.1.1:4316/\">http://192.168.1.1:4316/</a>",
+                         'The return value should be a fully formed link')
+        self.assertEqual(self.form.stage_url.text(),
+                         "<a href=\"http://192.168.1.1:4316/stage\">http://192.168.1.1:4316/stage</a>",
+                         'The return value should be a fully formed stage link')
+        self.assertEqual(self.form.live_url.text(),
+                         "<a href=\"http://192.168.1.1:4316/main\">http://192.168.1.1:4316/main</a>",
+                         'The return value should be a fully formed main link')
