@@ -21,9 +21,10 @@
 ###############################################################################
 
 import logging
+import os
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import OpenLPMixin
+from openlp.core.common import AppLocation, OpenLPMixin, check_directory_exists
 from openlp.core.common.httputils import get_web_page
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.lib import RemotesTab
@@ -57,6 +58,16 @@ class RemotesPlugin(Plugin, OpenLPMixin):
                                                'interfaces using openlp web services. \nPredefined interfaces can be '
                                                'download as well as custom developed interfaces')
         return about_text
+
+    def initialise(self):
+        """
+        Create the internal file structure if it does not exist
+        :return:
+        """
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'assets'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'images'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'templates'))
 
     def set_plugin_text_strings(self):
         """
