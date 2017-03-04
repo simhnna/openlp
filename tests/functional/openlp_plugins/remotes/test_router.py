@@ -35,8 +35,6 @@ from tests.helpers.testmixin import TestMixin
 __default_settings__ = {
     'remotes/twelve hour': True,
     'remotes/port': 4316,
-    'remotes/https port': 4317,
-    'remotes/https enabled': False,
     'remotes/user id': 'openlp',
     'remotes/password': 'password',
     'remotes/authentication enabled': False,
