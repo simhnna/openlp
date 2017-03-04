@@ -39,7 +39,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         remotes constructor
         """
-        super(RemotesPlugin, self).__init__('remotes', {}, settings_tab_class=RemotesTab)
+        super(RemotesPlugin, self).__init__('remotes', {})
         self.icon_path = ':/plugins/plugin_remote.png'
         self.icon = build_icon(self.icon_path)
         self.weight = -1
