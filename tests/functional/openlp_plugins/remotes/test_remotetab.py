@@ -37,8 +37,6 @@ from tests.helpers.testmixin import TestMixin
 __default_settings__ = {
     'remotes/twelve hour': True,
     'remotes/port': 4316,
-    'remotes/https port': 4317,
-    'remotes/https enabled': False,
     'remotes/user id': 'openlp',
     'remotes/password': 'password',
     'remotes/authentication enabled': False,
@@ -114,10 +112,6 @@ class TestRemoteTab(TestCase, TestMixin):
             self.form.set_urls()
             # THEN: the following screen values should be set
             self.assertEqual(self.form.address_edit.text(), ZERO_URL, 'The default URL should be set on the screen')
-            self.assertEqual(self.form.https_settings_group_box.isEnabled(), False,
-                             'The Https box should not be enabled')
-            self.assertEqual(self.form.https_settings_group_box.isChecked(), False,
-                             'The Https checked box should note be Checked')
             self.assertEqual(self.form.user_login_group_box.isChecked(), False,
                              'The authentication box should not be enabled')
 
@@ -143,7 +137,3 @@ class TestRemoteTab(TestCase, TestMixin):
             # THEN: the following screen values should be set
             self.assertEqual(self.form.http_settings_group_box.isEnabled(), True,
                              'The Http group box should be enabled')
-            self.assertEqual(self.form.https_settings_group_box.isChecked(), False,
-                             'The Https checked box should be Checked')
-            self.assertEqual(self.form.https_settings_group_box.isEnabled(), True,
-                             'The Https box should be enabled')
