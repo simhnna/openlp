@@ -28,7 +28,7 @@ from openlp.core.common import AppLocation, Registry, OpenLPMixin, check_directo
 from openlp.core.common.httputils import get_web_page
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.endpoint import remote_endpoint
-from openlp.plugins.remotes.deploy import download_and_check
+from openlp.core.api.deploy import download_and_check
 
 log = logging.getLogger(__name__)
 
@@ -47,12 +47,18 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.live_cache = None
         self.stage_cache = None
         register_endpoint(remote_endpoint)
-        print("AAAAAA")
         Registry().register_function('download_website', self.manage_download)
+
+    def initialise(self):
+        """
+        Create the internal file structure if it does not exist
+        :return:
+        """
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'assets'))
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'images'))
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static'))
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'templates'))
+
 
     @staticmethod
     def about():
