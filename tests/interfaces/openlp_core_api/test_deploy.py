@@ -81,6 +81,3 @@ class TestRemoteDeploy(TestCase, TestMixin):
         callback = MagicMock()
         callback.was_cancelled = False
         download_and_check(callback)
-
-
-
