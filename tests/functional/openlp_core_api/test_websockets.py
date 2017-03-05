@@ -22,7 +22,7 @@
 """
 Functional tests to test the Http Server Class.
 """
-import json
+
 from unittest import TestCase
 
 from openlp.core.common import Registry, Settings

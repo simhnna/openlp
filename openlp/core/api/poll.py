@@ -23,7 +23,7 @@
 import json
 
 from openlp.core.common import RegistryProperties, Settings
-
+from openlp.core.common.httputils import get_web_page
 
 class Poller(RegistryProperties):
     """
@@ -34,6 +34,8 @@ class Poller(RegistryProperties):
         Constructor for the poll builder class.
         """
         super(Poller, self).__init__()
+        self.live_cache = None
+        self.stage_cache = None
 
     def raw_poll(self):
         return {
@@ -47,8 +49,8 @@ class Poller(RegistryProperties):
             'version': 3,
             'isSecure': Settings().value('api/authentication enabled'),
             'isAuthorised': False,
-            'isStagedActive': self.plugin_manager.get_plugin_by_name('remotes').is_stage_active(),
-            'isLiveActive': self.plugin_manager.get_plugin_by_name('remotes').is_live_active()
+            'isStagedActive': self.is_stage_active(),
+            'isLiveActive': self.is_live_active()
         }
 
     def poll(self):
@@ -65,3 +67,43 @@ class Poller(RegistryProperties):
             'slide_count': self.live_controller.slide_count
         }
         return json.dumps({'results': result}).encode()
+
+    def reset_cache(self):
+        """
+        Reset the caches as the web has changed
+        :return:
+        """
+        self.stage_cache = None
+        self.live_cache = None
+
+    def is_stage_active(self):
+        """
+        Is stage active - call it and see but only once
+        :return: if stage is active or not
+        """
+        if self.stage_cache is None:
+            try:
+                page = get_web_page("http://localhost:4316/stage")
+            except:
+                page = None
+            if page:
+                self.stage_cache = True
+            else:
+                self.stage_cache = False
+        return self.stage_cache
+
+    def is_live_active(self):
+        """
+        Is main active - call it and see but only once
+        :return: if live is active or not
+        """
+        if self.live_cache is None:
+            try:
+                page = get_web_page("http://localhost:4316/main")
+            except:
+                page = None
+            if page:
+                self.live_cache = True
+            else:
+                self.live_cache = False
+        return self.live_cache
