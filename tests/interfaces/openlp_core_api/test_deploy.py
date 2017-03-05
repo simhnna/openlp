@@ -26,15 +26,18 @@ import shutil
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from openlp.core.common.httputils import url_get_file, get_web_page
+from openlp.core.common import Registry
+from openlp.core.common.httputils import url_get_file
+from openlp.core.api.deploy import download_sha256, download_and_check
 
 from tests.functional import MagicMock
+from tests.helpers.testmixin import TestMixin
 
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
 
 
-class TestRemoteDeploy(TestCase):
+class TestRemoteDeploy(TestCase, TestMixin):
     """
     Test the Remote plugin deploy functions
     """
@@ -44,6 +47,11 @@ class TestRemoteDeploy(TestCase):
         Setup for tests
         """
         self.app_root = mkdtemp()
+        self.setup_application()
+        self.app.setApplicationVersion('0.0')
+        self.app.process_events = lambda: None
+        Registry.create()
+        Registry().register('application', self.app)
 
     def tearDown(self):
         """
@@ -56,16 +64,23 @@ class TestRemoteDeploy(TestCase):
         Remote Deploy tests - Test hosted sites file matches the config file
         """
         # GIVEN: a hosted configuration file
-        user_agent = 'OpenLP/2.4.4'
         web = 'https://get.openlp.org/webclient/'
-        web_config = get_web_page('{host}{name}'.format(host=web, name='download.cfg'),
-                                  header=('User-Agent', user_agent))
-        sha = web_config.read().decode('utf-8').split()[0]
+        sha = download_sha256()
         callback = MagicMock()
         callback.was_cancelled = False
         f = os.path.join(self.app_root, 'sites.zip')
         # WHEN: I download the sites file
         # THEN: the file will download and match the sha256 from the config file
         url_get_file(callback, web + 'site.zip', f, sha256=sha)
+
+    def test_download_and_deploy(self):
+        """
+        Remote Deploy tests - Test hosted sites file matches the config file
+        """
+        # GIVEN: a hosted configuration file
+        callback = MagicMock()
+        callback.was_cancelled = False
+        download_and_check(callback)
+
 
 

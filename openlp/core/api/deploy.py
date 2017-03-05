@@ -22,19 +22,22 @@
 
 import os
 import zipfile
+import urllib.error
 
-from openlp.core.common.httputils import url_get_file
+from openlp.core.common import AppLocation, Registry
+from openlp.core.common.httputils import url_get_file, get_web_page
 
 
-def deploy_zipfile(zip_file, app_root):
+def deploy_zipfile(app_root, zip_name):
     """
     Process the downloaded zip file and add to the correct directory
 
-    :param zip_file: the zip file to be processed
+    :param zip_name: the zip file to be processed
     :param app_root: the directory where the zip get expanded to
 
     :return: None
     """
+    zip_file = os.path.join(app_root, zip_name)
     web_zip = zipfile.ZipFile(zip_file)
     for web_file in web_zip.namelist():
         (dir_name, filename) = os.path.split(web_file)
@@ -66,17 +69,19 @@ def check_for_previous_deployment(app_root, create=False):
         return False
 
 
-#def download_and_check():
-#    f = url_get_file(None, 'https://get.openlp.org/webclient', 'download.cfg')
-#    print(f)
+def download_sha256():
+    user_agent = 'OpenLP/' + Registry().get('application').applicationVersion()
+    try:
+        web_config = get_web_page('{host}{name}'.format(host='https://get.openlp.org/webclient/', name='download.cfg'),
+                                  header=('User-Agent', user_agent))
+    except (urllib.error.URLError, ConnectionError) as err:
+        return False
+    return web_config.read().decode('utf-8').split()[0]
 
-#download_and_check()
 
-
-#file_name = "/home/tim/Projects/OpenLP/openlp/remoteweb/deploy.zip"
-#app_root = "/home/tim/.openlp/data/remotes/"
-
-#deploy_zipfile(file_name)
-#print(check_for_previous_deployment(app_root))
-#print(check_for_previous_deployment(app_root, True))
-#print(check_for_previous_deployment(app_root))
+def download_and_check(callback=None):
+    sha256 = download_sha256()
+    if url_get_file(callback, '{host}{name}'.format(host='https://get.openlp.org/webclient/', name='site.zip'),
+                    os.path.join(AppLocation.get_section_data_path('remotes'), 'site.zip'),
+                    sha256=sha256):
+        deploy_zipfile(AppLocation.get_section_data_path('remotes'), 'site.zip')

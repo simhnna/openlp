@@ -106,6 +106,11 @@ class ApiTab(SettingsTab):
         self.password.setObjectName('password')
         self.user_login_layout.addRow(self.password_label, self.password)
         self.left_layout.addWidget(self.user_login_group_box)
+        self.update_site_group_box = QtWidgets.QGroupBox(self.left_column)
+        self.update_site_group_box.setCheckable(True)
+        self.update_site_group_box.setChecked(False)
+        self.update_site_group_box.setObjectName('update_site_group_box')
+        self.left_layout.addWidget(self.update_site_group_box)
         self.android_app_group_box = QtWidgets.QGroupBox(self.right_column)
         self.android_app_group_box.setObjectName('android_app_group_box')
         self.right_layout.addWidget(self.android_app_group_box)
@@ -183,6 +188,7 @@ class ApiTab(SettingsTab):
                       'Scan the QR code or click <a href="{qr}">download</a> to install the iOS app from the App '
                       'Store.').format(qr='https://itunes.apple.com/app/id1096218725'))
         self.user_login_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'User Authentication'))
+        self.update_site_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Download latest web site'))
         self.user_id_label.setText(translate('RemotePlugin.RemoteTab', 'User id:'))
         self.password_label.setText(translate('RemotePlugin.RemoteTab', 'Password:'))
 
@@ -247,6 +253,8 @@ class ApiTab(SettingsTab):
         Settings().setValue(self.settings_section + '/user id', self.user_id.text())
         Settings().setValue(self.settings_section + '/password', self.password.text())
         self.generate_icon()
+        if self.update_site_group_box.isChecked():
+            self.settings_form.register_post_process('download_website')
 
     def on_twelve_hour_check_box_changed(self, check_state):
         """

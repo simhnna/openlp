@@ -56,7 +56,7 @@ class ImageThread(QtCore.QThread):
         """
         Run the thread.
         """
-        self.image_manager._process()
+        self.image_manager.process()
 
 
 class Priority(object):
@@ -307,11 +307,11 @@ class ImageManager(QtCore.QObject):
         if not self.image_thread.isRunning():
             self.image_thread.start()
 
-    def _process(self):
+    def process(self):
         """
         Controls the processing called from a ``QtCore.QThread``.
         """
-        log.debug('_process - started')
+        log.debug('process - started')
         while not self._conversion_queue.empty() and not self.stop_manager:
             self._process_cache()
         log.debug('_process - ended')

@@ -254,8 +254,7 @@ class UiFirstTimeWizard(object):
         self.presentation_check_box.setText(translate('OpenLP.FirstTimeWizard',
                                                       'Presentations – Show .ppt, .odp and .pdf files'))
         self.media_check_box.setText(translate('OpenLP.FirstTimeWizard', 'Media – Playback of Audio and Video files'))
-        self.remote_check_box.setText(translate('OpenLP.FirstTimeWizard', 'Remote – Control OpenLP via browser or smart'
-                                                                          'phone app'))
+        self.remote_check_box.setText(translate('OpenLP.FirstTimeWizard', 'Remote – Download latest Web Pages'))
         self.song_usage_check_box.setText(translate('OpenLP.FirstTimeWizard', 'Song Usage Monitor'))
         self.alert_check_box.setText(translate('OpenLP.FirstTimeWizard',
                                                'Alerts – Display informative messages while showing other slides'))

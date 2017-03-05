@@ -24,10 +24,11 @@ import logging
 import os
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import AppLocation, OpenLPMixin, check_directory_exists
+from openlp.core.common import AppLocation, Registry, OpenLPMixin, check_directory_exists
 from openlp.core.common.httputils import get_web_page
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.endpoint import remote_endpoint
+from openlp.plugins.remotes.deploy import download_and_check
 
 log = logging.getLogger(__name__)
 
@@ -46,6 +47,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.live_cache = None
         self.stage_cache = None
         register_endpoint(remote_endpoint)
+        Registry().register_function('download_website', self.manage_download)
 
     @staticmethod
     def about():
@@ -121,3 +123,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
             else:
                 self.live_cache = False
         return self.live_cache
+
+    def manage_download(self):
+        download_and_check()
+        print("manage downlaod")
