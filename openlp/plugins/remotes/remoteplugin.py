@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 
 
 class RemotesPlugin(Plugin, OpenLPMixin):
-    log.info('Remote Plugin loaded')
+    log.info('Remotes Plugin loaded')
 
     def __init__(self):
         """
@@ -47,7 +47,12 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.live_cache = None
         self.stage_cache = None
         register_endpoint(remote_endpoint)
+        print("AAAAAA")
         Registry().register_function('download_website', self.manage_download)
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'assets'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'images'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'templates'))
 
     @staticmethod
     def about():
@@ -59,16 +64,6 @@ class RemotesPlugin(Plugin, OpenLPMixin):
                                                'interfaces using openlp web services. \nPredefined interfaces can be '
                                                'download as well as custom developed interfaces')
         return about_text
-
-    def initialise(self):
-        """
-        Create the internal file structure if it does not exist
-        :return:
-        """
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'assets'))
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'images'))
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static'))
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'templates'))
 
     def set_plugin_text_strings(self):
         """

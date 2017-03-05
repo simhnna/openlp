@@ -34,6 +34,7 @@ from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError
 
 from PyQt5 import QtCore, QtWidgets
 
+from openlp.core.api.deploy import download_and_check
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, \
     translate, clean_button_text, trace_error_handler
 from openlp.core.lib import PluginStatus, build_icon
@@ -555,7 +556,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         songs_destination = os.path.join(gettempdir(), 'openlp')
         bibles_destination = AppLocation.get_section_data_path('bibles')
         themes_destination = AppLocation.get_section_data_path('themes')
-        remote_destination = AppLocation.get_section_data_path('remotes')
         missed_files = []
         # Download songs
         for i in range(self.songs_list_widget.count()):
@@ -596,11 +596,10 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                                     sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
         if self.remote_check_box.isChecked():
-            self._increment_progress_bar(self.downloading.format(name='AA'), 0)
+            self._increment_progress_bar(self.downloading.format(
+                name=translate('OpenLP.FirstTimeWizard', 'Downloading Web Application')), 0)
             self.previous_size = 0
-            url_get_file(self, 'https://get.openlp.org/webclient', 'download.cfg',
-                                os.path.join(remote_destination, theme),
-                                sha256)
+            download_and_check(self)
         if missed_files:
             file_list = ''
             for entry in missed_files:

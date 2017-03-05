@@ -22,7 +22,7 @@
 
 from PyQt5 import QtCore, QtGui, QtNetwork, QtWidgets
 
-from openlp.core.common import Settings, translate
+from openlp.core.common import UiStrings, Settings, translate
 from openlp.core.lib import SettingsTab
 
 ZERO_URL = '0.0.0.0'
@@ -188,7 +188,7 @@ class ApiTab(SettingsTab):
                       'Scan the QR code or click <a href="{qr}">download</a> to install the iOS app from the App '
                       'Store.').format(qr='https://itunes.apple.com/app/id1096218725'))
         self.user_login_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'User Authentication'))
-        self.update_site_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Download latest web site'))
+        self.update_site_group_box.setTitle(str(UiStrings().WebDownloadText))
         self.user_id_label.setText(translate('RemotePlugin.RemoteTab', 'User id:'))
         self.password_label.setText(translate('RemotePlugin.RemoteTab', 'Password:'))
 
