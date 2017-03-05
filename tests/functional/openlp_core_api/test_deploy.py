@@ -35,28 +35,28 @@ TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 
 
 
 class TestRemoteDeploy(TestCase):
-    '''
+    """
     Test the Remote plugin deploy functions
-    '''
+    """
 
     def setUp(self):
-        '''
+        """
         Setup for tests
-        '''
+        """
         self.app_root = mkdtemp()
 
     def tearDown(self):
-        '''
+        """
         Clean up after tests
-        '''
+        """
         shutil.rmtree(self.app_root)
 
     @patch('openlp.core.api.deploy.os.path.isfile')
     @patch('openlp.core.api.deploy.os.mknod')
     def test_check_for_previous_deployment_false(self, mocked_mknod, mocked_isfile):
-        '''
+        """
         Remote Deploy tests - Test when the marker file is missing
-        '''
+        """
         # GIVEN: A new setup with no marker file
         # WHEN: I check for a deployment which does not create the marker file
         mocked_isfile.return_value = False
@@ -70,9 +70,9 @@ class TestRemoteDeploy(TestCase):
     @patch('openlp.core.api.deploy.os.path.isfile')
     @patch('openlp.core.api.deploy.os.mknod')
     def test_check_for_previous_deployment_true(self, mocked_mknod, mocked_isfile):
-        '''
+        """
         Remote Deploy tests - Test when the marker file is missing
-        '''
+        """
         # GIVEN: A new setup with not market file
         # WHEN: I check for a deployment which does create the marker file
         mocked_isfile.return_value = False
@@ -87,9 +87,9 @@ class TestRemoteDeploy(TestCase):
     @patch('openlp.core.api.deploy.os.path.isfile')
     @patch('openlp.core.api.deploy.os.mknod')
     def test_check_for_previous_deployment_true(self, mocked_mknod, mocked_isfile):
-        '''
+        """
         Remote Deploy tests - Test when the marker file is present
-        '''
+        """
         # GIVEN: A new setup with not market file
         # WHEN: I check for a deployment which does not create the marker file
         mocked_isfile.return_value = True
@@ -103,9 +103,9 @@ class TestRemoteDeploy(TestCase):
 
     @patch('openlp.core.api.deploy.open')
     def test_deploy_zipfile(self, mocked_open):
-        '''
+        """
         Remote Deploy tests - test the dummy zip file is processed correctly
-        '''
+        """
         # GIVEN: A new downloaded zip file
         zip_file = os.path.join(TEST_PATH, 'remotes', 'site.zip')
         app_root = os.path.join(self.app_root, 'site.zip')

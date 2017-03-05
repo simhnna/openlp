@@ -25,15 +25,26 @@ Functional tests to test the Http Server Class.
 
 from unittest import TestCase
 
+from openlp.core.common import Registry
 from openlp.core.api.http.server import HttpServer
 
-from tests.functional import patch
+from tests.functional import patch, MagicMock
 
 
 class TestHttpServer(TestCase):
     """
     A test suite to test starting the http server
     """
+
+    def setUp(self):
+        """
+        Create the UI
+        """
+    Registry().create()
+    Registry().register('service_list', MagicMock())
+
+
+
     @patch('openlp.core.api.http.server.HttpWorker')
     @patch('openlp.core.api.http.server.QtCore.QThread')
     def test_serverstart(self, mock_qthread, mock_thread):

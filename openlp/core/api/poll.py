@@ -25,6 +25,7 @@ import json
 from openlp.core.common import RegistryProperties, Settings
 from openlp.core.common.httputils import get_web_page
 
+
 class Poller(RegistryProperties):
     """
     Accessed by the web layer to get status type information from the application
