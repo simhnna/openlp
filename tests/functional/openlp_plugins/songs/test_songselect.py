@@ -72,7 +72,9 @@ class TestSongSelectImport(TestCase, TestMixin):
         mocked_build_opener.return_value = mocked_opener
         mocked_login_page = MagicMock()
         mocked_login_page.find.side_effect = [{'value': 'blah'}, None]
-        MockedBeautifulSoup.return_value = mocked_login_page
+        mocked_posted_page = MagicMock()
+        mocked_posted_page.find.return_value = None
+        MockedBeautifulSoup.side_effect = [mocked_login_page, mocked_posted_page]
         mock_callback = MagicMock()
         importer = SongSelectImport(None)
 
@@ -82,6 +84,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         # THEN: callback was called 3 times, open was called twice, find was called twice, and False was returned
         self.assertEqual(3, mock_callback.call_count, 'callback should have been called 3 times')
         self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice')
+        self.assertEqual(1, mocked_posted_page.find.call_count, 'find should have been called once')
         self.assertEqual(2, mocked_opener.open.call_count, 'opener should have been called twice')
         self.assertFalse(result, 'The login method should have returned False')
 

@@ -24,7 +24,7 @@ import sys
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core import parse_options
+from openlp.core import OpenLP, parse_options
 
 
 class TestInitFunctions(TestCase):
