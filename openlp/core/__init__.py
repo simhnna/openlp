@@ -319,7 +319,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         return QtWidgets.QApplication.event(self, event)
 
 
-def parse_options(args):
+def parse_options(args=None):
     """
     Parse the command line arguments
 

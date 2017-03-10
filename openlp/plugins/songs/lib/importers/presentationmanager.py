@@ -23,7 +23,7 @@
 The :mod:`presentationmanager` module provides the functionality for importing
 Presentationmanager song files into the current database.
 """
-
+import logging
 import os
 import re
 
@@ -33,6 +33,8 @@ from lxml import objectify, etree
 from openlp.core.common import translate
 from openlp.core.ui.lib.wizard import WizardStrings
 from .songimport import SongImport
+
+log = logging.getLogger(__name__)
 
 
 class PresentationManagerImport(SongImport):
@@ -65,15 +67,36 @@ class PresentationManagerImport(SongImport):
                                              'File is not in XML-format, which is the only format supported.'))
                     continue
             root = objectify.fromstring(etree.tostring(tree))
-            self.process_song(root)
+            self.process_song(root, file_path)
 
-    def process_song(self, root):
+    def _get_attr(self, elem, name):
+        """
+        Due to PresentationManager's habit of sometimes capitilising the first letter of an element, we have to do
+        some gymnastics.
+        """
+        if hasattr(elem, name):
+            log.debug('%s: %s', name, getattr(elem, name))
+            return str(getattr(elem, name))
+        name = name[0].upper() + name[1:]
+        if hasattr(elem, name):
+            log.debug('%s: %s', name, getattr(elem, name))
+            return str(getattr(elem, name))
+        else:
+            return ''
+
+    def process_song(self, root, file_path):
         self.set_defaults()
-        self.title = str(root.attributes.title)
-        self.add_author(str(root.attributes.author))
-        self.copyright = str(root.attributes.copyright)
-        self.ccli_number = str(root.attributes.ccli_number)
-        self.comments = str(root.attributes.comments)
+        attrs = None
+        if hasattr(root, 'attributes'):
+            attrs = root.attributes
+        elif hasattr(root, 'Attributes'):
+            attrs = root.Attributes
+        if attrs is not None:
+            self.title = self._get_attr(root.attributes, 'title')
+            self.add_author(self._get_attr(root.attributes, 'author'))
+            self.copyright = self._get_attr(root.attributes, 'copyright')
+            self.ccli_number = self._get_attr(root.attributes, 'ccli_number')
+            self.comments = str(root.attributes.comments) if hasattr(root.attributes, 'comments') else None
         verse_order_list = []
         verse_count = {}
         duplicates = []
@@ -105,4 +128,4 @@ class PresentationManagerImport(SongImport):
 
         self.verse_order_list = verse_order_list
         if not self.finish():
-            self.log_error(self.import_source)
+            self.log_error(os.path.basename(file_path))

@@ -25,11 +25,11 @@ This module contains tests for the lib submodule of the Remotes plugin.
 import os
 import urllib.request
 from unittest import TestCase
+from unittest.mock import MagicMock, patch, mock_open
 
 from openlp.core.common import Settings, Registry
 from openlp.core.ui import ServiceManager
 from openlp.plugins.remotes.lib.httpserver import HttpRouter
-from tests.functional import MagicMock, patch, mock_open
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
@@ -336,11 +336,13 @@ class TestRouter(TestCase, TestMixin):
         with patch.object(self.service_manager, 'setup_ui'), \
                 patch.object(self.router, 'do_json_header'):
             self.service_manager.bootstrap_initialise()
-            self.app.processEvents()
+            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
+            # self.app.processEvents()
 
             # WHEN: Remote next is received
             self.router.service(action='next')
-            self.app.processEvents()
+            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
+            # self.app.processEvents()
 
             # THEN: service_manager.next_item() should have been called
             self.assertTrue(mocked_next_item.called, 'next_item() should have been called in service_manager')
@@ -357,11 +359,13 @@ class TestRouter(TestCase, TestMixin):
         with patch.object(self.service_manager, 'setup_ui'), \
                 patch.object(self.router, 'do_json_header'):
             self.service_manager.bootstrap_initialise()
-            self.app.processEvents()
+            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
+            # self.app.processEvents()
 
             # WHEN: Remote next is received
             self.router.service(action='previous')
-            self.app.processEvents()
+            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
+            # self.app.processEvents()
 
             # THEN: service_manager.next_item() should have been called
             self.assertTrue(mocked_previous_item.called, 'previous_item() should have been called in service_manager')

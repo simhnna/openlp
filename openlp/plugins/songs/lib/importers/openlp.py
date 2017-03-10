@@ -221,11 +221,17 @@ class OpenLPSongImport(SongImport):
                     if not existing_book:
                         existing_book = Book.populate(name=entry.songbook.name, publisher=entry.songbook.publisher)
                     new_song.add_songbook_entry(existing_book, entry.entry)
-            elif song.book:
+            elif hasattr(song, 'book') and song.book:
                 existing_book = self.manager.get_object_filtered(Book, Book.name == song.book.name)
                 if not existing_book:
                     existing_book = Book.populate(name=song.book.name, publisher=song.book.publisher)
-                new_song.add_songbook_entry(existing_book, '')
+                # Get the song_number from "songs" table "song_number" field. (This is db structure from 2.2.1)
+                # If there's a number, add it to the song, otherwise it will be "".
+                existing_number = song.song_number if hasattr(song, 'song_number') else ''
+                if existing_number:
+                    new_song.add_songbook_entry(existing_book, existing_number)
+                else:
+                    new_song.add_songbook_entry(existing_book, '')
             # Find or create all the media files and add them to the new song object
             if has_media_files and song.media_files:
                 for media_file in song.media_files:
