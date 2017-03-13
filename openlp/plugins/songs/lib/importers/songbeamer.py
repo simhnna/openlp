@@ -22,8 +22,6 @@
 """
 The :mod:`songbeamer` module provides the functionality for importing SongBeamer songs into the OpenLP database.
 """
-import chardet
-import codecs
 import logging
 import os
 import re
@@ -119,7 +117,7 @@ class SongBeamerImport(SongImport):
                 # The encoding should only be ANSI (cp1252), UTF-8, Unicode, Big-Endian-Unicode.
                 # So if it doesn't start with 'u' we default to cp1252. See:
                 # https://forum.songbeamer.com/viewtopic.php?p=419&sid=ca4814924e37c11e4438b7272a98b6f2
-                if self.input_file_encoding.lower().startswith('u'):
+                if not self.input_file_encoding.lower().startswith('u'):
                     self.input_file_encoding = 'cp1252'
                 infile = open(import_file, 'rt', encoding=self.input_file_encoding)
                 song_data = infile.readlines()
