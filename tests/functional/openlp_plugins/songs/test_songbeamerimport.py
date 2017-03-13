@@ -49,6 +49,10 @@ class TestSongBeamerFileImport(SongImportTestHelper):
         self.file_import([os.path.join(TEST_PATH, 'Lobsinget dem Herrn.sng')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Lobsinget dem Herrn.json')))
 
+    def test_cp1252_encoded_file(self):
+        self.file_import([os.path.join(TEST_PATH, 'cp1252song.sng')],
+                         self.load_external_result_data(os.path.join(TEST_PATH, 'cp1252song.json')))
+
 
 class TestSongBeamerImport(TestCase):
     """
