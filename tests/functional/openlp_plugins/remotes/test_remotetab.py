@@ -37,8 +37,6 @@ from tests.helpers.testmixin import TestMixin
 __default_settings__ = {
     'remotes/twelve hour': True,
     'remotes/port': 4316,
-    'remotes/https port': 4317,
-    'remotes/https enabled': False,
     'remotes/user id': 'openlp',
     'remotes/password': 'password',
     'remotes/authentication enabled': False,
@@ -85,7 +83,6 @@ class TestRemoteTab(TestCase, TestMixin):
         """
         Test the get_ip_address function with given ip address
         """
-        # GIVEN: A mocked location
         # GIVEN: An ip address
         given_ip = '192.168.1.1'
         # WHEN: the default ip address is given
@@ -114,36 +111,24 @@ class TestRemoteTab(TestCase, TestMixin):
             self.form.set_urls()
             # THEN: the following screen values should be set
             self.assertEqual(self.form.address_edit.text(), ZERO_URL, 'The default URL should be set on the screen')
-            self.assertEqual(self.form.https_settings_group_box.isEnabled(), False,
-                             'The Https box should not be enabled')
-            self.assertEqual(self.form.https_settings_group_box.isChecked(), False,
-                             'The Https checked box should note be Checked')
             self.assertEqual(self.form.user_login_group_box.isChecked(), False,
                              'The authentication box should not be enabled')
 
-    def test_set_certificate_urls(self):
+    def test_set_urls(self):
         """
-        Test the set_urls function with certificate available
+        Test the set_url function to generate correct url links
         """
-        # GIVEN: A mocked location
-        with patch('openlp.core.common.Settings') as mocked_class, \
-                patch('openlp.core.common.applocation.AppLocation.get_directory') as mocked_get_directory, \
-                patch('openlp.core.common.check_directory_exists') as mocked_check_directory_exists, \
-                patch('openlp.core.common.applocation.os') as mocked_os:
-            # GIVEN: A mocked out Settings class and a mocked out AppLocation.get_directory()
-            mocked_settings = mocked_class.return_value
-            mocked_settings.contains.return_value = False
-            mocked_get_directory.return_value = TEST_PATH
-            mocked_check_directory_exists.return_value = True
-            mocked_os.path.normpath.return_value = TEST_PATH
-
-            # WHEN: when the set_urls is called having reloaded the form.
-            self.form.load()
-            self.form.set_urls()
-            # THEN: the following screen values should be set
-            self.assertEqual(self.form.http_settings_group_box.isEnabled(), True,
-                             'The Http group box should be enabled')
-            self.assertEqual(self.form.https_settings_group_box.isChecked(), False,
-                             'The Https checked box should be Checked')
-            self.assertEqual(self.form.https_settings_group_box.isEnabled(), True,
-                             'The Https box should be enabled')
+        # GIVEN: An ip address
+        self.form.address_edit.setText('192.168.1.1')
+        # WHEN: the urls are generated
+        self.form.set_urls()
+        # THEN: the following links are returned
+        self.assertEqual(self.form.remote_url.text(),
+                         "<a href=\"http://192.168.1.1:4316/\">http://192.168.1.1:4316/</a>",
+                         'The return value should be a fully formed link')
+        self.assertEqual(self.form.stage_url.text(),
+                         "<a href=\"http://192.168.1.1:4316/stage\">http://192.168.1.1:4316/stage</a>",
+                         'The return value should be a fully formed stage link')
+        self.assertEqual(self.form.live_url.text(),
+                         "<a href=\"http://192.168.1.1:4316/main\">http://192.168.1.1:4316/main</a>",
+                         'The return value should be a fully formed main link')

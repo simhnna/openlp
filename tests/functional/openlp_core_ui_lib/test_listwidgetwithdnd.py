@@ -33,6 +33,37 @@ class TestListWidgetWithDnD(TestCase):
     """
     Test the :class:`~openlp.core.lib.listwidgetwithdnd.ListWidgetWithDnD` class
     """
+    def test_clear_locked(self):
+        """
+        Test the clear method the list is 'locked'
+        """
+        with patch('openlp.core.ui.lib.listwidgetwithdnd.QtWidgets.QListWidget.clear') as mocked_clear_super_method:
+            # GIVEN: An instance of ListWidgetWithDnD
+            widget = ListWidgetWithDnD()
+
+            # WHEN: The list is 'locked' and clear has been called
+            widget.locked = True
+            widget.clear()
+
+            # THEN: The super method should not have been called (i.e. The list not cleared)
+            self.assertFalse(mocked_clear_super_method.called)
+
+    def test_clear_overide_locked(self):
+        """
+        Test the clear method the list is 'locked', but clear is called with 'override_lock' set to True
+        """
+        with patch('openlp.core.ui.lib.listwidgetwithdnd.QtWidgets.QListWidget.clear') as mocked_clear_super_method:
+            # GIVEN: An instance of ListWidgetWithDnD
+            widget = ListWidgetWithDnD()
+
+            # WHEN: The list is 'locked' and clear has been called with override_lock se to True
+            widget.locked = True
+            widget.clear(override_lock=True)
+
+            # THEN: The super method should have been called (i.e. The list is cleared regardless whether it is locked
+            #       or not)
+            mocked_clear_super_method.assert_called_once_with()
+
     def test_clear(self):
         """
         Test the clear method when called without any arguments.

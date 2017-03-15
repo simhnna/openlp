@@ -151,3 +151,17 @@ class TestSettingsForm(TestCase):
         # THEN: The general tab's cancel() method should have been called, but not the themes tab
         mocked_general_cancel.assert_called_with()
         self.assertEqual(0, mocked_theme_cancel.call_count, 'The Themes tab\'s cancel() should not have been called')
+
+    def test_register_post_process(self):
+        """
+        Test that the register_post_process() method works correctly
+        """
+        # GIVEN: A settings form instance
+        settings_form = SettingsForm(None)
+        fake_function = MagicMock()
+
+        # WHEN: register_post_process() is called
+        settings_form.register_post_process(fake_function)
+
+        # THEN: The fake function should be in the settings form's list
+        assert fake_function in settings_form.processes

@@ -106,4 +106,5 @@ class TestEditSongForm(TestCase, TestMixin):
         mocked_cache.append.assert_called_once_with('Charles')
         mocked_combo.setItemData.assert_called_once_with(0, 1)
         mocked_set_case_insensitive_completer.assert_called_once_with(mocked_cache, mocked_combo)
-        mocked_combo.setEditText.assert_called_once_with('')
+        mocked_combo.setCurrentIndex.assert_called_once_with(-1)
+        mocked_combo.setCurrentText.assert_called_once_with('')
