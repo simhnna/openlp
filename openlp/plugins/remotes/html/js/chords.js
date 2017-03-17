@@ -40,18 +40,17 @@ function storeTransposeValue(songId,transposeValueToSet) {
 
 // NOTE: This function has a python equivalent in openlp/plugins/songs/lib/__init__.py - make sure to update both!
 function transposeChord(chord, transposeValue, notation) {
-  var chordSplit = chord.replace('♭', 'b').split(/[\/\(\)]/);
+  var chordSplit = chord.replace('♭', 'b').split(/[\/]/);
   var transposedChord = '', note, notenumber, rest, currentChord;
   var notesSharp = notesSharpNotation[notation];
   var notesFlat = notesFlatNotation[notation];
   var notesPreferred = ['b','#','#','#','#','#','#','#','#','#','#','#'];
-  var chordNotes = Array();
   for (i = 0; i <= chordSplit.length - 1; i++) {
     if (i > 0) {
       transposedChord += '/';
     }
     currentchord = chordSplit[i];
-    if (currentchord.charAt(0) === '(') {
+    if (currentchord.length > 0 && currentchord.charAt(0) === '(') {
       transposedChord += '(';
       if (currentchord.length > 1) {
         currentchord = currentchord.substr(1);
@@ -186,9 +185,9 @@ window.OpenLP = {
       var $taillen = 0;
       var slimchars='fiíIÍjlĺľrtť.,;/ ()|"\'!:\\';
       // Transpose chord as dictated by the transpose value in local storage
-      $chord = transposeChord($chord, transposeValue, OpenLP.chordNotation);
-      // Replace any padding '_' added to tail
-      $tail = $tail.replace(/_+$/, '')
+      if (transposeValue != 0) {
+        $chord = transposeChord($chord, transposeValue, OpenLP.chordNotation);
+      }
       for (var i = 0; i < $chord.length; i++) if (slimchars.indexOf($chord.charAt(i)) === -1) {$chordlen += 2;} else {$chordlen += 1;}
       for (var i = 0; i < $tail.length; i++) if (slimchars.indexOf($tail.charAt(i)) === -1) {$taillen += 2;} else {$taillen += 1;}
       for (var i = 0; i < $remainder.length; i++) if (slimchars.indexOf($tail.charAt(i)) === -1) {$taillen += 2;} else {$taillen += 1;}
@@ -216,7 +215,7 @@ window.OpenLP = {
             w = '&ndash;';
           } else {
             wsl_mod = Math.floor(ws_length / 2);
-            ws_right = ws_left = new Array(wsl_mod +1).join(' ');
+            ws_right = ws_left = new Array(wsl_mod + 1).join(' ');
             w = ws_left + '&ndash;' + ws_right;
           }
         }

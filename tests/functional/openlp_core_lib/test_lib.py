@@ -30,7 +30,7 @@ from datetime import datetime, timedelta
 from PyQt5 import QtCore, QtGui
 
 from openlp.core.lib import build_icon, check_item_selected, clean_tags, create_thumb, create_separated_list, \
-    expand_tags, get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb
+    expand_tags, get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb, expand_chords
 from tests.functional import MagicMock, patch
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
@@ -746,3 +746,19 @@ class TestLib(TestCase):
         # THEN: We should have "Author 1, Author 2 and Author 3"
         self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
                          'Author 2, and Author 3".')
+
+    def test_expand_chords(self):
+        """
+        Test that the expanding of chords works as expected.
+        """
+        # GIVEN: A lyrics-line with chords
+        text_with_chords = 'H[C]alleluya.[F] [G]'
+
+        # WHEN: Expanding the chords
+        text_with_expanded_chords = expand_chords(text_with_chords)
+
+        # THEN: We should get html that looks like below
+        expected_html = '<span class="chordline firstchordline">H<span class="chord"><span><strong>C</strong></span>' \
+                        '</span>alleluya.<span class="chord"><span><strong>F</strong></span></span><span class="ws">' \
+                        '&nbsp;&nbsp;</span> <span class="chord"><span><strong>G</strong></span></span></span>'
+        self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')

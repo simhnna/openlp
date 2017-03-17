@@ -326,7 +326,7 @@ def expand_and_align_chords_in_line(match):
     :param match:
     :return: The line with expanded html-chords
     """
-    slimchars = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
+    SLIMCHARS = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
     whitespaces = ''
     chordlen = 0
     taillen = 0
@@ -341,19 +341,19 @@ def expand_and_align_chords_in_line(match):
     end = match.group(4)
     # Based on char width calculate width of chord
     for chord_char in chord:
-        if chord_char not in slimchars:
+        if chord_char not in SLIMCHARS:
             chordlen += 2
         else:
             chordlen += 1
     # Based on char width calculate width of tail
     for tail_char in tail:
-        if tail_char not in slimchars:
+        if tail_char not in SLIMCHARS:
             taillen += 2
         else:
             taillen += 1
     # Based on char width calculate width of remainder
     for remainder_char in remainder:
-        if remainder_char not in slimchars:
+        if remainder_char not in SLIMCHARS:
             taillen += 2
         else:
             taillen += 1
@@ -362,10 +362,10 @@ def expand_and_align_chords_in_line(match):
         # Decide if the padding should be "_" for drawing out words or spaces
         if tail:
             if not remainder:
-                for c in range(math.ceil((chordlen - taillen) / 2) + 1):
+                for c in range(math.ceil((chordlen - taillen) / 2) + 2):
                     whitespaces += '_'
             else:
-                for c in range(chordlen - taillen + 2):
+                for c in range(chordlen - taillen + 1):
                     whitespaces += '&nbsp;'
         else:
             if not remainder:

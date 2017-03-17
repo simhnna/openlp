@@ -617,7 +617,7 @@ def transpose_chord(chord, transpose_value, notation):
     notes_flat_notation['english'] = ['C', 'Db', 'D', 'Eb', 'Fb', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B']
     notes_sharp_notation['neo-latin'] = ['Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si']
     notes_flat_notation['neo-latin'] = ['Do', 'Reb', 'Re', 'Mib', 'Fab', 'Fa', 'Solb', 'Sol', 'Lab', 'La', 'Sib', 'Si']
-    chord_split = chord.replace('♭', 'b').split('/[\/\(\)]/')
+    chord_split = chord.replace('♭', 'b').split('/')
     transposed_chord = ''
     last_chord = ''
     notes_sharp = notes_sharp_notation[notation]
@@ -627,12 +627,12 @@ def transpose_chord(chord, transpose_value, notation):
         if i > 0:
             transposed_chord += '/'
         currentchord = chord_split[i]
-        if currentchord[0] == '(':
+        if currentchord and currentchord[0] == '(':
             transposed_chord += '('
             if len(currentchord) > 1:
                 currentchord = currentchord[1:]
             else:
-                currentchord = ""
+                currentchord = ''
         if len(currentchord) > 0:
             if len(currentchord) > 1:
                 if '#b'.find(currentchord[1]) == -1:
