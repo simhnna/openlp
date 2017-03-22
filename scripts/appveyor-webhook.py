@@ -35,8 +35,8 @@ import sys
 import time
 from subprocess import Popen, PIPE
 
-appveyor_build_url = 'https://ci.appveyor.com/project/TomasGroth/openlp/build'
-appveyor_api_url = 'https://ci.appveyor.com/api/projects/TomasGroth/openlp'
+appveyor_build_url = 'https://ci.appveyor.com/project/OpenLP/{project}/build'
+appveyor_api_url = 'https://ci.appveyor.com/api/projects/OpenLP/{project}'
 
 webhook_element = \
     {
@@ -119,11 +119,15 @@ def get_appveyor_build_url(branch):
     """
     Get the url of the build.
     """
-    responce = urllib.request.urlopen(appveyor_api_url)
+    if 'openlp-core/openlp/trunk' in branch:
+        project = 'trunk'
+    else:
+        project = 'dev'
+    responce = urllib.request.urlopen(appveyor_api_url.format(project=project))
     json_str = responce.read().decode('utf-8')
     build_json = json.loads(json_str)
-    build_url = '%s/%s' % (appveyor_build_url, build_json['build']['version'])
-    print('Check this URL for build status: %s' % build_url)
+    build_url = '%s/%s' % (appveyor_build_url.format(project=project), build_json['build']['version'])
+    print('Check this URL for build status: %s' % build_url.format(project=project))
 
 
 if len(sys.argv) != 3:
