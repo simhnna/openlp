@@ -23,14 +23,14 @@
 Package to test the openlp.plugins.bibles.forms.bibleimportform package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
 from openlp.core.common import Registry
-import openlp.plugins.bibles.forms.bibleimportform as bibleimportform
+from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm, PYSWORD_AVAILABLE
 
 from tests.helpers.testmixin import TestMixin
-from tests.functional import MagicMock, patch
 
 
 class TestBibleImportForm(TestCase, TestMixin):
@@ -46,15 +46,16 @@ class TestBibleImportForm(TestCase, TestMixin):
         self.setup_application()
         self.main_window = QtWidgets.QMainWindow()
         Registry().register('main_window', self.main_window)
-        bibleimportform.PYSWORD_AVAILABLE = False
-        self.form = bibleimportform.BibleImportForm(self.main_window, MagicMock(), MagicMock())
+        PYSWORD_AVAILABLE = False
+        self.mocked_manager = MagicMock()
+        self.form = BibleImportForm(self.main_window, self.mocked_manager, MagicMock())
 
-    # def tearDown(self):
-        # """
-        # Delete all the C++ objects at the end so that we don't have a segfault
-        # """
-        # del self.form
-        # del self.main_window
+    def tearDown(self):
+        """
+        Delete all the C++ objects at the end so that we don't have a segfault
+        """
+        del self.form
+        del self.main_window
 
     @patch('openlp.plugins.bibles.forms.bibleimportform.CWExtract.get_bibles_from_http')
     @patch('openlp.plugins.bibles.forms.bibleimportform.BGExtract.get_bibles_from_http')
