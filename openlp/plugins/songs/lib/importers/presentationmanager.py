@@ -23,7 +23,6 @@
 The :mod:`presentationmanager` module provides the functionality for importing
 Presentationmanager song files into the current database.
 """
-import logging
 import os
 import re
 
@@ -33,8 +32,6 @@ from lxml import objectify, etree
 from openlp.core.common import translate
 from openlp.core.ui.lib.wizard import WizardStrings
 from .songimport import SongImport
-
-log = logging.getLogger(__name__)
 
 
 class PresentationManagerImport(SongImport):
@@ -75,11 +72,9 @@ class PresentationManagerImport(SongImport):
         some gymnastics.
         """
         if hasattr(elem, name):
-            log.debug('%s: %s', name, getattr(elem, name))
             return str(getattr(elem, name))
         name = name[0].upper() + name[1:]
         if hasattr(elem, name):
-            log.debug('%s: %s', name, getattr(elem, name))
             return str(getattr(elem, name))
         else:
             return ''
