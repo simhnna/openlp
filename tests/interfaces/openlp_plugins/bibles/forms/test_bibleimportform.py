@@ -47,7 +47,7 @@ class TestBibleImportForm(TestCase, TestMixin):
         self.main_window = QtWidgets.QMainWindow()
         Registry().register('main_window', self.main_window)
         bibleimportform.PYSWORD_AVAILABLE = False
-        self.form = bibleimportform.BibleImportForm(self.main_window, MagicMock(), MagicMock())
+        self.form = bibleimportform.BibleImportForm(None, MagicMock(), MagicMock())
 
     def tearDown(self):
         """
