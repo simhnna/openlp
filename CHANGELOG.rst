@@ -8,3 +8,4 @@ OpenLP 2.4.6
 * Fix opening the data folder (KDE thought the old way was an SMB share)
 * Fix a problem with the new QMediaPlayer not controlling the playlist anymore
 * Added importing of author types to the OpenLP 2 song importer
+* Refactored the merge script and gave it some options

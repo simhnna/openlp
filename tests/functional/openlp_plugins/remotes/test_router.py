@@ -336,13 +336,9 @@ class TestRouter(TestCase, TestMixin):
         with patch.object(self.service_manager, 'setup_ui'), \
                 patch.object(self.router, 'do_json_header'):
             self.service_manager.bootstrap_initialise()
-            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
-            # self.app.processEvents()
 
             # WHEN: Remote next is received
             self.router.service(action='next')
-            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
-            # self.app.processEvents()
 
             # THEN: service_manager.next_item() should have been called
             self.assertTrue(mocked_next_item.called, 'next_item() should have been called in service_manager')
@@ -359,13 +355,9 @@ class TestRouter(TestCase, TestMixin):
         with patch.object(self.service_manager, 'setup_ui'), \
                 patch.object(self.router, 'do_json_header'):
             self.service_manager.bootstrap_initialise()
-            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
-            # self.app.processEvents()
 
             # WHEN: Remote next is received
             self.router.service(action='previous')
-            # Not sure why this is here, it doesn't make sense in the test and causes them to hang
-            # self.app.processEvents()
 
             # THEN: service_manager.next_item() should have been called
             self.assertTrue(mocked_previous_item.called, 'previous_item() should have been called in service_manager')
