@@ -1,4 +1,4 @@
-OpenLP 2.4.6
+OpenLP 2.5.1
 ============
 
 * Fixed a bug where the author type upgrade was being ignore because it was looking at the wrong table
