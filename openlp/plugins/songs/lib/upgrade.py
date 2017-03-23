@@ -159,6 +159,4 @@ def upgrade_6(session, metadata):
             op.drop_column('songs', 'song_book_id')
             op.drop_column('songs', 'song_number')
     # Finally, clean up our mess in people's databases
-    songs_songbooks = Table('songs_songbooks', metadata, autoload=True)
-    del_query = songs_songbooks.delete().where(songs_songbooks.c.songbook_id == 0)
-    op.execute(del_query)
+    op.execute('DELETE FROM songs_songbooks WHERE songbook_id = 0')
