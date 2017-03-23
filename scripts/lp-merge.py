@@ -51,7 +51,6 @@ will print the detected bugs + author for easy copying into the GUI.
 """
 import subprocess
 import re
-import sys
 import os
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -80,7 +79,7 @@ def is_merge_url_valid(url):
               'https://code.launchpad.net/~myusername/openlp/mybranch/+merge/271874')
         return False
     return True
-    
+
 
 def get_merge_info(url):
     """
