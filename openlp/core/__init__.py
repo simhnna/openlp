@@ -428,13 +428,12 @@ def main(args=None):
             sys.exit()
     # i18n Set Language
     language = LanguageManager.get_language()
-    application_translator, default_translator = LanguageManager.get_translator(language)
-    if not application_translator.isEmpty():
-        application.installTranslator(application_translator)
-    if not default_translator.isEmpty():
-        application.installTranslator(default_translator)
-    else:
-        log.debug('Could not find default_translator.')
+    translators = LanguageManager.get_translators(language)
+    for translator in translators:
+        if not translator.isEmpty():
+            application.installTranslator(translator)
+    if not translators:
+        log.debug('Could not find translators.')
     if args and not args.no_error_form:
         sys.excepthook = application.hook_exception
     sys.exit(application.run(qt_args))
