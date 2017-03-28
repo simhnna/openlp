@@ -9,3 +9,4 @@ OpenLP 2.5.1
 * Fix a problem with the new QMediaPlayer not controlling the playlist anymore
 * Added importing of author types to the OpenLP 2 song importer
 * Refactored the merge script and gave it some options
+* Fix a problem with loading Qt's translation files, bug #1676163
