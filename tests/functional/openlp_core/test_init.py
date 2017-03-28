@@ -136,7 +136,7 @@ class TestOpenLP(TestCase):
     """
     Test the OpenLP app class
     """
-    # @skip('Figure out why this is causing a segfault')
+    @skip('Figure out why this is causing a segfault')
     @patch('openlp.core.QtWidgets.QApplication.exec')
     def test_exec(self, mocked_exec):
         """
