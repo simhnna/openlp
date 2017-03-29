@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -70,6 +70,12 @@ class OpenLPMixin(object):
         Common log info handler
         """
         self.logger.info(message)
+
+    def log_warning(self, message):
+        """
+        Common log warning handler
+        """
+        self.logger.warning(message)
 
     def log_error(self, message):
         """

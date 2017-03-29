@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -38,7 +38,7 @@ class Ui_ExceptionDialog(object):
         Set up the UI.
         """
         exception_dialog.setObjectName('exception_dialog')
-        exception_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        exception_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         self.exception_layout = QtWidgets.QVBoxLayout(exception_dialog)
         self.exception_layout.setObjectName('exception_layout')
         self.message_layout = QtWidgets.QHBoxLayout()
@@ -97,9 +97,9 @@ class Ui_ExceptionDialog(object):
             translate('OpenLP.ExceptionDialog', '<strong>Please describe what you were trying to do.</strong> '
                                                 '&nbsp;If possible, write in English.'))
         exception_part1 = (translate('OpenLP.ExceptionDialog',
-                                     '<strong>Oops, OpenLP hit a problem and couldn\'t recover!</strong> <br><br>'
-                                     '<strong>You can help </strong> the OpenLP developers to <strong>fix this</strong>'
-                                     ' by<br> sending them a <strong>bug report</strong> to {email}{newlines}'
+                                     '<strong>Oops, OpenLP hit a problem and couldn\'t recover!<br><br>'
+                                     'You can help </strong> the OpenLP developers to <strong>fix this</strong>'
+                                     ' by<br> sending them a <strong>bug report to {email}</strong>{newlines}'
                                      ).format(email='<a href = "mailto:bugs@openlp.org" > bugs@openlp.org</a>',
                                               newlines='<br><br>'))
         self.message_label.setText(
@@ -107,7 +107,7 @@ class Ui_ExceptionDialog(object):
                       '<strong>No email app? </strong> You can <strong>save</strong> this '
                       'information to a <strong>file</strong> and<br>'
                       'send it from your <strong>mail on browser</strong> via an <strong>attachment.</strong><br><br>'
-                      '<strong>Thank you<strong> for being part of making OpenLP better!<br>'
+                      '<strong>Thank you</strong> for being part of making OpenLP better!<br>'
                       ).format(first_part=exception_part1))
         self.send_report_button.setText(translate('OpenLP.ExceptionDialog', 'Send E-Mail'))
         self.save_report_button.setText(translate('OpenLP.ExceptionDialog', 'Save to File'))

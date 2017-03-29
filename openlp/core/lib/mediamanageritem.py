@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -197,14 +197,9 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         """
         # Add the List widget
         self.list_view = ListWidgetWithDnD(self, self.plugin.name)
-        self.list_view.setSpacing(1)
-        self.list_view.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
-        self.list_view.setAlternatingRowColors(True)
         self.list_view.setObjectName('{name}ListView'.format(name=self.plugin.name))
         # Add to page_layout
         self.page_layout.addWidget(self.list_view)
-        # define and add the context menu
-        self.list_view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         if self.has_edit_icon:
             create_widget_action(self.list_view,
                                  text=self.plugin.get_string(StringContent.Edit)['title'],
@@ -266,7 +261,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         self.search_text_layout.setObjectName('search_text_layout')
         self.search_text_label = QtWidgets.QLabel(self.search_widget)
         self.search_text_label.setObjectName('search_text_label')
-        self.search_text_edit = SearchEdit(self.search_widget)
+        self.search_text_edit = SearchEdit(self.search_widget, self.settings_section)
         self.search_text_edit.setObjectName('search_text_edit')
         self.search_text_label.setBuddy(self.search_text_edit)
         self.search_text_layout.addRow(self.search_text_label, self.search_text_edit)
@@ -396,8 +391,6 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         item = self.list_view.itemAt(point)
         # Decide if we have to show the context menu or not.
         if item is None:
-            return
-        if not item.flags() & QtCore.Qt.ItemIsSelectable:
             return
         self.menu.exec(self.list_view.mapToGlobal(point))
 
@@ -637,34 +630,6 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         :param item: The item to be processed and returned.
         """
         return item
-
-    def check_search_result(self):
-        """
-        Checks if the list_view is empty and adds a "No Search Results" item.
-        """
-        if self.list_view.count():
-            return
-        message = translate('OpenLP.MediaManagerItem', 'No Search Results')
-        item = QtWidgets.QListWidgetItem(message)
-        item.setFlags(QtCore.Qt.NoItemFlags)
-        font = QtGui.QFont()
-        font.setItalic(True)
-        item.setFont(font)
-        self.list_view.addItem(item)
-
-    def check_search_result_search_while_typing_short(self):
-        """
-        This is used in Bible "Search while typing" if the search is shorter than the min required len.
-        """
-        if self.list_view.count():
-            return
-        message = translate('OpenLP.MediaManagerItem', 'Search is too short to be used in: "Search while typing"')
-        item = QtWidgets.QListWidgetItem(message)
-        item.setFlags(QtCore.Qt.NoItemFlags)
-        font = QtGui.QFont()
-        font.setItalic(True)
-        item.setFont(font)
-        self.list_view.addItem(item)
 
     def _get_id_of_item_to_generate(self, item, remote_item):
         """

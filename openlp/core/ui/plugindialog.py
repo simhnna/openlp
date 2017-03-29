@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -38,7 +38,7 @@ class Ui_PluginViewDialog(object):
         Set up the UI
         """
         plugin_view_dialog.setObjectName('plugin_view_dialog')
-        plugin_view_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        plugin_view_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         plugin_view_dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         self.plugin_layout = QtWidgets.QVBoxLayout(plugin_view_dialog)
         self.plugin_layout.setObjectName('plugin_layout')

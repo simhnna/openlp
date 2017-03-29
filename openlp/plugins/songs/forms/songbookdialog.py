@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -35,7 +35,7 @@ class Ui_SongBookDialog(object):
         Set up the user interface.
         """
         song_book_dialog.setObjectName('song_book_dialog')
-        song_book_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        song_book_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         song_book_dialog.resize(300, 10)
         self.dialog_layout = QtWidgets.QVBoxLayout(song_book_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -55,7 +55,7 @@ class UiFirstTimeWizard(object):
         :param first_time_wizard: The wizard form
         """
         first_time_wizard.setObjectName('first_time_wizard')
-        first_time_wizard.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        first_time_wizard.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         first_time_wizard.resize(550, 386)
         first_time_wizard.setModal(True)
         first_time_wizard.setOptions(QtWidgets.QWizard.IndependentPages | QtWidgets.QWizard.NoBackButtonOnStartPage |

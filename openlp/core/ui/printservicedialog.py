@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -50,7 +50,7 @@ class Ui_PrintServiceDialog(object):
         Set up the UI
         """
         print_service_dialog.setObjectName('print_service_dialog')
-        print_service_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        print_service_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         print_service_dialog.resize(664, 594)
         self.main_layout = QtWidgets.QVBoxLayout(print_service_dialog)
         self.main_layout.setSpacing(0)

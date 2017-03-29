@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -47,7 +47,7 @@ class Ui_ProjectorEditForm(object):
         Create the interface layout.
         """
         edit_projector_dialog.setObjectName('edit_projector_dialog')
-        edit_projector_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo-32x32.png'))
+        edit_projector_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         edit_projector_dialog.setMinimumWidth(400)
         edit_projector_dialog.setModal(True)
         # Define the basic layout

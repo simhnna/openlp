@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -54,7 +54,7 @@ class MediaDockManager(object):
                 match = True
                 break
         if not match:
-            self.media_dock.addItem(media_item, visible_title['title'])
+            self.media_dock.addItem(media_item, media_item.plugin.icon, visible_title['title'])
 
     def remove_dock(self, media_item):
         """

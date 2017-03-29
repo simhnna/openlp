@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -46,6 +46,7 @@ class WizardStrings(object):
     OSIS = 'OSIS'
     ZEF = 'Zefania'
     SWORD = 'Sword'
+    WordProject = 'WordProject'
     # These strings should need a good reason to be retranslated elsewhere.
     FinishedImport = translate('OpenLP.Ui', 'Finished import.')
     FormatLabel = translate('OpenLP.Ui', 'Format:')
@@ -95,6 +96,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         super(OpenLPWizard, self).__init__(parent)
         self.plugin = plugin
         self.with_progress_page = add_progress_page
+        self.setFixedWidth(640)
         self.setObjectName(name)
         self.open_icon = build_icon(':/general/general_open.png')
         self.delete_icon = build_icon(':/general/general_delete.png')

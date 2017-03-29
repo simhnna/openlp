@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -458,7 +458,7 @@ class OpenLyrics(object):
                 self._add_tag_to_formatting(tag, tags_element)
         # Replace end tags.
         for tag in end_tags:
-            text = text.replace('{{{tag}}}'.format(tag=tag), '</tag>')
+            text = text.replace('{{/{tag}}}'.format(tag=tag), '</tag>')
         # Replace \n with <br/>.
         text = text.replace('\n', '<br/>')
         element = etree.XML('<lines>{text}</lines>'.format(text=text))

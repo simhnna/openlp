@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -38,7 +38,7 @@ class Ui_ServiceItemEditDialog(object):
         Set up the UI
         """
         serviceItemEditDialog.setObjectName('serviceItemEditDialog')
-        serviceItemEditDialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        serviceItemEditDialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         self.dialog_layout = QtWidgets.QGridLayout(serviceItemEditDialog)
         self.dialog_layout.setContentsMargins(8, 8, 8, 8)
         self.dialog_layout.setSpacing(8)

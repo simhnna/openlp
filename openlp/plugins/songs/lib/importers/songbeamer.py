@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,12 +22,11 @@
 """
 The :mod:`songbeamer` module provides the functionality for importing SongBeamer songs into the OpenLP database.
 """
-import chardet
-import codecs
 import logging
 import os
 import re
 
+from openlp.core.common import get_file_encoding
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 
@@ -113,13 +112,15 @@ class SongBeamerImport(SongImport):
             read_verses = False
             file_name = os.path.split(import_file)[1]
             if os.path.isfile(import_file):
-                # First open in binary mode to detect the encoding
-                detect_file = open(import_file, 'rb')
-                details = chardet.detect(detect_file.read())
-                detect_file.close()
-                infile = codecs.open(import_file, 'r', details['encoding'])
+                # Detect the encoding
+                self.input_file_encoding = get_file_encoding(import_file)['encoding']
+                # The encoding should only be ANSI (cp1252), UTF-8, Unicode, Big-Endian-Unicode.
+                # So if it doesn't start with 'u' we default to cp1252. See:
+                # https://forum.songbeamer.com/viewtopic.php?p=419&sid=ca4814924e37c11e4438b7272a98b6f2
+                if not self.input_file_encoding.lower().startswith('u'):
+                    self.input_file_encoding = 'cp1252'
+                infile = open(import_file, 'rt', encoding=self.input_file_encoding)
                 song_data = infile.readlines()
-                infile.close()
             else:
                 continue
             self.title = file_name.split('.sng')[0]

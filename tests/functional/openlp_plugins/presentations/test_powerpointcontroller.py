@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -137,7 +137,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
                 instance.goto_slide(42)
 
                 # THEN: mocked_critical_error_message_box should have been called
-                mocked_critical_error_message_box.assert_called_with('Error', 'An error occurred in the Powerpoint '
+                mocked_critical_error_message_box.assert_called_with('Error', 'An error occurred in the PowerPoint '
                                                                      'integration and the presentation will be stopped.'
                                                                      ' Restart the presentation if you wish to '
                                                                      'present it.')

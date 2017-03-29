@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -38,7 +38,7 @@ class Ui_FormattingTagDialog(object):
         Set up the UI
         """
         formatting_tag_dialog.setObjectName('formatting_tag_dialog')
-        formatting_tag_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        formatting_tag_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         formatting_tag_dialog.resize(725, 548)
         self.list_data_grid_layout = QtWidgets.QVBoxLayout(formatting_tag_dialog)
         self.list_data_grid_layout.setContentsMargins(8, 8, 8, 8)

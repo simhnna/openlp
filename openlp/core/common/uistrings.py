@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -59,6 +59,13 @@ class UiStrings(object):
         self.Automatic = translate('OpenLP.Ui', 'Automatic')
         self.BackgroundColor = translate('OpenLP.Ui', 'Background Color')
         self.BackgroundColorColon = translate('OpenLP.Ui', 'Background color:')
+        self.BibleShortSearchTitle = translate('OpenLP.Ui', 'Search is Empty or too Short')
+        self.BibleShortSearch = translate('OpenLP.Ui', '<strong>The search you have entered is empty or shorter '
+                                                       'than 3 characters long.</strong><br><br>Please try again with '
+                                                       'a longer search.')
+        self.BibleNoBiblesTitle = translate('OpenLP.Ui', 'No Bibles Available')
+        self.BibleNoBibles = translate('OpenLP.Ui', '<strong>There are no Bibles currently installed.</strong><br><br>'
+                                                    'Please use the Import Wizard to install one or more Bibles.')
         self.Bottom = translate('OpenLP.Ui', 'Bottom')
         self.Browse = translate('OpenLP.Ui', 'Browse...')
         self.Cancel = translate('OpenLP.Ui', 'Cancel')
@@ -112,11 +119,14 @@ class UiStrings(object):
         self.NFSp = translate('OpenLP.Ui', 'No Files Selected', 'Plural')
         self.NISs = translate('OpenLP.Ui', 'No Item Selected', 'Singular')
         self.NISp = translate('OpenLP.Ui', 'No Items Selected', 'Plural')
+        self.NoResults = translate('OpenLP.Ui', 'No Search Results')
         self.OLP = translate('OpenLP.Ui', 'OpenLP')
         self.OLPV2 = "{name} {version}".format(name=self.OLP, version="2")
         self.OLPV2x = "{name} {version}".format(name=self.OLP, version="2.4")
         self.OpenLPStart = translate('OpenLP.Ui', 'OpenLP is already running. Do you wish to continue?')
         self.OpenService = translate('OpenLP.Ui', 'Open service.')
+        self.OptionalShowInFooter = translate('OpenLP.Ui', 'Optional, this will be displayed in footer.')
+        self.OptionalHideInFooter = translate('OpenLP.Ui', 'Optional, this won\'t be displayed in footer.')
         self.PlaySlidesInLoop = translate('OpenLP.Ui', 'Play Slides in Loop')
         self.PlaySlidesToEnd = translate('OpenLP.Ui', 'Play Slides to End')
         self.Preview = translate('OpenLP.Ui', 'Preview')
@@ -130,6 +140,7 @@ class UiStrings(object):
                                                             'player is disabled.')
         self.ResetBG = translate('OpenLP.Ui', 'Reset Background')
         self.ResetLiveBG = translate('OpenLP.Ui', 'Reset live background.')
+        self.RequiredShowInFooter = translate('OpenLP.Ui', 'Required, this will be displayed in footer.')
         self.Seconds = translate('OpenLP.Ui', 's', 'The abbreviated unit for seconds')
         self.SaveAndPreview = translate('OpenLP.Ui', 'Save && Preview')
         self.Search = translate('OpenLP.Ui', 'Search')
@@ -139,6 +150,7 @@ class UiStrings(object):
         self.Settings = translate('OpenLP.Ui', 'Settings')
         self.SaveService = translate('OpenLP.Ui', 'Save Service')
         self.Service = translate('OpenLP.Ui', 'Service')
+        self.ShortResults = translate('OpenLP.Ui', 'Please type more text to use \'Search As You Type\'')
         self.Split = translate('OpenLP.Ui', 'Optional &Split')
         self.SplitToolTip = translate('OpenLP.Ui',
                                       'Split a slide into two only if it does not fit on the screen as one slide.')
@@ -157,13 +169,6 @@ class UiStrings(object):
         self.View = translate('OpenLP.Ui', 'View')
         self.ViewMode = translate('OpenLP.Ui', 'View Mode')
         self.Video = translate('OpenLP.Ui', 'Video')
-        self.BibleShortSearchTitle = translate('OpenLP.Ui', 'Search is Empty or too Short')
-        self.BibleShortSearch = translate('OpenLP.Ui', '<strong>The search you have entered is empty or shorter '
-                                                       'than 3 characters long.</strong><br><br>Please try again with '
-                                                       'a longer search.')
-        self.BibleNoBiblesTitle = translate('OpenLP.Ui', 'No Bibles Available')
-        self.BibleNoBibles = translate('OpenLP.Ui', '<strong>There are no Bibles currently installed.</strong><br><br>'
-                                                    'Please use the Import Wizard to install one or more Bibles.')
         book_chapter = translate('OpenLP.Ui', 'Book Chapter')
         chapter = translate('OpenLP.Ui', 'Chapter')
         verse = translate('OpenLP.Ui', 'Verse')

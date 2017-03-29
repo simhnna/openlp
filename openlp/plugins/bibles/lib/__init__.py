@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -173,7 +173,7 @@ class BibleStrings(object):
 
 def update_reference_separators():
     """
-    Updates separators and matches for parsing and formating scripture references.
+    Updates separators and matches for parsing and formatting scripture references.
     """
     default_separators = [
         '|'.join([
@@ -215,7 +215,7 @@ def update_reference_separators():
         # escape reserved characters
         for character in '\\.^$*+?{}[]()':
             source_string = source_string.replace(character, '\\' + character)
-        # add various unicode alternatives
+        # add various Unicode alternatives
         source_string = source_string.replace('-', '(?:[-\u00AD\u2010\u2011\u2012\u2014\u2014\u2212\uFE63\uFF0D])')
         source_string = source_string.replace(',', '(?:[,\u201A])')
         REFERENCE_SEPARATORS['sep_{role}'.format(role=role)] = '\s*(?:{source})\s*'.format(source=source_string)
@@ -230,7 +230,7 @@ def update_reference_separators():
     REFERENCE_MATCHES['range_separator'] = re.compile(REFERENCE_SEPARATORS['sep_l'], re.UNICODE)
     # full reference match: <book>(<range>(,(?!$)|(?=$)))+
     REFERENCE_MATCHES['full'] = \
-        re.compile('^\s*(?!\s)(?P<book>[\d]*[^\d]+)(?<!\s)\s*'
+        re.compile('^\s*(?!\s)(?P<book>[\d]*[^\d\.]+)\.*(?<!\s)\s*'
                    '(?P<ranges>(?:%(range_regex)s(?:%(sep_l)s(?!\s*$)|(?=\s*$)))+)\s*$'
                    % dict(list(REFERENCE_SEPARATORS.items()) + [('range_regex', range_regex)]), re.UNICODE)
 
@@ -326,7 +326,7 @@ def parse_reference(reference, bible, language_selection, book_ref_id=False):
 
     ``^\s*(?!\s)(?P<book>[\d]*[^\d]+)(?<!\s)\s*``
         The ``book`` group starts with the first non-whitespace character. There are optional leading digits followed by
-        non-digits. The group ends before the whitspace in front of the next digit.
+        non-digits. The group ends before the whitspace, or a full stop in front of the next digit.
 
     ``(?P<ranges>(?:%(range_regex)s(?:%(sep_l)s(?!\s*$)|(?=\s*$)))+)\s*$``
         The second group contains all ``ranges``. This can be multiple declarations of range_regex separated by a list

@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -23,7 +23,6 @@
 Package to test the openlp.core.ui.firsttimeform package.
 """
 import os
-import socket
 import tempfile
 import urllib
 from unittest import TestCase
@@ -236,20 +235,3 @@ class TestFirstTimeForm(TestCase, TestMixin):
         # THEN: the critical_error_message_box should have been called
         self.assertEquals(mocked_message_box.mock_calls[1][1][0], 'Network Error 407',
                           'first_time_form should have caught Network Error')
-
-    @patch('openlp.core.ui.firsttimeform.urllib.request.urlopen')
-    def test_socket_timeout(self, mocked_urlopen):
-        """
-        Test socket timeout gets caught
-        """
-        # GIVEN: Mocked urlopen to fake a network disconnect in the middle of a download
-        first_time_form = FirstTimeForm(None)
-        first_time_form.initialize(MagicMock())
-        mocked_urlopen.side_effect = socket.timeout()
-
-        # WHEN: Attempt to retrieve a file
-        first_time_form.url_get_file(url='http://localhost/test', f_path=self.tempfile)
-
-        # THEN: socket.timeout should have been caught
-        # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
-        self.assertFalse(os.path.exists(self.tempfile), 'FTW url_get_file should have caught socket.timeout')

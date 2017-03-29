@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -37,7 +37,7 @@ class Ui_SongMaintenanceDialog(object):
         Set up the user interface for the song maintenance dialog
         """
         song_maintenance_dialog.setObjectName('song_maintenance_dialog')
-        song_maintenance_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        song_maintenance_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         song_maintenance_dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         song_maintenance_dialog.resize(10, 350)
         self.dialog_layout = QtWidgets.QGridLayout(song_maintenance_dialog)

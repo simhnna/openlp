@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -40,13 +40,13 @@ class Ui_ThemeWizard(object):
         Set up the UI
         """
         theme_wizard.setObjectName('OpenLP.ThemeWizard')
-        theme_wizard.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        theme_wizard.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         theme_wizard.setModal(True)
         theme_wizard.setOptions(QtWidgets.QWizard.IndependentPages |
                                 QtWidgets.QWizard.NoBackButtonOnStartPage | QtWidgets.QWizard.HaveCustomButton1)
+        theme_wizard.setFixedWidth(640)
         if is_macosx():
             theme_wizard.setPixmap(QtWidgets.QWizard.BackgroundPixmap, QtGui.QPixmap(':/wizards/openlp-osx-wizard.png'))
-            theme_wizard.resize(646, 400)
         else:
             theme_wizard.setWizardStyle(QtWidgets.QWizard.ModernStyle)
         self.spacer = QtWidgets.QSpacerItem(10, 0, QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Minimum)

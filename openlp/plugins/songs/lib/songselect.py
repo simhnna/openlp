@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -47,7 +47,7 @@ USER_AGENTS = [
 BASE_URL = 'https://songselect.ccli.com'
 LOGIN_PAGE = 'https://profile.ccli.com/account/signin?appContext=SongSelect&returnUrl='\
     'https%3a%2f%2fsongselect.ccli.com%2f'
-LOGIN_URL = 'https://profile.ccli.com/'
+LOGIN_URL = 'https://profile.ccli.com'
 LOGOUT_URL = BASE_URL + '/account/logout'
 SEARCH_URL = BASE_URL + '/search/results'
 
@@ -97,14 +97,27 @@ class SongSelectImport(object):
             'password': password,
             'RememberMe': 'false'
         })
+        login_form = login_page.find('form')
+        if login_form:
+            login_url = login_form.attrs['action']
+        else:
+            login_url = '/Account/SignIn'
+        if not login_url.startswith('http'):
+            if login_url[0] != '/':
+                login_url = '/' + login_url
+            login_url = LOGIN_URL + login_url
         try:
-            posted_page = BeautifulSoup(self.opener.open(LOGIN_URL, data.encode('utf-8')).read(), 'lxml')
+            posted_page = BeautifulSoup(self.opener.open(login_url, data.encode('utf-8')).read(), 'lxml')
         except (TypeError, URLError) as error:
             log.exception('Could not login to SongSelect, {error}'.format(error=error))
             return False
         if callback:
             callback()
-        return posted_page.find('input', id='SearchText') is not None
+        if posted_page.find('input', id='SearchText') is not None:
+            return True
+        else:
+            log.debug(posted_page)
+            return False
 
     def logout(self):
         """

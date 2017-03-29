@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -36,7 +36,7 @@ class Ui_EditSongDialog(object):
     """
     def setupUi(self, edit_song_dialog):
         edit_song_dialog.setObjectName('edit_song_dialog')
-        edit_song_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        edit_song_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         edit_song_dialog.resize(900, 600)
         edit_song_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(edit_song_dialog)

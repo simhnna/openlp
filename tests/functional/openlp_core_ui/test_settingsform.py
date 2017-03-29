@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -48,7 +48,7 @@ class TestSettingsForm(TestCase):
         general_tab = MagicMock()
         general_tab.tab_title = 'mock'
         general_tab.tab_title_visible = 'Mock'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
 
         # WHEN: We insert the general tab
         with patch.object(settings_form.stacked_layout, 'addWidget') as mocked_add_widget, \
@@ -86,14 +86,14 @@ class TestSettingsForm(TestCase):
         general_tab = QtWidgets.QWidget(None)
         general_tab.tab_title = 'mock-general'
         general_tab.tab_title_visible = 'Mock General'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_general_save = MagicMock()
         general_tab.save = mocked_general_save
         settings_form.insert_tab(general_tab, is_visible=True)
         themes_tab = QtWidgets.QWidget(None)
         themes_tab.tab_title = 'mock-themes'
         themes_tab.tab_title_visible = 'Mock Themes'
-        themes_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        themes_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_theme_save = MagicMock()
         themes_tab.save = mocked_theme_save
         settings_form.insert_tab(themes_tab, is_visible=False)
@@ -114,7 +114,7 @@ class TestSettingsForm(TestCase):
         general_tab = QtWidgets.QWidget(None)
         general_tab.tab_title = 'mock'
         general_tab.tab_title_visible = 'Mock'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
         settings_form.insert_tab(general_tab, is_visible=True)
 
         with patch.object(settings_form.stacked_layout, 'count') as mocked_count:
@@ -133,14 +133,14 @@ class TestSettingsForm(TestCase):
         general_tab = QtWidgets.QWidget(None)
         general_tab.tab_title = 'mock-general'
         general_tab.tab_title_visible = 'Mock General'
-        general_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        general_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_general_cancel = MagicMock()
         general_tab.cancel = mocked_general_cancel
         settings_form.insert_tab(general_tab, is_visible=True)
         themes_tab = QtWidgets.QWidget(None)
         themes_tab.tab_title = 'mock-themes'
         themes_tab.tab_title_visible = 'Mock Themes'
-        themes_tab.icon_path = ':/icon/openlp-logo-16x16.png'
+        themes_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_theme_cancel = MagicMock()
         themes_tab.cancel = mocked_theme_cancel
         settings_form.insert_tab(themes_tab, is_visible=False)
@@ -151,3 +151,17 @@ class TestSettingsForm(TestCase):
         # THEN: The general tab's cancel() method should have been called, but not the themes tab
         mocked_general_cancel.assert_called_with()
         self.assertEqual(0, mocked_theme_cancel.call_count, 'The Themes tab\'s cancel() should not have been called')
+
+    def test_register_post_process(self):
+        """
+        Test that the register_post_process() method works correctly
+        """
+        # GIVEN: A settings form instance
+        settings_form = SettingsForm(None)
+        fake_function = MagicMock()
+
+        # WHEN: register_post_process() is called
+        settings_form.register_post_process(fake_function)
+
+        # THEN: The fake function should be in the settings form's list
+        assert fake_function in settings_form.processes

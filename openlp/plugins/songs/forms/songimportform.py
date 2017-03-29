@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -52,7 +52,7 @@ class SongImportForm(OpenLPWizard, RegistryProperties):
         :param parent: The QWidget-derived parent of the wizard.
         :param plugin: The songs plugin.
         """
-        super(SongImportForm, self).__init__(parent, plugin, 'songImportWizard', ':/wizards/wizard_importsong.bmp')
+        super(SongImportForm, self).__init__(parent, plugin, 'songImportWizard', ':/wizards/wizard_song.bmp')
         self.clipboard = self.main_window.clipboard
 
     def setupUi(self, image):

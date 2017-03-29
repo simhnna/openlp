@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -34,7 +34,7 @@ class Ui_CustomEditDialog(object):
         :param custom_edit_dialog: The Dialog
         """
         custom_edit_dialog.setObjectName('custom_edit_dialog')
-        custom_edit_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        custom_edit_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         custom_edit_dialog.resize(450, 350)
         self.dialog_layout = QtWidgets.QVBoxLayout(custom_edit_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

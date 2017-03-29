@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -38,7 +38,7 @@ class Ui_SongUsageDetailDialog(object):
         :param song_usage_detail_dialog:
         """
         song_usage_detail_dialog.setObjectName('song_usage_detail_dialog')
-        song_usage_detail_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        song_usage_detail_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         song_usage_detail_dialog.resize(609, 413)
         self.vertical_layout = QtWidgets.QVBoxLayout(song_usage_detail_dialog)
         self.vertical_layout.setSpacing(8)

@@ -3,7 +3,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -43,3 +43,5 @@ class TestEasySlidesFileImport(SongImportTestHelper):
         """
         self.file_import(os.path.join(TEST_PATH, 'amazing-grace.xml'),
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+        self.file_import(os.path.join(TEST_PATH, 'Export_2017-01-12_BB.xml'),
+                         self.load_external_result_data(os.path.join(TEST_PATH, 'Export_2017-01-12_BB.json')))

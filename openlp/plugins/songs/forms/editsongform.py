@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -118,13 +118,14 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         objects = self.manager.get_all_objects(cls)
         objects.sort(key=get_key)
         combo.clear()
-        combo.addItem('')
         for obj in objects:
             row = combo.count()
             combo.addItem(obj.name)
             cache.append(obj.name)
             combo.setItemData(row, obj.id)
         set_case_insensitive_completer(cache, combo)
+        combo.setCurrentIndex(-1)
+        combo.setCurrentText('')
 
     def _add_author_to_list(self, author, author_type):
         """
@@ -317,7 +318,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 self.song.verse_order = re.sub('([' + verse.upper() + verse.lower() + '])(\W|$)',
                                                r'\g<1>1\2', self.song.verse_order)
         except:
-            log.exception('Problem processing song Lyrics \n{xml}'.forma(xml=sxml.dump_xml()))
+            log.exception('Problem processing song Lyrics \n{xml}'.format(xml=sxml.dump_xml()))
             raise
 
     def keyPressEvent(self, event):
@@ -360,7 +361,6 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         authors = self.manager.get_all_objects(Author)
         authors.sort(key=get_author_key)
         self.authors_combo_box.clear()
-        self.authors_combo_box.addItem('')
         self.authors = []
         for author in authors:
             row = self.authors_combo_box.count()
@@ -368,6 +368,8 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
             self.authors_combo_box.setItemData(row, author.id)
             self.authors.append(author.display_name)
         set_case_insensitive_completer(self.authors, self.authors_combo_box)
+        self.authors_combo_box.setCurrentIndex(-1)
+        self.authors_combo_box.setCurrentText('')
 
         # Types
         self.author_types_combo_box.clear()
@@ -398,11 +400,12 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
             return get_natural_key(theme)
 
         self.theme_combo_box.clear()
-        self.theme_combo_box.addItem('')
         self.themes = theme_list
         self.themes.sort(key=get_theme_key)
         self.theme_combo_box.addItems(theme_list)
         set_case_insensitive_completer(self.themes, self.theme_combo_box)
+        self.theme_combo_box.setCurrentIndex(-1)
+        self.theme_combo_box.setCurrentText('')
 
     def load_media_files(self):
         """
@@ -441,8 +444,8 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         self.load_topics()
         self.load_songbooks()
         self.load_media_files()
-        self.theme_combo_box.setEditText('')
-        self.theme_combo_box.setCurrentIndex(0)
+        self.theme_combo_box.setCurrentIndex(-1)
+        self.theme_combo_box.setCurrentText('')
         # it's a new song to preview is not possible
         self.preview_button.setVisible(False)
 
@@ -467,8 +470,8 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
             find_and_set_in_combo_box(self.theme_combo_box, str(self.song.theme_name))
         else:
             # Clear the theme combo box in case it was previously set (bug #1212801)
-            self.theme_combo_box.setEditText('')
-            self.theme_combo_box.setCurrentIndex(0)
+            self.theme_combo_box.setCurrentIndex(-1)
+            self.theme_combo_box.setCurrentText('')
         self.copyright_edit.setText(self.song.copyright if self.song.copyright else '')
         self.comments_edit.setPlainText(self.song.comments if self.song.comments else '')
         self.ccli_number_edit.setText(self.song.ccli_number if self.song.ccli_number else '')
@@ -571,12 +574,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         item = int(self.authors_combo_box.currentIndex())
         text = self.authors_combo_box.currentText().strip(' \r\n\t')
         author_type = self.author_types_combo_box.itemData(self.author_types_combo_box.currentIndex())
-        # This if statement is for OS X, which doesn't seem to work well with
-        # the QCompleter auto-completion class. See bug #812628.
-        if text in self.authors:
-            # Index 0 is a blank string, so add 1
-            item = self.authors.index(text) + 1
-        if item == 0 and text:
+        if item == -1 and text:
             if QtWidgets.QMessageBox.question(
                     self,
                     translate('SongsPlugin.EditSongForm', 'Add Author'),
@@ -591,10 +589,11 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 self.manager.save_object(author)
                 self._add_author_to_list(author, author_type)
                 self.load_authors()
-                self.authors_combo_box.setCurrentIndex(0)
+                self.authors_combo_box.setCurrentIndex(-1)
+                self.authors_combo_box.setCurrentText('')
             else:
                 return
-        elif item > 0:
+        elif item >= 0:
             item_id = (self.authors_combo_box.itemData(item))
             author = self.manager.get_object(Author, item_id)
             if self.authors_list_view.findItems(author.get_display_name(author_type), QtCore.Qt.MatchExactly):
@@ -602,7 +601,8 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                     message=translate('SongsPlugin.EditSongForm', 'This author is already in the list.'))
             else:
                 self._add_author_to_list(author, author_type)
-            self.authors_combo_box.setCurrentIndex(0)
+            self.authors_combo_box.setCurrentIndex(-1)
+            self.authors_combo_box.setCurrentText('')
         else:
             QtWidgets.QMessageBox.warning(
                 self, UiStrings().NISs,
@@ -654,7 +654,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
     def on_topic_add_button_clicked(self):
         item = int(self.topics_combo_box.currentIndex())
         text = self.topics_combo_box.currentText()
-        if item == 0 and text:
+        if item == -1 and text:
             if QtWidgets.QMessageBox.question(
                     self, translate('SongsPlugin.EditSongForm', 'Add Topic'),
                     translate('SongsPlugin.EditSongForm', 'This topic does not exist, do you want to add it?'),
@@ -666,10 +666,11 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 topic_item.setData(QtCore.Qt.UserRole, topic.id)
                 self.topics_list_view.addItem(topic_item)
                 self.load_topics()
-                self.topics_combo_box.setCurrentIndex(0)
+                self.topics_combo_box.setCurrentIndex(-1)
+                self.topics_combo_box.setCurrentText('')
             else:
                 return
-        elif item > 0:
+        elif item >= 0:
             item_id = (self.topics_combo_box.itemData(item))
             topic = self.manager.get_object(Topic, item_id)
             if self.topics_list_view.findItems(str(topic.name), QtCore.Qt.MatchExactly):
@@ -679,7 +680,8 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 topic_item = QtWidgets.QListWidgetItem(str(topic.name))
                 topic_item.setData(QtCore.Qt.UserRole, topic.id)
                 self.topics_list_view.addItem(topic_item)
-            self.topics_combo_box.setCurrentIndex(0)
+            self.topics_combo_box.setCurrentIndex(-1)
+            self.topics_combo_box.setCurrentText('')
         else:
             QtWidgets.QMessageBox.warning(
                 self, UiStrings().NISs,
@@ -699,7 +701,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
     def on_songbook_add_button_clicked(self):
         item = int(self.songbooks_combo_box.currentIndex())
         text = self.songbooks_combo_box.currentText()
-        if item == 0 and text:
+        if item == -1 and text:
             if QtWidgets.QMessageBox.question(
                     self, translate('SongsPlugin.EditSongForm', 'Add Songbook'),
                     translate('SongsPlugin.EditSongForm', 'This Songbook does not exist, do you want to add it?'),
@@ -709,11 +711,12 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                 self.manager.save_object(songbook)
                 self.add_songbook_entry_to_list(songbook.id, songbook.name, self.songbook_entry_edit.text())
                 self.load_songbooks()
-                self.songbooks_combo_box.setCurrentIndex(0)
+                self.songbooks_combo_box.setCurrentIndex(-1)
+                self.songbooks_combo_box.setCurrentText('')
                 self.songbook_entry_edit.clear()
             else:
                 return
-        elif item > 0:
+        elif item >= 0:
             item_id = (self.songbooks_combo_box.itemData(item))
             songbook = self.manager.get_object(Book, item_id)
             if self.songbooks_list_view.findItems(str(songbook.name), QtCore.Qt.MatchExactly):
@@ -721,7 +724,8 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                     message=translate('SongsPlugin.EditSongForm', 'This Songbook is already in the list.'))
             else:
                 self.add_songbook_entry_to_list(songbook.id, songbook.name, self.songbook_entry_edit.text())
-            self.songbooks_combo_box.setCurrentIndex(0)
+            self.songbooks_combo_box.setCurrentIndex(-1)
+            self.songbooks_combo_box.setCurrentText('')
             self.songbook_entry_edit.clear()
         else:
             QtWidgets.QMessageBox.warning(

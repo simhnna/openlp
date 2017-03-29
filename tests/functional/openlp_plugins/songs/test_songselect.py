@@ -5,7 +5,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -25,6 +25,7 @@ This module contains tests for the CCLI SongSelect importer.
 """
 import os
 from unittest import TestCase
+from unittest.mock import MagicMock, patch, call
 from urllib.error import URLError
 
 from PyQt5 import QtWidgets
@@ -32,9 +33,8 @@ from PyQt5 import QtWidgets
 from openlp.core import Registry
 from openlp.plugins.songs.forms.songselectform import SongSelectForm, SearchWorker
 from openlp.plugins.songs.lib import Song
-from openlp.plugins.songs.lib.songselect import SongSelectImport, LOGOUT_URL, BASE_URL
+from openlp.plugins.songs.lib.songselect import SongSelectImport, LOGIN_PAGE, LOGOUT_URL, BASE_URL
 
-from tests.functional import MagicMock, patch, call
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.helpers.testmixin import TestMixin
 
@@ -72,7 +72,9 @@ class TestSongSelectImport(TestCase, TestMixin):
         mocked_build_opener.return_value = mocked_opener
         mocked_login_page = MagicMock()
         mocked_login_page.find.side_effect = [{'value': 'blah'}, None]
-        MockedBeautifulSoup.return_value = mocked_login_page
+        mocked_posted_page = MagicMock()
+        mocked_posted_page.find.return_value = None
+        MockedBeautifulSoup.side_effect = [mocked_login_page, mocked_posted_page]
         mock_callback = MagicMock()
         importer = SongSelectImport(None)
 
@@ -82,6 +84,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         # THEN: callback was called 3 times, open was called twice, find was called twice, and False was returned
         self.assertEqual(3, mock_callback.call_count, 'callback should have been called 3 times')
         self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice')
+        self.assertEqual(1, mocked_posted_page.find.call_count, 'find should have been called once')
         self.assertEqual(2, mocked_opener.open.call_count, 'opener should have been called twice')
         self.assertFalse(result, 'The login method should have returned False')
 
@@ -112,8 +115,10 @@ class TestSongSelectImport(TestCase, TestMixin):
         mocked_opener = MagicMock()
         mocked_build_opener.return_value = mocked_opener
         mocked_login_page = MagicMock()
-        mocked_login_page.find.side_effect = [{'value': 'blah'}, MagicMock()]
-        MockedBeautifulSoup.return_value = mocked_login_page
+        mocked_login_page.find.side_effect = [{'value': 'blah'}, None]
+        mocked_posted_page = MagicMock()
+        mocked_posted_page.find.return_value = MagicMock()
+        MockedBeautifulSoup.side_effect = [mocked_login_page, mocked_posted_page]
         mock_callback = MagicMock()
         importer = SongSelectImport(None)
 
@@ -122,8 +127,38 @@ class TestSongSelectImport(TestCase, TestMixin):
 
         # THEN: callback was called 3 times, open was called twice, find was called twice, and True was returned
         self.assertEqual(3, mock_callback.call_count, 'callback should have been called 3 times')
-        self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice')
+        self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice on the login page')
+        self.assertEqual(1, mocked_posted_page.find.call_count, 'find should have been called once on the posted page')
         self.assertEqual(2, mocked_opener.open.call_count, 'opener should have been called twice')
+        self.assertTrue(result, 'The login method should have returned True')
+
+    @patch('openlp.plugins.songs.lib.songselect.build_opener')
+    @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
+    def login_url_from_form_test(self, MockedBeautifulSoup, mocked_build_opener):
+        """
+        Test that the login URL is from the form
+        """
+        # GIVEN: A bunch of mocked out stuff and an importer object
+        mocked_opener = MagicMock()
+        mocked_build_opener.return_value = mocked_opener
+        mocked_form = MagicMock()
+        mocked_form.attrs = {'action': 'do/login'}
+        mocked_login_page = MagicMock()
+        mocked_login_page.find.side_effect = [{'value': 'blah'}, mocked_form]
+        mocked_posted_page = MagicMock()
+        mocked_posted_page.find.return_value = MagicMock()
+        MockedBeautifulSoup.side_effect = [mocked_login_page, mocked_posted_page]
+        mock_callback = MagicMock()
+        importer = SongSelectImport(None)
+
+        # WHEN: The login method is called after being rigged to fail
+        result = importer.login('username', 'password', mock_callback)
+
+        # THEN: callback was called 3 times, open was called twice, find was called twice, and True was returned
+        self.assertEqual(3, mock_callback.call_count, 'callback should have been called 3 times')
+        self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice on the login page')
+        self.assertEqual(1, mocked_posted_page.find.call_count, 'find should have been called once on the posted page')
+        self.assertEqual('https://profile.ccli.com/do/login', mocked_opener.open.call_args_list[1][0][0])
         self.assertTrue(result, 'The login method should have returned True')
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')

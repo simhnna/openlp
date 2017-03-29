@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -207,29 +207,6 @@ class TestSlideController(TestCase):
         mocked_on_blank_display.assert_called_once_with(False)
         mocked_on_theme_display.assert_called_once_with(False)
         mocked_on_hide_display.assert_called_once_with(False)
-
-    def test_live_escape(self):
-        """
-        Test that when the live_escape() method is called, the display is set to invisible and any media is stopped
-        """
-        # GIVEN: A new SlideController instance and mocked out display and media_controller
-        mocked_display = MagicMock()
-        mocked_media_controller = MagicMock()
-        Registry.create()
-        Registry().register('media_controller', mocked_media_controller)
-        slide_controller = SlideController(None)
-        slide_controller.display = mocked_display
-        play_slides = MagicMock()
-        play_slides.isChecked.return_value = False
-        slide_controller.play_slides_loop = play_slides
-        slide_controller.play_slides_once = play_slides
-
-        # WHEN: live_escape() is called
-        slide_controller.live_escape()
-
-        # THEN: the display should be set to invisible and the media controller stopped
-        mocked_display.setVisible.assert_called_once_with(False)
-        mocked_media_controller.media_stop.assert_called_once_with(slide_controller)
 
     def test_on_go_live_live_controller(self):
         """
@@ -681,7 +658,7 @@ class TestSlideController(TestCase):
         slide_controller._process_item(mocked_media_item, 0)
 
         # THEN: Registry.execute should have been called to stop the presentation
-        self.assertEqual(3, mocked_execute.call_count, 'Execute should have been called 3 times')
+        self.assertEqual(2, mocked_execute.call_count, 'Execute should have been called 2 times')
         self.assertEqual('mocked_presentation_item_stop', mocked_execute.call_args_list[1][0][0],
                          'The presentation should have been stopped.')
 
@@ -697,7 +674,7 @@ class TestSlideController(TestCase):
         slide_controller.next_item = MagicMock()
         slide_controller.previous_service = MagicMock()
         slide_controller.next_service = MagicMock()
-        slide_controller.escape_item = MagicMock()
+        slide_controller.desktop_screen_enable = MagicMock()
         slide_controller.desktop_screen = MagicMock()
         slide_controller.blank_screen = MagicMock()
         slide_controller.theme_screen = MagicMock()
@@ -709,7 +686,7 @@ class TestSlideController(TestCase):
         mocked_widget.addActions.assert_called_with([
             slide_controller.previous_item, slide_controller.next_item,
             slide_controller.previous_service, slide_controller.next_service,
-            slide_controller.escape_item, slide_controller.desktop_screen,
+            slide_controller.desktop_screen_enable, slide_controller.desktop_screen,
             slide_controller.theme_screen, slide_controller.blank_screen
         ])
 

@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -37,7 +37,7 @@ class Ui_FileRenameDialog(object):
         Set up the UI
         """
         file_rename_dialog.setObjectName('file_rename_dialog')
-        file_rename_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        file_rename_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         file_rename_dialog.resize(300, 10)
         self.dialog_layout = QtWidgets.QGridLayout(file_rename_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

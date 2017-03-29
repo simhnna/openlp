@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -52,21 +52,17 @@ from openlp.core.ui.lib.mediadockmanager import MediaDockManager
 log = logging.getLogger(__name__)
 
 MEDIA_MANAGER_STYLE = """
-QToolBox {
-    padding-bottom: 2px;
-}
-QToolBox::tab {
+::tab#media_tool_box {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
         stop: 0 palette(button), stop: 1.0 palette(mid));
-    border: 1px solid palette(mid);
-    border-radius: 3px;
+    border: 0;
+    border-radius: 2px;
+    margin-top: 0;
+    margin-bottom: 0;
+    text-align: left;
 }
-QToolBox::tab:selected {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 palette(light), stop: 1.0 palette(button));
-    border: 1px solid palette(mid);
-    font-weight: bold;
-}
+/* This is here to make the tabs on KDE with the Breeze theme work */
+::tab:selected {}
 """
 
 PROGRESSBAR_STYLE = """
@@ -180,6 +176,7 @@ class Ui_MainWindow(object):
         self.projector_manager_contents = ProjectorManager(self.projector_manager_dock)
         self.projector_manager_contents.setObjectName('projector_manager_contents')
         self.projector_manager_dock.setWidget(self.projector_manager_contents)
+        self.projector_manager_dock.setVisible(False)
         main_window.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.projector_manager_dock)
         # Create the menu items
         action_list = ActionList.get_instance()
@@ -309,21 +306,12 @@ class Ui_MainWindow(object):
         self.about_item.setMenuRole(QtWidgets.QAction.AboutRole)
         if is_win():
             self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'OpenLP.chm')
-            self.offline_help_item = create_action(main_window, 'offlineHelpItem',
-                                                   icon=':/system/system_help_contents.png',
-                                                   can_shortcuts=True,
-                                                   category=UiStrings().Help, triggers=self.on_offline_help_clicked)
         elif is_macosx():
             self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir),
                                                 '..', 'Resources', 'OpenLP.help')
-            self.offline_help_item = create_action(main_window, 'offlineHelpItem',
-                                                   icon=':/system/system_help_contents.png',
-                                                   can_shortcuts=True,
-                                                   category=UiStrings().Help, triggers=self.on_offline_help_clicked)
-        self.on_line_help_item = create_action(main_window, 'onlineHelpItem',
-                                               icon=':/system/system_online_help.png',
-                                               can_shortcuts=True,
-                                               category=UiStrings().Help, triggers=self.on_online_help_clicked)
+        self.user_manual_item = create_action(main_window, 'userManualItem', icon=':/system/system_help_contents.png',
+                                              can_shortcuts=True, category=UiStrings().Help,
+                                              triggers=self.on_help_clicked)
         self.web_site_item = create_action(main_window, 'webSiteItem', can_shortcuts=True, category=UiStrings().Help)
         # Shortcuts not connected to buttons or menu entries.
         self.search_shortcut_action = create_action(main_window,
@@ -362,11 +350,7 @@ class Ui_MainWindow(object):
         add_actions(self.tools_menu, (self.tools_open_data_folder, None))
         add_actions(self.tools_menu, (self.tools_first_time_wizard, None))
         add_actions(self.tools_menu, [self.update_theme_images])
-        if (is_win() or is_macosx()) and (hasattr(sys, 'frozen') and sys.frozen == 1):
-            add_actions(self.help_menu, (self.offline_help_item, self.on_line_help_item, None, self.web_site_item,
-                        self.about_item))
-        else:
-            add_actions(self.help_menu, (self.on_line_help_item, None, self.web_site_item, self.about_item))
+        add_actions(self.help_menu, (self.user_manual_item, None, self.web_site_item, self.about_item))
         add_actions(self.menu_bar, (self.file_menu.menuAction(), self.view_menu.menuAction(),
                     self.tools_menu.menuAction(), self.settings_menu.menuAction(), self.help_menu.menuAction()))
         add_actions(self, [self.search_shortcut_action])
@@ -462,9 +446,7 @@ class Ui_MainWindow(object):
                                                                                    'from here.'))
         self.about_item.setText(translate('OpenLP.MainWindow', '&About'))
         self.about_item.setStatusTip(translate('OpenLP.MainWindow', 'More information about OpenLP.'))
-        if is_win() or is_macosx():
-            self.offline_help_item.setText(translate('OpenLP.MainWindow', '&User Guide'))
-        self.on_line_help_item.setText(translate('OpenLP.MainWindow', '&Online Help'))
+        self.user_manual_item.setText(translate('OpenLP.MainWindow', '&User Manual'))
         self.search_shortcut_action.setText(UiStrings().Search)
         self.search_shortcut_action.setToolTip(
             translate('OpenLP.MainWindow', 'Jump to the search box of the current active plugin.'))
@@ -778,18 +760,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         import webbrowser
         webbrowser.open_new('http://openlp.org/')
 
-    def on_offline_help_clicked(self):
+    def on_help_clicked(self):
         """
-        Load the local OpenLP help file
+        If is_macosx or is_win, open the local OpenLP help file.
+        Use the Online manual in other cases. (Linux)
         """
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl("file:///" + self.local_help_file))
-
-    def on_online_help_clicked(self):
-        """
-        Load the online OpenLP manual
-        """
-        import webbrowser
-        webbrowser.open_new('http://manual.openlp.org/')
+        if is_macosx() or is_win():
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(self.local_help_file))
+        else:
+            import webbrowser
+            webbrowser.open_new('http://manual.openlp.org/')
 
     def on_about_item_clicked(self):
         """
@@ -809,7 +789,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Open data folder
         """
         path = AppLocation.get_data_path()
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl("file:///" + path))
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(path))
 
     def on_update_theme_images(self):
         """
@@ -1413,7 +1393,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if event.timerId() == self.timer_id:
             self.timer_id = 0
             self.load_progress_bar.hide()
-            self.application.process_events()
+            # Sometimes the timer goes off as OpenLP is shutting down, and the application has already been deleted
+            if self.application:
+                self.application.process_events()
 
     def set_new_data_path(self, new_data_path):
         """

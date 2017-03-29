@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -51,7 +51,7 @@ class SongExportForm(OpenLPWizard):
         :param parent: The QWidget-derived parent of the wizard.
         :param plugin: The songs plugin.
         """
-        super(SongExportForm, self).__init__(parent, plugin, 'song_export_wizard', ':/wizards/wizard_exportsong.bmp')
+        super(SongExportForm, self).__init__(parent, plugin, 'song_export_wizard', ':/wizards/wizard_song.bmp')
         self.stop_export_flag = False
         Registry().register_function('openlp_stop_wizard', self.stop_export)
 

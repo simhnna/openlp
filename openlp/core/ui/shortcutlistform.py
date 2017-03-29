@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -426,11 +426,11 @@ class ShortcutListForm(QtWidgets.QDialog, Ui_ShortcutListDialog, RegistryPropert
                     is_valid = False
         if not is_valid:
             text = translate('OpenLP.ShortcutListDialog',
-                             'The shortcut "{key}" is already assigned to another action, please'
-                             ' use a different shortcut.'
+                             'The shortcut "{key}" is already assigned to another action,\n'
+                             'please use a different shortcut.'
                              ).format(key=self.get_shortcut_string(key_sequence))
             self.main_window.warning_message(translate('OpenLP.ShortcutListDialog', 'Duplicate Shortcut'),
-                                             text, for_display=True)
+                                             text)
             self.dialog_was_shown = True
         return is_valid
 

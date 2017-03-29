@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -39,7 +39,7 @@ class Ui_AlertDialog(object):
         """
         alert_dialog.setObjectName('alert_dialog')
         alert_dialog.resize(400, 300)
-        alert_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        alert_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         self.alert_dialog_layout = QtWidgets.QGridLayout(alert_dialog)
         self.alert_dialog_layout.setObjectName('alert_dialog_layout')
         self.alert_text_layout = QtWidgets.QFormLayout()

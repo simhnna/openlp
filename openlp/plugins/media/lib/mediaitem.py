@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -150,7 +150,8 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
                                                               triggers=self.on_replace_click)
         if 'webkit' not in get_media_players()[0]:
             self.replace_action.setDisabled(True)
-            self.replace_action_context.setDisabled(True)
+            if hasattr(self, 'replace_action_context'):
+                self.replace_action_context.setDisabled(True)
         self.reset_action = self.toolbar.add_toolbar_action('reset_action', icon=':/system/system_close.png',
                                                             visible=False, triggers=self.on_reset_click)
         self.media_widget = QtWidgets.QWidget(self)

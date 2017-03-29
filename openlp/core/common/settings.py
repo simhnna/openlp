@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -214,7 +214,12 @@ class Settings(QtCore.QSettings):
         ('media/players', 'media/players_temp', [(media_players_conv, None)]),  # Convert phonon to system
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
-        ('advanced/default image', '/core/logo file', [])  # Default image renamed + moved to general after 2.4.
+        ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
+        ('shortcuts/escapeItem', 'shortcuts/desktopScreenEnable', []),  # Escape item was removed in 2.6.
+        ('shortcuts/offlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
+        ('shortcuts/onlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
+        ('bibles/advanced bible', '', []),  # Common bible search widgets combined in 2.6
+        ('bibles/quick bible', 'bibles/primary bible', [])  # Common bible search widgets combined in 2.6
     ]
 
     @staticmethod
@@ -261,10 +266,10 @@ class Settings(QtCore.QSettings):
             'shortcuts/blankScreen': [QtGui.QKeySequence(QtCore.Qt.Key_Period)],
             'shortcuts/collapse': [QtGui.QKeySequence(QtCore.Qt.Key_Minus)],
             'shortcuts/desktopScreen': [QtGui.QKeySequence(QtCore.Qt.Key_D)],
+            'shortcuts/desktopScreenEnable': [QtGui.QKeySequence(QtCore.Qt.Key_Escape)],
             'shortcuts/delete': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
             'shortcuts/down': [QtGui.QKeySequence(QtCore.Qt.Key_Down)],
             'shortcuts/editSong': [],
-            'shortcuts/escapeItem': [QtGui.QKeySequence(QtCore.Qt.Key_Escape)],
             'shortcuts/expand': [QtGui.QKeySequence(QtCore.Qt.Key_Plus)],
             'shortcuts/exportThemeItem': [],
             'shortcuts/fileNewItem': [QtGui.QKeySequence(QtGui.QKeySequence.New)],
@@ -273,6 +278,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/fileSaveItem': [QtGui.QKeySequence(QtGui.QKeySequence.Save)],
             'shortcuts/fileOpenItem': [QtGui.QKeySequence(QtGui.QKeySequence.Open)],
             'shortcuts/goLive': [],
+            'shortcuts/userManualItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
             'shortcuts/importThemeItem': [],
             'shortcuts/importBibleItem': [],
             'shortcuts/listViewBiblesDeleteItem': [QtGui.QKeySequence(QtGui.QKeySequence.Delete)],
@@ -333,8 +339,6 @@ class Settings(QtCore.QSettings):
                                            QtGui.QKeySequence(QtCore.Qt.Key_PageDown)],
             'shortcuts/nextService': [QtGui.QKeySequence(QtCore.Qt.Key_Right)],
             'shortcuts/newService': [],
-            'shortcuts/offlineHelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
-            'shortcuts/onlineHelpItem': [QtGui.QKeySequence(QtGui.QKeySequence.HelpContents)],
             'shortcuts/openService': [],
             'shortcuts/saveService': [],
             'shortcuts/previousItem_live': [QtGui.QKeySequence(QtCore.Qt.Key_Up),
@@ -379,6 +383,7 @@ class Settings(QtCore.QSettings):
             'shortcuts/themeScreen': [QtGui.QKeySequence(QtCore.Qt.Key_T)],
             'shortcuts/toolsReindexItem': [],
             'shortcuts/toolsFindDuplicates': [],
+            'shortcuts/toolsSongListReport': [],
             'shortcuts/toolsAlertItem': [QtGui.QKeySequence(QtCore.Qt.Key_F7)],
             'shortcuts/toolsFirstTimeWizard': [],
             'shortcuts/toolsOpenDataFolder': [],

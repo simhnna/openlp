@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -20,7 +20,6 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
-import os
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_
@@ -184,7 +183,7 @@ class SongMaintenanceForm(QtWidgets.QDialog, Ui_SongMaintenanceDialog, RegistryP
                 Author.display_name == new_author.display_name
             )
         )
-        return self.__check_object_exists(authors, new_author, edit)
+        return self._check_object_exists(authors, new_author, edit)
 
     def check_topic_exists(self, new_topic, edit=False):
         """
@@ -194,7 +193,7 @@ class SongMaintenanceForm(QtWidgets.QDialog, Ui_SongMaintenanceDialog, RegistryP
         :param edit: Are we editing the song?
         """
         topics = self.manager.get_all_objects(Topic, Topic.name == new_topic.name)
-        return self.__check_object_exists(topics, new_topic, edit)
+        return self._check_object_exists(topics, new_topic, edit)
 
     def check_song_book_exists(self, new_book, edit=False):
         """
@@ -205,9 +204,9 @@ class SongMaintenanceForm(QtWidgets.QDialog, Ui_SongMaintenanceDialog, RegistryP
         """
         books = self.manager.get_all_objects(
             Book, and_(Book.name == new_book.name, Book.publisher == new_book.publisher))
-        return self.__check_object_exists(books, new_book, edit)
+        return self._check_object_exists(books, new_book, edit)
 
-    def __check_object_exists(self, existing_objects, new_object, edit):
+    def _check_object_exists(self, existing_objects, new_object, edit):
         """
         Utility method to check for an existing object.
 

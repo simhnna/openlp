@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -129,21 +129,21 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             application_stylesheet += WIN_REPAIR_STYLESHEET
         if application_stylesheet:
             self.setStyleSheet(application_stylesheet)
-        show_splash = Settings().value('core/show splash')
-        if show_splash:
+        can_show_splash = Settings().value('core/show splash')
+        if can_show_splash:
             self.splash = SplashScreen()
             self.splash.show()
         # make sure Qt really display the splash screen
         self.processEvents()
         # Check if OpenLP has been upgrade and if a backup of data should be created
-        self.backup_on_upgrade(has_run_wizard)
+        self.backup_on_upgrade(has_run_wizard, can_show_splash)
         # start the main app window
         self.main_window = MainWindow()
         Registry().execute('bootstrap_initialise')
         Registry().execute('bootstrap_post_set_up')
         Registry().initialise = False
         self.main_window.show()
-        if show_splash:
+        if can_show_splash:
             # now kill the splashscreen
             self.splash.finish(self.main_window)
             log.debug('Splashscreen closed')
@@ -177,6 +177,38 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             self.shared_memory.create(1)
             return False
 
+    def is_data_path_missing(self):
+        """
+        Check if the data folder path exists.
+        """
+        data_folder_path = AppLocation.get_data_path()
+        if not os.path.exists(data_folder_path):
+            log.critical('Database was not found in: ' + data_folder_path)
+            status = QtWidgets.QMessageBox.critical(None, translate('OpenLP', 'Data Directory Error'),
+                                                    translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}'
+                                                                        '\n\nThe location of the data folder was '
+                                                                        'previously changed from the OpenLP\'s '
+                                                                        'default location. If the data was stored on '
+                                                                        'removable device, that device needs to be '
+                                                                        'made available.\n\nYou may reset the data '
+                                                                        'location back to the default location, '
+                                                                        'or you can try to make the current location '
+                                                                        'available.\n\nDo you want to reset to the '
+                                                                        'default data location? If not, OpenLP will be '
+                                                                        'closed so you can try to fix the the problem.')
+                                                    .format(path=data_folder_path),
+                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
+                                                                                          QtWidgets.QMessageBox.No),
+                                                    QtWidgets.QMessageBox.No)
+            if status == QtWidgets.QMessageBox.No:
+                # If answer was "No", return "True", it will shutdown OpenLP in def main
+                log.info('User requested termination')
+                return True
+            # If answer was "Yes", remove the custom data path thus resetting the default location.
+            Settings().remove('advanced/data path')
+            log.info('Database location has been reset to the default settings.')
+            return False
+
     def hook_exception(self, exc_type, value, traceback):
         """
         Add an exception hook so that any uncaught exceptions are displayed in this window rather than somewhere where
@@ -192,13 +224,20 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             self.exception_form = ExceptionForm()
         self.exception_form.exception_text_edit.setPlainText(''.join(format_exception(exc_type, value, traceback)))
         self.set_normal_cursor()
+        is_splash_visible = False
+        if hasattr(self, 'splash') and self.splash.isVisible():
+            is_splash_visible = True
+            self.splash.hide()
         self.exception_form.exec()
+        if is_splash_visible:
+            self.splash.show()
 
-    def backup_on_upgrade(self, has_run_wizard):
+    def backup_on_upgrade(self, has_run_wizard, can_show_splash):
         """
         Check if OpenLP has been upgraded, and ask if a backup of data should be made
 
         :param has_run_wizard: OpenLP has been run before
+        :param can_show_splash: Should OpenLP show the splash screen
         """
         data_version = Settings().value('core/application version')
         openlp_version = get_application_version()['version']
@@ -207,9 +246,11 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             Settings().setValue('core/application version', openlp_version)
         # If data_version is different from the current version ask if we should backup the data folder
         elif data_version != openlp_version:
+            if self.splash.isVisible():
+                self.splash.hide()
             if QtWidgets.QMessageBox.question(None, translate('OpenLP', 'Backup'),
-                                              translate('OpenLP', 'OpenLP has been upgraded, do you want to create '
-                                                                  'a backup of OpenLPs data folder?'),
+                                              translate('OpenLP', 'OpenLP has been upgraded, do you want to create\n'
+                                                                  'a backup of the old data folder?'),
                                               QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                               QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
@@ -223,12 +264,14 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                                   translate('OpenLP', 'Backup of the data folder failed!'))
                     return
                 message = translate('OpenLP',
-                                    'A backup of the data folder has been created'
-                                    'at {text}').format(text=data_folder_backup_path)
+                                    'A backup of the data folder has been created at:\n\n'
+                                    '{text}').format(text=data_folder_backup_path)
                 QtWidgets.QMessageBox.information(None, translate('OpenLP', 'Backup'), message)
 
             # Update the version in the settings
             Settings().setValue('core/application version', openlp_version)
+            if can_show_splash:
+                self.splash.show()
 
     def process_events(self):
         """
@@ -276,7 +319,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         return QtWidgets.QApplication.event(self, event)
 
 
-def parse_options(args):
+def parse_options(args=None):
     """
     Parse the command line arguments
 
@@ -343,6 +386,7 @@ def main(args=None):
     application.setOrganizationName('OpenLP')
     application.setOrganizationDomain('openlp.org')
     application.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+    application.setAttribute(QtCore.Qt.AA_DontCreateNativeWidgetSiblings, True)
     if args and args.portable:
         application.setApplicationName('OpenLPPortable')
         Settings.setDefaultFormat(Settings.IniFormat)
@@ -368,8 +412,12 @@ def main(args=None):
     Registry.create()
     Registry().register('application', application)
     application.setApplicationVersion(get_application_version()['version'])
-    # Instance check
+    # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     if application.is_already_running():
+        sys.exit()
+    # If the custom data path is missing and the user wants to restore the data path, quit OpenLP.
+    if application.is_data_path_missing():
+        application.shared_memory.detach()
         sys.exit()
     # Remove/convert obsolete settings.
     Settings().remove_obsolete_settings()
@@ -380,13 +428,12 @@ def main(args=None):
             sys.exit()
     # i18n Set Language
     language = LanguageManager.get_language()
-    application_translator, default_translator = LanguageManager.get_translator(language)
-    if not application_translator.isEmpty():
-        application.installTranslator(application_translator)
-    if not default_translator.isEmpty():
-        application.installTranslator(default_translator)
-    else:
-        log.debug('Could not find default_translator.')
+    translators = LanguageManager.get_translators(language)
+    for translator in translators:
+        if not translator.isEmpty():
+            application.installTranslator(translator)
+    if not translators:
+        log.debug('Could not find translators.')
     if args and not args.no_error_form:
         sys.excepthook = application.hook_exception
     sys.exit(application.run(qt_args))

@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -61,6 +61,12 @@ class OpenLPSongImport(SongImport):
         :param progress_dialog: The QProgressDialog used when importing songs from the FRW.
         """
 
+        class OldAuthorSong(BaseModel):
+            """
+            Maps to the authors_songs table
+            """
+            pass
+
         class OldAuthor(BaseModel):
             """
             Maps to the authors table
@@ -109,14 +115,19 @@ class OpenLPSongImport(SongImport):
         source_meta.reflect(engine)
         self.source_session = scoped_session(sessionmaker(bind=engine))
         # Run some checks to see which version of the database we have
-        if 'media_files' in list(source_meta.tables.keys()):
+        table_list = list(source_meta.tables.keys())
+        if 'media_files' in table_list:
             has_media_files = True
         else:
             has_media_files = False
-        if 'songs_songbooks' in list(source_meta.tables.keys()):
+        if 'songs_songbooks' in table_list:
             has_songs_books = True
         else:
             has_songs_books = False
+        if 'authors_songs' in table_list:
+            has_authors_songs = True
+        else:
+            has_authors_songs = False
         # Load up the tabls and map them out
         source_authors_table = source_meta.tables['authors']
         source_song_books_table = source_meta.tables['song_books']
@@ -139,6 +150,15 @@ class OpenLPSongImport(SongImport):
                 class_mapper(OldSongBookEntry)
             except UnmappedClassError:
                 mapper(OldSongBookEntry, source_songs_songbooks_table, properties={'songbook': relation(OldBook)})
+        if has_authors_songs:
+            try:
+                class_mapper(OldAuthorSong)
+            except UnmappedClassError:
+                mapper(OldAuthorSong, source_authors_songs_table)
+        if has_authors_songs and 'author_type' in source_authors_songs_table.c.keys():
+            has_author_type = True
+        else:
+            has_author_type = False
         # Set up the songs relationships
         song_props = {
             'authors': relation(OldAuthor, backref='songs', secondary=source_authors_songs_table),
@@ -157,6 +177,8 @@ class OpenLPSongImport(SongImport):
             song_props['songbook_entries'] = relation(OldSongBookEntry, backref='song', cascade='all, delete-orphan')
         else:
             song_props['book'] = relation(OldBook, backref='songs')
+        if has_authors_songs:
+            song_props['authors_songs'] = relation(OldAuthorSong)
         # Map the rest of the tables
         try:
             class_mapper(OldAuthor)
@@ -205,8 +227,16 @@ class OpenLPSongImport(SongImport):
                     existing_author = Author.populate(
                         first_name=author.first_name,
                         last_name=author.last_name,
-                        display_name=author.display_name)
-                new_song.add_author(existing_author)
+                        display_name=author.display_name
+                    )
+                # If this is a new database, we need to import the author_type too
+                author_type = None
+                if has_author_type:
+                    for author_song in song.authors_songs:
+                        if author_song.author_id == author.id:
+                            author_type = author_song.author_type
+                            break
+                new_song.add_author(existing_author, author_type)
             # Find or create all the topics and add them to the new song object
             if song.topics:
                 for topic in song.topics:
@@ -221,11 +251,17 @@ class OpenLPSongImport(SongImport):
                     if not existing_book:
                         existing_book = Book.populate(name=entry.songbook.name, publisher=entry.songbook.publisher)
                     new_song.add_songbook_entry(existing_book, entry.entry)
-            elif song.book:
+            elif hasattr(song, 'book') and song.book:
                 existing_book = self.manager.get_object_filtered(Book, Book.name == song.book.name)
                 if not existing_book:
                     existing_book = Book.populate(name=song.book.name, publisher=song.book.publisher)
-                new_song.add_songbook_entry(existing_book, '')
+                # Get the song_number from "songs" table "song_number" field. (This is db structure from 2.2.1)
+                # If there's a number, add it to the song, otherwise it will be "".
+                existing_number = song.song_number if hasattr(song, 'song_number') else ''
+                if existing_number:
+                    new_song.add_songbook_entry(existing_book, existing_number)
+                else:
+                    new_song.add_songbook_entry(existing_book, '')
             # Find or create all the media files and add them to the new song object
             if has_media_files and song.media_files:
                 for media_file in song.media_files:

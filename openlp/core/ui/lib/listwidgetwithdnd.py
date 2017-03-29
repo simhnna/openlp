@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,7 +26,7 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common import Registry, UiStrings
 
 
 class ListWidgetWithDnD(QtWidgets.QListWidget):
@@ -37,8 +37,14 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         """
         Initialise the list widget
         """
-        super(ListWidgetWithDnD, self).__init__(parent)
+        super().__init__(parent)
         self.mime_data_text = name
+        self.no_results_text = UiStrings().NoResults
+        self.setSpacing(1)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.setAlternatingRowColors(True)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.locked = False
 
     def activateDnD(self):
         """
@@ -47,6 +53,21 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         self.setAcceptDrops(True)
         self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
         Registry().register_function(('%s_dnd' % self.mime_data_text), self.parent().load_file)
+
+    def clear(self, search_while_typing=False, override_lock=False):
+        """
+        Re-implement clear, so that we can customise feedback when using 'Search as you type'
+
+        :param search_while_typing: True if we want to display the customised message
+        :return: None
+        """
+        if self.locked and not override_lock:
+            return
+        if search_while_typing:
+            self.no_results_text = UiStrings().ShortResults
+        else:
+            self.no_results_text = UiStrings().NoResults
+        super().clear()
 
     def mouseMoveEvent(self, event):
         """
@@ -102,6 +123,24 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
                     listing = os.listdir(local_file)
                     for file in listing:
                         files.append(os.path.join(local_file, file))
-            Registry().execute('%s_dnd' % self.mime_data_text, {'files': files, 'target': self.itemAt(event.pos())})
+            Registry().execute('{mime_data}_dnd'.format(mime_data=self.mime_data_text),
+                               {'files': files, 'target': self.itemAt(event.pos())})
         else:
             event.ignore()
+
+    def paintEvent(self, event):
+        """
+        Re-implement paintEvent so that we can add 'No Results' text when the listWidget is empty.
+
+        :param event: A QPaintEvent
+        :return: None
+        """
+        super().paintEvent(event)
+        if not self.count():
+            viewport = self.viewport()
+            painter = QtGui.QPainter(viewport)
+            font = QtGui.QFont()
+            font.setItalic(True)
+            painter.setFont(font)
+            painter.drawText(QtCore.QRect(0, 0, viewport.width(), viewport.height()),
+                             (QtCore.Qt.AlignHCenter | QtCore.Qt.TextWordWrap), self.no_results_text)

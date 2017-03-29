@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,7 +26,7 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common import Registry, is_win
 
 
 class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
@@ -108,6 +108,11 @@ class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
 
         :param event: Handle of the event pint passed
         """
+        # If we are on Windows, OpenLP window will not be set on top. For example, user can drag images to Library and
+        # the folder stays on top of the group creation box. This piece of code fixes this issue.
+        if is_win():
+            self.setWindowState(self.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+            self.setWindowState(QtCore.Qt.WindowNoState)
         if event.mimeData().hasUrls():
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()

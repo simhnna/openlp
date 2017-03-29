@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -111,14 +111,9 @@ class OpenLPServer(RegistryProperties):
         self.address = address
         self.is_secure = Settings().value(self.settings_section + '/https enabled')
         self.needs_authentication = Settings().value(self.settings_section + '/authentication enabled')
-        if self.is_secure:
-            port = Settings().value(self.settings_section + '/https port')
-            self.port = port
-            self.start_server_instance(address, port, HTTPSServer)
-        else:
-            port = Settings().value(self.settings_section + '/port')
-            self.port = port
-            self.start_server_instance(address, port, ThreadingHTTPServer)
+        port = Settings().value(self.settings_section + '/port')
+        self.port = port
+        self.start_server_instance(address, port, ThreadingHTTPServer)
         if hasattr(self, 'httpd') and self.httpd:
             self.httpd.serve_forever()
         else:
@@ -158,19 +153,3 @@ class OpenLPServer(RegistryProperties):
             self.http_thread.stop()
         self.httpd = None
         log.debug('Stopped the server.')
-
-
-class HTTPSServer(HTTPServer):
-    def __init__(self, address, handler):
-        """
-        Initialise the secure handlers for the SSL server if required.s
-        """
-        BaseServer.__init__(self, address, handler)
-        local_data = AppLocation.get_directory(AppLocation.DataDir)
-        self.socket = ssl.SSLSocket(
-            sock=socket.socket(self.address_family, self.socket_type),
-            certfile=os.path.join(local_data, 'remotes', 'openlp.crt'),
-            keyfile=os.path.join(local_data, 'remotes', 'openlp.key'),
-            server_side=True)
-        self.server_bind()
-        self.server_activate()

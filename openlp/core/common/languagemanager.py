@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -45,7 +45,7 @@ class LanguageManager(object):
     auto_language = False
 
     @staticmethod
-    def get_translator(language):
+    def get_translators(language):
         """
         Set up a translator to use in this instance of OpenLP
 
@@ -59,9 +59,12 @@ class LanguageManager(object):
         # A translator for buttons and other default strings provided by Qt.
         if not is_win() and not is_macosx():
             lang_path = QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath)
+        # As of Qt5, the core translations come in 2 files per language
         default_translator = QtCore.QTranslator()
         default_translator.load('qt_%s' % language, lang_path)
-        return app_translator, default_translator
+        base_translator = QtCore.QTranslator()
+        base_translator.load('qtbase_%s' % language, lang_path)
+        return app_translator, default_translator, base_translator
 
     @staticmethod
     def find_qm_files():
@@ -71,8 +74,8 @@ class LanguageManager(object):
         log.debug('Translation files: {files}'.format(files=AppLocation.get_directory(AppLocation.LanguageDir)))
         trans_dir = QtCore.QDir(AppLocation.get_directory(AppLocation.LanguageDir))
         file_names = trans_dir.entryList(['*.qm'], QtCore.QDir.Files, QtCore.QDir.Name)
-        # Remove qm files from the list which start with "qt_".
-        file_names = [file_ for file_ in file_names if not file_.startswith('qt_')]
+        # Remove qm files from the list which start with "qt".
+        file_names = [file_ for file_ in file_names if not file_.startswith('qt')]
         return list(map(trans_dir.filePath, file_names))
 
     @staticmethod

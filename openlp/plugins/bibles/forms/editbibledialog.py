@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -32,7 +32,7 @@ from openlp.plugins.bibles.lib.db import BiblesResourcesDB
 class Ui_EditBibleDialog(object):
     def setupUi(self, edit_bible_dialog):
         edit_bible_dialog.setObjectName('edit_bible_dialog')
-        edit_bible_dialog.setWindowIcon(build_icon(u':/icon/openlp-logo.svg'))
+        edit_bible_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
         edit_bible_dialog.resize(520, 400)
         edit_bible_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(edit_bible_dialog)
@@ -68,6 +68,12 @@ class Ui_EditBibleDialog(object):
         self.permissions_edit.setObjectName('permissions_edit')
         self.permissions_label.setBuddy(self.permissions_edit)
         self.license_details_layout.addRow(self.permissions_label, self.permissions_edit)
+        self.full_license_label = QtWidgets.QLabel(self.license_details_group_box)
+        self.full_license_label.setObjectName('full_license_label')
+        self.full_license_edit = QtWidgets.QPlainTextEdit(self.license_details_group_box)
+        self.full_license_edit.setObjectName('full_license_edit')
+        self.full_license_label.setBuddy(self.full_license_edit)
+        self.license_details_layout.addRow(self.full_license_label, self.full_license_edit)
         self.meta_tab_layout.addWidget(self.license_details_group_box)
         self.language_selection_group_box = QtWidgets.QGroupBox(self.meta_tab)
         self.language_selection_group_box.setObjectName('language_selection_group_box')
@@ -132,6 +138,7 @@ class Ui_EditBibleDialog(object):
         self.version_name_label.setText(translate('BiblesPlugin.EditBibleForm', 'Version name:'))
         self.copyright_label.setText(translate('BiblesPlugin.EditBibleForm', 'Copyright:'))
         self.permissions_label.setText(translate('BiblesPlugin.EditBibleForm', 'Permissions:'))
+        self.full_license_label.setText(translate('BiblesPlugin.EditBibleForm', 'Full license:'))
         self.language_selection_group_box.setTitle(translate('BiblesPlugin.EditBibleForm', 'Default Bible Language'))
         self.language_selection_label.setText(
             translate('BiblesPlugin.EditBibleForm', 'Book name language in search field, search results and '

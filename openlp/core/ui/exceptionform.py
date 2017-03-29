@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -208,7 +208,7 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
             self.__button_state(False)
             self.description_word_count.setText(
                 translate('OpenLP.ExceptionDialog', '<strong>Please enter a more detailed description of the situation'
-                          ))
+                                                    '</strong>'))
 
     def on_attach_file_button_clicked(self):
         """

@@ -5,7 +5,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -51,101 +51,173 @@ will print the detected bugs + author for easy copying into the GUI.
 """
 import subprocess
 import re
-import sys
 import os
-import urllib.request
+from urllib.request import urlopen
+from urllib.error import HTTPError
+from argparse import ArgumentParser
 from bs4 import BeautifulSoup
 
-# Check that the argument count is correct
-if len(sys.argv) != 2:
-    print('\n\tUsage: ' + sys.argv[0] + ' <url to approved merge request>\n')
-    exit()
 
-url = sys.argv[1]
-pattern = re.compile('.+?/\+merge/\d+')
-match = pattern.match(url)
+def parse_args():
+    """
+    Parse command line arguments and return them
+    """
+    parser = ArgumentParser(prog='lp-merge', description='A helper script to merge proposals on Launchpad')
+    parser.add_argument('url', help='URL to the merge proposal')
+    parser.add_argument('-y', '--yes-to-all', action='store_true', help='Presume yes for all queries')
+    parser.add_argument('-q', '--use-qcommit', action='store_true', help='Use qcommit for committing')
+    return parser.parse_args()
 
-# Check that the given argument is an url in the right format
-if not url.startswith('https://code.launchpad.net/~') or match is None:
-    print('The url is not valid! It should look like this:\n    '
-          'https://code.launchpad.net/~tomasgroth/openlp/doc22update4/+merge/271874')
 
-page = urllib.request.urlopen(url)
-soup = BeautifulSoup(page.read(), 'lxml')
+def is_merge_url_valid(url):
+    """
+    Determine if the merge URL is valid
+    """
+    match = re.match(r'.+?/\+merge/\d+', url)
+    if not url.startswith('https://code.launchpad.net/~') or match is None:
+        print('The url is not valid! It should look like this:\n    '
+              'https://code.launchpad.net/~myusername/openlp/mybranch/+merge/271874')
+        return False
+    return True
 
-# Find this span tag that contains the branch url
-# <span class="branch-url">
-span_branch_url = soup.find('span', class_='branch-url')
-branch_url = span_branch_url.contents[0]
 
-# Find this tag that describes the branch. We'll use that for commit message
-# <meta name="description" content="...">
-meta = soup.find('meta', attrs={"name": "description"})
+def get_merge_info(url):
+    """
+    Get all the merge information and return it as a dictionary
+    """
+    merge_info = {}
+    print('Fetching merge information...')
+    # Try to load the page
+    try:
+        page = urlopen(url)
+    except HTTPError:
+        print('Unable to load merge URL: {}'.format(url))
+        return None
+    soup = BeautifulSoup(page.read(), 'lxml')
+    # Find this span tag that contains the branch url
+    # <span class="branch-url">
+    span_branch_url = soup.find('span', class_='branch-url')
+    if not span_branch_url:
+        print('Unable to find merge details on URL: {}'.format(url))
+        return None
+    merge_info['branch_url'] = span_branch_url.contents[0]
+    # Find this tag that describes the branch. We'll use that for commit message
+    # <meta name="description" content="...">
+    meta = soup.find('meta', attrs={"name": "description"})
+    merge_info['commit_message'] = meta.get('content')
+    # Find all tr-tags with this class. Makes it possible to get bug numbers.
+    # <tr class="bug-branch-summary"
+    bug_rows = soup.find_all('tr', class_='bug-branch-summary')
+    merge_info['bugs'] = []
+    for row in bug_rows:
+        id_attr = row.get('id')
+        merge_info['bugs'].append(id_attr[8:])
+    # Find target branch name using the tag below
+    # <div class="context-publication"><h1>Merge ... into...
+    div_branches = soup.find('div', class_='context-publication')
+    branches = div_branches.h1.contents[0]
+    merge_info['target_branch'] = '+branch/' + branches[(branches.find(' into lp:') + 9):]
+    # Find the authors email address. It is hidden in a javascript line like this:
+    # conf = {"status_value": "Needs review", "source_revid": "tomasgroth@yahoo.dk-20160921204550-gxduegmcmty9rljf",
+    #         "user_can_edit_status": false, ...
+    script_tag = soup.find('script', attrs={"id": "codereview-script"})
+    content = script_tag.contents[0]
+    start_pos = content.find('source_revid') + 16
+    pattern = re.compile('.*\w-\d\d\d\d\d+')
+    match = pattern.match(content[start_pos:])
+    merge_info['author_email'] = match.group()[:-15]
+    # Launchpad doesn't supply the author's true name, so we'll just grab whatever they use for display on LP
+    a_person = soup.find('div', id='registration').find('a', 'person')
+    merge_info['author_name'] = a_person.contents[0]
+    return merge_info
 
-commit_message = meta.get('content')
 
-# Find all tr-tags with this class. Makes it possible to get bug numbers.
-# <tr class="bug-branch-summary"
-bug_rows = soup.find_all('tr', class_='bug-branch-summary')
-bugs = []
-for row in bug_rows:
-    id_attr = row.get('id')
-    bugs.append(id_attr[8:])
+def do_merge(merge_info, yes_to_all=False):
+    """
+    Do the merge
+    """
+    # Check that we are in the right branch
+    bzr_info_output = subprocess.check_output(['bzr', 'info'])
+    if merge_info['target_branch'] not in bzr_info_output.decode():
+        print('ERROR: It seems you are not in the right folder...')
+        return False
+    # Merge the branch
+    if yes_to_all:
+        can_merge = True
+    else:
+        user_choice = input('Merge ' + merge_info['branch_url'] + ' into local branch? (y/N/q): ').lower()
+        if user_choice == 'q':
+            return False
+        can_merge = user_choice == 'y'
+    if can_merge:
+        print('Merging...')
+        subprocess.call(['bzr', 'merge', merge_info['branch_url']])
+    return True
 
-# Find target branch name using the tag below
-# <div class="context-publication"><h1>Merge ... into...
-div_branches = soup.find('div', class_='context-publication')
-branches = div_branches.h1.contents[0]
-target_branch = '+branch/' + branches[(branches.find(' into lp:') + 9):]
 
-# Check that we are in the right branch
-bzr_info_output = subprocess.check_output(['bzr', 'info'])
-if target_branch not in bzr_info_output.decode():
-    print('ERROR: It seems you are not in the right folder...')
-    exit()
-
-# Find the authors email address. It is hidden in a javascript line like this:
-# conf = {"status_value": "Needs review", "source_revid": "tomasgroth@yahoo.dk-20160921204550-gxduegmcmty9rljf",
-#         "user_can_edit_status": false, ...
-script_tag = soup.find('script', attrs={"id": "codereview-script"})
-content = script_tag.contents[0]
-start_pos = content.find('source_revid') + 16
-pattern = re.compile('.*\w-\d\d\d\d\d+')
-match = pattern.match(content[start_pos:])
-author_email = match.group()[:-15]
-
-# Merge the branch
-do_merge = input('Merge ' + branch_url + ' into local branch? (y/N/q): ').lower()
-if do_merge == 'y':
-    subprocess.call(['bzr', 'merge', branch_url])
-elif do_merge == 'q':
-    exit()
-
-# Create commit command
-commit_command = ['bzr', 'commit']
-
-for bug in bugs:
-    commit_command.append('--fixes')
-    commit_command.append('lp:' + bug)
-
-commit_command.append('-m')
-commit_command.append(commit_message)
-
-commit_command.append('--author')
-commit_command.append('"' + author_email + '"')
-
-print('About to run the bzr command below:\n')
-print(' '.join(commit_command))
-do_commit = input('Run the command (y), use qcommit (qcommit) or cancel (C): ').lower()
-
-if do_commit == 'y':
-    subprocess.call(commit_command)
-elif do_commit == 'qcommit':
+def qcommit(commit_message, author_name, author_email, bugs=[]):
+    """
+    Use qcommit to make the commit
+    """
     # Setup QT workaround to make qbzr look right on my box
     my_env = os.environ.copy()
     my_env['QT_GRAPHICSSYSTEM'] = 'native'
     # Print stuff that kan be copy/pasted into qbzr GUI
-    print('These bugs can be copy/pasted in: lp:' + ' lp:'.join(bugs))
-    print('The authors email is: ' + author_email)
+    if bugs:
+        print('These bugs can be copy/pasted in: ' + ' '.join(['lp:{}'.format(bug) for bug in bugs]))
+    print('The authors email is: {} <{}>'.format(author_name, author_email))
     # Run qcommit
     subprocess.call(['bzr', 'qcommit', '-m', commit_message], env=my_env)
+
+
+def do_commit(merge_info, yes_to_all=False, use_qcommit=False):
+    """
+    Actually do the commit
+    """
+    if use_qcommit:
+        qcommit(merge_info['commit_message'], merge_info['author_name'], merge_info['author_email'],
+                merge_info.get('bugs'))
+        return True
+    # Create commit command
+    commit_command = ['bzr', 'commit']
+    if 'bugs' in merge_info:
+        commit_command.extend(['--fixes=lp:{}'.format(bug) for bug in merge_info['bugs']])
+    commit_command.extend(['-m', merge_info['commit_message'],
+                           '--author', '{author_name} <{author_email}>'.format(**merge_info)])
+    if yes_to_all:
+        can_commit = True
+    else:
+        print('About to run the bzr command below:\n')
+        print(' '.join(commit_command))
+        user_choice = input('Run the command (y), use qcommit (q) or cancel (C): ').lower()
+        if user_choice == 'q':
+            qcommit(merge_info['commit_message'], merge_info['author_name'], merge_info['author_email'],
+                    merge_info.get('bugs'))
+            return True
+        can_commit = user_choice == 'y'
+    if can_commit:
+        print('Committing...')
+        subprocess.call(commit_command)
+        return True
+    else:
+        return False
+
+
+def main():
+    """
+    Run the script
+    """
+    args = parse_args()
+    if not is_merge_url_valid(args.url):
+        exit(1)
+    merge_info = get_merge_info(args.url)
+    if not merge_info:
+        exit(2)
+    if not do_merge(merge_info, args.yes_to_all):
+        exit(3)
+    if not do_commit(merge_info, args.yes_to_all, args.use_qcommit):
+        exit(4)
+
+
+if __name__ == '__main__':
+    main()

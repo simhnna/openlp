@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -270,6 +270,8 @@ class TestMainDisplay(TestCase, TestMixin):
         service_item = MagicMock()
         service_item.theme_data = MagicMock()
         service_item.theme_data.background_type = 'video'
+        service_item.theme_data.theme_name = 'name'
+        service_item.theme_data.background_filename = 'background_filename'
         mocked_plugin = MagicMock()
         display.plugin_manager = PluginManager()
         display.plugin_manager.plugins = [mocked_plugin]

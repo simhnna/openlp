@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,18 +24,13 @@ Package to test the openlp.core.ui.exeptionform package.
 """
 
 import os
-import socket
 import tempfile
-import urllib
 from unittest import TestCase
 from unittest.mock import mock_open
 
-from PyQt5.QtCore import QUrlQuery
-
 from openlp.core.common import Registry
-from openlp.core.ui.firsttimeform import FirstTimeForm
 
-from tests.functional import MagicMock, patch
+from tests.functional import patch
 from tests.helpers.testmixin import TestMixin
 
 from openlp.core.ui import exceptionform

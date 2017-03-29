@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -234,25 +234,32 @@ class SlideController(DisplayController, RegistryProperties):
             self.hide_menu.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
             self.hide_menu.setMenu(QtWidgets.QMenu(translate('OpenLP.SlideController', 'Hide'), self.toolbar))
             self.toolbar.add_toolbar_widget(self.hide_menu)
-            self.blank_screen = create_action(self, 'blankScreen',
-                                              text=translate('OpenLP.SlideController', 'Blank Screen'),
-                                              icon=':/slides/slide_blank.png',
-                                              checked=False, can_shortcuts=True, category=self.category,
-                                              triggers=self.on_blank_display)
-            self.theme_screen = create_action(self, 'themeScreen',
-                                              text=translate('OpenLP.SlideController', 'Blank to Theme'),
-                                              icon=':/slides/slide_theme.png',
-                                              checked=False, can_shortcuts=True, category=self.category,
-                                              triggers=self.on_theme_display)
+            # The order of the blank to modes in Shortcuts list comes from here.
+            self.desktop_screen_enable = create_action(self, 'desktopScreenEnable',
+                                                       text=translate('OpenLP.SlideController', 'Show Desktop'),
+                                                       icon=':/slides/slide_desktop.png', can_shortcuts=True,
+                                                       context=QtCore.Qt.WidgetWithChildrenShortcut,
+                                                       category=self.category, triggers=self.on_hide_display_enable)
             self.desktop_screen = create_action(self, 'desktopScreen',
-                                                text=translate('OpenLP.SlideController', 'Show Desktop'),
+                                                text=translate('OpenLP.SlideController', 'Toggle Desktop'),
                                                 icon=':/slides/slide_desktop.png',
                                                 checked=False, can_shortcuts=True, category=self.category,
                                                 triggers=self.on_hide_display)
+            self.theme_screen = create_action(self, 'themeScreen',
+                                              text=translate('OpenLP.SlideController', 'Toggle Blank to Theme'),
+                                              icon=':/slides/slide_theme.png',
+                                              checked=False, can_shortcuts=True, category=self.category,
+                                              triggers=self.on_theme_display)
+            self.blank_screen = create_action(self, 'blankScreen',
+                                              text=translate('OpenLP.SlideController', 'Toggle Blank Screen'),
+                                              icon=':/slides/slide_blank.png',
+                                              checked=False, can_shortcuts=True, category=self.category,
+                                              triggers=self.on_blank_display)
             self.hide_menu.setDefaultAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.blank_screen)
             self.hide_menu.menu().addAction(self.theme_screen)
             self.hide_menu.menu().addAction(self.desktop_screen)
+            self.hide_menu.menu().addAction(self.desktop_screen_enable)
             # Wide menu of display control buttons.
             self.blank_screen_button = QtWidgets.QToolButton(self.toolbar)
             self.blank_screen_button.setObjectName('blank_screen_button')
@@ -512,23 +519,6 @@ class SlideController(DisplayController, RegistryProperties):
                                           can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
                                           category=self.category,
                                           triggers=self.service_next)
-        self.escape_item = create_action(parent, 'escapeItem',
-                                         text=translate('OpenLP.SlideController', 'Escape Item'),
-                                         can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
-                                         category=self.category,
-                                         triggers=self.live_escape)
-
-    def live_escape(self, field=None):
-        """
-        If you press ESC on the live screen it should close the display temporarily.
-        """
-        self.display.setVisible(False)
-        self.media_controller.media_stop(self)
-        # Stop looping if active
-        if self.play_slides_loop.isChecked():
-            self.on_play_slides_loop(False)
-        elif self.play_slides_once.isChecked():
-            self.on_play_slides_once(False)
 
     def toggle_display(self, action):
         """
@@ -622,7 +612,7 @@ class SlideController(DisplayController, RegistryProperties):
         widget.addActions([
             self.previous_item, self.next_item,
             self.previous_service, self.next_service,
-            self.escape_item,
+            self.desktop_screen_enable,
             self.desktop_screen,
             self.theme_screen,
             self.blank_screen])
@@ -732,8 +722,10 @@ class SlideController(DisplayController, RegistryProperties):
         # Reset the button
         self.play_slides_once.setChecked(False)
         self.play_slides_once.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
         self.play_slides_loop.setChecked(False)
         self.play_slides_loop.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_loop.setText(UiStrings().PlaySlidesInLoop)
         if item.is_text():
             if (Settings().value(self.main_window.songs_settings_section + '/display songbar') and
                     not self.song_menu.menu().isEmpty()):
@@ -929,7 +921,8 @@ class SlideController(DisplayController, RegistryProperties):
                 Registry().execute('{name}_stop'.format(name=old_item.name.lower()), [old_item, self.is_live])
             if old_item.is_media() and not self.service_item.is_media():
                 self.on_media_close()
-        Registry().execute('slidecontroller_{item}_started'.format(item=self.type_prefix), [self.service_item])
+        if self.is_live:
+            Registry().execute('slidecontroller_{item}_started'.format(item=self.type_prefix), [self.service_item])
 
     def on_slide_selected_index(self, message):
         """
@@ -965,7 +958,7 @@ class SlideController(DisplayController, RegistryProperties):
             else:
                 Registry().execute('live_display_show')
         else:
-            self.live_escape()
+            self.on_hide_display_enable()
 
     def on_slide_blank(self):
         """
@@ -1025,6 +1018,7 @@ class SlideController(DisplayController, RegistryProperties):
     def on_hide_display(self, checked=None):
         """
         Handle the Hide screen button
+        This toggles the desktop screen.
 
         :param checked: the new state of the of the widget
         """
@@ -1040,6 +1034,20 @@ class SlideController(DisplayController, RegistryProperties):
         else:
             Settings().remove(self.main_window.general_settings_section + '/screen blank')
         self.hide_plugin(checked)
+        self.update_preview()
+        self.on_toggle_loop()
+
+    def on_hide_display_enable(self, checked=None):
+        """
+        Handle the on_hide_display_enable
+        This only enables the desktop screen.
+
+        :param checked: the new state of the of the widget
+        """
+        self.blank_screen.setChecked(False)
+        self.theme_screen.setChecked(False)
+        Registry().execute('live_display_hide', HideMode.Screen)
+        self.desktop_screen.setChecked(True)
         self.update_preview()
         self.on_toggle_loop()
 

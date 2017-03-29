@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2016 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -243,7 +243,7 @@ class SourceSelectTabs(QtWidgets.QDialog):
             title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
         self.setWindowTitle(title)
         self.setObjectName('source_select_tabs')
-        self.setWindowIcon(build_icon(':/icon/openlp-log-32x32.png'))
+        self.setWindowIcon(build_icon(':/icon/openlp-log.svg'))
         self.setModal(True)
         self.layout = QtWidgets.QVBoxLayout()
         self.layout.setObjectName('source_select_tabs_layout')
@@ -395,7 +395,7 @@ class SourceSelectSingle(QtWidgets.QDialog):
         else:
             title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
         self.setObjectName('source_select_single')
-        self.setWindowIcon(build_icon(':/icon/openlp-log-32x32.png'))
+        self.setWindowIcon(build_icon(':/icon/openlp-log.svg'))
         self.setModal(True)
         self.edit = edit
 
