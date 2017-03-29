@@ -387,8 +387,8 @@ class EasyWorshipSongImport(SongImport):
             song_id = song[0]
             # keep extra copy of title for error message because error check clears it
             self.title = title = song[1]
-            self.author      = song[2]
-            self.copyright   = song[3]
+            self.author = song[2]
+            self.copyright = song[3]
             self.ccli_number = song[4]
             words = words_db.execute('SELECT words FROM word WHERE song_id = ?;', (song_id,))
             self.set_song_import_object(self.author, words.fetchone()[0].encode())
@@ -396,7 +396,7 @@ class EasyWorshipSongImport(SongImport):
                 self.log_error(self.import_source,
                                translate('SongsPlugin.EasyWorshipSongImport',
                                          '"{title}" could not be imported. {entry}').
-                                         format(title=title, entry=self.entry_error_log))
+                               format(title=title, entry=self.entry_error_log))
 
         # close database handles
         songs_conn.close()

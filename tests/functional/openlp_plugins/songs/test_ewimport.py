@@ -284,7 +284,8 @@ class TestEasyWorshipSongImport(TestCase):
                 get_field_read_calls = test_results[2]['read']
                 get_field_seek_calls = test_results[2]['seek']
 
-                # THEN: db_get_field should return the appropriate value with the appropriate mocked objects being called
+                # THEN: db_get_field should return the appropriate value with the appropriate mocked objects being
+                # called
                 self.assertEqual(importer.db_get_field(field_index), get_field_result)
                 for call in get_field_read_calls:
                     mocked_memo_file.read.assert_any_call(call)
