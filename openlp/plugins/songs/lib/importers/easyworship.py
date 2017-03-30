@@ -373,14 +373,12 @@ class EasyWorshipSongImport(SongImport):
             songs_conn.close()
             words_conn.close()
             return
-
         # Take a stab at how text is encoded
         self.encoding = 'cp1252'
         self.encoding = retrieve_windows_encoding(self.encoding)
         if not self.encoding:
             log.debug('No encoding set.')
             return
-
         # import songs
         songs = songs_db.execute('SELECT rowid,title,author,copyright,vendor_id FROM song;')
         for song in songs:
@@ -397,7 +395,6 @@ class EasyWorshipSongImport(SongImport):
                                translate('SongsPlugin.EasyWorshipSongImport',
                                          '"{title}" could not be imported. {entry}').
                                format(title=title, entry=self.entry_error_log))
-
         # close database handles
         songs_conn.close()
         words_conn.close()
