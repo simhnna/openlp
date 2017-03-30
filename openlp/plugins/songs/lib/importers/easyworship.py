@@ -344,8 +344,8 @@ class EasyWorshipSongImport(SongImport):
         """
         Import the songs from an EasyWorship 6 SQLite database
         """
-        songs_db_path = self.import_source + "/Databases/Data/Songs.db"
-        song_words_db_path = self.import_source + "/Databases/Data/SongWords.db"
+        songs_db_path = os.path.join(self.import_source, "Databases", "Data", "Songs.db")
+        song_words_db_path = os.path.join(self.import_source, "Databases", "Data", "SongWords.db")
         # check to see if needed files are there
         if not os.path.isfile(songs_db_path):
             self.log_error(songs_db_path, translate('SongsPlugin.EasyWorshipSongImport',
