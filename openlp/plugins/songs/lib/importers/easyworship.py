@@ -340,12 +340,30 @@ class EasyWorshipSongImport(SongImport):
         db_file.close()
         self.memo_file.close()
 
+    def _find_file(self, base_path, path_list):
+        """
+        Find the specified file, with the option of the file being at any level in the specified directory structure.
+
+        :param base_path: the location search in
+        :param path_list: the targeted file, preceded by directories that may be their parents relative to the base_path
+        :return: path for targeted file
+        """
+        target_file = ''
+        while len(path_list) > 0:
+            target_file = os.path.join(path_list[len(path_list) - 1], target_file)
+            path_list = path_list[:len(path_list) - 1]
+            full_path = os.path.join(base_path, target_file)
+            full_path = full_path[:len(full_path) - 1]
+            if os.path.isfile(full_path):
+                return full_path
+        return ''
+
     def import_sqlite_db(self):
         """
         Import the songs from an EasyWorship 6 SQLite database
         """
-        songs_db_path = os.path.join(self.import_source, "Databases", "Data", "Songs.db")
-        song_words_db_path = os.path.join(self.import_source, "Databases", "Data", "SongWords.db")
+        songs_db_path = self._find_file(self.import_source, ["Databases", "Data", "Songs.db"])
+        song_words_db_path = self._find_file(self.import_source, ["Databases", "Data", "SongWords.db"])
         # check to see if needed files are there
         if not os.path.isfile(songs_db_path):
             self.log_error(songs_db_path, translate('SongsPlugin.EasyWorshipSongImport',
