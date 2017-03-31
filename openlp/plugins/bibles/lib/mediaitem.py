@@ -57,6 +57,17 @@ class BibleSearch(object):
     Combined = 3
 
 
+class ResultsTab(object):
+    Saved = 0
+    Search = 1
+
+
+class SearchStatus(object):
+    SearchButton = 0
+    SearchAsYouType = 1
+    NotEnoughText = 2
+
+
 class BibleMediaItem(MediaManagerItem):
     """
     This is the custom media manager item for Bibles.
@@ -78,6 +89,9 @@ class BibleMediaItem(MediaManagerItem):
         self.sort_icon = build_icon(':/bibles/bibles_book_sort.png')
         self.bible = None
         self.second_bible = None
+        self.saved_results = []
+        self.current_results = []
+        self.search_status = SearchStatus().SearchButton
         # TODO: Make more central and clean up after!
         self.search_timer = QtCore.QTimer()
         self.search_timer.setInterval(200)
@@ -176,15 +190,18 @@ class BibleMediaItem(MediaManagerItem):
         # Note: If we use QPushButton instead of the QToolButton, the icon will be larger than the Lock icon.
         self.clear_button = QtWidgets.QToolButton(self)
         self.clear_button.setIcon(self.clear_icon)
-        self.lock_button = QtWidgets.QToolButton(self)
-        self.lock_button.setIcon(self.unlock_icon)
-        self.lock_button.setCheckable(True)
+        self.save_results_button = QtWidgets.QToolButton(self)
+        self.save_results_button.setIcon(self.unlock_icon)
         self.search_button_layout.addWidget(self.clear_button)
-        self.search_button_layout.addWidget(self.lock_button)
+        self.search_button_layout.addWidget(self.save_results_button)
         self.search_button = QtWidgets.QPushButton(self)
         self.search_button_layout.addWidget(self.search_button)
         self.general_bible_layout.addRow(self.search_button_layout)
         self.page_layout.addWidget(self.options_widget)
+        self.results_view_tab = QtWidgets.QTabBar(self)
+        self.results_view_tab.addTab('')
+        self.results_view_tab.addTab('')
+        self.page_layout.addWidget(self.results_view_tab)
 
     def setupUi(self):
         super().setupUi()
@@ -211,12 +228,15 @@ class BibleMediaItem(MediaManagerItem):
         # Buttons
         self.book_order_button.toggled.connect(self.on_book_order_button_toggled)
         self.clear_button.clicked.connect(self.on_clear_button_clicked)
-        self.lock_button.toggled.connect(self.on_lock_button_toggled)
+        self.save_results_button.clicked.connect(self.on_save_results_button_clicked)
         self.search_button.clicked.connect(self.on_search_button_clicked)
         # Other stuff
         self.search_edit.returnPressed.connect(self.on_search_button_clicked)
         self.search_tab_bar.currentChanged.connect(self.on_search_tab_bar_current_changed)
+        self.results_view_tab.currentChanged.connect(self.on_results_view_tab_current_changed)
         self.search_edit.textChanged.connect(self.on_search_edit_text_changed)
+        self.on_results_view_tab_total_update(ResultsTab.Saved)
+        self.on_results_view_tab_total_update(ResultsTab.Search)
 
     def retranslateUi(self):
         log.debug('retranslateUi')
@@ -225,9 +245,9 @@ class BibleMediaItem(MediaManagerItem):
         self.style_combo_box.setItemText(LayoutStyle.VersePerSlide, UiStrings().VersePerSlide)
         self.style_combo_box.setItemText(LayoutStyle.VersePerLine, UiStrings().VersePerLine)
         self.style_combo_box.setItemText(LayoutStyle.Continuous, UiStrings().Continuous)
-        self.clear_button.setToolTip(translate('BiblesPlugin.MediaItem', 'Clear the search results.'))
-        self.lock_button.setToolTip(
-            translate('BiblesPlugin.MediaItem', 'Toggle to keep or clear the previous results.'))
+        self.clear_button.setToolTip(translate('BiblesPlugin.MediaItem', 'Clear the results on the current tab.'))
+        self.save_results_button.setToolTip(
+            translate('BiblesPlugin.MediaItem', 'Add the search results to the saved list.'))
         self.search_button.setText(UiStrings().Search)
 
     def on_focus(self):
@@ -423,6 +443,35 @@ class BibleMediaItem(MediaManagerItem):
         self.select_tab.setVisible(not search_tab)
         self.on_focus()
 
+    def on_results_view_tab_current_changed(self, index):
+        """
+        Update list_widget with the contents of the selected list
+
+        :param index: The index of the tab that has been changed to. (int)
+        :return: None
+        """
+        if index == ResultsTab.Saved:
+            self.add_built_results_to_list_widget(self.saved_results)
+        elif index == ResultsTab.Search:
+            self.add_built_results_to_list_widget(self.current_results)
+
+    def on_results_view_tab_total_update(self, index):
+        """
+        Update the result total count on the tab with the given index.
+
+        :param index: Index of the tab to update (int)
+        :return: None
+        """
+        string = ''
+        count = 0
+        if index == ResultsTab.Saved:
+            string = translate('BiblesPlugin.MediaItem', 'Saved ({result_count})')
+            count = len(self.saved_results)
+        elif index == ResultsTab.Search:
+            string = translate('BiblesPlugin.MediaItem', 'Results ({result_count})')
+            count = len(self.current_results)
+        self.results_view_tab.setTabText(index, string.format(result_count = count))
+
     def on_book_order_button_toggled(self, checked):
         """
         Change the sort order of the book names
@@ -442,22 +491,25 @@ class BibleMediaItem(MediaManagerItem):
 
         :return: None
         """
+        current_index = self.results_view_tab.currentIndex()
+        if current_index == ResultsTab.Saved:
+            self.saved_results = []
+        elif current_index == ResultsTab.Search:
+            self.current_results = []
+            self.search_edit.clear()
+            self.on_focus()
+        self.on_results_view_tab_total_update(current_index)
         self.list_view.clear()
-        self.search_edit.clear()
-        self.on_focus()
 
-    def on_lock_button_toggled(self, checked):
+    def on_save_results_button_clicked(self):
         """
-        Toggle the lock button, if Search tab is used, set focus to search field.
+        Toggle the lock button.
 
-        :param checked: The state of the toggle button. (bool)
         :return: None
         """
-        self.list_view.locked = checked
-        if checked:
-            self.sender().setIcon(self.lock_icon)
-        else:
-            self.sender().setIcon(self.unlock_icon)
+        for verse in self.list_view.selectedItems():
+            self.saved_results.append(verse.data(QtCore.Qt.UserRole))
+        self.on_results_view_tab_total_update(ResultsTab.Saved)
 
     def on_style_combo_box_index_changed(self, index):
         """
@@ -497,9 +549,11 @@ class BibleMediaItem(MediaManagerItem):
                 if critical_error_message_box(
                     message=translate('BiblesPlugin.MediaItem',
                                       'OpenLP cannot combine single and dual Bible verse search results. '
-                                      'Do you want to clear your search results and start a new search?'),
+                                      'Do you want to clear your results and start a new search?'),
                         parent=self, question=True) == QtWidgets.QMessageBox.Yes:
-                    self.list_view.clear(override_lock=True)
+                    self.display_results()
+                    self.saved_results = []
+                    self.on_results_view_tab_total_update(ResultsTab.Saved)
                 else:
                     self.second_combo_box.setCurrentIndex(self.second_combo_box.findData(self.second_bible))
                     return
@@ -602,6 +656,8 @@ class BibleMediaItem(MediaManagerItem):
 
         :return: None
         """
+        self.search_timer.stop()
+        self.search_status = SearchStatus().SearchButton
         if not self.bible:
             self.main_window.information_message(UiStrings().BibleNoBiblesTitle, UiStrings().BibleNoBibles)
             return
@@ -613,6 +669,7 @@ class BibleMediaItem(MediaManagerItem):
         elif self.select_tab.isVisible():
             self.select_search()
         self.search_button.setEnabled(True)
+        self.results_view_tab.setCurrentIndex(ResultsTab.Search)
         self.application.set_normal_cursor()
 
     def select_search(self):
@@ -636,13 +693,14 @@ class BibleMediaItem(MediaManagerItem):
 
         :return: None
         """
+        self.search_results = []
         verse_refs = self.plugin.manager.parse_ref(self.bible.name, search_text)
         self.search_results = self.plugin.manager.get_verses(self.bible.name, verse_refs, True)
         if self.second_bible and self.search_results:
             self.search_results = self.plugin.manager.get_verses(self.second_bible.name, verse_refs, True)
         self.display_results()
 
-    def on_text_search(self, text, search_while_type=False):
+    def on_text_search(self, text):
         """
         We are doing a 'Text Search'.
         This search is called on def text_search by 'Search' Text and Combined Searches.
@@ -663,7 +721,7 @@ class BibleMediaItem(MediaManagerItem):
                         verse=verse.verse, bible_name=self.second_bible.name))
                     not_found_count += 1
             self.search_results = filtered_search_results
-            if not_found_count != 0 and not search_while_type:
+            if not_found_count != 0 and self.search_status == SearchStatus.SearchButton:
                 self.main_window.information_message(
                     translate('BiblesPlugin.MediaItem', 'Verses not found'),
                     translate('BiblesPlugin.MediaItem',
@@ -673,22 +731,23 @@ class BibleMediaItem(MediaManagerItem):
                               ).format(second_name=self.second_bible.name, name=self.bible.name, count=not_found_count))
         self.display_results()
 
-    def text_search(self, search_while_type=False):
+    def text_search(self):
         """
         This triggers the proper 'Search' search based on which search type is used.
         "Eg. "Reference Search", "Text Search" or "Combined search".
         """
+        self.search_results = []
         log.debug('text_search called')
         text = self.search_edit.text()
         if text == '':
-            self.list_view.clear()
+            self.display_results()
             return
-        self.list_view.clear(search_while_typing=search_while_type)
+        self.on_results_view_tab_total_update(ResultsTab.Search)
         if self.search_edit.current_search_type() == BibleSearch.Reference:
             if get_reference_match('full').match(text):
                 # Valid reference found. Do reference search.
                 self.text_reference_search(text)
-            elif not search_while_type:
+            elif self.search_status == SearchStatus.SearchButton:
                 self.main_window.information_message(
                     translate('BiblesPlugin.BibleManager', 'Scripture Reference Error'),
                     translate('BiblesPlugin.BibleManager',
@@ -700,10 +759,12 @@ class BibleMediaItem(MediaManagerItem):
                 self.text_reference_search(text)
         else:
             # It can only be a 'Combined' search without a valid reference, or a 'Text' search
-            if search_while_type:
-                if len(text) > 8 and VALID_TEXT_SEARCH.search(text):
-                    self.on_text_search(text, True)
-            elif VALID_TEXT_SEARCH.search(text):
+            if self.search_status == SearchStatus().SearchAsYouType:
+                if len(text) <= 8:
+                    self.search_status = SearchStatus.NotEnoughText
+                    self.display_results()
+                    return
+            if VALID_TEXT_SEARCH.search(text):
                 self.on_text_search(text)
 
     def on_search_edit_text_changed(self):
@@ -724,7 +785,9 @@ class BibleMediaItem(MediaManagerItem):
 
         :return: None
         """
-        self.text_search(True)
+        self.search_status = SearchStatus().SearchAsYouType
+        self.text_search()
+        self.results_view_tab.setCurrentIndex(ResultsTab.Search)
 
     def display_results(self):
         """
@@ -732,14 +795,16 @@ class BibleMediaItem(MediaManagerItem):
 
         :return: None
         """
-        self.list_view.clear()
-        if self.search_results:
-            items = self.build_display_results(self.bible, self.second_bible, self.search_results)
-            for item in items:
-                self.list_view.addItem(item)
-            self.list_view.selectAll()
+        self.current_results = self.build_display_results(self.bible, self.second_bible, self.search_results)
         self.search_results = []
-        self.second_search_results = []
+        self.add_built_results_to_list_widget(self.current_results)
+
+    def add_built_results_to_list_widget(self, results):
+        self.list_view.clear(self.search_status == SearchStatus.NotEnoughText)
+        for item in self.build_list_widget_items(results):
+            self.list_view.addItem(item)
+        self.list_view.selectAll()
+        self.on_results_view_tab_total_update(ResultsTab.Search)
 
     def build_display_results(self, bible, second_bible, search_results):
         """
@@ -789,10 +854,18 @@ class BibleMediaItem(MediaManagerItem):
                 bible_text = '{book} {chapter:d}{sep}{verse:d} ({version}, {second_version})'
             else:
                 bible_text = '{book} {chapter:d}{sep}{verse:d} ({version})'
-            bible_verse = QtWidgets.QListWidgetItem(bible_text.format(sep=verse_separator, **data))
-            bible_verse.setData(QtCore.Qt.UserRole, data)
-            items.append(bible_verse)
+            data['item_title'] = bible_text.format(sep=verse_separator, **data)
+            items.append(data)
         return items
+
+    def build_list_widget_items(self, items):
+        list_widget_items = []
+        for data in items:
+            bible_verse = QtWidgets.QListWidgetItem(data['item_title'])
+            bible_verse.setData(QtCore.Qt.UserRole, data)
+            list_widget_items.append(bible_verse)
+        return list_widget_items
+
 
     def generate_slide_data(self, service_item, item=None, xml_version=False, remote=False,
                             context=ServiceItemContext.Service):
@@ -910,4 +983,5 @@ class BibleMediaItem(MediaManagerItem):
         """
         reference = self.plugin.manager.parse_ref(self.bible.name, item_id)
         search_results = self.plugin.manager.get_verses(self.bible.name, reference, False)
-        return self.build_display_results(self.bible, None, search_results)
+        items = self.build_display_results(self.bible, None, search_results)
+        return self.build_list_widget_items(items)
