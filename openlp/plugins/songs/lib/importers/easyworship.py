@@ -364,15 +364,13 @@ class EasyWorshipSongImport(SongImport):
         """
         songs_db_path = self._find_file(self.import_source, ["Databases", "Data", "Songs.db"])
         song_words_db_path = self._find_file(self.import_source, ["Databases", "Data", "SongWords.db"])
+        invalid_dir_msg = 'This does not appear to be a valid Easy Worship 6 database directory.'
         # check to see if needed files are there
         if not os.path.isfile(songs_db_path):
-            self.log_error(songs_db_path, translate('SongsPlugin.EasyWorshipSongImport',
-                                                    'This file does not exist.'))
+            self.log_error(songs_db_path, translate('SongsPlugin.EasyWorshipSongImport', invalid_dir_msg))
             return
         if not os.path.isfile(song_words_db_path):
-            self.log_error(song_words_db_path, translate('SongsPlugin.EasyWorshipSongImport',
-                                                         'This does not appear to be a Easy Worship 6 database '
-                                                         'directory.'))
+            self.log_error(song_words_db_path, translate('SongsPlugin.EasyWorshipSongImport', invalid_dir_msg))
             return
         # get database handles
         songs_conn = sqlite3.connect(songs_db_path)
