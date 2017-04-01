@@ -371,8 +371,8 @@ class EasyWorshipSongImport(SongImport):
             return
         if not os.path.isfile(song_words_db_path):
             self.log_error(song_words_db_path, translate('SongsPlugin.EasyWorshipSongImport',
-                                                         'Could not find the "Songs.MB" file. It must be in the same '
-                                                         'folder as the "Songs.DB" file.'))
+                                                         'This does not appear to be a Easy Worship 6 database '
+                                                         'directory.'))
             return
         # get database handles
         songs_conn = sqlite3.connect(songs_db_path)
