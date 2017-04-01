@@ -350,7 +350,7 @@ class EasyWorshipSongImport(SongImport):
         """
         target_file = ''
         while len(path_list) > 0:
-            target_file = os.path.join(path_list[len(path_list) - 1], target_file)
+            target_file = os.path.join(path_list[-1], target_file)
             path_list = path_list[:len(path_list) - 1]
             full_path = os.path.join(base_path, target_file)
             full_path = full_path[:len(full_path) - 1]
