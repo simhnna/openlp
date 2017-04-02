@@ -84,8 +84,7 @@ class BibleMediaItem(MediaManagerItem):
         :param kwargs: Keyword arguments to pass to the super method. (dict)
         """
         self.clear_icon = build_icon(':/bibles/bibles_search_clear.png')
-        self.lock_icon = build_icon(':/bibles/bibles_search_lock.png')
-        self.unlock_icon = build_icon(':/bibles/bibles_search_unlock.png')
+        self.save_results_icon = build_icon(':/bibles/bibles_save_results.png')
         self.sort_icon = build_icon(':/bibles/bibles_book_sort.png')
         self.bible = None
         self.second_bible = None
@@ -191,7 +190,7 @@ class BibleMediaItem(MediaManagerItem):
         self.clear_button = QtWidgets.QToolButton(self)
         self.clear_button.setIcon(self.clear_icon)
         self.save_results_button = QtWidgets.QToolButton(self)
-        self.save_results_button.setIcon(self.unlock_icon)
+        self.save_results_button.setIcon(self.save_results_icon)
         self.search_button_layout.addWidget(self.clear_button)
         self.search_button_layout.addWidget(self.save_results_button)
         self.search_button = QtWidgets.QPushButton(self)
@@ -201,6 +200,7 @@ class BibleMediaItem(MediaManagerItem):
         self.results_view_tab = QtWidgets.QTabBar(self)
         self.results_view_tab.addTab('')
         self.results_view_tab.addTab('')
+        self.results_view_tab.setCurrentIndex(ResultsTab.Search)
         self.page_layout.addWidget(self.results_view_tab)
 
     def setupUi(self):
@@ -492,18 +492,18 @@ class BibleMediaItem(MediaManagerItem):
         :return: None
         """
         current_index = self.results_view_tab.currentIndex()
+        for item in self.list_view.selectedItems():
+            self.list_view.takeItem(self.list_view.row(item))
+        results = [item.data(QtCore.Qt.UserRole) for item in self.list_view.allItems()]
         if current_index == ResultsTab.Saved:
-            self.saved_results = []
+            self.saved_results = results
         elif current_index == ResultsTab.Search:
-            self.current_results = []
-            self.search_edit.clear()
-            self.on_focus()
+            self.current_results = results
         self.on_results_view_tab_total_update(current_index)
-        self.list_view.clear()
 
     def on_save_results_button_clicked(self):
         """
-        Toggle the lock button.
+        Add the selected verses to the saved_results list.
 
         :return: None
         """

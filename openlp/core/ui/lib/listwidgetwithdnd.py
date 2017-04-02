@@ -125,6 +125,15 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         else:
             event.ignore()
 
+    def allItems(self):
+        """
+        An generator to list all the items in the widget
+        
+        :return: a generator
+        """
+        for row in range(self.count()):
+            yield self.item(row)
+
     def paintEvent(self, event):
         """
         Re-implement paintEvent so that we can add 'No Results' text when the listWidget is empty.

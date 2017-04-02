@@ -23,6 +23,7 @@
 This module contains tests for the openlp.core.lib.listwidgetwithdnd module
 """
 from unittest import TestCase
+from types import GeneratorType
 
 from openlp.core.common.uistrings import UiStrings
 from openlp.core.ui.lib.listwidgetwithdnd import ListWidgetWithDnD
@@ -58,6 +59,38 @@ class TestListWidgetWithDnD(TestCase):
 
         # THEN: The results text should be the 'short results' text.
         self.assertEqual(widget.no_results_text, UiStrings().ShortResults)
+
+    def test_all_items_no_list_items(self):
+        """
+        Test allItems when there are no items in the list widget
+        """
+        # GIVEN: An instance of ListWidgetWithDnD
+        widget = ListWidgetWithDnD()
+        with patch.object(widget, 'count', return_value=0), \
+                patch.object(widget, 'item', side_effect=lambda x: [][x]):
+
+            # WHEN: Calling allItems
+            result = widget.allItems()
+
+            # THEN: An instance of a Generator object should be returned. The generator should not yeild any results
+            self.assertIsInstance(result, GeneratorType)
+            self.assertEqual(list(result), [])
+
+    def test_all_items_list_items(self):
+        """
+        Test allItems when the list widget contains some items.
+        """
+        # GIVEN: An instance of ListWidgetWithDnD
+        widget = ListWidgetWithDnD()
+        with patch.object(widget, 'count', return_value=2), \
+                patch.object(widget, 'item', side_effect=lambda x: [5, 3][x]):
+
+            # WHEN: Calling allItems
+            result = widget.allItems()
+
+            # THEN: An instance of a Generator object should be returned. The generator should not yeild any results
+            self.assertIsInstance(result, GeneratorType)
+            self.assertEqual(list(result), [5, 3])
 
     def test_paint_event(self):
         """
