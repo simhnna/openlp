@@ -470,7 +470,7 @@ class BibleMediaItem(MediaManagerItem):
         elif index == ResultsTab.Search:
             string = translate('BiblesPlugin.MediaItem', 'Results ({result_count})')
             count = len(self.current_results)
-        self.results_view_tab.setTabText(index, string.format(result_count = count))
+        self.results_view_tab.setTabText(index, string.format(result_count=count))
 
     def on_book_order_button_toggled(self, checked):
         """
@@ -865,7 +865,6 @@ class BibleMediaItem(MediaManagerItem):
             bible_verse.setData(QtCore.Qt.UserRole, data)
             list_widget_items.append(bible_verse)
         return list_widget_items
-
 
     def generate_slide_data(self, service_item, item=None, xml_version=False, remote=False,
                             context=ServiceItemContext.Service):

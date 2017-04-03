@@ -158,7 +158,6 @@ class TestMediaItem(TestCase, TestMixin):
         self.mocked_bible_2 = MagicMock(**{'get_books.return_value': self.book_list_2})
         self.mocked_bible_2.name = 'Bible 2'
 
-
     def test_media_item_instance(self):
         """
         When creating an instance of C test that it is also an instance of
@@ -700,7 +699,6 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.list_view.clear.assert_called_once_with()
             self.media_item.search_edit.clear.assert_called_once_with()
 
-
     def test_on_save_results_button_clicked(self):
         """
         Test that "on_save_results_button_clicked" saves the results.
@@ -712,7 +710,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.list_view = MagicMock(**{'selectedItems.return_value': [result_1, result_2, result_3]})
 
         with patch.object(self.media_item, 'on_results_view_tab_total_update') as \
-                mocked_on_results_view_tab_total_update :
+                mocked_on_results_view_tab_total_update:
 
             # WHEN: When the save_results_button is clicked
             self.media_item.on_save_results_button_clicked()
