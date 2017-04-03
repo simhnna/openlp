@@ -128,7 +128,7 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
     def allItems(self):
         """
         An generator to list all the items in the widget
-        
+
         :return: a generator
         """
         for row in range(self.count()):
