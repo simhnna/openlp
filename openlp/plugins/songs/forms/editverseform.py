@@ -48,6 +48,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.split_button.clicked.connect(self.on_split_button_clicked)
         self.verse_text_edit.cursorPositionChanged.connect(self.on_cursor_position_changed)
         self.verse_type_combo_box.currentIndexChanged.connect(self.on_verse_type_combo_box_changed)
+        self.force_split_button.clicked.connect(self.on_force_split_button_clicked)
 
     def insert_verse(self, verse_tag, verse_num=1):
         """
@@ -69,6 +70,20 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         text = self.verse_text_edit.toPlainText()
         position = self.verse_text_edit.textCursor().position()
         insert_string = '[---]'
+        if position and text[position - 1] != '\n':
+            insert_string = '\n' + insert_string
+        if position == len(text) or text[position] != '\n':
+            insert_string += '\n'
+        self.verse_text_edit.insertPlainText(insert_string)
+        self.verse_text_edit.setFocus()
+
+    def on_force_split_button_clicked(self):
+        """
+        The force split button has been pressed so we need add the split 
+        """
+        text = self.verse_text_edit.toPlainText()
+        position = self.verse_text_edit.textCursor().position()
+        insert_string = '[##-divide-##]'
         if position and text[position - 1] != '\n':
             insert_string = '\n' + insert_string
         if position == len(text) or text[position] != '\n':
