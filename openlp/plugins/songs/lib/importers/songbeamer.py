@@ -157,7 +157,9 @@ class SongBeamerImport(SongImport):
                     if verse_start:
                         verse_start = False
                         if not self.check_verse_marks(line):
+                            line = self.insert_chords(line_number, line)
                             self.current_verse += line.strip() + '\n'
+                            line_number += 1
                     else:
                         line = self.insert_chords(line_number, line)
                         self.current_verse += line.strip() + '\n'
