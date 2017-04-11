@@ -29,8 +29,10 @@ from datetime import datetime, timedelta
 
 from PyQt5 import QtCore, QtGui
 
+from openlp.core.lib import FormattingTags
 from openlp.core.lib import build_icon, check_item_selected, clean_tags, create_thumb, create_separated_list, \
-    expand_tags, get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb, expand_chords
+    expand_tags, get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb, expand_chords, \
+    compare_chord_lyric, find_formatting_tags
 from tests.functional import MagicMock, patch
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
@@ -762,3 +764,46 @@ class TestLib(TestCase):
                         '</span>alleluya.<span class="chord"><span><strong>F</strong></span></span><span class="ws">' \
                         '&nbsp;&nbsp;</span> <span class="chord"><span><strong>G</strong></span></span></span>'
         self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')
+
+    def test_compare_chord_lyric_short_chord(self):
+        """
+        Test that the chord/lyric comparing works.
+        """
+        # GIVEN: A chord and some lyric
+        chord = 'C'
+        lyrics = 'alleluya'
+
+        # WHEN: Comparing the chord and lyrics
+        ret = compare_chord_lyric(chord, lyrics)
+
+        # THEN: The returned value should 0 because the lyric is longer than the chord
+        self.assertEquals(0, ret, 'The returned value should 0 because the lyric is longer than the chord')
+
+    def test_compare_chord_lyric_long_chord(self):
+        """
+        Test that the chord/lyric comparing works.
+        """
+        # GIVEN: A chord and some lyric
+        chord = 'Gsus'
+        lyrics = 'me'
+
+        # WHEN: Comparing the chord and lyrics
+        ret = compare_chord_lyric(chord, lyrics)
+
+        # THEN: The returned value should 4 because the chord is longer than the lyric
+        self.assertEquals(4, ret, 'The returned value should 4 because the chord is longer than the lyric')
+
+    def test_find_formatting_tags(self):
+        """
+        Test that find_formatting_tags works as expected
+        """
+        # GIVEN: Lyrics with formatting tags and a empty list of formatting tags
+        lyrics = '{st}Amazing {r}grace{/r} how sweet the sound'
+        tags = []
+        FormattingTags.load_tags()
+
+        # WHEN: Detecting active formatting tags
+        active_tags = find_formatting_tags(lyrics, tags)
+
+        # THEN: The list of active tags should contain only 'st'
+        self.assertListEqual(['st'], active_tags, 'The list of active tags should contain only "st"')

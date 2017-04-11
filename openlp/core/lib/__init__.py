@@ -470,6 +470,7 @@ def find_formatting_tags(text, active_formatting_tags):
             start_tag = True
             if char == '/':
                 start_tag = False
+                char = next(word_it)
             while char != '}':
                 tag += char
                 char = next(word_it)
@@ -479,10 +480,12 @@ def find_formatting_tags(text, active_formatting_tags):
                     if formatting_tag['end tag']:
                         if start_tag:
                             # prepend the new tag to the list of active formatting tags
-                            active_formatting_tags[:0] = tag
+                            active_formatting_tags[:0] = [tag]
                         else:
                             # remove the tag from the list
                             active_formatting_tags.remove(tag)
+                    # Break out of the loop matching the found tag against the tag list.
+                    break
     return active_formatting_tags
 
 
