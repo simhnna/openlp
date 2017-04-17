@@ -45,7 +45,7 @@ class TestSongBeamerFileImport(SongImportTestHelper):
     @patch('openlp.plugins.songs.lib.importers.songbeamer.Settings')
     def test_song_import(self, mocked_settings):
         """
-        Test that loading an OpenSong file works correctly on various files
+        Test that loading an SongBeamer file works correctly on various files
         """
         # Mock out the settings - always return False
         mocked_returned_settings = MagicMock()
@@ -55,6 +55,8 @@ class TestSongBeamerFileImport(SongImportTestHelper):
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
         self.file_import([os.path.join(TEST_PATH, 'Lobsinget dem Herrn.sng')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Lobsinget dem Herrn.json')))
+        self.file_import([os.path.join(TEST_PATH, 'When I Call On You.sng')],
+                         self.load_external_result_data(os.path.join(TEST_PATH, 'When I Call On You.json')))
 
     def test_cp1252_encoded_file(self):
         """
