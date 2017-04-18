@@ -29,7 +29,7 @@ from datetime import datetime, timedelta
 
 from PyQt5 import QtCore, QtGui
 
-from openlp.core.lib import FormattingTags
+from openlp.core.lib import FormattingTags, expand_chords_for_printing
 from openlp.core.lib import build_icon, check_item_selected, clean_tags, create_thumb, create_separated_list, \
     expand_tags, get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb, expand_chords, \
     compare_chord_lyric, find_formatting_tags
@@ -807,3 +807,40 @@ class TestLib(TestCase):
 
         # THEN: The list of active tags should contain only 'st'
         self.assertListEqual(['st'], active_tags, 'The list of active tags should contain only "st"')
+
+    def test_expand_chords_for_printing(self):
+        """
+        Test that the expanding of chords for printing works as expected.
+        """
+        # GIVEN: A lyrics-line with chords
+        text_with_chords = '{st}[D]Amazing {r}gr[D7]ace{/r}  how [G]sweet the [D]sound  [F]{/st}'
+        FormattingTags.load_tags()
+
+        # WHEN: Expanding the chords
+        text_with_expanded_chords = expand_chords_for_printing(text_with_chords, '{br}')
+
+        # THEN: We should get html that looks like below
+        expected_html = '<table class="line" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><table ' \
+                        'class="segment" cellpadding="0" cellspacing="0" border="0" align="left"><tr class="chordrow">'\
+                        '<td class="chord">&nbsp;</td><td class="chord">D</td></tr><tr><td class="lyrics">{st}{/st}' \
+                        '</td><td class="lyrics">{st}Amazing&nbsp;{/st}</td></tr></table><table class="segment" ' \
+                        'cellpadding="0" cellspacing="0" border="0" align="left"><tr class="chordrow">' \
+                        '<td class="chord">&nbsp;</td><td class="chord">D7</td></tr><tr><td class="lyrics">{st}{r}gr' \
+                        '{/r}{/st}</td><td class="lyrics">{r}{st}ace{/r}&nbsp;{/st}</td></tr></table><table ' \
+                        'class="segment" cellpadding="0" cellspacing="0" border="0" align="left"><tr class="chordrow">'\
+                        '<td class="chord">&nbsp;</td></tr><tr><td class="lyrics">{st}&nbsp;{/st}</td></tr></table>' \
+                        '<table class="segment" cellpadding="0" cellspacing="0" border="0" align="left"><tr ' \
+                        'class="chordrow"><td class="chord">&nbsp;</td></tr><tr><td class="lyrics">{st}how&nbsp;{/st}' \
+                        '</td></tr></table><table class="segment" cellpadding="0" cellspacing="0" border="0" ' \
+                        'align="left"><tr class="chordrow"><td class="chord">G</td></tr><tr><td class="lyrics">{st}' \
+                        'sweet&nbsp;{/st}</td></tr></table><table class="segment" cellpadding="0" cellspacing="0" ' \
+                        'border="0" align="left"><tr class="chordrow"><td class="chord">&nbsp;</td></tr><tr><td ' \
+                        'class="lyrics">{st}the&nbsp;{/st}</td></tr></table><table class="segment" cellpadding="0" ' \
+                        'cellspacing="0" border="0" align="left"><tr class="chordrow"><td class="chord">D</td></tr>' \
+                        '<tr><td class="lyrics">{st}sound&nbsp;{/st}</td></tr></table><table class="segment" ' \
+                        'cellpadding="0" cellspacing="0" border="0" align="left"><tr class="chordrow"><td ' \
+                        'class="chord">&nbsp;</td></tr><tr><td class="lyrics">{st}&nbsp;{/st}</td></tr></table>' \
+                        '<table class="segment" cellpadding="0" cellspacing="0" border="0" align="left"><tr ' \
+                        'class="chordrow"><td class="chord">F</td></tr><tr><td class="lyrics">{st}{/st}&nbsp;</td>' \
+                        '</tr></table></td></tr></table>'
+        self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')

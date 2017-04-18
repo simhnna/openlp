@@ -553,6 +553,7 @@ def expand_chords_for_printing(text, line_split):
                         if active_formatting_tags:
                             end_formatting_tags = '{/' + '}{/'.join(active_formatting_tags) + '}'
                         new_chord_line += '<td class="chord">%s</td>' % chords[i]
+                        # Check if this is the last column, if so skip spacing calc and instead insert a single space
                         if i + 1 == len(lyrics):
                             new_lyric_line += '<td class="lyrics">{starttags}{lyrics}&nbsp;{endtags}</td>'.format(
                                 starttags=start_formatting_tags, lyrics=lyrics[i], endtags=end_formatting_tags)
