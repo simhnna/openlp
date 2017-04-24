@@ -22,16 +22,15 @@
 """
 Package to test the openlp.core.utils.__init__ package.
 """
-
-from unittest import TestCase
 import urllib.request
 import urllib.error
 import urllib.parse
-
-from tests.functional import patch
-from tests.helpers.testmixin import TestMixin
+from unittest import TestCase
+from unittest.mock import patch
 
 from openlp.core.common.httputils import CONNECTION_RETRIES, get_web_page
+
+from tests.helpers.testmixin import TestMixin
 
 
 class TestFirstTimeWizard(TestMixin, TestCase):

@@ -22,10 +22,9 @@
 """
 This module contains tests for the SongShow Plus song importer.
 """
-
 import os
 from unittest import TestCase
-from tests.functional import patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 from openlp.plugins.songs.lib.importers.foilpresenter import FoilPresenter
 

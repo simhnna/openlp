@@ -23,13 +23,14 @@
 Package to test the openlp.plugins.songs.forms.editsongform package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 from PyQt5 import QtWidgets
 
 from openlp.core.common import Registry
 from openlp.core.common.uistrings import UiStrings
 from openlp.plugins.songs.forms.editsongform import EditSongForm
-from tests.interfaces import MagicMock
+
 from tests.helpers.testmixin import TestMixin
 
 

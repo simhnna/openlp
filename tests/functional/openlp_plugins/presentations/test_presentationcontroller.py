@@ -23,10 +23,11 @@
 Functional tests to test the PresentationController and PresentationDocument
 classes and related methods.
 """
-from unittest import TestCase
 import os
+from unittest import TestCase
+from unittest.mock import MagicMock, mock_open, patch
+
 from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
-from tests.functional import MagicMock, mock_open, patch
 
 FOLDER_TO_PATCH = 'openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument.get_thumbnail_folder'
 

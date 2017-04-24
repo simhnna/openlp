@@ -22,15 +22,15 @@
 """
     Package to test the openlp.core.ui.lib.listpreviewwidget.
 """
-
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtGui, QtWidgets
 
 from openlp.core.common import Registry
 from openlp.core.lib import ServiceItem
 from openlp.core.ui.lib import ListWidgetWithDnD, ListPreviewWidget
-from tests.interfaces import MagicMock, patch
+
 from tests.utils.osdinteraction import read_service_from_file
 from tests.helpers.testmixin import TestMixin
 
