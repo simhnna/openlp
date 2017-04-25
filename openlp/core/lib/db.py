@@ -191,10 +191,10 @@ def upgrade_db(url, upgrade):
                 break
     except (SQLAlchemyError, DBAPIError):
         version_meta = Metadata.populate(key='version', value=int(upgrade.__version__))
-        session.commit()
+        session.remove()
     upgrade_version = upgrade.__version__
     version = int(version_meta.value)
-    session.close()
+    session.remove()
     return version, upgrade_version
 
 
