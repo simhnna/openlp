@@ -689,7 +689,7 @@ class AudioPlayer(OpenLPMixin, QtCore.QObject):
         """
         Skip forward to the next track in the list
         """
-        self.player.next()
+        self.playerlist.next()
 
     def go_to(self, index):
         """
