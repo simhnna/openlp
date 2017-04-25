@@ -302,16 +302,17 @@ def clean_tags(text, remove_chords=False):
     return text
 
 
-def expand_tags(text, for_printing=False):
+def expand_tags(text, expand_chord_tags=False, for_printing=False):
     """
     Expand tags HTML for display
 
     :param text: The text to be expanded.
     """
-    if for_printing:
-        text = expand_chords_for_printing(text, '{br}')
-    else:
-        text = expand_chords(text)
+    if expand_chord_tags:
+        if for_printing:
+            text = expand_chords_for_printing(text, '{br}')
+        else:
+            text = expand_chords(text)
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], tag['start html'])
         text = text.replace(tag['end tag'], tag['end html'])

@@ -259,13 +259,13 @@ class ServiceItem(RegistryProperties):
                     previous_pages[verse_tag] = (slide['raw_slide'], pages)
                 for page in pages:
                     page = page.replace('<br>', '{br}')
-                    html_data = expand_tags(html.escape(page.rstrip()))
+                    html_data = expand_tags(html.escape(page.rstrip()), self.name == 'songs')
                     new_frame = {
                         'title': clean_tags(page),
-                        'text': clean_tags(page.rstrip(), True),
+                        'text': clean_tags(page.rstrip(), self.name == 'songs'),
                         'chords_text': expand_chords(clean_tags(page.rstrip(), False)),
                         'html': html_data.replace('&amp;nbsp;', '&nbsp;'),
-                        'printing_html': expand_tags(html.escape(page.rstrip()), True),
+                        'printing_html': expand_tags(html.escape(page.rstrip()), self.name == 'songs', True),
                         'verseTag': verse_tag,
                     }
                     self._display_frames.append(new_frame)
