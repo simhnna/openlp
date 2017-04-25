@@ -246,6 +246,7 @@ class ServiceItem(RegistryProperties):
             self.renderer.set_item_theme(self.theme)
             self.theme_data, self.main, self.footer = self.renderer.pre_render()
         if self.service_item_type == ServiceItemType.Text:
+            expand_chord_tags = self.name == 'songs' and Settings().value('songs/enable chords')
             log.debug('Formatting slides: {title}'.format(title=self.title))
             # Save rendered pages to this dict. In the case that a slide is used twice we can use the pages saved to
             # the dict instead of rendering them again.
@@ -259,13 +260,13 @@ class ServiceItem(RegistryProperties):
                     previous_pages[verse_tag] = (slide['raw_slide'], pages)
                 for page in pages:
                     page = page.replace('<br>', '{br}')
-                    html_data = expand_tags(html.escape(page.rstrip()), self.name == 'songs')
+                    html_data = expand_tags(html.escape(page.rstrip()), expand_chord_tags)
                     new_frame = {
                         'title': clean_tags(page),
-                        'text': clean_tags(page.rstrip(), self.name == 'songs'),
+                        'text': clean_tags(page.rstrip(), expand_chord_tags),
                         'chords_text': expand_chords(clean_tags(page.rstrip(), False)),
                         'html': html_data.replace('&amp;nbsp;', '&nbsp;'),
-                        'printing_html': expand_tags(html.escape(page.rstrip()), self.name == 'songs', True),
+                        'printing_html': expand_tags(html.escape(page.rstrip()), expand_chord_tags, True),
                         'verseTag': verse_tag,
                     }
                     self._display_frames.append(new_frame)
