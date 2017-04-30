@@ -306,7 +306,8 @@ class ImageManager(QtCore.QObject):
             # Let's see if the image was requested with specific dimensions
             width = self.width if image.width == -1 else image.width
             height = self.height if image.height == -1 else image.height
-            image.image = resize_image(image.path, width, height, image.background, Settings().value('advanced/ignore aspect ratio'))
+            image.image = resize_image(image.path, width, height, image.background,
+                                       Settings().value('advanced/ignore aspect ratio'))
             # Set the priority to Lowest and stop here as we need to process more important images first.
             if image.priority == Priority.Normal:
                 self._conversion_queue.modify_priority(image, Priority.Lowest)
