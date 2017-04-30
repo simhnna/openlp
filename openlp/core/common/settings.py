@@ -121,6 +121,7 @@ class Settings(QtCore.QSettings):
         'advanced/enable exit confirmation': True,
         'advanced/expand service item': False,
         'advanced/hide mouse': True,
+        'advanced/ignore aspect ratio': False,
         'advanced/is portable': False,
         'advanced/max recent files': 20,
         'advanced/print file meta data': False,
