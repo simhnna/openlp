@@ -188,7 +188,9 @@ class SongBeamerImport(SongImport):
                 elif int_idx > len(line):
                     # If a chord is placed beyond the current end of the line, extend the line with spaces.
                     line += ' ' * (int_idx - len(line))
-                line = line[:int_idx] + '[' + self.chord_table[line_number][idx] + ']' + line[int_idx:]
+                chord = self.chord_table[line_number][idx]
+                chord = chord.replace('<', '♭')
+                line = line[:int_idx] + '[' + chord + ']' + line[int_idx:]
         return line
 
     def replace_html_tags(self):
