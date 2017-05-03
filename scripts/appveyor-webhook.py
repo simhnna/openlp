@@ -84,7 +84,7 @@ def get_version():
     return version_string, version
 
 
-def get_yml(branch):
+def get_yml(branch, build_docs):
     """
     Returns the content of appveyor.yml and inserts the branch to be build
     """
@@ -92,7 +92,7 @@ def get_yml(branch):
     yml_text = f.read()
     f.close()
     yml_text = yml_text.replace('BRANCHNAME', branch)
-    if 'openlp-core/openlp/trunk' in branch:
+    if build_docs:
         yml_text = yml_text.replace('BUILD_DOCS', '$TRUE')
     else:
         yml_text = yml_text.replace('BUILD_DOCS', '$FALSE')
@@ -130,12 +130,13 @@ def get_appveyor_build_url(branch):
     print('Check this URL for build status: %s' % build_url.format(project=project))
 
 
-if len(sys.argv) != 3:
-    print('Usage: %s <webhook-url> <branch>' % sys.argv[0])
+if len(sys.argv) != 4:
+    print('Usage: %s <webhook-url> <branch> <build-docs>' % sys.argv[0])
 else:
     webhook_url = sys.argv[1]
     branch = sys.argv[2]
-    hook(webhook_url, get_yml(branch))
+    build_docs = sys.argv[3].upper() == 'TRUE'
+    hook(webhook_url, get_yml(branch, build_docs))
     # Wait 5 seconds to make sure the hook has been triggered
     time.sleep(5)
     get_appveyor_build_url(branch)

@@ -36,7 +36,7 @@ build: off
 test_script:
   - cd openlp-branch
   # Run the tests
-  - "%PYTHON%\\python.exe -m nose -v tests"
+  #- "%PYTHON%\\python.exe -m nose -v tests"
   # Go back to the user root folder
   - cd..
 
@@ -74,7 +74,7 @@ after_test:
         7z x documentation.tar
         mv ~openlp-core/openlp/documentation documentation
         cd packaging
-        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable
+        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable
       } else {
         cd packaging
         &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch --portable
