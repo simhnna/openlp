@@ -36,7 +36,7 @@ build: off
 test_script:
   - cd openlp-branch
   # Run the tests
-  #- "%PYTHON%\\python.exe -m nose -v tests"
+  - "%PYTHON%\\python.exe -m nose -v tests"
   # Go back to the user root folder
   - cd..
 
