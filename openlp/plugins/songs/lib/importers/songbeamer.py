@@ -112,6 +112,7 @@ class SongBeamerImport(SongImport):
             self.current_verse = ''
             self.current_verse_type = VerseType.tags[VerseType.Verse]
             self.chord_table = None
+            self.editor_version = 0
             file_name = os.path.split(import_file)[1]
             if os.path.isfile(import_file):
                 # Detect the encoding
@@ -143,7 +144,7 @@ class SongBeamerImport(SongImport):
                         self.current_verse_type = VerseType.tags[VerseType.Verse]
                     read_verses = True
                     verse_start = True
-                    # Songbeamer allows chord on line "-1"
+                    # Songbeamer allows chord on line "-1", meaning the first line has only chords
                     if line_number == -1:
                         first_line = self.insert_chords(line_number, '')
                         if first_line:
@@ -159,6 +160,8 @@ class SongBeamerImport(SongImport):
                         if not self.check_verse_marks(line):
                             line = self.insert_chords(line_number, line)
                             self.current_verse += line.strip() + '\n'
+                            line_number += 1
+                        elif self.editor_version < 4:
                             line_number += 1
                     else:
                         line = self.insert_chords(line_number, line)
@@ -241,7 +244,10 @@ class SongBeamerImport(SongImport):
             except ValueError:
                 self.comments = tag_val[1]
         elif tag_val[0] == '#Editor':
-            pass
+            try:
+                self.editor_version = float(re.sub('[a-zA-Z ]', '', tag_val[1]))
+            except ValueError:
+                self.editor_version = 0
         elif tag_val[0] == '#Font':
             pass
         elif tag_val[0] == '#FontLang2':
