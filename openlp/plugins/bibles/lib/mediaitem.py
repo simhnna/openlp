@@ -175,8 +175,10 @@ class BibleMediaItem(MediaManagerItem):
         self.select_tab.setVisible(False)
         self.page_layout.addWidget(self.select_tab)
         # General Search Opions
-        self.options_widget = QtWidgets.QGroupBox(translate('BiblesPlugin.MediaItem', 'Options'), self)
-        self.general_bible_layout = QtWidgets.QFormLayout(self.options_widget)
+        self.options_tab = QtWidgets.QWidget()
+        self.options_tab.setSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        self.search_tab_bar.addTab(translate('BiblesPlugin.MediaItem', 'Options'))
+        self.general_bible_layout = QtWidgets.QFormLayout(self.options_tab)
         self.version_combo_box = create_horizontal_adjusting_combo_box(self, 'version_combo_box')
         self.general_bible_layout.addRow('{version}:'.format(version=UiStrings().Version), self.version_combo_box)
         self.second_combo_box = create_horizontal_adjusting_combo_box(self, 'second_combo_box')
@@ -184,19 +186,23 @@ class BibleMediaItem(MediaManagerItem):
         self.style_combo_box = create_horizontal_adjusting_combo_box(self, 'style_combo_box')
         self.style_combo_box.addItems(['', '', ''])
         self.general_bible_layout.addRow(UiStrings().LayoutStyle, self.style_combo_box)
-        self.search_button_layout = QtWidgets.QHBoxLayout()
+        self.options_tab.setVisible(False)
+        self.page_layout.addWidget(self.options_tab)
+        # This widget is the easier way to reset the spacing of search_button_layout. (Because page_layout has had its
+        # spacing set to 0)
+        self.search_button_widget = QtWidgets.QWidget()
+        self.search_button_layout = QtWidgets.QHBoxLayout(self.search_button_widget)
         self.search_button_layout.addStretch()
         # Note: If we use QPushButton instead of the QToolButton, the icon will be larger than the Lock icon.
-        self.clear_button = QtWidgets.QToolButton(self)
+        self.clear_button = QtWidgets.QPushButton()
         self.clear_button.setIcon(self.clear_icon)
-        self.save_results_button = QtWidgets.QToolButton(self)
+        self.save_results_button = QtWidgets.QPushButton()
         self.save_results_button.setIcon(self.save_results_icon)
         self.search_button_layout.addWidget(self.clear_button)
         self.search_button_layout.addWidget(self.save_results_button)
         self.search_button = QtWidgets.QPushButton(self)
         self.search_button_layout.addWidget(self.search_button)
-        self.general_bible_layout.addRow(self.search_button_layout)
-        self.page_layout.addWidget(self.options_widget)
+        self.page_layout.addWidget(self.search_button_widget)
         self.results_view_tab = QtWidgets.QTabBar(self)
         self.results_view_tab.addTab('')
         self.results_view_tab.addTab('')
@@ -438,9 +444,13 @@ class BibleMediaItem(MediaManagerItem):
         :param index: The tab selected (int)
         :return: None
         """
-        search_tab = index == 0
-        self.search_tab.setVisible(search_tab)
-        self.select_tab.setVisible(not search_tab)
+        if index == 0 or index == 1:
+            self.search_button.setEnabled(True)
+        else:
+            self.search_button.setEnabled(False)
+            self.search_tab.setVisible(index == 0)
+            self.select_tab.setVisible(index == 1)
+            self.options_tab.setVisible(index == 2)
         self.on_focus()
 
     def on_results_view_tab_current_changed(self, index):
@@ -542,16 +552,15 @@ class BibleMediaItem(MediaManagerItem):
         :return: None
         """
         new_selection = self.second_combo_box.currentData()
-        if self.list_view.count():
+        if self.saved_results:
             # Exclusive or (^) the new and previous selections to detect if the user has switched between single and
             # dual bible mode
             if (new_selection is None) ^ (self.second_bible is None):
                 if critical_error_message_box(
                     message=translate('BiblesPlugin.MediaItem',
                                       'OpenLP cannot combine single and dual Bible verse search results. '
-                                      'Do you want to clear your results and start a new search?'),
+                                      'Do you want to clear your saved results?'),
                         parent=self, question=True) == QtWidgets.QMessageBox.Yes:
-                    self.display_results()
                     self.saved_results = []
                     self.on_results_view_tab_total_update(ResultsTab.Saved)
                 else:
@@ -706,6 +715,8 @@ class BibleMediaItem(MediaManagerItem):
         This search is called on def text_search by 'Search' Text and Combined Searches.
         """
         self.search_results = self.plugin.manager.verse_search(self.bible.name, text)
+        if self.search_results is None:
+            return
         if self.second_bible and self.search_results:
             filtered_search_results = []
             not_found_count = 0
@@ -774,9 +785,12 @@ class BibleMediaItem(MediaManagerItem):
 
         :return: None
         """
-        if Settings().value('bibles/is search while typing enabled'):
-            if not self.search_timer.isActive():
-                self.search_timer.start()
+        if not Settings().value('bibles/is search while typing enabled') or \
+                not self.bible or self.bible.is_web_bible or \
+                (self.second_bible and self.bible.is_web_bible):
+            return
+        if not self.search_timer.isActive():
+            self.search_timer.start()
 
     def on_search_timer_timeout(self):
         """
@@ -969,6 +983,8 @@ class BibleMediaItem(MediaManagerItem):
         """
         Search for some Bible verses (by reference).
         """
+        if self.bible is None:
+            return []
         reference = self.plugin.manager.parse_ref(self.bible.name, string)
         search_results = self.plugin.manager.get_verses(self.bible.name, reference, showError)
         if search_results:
@@ -980,6 +996,8 @@ class BibleMediaItem(MediaManagerItem):
         """
         Create a media item from an item id.
         """
+        if self.bible is None:
+            return []
         reference = self.plugin.manager.parse_ref(self.bible.name, item_id)
         search_results = self.plugin.manager.get_verses(self.bible.name, reference, False)
         items = self.build_display_results(self.bible, None, search_results)

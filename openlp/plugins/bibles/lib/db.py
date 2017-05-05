@@ -158,6 +158,7 @@ class BibleDB(Manager):
                 self.get_name()
         if 'path' in kwargs:
             self.path = kwargs['path']
+        self._is_web_bible = None
 
     def get_name(self):
         """
@@ -425,6 +426,18 @@ class BibleDB(Manager):
         if not count:
             return 0
         return count
+
+    @property
+    def is_web_bible(self):
+        """
+        A read only property indicating if the bible is a 'web bible'
+        
+        :return: If the bible is a web bible.
+        :rtype: bool
+        """
+        if self._is_web_bible == None:
+            self._is_web_bible = bool(self.get_object(BibleMeta, 'download_source'))
+        return self._is_web_bible
 
     def dump_bible(self):
         """
