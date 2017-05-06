@@ -305,10 +305,11 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         """
         Does a verse search for the given bible and text.
 
-        :param bible: The bible to search in (unicode).
-        :param second_bible: The second bible (unicode). We do not search in this bible.
-        :param text: The text to search for (unicode).
-        
+        :param bible: The bible to search
+        :type bible: str
+        :param text: The text to search for
+        :type text: str
+
         :return: The search results if valid, or None if the search is invalid.
         :rtype: None, list
         """
