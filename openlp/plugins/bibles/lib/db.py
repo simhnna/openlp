@@ -431,11 +431,11 @@ class BibleDB(Manager):
     def is_web_bible(self):
         """
         A read only property indicating if the bible is a 'web bible'
-        
+
         :return: If the bible is a web bible.
         :rtype: bool
         """
-        if self._is_web_bible == None:
+        if self._is_web_bible is None:
             self._is_web_bible = bool(self.get_object(BibleMeta, 'download_source'))
         return self._is_web_bible
 
