@@ -22,6 +22,7 @@
 
 import logging
 import re
+from enum import Enum, unique
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -48,24 +49,43 @@ def get_reference_separators():
             'list': get_reference_separator('sep_l_display')}
 
 
-class BibleSearch(object):
+@unique
+class BibleSearch(Enum):
     """
-    Enumeration class for the different search methods for the "Search" tab.
+    Enumeration class for the different search types for the "Search" tab.
     """
     Reference = 1
     Text = 2
     Combined = 3
 
 
-class ResultsTab(object):
+@unique
+class ResultsTab(Enum):
+    """
+    Enumeration class for the different tabs for the results list.
+    """
     Saved = 0
     Search = 1
 
 
-class SearchStatus(object):
+@unique
+class SearchStatus(Enum):
+    """
+    Enumeration class for the different search methods.
+    """
     SearchButton = 0
     SearchAsYouType = 1
     NotEnoughText = 2
+
+
+@unique
+class SearchTabs(Enum):
+    """
+    Enumeration class for the tabs on the media item.
+    """
+    Search = 0
+    Select = 1
+    Options = 2
 
 
 class BibleMediaItem(MediaManagerItem):
@@ -267,8 +287,10 @@ class BibleMediaItem(MediaManagerItem):
         if self.search_tab.isVisible():
             self.search_edit.setFocus()
             self.search_edit.selectAll()
-        else:
+        if self.select_tab.isVisible():
             self.select_book_combo_box.setFocus()
+        if self.options_tab.isVisible():
+            self.version_combo_box.setFocus()
 
     def config_update(self):
         """
@@ -441,16 +463,17 @@ class BibleMediaItem(MediaManagerItem):
         """
         Show the selected tab and set focus to it
 
-        :param index: The tab selected (int)
+        :param index: The tab selected
+        :type index: int
         :return: None
         """
-        if index == 0 or index == 1:
+        if index == SearchTabs.Search or index == SearchTabs.Select:
             self.search_button.setEnabled(True)
         else:
             self.search_button.setEnabled(False)
-            self.search_tab.setVisible(index == 0)
-            self.select_tab.setVisible(index == 1)
-            self.options_tab.setVisible(index == 2)
+        self.search_tab.setVisible(index == SearchTabs.Search)
+        self.select_tab.setVisible(index == SearchTabs.Select)
+        self.options_tab.setVisible(index == SearchTabs.Options)
         self.on_focus()
 
     def on_results_view_tab_current_changed(self, index):
@@ -588,7 +611,8 @@ class BibleMediaItem(MediaManagerItem):
             log.warning('Not enough chapters in %s', book_ref_id)
             critical_error_message_box(message=translate('BiblesPlugin.MediaItem', 'Bible not fully loaded.'))
         else:
-            self.search_button.setEnabled(True)
+            if self.select_tab.isVisible():
+                self.search_button.setEnabled(True)
             self.adjust_combo_box(1, self.chapter_count, self.from_chapter)
             self.adjust_combo_box(1, self.chapter_count, self.to_chapter)
             self.adjust_combo_box(1, verse_count, self.from_verse)
