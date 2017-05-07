@@ -22,7 +22,7 @@
 
 import logging
 import re
-from enum import Enum, unique
+from enum import IntEnum, unique
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -50,7 +50,7 @@ def get_reference_separators():
 
 
 @unique
-class BibleSearch(Enum):
+class BibleSearch(IntEnum):
     """
     Enumeration class for the different search types for the "Search" tab.
     """
@@ -60,7 +60,7 @@ class BibleSearch(Enum):
 
 
 @unique
-class ResultsTab(Enum):
+class ResultsTab(IntEnum):
     """
     Enumeration class for the different tabs for the results list.
     """
@@ -69,7 +69,7 @@ class ResultsTab(Enum):
 
 
 @unique
-class SearchStatus(Enum):
+class SearchStatus(IntEnum):
     """
     Enumeration class for the different search methods.
     """
@@ -79,7 +79,7 @@ class SearchStatus(Enum):
 
 
 @unique
-class SearchTabs(Enum):
+class SearchTabs(IntEnum):
     """
     Enumeration class for the tabs on the media item.
     """
@@ -110,7 +110,7 @@ class BibleMediaItem(MediaManagerItem):
         self.second_bible = None
         self.saved_results = []
         self.current_results = []
-        self.search_status = SearchStatus().SearchButton
+        self.search_status = SearchStatus.SearchButton
         # TODO: Make more central and clean up after!
         self.search_timer = QtCore.QTimer()
         self.search_timer.setInterval(200)
@@ -690,7 +690,7 @@ class BibleMediaItem(MediaManagerItem):
         :return: None
         """
         self.search_timer.stop()
-        self.search_status = SearchStatus().SearchButton
+        self.search_status = SearchStatus.SearchButton
         if not self.bible:
             self.main_window.information_message(UiStrings().BibleNoBiblesTitle, UiStrings().BibleNoBibles)
             return
@@ -794,7 +794,7 @@ class BibleMediaItem(MediaManagerItem):
                 self.text_reference_search(text)
         else:
             # It can only be a 'Combined' search without a valid reference, or a 'Text' search
-            if self.search_status == SearchStatus().SearchAsYouType:
+            if self.search_status == SearchStatus.SearchAsYouType:
                 if len(text) <= 8:
                     self.search_status = SearchStatus.NotEnoughText
                     self.display_results()
@@ -823,7 +823,7 @@ class BibleMediaItem(MediaManagerItem):
 
         :return: None
         """
-        self.search_status = SearchStatus().SearchAsYouType
+        self.search_status = SearchStatus.SearchAsYouType
         self.text_search()
         self.results_view_tab.setCurrentIndex(ResultsTab.Search)
 
