@@ -62,6 +62,13 @@ class SongBeamerTypes(object):
     }
 
 
+class VerseTagMode(object):
+    Unknown = 0
+    ContainsTags = 1
+    ContainsNoTags = 2
+    ContainsNoTagsRestart = 3
+
+
 class SongBeamerImport(SongImport):
     """
     Import Song Beamer files(s). Song Beamer file format is text based in the beginning are one or more control tags
@@ -130,8 +137,12 @@ class SongBeamerImport(SongImport):
             read_verses = False
             # The first verse separator doesn't count, but the others does, so line count starts at -1
             line_number = -1
-            for line in song_data:
-                line = line.rstrip()
+            verse_tags_mode = VerseTagMode.Unknown
+            first_verse = True
+            idx = -1
+            while idx + 1 < len(song_data):
+                idx = idx + 1
+                line = song_data[idx].rstrip()
                 stripped_line = line.strip()
                 if line.startswith('#') and not read_verses:
                     self.parse_tags(line)
@@ -142,6 +153,7 @@ class SongBeamerImport(SongImport):
                         self.add_verse(self.current_verse, self.current_verse_type)
                         self.current_verse = ''
                         self.current_verse_type = VerseType.tags[VerseType.Verse]
+                        first_verse = False
                     read_verses = True
                     verse_start = True
                     # Songbeamer allows chord on line "-1", meaning the first line has only chords
@@ -157,11 +169,33 @@ class SongBeamerImport(SongImport):
                 elif read_verses:
                     if verse_start:
                         verse_start = False
-                        if not self.check_verse_marks(line):
+                        verse_mark = self.check_verse_marks(line)
+                        # To ensure that linenumbers are mapped correctly when inserting chords, we attempt to detect
+                        # if verse tags are inserted manually or by SongBeamer. If they are inserted manually the lines
+                        # should be counted, otherwise not. If all verses start with a tag we assume it is inserted by
+                        # SongBeamer.
+                        if first_verse and verse_tags_mode == VerseTagMode.Unknown:
+                            if verse_mark:
+                                verse_tags_mode = VerseTagMode.ContainsTags
+                            else:
+                                verse_tags_mode = VerseTagMode.ContainsNoTags
+                        elif verse_tags_mode != VerseTagMode.ContainsNoTagsRestart:
+                            if not verse_mark and verse_tags_mode == VerseTagMode.ContainsTags:
+                                # Restart loop without counting tags as lines
+                                self.set_defaults()
+                                self.title = file_name.split('.sng')[0]
+                                verse_tags_mode = VerseTagMode.ContainsNoTagsRestart
+                                read_verses = False
+                                # The first verse separator doesn't count, but the others does, so line count starts at -1
+                                line_number = -1
+                                first_verse = True
+                                idx = -1
+                                continue
+                        if not verse_mark:
                             line = self.insert_chords(line_number, line)
                             self.current_verse += line.strip() + '\n'
                             line_number += 1
-                        elif self.editor_version < 4:
+                        elif verse_tags_mode in [VerseTagMode.ContainsNoTags, VerseTagMode.ContainsNoTagsRestart]:
                             line_number += 1
                     else:
                         line = self.insert_chords(line_number, line)
