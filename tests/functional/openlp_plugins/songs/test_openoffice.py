@@ -23,6 +23,7 @@
 This module contains tests for the OpenOffice/LibreOffice importer.
 """
 from unittest import TestCase, SkipTest
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry
 try:
@@ -30,7 +31,6 @@ try:
 except ImportError:
     raise SkipTest('Could not import OpenOfficeImport probably due to unavailability of uno')
 
-from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
 

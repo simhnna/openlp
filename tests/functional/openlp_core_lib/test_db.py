@@ -24,13 +24,13 @@ Package to test the openlp.core.lib package.
 """
 import os
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
 from sqlalchemy.pool import NullPool
 from sqlalchemy.orm.scoping import ScopedSession
 from sqlalchemy import MetaData
 
 from openlp.core.lib.db import init_db, get_upgrade_op, delete_database
-from tests.functional import patch, MagicMock
 
 
 class TestDB(TestCase):

@@ -23,14 +23,13 @@
 Package to test the openlp.core.ui.media.systemplayer package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, call, patch
 
 from PyQt5 import QtCore, QtMultimedia
 
 from openlp.core.common import Registry
 from openlp.core.ui.media import MediaState
 from openlp.core.ui.media.systemplayer import SystemPlayer, CheckMediaWorker, ADDITIONAL_EXT
-
-from tests.functional import MagicMock, call, patch
 
 
 class TestSystemPlayer(TestCase):

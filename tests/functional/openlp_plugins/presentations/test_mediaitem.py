@@ -23,10 +23,11 @@
 This module contains tests for the lib submodule of the Presentations plugin.
 """
 from unittest import TestCase
+from unittest.mock import patch, MagicMock, call
 
 from openlp.core.common import Registry
 from openlp.plugins.presentations.lib.mediaitem import PresentationMediaItem
-from tests.functional import patch, MagicMock, call
+
 from tests.helpers.testmixin import TestMixin
 
 

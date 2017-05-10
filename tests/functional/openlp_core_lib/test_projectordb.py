@@ -27,11 +27,11 @@ PREREQUISITE: add_record() and get_all() functions validated.
 """
 import os
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.lib.projector.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
 from openlp.core.lib.projector.constants import PJLINK_PORT
 
-from tests.functional import MagicMock, patch
 from tests.resources.projector.data import TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
 
 

@@ -23,14 +23,14 @@
 This module contains tests for the ZionWorx song importer.
 """
 import os
-
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from tests.functional import MagicMock, patch
-from tests.helpers.songfileimport import SongImportTestHelper
 from openlp.plugins.songs.lib.importers.zionworx import ZionWorxImport
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.core.common import Registry
+
+from tests.helpers.songfileimport import SongImportTestHelper
 
 TEST_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'zionworxsongs'))

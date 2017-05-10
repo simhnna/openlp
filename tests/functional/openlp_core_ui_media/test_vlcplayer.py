@@ -26,12 +26,12 @@ import os
 import sys
 from datetime import datetime, timedelta
 from unittest import TestCase, skip
+from unittest.mock import MagicMock, patch, call
 
 from openlp.core.common import Registry
 from openlp.core.ui.media import MediaState, MediaType
 from openlp.core.ui.media.vlcplayer import AUDIO_EXT, VIDEO_EXT, VlcPlayer, get_vlc
 
-from tests.functional import MagicMock, patch, call
 from tests.helpers import MockDateTime
 from tests.helpers.testmixin import TestMixin
 
