@@ -256,7 +256,10 @@ class SongImport(QtCore.QObject):
                 if author2.endswith('.'):
                     author2 = author2[:-1]
                 if author2:
-                    self.add_author(author2, type)
+                    if type:
+                        self.add_author(author2, type)
+                    else:
+                        self.add_author(author2)
 
     def add_author(self, author, type=None):
         """
