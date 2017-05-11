@@ -22,14 +22,14 @@
 """
 This module contains tests for the Songbeamer song importer.
 """
-
 import os
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from tests.helpers.songfileimport import SongImportTestHelper
-from tests.functional import MagicMock, patch
 from openlp.plugins.songs.lib.importers.songbeamer import SongBeamerImport, SongBeamerTypes
 from openlp.core.common import Registry
+
+from tests.helpers.songfileimport import SongImportTestHelper
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                          '..', '..', '..', 'resources', 'songbeamersongs'))

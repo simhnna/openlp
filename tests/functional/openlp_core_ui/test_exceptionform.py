@@ -26,14 +26,12 @@ Package to test the openlp.core.ui.exeptionform package.
 import os
 import tempfile
 from unittest import TestCase
-from unittest.mock import mock_open
+from unittest.mock import mock_open, patch
 
 from openlp.core.common import Registry
-
-from tests.functional import patch
-from tests.helpers.testmixin import TestMixin
-
 from openlp.core.ui import exceptionform
+
+from tests.helpers.testmixin import TestMixin
 
 exceptionform.WEBKIT_VERSION = 'Webkit Test'
 exceptionform.MIGRATE_VERSION = 'Migrate Test'

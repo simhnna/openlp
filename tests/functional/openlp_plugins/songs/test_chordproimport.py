@@ -25,7 +25,7 @@ This module contains tests for the OpenSong song importer.
 import os
 
 from tests.helpers.songfileimport import SongImportTestHelper
-from tests.functional import patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 TEST_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'chordprosongs'))

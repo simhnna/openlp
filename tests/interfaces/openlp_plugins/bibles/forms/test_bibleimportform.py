@@ -28,12 +28,11 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtWidgets
 
 from openlp.core.common import Registry
-from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm, PYSWORD_AVAILABLE
+from openlp.plugins.bibles.forms import bibleimportform
 
 from tests.helpers.testmixin import TestMixin
 
 
-@skip('One of the QFormLayouts in the BibleImportForm is causing a segfault')
 class TestBibleImportForm(TestCase, TestMixin):
     """
     Test the BibleImportForm class
@@ -47,9 +46,9 @@ class TestBibleImportForm(TestCase, TestMixin):
         self.setup_application()
         self.main_window = QtWidgets.QMainWindow()
         Registry().register('main_window', self.main_window)
-        PYSWORD_AVAILABLE = False
+        bibleimportform.PYSWORD_AVAILABLE = False
         self.mocked_manager = MagicMock()
-        self.form = BibleImportForm(self.main_window, self.mocked_manager, MagicMock())
+        self.form = bibleimportform.BibleImportForm(self.main_window, self.mocked_manager, MagicMock())
 
     def tearDown(self):
         """

@@ -23,10 +23,10 @@
 Functional tests to test the Bible Manager class and related methods.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry, Settings
 from openlp.plugins.bibles.lib import BibleManager, LanguageSelection
-from tests.interfaces import MagicMock, patch
 
 from tests.utils.constants import TEST_RESOURCES_PATH
 from tests.helpers.testmixin import TestMixin

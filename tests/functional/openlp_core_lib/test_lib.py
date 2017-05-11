@@ -23,9 +23,9 @@
 Package to test the openlp.core.lib package.
 """
 import os
-
-from unittest import TestCase
 from datetime import datetime, timedelta
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtGui
 
@@ -33,7 +33,6 @@ from openlp.core.lib import FormattingTags, expand_chords_for_printing
 from openlp.core.lib import build_icon, check_item_selected, clean_tags, create_thumb, create_separated_list, \
     expand_tags, get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb, expand_chords, \
     compare_chord_lyric, find_formatting_tags
-from tests.functional import MagicMock, patch
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
 

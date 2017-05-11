@@ -24,10 +24,9 @@ Package to test the openlp.core.lib.formattingtags package.
 """
 import copy
 from unittest import TestCase
+from unittest.mock import patch
 
 from openlp.core.lib import FormattingTags
-from tests.functional import patch
-
 
 TAG = {
     'end tag': '{/aa}',

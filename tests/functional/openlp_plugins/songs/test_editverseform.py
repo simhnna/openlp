@@ -23,14 +23,12 @@
 This module contains tests for the editverseform of the Songs plugin.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
 
-from openlp.core.common import Registry, Settings
-from openlp.core.lib import ServiceItem
 from openlp.plugins.songs.forms.editverseform import EditVerseForm
-from openlp.plugins.songs.lib.db import AuthorType
-from tests.functional import patch, MagicMock
+
 from tests.helpers.testmixin import TestMixin
 
 

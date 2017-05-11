@@ -25,12 +25,12 @@ class and methods.
 """
 import os
 from unittest import TestCase
+from unittest.mock import patch
 
 from openlp.core.common import Registry
 from openlp.core.lib.projector.db import Projector, ProjectorDB
 from openlp.core.ui import ProjectorEditForm
 
-from tests.functional import patch
 from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB, TEST1_DATA, TEST2_DATA
 

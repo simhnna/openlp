@@ -24,12 +24,12 @@ This module contains tests for the OpenSong song importer.
 """
 import os
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
-from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
 from openlp.core.common import Registry
+from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
 
 from tests.helpers.songfileimport import SongImportTestHelper
-from tests.functional import patch, MagicMock
 
 TEST_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'opensongsongs'))

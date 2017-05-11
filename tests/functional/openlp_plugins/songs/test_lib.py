@@ -23,10 +23,10 @@
 This module contains tests for the lib submodule of the Songs plugin.
 """
 from unittest import TestCase
+from unittest.mock import patch, MagicMock, PropertyMock
 
 from openlp.plugins.songs.lib import VerseType, clean_string, clean_title, strip_rtf, transpose_chord, transpose_lyrics
 from openlp.plugins.songs.lib.songcompare import songs_probably_equal, _remove_typos, _op_length
-from tests.functional import patch, MagicMock, PropertyMock
 
 
 class TestLib(TestCase):
