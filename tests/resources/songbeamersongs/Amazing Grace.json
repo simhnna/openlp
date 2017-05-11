@@ -1,6 +1,6 @@
 {
     "authors": [
-        "John Newton"
+        ["John Newton", "words"]
     ],
     "title": "Amazing grace",
     "verse_order_list": ["v1", "v2", "v3", "v4", "v5"],

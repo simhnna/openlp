@@ -119,7 +119,6 @@ class SongBeamerImport(SongImport):
             self.current_verse = ''
             self.current_verse_type = VerseType.tags[VerseType.Verse]
             self.chord_table = None
-            self.editor_version = 0
             file_name = os.path.split(import_file)[1]
             if os.path.isfile(import_file):
                 # Detect the encoding
@@ -181,12 +180,14 @@ class SongBeamerImport(SongImport):
                                 verse_tags_mode = VerseTagMode.ContainsNoTags
                         elif verse_tags_mode != VerseTagMode.ContainsNoTagsRestart:
                             if not verse_mark and verse_tags_mode == VerseTagMode.ContainsTags:
-                                # Restart loop without counting tags as lines
+                                # A verse mark was expected but not found, which means that verse marks has not been
+                                # inserted by songbeamer, but are manually added headings. So restart the loop, and
+                                # count tags as lines.
                                 self.set_defaults()
                                 self.title = file_name.split('.sng')[0]
                                 verse_tags_mode = VerseTagMode.ContainsNoTagsRestart
                                 read_verses = False
-                                # The first verse separator doesn't count, but the others does, so line count starts at -1
+                                # The first verseseparator doesn't count, but the others does, so linecount starts at -1
                                 line_number = -1
                                 first_verse = True
                                 idx = -1
@@ -257,7 +258,7 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#AudioFile':
             self.parse_audio_file(tag_val[1])
         elif tag_val[0] == '#Author':
-            self.parse_author(tag_val[1])
+            self.parse_author(tag_val[1], 'words')
         elif tag_val[0] == '#BackgroundImage':
             pass
         elif tag_val[0] == '#Bible':
@@ -278,10 +279,7 @@ class SongBeamerImport(SongImport):
             except ValueError:
                 self.comments = tag_val[1]
         elif tag_val[0] == '#Editor':
-            try:
-                self.editor_version = float(re.sub('[a-zA-Z ]', '', tag_val[1]))
-            except ValueError:
-                self.editor_version = 0
+            pass
         elif tag_val[0] == '#Font':
             pass
         elif tag_val[0] == '#FontLang2':
@@ -303,7 +301,7 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#LangCount':
             pass
         elif tag_val[0] == '#Melody':
-            self.parse_author(tag_val[1])
+            self.parse_author(tag_val[1], 'music')
         elif tag_val[0] == '#NatCopyright':
             pass
         elif tag_val[0] == '#OTitle':
