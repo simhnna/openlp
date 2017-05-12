@@ -398,7 +398,7 @@ def check_binary_exists(program_path):
     """
     Function that checks whether a binary exists.
 
-    :param program_path:The full path to the binary to check.
+    :param program_path: The full path to the binary to check.
     :return: program output to be parsed
     """
     log.debug('testing program_path: {text}'.format(text=program_path))

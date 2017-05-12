@@ -21,6 +21,7 @@
 ###############################################################################
 
 from .colorbutton import ColorButton
+from .pathedit import PathEdit, PathType
 from .listwidgetwithdnd import ListWidgetWithDnD
 from .treewidgetwithdnd import TreeWidgetWithDnD
 from .toolbar import OpenLPToolbar
@@ -30,5 +31,6 @@ from .mediadockmanager import MediaDockManager
 from .listpreviewwidget import ListPreviewWidget
 from .spelltextedit import SpellTextEdit
 
-__all__ = ['ColorButton', 'ListPreviewWidget', 'ListWidgetWithDnD', 'OpenLPToolbar', 'OpenLPDockWidget',
-           'OpenLPWizard', 'WizardStrings', 'MediaDockManager', 'ListPreviewWidget', 'SpellTextEdit']
+__all__ = ['ColorButton', 'PathEdit', 'PathType', 'ListPreviewWidget', 'ListWidgetWithDnD', 'OpenLPToolbar',
+           'OpenLPDockWidget', 'OpenLPWizard', 'WizardStrings', 'MediaDockManager', 'ListPreviewWidget',
+           'SpellTextEdit']

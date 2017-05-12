@@ -50,10 +50,10 @@ class TestThemeManager(TestCase):
             instance = ThemeForm(None)
             mocked_image_file_edit = MagicMock()
             mocked_image_file_edit.text.return_value = '/original_path/file.ext'
-            instance.image_file_edit = mocked_image_file_edit
+            instance.image_path_edit = mocked_image_file_edit
 
             # WHEN: on_image_browse_button is clicked
-            instance.on_image_browse_button_clicked()
+            instance.on_image_path_edit_path_changed()
 
             # THEN: The QFileDialog getOpenFileName and set_background_page_values moethods should have been called
             #       with known arguments
@@ -77,11 +77,11 @@ class TestThemeManager(TestCase):
             instance = ThemeForm(None)
             mocked_image_file_edit = MagicMock()
             mocked_image_file_edit.text.return_value = '/original_path/file.ext'
-            instance.image_file_edit = mocked_image_file_edit
+            instance.image_path_edit = mocked_image_file_edit
             instance.theme = MagicMock()
 
             # WHEN: on_image_browse_button is clicked
-            instance.on_image_browse_button_clicked()
+            instance.on_image_path_edit_path_changed()
 
             # THEN: The QFileDialog getOpenFileName and set_background_page_values moethods should have been called
             #       with known arguments and theme.background_filename should be set
