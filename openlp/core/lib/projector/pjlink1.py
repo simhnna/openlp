@@ -78,6 +78,33 @@ class PJLink1(QtNetwork.QTcpSocket):
     projectorNoAuthentication = QtCore.pyqtSignal(str)  # PIN set and no authentication needed
     projectorReceivedData = QtCore.pyqtSignal()  # Notify when received data finished processing
     projectorUpdateIcons = QtCore.pyqtSignal()  # Update the status icons on toolbar
+    # New commands available in PJLink Class 2
+    pjlink_future = [
+        'ACKN',  # UDP Reply to 'SRCH'
+        'FILT',  # Get current filter usage time
+        'FREZ',  # Set freeze/unfreeze picture being projected
+        'INNM',  # Get Video source input terminal name
+        'IRES',  # Get Video source resolution
+        'LKUP',  # UPD Linkup status notification
+        'MVOL',  # Set microphone volume
+        'RFIL',  # Get replacement air filter model number
+        'RLMP',  # Get lamp replacement model number
+        'RRES',  # Get projector recommended video resolution
+        'SNUM',  # Get projector serial number
+        'SRCH',  # UDP broadcast search for available projectors on local network
+        'SVER',  # Get projector software version
+        'SVOL',  # Set speaker volume
+        'TESTMEONLY'  # For testing when other commands have been implemented
+    ]
+
+    pjlink_udp_commands = [
+        'ACKN',
+        'ERST',  # Class 1 or 2
+        'INPT',  # Class 1 or 2
+        'LKUP',
+        'POWR',  # Class 1 or 2
+        'SRCH'
+    ]
 
     def __init__(self, name=None, ip=None, port=PJLINK_PORT, pin=None, *args, **kwargs):
         """
@@ -403,7 +430,8 @@ class PJLink1(QtNetwork.QTcpSocket):
             return
         self.socket_timer.stop()
         self.projectorNetwork.emit(S_NETWORK_RECEIVED)
-        data_in = decode(read, 'ascii')
+        # NOTE: Class2 has changed to some values being UTF-8
+        data_in = decode(read, 'utf-8')
         data = data_in.strip()
         if len(data) < 7:
             # Not enough data for a packet
@@ -510,11 +538,12 @@ class PJLink1(QtNetwork.QTcpSocket):
             self._send_command()
 
     @QtCore.pyqtSlot()
-    def _send_command(self, data=None):
+    def _send_command(self, data=None, utf8=False):
         """
         Socket interface to send data. If data=None, then check queue.
 
         :param data: Immediate data to send
+        :param utf8: Send as UTF-8 string otherwise send as ASCII string
         """
         log.debug('({ip}) _send_string()'.format(ip=self.ip))
         log.debug('({ip}) _send_string(): Connection status: {data}'.format(ip=self.ip, data=self.state()))
@@ -542,7 +571,7 @@ class PJLink1(QtNetwork.QTcpSocket):
         log.debug('({ip}) _send_string(): Queue = {data}'.format(ip=self.ip, data=self.send_queue))
         self.socket_timer.start()
         self.projectorNetwork.emit(S_NETWORK_SENDING)
-        sent = self.write(out.encode('ascii'))
+        sent = self.write(out.encode('{string_encoding}'.format(string_encoding='utf-8' if utf8 else 'ascii')))
         self.waitForBytesWritten(2000)  # 2 seconds should be enough
         if sent == -1:
             # Network error?
@@ -556,7 +585,13 @@ class PJLink1(QtNetwork.QTcpSocket):
         :param cmd: Command to process
         :param data: Data being processed
         """
-        log.debug('({ip}) Processing command "{data}"'.format(ip=self.ip, data=cmd))
+        log.debug('({ip}) Processing command "{cmd}" with data "{data}"'.format(ip=self.ip,
+                                                                                cmd=cmd,
+                                                                                data=data))
+        # Check if we have a future command not available yet
+        if cmd in self.pjlink_future:
+            self._not_implemented(cmd)
+            return
         if data in PJLINK_ERRORS:
             # Oops - projector error
             log.error('({ip}) Projector returned error "{data}"'.format(ip=self.ip, data=data))
@@ -568,9 +603,8 @@ class PJLink1(QtNetwork.QTcpSocket):
                 self.projectorAuthentication.emit(self.name)
             elif data.upper() == 'ERR1':
                 # Undefined command
-                self.change_status(E_UNDEFINED, '{error} "{data}"'.format(error=translate('OpenLP.PJLink1',
-                                                                                          'Undefined command:'),
-                                                                          data=cmd))
+                self.change_status(E_UNDEFINED, '{error}: "{data}"'.format(error=ERROR_MSG[E_UNDEFINED],
+                                                                           data=cmd))
             elif data.upper() == 'ERR2':
                 # Invalid parameter
                 self.change_status(E_PARAMETER)
@@ -681,6 +715,7 @@ class PJLink1(QtNetwork.QTcpSocket):
 
         :param data: Currently selected source
         """
+        # TODO: Class 2 change: verify input does not exceed 95 bytes
         self.source = data
         log.info('({ip}) Setting data source to "{data}"'.format(ip=self.ip, data=self.source))
         return
@@ -962,3 +997,11 @@ class PJLink1(QtNetwork.QTcpSocket):
         log.debug('({ip}) Setting AVMT to "10" (shutter open)'.format(ip=self.ip))
         self.send_command(cmd='AVMT', opts='10')
         self.poll_loop()
+
+    def _not_implemented(self, cmd):
+        """
+        Log when a future PJLink command has not been implemented yet.
+        """
+        log.warn("({ip}) Future command '{cmd}' has not been implemented yet".format(ip=self.ip,
+                                                                                     cmd=cmd))
+        return
