@@ -438,3 +438,13 @@ def get_file_encoding(filename):
         return detector.result
     except OSError:
         log.exception('Error detecting file encoding')
+
+
+def json_default(o):
+    """
+    Function to help save objects as JSON
+        
+    :param o: object 
+    :return: the object dictionary
+    """
+    return o.__dict__

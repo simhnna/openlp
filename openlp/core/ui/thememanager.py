@@ -22,6 +22,7 @@
 """
 The Theme Manager manages adding, deleteing and modifying of themes.
 """
+import json
 import os
 import zipfile
 import shutil
@@ -30,10 +31,10 @@ from xml.etree.ElementTree import ElementTree, XML
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, OpenLPMixin, RegistryMixin, \
-    check_directory_exists, UiStrings, translate, is_win, get_filesystem_encoding, delete_file
+    check_directory_exists, UiStrings, translate, is_win, get_filesystem_encoding, delete_file, json_default
 from openlp.core.lib import FileDialog, ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
-from openlp.core.lib.theme import ThemeXML, BackgroundType
+from openlp.core.lib.theme import Theme, BackgroundType
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action
 from openlp.core.ui import FileRenameForm, ThemeForm
 from openlp.core.ui.lib import OpenLPToolbar
@@ -245,7 +246,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         their customisations.
         :param field:
         """
-        theme = ThemeXML()
+        theme = Theme()
         theme.set_default_header_footer()
         self.theme_form.theme = theme
         self.theme_form.exec()
@@ -452,7 +453,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         files = AppLocation.get_files(self.settings_section, '.png')
         # No themes have been found so create one
         if not files:
-            theme = ThemeXML()
+            theme = Theme()
             theme.theme_name = UiStrings().Default
             self._write_theme(theme, None, None)
             Settings().setValue(self.settings_section + '/global theme', theme.theme_name)
@@ -515,7 +516,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         xml = get_text_file_string(xml_file)
         if not xml:
             self.log_debug('No theme data - using default theme')
-            return ThemeXML()
+            return Theme()
         else:
             return self._create_theme_from_xml(xml, self.path)
 
@@ -646,16 +647,16 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :param image_to: Where the Theme Image is to be saved to
         """
         name = theme.theme_name
-        theme_pretty_xml = theme.extract_formatted_xml()
+        theme_pretty = json.dumps(theme, default=json_default)
         theme_dir = os.path.join(self.path, name)
         check_directory_exists(theme_dir)
-        theme_file = os.path.join(theme_dir, name + '.xml')
+        theme_file = os.path.join(theme_dir, name + '.json')
         if self.old_background_image and image_to != self.old_background_image:
             delete_file(self.old_background_image)
         out_file = None
         try:
             out_file = open(theme_file, 'w', encoding='utf-8')
-            out_file.write(theme_pretty_xml.decode('utf-8'))
+            out_file.write(theme_pretty)
         except IOError:
             self.log_exception('Saving theme to file failed')
         finally:
@@ -717,7 +718,8 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         return os.path.join(self.path, theme + '.png')
 
-    def _create_theme_from_xml(self, theme_xml, image_path):
+    @staticmethod
+    def _create_theme_from_xml(theme_xml, image_path):
         """
         Return a theme object using information parsed from XML
 
@@ -725,8 +727,22 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :param image_path: Where the theme image is stored
         :return: Theme data.
         """
-        theme = ThemeXML()
+        theme = Theme()
         theme.parse(theme_xml)
+        theme.extend_image_filename(image_path)
+        return theme
+
+    @staticmethod
+    def _create_theme_from_json(theme_json, image_path):
+        """
+        Return a theme object using information parsed from JSON
+
+        :param theme_json: The Theme data object.
+        :param image_path: Where the theme image is stored
+        :return: Theme data.
+        """
+        theme = Theme()
+        theme.load_theme(theme_json)
         theme.extend_image_filename(image_path)
         return theme
 
