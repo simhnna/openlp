@@ -23,10 +23,11 @@
 Package to test the openlp.core.lib.projector.pjlink1 package.
 """
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import call, patch, MagicMock
 
 from openlp.core.lib.projector.pjlink1 import PJLink1
-from openlp.core.lib.projector.constants import E_PARAMETER, ERROR_STRING, S_OFF, S_STANDBY, S_ON, PJLINK_POWR_STATUS
+from openlp.core.lib.projector.constants import E_PARAMETER, ERROR_STRING, S_OFF, S_STANDBY, S_ON, \
+    PJLINK_POWR_STATUS, S_CONNECTED
 
 from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_CONNECT_AUTHENTICATE, TEST_HASH
 
@@ -170,6 +171,7 @@ class TestPJLink(TestCase):
         # GIVEN: Test object and preset
         pjlink = pjlink_test
         pjlink.power = S_STANDBY
+        pjlink.socket_timer = MagicMock()
 
         # WHEN: Call process_command with turn power on command
         pjlink.process_command('POWR', PJLINK_POWR_STATUS[S_ON])
@@ -381,3 +383,80 @@ class TestPJLink(TestCase):
 
         # THEN: pjlink1.__not_implemented should have been called with test_cmd
         mock_not_implemented.assert_called_with(test_cmd)
+
+    @patch.object(pjlink_test, 'disconnect_from_host')
+    def socket_abort_test(self, mock_disconnect):
+        """
+        Test PJLink1.socket_abort calls disconnect_from_host
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+
+        # WHEN: Calling socket_abort
+        pjlink.socket_abort()
+
+        # THEN: disconnect_from_host should be called
+        self.assertTrue(mock_disconnect.called, 'Should have called disconnect_from_host')
+
+    def poll_loop_not_connected_test(self):
+        """
+        Test PJLink1.poll_loop not connected return
+        """
+        # GIVEN: Test object and mocks
+        pjlink = pjlink_test
+        pjlink.state = MagicMock()
+        pjlink.timer = MagicMock()
+        pjlink.state.return_value = False
+        pjlink.ConnectedState = True
+
+        # WHEN: PJLink1.poll_loop called
+        pjlink.poll_loop()
+
+        # THEN: poll_loop should exit without calling any other method
+        self.assertFalse(pjlink.timer.called, 'Should have returned without calling any other method')
+
+    @patch.object(pjlink_test, 'send_command')
+    def poll_loop_start_test(self, mock_send_command):
+        """
+        Test PJLink1.poll_loop makes correct calls
+        """
+        # GIVEN: test object and test data
+        pjlink = pjlink_test
+        pjlink.state = MagicMock()
+        pjlink.timer = MagicMock()
+        pjlink.timer.interval = MagicMock()
+        pjlink.timer.setInterval = MagicMock()
+        pjlink.timer.start = MagicMock()
+        pjlink.poll_time = 20
+        pjlink.power = S_ON
+        pjlink.source_available = None
+        pjlink.other_info = None
+        pjlink.manufacturer = None
+        pjlink.model = None
+        pjlink.pjlink_name = None
+        pjlink.ConnectedState = S_CONNECTED
+        pjlink.timer.interval.return_value = 10
+        pjlink.state.return_value = S_CONNECTED
+        call_list = [
+            call('POWR', queue=True),
+            call('ERST', queue=True),
+            call('LAMP', queue=True),
+            call('AVMT', queue=True),
+            call('INPT', queue=True),
+            call('INST', queue=True),
+            call('INFO', queue=True),
+            call('INF1', queue=True),
+            call('INF2', queue=True),
+            call('NAME', queue=True),
+        ]
+
+        # WHEN: PJLink1.poll_loop is called
+        pjlink.poll_loop()
+
+        # THEN: proper calls were made to retrieve projector data
+        # First, call to update the timer with the next interval
+        self.assertTrue(pjlink.timer.setInterval.called, 'Should have updated the timer')
+        # Next, should have called the timer to start
+        self.assertTrue(pjlink.timer.start.called, 'Should have started the timer')
+        # Finally, should have called send_command with a list of projetctor status checks
+        mock_send_command.assert_has_calls(call_list, 'Should have queued projector queries')

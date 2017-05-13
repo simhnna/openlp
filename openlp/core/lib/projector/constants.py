@@ -57,20 +57,35 @@ LF = chr(0x0A)  # \n
 PJLINK_PORT = 4352
 TIMEOUT = 30.0
 PJLINK_MAX_PACKET = 136
-PJLINK_VALID_CMD = {'1': ['PJLINK',  # Initial connection
-                          'POWR',  # Power option
-                          'INPT',  # Video sources option
-                          'AVMT',  # Shutter option
-                          'ERST',  # Error status option
-                          'LAMP',  # Lamp(s) query (Includes fans)
-                          'INST',  # Input sources available query
-                          'NAME',  # Projector name query
-                          'INF1',  # Manufacturer name query
-                          'INF2',  # Product name query
-                          'INFO',  # Other information query
-                          'CLSS'   # PJLink class support query
-                          ]}
-
+# NOTE: Change format to account for some commands are both class 1 and 2
+PJLINK_VALID_CMD = {
+    'ACKN': ['2', ],  # UDP Reply to 'SRCH'
+    'AVMT': ['1', ],  # Shutter option
+    'CLSS': ['1', ],   # PJLink class support query
+    'ERST': ['1', '2'],  # Error status option
+    'FILT': ['2', ],  # Get current filter usage time
+    'FREZ': ['2', ],  # Set freeze/unfreeze picture being projected
+    'INF1': ['1', ],  # Manufacturer name query
+    'INF2': ['1', ],  # Product name query
+    'INFO': ['1', ],  # Other information query
+    'INNM': ['2', ],  # Get Video source input terminal name
+    'INPT': ['1', ],  # Video sources option
+    'INST': ['1', ],  # Input sources available query
+    'IRES': ['2', ],  # Get Video source resolution
+    'LAMP': ['1', ],  # Lamp(s) query (Includes fans)
+    'LKUP': ['2', ],  # UPD Linkup status notification
+    'MVOL': ['2', ],  # Set microphone volume
+    'NAME': ['1', ],  # Projector name query
+    'PJLINK': ['1', ],  # Initial connection
+    'POWR': ['1', ],  # Power option
+    'RFIL': ['2', ],  # Get replacement air filter model number
+    'RLMP': ['2', ],  # Get lamp replacement model number
+    'RRES': ['2', ],  # Get projector recommended video resolution
+    'SNUM': ['2', ],  # Get projector serial number
+    'SRCH': ['2', ],  # UDP broadcast search for available projectors on local network
+    'SVER': ['2', ],  # Get projector software version
+    'SVOL': ['2', ]  # Set speaker volume
+}
 # Error and status codes
 S_OK = E_OK = 0  # E_OK included since I sometimes forget
 # Error codes. Start at 200 so we don't duplicate system error codes.
