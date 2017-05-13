@@ -512,13 +512,20 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :return: The theme object.
         """
         self.log_debug('get theme data for theme {name}'.format(name=theme_name))
-        xml_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
-        xml = get_text_file_string(xml_file)
-        if not xml:
+        theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.json')
+        jsn = True
+        if not theme_file:
+            theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
+            jsn = False
+        theme_data = get_text_file_string(theme_file)
+        if not theme_data:
             self.log_debug('No theme data - using default theme')
             return Theme()
         else:
-            return self._create_theme_from_xml(xml, self.path)
+            if jsn:
+                return self._create_theme_from_json(theme_data, self.path)
+            else:
+                return self._create_theme_from_xml(theme_data, self.path)
 
     def over_write_message_box(self, theme_name):
         """
