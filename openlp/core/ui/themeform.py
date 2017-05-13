@@ -69,8 +69,6 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
         self.video_color_button.colorChanged.connect(self.on_video_color_changed)
         self.gradient_start_button.colorChanged.connect(self.on_gradient_start_color_changed)
         self.gradient_end_button.colorChanged.connect(self.on_gradient_end_color_changed)
-
-
         self.image_path_edit.filters = \
             '{name};;{text} (*.*)'.format(name=get_images_filter(), text=UiStrings().AllFiles)
         self.image_path_edit.pathChanged.connect(self.on_image_path_edit_path_changed)
@@ -80,12 +78,7 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
         video_filter = '{trans} {visible} {actual}'.format(trans=translate('OpenLP', 'Video Files'),
                                                            visible=visible_formats, actual=actual_formats)
         self.video_path_edit.filters = '{video};;{ui} (*.*)'.format(video=video_filter, ui=UiStrings().AllFiles)
-
         self.video_path_edit.pathChanged.connect(self.on_video_path_edit_path_changed)
-
-
-
-
         self.main_color_button.colorChanged.connect(self.on_main_color_changed)
         self.outline_color_button.colorChanged.connect(self.on_outline_color_changed)
         self.shadow_color_button.colorChanged.connect(self.on_shadow_color_changed)

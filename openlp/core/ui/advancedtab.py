@@ -223,10 +223,7 @@ class AdvancedTab(SettingsTab):
         self.service_name_edit.textChanged.connect(self.update_service_name_example)
         self.service_name_revert_button.clicked.connect(self.on_service_name_revert_button_clicked)
         self.alternate_rows_check_box.toggled.connect(self.on_alternate_rows_check_box_toggled)
-
-
         self.data_directory_path_edit.pathChanged.connect(self.on_data_directory_path_edit_path_changed)
-
         self.data_directory_cancel_button.clicked.connect(self.on_data_directory_cancel_button_clicked)
         self.data_directory_copy_check_box.toggled.connect(self.on_data_directory_copy_check_box_toggled)
         self.end_slide_radio_button.clicked.connect(self.on_end_slide_button_clicked)

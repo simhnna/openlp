@@ -119,7 +119,6 @@ class TestPathEdit(TestCase):
         self.widget.browse_button.setToolTip.assert_called_once_with('Browse for file.')
         self.widget.revert_button.setToolTip.assert_called_once_with('Revert to default file.')
 
-
     def test_on_browse_button_clicked_directory(self):
         """
         Test the `browse_button` `clicked` handler on_browse_button_clicked when the `path_type` is set to Directories.
@@ -273,7 +272,7 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked `line_edit` and `on_new_path`.
         with patch.object(self.widget, 'on_new_path') as mocked_on_new_path:
-            self.widget.line_edit = MagicMock(**{'text.return_value':'/test/pat.h'})
+            self.widget.line_edit = MagicMock(**{'text.return_value': '/test/pat.h'})
 
             # WHEN: Calling `on_line_edit_editing_finished`
             self.widget.on_line_edit_editing_finished()
