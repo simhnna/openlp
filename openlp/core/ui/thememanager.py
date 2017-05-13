@@ -513,11 +513,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         self.log_debug('get theme data for theme {name}'.format(name=theme_name))
         theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.json')
-        jsn = True
-        if not theme_file:
-            theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
-            jsn = False
         theme_data = get_text_file_string(theme_file)
+        jsn = True
+        if not theme_data:
+            theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
+            theme_data = get_text_file_string(theme_file)
+            jsn = False
         if not theme_data:
             self.log_debug('No theme data - using default theme')
             return Theme()
