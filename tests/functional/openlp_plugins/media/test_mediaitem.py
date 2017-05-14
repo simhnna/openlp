@@ -23,15 +23,13 @@
 Test the media plugin
 """
 from unittest import TestCase
-
-from openlp.core import Registry, Settings
-from openlp.plugins.media.mediaplugin import MediaPlugin
-from openlp.plugins.media.lib.mediaitem import MediaMediaItem
-from openlp.core.ui.media.mediacontroller import MediaController
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
-from tests.functional import MagicMock, patch
+from openlp.core import Settings
+from openlp.plugins.media.lib.mediaitem import MediaMediaItem
+
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {

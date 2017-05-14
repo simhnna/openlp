@@ -23,9 +23,9 @@
 This module contains tests for the openlp.core.ui.lib.colorbutton module
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, call, patch
 
 from openlp.core.ui.lib import ColorButton
-from tests.functional import MagicMock, call, patch
 
 
 class TestColorDialog(TestCase):

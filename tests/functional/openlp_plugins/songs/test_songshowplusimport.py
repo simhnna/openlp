@@ -22,14 +22,14 @@
 """
 This module contains tests for the SongShow Plus song importer.
 """
-
 import os
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
-from tests.helpers.songfileimport import SongImportTestHelper
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songshowplus import SongShowPlusImport
-from tests.functional import patch, MagicMock
+
+from tests.helpers.songfileimport import SongImportTestHelper
 
 TEST_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'songshowplussongs'))

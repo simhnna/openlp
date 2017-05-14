@@ -23,6 +23,7 @@
 Package to test the openlp.core.ui.renderer package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
@@ -31,7 +32,6 @@ from openlp.core.lib import Renderer, ScreenList, ServiceItem, FormattingTags
 from openlp.core.lib.renderer import words_split, get_start_tags
 from openlp.core.lib.theme import ThemeXML
 
-from tests.functional import MagicMock, patch
 
 SCREEN = {
     'primary': False,

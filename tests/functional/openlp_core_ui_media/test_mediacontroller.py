@@ -23,12 +23,12 @@
 Package to test the openlp.core.ui.media package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.ui.media.mediacontroller import MediaController
 from openlp.core.ui.media.mediaplayer import MediaPlayer
 from openlp.core.common import Registry
 
-from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
 
