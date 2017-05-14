@@ -23,8 +23,9 @@
 The :mod:`common` module contains most of the components and libraries that make
 OpenLP work.
 """
+import glob
 import hashlib
-
+import importlib
 import logging
 import os
 import re
@@ -77,6 +78,38 @@ def check_directory_exists(directory, do_not_log=False):
     except IOError as e:
         if not do_not_log:
             log.exception('failed to check if directory exists or create directory')
+
+
+def extension_loader(glob_pattern, excluded_files=[]):
+    """
+    A utility function to find and load OpenLP extensions, such as plugins, presentation and media controllers and
+    importers.
+
+    :param glob_pattern: A glob pattern used to find the extension(s) to be imported.
+        i.e. openlp_app_dir/plugins/*/*plugin.py
+    :type glob_pattern: str
+    :param excluded_files: A list of file names to exclude that the glob pattern may find.
+    :type excluded_files: list of strings
+
+    :return: None
+    :rtype: None
+    """
+    for extension_path in glob.iglob(glob_pattern):
+        filename = os.path.split(extension_path)[1]
+        if filename in excluded_files:
+            continue
+        module_name = os.path.splitext(filename)[0]
+        try:
+            loader = importlib.machinery.SourceFileLoader(module_name, extension_path)
+            loader.load_module()
+            # TODO: A better way to do this (once we drop python 3.4 support)
+            # spec = importlib.util.spec_from_file_location('what.ever', 'foo.py')
+            # module = importlib.util.module_from_spec(spec)
+            # spec.loader.exec_module(module)
+        except (ImportError, OSError):
+            # On some platforms importing vlc.py might cause OSError exceptions. (e.g. Mac OS X)
+            log.warning('Failed to import {module_name} on path {extension_path}'
+                        .format(module_name=module_name, extension_path=extension_path))
 
 
 def get_frozen_path(frozen_option, non_frozen_option):

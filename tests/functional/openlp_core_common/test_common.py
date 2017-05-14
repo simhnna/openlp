@@ -24,10 +24,10 @@ Functional tests to test the AppLocation class and related methods.
 """
 
 from unittest import TestCase
+from unittest.mock import MagicMock, call, patch
 
-from openlp.core.common import check_directory_exists, de_hump, trace_error_handler, translate, is_win, is_macosx, \
-    is_linux, clean_button_text
-from tests.functional import MagicMock, patch
+from openlp.core.common import check_directory_exists, clean_button_text, de_hump, extension_loader, is_macosx, \
+    is_linux, is_win, trace_error_handler, translate
 
 
 class TestCommonFunctions(TestCase):
@@ -72,6 +72,68 @@ class TestCommonFunctions(TestCase):
             # THEN: check_directory_exists raises an exception
             mocked_exists.assert_called_with(directory_to_check)
             self.assertRaises(ValueError, check_directory_exists, directory_to_check)
+
+    def test_extension_loader_no_files_found(self):
+        """
+        Test the `extension_loader` function when no files are found
+        """
+        # GIVEN: A mocked `iglob` function which does not match any files
+        with patch('openlp.core.common.glob.iglob', return_value=[]), \
+                patch('openlp.core.common.importlib.machinery.SourceFileLoader') as mocked_source_file_loader:
+
+            # WHEN: Calling `extension_loader`
+            extension_loader('glob', ['file2.py', 'file3.py'])
+
+            # THEN: `extension_loader` should not try to import any files
+            self.assertFalse(mocked_source_file_loader.called)
+
+    def test_extension_loader_files_found(self):
+        """
+        Test the `extension_loader` function when it successfully finds and loads some files
+        """
+        # GIVEN: A mocked `iglob` function which returns a list of files
+        with patch('openlp.core.common.glob.iglob', return_value=['import_dir/file1.py', 'import_dir/file2.py',
+                                                                  'import_dir/file3.py', 'import_dir/file4.py']), \
+                patch('openlp.core.common.importlib.machinery.SourceFileLoader') as mocked_source_file_loader:
+
+            # WHEN: Calling `extension_loader` with a list of files to exclude
+            extension_loader('glob', ['file2.py', 'file3.py'])
+
+            # THEN: `extension_loader` should only try to import the files that are matched by the blob, excluding the
+            #       files listed in the `excluded_files` argument
+            mocked_source_file_loader.assert_has_calls([call('file1', 'import_dir/file1.py'), call().load_module(),
+                                                        call('file4', 'import_dir/file4.py'), call().load_module()])
+
+    def test_extension_loader_import_error(self):
+        """
+        Test the `extension_loader` function when `SourceFileLoader` raises a `ImportError`
+        """
+        # GIVEN: A mocked `SourceFileLoader` which raises an `ImportError`
+        with patch('openlp.core.common.glob.iglob', return_value=['import_dir/file1.py', 'import_dir/file2.py',
+                                                                  'import_dir/file3.py', 'import_dir/file4.py']), \
+                patch('openlp.core.common.importlib.machinery.SourceFileLoader', side_effect=ImportError()), \
+                patch('openlp.core.common.log') as mocked_logger:
+
+            # WHEN: Calling `extension_loader`
+            extension_loader('glob')
+
+            # THEN: The `ImportError` should be caught and logged
+            self.assertTrue(mocked_logger.warning.called)
+
+    def test_extension_loader_os_error(self):
+        """
+        Test the `extension_loader` function when `SourceFileLoader` raises a `ImportError`
+        """
+        # GIVEN: A mocked `SourceFileLoader` which raises an `OSError`
+        with patch('openlp.core.common.glob.iglob', return_value=['import_dir/file1.py']), \
+                patch('openlp.core.common.importlib.machinery.SourceFileLoader', side_effect=OSError()), \
+                patch('openlp.core.common.log') as mocked_logger:
+
+            # WHEN: Calling `extension_loader`
+            extension_loader('glob')
+
+            # THEN: The `OSError` should be caught and logged
+            self.assertTrue(mocked_logger.warning.called)
 
     def test_de_hump_conversion(self):
         """
