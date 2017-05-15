@@ -88,7 +88,7 @@ def extension_loader(glob_pattern, excluded_files=[]):
     :param glob_pattern: A glob pattern used to find the extension(s) to be imported. Should be relative to the
         application directory. i.e. openlp/plugins/*/*plugin.py
     :type glob_pattern: str
-    
+
     :param excluded_files: A list of file names to exclude that the glob pattern may find.
     :type excluded_files: list of strings
 
@@ -108,13 +108,14 @@ def extension_loader(glob_pattern, excluded_files=[]):
             log.warning('Failed to import {module_name} on path {extension_path}'
                         .format(module_name=module_name, extension_path=str(extension_path)))
 
+
 def path_to_module(path):
     """
     Convert a path to a module name (i.e openlp.core.common)
-    
+
     :param path: The path to convert to a module name.
     :type path: Path
-    
+
     :return: The module name.
     :rtype: str
     """
