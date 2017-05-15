@@ -23,7 +23,7 @@
 Package to test the openlp.core.ui.media.webkitplayer package.
 """
 from unittest import TestCase
-from tests.functional import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from openlp.core.ui.media.webkitplayer import WebkitPlayer
 

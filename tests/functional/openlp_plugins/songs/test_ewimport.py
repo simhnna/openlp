@@ -22,11 +22,9 @@
 """
 This module contains tests for the EasyWorship song importer.
 """
-
 import os
 from unittest import TestCase
-
-from tests.functional import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry
 from openlp.plugins.songs.lib.importers.easyworship import EasyWorshipSongImport, FieldDescEntry, FieldType

@@ -19,13 +19,12 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-This module contains tests for the VideoPsalm song importer.
+This module contains tests for the SundayPlus song importer.
 """
-
 import os
+from unittest.mock import patch
 
 from tests.helpers.songfileimport import SongImportTestHelper
-from tests.functional import patch
 
 TEST_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'sundayplussongs'))

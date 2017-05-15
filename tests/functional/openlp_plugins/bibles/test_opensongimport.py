@@ -22,18 +22,18 @@
 """
 This module contains tests for the OpenSong Bible importer.
 """
-
 import json
 import os
 from unittest import TestCase
+from unittest.mock import MagicMock, patch, call
 
 from lxml import objectify
 
-from tests.functional import MagicMock, patch, call
-from tests.helpers.testmixin import TestMixin
 from openlp.core.common import Registry
 from openlp.plugins.bibles.lib.importers.opensong import OpenSongBible, get_text, parse_chapter_number
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
+
+from tests.helpers.testmixin import TestMixin
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                          '..', '..', '..', 'resources', 'bibles'))

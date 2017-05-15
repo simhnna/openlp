@@ -26,11 +26,11 @@ import os
 import tempfile
 import urllib
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry
 from openlp.core.ui.firsttimeform import FirstTimeForm
 
-from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
 FAKE_CONFIG = b"""

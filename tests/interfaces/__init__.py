@@ -19,9 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import sys
-
-if sys.version_info[1] >= 3:
-    from unittest.mock import patch, MagicMock
-else:
-    from mock import patch, MagicMock
+"""
+Interface tests
+"""

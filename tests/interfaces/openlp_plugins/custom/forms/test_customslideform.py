@@ -23,12 +23,13 @@
 Module to test the EditCustomSlideForm.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
 from openlp.core.common import Registry
 from openlp.plugins.custom.forms.editcustomslideform import EditCustomSlideForm
-from tests.interfaces import MagicMock, patch
+
 from tests.helpers.testmixin import TestMixin
 
 
