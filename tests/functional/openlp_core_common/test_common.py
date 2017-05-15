@@ -22,12 +22,13 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
-
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
+from openlp.core import common
 from openlp.core.common import check_directory_exists, clean_button_text, de_hump, extension_loader, is_macosx, \
-    is_linux, is_win, trace_error_handler, translate
+    is_linux, is_win, path_to_module, trace_error_handler, translate
 
 
 class TestCommonFunctions(TestCase):
@@ -77,41 +78,44 @@ class TestCommonFunctions(TestCase):
         """
         Test the `extension_loader` function when no files are found
         """
-        # GIVEN: A mocked `iglob` function which does not match any files
-        with patch('openlp.core.common.glob.iglob', return_value=[]), \
-                patch('openlp.core.common.importlib.machinery.SourceFileLoader') as mocked_source_file_loader:
+        # GIVEN: A mocked `Path.glob` method which does not match any files
+        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
+                patch.object(common.Path, 'glob', return_value=[]), \
+                patch('openlp.core.common.importlib.import_module') as mocked_import_module:
 
             # WHEN: Calling `extension_loader`
             extension_loader('glob', ['file2.py', 'file3.py'])
 
             # THEN: `extension_loader` should not try to import any files
-            self.assertFalse(mocked_source_file_loader.called)
+            self.assertFalse(mocked_import_module.called)
 
     def test_extension_loader_files_found(self):
         """
         Test the `extension_loader` function when it successfully finds and loads some files
         """
-        # GIVEN: A mocked `iglob` function which returns a list of files
-        with patch('openlp.core.common.glob.iglob', return_value=['import_dir/file1.py', 'import_dir/file2.py',
-                                                                  'import_dir/file3.py', 'import_dir/file4.py']), \
-                patch('openlp.core.common.importlib.machinery.SourceFileLoader') as mocked_source_file_loader:
+        # GIVEN: A mocked `Path.glob` method which returns a list of files
+        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
+                patch.object(common.Path, 'glob', return_value=[Path('/app/dir/openlp/import_dir/file1.py'),
+                                                                Path('/app/dir/openlp/import_dir/file2.py'),
+                                                                Path('/app/dir/openlp/import_dir/file3.py'),
+                                                                Path('/app/dir/openlp/import_dir/file4.py')]), \
+                patch('openlp.core.common.importlib.import_module') as mocked_import_module:
 
             # WHEN: Calling `extension_loader` with a list of files to exclude
             extension_loader('glob', ['file2.py', 'file3.py'])
 
             # THEN: `extension_loader` should only try to import the files that are matched by the blob, excluding the
             #       files listed in the `excluded_files` argument
-            mocked_source_file_loader.assert_has_calls([call('file1', 'import_dir/file1.py'), call().load_module(),
-                                                        call('file4', 'import_dir/file4.py'), call().load_module()])
+            mocked_import_module.assert_has_calls([call('openlp.import_dir.file1'), call('openlp.import_dir.file4')])
 
     def test_extension_loader_import_error(self):
         """
         Test the `extension_loader` function when `SourceFileLoader` raises a `ImportError`
         """
-        # GIVEN: A mocked `SourceFileLoader` which raises an `ImportError`
-        with patch('openlp.core.common.glob.iglob', return_value=['import_dir/file1.py', 'import_dir/file2.py',
-                                                                  'import_dir/file3.py', 'import_dir/file4.py']), \
-                patch('openlp.core.common.importlib.machinery.SourceFileLoader', side_effect=ImportError()), \
+        # GIVEN: A mocked `import_module` which raises an `ImportError`
+        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
+                patch.object(common.Path, 'glob', return_value=[Path('/app/dir/openlp/import_dir/file1.py')]), \
+                patch('openlp.core.common.importlib.import_module', side_effect=ImportError()), \
                 patch('openlp.core.common.log') as mocked_logger:
 
             # WHEN: Calling `extension_loader`
@@ -122,11 +126,12 @@ class TestCommonFunctions(TestCase):
 
     def test_extension_loader_os_error(self):
         """
-        Test the `extension_loader` function when `SourceFileLoader` raises a `ImportError`
+        Test the `extension_loader` function when `import_module` raises a `ImportError`
         """
         # GIVEN: A mocked `SourceFileLoader` which raises an `OSError`
-        with patch('openlp.core.common.glob.iglob', return_value=['import_dir/file1.py']), \
-                patch('openlp.core.common.importlib.machinery.SourceFileLoader', side_effect=OSError()), \
+        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
+                patch.object(common.Path, 'glob', return_value=[Path('/app/dir/openlp/import_dir/file1.py')]), \
+                patch('openlp.core.common.importlib.import_module', side_effect=OSError()), \
                 patch('openlp.core.common.log') as mocked_logger:
 
             # WHEN: Calling `extension_loader`
@@ -146,7 +151,7 @@ class TestCommonFunctions(TestCase):
         new_string = de_hump(string)
 
         # THEN: the new string should be converted to python format
-        self.assertTrue(new_string == "my_class", 'The class name should have been converted')
+        self.assertEqual(new_string, "my_class", 'The class name should have been converted')
 
     def test_de_hump_static(self):
         """
@@ -159,7 +164,20 @@ class TestCommonFunctions(TestCase):
         new_string = de_hump(string)
 
         # THEN: the new string should be converted to python format
-        self.assertTrue(new_string == "my_class", 'The class name should have been preserved')
+        self.assertEqual(new_string, "my_class", 'The class name should have been preserved')
+
+    def test_path_to_module(self):
+        """
+        Test `path_to_module` when supplied with a `Path` object
+        """
+        # GIVEN: A `Path` object
+        path = Path('openlp/core/ui/media/webkitplayer.py')
+
+        # WHEN: Calling path_to_module with the `Path` object
+        result = path_to_module(path)
+
+        # THEN: path_to_module should return the module name
+        self.assertEqual(result, 'openlp.core.ui.media.webkitplayer')
 
     def test_trace_error_handler(self):
         """

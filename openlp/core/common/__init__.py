@@ -23,7 +23,6 @@
 The :mod:`common` module contains most of the components and libraries that make
 OpenLP work.
 """
-import glob
 import hashlib
 import importlib
 import logging
@@ -33,6 +32,7 @@ import sys
 import traceback
 from chardet.universaldetector import UniversalDetector
 from ipaddress import IPv4Address, IPv6Address, AddressValueError
+from pathlib import Path
 from shutil import which
 from subprocess import check_output, CalledProcessError, STDOUT
 
@@ -85,31 +85,41 @@ def extension_loader(glob_pattern, excluded_files=[]):
     A utility function to find and load OpenLP extensions, such as plugins, presentation and media controllers and
     importers.
 
-    :param glob_pattern: A glob pattern used to find the extension(s) to be imported.
-        i.e. openlp_app_dir/plugins/*/*plugin.py
+    :param glob_pattern: A glob pattern used to find the extension(s) to be imported. Should be relative to the
+        application directory. i.e. openlp/plugins/*/*plugin.py
     :type glob_pattern: str
+    
     :param excluded_files: A list of file names to exclude that the glob pattern may find.
     :type excluded_files: list of strings
 
     :return: None
     :rtype: None
     """
-    for extension_path in glob.iglob(glob_pattern):
-        filename = os.path.split(extension_path)[1]
-        if filename in excluded_files:
+    app_dir = Path(AppLocation.get_directory(AppLocation.AppDir)).parent
+    for extension_path in app_dir.glob(glob_pattern):
+        extension_path = extension_path.relative_to(app_dir)
+        if extension_path.name in excluded_files:
             continue
-        module_name = os.path.splitext(filename)[0]
+        module_name = path_to_module(extension_path)
         try:
-            loader = importlib.machinery.SourceFileLoader(module_name, extension_path)
-            loader.load_module()
-            # TODO: A better way to do this (once we drop python 3.4 support)
-            # spec = importlib.util.spec_from_file_location('what.ever', 'foo.py')
-            # module = importlib.util.module_from_spec(spec)
-            # spec.loader.exec_module(module)
+            importlib.import_module(module_name)
         except (ImportError, OSError):
             # On some platforms importing vlc.py might cause OSError exceptions. (e.g. Mac OS X)
             log.warning('Failed to import {module_name} on path {extension_path}'
-                        .format(module_name=module_name, extension_path=extension_path))
+                        .format(module_name=module_name, extension_path=str(extension_path)))
+
+def path_to_module(path):
+    """
+    Convert a path to a module name (i.e openlp.core.common)
+    
+    :param path: The path to convert to a module name.
+    :type path: Path
+    
+    :return: The module name.
+    :rtype: str
+    """
+    module_path = path.with_suffix('')
+    return '.'.join(module_path.parts)
 
 
 def get_frozen_path(frozen_option, non_frozen_option):
