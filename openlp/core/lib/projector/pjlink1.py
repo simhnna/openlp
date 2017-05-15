@@ -715,7 +715,6 @@ class PJLink1(QtNetwork.QTcpSocket):
 
         :param data: Currently selected source
         """
-        # TODO: Class 2 change: verify input does not exceed 95 bytes
         self.source = data
         log.info('({ip}) Setting data source to "{data}"'.format(ip=self.ip, data=self.source))
         return
