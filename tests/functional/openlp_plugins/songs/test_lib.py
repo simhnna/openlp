@@ -206,7 +206,7 @@ class TestLib(TestCase):
         assert result[0][3] == 0, 'The start indices should be kept.'
         assert result[0][4] == 21, 'The stop indices should be kept.'
 
-    def test_remove_typos_beginning_negated(self):
+    def test_remove_typos_middle_negated(self):
         """
         Test the _remove_typos function with a large difference in the middle.
         """

@@ -764,6 +764,23 @@ class TestLib(TestCase):
                         '&nbsp;&nbsp;</span> <span class="chord"><span><strong>G</strong></span></span></span>'
         self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')
 
+    def test_expand_chords2(self):
+        """
+        Test that the expanding of chords works as expected when special chars are involved.
+        """
+        import html
+        # GIVEN: A lyrics-line with chords
+        text_with_chords = "I[D]'M NOT MOVED BY WHAT I SEE HALLE[F]LUJA[C]H"
+
+        # WHEN: Expanding the chords
+        text_with_expanded_chords = expand_tags(text_with_chords, True)
+
+        # THEN: We should get html that looks like below
+        expected_html = '<span class="chordline firstchordline">I<span class="chord"><span><strong>D</strong></span>' \
+                        '</span>&#x27;M NOT MOVED BY WHAT I SEE HALLE<span class="chord"><span><strong>F</strong>' \
+                        '</span></span>LUJA<span class="chord"><span><strong>C</strong></span></span>H</span>'
+        self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')
+
     def test_compare_chord_lyric_short_chord(self):
         """
         Test that the chord/lyric comparing works.

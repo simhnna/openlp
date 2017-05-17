@@ -261,7 +261,7 @@ class ServiceItem(RegistryProperties):
                     previous_pages[verse_tag] = (slide['raw_slide'], pages)
                 for page in pages:
                     page = page.replace('<br>', '{br}')
-                    html_data = expand_tags(html.escape(page.rstrip()), expand_chord_tags)
+                    html_data = expand_tags(page.rstrip(), expand_chord_tags)
                     new_frame = {
                         'title': clean_tags(page),
                         'text': clean_tags(page.rstrip(), expand_chord_tags),

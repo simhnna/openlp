@@ -23,18 +23,19 @@
 The :mod:`lib` module contains most of the components and libraries that make
 OpenLP work.
 """
-
+import html
 import logging
 import os
 import re
 import math
-from distutils.version import LooseVersion
 
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 
 from openlp.core.common import translate
 
 log = logging.getLogger(__name__ + '.__init__')
+
+SLIMCHARS = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
 
 
 class ServiceItemContext(object):
@@ -327,7 +328,6 @@ def expand_and_align_chords_in_line(match):
     :param match:
     :return: The line with expanded html-chords
     """
-    SLIMCHARS = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
     whitespaces = ''
     chordlen = 0
     taillen = 0
@@ -389,7 +389,8 @@ def expand_and_align_chords_in_line(match):
                 ws_right = ws_left = ' ' * wsl_mod
                 whitespaces = ws_left + '&ndash;' + ws_right
         whitespaces = '<span class="ws">' + whitespaces + '</span>'
-    return '<span class="chord"><span><strong>' + chord + '</strong></span></span>' + tail + whitespaces + remainder
+    return '<span class="chord"><span><strong>' + html.escape(chord) + '</strong></span></span>' + html.escape(tail) + \
+           whitespaces + html.escape(remainder)
 
 
 def expand_chords(text):
@@ -417,7 +418,7 @@ def expand_chords(text):
             expanded_text_lines.append(new_line)
         else:
             chords_on_prev_line = False
-            expanded_text_lines.append(line)
+            expanded_text_lines.append(html.escape(line))
     return '{br}'.join(expanded_text_lines)
 
 
@@ -429,7 +430,6 @@ def compare_chord_lyric(chord, lyric):
     :param lyric:
     :return:
     """
-    SLIMCHARS = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
     chordlen = 0
     if chord == '&nbsp;':
         return 0
