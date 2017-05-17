@@ -17,52 +17,80 @@
 * Temple Place, Suite 330, Boston, MA 02111-1307 USA                          *
 ******************************************************************************/
 
-body {
-  background-color: black;
-  font-family: sans-serif;
-  overflow: hidden;
-  -webkit-user-select: none; /* Chrome/Safari */
-  -moz-user-select: none;    /* Firefox */
-  -ms-user-select: none;     /* IE 10+ */
-  user-select: none;         /* Future */
+#header {
+  padding-bottom: 1em;
 }
 
-#currentslide {
-  font-size: 40pt;
-  color: white;
-  padding-bottom: 0px;
-}
-
-#nextslide {
-  font-size: 40pt;
-  color: grey;
-  padding-top: 0px;
-  padding-bottom: 0px;
-}
-
-#right {
-  float: right;
-}
-
-#clock {
+#transpose,
+#transposevalue,
+#capodisplay {
+  display: inline-block;
   font-size: 30pt;
-  color: yellow;
-  text-align: right;
+  color: gray;
+  vertical-align: middle;
 }
 
-#notes {
-  font-size: 36pt;
-  color: salmon;
-  text-align: right;
+.button {
+  display: inline-block;
+  box-sizing: border-box;
+  border: 1px solid gray;
+  border-radius: .3em;
+  padding: 0 .2em;
+  min-width: 1.2em;
+  line-height: 1.2em;
+  font-size: 25pt;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px white;
+  color: black;
+  background: linear-gradient(to bottom, white 5%, gray 100%);
+  background-color: gray;
+  cursor: pointer;
+}
+.button:hover {
+  background: linear-gradient(to bottom, white 10%, gray 150%);
+  color: darkslategray ;
+  background-color: gray;
+}
+.button:active {
+  position:relative;
+  top:1px;
 }
 
+/* Extending existing definition in stage.css */
 #verseorder {
-  font-size: 30pt;
-  color: green;
-  text-align: left;
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
 }
 
-.currenttag {
-   color: lightgreen;
-   font-weight: bold;
+.chordline {
+  line-height: 2.0;
+}
+
+.chordline1 {
+  line-height: 1.0
+}
+
+.chordline span.chord span {
+  position: relative;
+}
+
+.chordline span.chord span strong {
+  position: absolute;
+  top: -0.8em;
+  left: 0;
+  font-size: 30pt;
+  font-weight: normal;
+  line-height: normal;
+  color: yellow;
+}
+
+.ws {
+  white-space: pre-wrap;
+}
+
+#nextslide .chordline span.chord span strong {
+  color: gray;
 }

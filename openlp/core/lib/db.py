@@ -172,6 +172,7 @@ def upgrade_db(url, upgrade):
     else:
         version = int(version_meta.value)
     if version > upgrade.__version__:
+        session.remove()
         return version, upgrade.__version__
     version += 1
     try:
@@ -194,7 +195,7 @@ def upgrade_db(url, upgrade):
         session.commit()
     upgrade_version = upgrade.__version__
     version = int(version_meta.value)
-    session.close()
+    session.remove()
     return version, upgrade_version
 
 
