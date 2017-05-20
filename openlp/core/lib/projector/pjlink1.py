@@ -42,7 +42,7 @@ log = logging.getLogger(__name__)
 
 log.debug('pjlink1 loaded')
 
-__all__ = ['PJLink1']
+__all__ = ['PJLink']
 
 from codecs import decode
 
@@ -68,7 +68,7 @@ PJLINK_HEADER = '{prefix}{{linkclass}}'.format(prefix=PJLINK_PREFIX)
 PJLINK_SUFFIX = CR
 
 
-class PJLink1(QtNetwork.QTcpSocket):
+class PJLink(QtNetwork.QTcpSocket):
     """
     Socket service for connecting to a PJLink-capable projector.
     """
@@ -129,7 +129,7 @@ class PJLink1(QtNetwork.QTcpSocket):
         self.ip = ip
         self.port = port
         self.pin = pin
-        super(PJLink1, self).__init__()
+        super(PJLink, self).__init__()
         self.dbid = None
         self.location = None
         self.notes = None
@@ -162,7 +162,7 @@ class PJLink1(QtNetwork.QTcpSocket):
         # Socket timer for some possible brain-dead projectors or network cable pulled
         self.socket_timer = None
         # Map command to function
-        self.pjlink1_functions = {
+        self.pjlink_functions = {
             'AVMT': self.process_avmt,
             'CLSS': self.process_clss,
             'ERST': self.process_erst,
@@ -286,7 +286,7 @@ class PJLink1(QtNetwork.QTcpSocket):
         elif status in STATUS_STRING:
             return STATUS_STRING[status], ERROR_MSG[status]
         else:
-            return status, translate('OpenLP.PJLink1', 'Unknown status')
+            return status, translate('OpenLP.PJLink', 'Unknown status')
 
     def change_status(self, status, msg=None):
         """
@@ -296,7 +296,7 @@ class PJLink1(QtNetwork.QTcpSocket):
         :param status: Status code
         :param msg: Optional message
         """
-        message = translate('OpenLP.PJLink1', 'No message') if msg is None else msg
+        message = translate('OpenLP.PJLink', 'No message') if msg is None else msg
         (code, message) = self._get_status(status)
         if msg is not None:
             message = msg
@@ -576,7 +576,7 @@ class PJLink1(QtNetwork.QTcpSocket):
         if sent == -1:
             # Network error?
             self.change_status(E_NETWORK,
-                               translate('OpenLP.PJLink1', 'Error while sending data to projector'))
+                               translate('OpenLP.PJLink', 'Error while sending data to projector'))
 
     def process_command(self, cmd, data):
         """
@@ -625,8 +625,9 @@ class PJLink1(QtNetwork.QTcpSocket):
             self.projectorReceivedData.emit()
             return
 
-        if cmd in self.pjlink1_functions:
-            self.pjlink1_functions[cmd](data)
+        if cmd in self.pjlink_functions:
+            log.debug('({ip}) Calling function for {cmd}'.format(ip=self.ip, cmd=cmd))
+            self.pjlink_functions[cmd](data)
         else:
             log.warning('({ip}) Invalid command {data}'.format(ip=self.ip, data=cmd))
         self.send_busy = False
@@ -662,6 +663,7 @@ class PJLink1(QtNetwork.QTcpSocket):
 
         :param data: Power status
         """
+        log.debug('({ip}: Processing POWR command'.format(ip=self.ip))
         if data in PJLINK_POWR_STATUS:
             power = PJLINK_POWR_STATUS[data]
             update_icons = self.power != power

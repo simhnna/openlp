@@ -25,13 +25,13 @@ Package to test the openlp.core.lib.projector.pjlink1 package.
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
 
-from openlp.core.lib.projector.pjlink1 import PJLink1
+from openlp.core.lib.projector.pjlink1 import PJLink
 from openlp.core.lib.projector.constants import E_PARAMETER, ERROR_STRING, S_OFF, S_STANDBY, S_ON, \
     PJLINK_POWR_STATUS, S_CONNECTED
 
 from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_CONNECT_AUTHENTICATE, TEST_HASH
 
-pjlink_test = PJLink1(name='test', ip='127.0.0.1', pin=TEST_PIN, no_poll=True)
+pjlink_test = PJLink(name='test', ip='127.0.0.1', pin=TEST_PIN, no_poll=True)
 
 
 class TestPJLink(TestCase):
@@ -164,23 +164,36 @@ class TestPJLink(TestCase):
                           'Lamp 3 hours should have been set to 33333')
 
     @patch.object(pjlink_test, 'projectorReceivedData')
-    def test_projector_process_power_on(self, mock_projectorReceivedData):
+    @patch.object(pjlink_test, 'projectorUpdateIcons')
+    @patch.object(pjlink_test, 'send_command')
+    @patch.object(pjlink_test, 'change_status')
+    def test_projector_process_power_on(self, mock_change_status,
+                                        mock_send_command,
+                                        mock_UpdateIcons,
+                                        mock_ReceivedData):
         """
         Test status power to ON
         """
         # GIVEN: Test object and preset
         pjlink = pjlink_test
         pjlink.power = S_STANDBY
-        pjlink.socket_timer = MagicMock()
 
         # WHEN: Call process_command with turn power on command
         pjlink.process_command('POWR', PJLINK_POWR_STATUS[S_ON])
 
         # THEN: Power should be set to ON
         self.assertEquals(pjlink.power, S_ON, 'Power should have been set to ON')
+        mock_send_command.assert_called_once_with('INST')
+        self.assertEquals(mock_UpdateIcons.emit.called, True, 'projectorUpdateIcons should have been called')
 
     @patch.object(pjlink_test, 'projectorReceivedData')
-    def test_projector_process_power_off(self, mock_projectorReceivedData):
+    @patch.object(pjlink_test, 'projectorUpdateIcons')
+    @patch.object(pjlink_test, 'send_command')
+    @patch.object(pjlink_test, 'change_status')
+    def test_projector_process_power_off(self, mock_change_status,
+                                         mock_send_command,
+                                         mock_UpdateIcons,
+                                         mock_ReceivedData):
         """
         Test status power to STANDBY
         """
@@ -193,6 +206,8 @@ class TestPJLink(TestCase):
 
         # THEN: Power should be set to STANDBY
         self.assertEquals(pjlink.power, S_STANDBY, 'Power should have been set to STANDBY')
+        self.assertEquals(mock_send_command.called, False, 'send_command should not have been called')
+        self.assertEquals(mock_UpdateIcons.emit.called, True, 'projectorUpdateIcons should have been called')
 
     @patch.object(pjlink_test, 'projectorUpdateIcons')
     def test_projector_process_avmt_closed_unmuted(self, mock_projectorReceivedData):
@@ -372,7 +387,7 @@ class TestPJLink(TestCase):
     @patch.object(pjlink_test, '_not_implemented')
     def not_implemented_test(self, mock_not_implemented):
         """
-        Test pjlink1._not_implemented method being called
+        Test PJLink._not_implemented method being called
         """
         # GIVEN: test object
         pjlink = pjlink_test
@@ -381,13 +396,13 @@ class TestPJLink(TestCase):
         # WHEN: A future command is called that is not implemented yet
         pjlink.process_command(test_cmd, "Garbage data for test only")
 
-        # THEN: pjlink1.__not_implemented should have been called with test_cmd
+        # THEN: PJLink.__not_implemented should have been called with test_cmd
         mock_not_implemented.assert_called_with(test_cmd)
 
     @patch.object(pjlink_test, 'disconnect_from_host')
     def socket_abort_test(self, mock_disconnect):
         """
-        Test PJLink1.socket_abort calls disconnect_from_host
+        Test PJLink.socket_abort calls disconnect_from_host
         """
         # GIVEN: Test object
         pjlink = pjlink_test
@@ -400,7 +415,7 @@ class TestPJLink(TestCase):
 
     def poll_loop_not_connected_test(self):
         """
-        Test PJLink1.poll_loop not connected return
+        Test PJLink.poll_loop not connected return
         """
         # GIVEN: Test object and mocks
         pjlink = pjlink_test
@@ -409,7 +424,7 @@ class TestPJLink(TestCase):
         pjlink.state.return_value = False
         pjlink.ConnectedState = True
 
-        # WHEN: PJLink1.poll_loop called
+        # WHEN: PJLink.poll_loop called
         pjlink.poll_loop()
 
         # THEN: poll_loop should exit without calling any other method
@@ -418,7 +433,7 @@ class TestPJLink(TestCase):
     @patch.object(pjlink_test, 'send_command')
     def poll_loop_start_test(self, mock_send_command):
         """
-        Test PJLink1.poll_loop makes correct calls
+        Test PJLink.poll_loop makes correct calls
         """
         # GIVEN: test object and test data
         pjlink = pjlink_test
@@ -450,7 +465,7 @@ class TestPJLink(TestCase):
             call('NAME', queue=True),
         ]
 
-        # WHEN: PJLink1.poll_loop is called
+        # WHEN: PJLink.poll_loop is called
         pjlink.poll_loop()
 
         # THEN: proper calls were made to retrieve projector data
