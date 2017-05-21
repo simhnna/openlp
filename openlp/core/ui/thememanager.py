@@ -379,11 +379,10 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             critical_error_message_box(message=translate('OpenLP.ThemeManager', 'You have not selected a theme.'))
             return
         theme = item.data(QtCore.Qt.UserRole)
-        path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                                                          translate('OpenLP.ThemeManager',
-                                                                    'Save Theme - ({name})').format(name=theme),
-                                                          Settings().value(self.settings_section +
-                                                                           '/last directory export'))
+        path, filter_used = QtWidgets.QFileDialog.getSaveFileName(self.main_window,
+            translate('OpenLP.ThemeManager', 'Save Theme - ({name})').format(name=theme),
+            Settings().value(self.settings_section + '/last directory export'),
+            translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
         self.application.set_busy_cursor()
         if path:
             Settings().setValue(self.settings_section + '/last directory export', path)
@@ -394,13 +393,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                                                             'Your theme has been successfully exported.'))
         self.application.set_normal_cursor()
 
-    def _export_theme(self, path, theme):
+    def _export_theme(self, theme_path, theme):
         """
         Create the zipfile with the theme contents.
-        :param path: Location where the zip file will be placed
+        :param theme_path: Location where the zip file will be placed
         :param theme: The name of the theme to be exported
         """
-        theme_path = os.path.join(path, theme + '.otz')
         theme_zip = None
         try:
             theme_zip = zipfile.ZipFile(theme_path, 'w')
