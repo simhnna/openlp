@@ -556,16 +556,24 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         abort_import = True
         try:
             theme_zip = zipfile.ZipFile(file_name)
-            xml_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.xml']
-            if len(xml_file) != 1:
-                self.log_error('Theme contains "{val:d}" XML files'.format(val=len(xml_file)))
-                raise ValidationError
-            xml_tree = ElementTree(element=XML(theme_zip.read(xml_file[0]))).getroot()
-            theme_version = xml_tree.get('version', default=None)
-            if not theme_version or float(theme_version) < 2.0:
-                self.log_error('Theme version is less than 2.0')
-                raise ValidationError
-            theme_name = xml_tree.find('name').text.strip()
+            json_theme = False
+            json_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.json']
+            if len(json_file) != 1:
+                xml_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.xml']
+                if len(xml_file) != 1:
+                    self.log_error('Theme contains "{val:d}" theme files'.format(val=len(xml_file)))
+                    raise ValidationError
+                xml_tree = ElementTree(element=XML(theme_zip.read(xml_file[0]))).getroot()
+                theme_version = xml_tree.get('version', default=None)
+                if not theme_version or float(theme_version) < 2.0:
+                    self.log_error('Theme version is less than 2.0')
+                    raise ValidationError
+                theme_name = xml_tree.find('name').text.strip()
+            else:
+                theme = Theme()
+                theme.load_theme(theme_zip.read(json_file[0]).decode("utf-8"))
+                theme_name = theme.theme_name
+                json_theme = True
             theme_folder = os.path.join(directory, theme_name)
             theme_exists = os.path.exists(theme_folder)
             if theme_exists and not self.over_write_message_box(theme_name):
@@ -581,7 +589,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     continue
                 full_name = os.path.join(directory, out_name)
                 check_directory_exists(os.path.dirname(full_name))
-                if os.path.splitext(name)[1].lower() == '.xml':
+                if os.path.splitext(name)[1].lower() == '.xml' or os.path.splitext(name)[1].lower() == '.json':
                     file_xml = str(theme_zip.read(name), 'utf-8')
                     out_file = open(full_name, 'w', encoding='utf-8')
                     out_file.write(file_xml)
@@ -604,7 +612,10 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             if not abort_import:
                 # As all files are closed, we can create the Theme.
                 if file_xml:
-                    theme = self._create_theme_from_xml(file_xml, self.path)
+                    if json_theme:
+                        theme = self._create_theme_from_json(file_xml, self.path)
+                    else:
+                        theme = self._create_theme_from_xml(file_xml, self.path)
                     self.generate_and_save_image(theme_name, theme)
                 # Only show the error message, when IOError was not raised (in
                 # this case the error message has already been shown).
