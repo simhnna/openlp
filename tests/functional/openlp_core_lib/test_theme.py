@@ -38,7 +38,7 @@ class TestTheme(TestCase):
         """
         Test the Theme constructor
         """
-        # GIVEN: The ThemeXML class
+        # GIVEN: The Theme class
         # WHEN: A theme object is created
         default_theme = Theme()
 
@@ -49,7 +49,7 @@ class TestTheme(TestCase):
         """
         Test the expand_json method
         """
-        # GIVEN: A ThemeXML object and some JSON to "expand"
+        # GIVEN: A Theme object and some JSON to "expand"
         theme = Theme()
         theme_json = {
             'background': {
@@ -69,7 +69,7 @@ class TestTheme(TestCase):
             }
         }
 
-        # WHEN: ThemeXML.expand_json() is run
+        # WHEN: Theme.expand_json() is run
         theme.expand_json(theme_json)
 
         # THEN: The attributes should be set on the object
@@ -86,7 +86,7 @@ class TestTheme(TestCase):
         theme.background_type = 'video'
         path = os.path.expanduser('~')
 
-        # WHEN: ThemeXML.extend_image_filename is run
+        # WHEN: Theme.extend_image_filename is run
         theme.extend_image_filename(path)
 
         # THEN: The filename of the background should be correct
