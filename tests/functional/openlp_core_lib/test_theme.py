@@ -32,7 +32,7 @@ from openlp.core.lib.theme import Theme
 
 class TestTheme(TestCase):
     """
-    Test the ThemeL class
+    Test the Theme class
     """
     def test_new_theme(self):
         """
