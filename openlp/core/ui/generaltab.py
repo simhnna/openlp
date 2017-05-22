@@ -267,7 +267,7 @@ class GeneralTab(SettingsTab):
         self.start_paused_check_box.setText(translate('OpenLP.GeneralTab', 'Start background audio paused'))
         self.repeat_list_check_box.setText(translate('OpenLP.GeneralTab', 'Repeat track list'))
         self.logo_file_path_edit.dialog_caption = dialog_caption = translate('OpenLP.AdvancedTab', 'Select Logo File')
-        self.logo_file_path_edit.filters = '{text};;{names} (*.*)'.format(
+        self.logo_file_path_edit.filters = '{text};;{names} (*)'.format(
             text=get_images_filter(), names=UiStrings().AllFiles)
 
     def load(self):
