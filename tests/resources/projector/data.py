@@ -27,6 +27,8 @@ import os
 from tempfile import gettempdir
 
 # Test data
+TEST_DB_PJLINK1 = 'projector_pjlink1.sqlite'
+
 TEST_DB = os.path.join(gettempdir(), 'openlp-test-projectordb.sql')
 
 TEST_SALT = '498e4a67'
@@ -44,21 +46,33 @@ TEST1_DATA = dict(ip='111.111.111.111',
                   pin='1111',
                   name='___TEST_ONE___',
                   location='location one',
-                  notes='notes one')
+                  notes='notes one',
+                  serial_no='Serial Number 1',
+                  sw_version='Version 1',
+                  model_filter='Filter type 1',
+                  model_lamp='Lamp type 1')
 
 TEST2_DATA = dict(ip='222.222.222.222',
                   port='2222',
                   pin='2222',
                   name='___TEST_TWO___',
                   location='location two',
-                  notes='notes two')
+                  notes='notes one',
+                  serial_no='Serial Number 2',
+                  sw_version='Version 2',
+                  model_filter='Filter type 2',
+                  model_lamp='Lamp type 2')
 
 TEST3_DATA = dict(ip='333.333.333.333',
                   port='3333',
                   pin='3333',
                   name='___TEST_THREE___',
                   location='location three',
-                  notes='notes three')
+                  notes='notes one',
+                  serial_no='Serial Number 3',
+                  sw_version='Version 3',
+                  model_filter='Filter type 3',
+                  model_lamp='Lamp type 3')
 
 TEST_VIDEO_CODES = {
     '11': 'RGB 1',
