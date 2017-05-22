@@ -48,7 +48,8 @@ __all__ = ['S_OK', 'E_GENERAL', 'E_NOT_CONNECTED', 'E_FAN', 'E_LAMP', 'E_TEMP',
            'S_INFO', 'S_NETWORK_SENDING', 'S_NETWORK_RECEIVED',
            'ERROR_STRING', 'CR', 'LF', 'PJLINK_ERST_STATUS', 'PJLINK_POWR_STATUS',
            'PJLINK_PORT', 'PJLINK_MAX_PACKET', 'TIMEOUT', 'ERROR_MSG', 'PJLINK_ERRORS',
-           'STATUS_STRING', 'PJLINK_VALID_CMD', 'CONNECTION_ERRORS']
+           'STATUS_STRING', 'PJLINK_VALID_CMD', 'CONNECTION_ERRORS',
+           'PJLINK_DEFAULT_SOURCES', 'PJLINK_DEFAULT_CODES', 'PJLINK_DEFAULT_ITEMS']
 
 # Set common constants.
 CR = chr(0x0D)  # \r
@@ -56,20 +57,35 @@ LF = chr(0x0A)  # \n
 PJLINK_PORT = 4352
 TIMEOUT = 30.0
 PJLINK_MAX_PACKET = 136
-PJLINK_VALID_CMD = {'1': ['PJLINK',  # Initial connection
-                          'POWR',  # Power option
-                          'INPT',  # Video sources option
-                          'AVMT',  # Shutter option
-                          'ERST',  # Error status option
-                          'LAMP',  # Lamp(s) query (Includes fans)
-                          'INST',  # Input sources available query
-                          'NAME',  # Projector name query
-                          'INF1',  # Manufacturer name query
-                          'INF2',  # Product name query
-                          'INFO',  # Other information query
-                          'CLSS'   # PJLink class support query
-                          ]}
-
+# NOTE: Change format to account for some commands are both class 1 and 2
+PJLINK_VALID_CMD = {
+    'ACKN': ['2', ],  # UDP Reply to 'SRCH'
+    'AVMT': ['1', ],  # Shutter option
+    'CLSS': ['1', ],   # PJLink class support query
+    'ERST': ['1', '2'],  # Error status option
+    'FILT': ['2', ],  # Get current filter usage time
+    'FREZ': ['2', ],  # Set freeze/unfreeze picture being projected
+    'INF1': ['1', ],  # Manufacturer name query
+    'INF2': ['1', ],  # Product name query
+    'INFO': ['1', ],  # Other information query
+    'INNM': ['2', ],  # Get Video source input terminal name
+    'INPT': ['1', ],  # Video sources option
+    'INST': ['1', ],  # Input sources available query
+    'IRES': ['2', ],  # Get Video source resolution
+    'LAMP': ['1', ],  # Lamp(s) query (Includes fans)
+    'LKUP': ['2', ],  # UPD Linkup status notification
+    'MVOL': ['2', ],  # Set microphone volume
+    'NAME': ['1', ],  # Projector name query
+    'PJLINK': ['1', ],  # Initial connection
+    'POWR': ['1', ],  # Power option
+    'RFIL': ['2', ],  # Get replacement air filter model number
+    'RLMP': ['2', ],  # Get lamp replacement model number
+    'RRES': ['2', ],  # Get projector recommended video resolution
+    'SNUM': ['2', ],  # Get projector serial number
+    'SRCH': ['2', ],  # UDP broadcast search for available projectors on local network
+    'SVER': ['2', ],  # Get projector software version
+    'SVOL': ['2', ]  # Set speaker volume
+}
 # Error and status codes
 S_OK = E_OK = 0  # E_OK included since I sometimes forget
 # Error codes. Start at 200 so we don't duplicate system error codes.
@@ -321,53 +337,54 @@ PJLINK_DEFAULT_SOURCES = {
     '2': translate('OpenLP.DB', 'Video'),
     '3': translate('OpenLP.DB', 'Digital'),
     '4': translate('OpenLP.DB', 'Storage'),
-    '5': translate('OpenLP.DB', 'Network')
+    '5': translate('OpenLP.DB', 'Network'),
+    '6': translate('OpenLP.DB', 'Internal')
 }
 
-PJLINK_DEFAULT_CODES = {
-    '11': translate('OpenLP.DB', 'RGB 1'),
-    '12': translate('OpenLP.DB', 'RGB 2'),
-    '13': translate('OpenLP.DB', 'RGB 3'),
-    '14': translate('OpenLP.DB', 'RGB 4'),
-    '15': translate('OpenLP.DB', 'RGB 5'),
-    '16': translate('OpenLP.DB', 'RGB 6'),
-    '17': translate('OpenLP.DB', 'RGB 7'),
-    '18': translate('OpenLP.DB', 'RGB 8'),
-    '19': translate('OpenLP.DB', 'RGB 9'),
-    '21': translate('OpenLP.DB', 'Video 1'),
-    '22': translate('OpenLP.DB', 'Video 2'),
-    '23': translate('OpenLP.DB', 'Video 3'),
-    '24': translate('OpenLP.DB', 'Video 4'),
-    '25': translate('OpenLP.DB', 'Video 5'),
-    '26': translate('OpenLP.DB', 'Video 6'),
-    '27': translate('OpenLP.DB', 'Video 7'),
-    '28': translate('OpenLP.DB', 'Video 8'),
-    '29': translate('OpenLP.DB', 'Video 9'),
-    '31': translate('OpenLP.DB', 'Digital 1'),
-    '32': translate('OpenLP.DB', 'Digital 2'),
-    '33': translate('OpenLP.DB', 'Digital 3'),
-    '34': translate('OpenLP.DB', 'Digital 4'),
-    '35': translate('OpenLP.DB', 'Digital 5'),
-    '36': translate('OpenLP.DB', 'Digital 6'),
-    '37': translate('OpenLP.DB', 'Digital 7'),
-    '38': translate('OpenLP.DB', 'Digital 8'),
-    '39': translate('OpenLP.DB', 'Digital 9'),
-    '41': translate('OpenLP.DB', 'Storage 1'),
-    '42': translate('OpenLP.DB', 'Storage 2'),
-    '43': translate('OpenLP.DB', 'Storage 3'),
-    '44': translate('OpenLP.DB', 'Storage 4'),
-    '45': translate('OpenLP.DB', 'Storage 5'),
-    '46': translate('OpenLP.DB', 'Storage 6'),
-    '47': translate('OpenLP.DB', 'Storage 7'),
-    '48': translate('OpenLP.DB', 'Storage 8'),
-    '49': translate('OpenLP.DB', 'Storage 9'),
-    '51': translate('OpenLP.DB', 'Network 1'),
-    '52': translate('OpenLP.DB', 'Network 2'),
-    '53': translate('OpenLP.DB', 'Network 3'),
-    '54': translate('OpenLP.DB', 'Network 4'),
-    '55': translate('OpenLP.DB', 'Network 5'),
-    '56': translate('OpenLP.DB', 'Network 6'),
-    '57': translate('OpenLP.DB', 'Network 7'),
-    '58': translate('OpenLP.DB', 'Network 8'),
-    '59': translate('OpenLP.DB', 'Network 9')
+PJLINK_DEFAULT_ITEMS = {
+    '1': translate('OpenLP.DB', '1'),
+    '2': translate('OpenLP.DB', '2'),
+    '3': translate('OpenLP.DB', '3'),
+    '4': translate('OpenLP.DB', '4'),
+    '5': translate('OpenLP.DB', '5'),
+    '6': translate('OpenLP.DB', '6'),
+    '7': translate('OpenLP.DB', '7'),
+    '8': translate('OpenLP.DB', '8'),
+    '9': translate('OpenLP.DB', '9'),
+    'A': translate('OpenLP.DB', 'A'),
+    'B': translate('OpenLP.DB', 'B'),
+    'C': translate('OpenLP.DB', 'C'),
+    'D': translate('OpenLP.DB', 'D'),
+    'E': translate('OpenLP.DB', 'E'),
+    'F': translate('OpenLP.DB', 'F'),
+    'G': translate('OpenLP.DB', 'G'),
+    'H': translate('OpenLP.DB', 'H'),
+    'I': translate('OpenLP.DB', 'I'),
+    'J': translate('OpenLP.DB', 'J'),
+    'K': translate('OpenLP.DB', 'K'),
+    'L': translate('OpenLP.DB', 'L'),
+    'M': translate('OpenLP.DB', 'M'),
+    'N': translate('OpenLP.DB', 'N'),
+    'O': translate('OpenLP.DB', 'O'),
+    'P': translate('OpenLP.DB', 'P'),
+    'Q': translate('OpenLP.DB', 'Q'),
+    'R': translate('OpenLP.DB', 'R'),
+    'S': translate('OpenLP.DB', 'S'),
+    'T': translate('OpenLP.DB', 'T'),
+    'U': translate('OpenLP.DB', 'U'),
+    'V': translate('OpenLP.DB', 'V'),
+    'W': translate('OpenLP.DB', 'W'),
+    'X': translate('OpenLP.DB', 'X'),
+    'Y': translate('OpenLP.DB', 'Y'),
+    'Z': translate('OpenLP.DB', 'Z')
 }
+
+# Due to the expanded nature of PJLink class 2 video sources,
+# translate the individual types then build the video source
+# dictionary from the translations.
+PJLINK_DEFAULT_CODES = dict()
+for source in PJLINK_DEFAULT_SOURCES:
+    for item in PJLINK_DEFAULT_ITEMS:
+        label = "{source}{item}".format(source=source, item=item)
+        PJLINK_DEFAULT_CODES[label] = "{source} {item}".format(source=PJLINK_DEFAULT_SOURCES[source],
+                                                               item=PJLINK_DEFAULT_ITEMS[item])

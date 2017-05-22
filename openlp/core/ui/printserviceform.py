@@ -37,7 +37,7 @@ from openlp.core.common import AppLocation
 DEFAULT_CSS = """/*
 Edit this file to customize the service order print. Note, that not all CSS
 properties are supported. See:
-http://doc.trolltech.com/4.7/richtext-html-subset.html#css-properties
+https://doc.qt.io/qt-5/richtext-html-subset.html#css-properties
 */
 
 .serviceTitle {
@@ -100,6 +100,19 @@ http://doc.trolltech.com/4.7/richtext-html-subset.html#css-properties
 
 .newPage {
     page-break-before: always;
+}
+
+table.line {}
+
+table.segment {
+  float: left;
+}
+
+td.chord {
+    font-size: 80%;
+}
+
+td.lyrics {
 }
 """
 
@@ -172,6 +185,12 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
         self._add_element('h1', html.escape(self.title_line_edit.text()), html_data.body, classId='serviceTitle')
         for index, item in enumerate(self.service_manager.service_items):
             self._add_preview_item(html_data.body, item['service_item'], index)
+        if not self.show_chords_check_box.isChecked():
+            # Remove chord row and spacing span elements when not printing chords
+            for chord_row in html_data.find_class('chordrow'):
+                chord_row.drop_tree()
+            for spacing_span in html_data.find_class('chordspacing'):
+                spacing_span.drop_tree()
         # Add the custom service notes:
         if self.footer_text_edit.toPlainText():
             div = self._add_element('div', parent=html_data.body, classId='customNotes')
@@ -196,13 +215,13 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
                 verse_def = None
                 verse_html = None
                 for slide in item.get_frames():
-                    if not verse_def or verse_def != slide['verseTag'] or verse_html == slide['html']:
+                    if not verse_def or verse_def != slide['verseTag'] or verse_html == slide['printing_html']:
                         text_div = self._add_element('div', parent=div, classId='itemText')
-                    else:
+                    elif 'chordspacing' not in slide['printing_html']:
                         self._add_element('br', parent=text_div)
-                    self._add_element('span', slide['html'], text_div)
+                    self._add_element('span', slide['printing_html'], text_div)
                     verse_def = slide['verseTag']
-                    verse_html = slide['html']
+                    verse_html = slide['printing_html']
                 # Break the page before the div element.
                 if index != 0 and self.page_break_after_text.isChecked():
                     div.set('class', 'item newPage')

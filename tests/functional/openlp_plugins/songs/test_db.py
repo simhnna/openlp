@@ -48,7 +48,8 @@ class TestDB(TestCase):
         """
         Clean up after tests
         """
-        shutil.rmtree(self.tmp_folder)
+        # Ignore errors since windows can have problems with locked files
+        shutil.rmtree(self.tmp_folder, ignore_errors=True)
 
     def test_add_author(self):
         """

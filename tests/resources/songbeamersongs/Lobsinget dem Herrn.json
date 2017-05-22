@@ -8,5 +8,8 @@
     ],
     "song_book_name": "Glaubenslieder I",
     "song_number": "1",
-    "authors": ["Carl Brockhaus", "Johann Jakob Vetter"]
+    "authors": [
+        ["Carl Brockhaus", "words"],
+        ["Johann Jakob Vetter", "music"]
+    ]
 }

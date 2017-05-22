@@ -60,6 +60,35 @@ class SongsTab(SettingsTab):
         self.display_copyright_check_box.setObjectName('copyright_check_box')
         self.mode_layout.addWidget(self.display_copyright_check_box)
         self.left_layout.addWidget(self.mode_group_box)
+        # Chords group box
+        self.chords_group_box = QtWidgets.QGroupBox(self.left_column)
+        self.chords_group_box.setObjectName('chords_group_box')
+        self.chords_group_box.setCheckable(True)
+        self.chords_layout = QtWidgets.QVBoxLayout(self.chords_group_box)
+        self.chords_layout.setObjectName('chords_layout')
+        self.chords_info_label = QtWidgets.QLabel(self.chords_group_box)
+        self.chords_info_label.setWordWrap(True)
+        self.chords_layout.addWidget(self.chords_info_label)
+        self.mainview_chords_check_box = QtWidgets.QCheckBox(self.mode_group_box)
+        self.mainview_chords_check_box.setObjectName('mainview_chords_check_box')
+        self.chords_layout.addWidget(self.mainview_chords_check_box)
+        self.disable_chords_import_check_box = QtWidgets.QCheckBox(self.mode_group_box)
+        self.disable_chords_import_check_box.setObjectName('disable_chords_import_check_box')
+        self.chords_layout.addWidget(self.disable_chords_import_check_box)
+        # Chords notation group box
+        self.chord_notation_label = QtWidgets.QLabel(self.chords_group_box)
+        self.chord_notation_label.setWordWrap(True)
+        self.chords_layout.addWidget(self.chord_notation_label)
+        self.english_notation_radio_button = QtWidgets.QRadioButton(self.chords_group_box)
+        self.english_notation_radio_button.setObjectName('english_notation_radio_button')
+        self.chords_layout.addWidget(self.english_notation_radio_button)
+        self.german_notation_radio_button = QtWidgets.QRadioButton(self.chords_group_box)
+        self.german_notation_radio_button.setObjectName('german_notation_radio_button')
+        self.chords_layout.addWidget(self.german_notation_radio_button)
+        self.neolatin_notation_radio_button = QtWidgets.QRadioButton(self.chords_group_box)
+        self.neolatin_notation_radio_button.setObjectName('neolatin_notation_radio_button')
+        self.chords_layout.addWidget(self.neolatin_notation_radio_button)
+        self.left_layout.addWidget(self.chords_group_box)
         self.left_layout.addStretch()
         self.right_layout.addStretch()
         self.tool_bar_active_check_box.stateChanged.connect(self.on_tool_bar_active_check_box_changed)
@@ -68,6 +97,11 @@ class SongsTab(SettingsTab):
         self.display_songbook_check_box.stateChanged.connect(self.on_songbook_check_box_changed)
         self.display_written_by_check_box.stateChanged.connect(self.on_written_by_check_box_changed)
         self.display_copyright_check_box.stateChanged.connect(self.on_copyright_check_box_changed)
+        self.mainview_chords_check_box.stateChanged.connect(self.on_mainview_chords_check_box_changed)
+        self.disable_chords_import_check_box.stateChanged.connect(self.on_disable_chords_import_check_box_changed)
+        self.english_notation_radio_button.clicked.connect(self.on_english_notation_button_clicked)
+        self.german_notation_radio_button.clicked.connect(self.on_german_notation_button_clicked)
+        self.neolatin_notation_radio_button.clicked.connect(self.on_neolatin_notation_button_clicked)
 
     def retranslateUi(self):
         self.mode_group_box.setTitle(translate('SongsPlugin.SongsTab', 'Song related settings'))
@@ -82,6 +116,17 @@ class SongsTab(SettingsTab):
         self.display_copyright_check_box.setText(translate('SongsPlugin.SongsTab',
                                                            'Display "{symbol}" symbol before copyright '
                                                            'info').format(symbol=SongStrings.CopyrightSymbol))
+        self.chords_info_label.setText(translate('SongsPlugin.SongsTab', 'If enabled all text between "[" and "]" will '
+                                                                         'be regarded as chords.'))
+        self.chords_group_box.setTitle(translate('SongsPlugin.SongsTab', 'Chords'))
+        self.mainview_chords_check_box.setText(translate('SongsPlugin.SongsTab', 'Display chords in the main view'))
+        self.disable_chords_import_check_box.setText(translate('SongsPlugin.SongsTab',
+                                                               'Ignore chords when importing songs'))
+        self.chord_notation_label.setText(translate('SongsPlugin.SongsTab', 'Chord notation to use:'))
+        self.english_notation_radio_button.setText(translate('SongsPlugin.SongsTab', 'English') + ' (C-D-E-F-G-A-B)')
+        self.german_notation_radio_button.setText(translate('SongsPlugin.SongsTab', 'German') + ' (C-D-E-F-G-A-H)')
+        self.neolatin_notation_radio_button.setText(
+            translate('SongsPlugin.SongsTab', 'Neo-Latin') + ' (Do-Re-Mi-Fa-Sol-La-Si)')
 
     def on_search_as_type_check_box_changed(self, check_state):
         self.song_search = (check_state == QtCore.Qt.Checked)
@@ -104,6 +149,21 @@ class SongsTab(SettingsTab):
     def on_copyright_check_box_changed(self, check_state):
         self.display_copyright_symbol = (check_state == QtCore.Qt.Checked)
 
+    def on_mainview_chords_check_box_changed(self, check_state):
+        self.mainview_chords = (check_state == QtCore.Qt.Checked)
+
+    def on_disable_chords_import_check_box_changed(self, check_state):
+        self.disable_chords_import = (check_state == QtCore.Qt.Checked)
+
+    def on_english_notation_button_clicked(self):
+        self.chord_notation = 'english'
+
+    def on_german_notation_button_clicked(self):
+        self.chord_notation = 'german'
+
+    def on_neolatin_notation_button_clicked(self):
+        self.chord_notation = 'neo-latin'
+
     def load(self):
         settings = Settings()
         settings.beginGroup(self.settings_section)
@@ -113,12 +173,25 @@ class SongsTab(SettingsTab):
         self.display_songbook = settings.value('display songbook')
         self.display_written_by = settings.value('display written by')
         self.display_copyright_symbol = settings.value('display copyright symbol')
+        self.enable_chords = settings.value('enable chords')
+        self.chord_notation = settings.value('chord notation')
+        self.mainview_chords = settings.value('mainview chords')
+        self.disable_chords_import = settings.value('disable chords import')
         self.tool_bar_active_check_box.setChecked(self.tool_bar)
         self.update_on_edit_check_box.setChecked(self.update_edit)
         self.add_from_service_check_box.setChecked(self.update_load)
         self.display_songbook_check_box.setChecked(self.display_songbook)
         self.display_written_by_check_box.setChecked(self.display_written_by)
         self.display_copyright_check_box.setChecked(self.display_copyright_symbol)
+        self.chords_group_box.setChecked(self.enable_chords)
+        self.mainview_chords_check_box.setChecked(self.mainview_chords)
+        self.disable_chords_import_check_box.setChecked(self.disable_chords_import)
+        if self.chord_notation == 'german':
+            self.german_notation_radio_button.setChecked(True)
+        elif self.chord_notation == 'neo-latin':
+            self.neolatin_notation_radio_button.setChecked(True)
+        else:
+            self.english_notation_radio_button.setChecked(True)
         settings.endGroup()
 
     def save(self):
@@ -130,6 +203,10 @@ class SongsTab(SettingsTab):
         settings.setValue('display songbook', self.display_songbook)
         settings.setValue('display written by', self.display_written_by)
         settings.setValue('display copyright symbol', self.display_copyright_symbol)
+        settings.setValue('enable chords', self.chords_group_box.isChecked())
+        settings.setValue('mainview chords', self.mainview_chords)
+        settings.setValue('disable chords import', self.disable_chords_import)
+        settings.setValue('chord notation', self.chord_notation)
         settings.endGroup()
         if self.tab_visited:
             self.settings_form.register_post_process('songs_config_updated')
