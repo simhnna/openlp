@@ -20,18 +20,17 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-The :mod:`presentationplugin` module provides the ability for OpenLP to display presentations from a variety of document
-formats.
+The :mod:`openlp.plugins.presentations.presentationplugin` module provides the ability for OpenLP to display
+presentations from a variety of document formats.
 """
 import os
 import logging
 
 from PyQt5 import QtCore
 
-from openlp.core.common import AppLocation, translate
+from openlp.core.common import AppLocation, extension_loader, translate
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.presentations.lib import PresentationController, PresentationMediaItem, PresentationTab
-
 
 log = logging.getLogger(__name__)
 
@@ -122,17 +121,9 @@ class PresentationPlugin(Plugin):
         Check to see if we have any presentation software available. If not do not install the plugin.
         """
         log.debug('check_pre_conditions')
-        controller_dir = os.path.join(AppLocation.get_directory(AppLocation.PluginsDir), 'presentations', 'lib')
-        for filename in os.listdir(controller_dir):
-            if filename.endswith('controller.py') and filename != 'presentationcontroller.py':
-                path = os.path.join(controller_dir, filename)
-                if os.path.isfile(path):
-                    module_name = 'openlp.plugins.presentations.lib.' + os.path.splitext(filename)[0]
-                    log.debug('Importing controller {name}'.format(name=module_name))
-                    try:
-                        __import__(module_name, globals(), locals(), [])
-                    except ImportError:
-                        log.warning('Failed to import {name} on path {path}'.format(name=module_name, path=path))
+        controller_dir = os.path.join('openlp', 'plugins', 'presentations', 'lib')
+        glob_pattern = os.path.join(controller_dir, '*controller.py')
+        extension_loader(glob_pattern, ['presentationcontroller.py'])
         controller_classes = PresentationController.__subclasses__()
         for controller_class in controller_classes:
             controller = controller_class(self)
