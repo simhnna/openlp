@@ -40,32 +40,42 @@ class PathEdit(QtWidgets.QWidget):
     """
     pathChanged = QtCore.pyqtSignal(str)
 
-    def __init__(self, parent=None, show_revert=True):
+    def __init__(self, parent=None, path_type=PathType.Files, default_path=None, dialog_caption=None, show_revert=True):
         """
         Initalise the PathEdit widget
 
         :param parent: The parent of the widget. This is just passed to the super method.
         :type parent: QWidget or None
+        
+        :param dialog_caption: Used to customise the caption in the QFileDialog.
+        :param dialog_caption: str
+        
+        :param default_path: The default path. This is set as the path when the revert button is clicked
+        :type default_path: str
 
         :param show_revert: Used to determin if the 'revert button' should be visible.
         :type show_revert: bool
-
-        :ivar default_path: The default path. This is set as the path when the revert button is clicked
-        :vartype default_path: str
-
-        :ivar dialog_caption: Used to customise the caption in the QFileDialog.
-        :vartype dialog_caption: str
+        
+        :return: None
+        :rtype: None
         """
         super().__init__(parent)
-        self.default_path = ''
-        self.dialog_caption = ''
-        self._path_type = PathType.Files
-        self._path = ''
+        self.default_path = default_path
+        self.dialog_caption = dialog_caption
+        self._path_type = path_type
+        self._path = None
         self.filters = '{all_files} (*)'.format(all_files=UiStrings().AllFiles)
         self._setup(show_revert)
 
     def _setup(self, show_revert):
-
+        """
+        Set up the widget
+        :param show_revert: Show or hide the revert button
+        :type show_revert: bool
+        
+        :return: None
+        :rtype: None
+        """
         widget_layout = QtWidgets.QHBoxLayout()
         widget_layout.setContentsMargins(0, 0, 0, 0)
         self.line_edit = QtWidgets.QLineEdit(self)
@@ -79,12 +89,10 @@ class PathEdit(QtWidgets.QWidget):
         self.revert_button.setVisible(show_revert)
         widget_layout.addWidget(self.revert_button)
         self.setLayout(widget_layout)
-
         # Signals and Slots
         self.browse_button.clicked.connect(self.on_browse_button_clicked)
         self.revert_button.clicked.connect(self.on_revert_button_clicked)
         self.line_edit.editingFinished.connect(self.on_line_edit_editing_finished)
-
         self.update_button_tool_tips()
 
     @property

@@ -172,9 +172,7 @@ class GeneralTab(SettingsTab):
         self.logo_layout.setObjectName('logo_layout')
         self.logo_file_label = QtWidgets.QLabel(self.logo_group_box)
         self.logo_file_label.setObjectName('logo_file_label')
-        self.logo_file_path_edit = \
-            PathEdit(self.logo_group_box)
-        self.logo_file_path_edit.default_path = ':/graphics/openlp-splash-screen.png'
+        self.logo_file_path_edit = PathEdit(self.logo_group_box, default_path=':/graphics/openlp-splash-screen.png')
         self.logo_layout.addRow(self.logo_file_label, self.logo_file_path_edit)
         self.logo_color_label = QtWidgets.QLabel(self.logo_group_box)
         self.logo_color_label.setObjectName('logo_color_label')

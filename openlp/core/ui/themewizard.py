@@ -116,8 +116,9 @@ class Ui_ThemeWizard(object):
         self.image_layout.addRow(self.image_color_label, self.image_color_button)
         self.image_label = QtWidgets.QLabel(self.image_widget)
         self.image_label.setObjectName('image_label')
-        self.image_path_edit = PathEdit(self.image_widget, show_revert=False)
-        self.image_path_edit.dialog_caption = translate('OpenLP.ThemeWizard', 'Select Image')
+        self.image_path_edit = PathEdit(self.image_widget,
+                                        dialog_caption=translate('OpenLP.ThemeWizard', 'Select Image'),
+                                        show_revert=False)
         self.image_layout.addRow(self.image_label, self.image_path_edit)
         self.image_layout.setItem(2, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.background_stack.addWidget(self.image_widget)
@@ -140,8 +141,9 @@ class Ui_ThemeWizard(object):
         self.video_layout.addRow(self.video_color_label, self.video_color_button)
         self.video_label = QtWidgets.QLabel(self.video_widget)
         self.video_label.setObjectName('video_label')
-        self.video_path_edit = PathEdit(self.video_widget, show_revert=False)
-        self.video_path_edit.dialog_caption = translate('OpenLP.ThemeWizard', 'Select Video')
+        self.video_path_edit = PathEdit(self.video_widget,
+                                        dialog_caption=translate('OpenLP.ThemeWizard', 'Select Video'),
+                                        show_revert=False)
         self.video_layout.addRow(self.video_label, self.video_path_edit)
         self.video_layout.setItem(2, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.background_stack.addWidget(self.video_widget)

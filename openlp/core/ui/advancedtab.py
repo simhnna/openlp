@@ -155,9 +155,8 @@ class AdvancedTab(SettingsTab):
         self.data_directory_layout.setObjectName('data_directory_layout')
         self.data_directory_new_label = QtWidgets.QLabel(self.data_directory_group_box)
         self.data_directory_new_label.setObjectName('data_directory_current_label')
-        self.data_directory_path_edit = PathEdit(self.data_directory_group_box)
-        self.data_directory_path_edit.path_type = PathType.Directories
-        self.data_directory_path_edit.default_path = AppLocation.get_directory(AppLocation.DataDir)
+        self.data_directory_path_edit = PathEdit(self.data_directory_group_box, path_type=PathType.Directories,
+                                                 default_path=AppLocation.get_directory(AppLocation.DataDir))
         self.data_directory_layout.addRow(self.data_directory_new_label, self.data_directory_path_edit)
         self.new_data_directory_has_files_label = QtWidgets.QLabel(self.data_directory_group_box)
         self.new_data_directory_has_files_label.setObjectName('new_data_directory_has_files_label')
