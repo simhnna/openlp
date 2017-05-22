@@ -61,7 +61,7 @@ class PathEdit(QtWidgets.QWidget):
         self.dialog_caption = ''
         self._path_type = PathType.Files
         self._path = ''
-        self.filters = '{all_files} (*.*)'.format(all_files=UiStrings().AllFiles)
+        self.filters = '{all_files} (*)'.format(all_files=UiStrings().AllFiles)
         self._setup(show_revert)
 
     def _setup(self, show_revert):
