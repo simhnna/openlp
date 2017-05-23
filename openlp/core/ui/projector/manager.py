@@ -38,7 +38,7 @@ from openlp.core.lib.projector.constants import ERROR_MSG, ERROR_STRING, E_AUTHE
     E_NETWORK, E_NOT_CONNECTED, E_UNKNOWN_SOCKET_ERROR, STATUS_STRING, S_CONNECTED, S_CONNECTING, S_COOLDOWN, \
     S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
 from openlp.core.lib.projector.db import ProjectorDB
-from openlp.core.lib.projector.pjlink1 import PJLink1
+from openlp.core.lib.projector.pjlink1 import PJLink
 from openlp.core.ui.projector.editform import ProjectorEditForm
 from openlp.core.ui.projector.sourceselectform import SourceSelectTabs, SourceSelectSingle
 
@@ -690,19 +690,19 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         Helper app to build a projector instance
 
         :param projector: Dict of projector database information
-        :returns: PJLink1() instance
+        :returns: PJLink() instance
         """
         log.debug('_add_projector()')
-        return PJLink1(dbid=projector.id,
-                       ip=projector.ip,
-                       port=int(projector.port),
-                       name=projector.name,
-                       location=projector.location,
-                       notes=projector.notes,
-                       pin=None if projector.pin == '' else projector.pin,
-                       poll_time=self.poll_time,
-                       socket_timeout=self.socket_timeout
-                       )
+        return PJLink(dbid=projector.id,
+                      ip=projector.ip,
+                      port=int(projector.port),
+                      name=projector.name,
+                      location=projector.location,
+                      notes=projector.notes,
+                      pin=None if projector.pin == '' else projector.pin,
+                      poll_time=self.poll_time,
+                      socket_timeout=self.socket_timeout
+                      )
 
     def add_projector(self, projector, start=False):
         """
@@ -961,7 +961,7 @@ class ProjectorItem(QtCore.QObject):
         """
         Initialization for ProjectorItem instance
 
-        :param link: PJLink1 instance for QListWidgetItem
+        :param link: PJLink instance for QListWidgetItem
         """
         self.link = link
         self.thread = None

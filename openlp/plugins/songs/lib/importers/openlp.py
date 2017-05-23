@@ -150,7 +150,12 @@ class OpenLPSongImport(SongImport):
                 class_mapper(OldSongBookEntry)
             except UnmappedClassError:
                 mapper(OldSongBookEntry, source_songs_songbooks_table, properties={'songbook': relation(OldBook)})
-        if has_authors_songs and 'author_type' in source_authors_songs_table.c.values():
+        if has_authors_songs:
+            try:
+                class_mapper(OldAuthorSong)
+            except UnmappedClassError:
+                mapper(OldAuthorSong, source_authors_songs_table)
+        if has_authors_songs and 'author_type' in source_authors_songs_table.c.keys():
             has_author_type = True
         else:
             has_author_type = False
@@ -191,11 +196,6 @@ class OpenLPSongImport(SongImport):
             class_mapper(OldTopic)
         except UnmappedClassError:
             mapper(OldTopic, source_topics_table)
-        if has_authors_songs:
-            try:
-                class_mapper(OldTopic)
-            except UnmappedClassError:
-                mapper(OldTopic, source_topics_table)
 
         source_songs = self.source_session.query(OldSong).all()
         if self.import_wizard:

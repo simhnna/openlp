@@ -152,6 +152,7 @@ class HttpRouter(RegistryProperties):
             ('^/$', {'function': self.serve_file, 'secure': False}),
             ('^/(stage)$', {'function': self.serve_file, 'secure': False}),
             ('^/(stage)/(.*)$', {'function': self.stages, 'secure': False}),
+            ('^/(chords)$', {'function': self.serve_file, 'secure': False}),
             ('^/(main)$', {'function': self.serve_file, 'secure': False}),
             (r'^/(\w+)/thumbnails([^/]+)?/(.*)$', {'function': self.serve_thumbnail, 'secure': False}),
             (r'^/api/poll$', {'function': self.poll, 'secure': False}),
@@ -318,10 +319,12 @@ class HttpRouter(RegistryProperties):
         """
         remote = translate('RemotePlugin.Mobile', 'Remote')
         stage = translate('RemotePlugin.Mobile', 'Stage View')
+        chords = translate('RemotePlugin.Mobile', 'Chords View')
         live = translate('RemotePlugin.Mobile', 'Live View')
         self.template_vars = {
             'app_title': "{main} {remote}".format(main=UiStrings().OLPV2x, remote=remote),
             'stage_title': "{main} {stage}".format(main=UiStrings().OLPV2x, stage=stage),
+            'chords_title': "{main} {chords}".format(main=UiStrings().OLPV2x, chords=chords),
             'live_title': "{main} {live}".format(main=UiStrings().OLPV2x, live=live),
             'service_manager': translate('RemotePlugin.Mobile', 'Service Manager'),
             'slide_controller': translate('RemotePlugin.Mobile', 'Slide Controller'),
@@ -482,7 +485,8 @@ class HttpRouter(RegistryProperties):
             'display': self.live_controller.desktop_screen.isChecked(),
             'version': 2,
             'isSecure': Settings().value(self.settings_section + '/authentication enabled'),
-            'isAuthorised': self.authorised
+            'isAuthorised': self.authorised,
+            'chordNotation': Settings().value('songs/chord notation'),
         }
         self.do_json_header()
         return json.dumps({'results': result}).encode()
@@ -554,6 +558,7 @@ class HttpRouter(RegistryProperties):
                         item['tag'] = str(frame['verseTag'])
                     else:
                         item['tag'] = str(index + 1)
+                    item['chords_text'] = str(frame['chords_text'])
                     item['text'] = str(frame['text'])
                     item['html'] = str(frame['html'])
                 # Handle images, unless a custom thumbnail is given or if thumbnails is disabled

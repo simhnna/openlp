@@ -25,10 +25,12 @@ The :mod:`songbeamer` module provides the functionality for importing SongBeamer
 import logging
 import os
 import re
+import base64
+import math
 
-from openlp.core.common import get_file_encoding
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
+from openlp.core.common import Settings, is_win, is_macosx, get_file_encoding
 
 log = logging.getLogger(__name__)
 
@@ -58,6 +60,13 @@ class SongBeamerTypes(object):
         'unbenannt': VerseType.tags[VerseType.Other],
         '$$m=': VerseType.tags[VerseType.Other]
     }
+
+
+class VerseTagMode(object):
+    Unknown = 0
+    ContainsTags = 1
+    ContainsNoTags = 2
+    ContainsNoTagsRestart = 3
 
 
 class SongBeamerImport(SongImport):
@@ -109,7 +118,7 @@ class SongBeamerImport(SongImport):
             self.set_defaults()
             self.current_verse = ''
             self.current_verse_type = VerseType.tags[VerseType.Verse]
-            read_verses = False
+            self.chord_table = None
             file_name = os.path.split(import_file)[1]
             if os.path.isfile(import_file):
                 # Detect the encoding
@@ -125,32 +134,102 @@ class SongBeamerImport(SongImport):
                 continue
             self.title = file_name.split('.sng')[0]
             read_verses = False
-            for line in song_data:
-                # Just make sure that the line is of the type 'Unicode'.
-                line = str(line).strip()
+            # The first verse separator doesn't count, but the others does, so line count starts at -1
+            line_number = -1
+            verse_tags_mode = VerseTagMode.Unknown
+            first_verse = True
+            idx = -1
+            while idx + 1 < len(song_data):
+                idx = idx + 1
+                line = song_data[idx].rstrip()
+                stripped_line = line.strip()
                 if line.startswith('#') and not read_verses:
-                    self.parseTags(line)
-                elif line.startswith('--'):
-                    # --- and -- allowed for page-breaks (difference in Songbeamer only in printout)
+                    self.parse_tags(line)
+                elif stripped_line.startswith('---'):
+                    # '---' is a verse breaker
                     if self.current_verse:
                         self.replace_html_tags()
                         self.add_verse(self.current_verse, self.current_verse_type)
                         self.current_verse = ''
                         self.current_verse_type = VerseType.tags[VerseType.Verse]
+                        first_verse = False
                     read_verses = True
                     verse_start = True
+                    # Songbeamer allows chord on line "-1", meaning the first line has only chords
+                    if line_number == -1:
+                        first_line = self.insert_chords(line_number, '')
+                        if first_line:
+                            self.current_verse = first_line.strip() + '\n'
+                    line_number += 1
+                elif stripped_line.startswith('--'):
+                    # '--' is a page breaker, we convert to optional page break
+                    self.current_verse += '[---]\n'
+                    line_number += 1
                 elif read_verses:
                     if verse_start:
                         verse_start = False
-                        if not self.check_verse_marks(line):
-                            self.current_verse = line + '\n'
+                        verse_mark = self.check_verse_marks(line)
+                        # To ensure that linenumbers are mapped correctly when inserting chords, we attempt to detect
+                        # if verse tags are inserted manually or by SongBeamer. If they are inserted manually the lines
+                        # should be counted, otherwise not. If all verses start with a tag we assume it is inserted by
+                        # SongBeamer.
+                        if first_verse and verse_tags_mode == VerseTagMode.Unknown:
+                            if verse_mark:
+                                verse_tags_mode = VerseTagMode.ContainsTags
+                            else:
+                                verse_tags_mode = VerseTagMode.ContainsNoTags
+                        elif verse_tags_mode != VerseTagMode.ContainsNoTagsRestart:
+                            if not verse_mark and verse_tags_mode == VerseTagMode.ContainsTags:
+                                # A verse mark was expected but not found, which means that verse marks has not been
+                                # inserted by songbeamer, but are manually added headings. So restart the loop, and
+                                # count tags as lines.
+                                self.set_defaults()
+                                self.title = file_name.split('.sng')[0]
+                                verse_tags_mode = VerseTagMode.ContainsNoTagsRestart
+                                read_verses = False
+                                # The first verseseparator doesn't count, but the others does, so linecount starts at -1
+                                line_number = -1
+                                first_verse = True
+                                idx = -1
+                                continue
+                        if not verse_mark:
+                            line = self.insert_chords(line_number, line)
+                            self.current_verse += line.strip() + '\n'
+                            line_number += 1
+                        elif verse_tags_mode in [VerseTagMode.ContainsNoTags, VerseTagMode.ContainsNoTagsRestart]:
+                            line_number += 1
                     else:
-                        self.current_verse += line + '\n'
+                        line = self.insert_chords(line_number, line)
+                        self.current_verse += line.strip() + '\n'
+                        line_number += 1
             if self.current_verse:
                 self.replace_html_tags()
                 self.add_verse(self.current_verse, self.current_verse_type)
             if not self.finish():
                 self.log_error(import_file)
+
+    def insert_chords(self, line_number, line):
+        """
+        Insert chords into text if any exists and chords import is enabled
+
+        :param linenumber: Number of the current line
+        :param line: The line of lyrics to insert chords
+        """
+        if self.chord_table and Settings().value('songs/enable chords') and not Settings().value(
+                'songs/disable chords import') and line_number in self.chord_table:
+            line_idx = sorted(self.chord_table[line_number].keys(), reverse=True)
+            for idx in line_idx:
+                # In SongBeamer the column position of the chord can be a decimal, we just round it up.
+                int_idx = int(math.ceil(idx))
+                if int_idx < 0:
+                    int_idx = 0
+                elif int_idx > len(line):
+                    # If a chord is placed beyond the current end of the line, extend the line with spaces.
+                    line += ' ' * (int_idx - len(line))
+                chord = self.chord_table[line_number][idx]
+                chord = chord.replace('<', '♭')
+                line = line[:int_idx] + '[' + chord + ']' + line[int_idx:]
+        return line
 
     def replace_html_tags(self):
         """
@@ -159,7 +238,7 @@ class SongBeamerImport(SongImport):
         for pair in SongBeamerImport.HTML_TAG_PAIRS:
             self.current_verse = pair[0].sub(pair[1], self.current_verse)
 
-    def parseTags(self, line):
+    def parse_tags(self, line):
         """
         Parses a meta data line.
 
@@ -176,8 +255,10 @@ class SongBeamerImport(SongImport):
             self.add_copyright(tag_val[1])
         elif tag_val[0] == '#AddCopyrightInfo':
             pass
+        elif tag_val[0] == '#AudioFile':
+            self.parse_audio_file(tag_val[1])
         elif tag_val[0] == '#Author':
-            self.parse_author(tag_val[1])
+            self.parse_author(tag_val[1], 'words')
         elif tag_val[0] == '#BackgroundImage':
             pass
         elif tag_val[0] == '#Bible':
@@ -187,13 +268,16 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#CCLI':
             self.ccli_number = tag_val[1]
         elif tag_val[0] == '#Chords':
-            pass
+            self.chord_table = self.parse_chords(tag_val[1])
         elif tag_val[0] == '#ChurchSongID':
             pass
         elif tag_val[0] == '#ColorChords':
             pass
         elif tag_val[0] == '#Comments':
-            self.comments = tag_val[1]
+            try:
+                self.comments = base64.b64decode(tag_val[1]).decode(self.input_file_encoding)
+            except ValueError:
+                self.comments = tag_val[1]
         elif tag_val[0] == '#Editor':
             pass
         elif tag_val[0] == '#Font':
@@ -217,7 +301,7 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#LangCount':
             pass
         elif tag_val[0] == '#Melody':
-            self.parse_author(tag_val[1])
+            self.parse_author(tag_val[1], 'music')
         elif tag_val[0] == '#NatCopyright':
             pass
         elif tag_val[0] == '#OTitle':
@@ -243,7 +327,7 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#TextAlign':
             pass
         elif tag_val[0] == '#Title':
-            self.title = str(tag_val[1]).strip()
+            self.title = tag_val[1].strip()
         elif tag_val[0] == '#TitleAlign':
             pass
         elif tag_val[0] == '#TitleFontSize':
@@ -263,25 +347,80 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#Version':
             pass
         elif tag_val[0] == '#VerseOrder':
-            # TODO: add the verse order.
-            pass
+            verse_order = tag_val[1].strip()
+            for verse_mark in verse_order.split(','):
+                new_verse_mark = self.convert_verse_marks(verse_mark)
+                if new_verse_mark:
+                    self.verse_order_list.append(new_verse_mark)
 
     def check_verse_marks(self, line):
         """
         Check and add the verse's MarkType. Returns ``True`` if the given line contains a correct verse mark otherwise
         ``False``.
 
-        :param line: The line to check for marks (unicode).
+        :param line: The line to check for marks.
         """
-        marks = line.split(' ')
-        if len(marks) <= 2 and marks[0].lower() in SongBeamerTypes.MarkTypes:
-            self.current_verse_type = SongBeamerTypes.MarkTypes[marks[0].lower()]
-            if len(marks) == 2:
-                # If we have a digit, we append it to current_verse_type.
-                if marks[1].isdigit():
-                    self.current_verse_type += marks[1]
-            return True
-        elif marks[0].lower().startswith('$$m='):  # this verse-mark cannot be numbered
-            self.current_verse_type = SongBeamerTypes.MarkTypes['$$m=']
+        new_verse_mark = self.convert_verse_marks(line)
+        if new_verse_mark:
+            self.current_verse_type = new_verse_mark
             return True
         return False
+
+    def convert_verse_marks(self, line):
+        """
+        Convert the verse's MarkType. Returns the OpenLP versemark if the given line contains a correct SongBeamer verse
+        mark otherwise ``None``.
+
+        :param line: The line to check for marks.
+        """
+        new_verse_mark = None
+        marks = line.split(' ')
+        if len(marks) <= 2 and marks[0].lower() in SongBeamerTypes.MarkTypes:
+            new_verse_mark = SongBeamerTypes.MarkTypes[marks[0].lower()]
+            if len(marks) == 2:
+                # If we have a digit, we append it to the converted verse mark
+                if marks[1].isdigit():
+                    new_verse_mark += marks[1]
+        elif marks[0].lower().startswith('$$m='):  # this verse-mark cannot be numbered
+            new_verse_mark = SongBeamerTypes.MarkTypes['$$m=']
+        return new_verse_mark
+
+    def parse_chords(self, chords):
+        """
+        Parse chords. The chords are in a base64 encode string. The decoded string is an index of chord placement
+        separated by "\r", like this: "<linecolumn>,<linenumber>,<chord>\r"
+
+        :param chords: Chords in a base64 encoded string
+        """
+        chord_list = base64.b64decode(chords).decode(self.input_file_encoding).split('\r')
+        chord_table = {}
+        for chord_index in chord_list:
+            if not chord_index:
+                continue
+            [col_str, line_str, chord] = chord_index.split(',')
+            col = float(col_str)
+            line = int(line_str)
+            if line not in chord_table:
+                chord_table[line] = {}
+            chord_table[line][col] = chord
+        return chord_table
+
+    def parse_audio_file(self, audio_file_path):
+        """
+        Parse audio file. The path is relative to the SongsBeamer Songs folder.
+
+        :param audio_file_path: Path to the audio file
+        """
+        # The path is relative to SongBeamers Song folder
+        if is_win():
+            user_doc_folder = os.path.expandvars('$DOCUMENTS')
+        elif is_macosx():
+            user_doc_folder = os.path.join(os.path.expanduser('~'), 'Documents')
+        else:
+            # SongBeamer only runs on mac and win...
+            return
+        audio_file_path = os.path.normpath(os.path.join(user_doc_folder, 'SongBeamer', 'Songs', audio_file_path))
+        if os.path.isfile(audio_file_path):
+            self.add_media_file(audio_file_path)
+        else:
+            log.debug('Could not import mediafile "%s" since it does not exists!' % audio_file_path)

@@ -23,14 +23,14 @@
 Module to test the EditCustomForm.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtTest, QtCore, QtWidgets
 
 from openlp.core.common import Registry
-# TODO: FIXME: Import needed due to horrible bad imports
 from openlp.plugins.custom.lib.mediaitem import CustomMediaItem
 from openlp.plugins.custom.forms.editcustomform import EditCustomForm
-from tests.interfaces import MagicMock, patch
+
 from tests.helpers.testmixin import TestMixin
 
 

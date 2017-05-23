@@ -22,9 +22,10 @@
 """
 Module to test the MediaClipSelectorForm.
 """
-
 import os
 from unittest import TestCase, SkipTest
+from unittest.mock import MagicMock, patch
+
 from openlp.core.ui.media.vlcplayer import get_vlc
 
 if os.name == 'nt' and not get_vlc():
@@ -34,7 +35,7 @@ from PyQt5 import QtTest, QtCore, QtWidgets
 
 from openlp.core.common import Registry
 from openlp.plugins.media.forms.mediaclipselectorform import MediaClipSelectorForm
-from tests.interfaces import MagicMock, patch
+
 from tests.helpers.testmixin import TestMixin
 
 

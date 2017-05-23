@@ -24,12 +24,12 @@ Package to test the openlp.core.lib package.
 """
 import os
 from unittest import TestCase
-
-from tests.functional import MagicMock, patch
-from tests.utils import assert_length, convert_file_service_item
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry, md5_hash
-from openlp.core.lib import ItemCapabilities, ServiceItem, ServiceItemType
+from openlp.core.lib import ItemCapabilities, ServiceItem, ServiceItemType, FormattingTags
+
+from tests.utils import assert_length, convert_file_service_item
 
 VERSE = 'The Lord said to {r}Noah{/r}: \n'\
         'There\'s gonna be a {su}floody{/su}, {sb}floody{/sb}\n'\
@@ -38,6 +38,23 @@ VERSE = 'The Lord said to {r}Noah{/r}: \n'\
         'Get those children out of the muddy, muddy \n'\
         '{r}C{/r}{b}h{/b}{bl}i{/bl}{y}l{/y}{g}d{/g}{pk}'\
         'r{/pk}{o}e{/o}{pp}n{/pp} of the Lord\n'
+CLEANED_VERSE = 'The Lord said to Noah: \n'\
+                'There\'s gonna be a floody, floody\n'\
+                'The Lord said to Noah:\n'\
+                'There\'s gonna be a floody, floody\n'\
+                'Get those children out of the muddy, muddy \n'\
+                'Children of the Lord\n'
+RENDERED_VERSE = 'The Lord said to <span style="-webkit-text-fill-color:red">Noah</span>: \n'\
+                 'There&#x27;s gonna be a <sup>floody</sup>, <sub>floody</sub>\n'\
+                 'The Lord said to <span style="-webkit-text-fill-color:green">Noah</span>:\n'\
+                 'There&#x27;s gonna be a <strong>floody</strong>, <em>floody</em>\n'\
+                 'Get those children out of the muddy, muddy \n'\
+                 '<span style="-webkit-text-fill-color:red">C</span><span style="-webkit-text-fill-color:black">h' \
+                 '</span><span style="-webkit-text-fill-color:blue">i</span>'\
+                 '<span style="-webkit-text-fill-color:yellow">l</span><span style="-webkit-text-fill-color:green">d'\
+                 '</span><span style="-webkit-text-fill-color:#FFC0CB">r</span>'\
+                 '<span style="-webkit-text-fill-color:#FFA500">e</span><span style="-webkit-text-fill-color:#800080">'\
+                 'n</span> of the Lord\n'
 FOOTER = ['Arky Arky (Unknown)', 'Public Domain', 'CCLI 123456']
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources', 'service'))
 
@@ -74,6 +91,7 @@ class TestServiceItem(TestCase):
         # GIVEN: A new service item and a mocked add icon function
         service_item = ServiceItem(None)
         service_item.add_icon = MagicMock()
+        FormattingTags.load_tags()
 
         # WHEN: We add a custom from a saved service
         line = convert_file_service_item(TEST_PATH, 'serviceitem_custom_1.osj')
@@ -89,9 +107,9 @@ class TestServiceItem(TestCase):
 
         # THEN: The frames should also be valid
         self.assertEqual('Test Custom', service_item.get_display_title(), 'The title should be "Test Custom"')
-        self.assertEqual(VERSE[:-1], service_item.get_frames()[0]['text'],
+        self.assertEqual(CLEANED_VERSE[:-1], service_item.get_frames()[0]['text'],
                          'The returned text matches the input, except the last line feed')
-        self.assertEqual(VERSE.split('\n', 1)[0], service_item.get_rendered_frame(1),
+        self.assertEqual(RENDERED_VERSE.split('\n', 1)[0], service_item.get_rendered_frame(1),
                          'The first line has been returned')
         self.assertEqual('Slide 1', service_item.get_frame_title(0), '"Slide 1" has been returned as the title')
         self.assertEqual('Slide 2', service_item.get_frame_title(1), '"Slide 2" has been returned as the title')
@@ -300,6 +318,7 @@ class TestServiceItem(TestCase):
         # GIVEN: A new service item and a mocked add icon function
         service_item = ServiceItem(None)
         service_item.add_icon = MagicMock()
+        FormattingTags.load_tags()
 
         # WHEN: We add a custom from a saved service
         line = convert_file_service_item(TEST_PATH, 'serviceitem-song-linked-audio.osj')
@@ -315,9 +334,9 @@ class TestServiceItem(TestCase):
 
         # THEN: The frames should also be valid
         self.assertEqual('Amazing Grace', service_item.get_display_title(), 'The title should be "Amazing Grace"')
-        self.assertEqual(VERSE[:-1], service_item.get_frames()[0]['text'],
+        self.assertEqual(CLEANED_VERSE[:-1], service_item.get_frames()[0]['text'],
                          'The returned text matches the input, except the last line feed')
-        self.assertEqual(VERSE.split('\n', 1)[0], service_item.get_rendered_frame(1),
+        self.assertEqual(RENDERED_VERSE.split('\n', 1)[0], service_item.get_rendered_frame(1),
                          'The first line has been returned')
         self.assertEqual('Amazing Grace! how sweet the s', service_item.get_frame_title(0),
                          '"Amazing Grace! how sweet the s" has been returned as the title')

@@ -163,7 +163,7 @@ class Theme(object):
         jsn = get_text_file_string(json_file)
         jsn = json.loads(jsn)
         self.expand_json(jsn)
-        self.background_filename = None
+        self.background_filename = ''
 
     def expand_json(self, var, prev=None):
         """

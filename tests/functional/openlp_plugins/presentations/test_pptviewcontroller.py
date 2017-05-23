@@ -24,16 +24,15 @@ This module contains tests for the pptviewcontroller module of the Presentations
 """
 import os
 import shutil
-
 from tempfile import mkdtemp
 from unittest import TestCase
-
-from tests.functional import MagicMock, patch
-from tests.helpers.testmixin import TestMixin
-from tests.utils.constants import TEST_RESOURCES_PATH
+from unittest.mock import MagicMock, patch
 
 from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from openlp.core.common import is_win
+
+from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import TEST_RESOURCES_PATH
 
 if is_win():
     from ctypes import cdll

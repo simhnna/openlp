@@ -23,8 +23,7 @@
 Package to test the openlp.core.ui.formattingtagsform package.
 """
 from unittest import TestCase
-
-from tests.functional import MagicMock, patch, call
+from unittest.mock import MagicMock, patch, call
 
 from openlp.core.ui.formattingtagform import FormattingTagForm
 

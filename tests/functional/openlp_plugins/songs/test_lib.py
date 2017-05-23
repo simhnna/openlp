@@ -23,10 +23,10 @@
 This module contains tests for the lib submodule of the Songs plugin.
 """
 from unittest import TestCase
+from unittest.mock import patch, MagicMock, PropertyMock
 
-from openlp.plugins.songs.lib import VerseType, clean_string, clean_title, strip_rtf
+from openlp.plugins.songs.lib import VerseType, clean_string, clean_title, strip_rtf, transpose_chord, transpose_lyrics
 from openlp.plugins.songs.lib.songcompare import songs_probably_equal, _remove_typos, _op_length
-from tests.functional import patch, MagicMock, PropertyMock
 
 
 class TestLib(TestCase):
@@ -206,7 +206,7 @@ class TestLib(TestCase):
         assert result[0][3] == 0, 'The start indices should be kept.'
         assert result[0][4] == 21, 'The stop indices should be kept.'
 
-    def test_remove_typos_beginning_negated(self):
+    def test_remove_typos_middle_negated(self):
         """
         Test the _remove_typos function with a large difference in the middle.
         """
@@ -263,6 +263,85 @@ class TestLib(TestCase):
 
             # THEN: The stripped text matches thed expected result
             assert result == exp_result, 'The result should be %s' % exp_result
+
+    def test_transpose_chord_up(self):
+        """
+        Test that the transpose_chord() method works when transposing up
+        """
+        # GIVEN: A Chord
+        chord = 'C'
+
+        # WHEN: Transposing it 1 up
+        new_chord = transpose_chord(chord, 1, 'english')
+
+        # THEN: The chord should be transposed up one note
+        self.assertEqual(new_chord, 'C#', 'The chord should be transposed up.')
+
+    def test_transpose_chord_up_adv(self):
+        """
+        Test that the transpose_chord() method works when transposing up an advanced chord
+        """
+        # GIVEN: An advanced Chord
+        chord = '(C/D#)'
+
+        # WHEN: Transposing it 1 up
+        new_chord = transpose_chord(chord, 1, 'english')
+
+        # THEN: The chord should be transposed up one note
+        self.assertEqual(new_chord, '(C#/E)', 'The chord should be transposed up.')
+
+    def test_transpose_chord_down(self):
+        """
+        Test that the transpose_chord() method works when transposing down
+        """
+        # GIVEN: A Chord
+        chord = 'C'
+
+        # WHEN: Transposing it 1 down
+        new_chord = transpose_chord(chord, -1, 'english')
+
+        # THEN: The chord should be transposed down one note
+        self.assertEqual(new_chord, 'B', 'The chord should be transposed down.')
+
+    def test_transpose_chord_error(self):
+        """
+        Test that the transpose_chord() raises exception on invalid chord
+        """
+        # GIVEN: A invalid Chord
+        chord = 'T'
+
+        # WHEN: Transposing it 1 down
+        # THEN: An exception should be raised
+        with self.assertRaises(ValueError) as err:
+            new_chord = transpose_chord(chord, -1, 'english')
+        self.assertEqual(err.exception.args[0], '\'T\' is not in list',
+                         'ValueError exception should have been thrown for invalid chord')
+
+    @patch('openlp.plugins.songs.lib.transpose_verse')
+    @patch('openlp.plugins.songs.lib.Settings')
+    def test_transpose_lyrics(self, mocked_settings, mocked_transpose_verse):
+        """
+        Test that the transpose_lyrics() splits verses correctly
+        """
+        # GIVEN: Lyrics with verse splitters and a mocked settings
+        lyrics = '---[Verse:1]---\n'\
+                 'Amazing grace how sweet the sound\n'\
+                 '[---]\n'\
+                 'That saved a wretch like me.\n'\
+                 '---[Verse:2]---\n'\
+                 'I once was lost but now I\'m found.'
+        mocked_returned_settings = MagicMock()
+        mocked_returned_settings.value.return_value = 'english'
+        mocked_settings.return_value = mocked_returned_settings
+
+        # WHEN: Transposing the lyrics
+        transpose_lyrics(lyrics, 1)
+
+        # THEN: transpose_verse should have been called
+        mocked_transpose_verse.assert_any_call('', 1, 'english')
+        mocked_transpose_verse.assert_any_call('\nAmazing grace how sweet the sound\n', 1, 'english')
+        mocked_transpose_verse.assert_any_call('\nThat saved a wretch like me.\n', 1, 'english')
+        mocked_transpose_verse.assert_any_call('\nI once was lost but now I\'m found.', 1, 'english')
 
 
 class TestVerseType(TestCase):

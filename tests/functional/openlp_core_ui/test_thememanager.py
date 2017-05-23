@@ -24,17 +24,16 @@ Package to test the openlp.core.ui.thememanager package.
 """
 import os
 import shutil
-
+from tempfile import mkdtemp
 from unittest import TestCase
+from unittest.mock import ANY, MagicMock, patch
 
 from PyQt5 import QtWidgets
-from tempfile import mkdtemp
 
 from openlp.core.ui import ThemeManager
 from openlp.core.common import Registry
 
 from tests.utils.constants import TEST_RESOURCES_PATH
-from tests.functional import ANY, MagicMock, patch
 
 
 class TestThemeManager(TestCase):
