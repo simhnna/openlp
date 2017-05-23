@@ -440,11 +440,14 @@ def get_file_encoding(filename):
         log.exception('Error detecting file encoding')
 
 
-def json_default(o):
+def json_default(obj):
     """
     Function to help save objects as JSON
         
-    :param o: object 
+    :param obj: object 
     :return: the object dictionary
     """
-    return o.__dict__
+    try:
+        return obj.__dict__
+    except:
+        raise TypeError("Unserializable object {} of type {}".format(obj, type(obj)))

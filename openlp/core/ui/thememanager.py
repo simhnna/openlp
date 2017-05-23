@@ -379,10 +379,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             critical_error_message_box(message=translate('OpenLP.ThemeManager', 'You have not selected a theme.'))
             return
         theme = item.data(QtCore.Qt.UserRole)
-        path, filter_used = QtWidgets.QFileDialog.getSaveFileName(self.main_window,
-            translate('OpenLP.ThemeManager', 'Save Theme - ({name})').format(name=theme),
-            Settings().value(self.settings_section + '/last directory export'),
-            translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
+        path, filter_used = \
+            QtWidgets.QFileDialog.getSaveFileName(self.main_window,
+                                                  translate('OpenLP.ThemeManager', 'Save Theme - ({name})').
+                                                  format(name=theme),
+                                                  Settings().value(self.settings_section + '/last directory export'),
+                                                  translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
         self.application.set_busy_cursor()
         if path:
             Settings().setValue(self.settings_section + '/last directory export', path)
