@@ -22,11 +22,9 @@
 """
 Package to test the openlp.core.lib.theme package.
 """
-import json
 from unittest import TestCase
 import os
 
-from openlp.core.common import json_default
 from openlp.core.lib.theme import Theme
 
 
