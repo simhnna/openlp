@@ -72,7 +72,7 @@ class PathEdit(QtWidgets.QWidget):
         Set up the widget
         :param show_revert: Show or hide the revert button
         :type show_revert: bool
-        
+
         :return: None
         :rtype: None
         """
