@@ -209,12 +209,22 @@ class Theme(object):
 
     def load_theme(self, theme):
         """
-        Pull out the XML string formatted for human consumption
+        Convert the JSON file and expand it.
         
         :param theme: the theme string
         """
         jsn = json.loads(theme)
         self.expand_json(jsn)
+
+    def export_theme(self):
+        """
+        Loop through the fields and build a dictionary of them
+
+        """
+        theme_data = {}
+        for attr, value in self.__dict__.items():
+            theme_data["{attr}".format(attr=attr)] = value
+        return json.dumps(theme_data)
 
     def parse(self, xml):
         """

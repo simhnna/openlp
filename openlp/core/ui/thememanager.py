@@ -666,7 +666,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :param image_to: Where the Theme Image is to be saved to
         """
         name = theme.theme_name
-        theme_pretty = json.dumps(theme, default=json_default)
+        theme_pretty = theme.export_theme()
         theme_dir = os.path.join(self.path, name)
         check_directory_exists(theme_dir)
         theme_file = os.path.join(theme_dir, name + '.json')

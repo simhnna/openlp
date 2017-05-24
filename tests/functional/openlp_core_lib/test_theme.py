@@ -102,7 +102,7 @@ class TestTheme(TestCase):
         # WHEN: A theme object is created
         default_theme = Theme()
         # THEN: The default values should be correct
-        save_theme_json = json.dumps(default_theme, default=json_default)
+        save_theme_json = default_theme.export_theme()
         lt = Theme()
         lt.load_theme(save_theme_json)
         self.check_theme(lt)
