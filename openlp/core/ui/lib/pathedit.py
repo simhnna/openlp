@@ -46,16 +46,16 @@ class PathEdit(QtWidgets.QWidget):
 
         :param parent: The parent of the widget. This is just passed to the super method.
         :type parent: QWidget or None
-        
+
         :param dialog_caption: Used to customise the caption in the QFileDialog.
         :param dialog_caption: str
-        
+
         :param default_path: The default path. This is set as the path when the revert button is clicked
         :type default_path: str
 
         :param show_revert: Used to determin if the 'revert button' should be visible.
         :type show_revert: bool
-        
+
         :return: None
         :rtype: None
         """

@@ -210,7 +210,7 @@ class Theme(object):
     def load_theme(self, theme):
         """
         Convert the JSON file and expand it.
-        
+
         :param theme: the theme string
         """
         jsn = json.loads(theme)
