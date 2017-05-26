@@ -25,14 +25,15 @@ Package to test the openlp.core.ui package.
 import os
 import time
 from threading import Lock
-
 from unittest import TestCase
+from unittest.mock import patch
+
 from PyQt5 import QtGui
 
 from openlp.core.common import Registry
 from openlp.core.lib import ImageManager, ScreenList
 from openlp.core.lib.imagemanager import Priority
-from tests.functional import patch
+
 from tests.helpers.testmixin import TestMixin
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))

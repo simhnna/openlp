@@ -26,13 +26,15 @@ record functions.
 PREREQUISITE: add_record() and get_all() functions validated.
 """
 import os
+import shutil
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.lib.projector.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
 from openlp.core.lib.projector.constants import PJLINK_PORT
 
-from tests.functional import MagicMock, patch
-from tests.resources.projector.data import TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
+from tests.resources.projector.data import TEST_DB_PJLINK1, TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
+from tests.utils.constants import TEST_RESOURCES_PATH
 
 
 def compare_data(one, two):
@@ -45,7 +47,11 @@ def compare_data(one, two):
         one.port == two.port and \
         one.name == two.name and \
         one.location == two.location and \
-        one.notes == two.notes
+        one.notes == two.notes and \
+        one.sw_version == two.sw_version and \
+        one.serial_no == two.serial_no and \
+        one.model_filter == two.model_filter and \
+        one.model_lamp == two.model_lamp
 
 
 def compare_source(one, two):
@@ -168,6 +174,10 @@ class TestProjectorDB(TestCase):
         record.name = TEST3_DATA['name']
         record.location = TEST3_DATA['location']
         record.notes = TEST3_DATA['notes']
+        record.sw_version = TEST3_DATA['sw_version']
+        record.serial_no = TEST3_DATA['serial_no']
+        record.model_filter = TEST3_DATA['model_filter']
+        record.model_lamp = TEST3_DATA['model_lamp']
         updated = self.projector.update_projector(record)
         self.assertTrue(updated, 'Save updated record should have returned True')
         record = self.projector.get_projector_by_ip(TEST3_DATA['ip'])
@@ -246,7 +256,8 @@ class TestProjectorDB(TestCase):
         projector = Projector()
 
         # WHEN: projector() is populated
-        # NOTE: projector.pin, projector.other, projector.sources should all return None
+        # NOTE: projector.[pin, other, sources, sw_version, serial_no, sw_version, model_lamp, model_filter]
+        #           should all return None.
         #       projector.source_list should return an empty list
         projector.id = 0
         projector.ip = '127.0.0.1'
@@ -262,8 +273,9 @@ class TestProjectorDB(TestCase):
         self.assertEqual(str(projector),
                          '< Projector(id="0", ip="127.0.0.1", port="4352", pin="None", name="Test One", '
                          'location="Somewhere over the rainbow", notes="Not again", pjlink_name="TEST", '
-                         'manufacturer="IN YOUR DREAMS", model="OpenLP", other="None", sources="None", '
-                         'source_list="[]") >',
+                         'manufacturer="IN YOUR DREAMS", model="OpenLP", serial_no="None", other="None", '
+                         'sources="None", source_list="[]", model_filter="None", model_lamp="None", '
+                         'sw_version="None") >',
                          'Projector.__repr__() should have returned a proper representation string')
 
     def test_projectorsource_repr(self):

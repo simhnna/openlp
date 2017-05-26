@@ -23,7 +23,7 @@
 This module contains tests for the lib submodule of the Bibles plugin.
 """
 from unittest import TestCase
-from tests.interfaces import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry, Settings
 from openlp.plugins.bibles.lib import BibleManager, parse_reference, LanguageSelection

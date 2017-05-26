@@ -23,10 +23,11 @@
 Package to test the openlp.core.common.versionchecker package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common.settings import Settings
 from openlp.core.common.versionchecker import VersionThread
-from tests.functional import MagicMock, patch
+
 from tests.helpers.testmixin import TestMixin
 
 

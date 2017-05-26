@@ -39,7 +39,7 @@ class ColorButton(QtWidgets.QPushButton):
         """
         Initialise the ColorButton
         """
-        super(ColorButton, self).__init__()
+        super().__init__(parent)
         self.parent = parent
         self.change_color('#ffffff')
         self.setToolTip(translate('OpenLP.ColorButton', 'Click to select a color.'))

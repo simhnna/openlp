@@ -23,15 +23,15 @@
 This module contains tests for the lib submodule of the Songs plugin.
 """
 from unittest import TestCase
-from unittest.mock import call
+from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtCore
 
 from openlp.core.common import Registry, Settings
 from openlp.core.lib import ServiceItem
-from openlp.plugins.songs.lib.mediaitem import SongMediaItem
 from openlp.plugins.songs.lib.db import AuthorType, Song
-from tests.functional import patch, MagicMock
+from openlp.plugins.songs.lib.mediaitem import SongMediaItem
+
 from tests.helpers.testmixin import TestMixin
 
 

@@ -23,6 +23,7 @@
 Package to test the openlp.core.ui.slidecontroller package.
 """
 from unittest import TestCase, skipUnless
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
@@ -33,11 +34,9 @@ from openlp.core.ui.media import MediaController
 from openlp.core.ui.maindisplay import TRANSPARENT_STYLESHEET, OPAQUE_STYLESHEET
 
 from tests.helpers.testmixin import TestMixin
-from tests.functional import MagicMock, patch
 
 if is_macosx():
     from ctypes import pythonapi, c_void_p, c_char_p, py_object
-
     from sip import voidptr
     from objc import objc_object
     from AppKit import NSMainMenuWindowLevel, NSWindowCollectionBehaviorManaged

@@ -35,7 +35,7 @@ if is_win():
 
 from openlp.core.common import AppLocation
 from openlp.core.lib import ScreenList
-from .presentationcontroller import PresentationController, PresentationDocument
+from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
 
 log = logging.getLogger(__name__)
