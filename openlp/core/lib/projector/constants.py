@@ -59,33 +59,61 @@ TIMEOUT = 30.0
 PJLINK_MAX_PACKET = 136
 # NOTE: Change format to account for some commands are both class 1 and 2
 PJLINK_VALID_CMD = {
-    'ACKN': ['2', ],  # UDP Reply to 'SRCH'
-    'AVMT': ['1', ],  # Shutter option
-    'CLSS': ['1', ],   # PJLink class support query
-    'ERST': ['1', '2'],  # Error status option
-    'FILT': ['2', ],  # Get current filter usage time
-    'FREZ': ['2', ],  # Set freeze/unfreeze picture being projected
-    'INF1': ['1', ],  # Manufacturer name query
-    'INF2': ['1', ],  # Product name query
-    'INFO': ['1', ],  # Other information query
-    'INNM': ['2', ],  # Get Video source input terminal name
-    'INPT': ['1', ],  # Video sources option
-    'INST': ['1', ],  # Input sources available query
-    'IRES': ['2', ],  # Get Video source resolution
-    'LAMP': ['1', ],  # Lamp(s) query (Includes fans)
-    'LKUP': ['2', ],  # UPD Linkup status notification
-    'MVOL': ['2', ],  # Set microphone volume
-    'NAME': ['1', ],  # Projector name query
-    'PJLINK': ['1', ],  # Initial connection
-    'POWR': ['1', ],  # Power option
-    'RFIL': ['2', ],  # Get replacement air filter model number
-    'RLMP': ['2', ],  # Get lamp replacement model number
-    'RRES': ['2', ],  # Get projector recommended video resolution
-    'SNUM': ['2', ],  # Get projector serial number
-    'SRCH': ['2', ],  # UDP broadcast search for available projectors on local network
-    'SVER': ['2', ],  # Get projector software version
-    'SVOL': ['2', ]  # Set speaker volume
+    'ACKN': {'version': ['2', ],  # UDP Reply to 'SRCH'
+             'description': 'Acknowledge a PJLink SRCH command - returns MAC address.'},
+    'AVMT': {'version': ['1', ],
+             'description': 'Blank/unblank video and/or mute audio.'},
+    'CLSS': {'version': ['1', ],
+             'description': 'Query projector PJLink class support.'},
+    'ERST': {'version': ['1', '2'],
+             'description': 'Query error status from projector. '
+                            'Returns fan/lamp/temp/cover/filter/other error status.'},
+    'FILT': {'version': ['2', ],  # Assume (!) time in hours
+             'description': 'Query number of hours on filter.'},
+    'FREZ': {'version': ['2', ],
+             'description': 'Freeze or unfreeze current image being projected.'},
+    'INF1': {'version': ['1', ],
+             'description': 'Query projector manufacturer name.'},
+    'INF2': {'version': ['1', ],
+             'description': 'Query projector product name.'},
+    'INFO': {'version': ['1', ],
+             'description': 'Query projector for other information set by manufacturer.'},
+    'INNM': {'version': ['2', ],
+             'description': 'Query specified input source name'},
+    'INPT': {'version': ['1', ],
+             'description': 'Switch to specified video source.'},
+    'INST': {'version': ['1', ],
+             'description': 'Query available input sources.'},
+    'IRES': {'version:': ['2', ],
+             'description': 'Query current input resolution.'},
+    'LAMP': {'version': ['1', ],
+             'description': 'Query lamp time and on/off status. Multiple lamps supported.'},
+    'LKUP': {'version': ['2', ],
+             'description': 'UDP Status notify. Returns MAC address.'},
+    'MVOL': {'version': ['2', ],
+             'description': 'Adjust microphone volume by 1 step.'},
+    'NAME': {'version': ['1', ],
+             'description': 'Query customer-set projector name.'},
+    'PJLINK': {'version': ['1', ],
+               'description': 'Initial connection with authentication/no authentication request.'},
+    'POWR': {'version': ['1', ],
+             'description': 'Turn lamp on or off/standby.'},
+    'RFIL': {'version': ['2', ],
+             'description': 'Query replacement air filter model number.'},
+    'RLMP': {'version': ['2', ],
+             'description': 'Query replacement lamp model number.'},
+    'RRES': {'version': ['2', ],
+             'description': 'Query recommended resolution.'},
+    'SNUM': {'version': ['2', ],
+             'description': 'Query projector serial number.'},
+    'SRCH': {'version': ['2', ],
+             'description': 'UDP broadcast search request for available projectors.'},
+    'SVER': {'version': ['2', ],
+             'description': 'Query projector software version number.'},
+    'SVOL': {'version': ['2', ],
+             'description': 'Adjust speaker volume by 1 step.'}
 }
+
 # Error and status codes
 S_OK = E_OK = 0  # E_OK included since I sometimes forget
 # Error codes. Start at 200 so we don't duplicate system error codes.

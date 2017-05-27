@@ -44,6 +44,7 @@ from sqlalchemy.orm import relationship
 
 from openlp.core.lib.db import Manager, init_db, init_url
 from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES
+from openlp.core.lib.projector import upgrade
 
 Base = declarative_base(MetaData())
 
@@ -243,7 +244,9 @@ class ProjectorDB(Manager):
     """
     def __init__(self, *args, **kwargs):
         log.debug('ProjectorDB().__init__(args="{arg}", kwargs="{kwarg}")'.format(arg=args, kwarg=kwargs))
-        super().__init__(plugin_name='projector', init_schema=self.init_schema)
+        super(ProjectorDB, self).__init__(plugin_name='projector',
+                                          init_schema=self.init_schema,
+                                          upgrade_mod=upgrade)
         log.debug('ProjectorDB() Initialized using db url {db}'.format(db=self.db_url))
         log.debug('Session: {session}'.format(session=self.session))
 
