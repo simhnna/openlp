@@ -740,6 +740,11 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
             self.current_media_players[controller.controller_type].stop(display)
             self.current_media_players[controller.controller_type].set_visible(display, False)
             controller.seek_slider.setSliderPosition(0)
+            total_seconds = controller.media_info.length // 1000
+            total_minutes = total_seconds // 60
+            total_seconds %= 60
+            controller.position_label.setText(' %02d:%02d / %02d:%02d' %
+                                              (0, 0, total_minutes, total_seconds))
             controller.mediabar.actions['playbackPlay'].setVisible(True)
             controller.mediabar.actions['playbackStop'].setDisabled(True)
             controller.mediabar.actions['playbackPause'].setVisible(False)
