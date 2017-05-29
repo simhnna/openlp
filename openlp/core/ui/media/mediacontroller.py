@@ -822,7 +822,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         display = self._define_display(self.live_controller)
         if self.live_controller.controller_type in self.current_media_players and \
                 self.current_media_players[self.live_controller.controller_type].get_live_state() == MediaState.Playing:
-            self.current_media_players[self.live_controller.controller_type].pause(display)
+            self.media_pause(display.controller)
             self.current_media_players[self.live_controller.controller_type].set_visible(display, False)
 
     def media_blank(self, msg):
@@ -840,7 +840,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         display = self._define_display(self.live_controller)
         if self.live_controller.controller_type in self.current_media_players and \
                 self.current_media_players[self.live_controller.controller_type].get_live_state() == MediaState.Playing:
-            self.current_media_players[self.live_controller.controller_type].pause(display)
+            self.media_pause(display.controller)
             self.current_media_players[self.live_controller.controller_type].set_visible(display, False)
 
     def media_unblank(self, msg):
@@ -858,7 +858,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         if self.live_controller.controller_type in self.current_media_players and \
                 self.current_media_players[self.live_controller.controller_type].get_live_state() != \
                 MediaState.Playing:
-            if self.current_media_players[self.live_controller.controller_type].play(display):
+            if self.media_play(display.controller):
                 self.current_media_players[self.live_controller.controller_type].set_visible(display, True)
                 # Start Timer for ui updates
                 if not self.live_timer.isActive():
