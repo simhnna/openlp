@@ -294,7 +294,9 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
                                                triggers=controller.send_to_plugins)
         controller.position_label = QtWidgets.QLabel()
         controller.position_label.setText(' 00:00 / 00:00')
+        controller.position_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         controller.position_label.setToolTip(translate('OpenLP.SlideController', 'Video timer.'))
+        controller.position_label.setMinimumSize(90, 0)
         controller.position_label.setObjectName('position_label')
         controller.mediabar.add_toolbar_widget(controller.position_label)
         # Build the seek_slider.
