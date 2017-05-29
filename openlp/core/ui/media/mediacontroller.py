@@ -432,7 +432,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         log.debug('video mediatype: ' + str(controller.media_info.media_type))
         # dont care about actual theme, set a black background
         if controller.is_live and not controller.media_info.is_background:
-            display.frame.evaluateJavaScript('show_video( "setBackBoard", null, null, null,"visible");')
+            display.frame.evaluateJavaScript('show_video( "setBackBoard", null, null,"visible");')
         # now start playing - Preview is autoplay!
         autoplay = False
         # Preview requested
@@ -802,7 +802,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
             display.override = {}
             self.current_media_players[controller.controller_type].reset(display)
             self.current_media_players[controller.controller_type].set_visible(display, False)
-            display.frame.evaluateJavaScript('show_video( "setBackBoard", null, null, null,"hidden");')
+            display.frame.evaluateJavaScript('show_video("setBackBoard", null, null, "hidden");')
             del self.current_media_players[controller.controller_type]
 
     def media_hide(self, msg):
