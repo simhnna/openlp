@@ -442,11 +442,15 @@ class TestSystemPlayer(TestCase):
         # THEN: The css should be empty
         self.assertEqual('', result)
 
-    def test_get_info(self):
+    @patch('openlp.core.ui.media.systemplayer.QtMultimedia.QMediaPlayer')
+    def test_get_info(self, MockQMediaPlayer):
         """
         Test the get_info() method of the SystemPlayer
         """
         # GIVEN: A SystemPlayer instance
+        mocked_media_player = MagicMock()
+        mocked_media_player.supportedMimeTypes.return_value = []
+        MockQMediaPlayer.return_value = mocked_media_player
         player = SystemPlayer(self)
 
         # WHEN: get_info() is called
