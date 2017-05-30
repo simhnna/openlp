@@ -500,8 +500,7 @@ class SongMediaItem(MediaManagerItem):
                     translate('SongsPlugin.MediaItem',
                               'Are you sure you want to delete the "{items:d}" '
                               'selected song(s)?').format(items=len(items)),
-                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                    QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.No:
+                    defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.No:
                 return
             self.application.set_busy_cursor()
             self.main_window.display_progress_bar(len(items))

@@ -533,9 +533,7 @@ class AdvancedTab(SettingsTab):
                                                           'location of the OpenLP data directory to:\n\n{path}'
                                                           '\n\nThe data directory will be changed when OpenLP is '
                                                           'closed.').format(path=new_data_path),
-                                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                      QtWidgets.QMessageBox.No),
-                                                QtWidgets.QMessageBox.No)
+                                                defaultButton=QtWidgets.QMessageBox.No)
         if answer != QtWidgets.QMessageBox.Yes:
             return
         # Check if data already exists here.
@@ -559,9 +557,7 @@ class AdvancedTab(SettingsTab):
                                                                                     'directory to the default location?'
                                                                                     '\n\nThis location will be used '
                                                                                     'after OpenLP is closed.'),
-                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                          QtWidgets.QMessageBox.No),
-                                                    QtWidgets.QMessageBox.No)
+                                                    defaultButton=QtWidgets.QMessageBox.No)
             if answer != QtWidgets.QMessageBox.Yes:
                 return
             self.check_data_overwrite(new_data_path)

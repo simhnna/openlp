@@ -197,9 +197,6 @@ class TestMediaItem(TestCase, TestMixin):
         self.assertTrue(self.media_item.has_delete_icon, 'Check that the icon is called as True.')
         self.assertFalse(self.media_item.add_to_service_item, 'Check that the icon is called as False')
 
-    # TODO: Test add_end_header_bar
-    # TODO: Test setupUi
-
     def test_on_focus_search_tab_visible(self):
         """
         Test the correct widget gets focus when the BibleMediaItem receives focus
@@ -1344,8 +1341,6 @@ class TestMediaItem(TestCase, TestMixin):
             self.assertEqual(self.mocked_log.debug.call_count, 2)
             self.assertTrue(self.mocked_main_window.information_message.called)
             mocked_display_results.assert_called_once_with()
-
-    # TODO: Test text_search
 
     def test_on_search_edit_text_changed_search_while_typing_disabled(self):
         """

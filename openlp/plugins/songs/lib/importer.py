@@ -256,7 +256,7 @@ class SongFormat(object):
         },
         EasyWorshipService: {
             'class': EasyWorshipSongImport,
-            'name': 'EasyWorship Service File',
+            'name': 'EasyWorship Service',
             'prefix': 'ew',
             'selectMode': SongFormatSelect.SingleFile,
             'filter': '{text} (*.ews)'.format(text=translate('SongsPlugin.ImportWizardForm',

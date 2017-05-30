@@ -121,7 +121,7 @@ class SongExportForm(OpenLPWizard):
         self.selected_list_widget = QtWidgets.QListWidget(self.export_song_page)
         self.selected_list_widget.setObjectName('selected_list_widget')
         self.grid_layout.addWidget(self.selected_list_widget, 1, 0, 1, 1)
-        # FIXME: self.horizontal_layout is already defined above?!?!?
+        # FIXME: self.horizontal_layout is already defined above?!?!? Replace with Path Eidt!
         self.horizontal_layout = QtWidgets.QHBoxLayout()
         self.horizontal_layout.setObjectName('horizontal_layout')
         self.directory_label = QtWidgets.QLabel(self.export_song_page)
@@ -143,9 +143,8 @@ class SongExportForm(OpenLPWizard):
         Song wizard localisation.
         """
         self.setWindowTitle(translate('SongsPlugin.ExportWizardForm', 'Song Export Wizard'))
-        # TODO: Verify format() with template variables
-        self.title_label.setText(WizardStrings.HeaderStyle %
-                                 translate('OpenLP.Ui', 'Welcome to the Song Export Wizard'))
+        self.title_label.setText(
+            WizardStrings.HeaderStyle.format(text=translate('OpenLP.Ui', 'Welcome to the Song Export Wizard')))
         self.information_label.setText(
             translate('SongsPlugin.ExportWizardForm', 'This wizard will help to export your songs to the open and free '
                                                       '<strong>OpenLyrics </strong> worship song format.'))

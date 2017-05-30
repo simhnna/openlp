@@ -542,5 +542,5 @@ def _get_text_from_shapes(shapes):
                     text += shape.TextFrame.TextRange.Text + '\n'
     except pywintypes.com_error as e:
         log.warning('Failed to extract text from powerpoint slide')
-        log.warning(e)
+        log.exception(e)
     return text

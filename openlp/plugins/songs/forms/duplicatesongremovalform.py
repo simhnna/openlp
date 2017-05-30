@@ -130,9 +130,9 @@ class DuplicateSongRemovalForm(OpenLPWizard, RegistryProperties):
         Song wizard localisation.
         """
         self.setWindowTitle(translate('Wizard', 'Wizard'))
-        # TODO: Check format() using template strings
-        self.title_label.setText(WizardStrings.HeaderStyle % translate('OpenLP.Ui',
-                                                                       'Welcome to the Duplicate Song Removal Wizard'))
+        self.title_label.setText(
+            WizardStrings.HeaderStyle.format(text=translate('OpenLP.Ui',
+                                                            'Welcome to the Duplicate Song Removal Wizard')))
         self.information_label.setText(
             translate("Wizard",
                       'This wizard will help you to remove duplicate songs from the song database. You will have a '
@@ -216,8 +216,7 @@ class DuplicateSongRemovalForm(OpenLPWizard, RegistryProperties):
         self.button(QtWidgets.QWizard.CancelButton).hide()
         QtWidgets.QMessageBox.information(
             self, translate('Wizard', 'Information'),
-            translate('Wizard', 'No duplicate songs have been found in the database.'),
-            QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
+            translate('Wizard', 'No duplicate songs have been found in the database.'))
 
     def add_duplicates_to_song_list(self, search_song, duplicate_song):
         """
