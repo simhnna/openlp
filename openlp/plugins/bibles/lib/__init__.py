@@ -230,7 +230,7 @@ def update_reference_separators():
     REFERENCE_MATCHES['full'] = \
         re.compile(r'^\s*(?!\s)(?P<book>[\d]*[^\d\.]+)\.*(?<!\s)\s*'
                    r'(?P<ranges>(?:{range_regex}(?:{sep_l}(?!\s*$)|(?=\s*$)))+)\s*$'.format(
-                   range_regex=range_regex, sep_l=REFERENCE_SEPARATORS['sep_l']), re.UNICODE)
+                       range_regex=range_regex, sep_l=REFERENCE_SEPARATORS['sep_l']), re.UNICODE)
 
 
 def get_reference_separator(separator_type):
