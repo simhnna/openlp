@@ -21,7 +21,7 @@
 ###############################################################################
 """
 The :mod:`upgrade` module provides a way for the database and schema that is the
-backend for the Songs plugin
+backend for the projector setup.
 """
 import logging
 
@@ -70,4 +70,4 @@ def upgrade_2(session, metadata):
         new_op.add_column('projector', Column('model_filter', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('model_lamp', types.String(30), server_default=null()))
     else:
-        log_warn("Skipping upgrade_2 of projector DB")
+        log.warn("Skipping upgrade_2 of projector DB")

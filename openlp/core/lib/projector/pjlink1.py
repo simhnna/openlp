@@ -129,7 +129,7 @@ class PJLink(QtNetwork.QTcpSocket):
         self.ip = ip
         self.port = port
         self.pin = pin
-        super(PJLink, self).__init__()
+        super().__init__()
         self.dbid = None
         self.location = None
         self.notes = None
@@ -467,7 +467,7 @@ class PJLink(QtNetwork.QTcpSocket):
             log.warning('({ip}) get_data(): Invalid packet - unknown command "{data}"'.format(ip=self.ip, data=cmd))
             self.receive_data_signal()
             return
-        if int(self.pjlink_class) < int(class_):
+        if int(self.pjlink_class) < int(version):
             log.warn('({ip}) get_data(): Projector returned class reply higher '
                      'than projector stated class'.format(ip=self.ip))
         return self.process_command(cmd, data)
