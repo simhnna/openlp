@@ -27,11 +27,15 @@ from unittest.mock import MagicMock
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common import Registry, Settings
 from openlp.core.common.uistrings import UiStrings
 from openlp.plugins.songs.forms.editsongform import EditSongForm
 
 from tests.helpers.testmixin import TestMixin
+
+__default_settings__ = {
+    'songs/enable chords': True,
+}
 
 
 class TestEditSongForm(TestCase, TestMixin):
@@ -48,12 +52,15 @@ class TestEditSongForm(TestCase, TestMixin):
         self.main_window = QtWidgets.QMainWindow()
         Registry().register('main_window', self.main_window)
         Registry().register('theme_manager', MagicMock())
+        self.build_settings()
+        Settings().extend_default_settings(__default_settings__)
         self.form = EditSongForm(MagicMock(), self.main_window, MagicMock())
 
     def tearDown(self):
         """
         Delete all the C++ objects at the end so that we don't have a segfault
         """
+        self.destroy_settings()
         del self.form
         del self.main_window
 
