@@ -43,7 +43,7 @@ if is_win():
 from openlp.core.lib import ScreenList
 from openlp.core.lib.ui import UiStrings, critical_error_message_box, translate
 from openlp.core.common import trace_error_handler, Registry
-from .presentationcontroller import PresentationController, PresentationDocument
+from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
 log = logging.getLogger(__name__)
 

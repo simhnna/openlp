@@ -29,7 +29,6 @@ class TestProjectorConstants(TestCase):
     """
     Test specific functions in the projector constants module.
     """
-    @skip('Waiting for merge of ~alisonken1/openlp/pjlink2-resource-data')
     def build_pjlink_video_label_test(self):
         """
         Test building PJLINK_DEFAULT_CODES dictionary
