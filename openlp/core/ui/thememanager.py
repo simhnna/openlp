@@ -506,7 +506,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
 
     def get_theme_data(self, theme_name):
         """
-        Returns a theme object from an XML file
+        Returns a theme object from an XML or JSON file
 
         :param theme_name: Name of the theme to load from file
         :return: The theme object.
@@ -556,11 +556,13 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         out_file = None
         file_xml = None
         abort_import = True
+        json_theme = False
+        theme_name = ""
         try:
             theme_zip = zipfile.ZipFile(file_name)
-            json_theme = False
             json_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.json']
             if len(json_file) != 1:
+                # TODO: remove XML handling at some point but would need a auto conversion to run first.
                 xml_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.xml']
                 if len(xml_file) != 1:
                     self.log_error('Theme contains "{val:d}" theme files'.format(val=len(xml_file)))
@@ -572,9 +574,9 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     raise ValidationError
                 theme_name = xml_tree.find('name').text.strip()
             else:
-                theme = Theme()
-                theme.load_theme(theme_zip.read(json_file[0]).decode("utf-8"))
-                theme_name = theme.theme_name
+                new_theme = Theme()
+                new_theme.load_theme(theme_zip.read(json_file[0]).decode("utf-8"))
+                theme_name = new_theme.theme_name
                 json_theme = True
             theme_folder = os.path.join(directory, theme_name)
             theme_exists = os.path.exists(theme_folder)
