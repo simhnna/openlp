@@ -57,61 +57,113 @@ LF = chr(0x0A)  # \n
 PJLINK_PORT = 4352
 TIMEOUT = 30.0
 PJLINK_MAX_PACKET = 136
-# NOTE: Change format to account for some commands are both class 1 and 2
+# NOTE: Changed format to account for some commands are both class 1 and 2
 PJLINK_VALID_CMD = {
-    'ACKN': {'version': ['2', ],  # UDP Reply to 'SRCH'
-             'description': 'Acknowledge a PJLink SRCH command - returns MAC address.'},
+    'ACKN': {'version': ['2', ],
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Acknowledge a PJLink SRCH command - returns MAC address.')
+             },
     'AVMT': {'version': ['1', ],
-             'description': 'Blank/unblank video and/or mute audio.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Blank/unblank video and/or mute audio.')
+             },
     'CLSS': {'version': ['1', ],
-             'description': 'Query projector PJLink class support.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query projector PJLink class support.')
+             },
     'ERST': {'version': ['1', '2'],
-             'description': 'Query error status from projector. '
-                            'Returns fan/lamp/temp/cover/filter/other error status.'},
-    'FILT': {'version': ['2', ],  # Assume (!) time in hours
-             'description': 'Query number of hours on filter.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query error status from projector. '
+                                      'Returns fan/lamp/temp/cover/filter/other error status.')
+             },
+    'FILT': {'version': ['2', ],
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query number of hours on filter.')
+             },
     'FREZ': {'version': ['2', ],
-             'description': 'Freeze or unfreeze current image being projected.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Freeze or unfreeze current image being projected.')
+             },
     'INF1': {'version': ['1', ],
-             'description': 'Query projector manufacturer name.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query projector manufacturer name.')
+             },
     'INF2': {'version': ['1', ],
-             'description': 'Query projector product name.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query projector product name.')
+             },
     'INFO': {'version': ['1', ],
-             'description': 'Query projector for other information set by manufacturer.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query projector for other information set by manufacturer.')
+             },
     'INNM': {'version': ['2', ],
-             'description': 'Query specified input source name'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query specified input source name')
+             },
     'INPT': {'version': ['1', ],
-             'description': 'Switch to specified video source.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Switch to specified video source.')
+             },
     'INST': {'version': ['1', ],
-             'description': 'Query available input sources.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query available input sources.')
+             },
     'IRES': {'version:': ['2', ],
-             'description': 'Query current input resolution.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query current input resolution.')
+             },
     'LAMP': {'version': ['1', ],
-             'description': 'Query lamp time and on/off status. Multiple lamps supported.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query lamp time and on/off status. Multiple lamps supported.')
+             },
     'LKUP': {'version': ['2', ],
-             'description': 'UDP Status notify. Returns MAC address.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'UDP Status notify. Includes MAC address.')
+             },
     'MVOL': {'version': ['2', ],
-             'description': 'Adjust microphone volume by 1 step.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Adjust microphone volume by 1 step.')
+             },
     'NAME': {'version': ['1', ],
-             'description': 'Query customer-set projector name.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query customer-set projector name.')
+             },
     'PJLINK': {'version': ['1', ],
-               'description': 'Initial connection with authentication/no authentication request.'},
+               'description': translate('OpenLP.PJLinkConstants',
+                                        'Initial connection with authentication/no authentication request.')
+               },
     'POWR': {'version': ['1', ],
-             'description': 'Turn lamp on or off/standby.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Turn lamp on or off/standby.')
+             },
     'RFIL': {'version': ['2', ],
-             'description': 'Query replacement air filter model number.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query replacement air filter model number.')
+             },
     'RLMP': {'version': ['2', ],
-             'description': 'Query replacement lamp model number.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query replacement lamp model number.')
+             },
     'RRES': {'version': ['2', ],
-             'description': 'Query recommended resolution.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query recommended resolution.')
+             },
     'SNUM': {'version': ['2', ],
-             'description': 'Query projector serial number.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query projector serial number.')
+             },
     'SRCH': {'version': ['2', ],
-             'description': 'UDP broadcast search request for available projectors.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'UDP broadcast search request for available projectors.')
+             },
     'SVER': {'version': ['2', ],
-             'description': 'Query projector software version number.'},
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Query projector software version number.')
+             },
     'SVOL': {'version': ['2', ],
-             'description': 'Adjust speaker volume by 1 step.'}
+             'description': translate('OpenLP.PJLinkConstants',
+                                      'Adjust speaker volume by 1 step.')
+             }
 }
 
 # Error and status codes

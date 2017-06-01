@@ -65,6 +65,7 @@ def upgrade_2(session, metadata):
     new_op = get_upgrade_op(session)
     if 'serial_no' not in [t.name for t in metadata.tables.values()]:
         log.debug("Upgrading projector DB to version '2'")
+        new_op.add_column('projector', Column('mac_adx', types.String(18), server_default=null()))
         new_op.add_column('projector', Column('serial_no', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('sw_version', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('model_filter', types.String(30), server_default=null()))

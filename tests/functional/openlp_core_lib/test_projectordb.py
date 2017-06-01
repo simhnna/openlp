@@ -306,10 +306,10 @@ class TestProjectorDB(TestCase):
 
         # THEN: __repr__ should return a proper string
         self.assertEqual(str(projector),
-                         '< Projector(id="0", ip="127.0.0.1", port="4352", pin="None", name="Test One", '
-                         'location="Somewhere over the rainbow", notes="Not again", pjlink_name="TEST", '
-                         'manufacturer="IN YOUR DREAMS", model="OpenLP", serial_no="None", other="None", '
-                         'sources="None", source_list="[]", model_filter="None", model_lamp="None", '
+                         '< Projector(id="0", ip="127.0.0.1", port="4352", mac_adx="None", pin="None", '
+                         'name="Test One", location="Somewhere over the rainbow", notes="Not again", '
+                         'pjlink_name="TEST", manufacturer="IN YOUR DREAMS", model="OpenLP", serial_no="None", '
+                         'other="None", sources="None", source_list="[]", model_filter="None", model_lamp="None", '
                          'sw_version="None") >',
                          'Projector.__repr__() should have returned a proper representation string')
 
