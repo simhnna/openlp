@@ -63,7 +63,7 @@ class TestThemeManager(TestCase):
             mocked_zipfile_init.return_value = None
 
             # WHEN: The theme is exported
-            theme_manager._export_theme(os.path.join('some', 'path'), 'Default')
+            theme_manager._export_theme(os.path.join('some', 'path', 'Default.otz'), 'Default')
 
             # THEN: The zipfile should be created at the given path
             mocked_zipfile_init.assert_called_with(os.path.join('some', 'path', 'Default.otz'), 'w')
@@ -126,8 +126,9 @@ class TestThemeManager(TestCase):
             theme_manager.path = ''
             mocked_theme = MagicMock()
             mocked_theme.theme_name = 'themename'
-            mocked_theme.extract_formatted_xml = MagicMock()
-            mocked_theme.extract_formatted_xml.return_value = 'fake_theme_xml'.encode()
+            mocked_theme.filename = "filename"
+            # mocked_theme.extract_formatted_xml = MagicMock()
+            # mocked_theme.extract_formatted_xml.return_value = 'fake_theme_xml'.encode()
 
             # WHEN: Calling _write_theme with path to different images
             file_name1 = os.path.join(TEST_RESOURCES_PATH, 'church.jpg')
@@ -148,14 +149,13 @@ class TestThemeManager(TestCase):
         theme_manager.path = self.temp_folder
         mocked_theme = MagicMock()
         mocked_theme.theme_name = 'theme 愛 name'
-        mocked_theme.extract_formatted_xml = MagicMock()
-        mocked_theme.extract_formatted_xml.return_value = 'fake theme 愛 XML'.encode()
+        mocked_theme.export_theme.return_value = "{}"
 
         # WHEN: Calling _write_theme with a theme with a name with special characters in it
         theme_manager._write_theme(mocked_theme, None, None)
 
         # THEN: It should have been created
-        self.assertTrue(os.path.exists(os.path.join(self.temp_folder, 'theme 愛 name', 'theme 愛 name.xml')),
+        self.assertTrue(os.path.exists(os.path.join(self.temp_folder, 'theme 愛 name', 'theme 愛 name.json')),
                         'Theme with special characters should have been created!')
 
     def test_over_write_message_box_yes(self):

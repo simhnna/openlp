@@ -31,7 +31,8 @@ from tests.helpers.testmixin import TestMixin
 
 from openlp.core.common import Registry
 from openlp.core.lib import MediaManagerItem
-from openlp.plugins.bibles.lib.mediaitem import BibleMediaItem, BibleSearch, get_reference_separators, VALID_TEXT_SEARCH
+from openlp.plugins.bibles.lib.mediaitem import BibleMediaItem, BibleSearch, ResultsTab, SearchStatus, \
+    get_reference_separators, VALID_TEXT_SEARCH
 
 
 class TestBibleMediaItemModulefunctions(TestCase):
@@ -143,6 +144,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item = BibleMediaItem(None, self.mocked_plugin)
 
         self.media_item.settings_section = 'bibles'
+        self.media_item.results_view_tab = MagicMock()
 
         self.mocked_book_1 = MagicMock(**{'get_name.return_value': 'Book 1', 'book_reference_id': 1})
         self.mocked_book_2 = MagicMock(**{'get_name.return_value': 'Book 2', 'book_reference_id': 2})
@@ -655,56 +657,65 @@ class TestMediaItem(TestCase, TestMixin):
         # THEN: The select_book_combo_box model sort should have been reset
         self.media_item.select_book_combo_box.model().sort.assert_called_once_with(-1)
 
-    def test_on_clear_button_clicked(self):
+    def test_on_clear_button_clicked_saved_tab(self):
         """
-        Test on_clear_button_clicked
+        Test on_clear_button_clicked when the saved tab is selected
+        """
+        # GIVEN: An instance of :class:`MediaManagerItem` and mocked out saved_tab and select_tab and a mocked out
+        #        list_view and search_edit
+        self.media_item.list_view = MagicMock()
+        self.media_item.search_edit = MagicMock()
+        self.media_item.results_view_tab = MagicMock(**{'currentIndex.return_value': ResultsTab.Saved})
+        self.media_item.saved_results = ['Some', 'Results']
+        with patch.object(self.media_item, 'on_focus'):
+
+            # WHEN: Calling on_clear_button_clicked
+            self.media_item.on_clear_button_clicked()
+
+            # THEN: The list_view should be cleared
+            self.assertEqual(self.media_item.saved_results, [])
+            self.media_item.list_view.clear.assert_called_once_with()
+
+    def test_on_clear_button_clicked_search_tab(self):
+        """
+        Test on_clear_button_clicked when the search tab is selected
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and mocked out search_tab and select_tab and a mocked out
         #        list_view and search_edit
         self.media_item.list_view = MagicMock()
         self.media_item.search_edit = MagicMock()
+        self.media_item.results_view_tab = MagicMock(**{'currentIndex.return_value': ResultsTab.Search})
+        self.media_item.current_results = ['Some', 'Results']
         with patch.object(self.media_item, 'on_focus'):
 
             # WHEN: Calling on_clear_button_clicked
             self.media_item.on_clear_button_clicked()
 
             # THEN: The list_view and the search_edit should be cleared
+            self.assertEqual(self.media_item.current_results, [])
             self.media_item.list_view.clear.assert_called_once_with()
             self.media_item.search_edit.clear.assert_called_once_with()
 
-    def test_on_lock_button_toggled_search_tab_lock_icon(self):
+    def test_on_save_results_button_clicked(self):
         """
-        Test that "on_lock_button_toggled" toggles the lock properly.
+        Test that "on_save_results_button_clicked" saves the results.
         """
-        # GIVEN: An instance of :class:`MediaManagerItem` a mocked sender and list_view
-        self.media_item.list_view = MagicMock()
-        self.media_item.lock_icon = 'lock icon'
-        mocked_sender_instance = MagicMock()
-        with patch.object(self.media_item, 'sender', return_value=mocked_sender_instance):
+        # GIVEN: An instance of :class:`MediaManagerItem` and a mocked list_view
+        result_1 = MagicMock(**{'data.return_value': 'R1'})
+        result_2 = MagicMock(**{'data.return_value': 'R2'})
+        result_3 = MagicMock(**{'data.return_value': 'R3'})
+        self.media_item.list_view = MagicMock(**{'selectedItems.return_value': [result_1, result_2, result_3]})
 
-            # WHEN: When the lock_button is checked
-            self.media_item.on_lock_button_toggled(True)
+        with patch.object(self.media_item, 'on_results_view_tab_total_update') as \
+                mocked_on_results_view_tab_total_update:
 
-            # THEN: list_view should be 'locked' and the lock icon set
-            self.assertTrue(self.media_item.list_view.locked)
-            mocked_sender_instance.setIcon.assert_called_once_with('lock icon')
+            # WHEN: When the save_results_button is clicked
+            self.media_item.on_save_results_button_clicked()
 
-    def test_on_lock_button_toggled_unlock_icon(self):
-        """
-        Test that "on_lock_button_toggled" toggles the lock properly.
-        """
-        # GIVEN: An instance of :class:`MediaManagerItem` a mocked sender and list_view
-        self.media_item.list_view = MagicMock()
-        self.media_item.unlock_icon = 'unlock icon'
-        mocked_sender_instance = MagicMock()
-        with patch.object(self.media_item, 'sender', return_value=mocked_sender_instance):
-
-            # WHEN: When the lock_button is unchecked
-            self.media_item.on_lock_button_toggled(False)
-
-            # THEN: list_view should be 'unlocked' and the unlock icon set
-            self.assertFalse(self.media_item.list_view.locked)
-            mocked_sender_instance.setIcon.assert_called_once_with('unlock icon')
+            # THEN: The selected results in the list_view should be added to the 'saved_results' list. And the saved_tab
+            #       total should be updated.
+            self.assertEqual(self.media_item.saved_results, ['R1', 'R2', 'R3'])
+            mocked_on_results_view_tab_total_update.assert_called_once_with(ResultsTab.Saved)
 
     def test_on_style_combo_box_changed(self):
         """
@@ -812,7 +823,9 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.list_view = MagicMock(**{'count.return_value': 5})
         self.media_item.style_combo_box = MagicMock()
         self.media_item.select_book_combo_box = MagicMock()
+        self.media_item.search_results = ['list', 'of', 'results']
         with patch.object(self.media_item, 'initialise_advanced_bible') as mocked_initialise_advanced_bible, \
+                patch.object(self.media_item, 'display_results'), \
                 patch('openlp.plugins.bibles.lib.mediaitem.critical_error_message_box',
                       return_value=QtWidgets.QMessageBox.Yes) as mocked_critical_error_message_box:
 
@@ -822,9 +835,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.second_combo_box = MagicMock(**{'currentData.return_value': self.mocked_bible_1})
             self.media_item.on_second_combo_box_index_changed(5)
 
-            # THEN: The list_view should be cleared and the selected bible should be set as the current bible
+            # THEN: The selected bible should be set as the current bible
             self.assertTrue(mocked_critical_error_message_box.called)
-            self.media_item.list_view.clear.assert_called_once_with(override_lock=True)
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(False)
             self.assertTrue(mocked_initialise_advanced_bible.called)
             self.assertEqual(self.media_item.second_bible, self.mocked_bible_1)
@@ -838,7 +850,9 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.list_view = MagicMock(**{'count.return_value': 5})
         self.media_item.style_combo_box = MagicMock()
         self.media_item.select_book_combo_box = MagicMock()
+        self.media_item.search_results = ['list', 'of', 'results']
         with patch.object(self.media_item, 'initialise_advanced_bible') as mocked_initialise_advanced_bible, \
+                patch.object(self.media_item, 'display_results'), \
                 patch('openlp.plugins.bibles.lib.mediaitem.critical_error_message_box',
                       return_value=QtWidgets.QMessageBox.Yes) as mocked_critical_error_message_box:
             # WHEN: The previously is a bible new selection is None and the user selects yes
@@ -847,9 +861,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.second_combo_box = MagicMock(**{'currentData.return_value': None})
             self.media_item.on_second_combo_box_index_changed(0)
 
-            # THEN: The list_view should be cleared and the selected bible should be set as the current bible
+            # THEN: The selected bible should be set as the current bible
             self.assertTrue(mocked_critical_error_message_box.called)
-            self.media_item.list_view.clear.assert_called_once_with(override_lock=True)
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(True)
             self.assertFalse(mocked_initialise_advanced_bible.called)
             self.assertEqual(self.media_item.second_bible, None)
@@ -1383,8 +1396,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling on_search_timer_timeout
             self.media_item.on_search_timer_timeout()
 
-            # THEN: The text_search method should have been called with True
-            mocked_text_search.assert_called_once_with(True)
+            # THEN: The search_status should be set to SearchAsYouType and text_search should have been called
+            self.assertEqual(self.media_item.search_status, SearchStatus().SearchAsYouType)
+            mocked_text_search.assert_called_once_with()
 
     def test_display_results_no_results(self):
         """
@@ -1402,7 +1416,6 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.display_results()
 
             # THEN: No items should be added to the list
-            self.media_item.list_view.clear.assert_called_once_with()
             self.assertFalse(self.media_item.list_view.addItem.called)
 
     def test_display_results_results(self):
@@ -1410,7 +1423,10 @@ class TestMediaItem(TestCase, TestMixin):
         Test the display_results method when there are items to display
         """
         # GIVEN: An instance of BibleMediaItem and a mocked build_display_results which returns a list of results
-        with patch.object(self.media_item, 'build_display_results', return_value=['list', 'items']):
+        with patch.object(self.media_item, 'build_display_results', return_value=[
+            {'item_title': 'Title 1'}, {'item_title': 'Title 2'}]), \
+            patch.object(self.media_item, 'add_built_results_to_list_widget') as \
+                mocked_add_built_results_to_list_widget:
             self.media_item.search_results = ['results']
             self.media_item.list_view = MagicMock()
 
@@ -1418,5 +1434,5 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.display_results()
 
             # THEN: addItem should have been with the display items
-            self.media_item.list_view.clear.assert_called_once_with()
-            self.assertEqual(self.media_item.list_view.addItem.call_args_list, [call('list'), call('items')])
+            mocked_add_built_results_to_list_widget.assert_called_once_with(
+                [{'item_title': 'Title 1'}, {'item_title': 'Title 2'}])

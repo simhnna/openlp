@@ -30,7 +30,7 @@ from PyQt5 import QtCore
 from openlp.core.common import Registry
 from openlp.core.lib import Renderer, ScreenList, ServiceItem, FormattingTags
 from openlp.core.lib.renderer import words_split, get_start_tags
-from openlp.core.lib.theme import ThemeXML
+from openlp.core.lib.theme import Theme
 
 
 SCREEN = {
@@ -189,7 +189,7 @@ class TestRenderer(TestCase):
         # GIVEN: test object and data
         mock_lyrics_css.return_value = ' FORMAT CSS; '
         mock_outline_css.return_value = ' OUTLINE CSS; '
-        theme_data = ThemeXML()
+        theme_data = Theme()
         theme_data.font_main_name = 'Arial'
         theme_data.font_main_size = 20
         theme_data.font_main_color = '#FFFFFF'

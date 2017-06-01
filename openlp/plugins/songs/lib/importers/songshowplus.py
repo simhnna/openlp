@@ -23,7 +23,6 @@
 The :mod:`songshowplus` module provides the functionality for importing SongShow Plus songs into the OpenLP
 database.
 """
-import chardet
 import os
 import logging
 import re
@@ -225,6 +224,7 @@ class SongShowPlusImport(SongImport):
 
     def decode(self, data):
         try:
-            return str(data, chardet.detect(data)['encoding'])
+            # Don't question this, it works...
+            return data.decode('utf-8').encode('cp1251').decode('cp1251')
         except:
-            return str(data, retrieve_windows_encoding())
+            return data.decode(retrieve_windows_encoding())
