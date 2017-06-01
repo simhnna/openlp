@@ -25,36 +25,30 @@ Package to test the openlp.core.lib.theme package.
 from unittest import TestCase
 import os
 
-from openlp.core.lib.theme import ThemeXML
+from openlp.core.lib.theme import Theme
 
 
-class TestThemeXML(TestCase):
+class TestTheme(TestCase):
     """
-    Test the ThemeXML class
+    Test the Theme class
     """
     def test_new_theme(self):
         """
-        Test the ThemeXML constructor
+        Test the Theme constructor
         """
-        # GIVEN: The ThemeXML class
+        # GIVEN: The Theme class
         # WHEN: A theme object is created
-        default_theme = ThemeXML()
+        default_theme = Theme()
 
         # THEN: The default values should be correct
-        self.assertEqual('#000000', default_theme.background_border_color,
-                         'background_border_color should be "#000000"')
-        self.assertEqual('solid', default_theme.background_type, 'background_type should be "solid"')
-        self.assertEqual(0, default_theme.display_vertical_align, 'display_vertical_align should be 0')
-        self.assertEqual('Arial', default_theme.font_footer_name, 'font_footer_name should be "Arial"')
-        self.assertFalse(default_theme.font_main_bold, 'font_main_bold should be False')
-        self.assertEqual(47, len(default_theme.__dict__), 'The theme should have 47 attributes')
+        self.check_theme(default_theme)
 
     def test_expand_json(self):
         """
         Test the expand_json method
         """
-        # GIVEN: A ThemeXML object and some JSON to "expand"
-        theme = ThemeXML()
+        # GIVEN: A Theme object and some JSON to "expand"
+        theme = Theme()
         theme_json = {
             'background': {
                 'border_color': '#000000',
@@ -73,31 +67,48 @@ class TestThemeXML(TestCase):
             }
         }
 
-        # WHEN: ThemeXML.expand_json() is run
+        # WHEN: Theme.expand_json() is run
         theme.expand_json(theme_json)
 
         # THEN: The attributes should be set on the object
-        self.assertEqual('#000000', theme.background_border_color, 'background_border_color should be "#000000"')
-        self.assertEqual('solid', theme.background_type, 'background_type should be "solid"')
-        self.assertEqual(0, theme.display_vertical_align, 'display_vertical_align should be 0')
-        self.assertFalse(theme.font_footer_bold, 'font_footer_bold should be False')
-        self.assertEqual('Arial', theme.font_main_name, 'font_main_name should be "Arial"')
+        self.check_theme(theme)
 
     def test_extend_image_filename(self):
         """
         Test the extend_image_filename method
         """
         # GIVEN: A theme object
-        theme = ThemeXML()
+        theme = Theme()
         theme.theme_name = 'MyBeautifulTheme   '
         theme.background_filename = '    video.mp4'
         theme.background_type = 'video'
         path = os.path.expanduser('~')
 
-        # WHEN: ThemeXML.extend_image_filename is run
+        # WHEN: Theme.extend_image_filename is run
         theme.extend_image_filename(path)
 
         # THEN: The filename of the background should be correct
         expected_filename = os.path.join(path, 'MyBeautifulTheme', 'video.mp4')
         self.assertEqual(expected_filename, theme.background_filename)
         self.assertEqual('MyBeautifulTheme', theme.theme_name)
+
+    def test_save_retrieve(self):
+        """
+        Load a dummy theme, save it and reload it
+        """
+        # GIVEN: The default Theme class
+        # WHEN: A theme object is created
+        default_theme = Theme()
+        # THEN: The default values should be correct
+        save_theme_json = default_theme.export_theme()
+        lt = Theme()
+        lt.load_theme(save_theme_json)
+        self.check_theme(lt)
+
+    def check_theme(self, theme):
+        self.assertEqual('#000000', theme.background_border_color, 'background_border_color should be "#000000"')
+        self.assertEqual('solid', theme.background_type, 'background_type should be "solid"')
+        self.assertEqual(0, theme.display_vertical_align, 'display_vertical_align should be 0')
+        self.assertFalse(theme.font_footer_bold, 'font_footer_bold should be False')
+        self.assertEqual('Arial', theme.font_main_name, 'font_main_name should be "Arial"')
+        self.assertEqual(47, len(theme.__dict__), 'The theme should have 47 attributes')
