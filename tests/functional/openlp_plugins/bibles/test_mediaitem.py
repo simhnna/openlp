@@ -504,7 +504,7 @@ class TestMediaItem(TestCase, TestMixin):
             mocked_set_case_insensitive_completer.assert_called_once_with(
                 ['Book 1 ', 'Book 2 ', 'Book 3 '], mocked_search_edit)
 
-    def test_on_import_click_no_import_wizzard_attr(self):
+    def test_on_import_click_no_import_wizard_attr(self):
         """
         Test on_import_click when media_item does not have the `import_wizard` attribute. And the wizard was canceled.
         """
