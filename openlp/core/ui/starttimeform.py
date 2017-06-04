@@ -38,8 +38,8 @@ class StartTimeForm(QtWidgets.QDialog, Ui_StartTimeDialog, RegistryProperties):
         """
         Constructor
         """
-        super(StartTimeForm, self).__init__(Registry().get('main_window'),
-                                            QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(StartTimeForm, self).__init__(Registry().get('main_window'), QtCore.Qt.WindowSystemMenuHint |
+                                            QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
 
     def exec(self):
