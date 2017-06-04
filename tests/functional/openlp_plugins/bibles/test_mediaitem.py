@@ -521,9 +521,9 @@ class TestMediaItem(TestCase, TestMixin):
             self.assertTrue(mocked_bible_import_form.called)
             self.assertFalse(mocked_reload_bibles.called)
 
-    def test_on_import_click_wizzard_not_canceled(self):
+    def test_on_import_click_wizard_not_canceled(self):
         """
-        Test on_import_click when the media item has the import_wizzard attr set and wizard completes sucessfully.
+        Test on_import_click when the media item has the import_wizard attr set and wizard completes sucessfully.
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and a mocked import_wizard
         mocked_import_wizard = MagicMock(**{'exec.return_value': True})
