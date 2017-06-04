@@ -480,9 +480,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling update_auto_completer
             self.media_item.update_auto_completer()
 
-            # THEN: set_case_insensitive_completer should have been called with the names of the books in order
+            # THEN: set_case_insensitive_completer should have been called with the names of the books + space in order
             mocked_set_case_insensitive_completer.assert_called_once_with(
-                ['Book 1', 'Book 2', 'Book 3'], mocked_search_edit)
+                ['Book 1 ', 'Book 2 ', 'Book 3 '], mocked_search_edit)
 
     def test_update_auto_completer_search_combined_type(self):
         """
@@ -500,9 +500,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling update_auto_completer
             self.media_item.update_auto_completer()
 
-            # THEN: set_case_insensitive_completer should have been called with the names of the books in order
+            # THEN: set_case_insensitive_completer should have been called with the names of the books + space in order
             mocked_set_case_insensitive_completer.assert_called_once_with(
-                ['Book 1', 'Book 2', 'Book 3'], mocked_search_edit)
+                ['Book 1 ', 'Book 2 ', 'Book 3 '], mocked_search_edit)
 
     def test_on_import_click_no_import_wizzard_attr(self):
         """
