@@ -40,7 +40,7 @@ __default_settings__ = {
     'custom/db password': '',
     'custom/db hostname': '',
     'custom/db database': '',
-    'custom/last search type': CustomSearch.Titles,
+    'custom/last used search type': CustomSearch.Titles,
     'custom/display footer': True,
     'custom/add custom from service': True
 }
