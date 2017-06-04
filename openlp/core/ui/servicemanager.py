@@ -698,7 +698,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 translate('OpenLP.ServiceManager',
                           'OpenLP Service Files (*.osz);; OpenLP Service Files - lite (*.oszl)'))
         else:
-            file_name, filter_uesd = QtWidgets.QFileDialog.getSaveFileName(
+            file_name, filter_used = QtWidgets.QFileDialog.getSaveFileName(
                 self.main_window, UiStrings().SaveService, path,
                 translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz);;'))
         if not file_name:

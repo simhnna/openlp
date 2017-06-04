@@ -38,6 +38,7 @@ class TestBibleManager(TestCase, TestMixin):
         """
         Set up the environment for testing bible queries with 1 Timothy 3
         """
+        self.setup_application()
         self.build_settings()
         Registry.create()
         Registry().register('service_list', MagicMock())
