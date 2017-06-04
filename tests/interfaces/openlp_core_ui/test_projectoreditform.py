@@ -45,8 +45,8 @@ class TestProjectorEditForm(TestCase, TestMixin):
 
         :return: None
         """
-        self.build_settings()
         self.setup_application()
+        self.build_settings()
         Registry.create()
         with patch('openlp.core.lib.projector.db.init_url') as mocked_init_url:
             if os.path.exists(TEST_DB):
