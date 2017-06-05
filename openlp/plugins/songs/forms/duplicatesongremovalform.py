@@ -83,7 +83,7 @@ class DuplicateSongRemovalForm(OpenLPWizard, RegistryProperties):
         self.cancel_button.clicked.connect(self.on_wizard_exit)
 
     def closeEvent(self, event):
-            self.on_wizard_exit()
+        self.on_wizard_exit()
 
     def add_custom_pages(self):
         """
