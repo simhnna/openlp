@@ -222,7 +222,7 @@ class Settings(QtCore.QSettings):
         ('bibles/quick bible', 'bibles/primary bible', []),  # Common bible search widgets combined in 2.6
         # Last search type was renamed to last used search type in 2.6 since Bible search value type changed in 2.6.
         ('songs/last search type', 'songs/last used search type', []),
-        ('bibles/last search type', 'bibles/last used search type', []),
+        ('bibles/last search type', '', []),
         ('custom/last search type', 'custom/last used search type', [])
     ]
 
