@@ -29,7 +29,7 @@ from PyQt5 import QtCore
 
 from openlp.core.common import Registry, is_macosx, Settings
 from openlp.core.lib import ScreenList, PluginManager
-from openlp.core.ui import MainDisplay
+from openlp.core.ui import MainDisplay, AudioPlayer
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.maindisplay import TRANSPARENT_STYLESHEET, OPAQUE_STYLESHEET
 
@@ -283,3 +283,18 @@ class TestMainDisplay(TestCase, TestMixin):
         self.assertEquals(main_display.web_view.setHtml.call_count, 1, 'setHTML should be called once')
         self.assertEquals(main_display.media_controller.video.call_count, 1,
                           'Media Controller video should have been called once')
+
+
+def test_calling_next_item_in_playlist():
+    """
+    Test the AudioPlayer.next() method
+    """
+    # GIVEN: An instance of AudioPlayer with a mocked out playlist
+    audio_player = AudioPlayer(None)
+
+    # WHEN: next is called.
+    with patch.object(audio_player, 'playlist') as mocked_playlist:
+        audio_player.next()
+
+    # THEN: playlist.next should had been called once.
+    mocked_playlist.next.assert_called_once_with()
