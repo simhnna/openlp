@@ -34,7 +34,6 @@ from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.plugins.remotes.deploy import download_and_check
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, \
     translate, clean_button_text, trace_error_handler
 from openlp.core.lib import PluginStatus, build_icon
@@ -595,11 +594,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                                     os.path.join(themes_destination, theme),
                                     sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
-        if self.remote_check_box.isChecked():
-            self._increment_progress_bar(self.downloading.format(
-                name=translate('OpenLP.FirstTimeWizard', 'Downloading Web Application')), 0)
-            self.previous_size = 0
-            download_and_check(self)
         if missed_files:
             file_list = ''
             for entry in missed_files:

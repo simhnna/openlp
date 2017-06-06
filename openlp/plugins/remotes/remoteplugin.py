@@ -81,5 +81,10 @@ class RemotesPlugin(Plugin, OpenLPMixin):
             'title': translate('RemotePlugin', 'Web Remote', 'container title')
         }
 
-    def manage_download(self):
+    def first_time(self):
+        """
+        Import web site code if active
+        """
+        self.application.process_events()
         download_and_check()
+        self.application.process_events()
