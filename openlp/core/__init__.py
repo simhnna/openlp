@@ -338,7 +338,7 @@ def parse_options(args):
     parser.add_argument('-d', '--dev-version', dest='dev_version', action='store_true',
                         help='Ignore the version file and pull the version directly from Bazaar')
     parser.add_argument('-s', '--style', dest='style', help='Set the Qt5 style (passed directly to Qt5).')
-    parser.add_argument('-w', '--webServer', dest='webServer', action='store_false',
+    parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_false',
                         help='Turn off the Web and Socket Server ')
     parser.add_argument('rargs', nargs='?', default=[])
     # Parse command line options and deal with them. Use args supplied pragmatically if possible.
@@ -413,7 +413,7 @@ def main(args=None):
         set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
     Registry.create()
     Registry().register('application', application)
-    Registry().set_flag('webServer', args.webServer)
+    Registry().set_flag('no_web_server', args.no_web_server)
     application.setApplicationVersion(get_application_version()['version'])
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     if application.is_already_running():

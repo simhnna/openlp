@@ -34,7 +34,7 @@ from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.api.deploy import download_and_check
+from openlp.plugins.remotes.deploy import download_and_check
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, \
     translate, clean_button_text, trace_error_handler
 from openlp.core.lib import PluginStatus, build_icon
