@@ -22,6 +22,7 @@
 """
 The Theme Manager manages adding, deleteing and modifying of themes.
 """
+import json
 import os
 import zipfile
 import shutil
@@ -33,7 +34,7 @@ from openlp.core.common import Registry, RegistryProperties, AppLocation, Settin
     check_directory_exists, UiStrings, translate, is_win, get_filesystem_encoding, delete_file
 from openlp.core.lib import FileDialog, ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
-from openlp.core.lib.theme import ThemeXML, BackgroundType
+from openlp.core.lib.theme import Theme, BackgroundType
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action
 from openlp.core.ui import FileRenameForm, ThemeForm
 from openlp.core.ui.lib import OpenLPToolbar
@@ -245,7 +246,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         their customisations.
         :param field:
         """
-        theme = ThemeXML()
+        theme = Theme()
         theme.set_default_header_footer()
         self.theme_form.theme = theme
         self.theme_form.exec()
@@ -378,11 +379,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             critical_error_message_box(message=translate('OpenLP.ThemeManager', 'You have not selected a theme.'))
             return
         theme = item.data(QtCore.Qt.UserRole)
-        path = QtWidgets.QFileDialog.getExistingDirectory(self,
-                                                          translate('OpenLP.ThemeManager',
-                                                                    'Save Theme - ({name})').format(name=theme),
-                                                          Settings().value(self.settings_section +
-                                                                           '/last directory export'))
+        path, filter_used = \
+            QtWidgets.QFileDialog.getSaveFileName(self.main_window,
+                                                  translate('OpenLP.ThemeManager', 'Save Theme - ({name})').
+                                                  format(name=theme),
+                                                  Settings().value(self.settings_section + '/last directory export'),
+                                                  translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
         self.application.set_busy_cursor()
         if path:
             Settings().setValue(self.settings_section + '/last directory export', path)
@@ -393,13 +395,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                                                             'Your theme has been successfully exported.'))
         self.application.set_normal_cursor()
 
-    def _export_theme(self, path, theme):
+    def _export_theme(self, theme_path, theme):
         """
         Create the zipfile with the theme contents.
-        :param path: Location where the zip file will be placed
+        :param theme_path: Location where the zip file will be placed
         :param theme: The name of the theme to be exported
         """
-        theme_path = os.path.join(path, theme + '.otz')
         theme_zip = None
         try:
             theme_zip = zipfile.ZipFile(theme_path, 'w')
@@ -452,7 +453,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         files = AppLocation.get_files(self.settings_section, '.png')
         # No themes have been found so create one
         if not files:
-            theme = ThemeXML()
+            theme = Theme()
             theme.theme_name = UiStrings().Default
             self._write_theme(theme, None, None)
             Settings().setValue(self.settings_section + '/global theme', theme.theme_name)
@@ -505,19 +506,27 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
 
     def get_theme_data(self, theme_name):
         """
-        Returns a theme object from an XML file
+        Returns a theme object from an XML or JSON file
 
         :param theme_name: Name of the theme to load from file
         :return: The theme object.
         """
         self.log_debug('get theme data for theme {name}'.format(name=theme_name))
-        xml_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
-        xml = get_text_file_string(xml_file)
-        if not xml:
+        theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.json')
+        theme_data = get_text_file_string(theme_file)
+        jsn = True
+        if not theme_data:
+            theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
+            theme_data = get_text_file_string(theme_file)
+            jsn = False
+        if not theme_data:
             self.log_debug('No theme data - using default theme')
-            return ThemeXML()
+            return Theme()
         else:
-            return self._create_theme_from_xml(xml, self.path)
+            if jsn:
+                return self._create_theme_from_json(theme_data, self.path)
+            else:
+                return self._create_theme_from_xml(theme_data, self.path)
 
     def over_write_message_box(self, theme_name):
         """
@@ -547,18 +556,28 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         out_file = None
         file_xml = None
         abort_import = True
+        json_theme = False
+        theme_name = ""
         try:
             theme_zip = zipfile.ZipFile(file_name)
-            xml_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.xml']
-            if len(xml_file) != 1:
-                self.log_error('Theme contains "{val:d}" XML files'.format(val=len(xml_file)))
-                raise ValidationError
-            xml_tree = ElementTree(element=XML(theme_zip.read(xml_file[0]))).getroot()
-            theme_version = xml_tree.get('version', default=None)
-            if not theme_version or float(theme_version) < 2.0:
-                self.log_error('Theme version is less than 2.0')
-                raise ValidationError
-            theme_name = xml_tree.find('name').text.strip()
+            json_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.json']
+            if len(json_file) != 1:
+                # TODO: remove XML handling at some point but would need a auto conversion to run first.
+                xml_file = [name for name in theme_zip.namelist() if os.path.splitext(name)[1].lower() == '.xml']
+                if len(xml_file) != 1:
+                    self.log_error('Theme contains "{val:d}" theme files'.format(val=len(xml_file)))
+                    raise ValidationError
+                xml_tree = ElementTree(element=XML(theme_zip.read(xml_file[0]))).getroot()
+                theme_version = xml_tree.get('version', default=None)
+                if not theme_version or float(theme_version) < 2.0:
+                    self.log_error('Theme version is less than 2.0')
+                    raise ValidationError
+                theme_name = xml_tree.find('name').text.strip()
+            else:
+                new_theme = Theme()
+                new_theme.load_theme(theme_zip.read(json_file[0]).decode("utf-8"))
+                theme_name = new_theme.theme_name
+                json_theme = True
             theme_folder = os.path.join(directory, theme_name)
             theme_exists = os.path.exists(theme_folder)
             if theme_exists and not self.over_write_message_box(theme_name):
@@ -574,7 +593,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     continue
                 full_name = os.path.join(directory, out_name)
                 check_directory_exists(os.path.dirname(full_name))
-                if os.path.splitext(name)[1].lower() == '.xml':
+                if os.path.splitext(name)[1].lower() == '.xml' or os.path.splitext(name)[1].lower() == '.json':
                     file_xml = str(theme_zip.read(name), 'utf-8')
                     out_file = open(full_name, 'w', encoding='utf-8')
                     out_file.write(file_xml)
@@ -597,7 +616,10 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             if not abort_import:
                 # As all files are closed, we can create the Theme.
                 if file_xml:
-                    theme = self._create_theme_from_xml(file_xml, self.path)
+                    if json_theme:
+                        theme = self._create_theme_from_json(file_xml, self.path)
+                    else:
+                        theme = self._create_theme_from_xml(file_xml, self.path)
                     self.generate_and_save_image(theme_name, theme)
                 # Only show the error message, when IOError was not raised (in
                 # this case the error message has already been shown).
@@ -646,16 +668,16 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :param image_to: Where the Theme Image is to be saved to
         """
         name = theme.theme_name
-        theme_pretty_xml = theme.extract_formatted_xml()
+        theme_pretty = theme.export_theme()
         theme_dir = os.path.join(self.path, name)
         check_directory_exists(theme_dir)
-        theme_file = os.path.join(theme_dir, name + '.xml')
+        theme_file = os.path.join(theme_dir, name + '.json')
         if self.old_background_image and image_to != self.old_background_image:
             delete_file(self.old_background_image)
         out_file = None
         try:
             out_file = open(theme_file, 'w', encoding='utf-8')
-            out_file.write(theme_pretty_xml.decode('utf-8'))
+            out_file.write(theme_pretty)
         except IOError:
             self.log_exception('Saving theme to file failed')
         finally:
@@ -717,7 +739,8 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         return os.path.join(self.path, theme + '.png')
 
-    def _create_theme_from_xml(self, theme_xml, image_path):
+    @staticmethod
+    def _create_theme_from_xml(theme_xml, image_path):
         """
         Return a theme object using information parsed from XML
 
@@ -725,8 +748,22 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :param image_path: Where the theme image is stored
         :return: Theme data.
         """
-        theme = ThemeXML()
+        theme = Theme()
         theme.parse(theme_xml)
+        theme.extend_image_filename(image_path)
+        return theme
+
+    @staticmethod
+    def _create_theme_from_json(theme_json, image_path):
+        """
+        Return a theme object using information parsed from JSON
+
+        :param theme_json: The Theme data object.
+        :param image_path: Where the theme image is stored
+        :return: Theme data.
+        """
+        theme = Theme()
+        theme.load_theme(theme_json)
         theme.extend_image_filename(image_path)
         return theme
 

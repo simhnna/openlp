@@ -925,6 +925,8 @@ class SlideController(DisplayController, RegistryProperties):
                 Registry().execute('{name}_stop'.format(name=old_item.name.lower()), [old_item, self.is_live])
             if old_item.is_media() and not self.service_item.is_media():
                 self.on_media_close()
+        if self.is_live:
+            Registry().execute('slidecontroller_{item}_started'.format(item=self.type_prefix), [self.service_item])
 
     def on_slide_selected_index(self, message):
         """

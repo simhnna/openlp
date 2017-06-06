@@ -29,7 +29,7 @@ from subprocess import check_output, CalledProcessError
 from openlp.core.common import AppLocation, check_binary_exists
 from openlp.core.common import Settings, is_win
 from openlp.core.lib import ScreenList
-from .presentationcontroller import PresentationController, PresentationDocument
+from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
 if is_win():
     from subprocess import STARTUPINFO, STARTF_USESHOWWINDOW

@@ -246,7 +246,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             Settings().setValue('core/application version', openlp_version)
         # If data_version is different from the current version ask if we should backup the data folder
         elif data_version != openlp_version:
-            if self.splash.isVisible():
+            if can_show_splash and self.splash.isVisible():
                 self.splash.hide()
             if QtWidgets.QMessageBox.question(None, translate('OpenLP', 'Backup'),
                                               translate('OpenLP', 'OpenLP has been upgraded, do you want to create\n'
@@ -319,7 +319,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         return QtWidgets.QApplication.event(self, event)
 
 
-def parse_options(args):
+def parse_options(args=None):
     """
     Parse the command line arguments
 
@@ -431,13 +431,12 @@ def main(args=None):
             sys.exit()
     # i18n Set Language
     language = LanguageManager.get_language()
-    application_translator, default_translator = LanguageManager.get_translator(language)
-    if not application_translator.isEmpty():
-        application.installTranslator(application_translator)
-    if not default_translator.isEmpty():
-        application.installTranslator(default_translator)
-    else:
-        log.debug('Could not find default_translator.')
+    translators = LanguageManager.get_translators(language)
+    for translator in translators:
+        if not translator.isEmpty():
+            application.installTranslator(translator)
+    if not translators:
+        log.debug('Could not find translators.')
     if args and not args.no_error_form:
         sys.excepthook = application.hook_exception
     sys.exit(application.run(qt_args))

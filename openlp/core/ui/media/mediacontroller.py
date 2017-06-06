@@ -28,11 +28,11 @@ import os
 import datetime
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties, Settings, UiStrings, translate
 from openlp.core.api.http import register_endpoint
+from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties, Settings, UiStrings, \
+    extension_loader, translate
 from openlp.core.lib import ItemCapabilities
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.common import AppLocation
 from openlp.core.ui import DisplayControllerType
 from openlp.core.ui.media.endpoint import media_endpoint
 from openlp.core.ui.media.vendor.mediainfoWrapper import MediaInfoWrapper
@@ -40,6 +40,7 @@ from openlp.core.ui.media.mediaplayer import MediaPlayer
 from openlp.core.ui.media import MediaState, MediaInfo, MediaType, get_media_players, set_media_players,\
     parse_optical_path
 from openlp.core.ui.lib.toolbar import OpenLPToolbar
+
 
 log = logging.getLogger(__name__)
 
@@ -175,19 +176,9 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Check to see if we have any media Player's available.
         """
         log.debug('_check_available_media_players')
-        controller_dir = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'core', 'ui', 'media')
-        for filename in os.listdir(controller_dir):
-            if filename.endswith('player.py') and filename != 'mediaplayer.py':
-                path = os.path.join(controller_dir, filename)
-                if os.path.isfile(path):
-                    module_name = 'openlp.core.ui.media.' + os.path.splitext(filename)[0]
-                    log.debug('Importing controller %s', module_name)
-                    try:
-                        __import__(module_name, globals(), locals(), [])
-                    # On some platforms importing vlc.py might cause
-                    # also OSError exceptions. (e.g. Mac OS X)
-                    except (ImportError, OSError):
-                        log.warning('Failed to import %s on path %s', module_name, path)
+        controller_dir = os.path.join('openlp', 'core', 'ui', 'media')
+        glob_pattern = os.path.join(controller_dir, '*player.py')
+        extension_loader(glob_pattern, ['mediaplayer.py'])
         player_classes = MediaPlayer.__subclasses__()
         for player_class in player_classes:
             self.register_players(player_class(self))

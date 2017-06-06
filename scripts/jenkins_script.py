@@ -59,14 +59,13 @@ class OpenLPJobs(object):
     Branch_Pull = 'Branch-01-Pull'
     Branch_Functional = 'Branch-02-Functional-Tests'
     Branch_Interface = 'Branch-03-Interface-Tests'
-    Branch_Windows_Functional = 'Branch-04a-Windows_Functional_Tests'
-    Branch_Windows_Interface = 'Branch-04b-Windows_Interface_Tests'
-    Branch_PEP = 'Branch-05a-Code_Analysis'
-    Branch_Coverage = 'Branch-05b-Test_Coverage'
-    Branch_Pylint = 'Branch-05c-Code_Analysis2'
+    Branch_PEP = 'Branch-04a-Code_Analysis'
+    Branch_Coverage = 'Branch-04b-Test_Coverage'
+    Branch_Pylint = 'Branch-04c-Code_Analysis2'
+    Branch_AppVeyor = 'Branch-05-AppVeyor-Tests'
 
-    Jobs = [Branch_Pull, Branch_Functional, Branch_Interface, Branch_Windows_Functional, Branch_Windows_Interface,
-            Branch_PEP, Branch_Coverage, Branch_Pylint]
+    Jobs = [Branch_Pull, Branch_Functional, Branch_Interface, Branch_PEP, Branch_Coverage, Branch_Pylint,
+            Branch_AppVeyor]
 
 
 class Colour(object):
@@ -217,6 +216,7 @@ def main():
             jenkins_trigger.print_output()
     else:
         parser.print_help()
+
 
 if __name__ == '__main__':
     main()

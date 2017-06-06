@@ -54,25 +54,20 @@ class SongUsageDetailForm(QtWidgets.QDialog, Ui_SongUsageDetailDialog, RegistryP
         """
         self.from_date_calendar.setSelectedDate(Settings().value(self.plugin.settings_section + '/from date'))
         self.to_date_calendar.setSelectedDate(Settings().value(self.plugin.settings_section + '/to date'))
-        self.file_line_edit.setText(Settings().value(self.plugin.settings_section + '/last directory export'))
+        self.report_path_edit.path = Settings().value(self.plugin.settings_section + '/last directory export')
 
-    def define_output_location(self):
+    def on_report_path_edit_path_changed(self, file_path):
         """
         Triggered when the Directory selection button is clicked
         """
-        path = QtWidgets.QFileDialog.getExistingDirectory(
-            self, translate('SongUsagePlugin.SongUsageDetailForm', 'Output File Location'),
-            Settings().value(self.plugin.settings_section + '/last directory export'))
-        if path:
-            Settings().setValue(self.plugin.settings_section + '/last directory export', path)
-            self.file_line_edit.setText(path)
+        Settings().setValue(self.plugin.settings_section + '/last directory export', file_path)
 
     def accept(self):
         """
         Ok was triggered so lets save the data and run the report
         """
         log.debug('accept')
-        path = self.file_line_edit.text()
+        path = self.report_path_edit.path
         if not path:
             self.main_window.error_message(
                 translate('SongUsagePlugin.SongUsageDetailForm', 'Output Path Not Selected'),

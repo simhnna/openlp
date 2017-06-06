@@ -23,10 +23,10 @@
 Functional tests to test the Bible Manager class and related methods.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry, Settings
 from openlp.plugins.bibles.lib import BibleManager, LanguageSelection
-from tests.interfaces import MagicMock, patch
 
 from tests.utils.constants import TEST_RESOURCES_PATH
 from tests.helpers.testmixin import TestMixin
@@ -38,6 +38,7 @@ class TestBibleManager(TestCase, TestMixin):
         """
         Set up the environment for testing bible queries with 1 Timothy 3
         """
+        self.setup_application()
         self.build_settings()
         Registry.create()
         Registry().register('service_list', MagicMock())

@@ -23,8 +23,8 @@
 Package to test openlp.core.ui.mainwindow package.
 """
 import os
-
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
@@ -32,7 +32,6 @@ from openlp.core.ui.mainwindow import MainWindow
 from openlp.core.lib.ui import UiStrings
 from openlp.core.common.registry import Registry
 
-from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH
 

@@ -22,11 +22,9 @@
 """
 This module contains tests for the EasyWorship song importer.
 """
-
 import os
 from unittest import TestCase
-
-from tests.functional import MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry
 from openlp.plugins.songs.lib.importers.easyworship import EasyWorshipSongImport, FieldDescEntry, FieldType
@@ -116,6 +114,7 @@ class TestFieldDesc:
         self.field_type = field_type
         self.size = size
 
+
 TEST_DATA_ENCODING = 'cp1252'
 CODE_PAGE_MAPPINGS = [
     (852, 'cp1250'), (737, 'cp1253'), (775, 'cp1257'), (855, 'cp1251'), (857, 'cp1254'),
@@ -188,7 +187,7 @@ class TestEasyWorshipSongImport(TestCase):
 
     def test_find_field_exists(self):
         """
-        Test finding an existing field in a given list using the :mod:`find_field`
+        Test finding an existing field in a given list using the :mod:`db_find_field`
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a list of field descriptions.
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'):
@@ -202,11 +201,11 @@ class TestEasyWorshipSongImport(TestCase):
             for field_name in existing_fields:
 
                 # THEN: The item corresponding the index returned should have the same name attribute
-                self.assertEqual(importer.field_descriptions[importer.find_field(field_name)].name, field_name)
+                self.assertEqual(importer.field_descriptions[importer.db_find_field(field_name)].name, field_name)
 
     def test_find_non_existing_field(self):
         """
-        Test finding an non-existing field in a given list using the :mod:`find_field`
+        Test finding an non-existing field in a given list using the :mod:`db_find_field`
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a list of field descriptions
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'):
@@ -219,11 +218,11 @@ class TestEasyWorshipSongImport(TestCase):
             for field_name in non_existing_fields:
 
                 # THEN: The importer object should not be None
-                self.assertRaises(IndexError, importer.find_field, field_name)
+                self.assertRaises(IndexError, importer.db_find_field, field_name)
 
     def test_set_record_struct(self):
         """
-        Test the :mod:`set_record_struct` module
+        Test the :mod:`db_set_record_struct` module
         """
         # GIVEN: A mocked out SongImport class, a mocked out struct class, and a mocked out "manager" and a list of
         #       field descriptions
@@ -232,17 +231,17 @@ class TestEasyWorshipSongImport(TestCase):
             mocked_manager = MagicMock()
             importer = EasyWorshipSongImport(mocked_manager, filenames=[])
 
-            # WHEN: set_record_struct is called with a list of field descriptions
-            return_value = importer.set_record_struct(TEST_FIELD_DESCS)
+            # WHEN: db_set_record_struct is called with a list of field descriptions
+            return_value = importer.db_set_record_struct(TEST_FIELD_DESCS)
 
-            # THEN: set_record_struct should return None and Struct should be called with a value representing
+            # THEN: db_set_record_struct should return None and Struct should be called with a value representing
             #       the list of field descriptions
-            self.assertIsNone(return_value, 'set_record_struct should return None')
+            self.assertIsNone(return_value, 'db_set_record_struct should return None')
             mocked_struct.Struct.assert_called_with('>50sHIB250s250s10sQ')
 
     def test_get_field(self):
         """
-        Test the :mod:`get_field` module
+        Test the :mod:`db_get_field` module
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager", an encoding and some test data and known results
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'):
@@ -255,16 +254,16 @@ class TestEasyWorshipSongImport(TestCase):
 
             # WHEN: Called with test data
             for field_index, result in field_results:
-                return_value = importer.get_field(field_index)
+                return_value = importer.db_get_field(field_index)
 
-                # THEN: get_field should return the known results
+                # THEN: db_get_field should return the known results
                 self.assertEqual(return_value, result,
-                                 'get_field should return "%s" when called with "%s"' %
+                                 'db_get_field should return "%s" when called with "%s"' %
                                  (result, TEST_FIELDS[field_index]))
 
     def test_get_memo_field(self):
         """
-        Test the :mod:`get_field` module
+        Test the :mod:`db_get_field` module
         """
         for test_results in GET_MEMO_FIELD_TEST_RESULTS:
             # GIVEN: A mocked out SongImport class, a mocked out "manager", a mocked out memo_file and an encoding
@@ -284,8 +283,9 @@ class TestEasyWorshipSongImport(TestCase):
                 get_field_read_calls = test_results[2]['read']
                 get_field_seek_calls = test_results[2]['seek']
 
-                # THEN: get_field should return the appropriate value with the appropriate mocked objects being called
-                self.assertEqual(importer.get_field(field_index), get_field_result)
+                # THEN: db_get_field should return the appropriate value with the appropriate mocked objects being
+                # called
+                self.assertEqual(importer.db_get_field(field_index), get_field_result)
                 for call in get_field_read_calls:
                     mocked_memo_file.read.assert_any_call(call)
                 for call in get_field_seek_calls:
@@ -406,6 +406,12 @@ class TestEasyWorshipSongImport(TestCase):
                 mocked_retrieve_windows_encoding.assert_any_call(encoding)
 
     def test_db_file_import(self):
+        return self._test_db_file_import(os.path.join(TEST_PATH, 'Songs.DB'))
+
+    def test_sqlite_db_file_import(self):
+        return self._test_db_file_import(os.path.join(TEST_PATH, 'ew6'))
+
+    def _test_db_file_import(self, source_path):
         """
         Test the actual import of real song database files and check that the imported data is correct.
         """
@@ -433,7 +439,7 @@ class TestEasyWorshipSongImport(TestCase):
             importer.topics = []
 
             # WHEN: Importing each file
-            importer.import_source = os.path.join(TEST_PATH, 'Songs.DB')
+            importer.import_source = source_path
             import_result = importer.do_import()
 
             # THEN: do_import should return none, the song data should be as expected, and finish should have been

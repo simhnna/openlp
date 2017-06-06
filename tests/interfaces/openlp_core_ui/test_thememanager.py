@@ -23,10 +23,11 @@
 Interface tests to test the themeManager class and related methods.
 """
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
 from openlp.core.common import Registry, Settings
 from openlp.core.ui import ThemeManager, ThemeForm, FileRenameForm
-from tests.functional import patch, MagicMock
+
 from tests.helpers.testmixin import TestMixin
 
 

@@ -23,10 +23,11 @@
 Package to test the openlp.core.lib.settings package.
 """
 from unittest import TestCase
+from unittest.mock import patch
 
 from openlp.core.common import Settings
 from openlp.core.common.settings import recent_files_conv
-from tests.functional import patch
+
 from tests.helpers.testmixin import TestMixin
 
 

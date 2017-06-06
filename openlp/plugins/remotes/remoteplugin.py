@@ -27,7 +27,7 @@ from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, Registry, OpenLPMixin, check_directory_exists
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.endpoint import remote_endpoint
-from openlp.core.api.deploy import download_and_check
+from openlp.plugins.remotes.deploy import download_and_check
 
 log = logging.getLogger(__name__)
 
