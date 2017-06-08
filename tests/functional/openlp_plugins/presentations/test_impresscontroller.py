@@ -23,7 +23,7 @@
 Functional tests to test the Impress class and related methods.
 """
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 import os
 import shutil
 from tempfile import mkdtemp

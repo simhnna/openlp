@@ -25,12 +25,13 @@ import shutil
 
 from tempfile import mkdtemp
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 from openlp.core.common import Registry
 from openlp.core.common.httputils import url_get_file
-from openlp.core.api.deploy import download_sha256, download_and_check
+from openlp.plugins.remotes.deploy import download_sha256, download_and_check
 
-from tests.functional import MagicMock
+
 from tests.helpers.testmixin import TestMixin
 
 
@@ -65,7 +66,7 @@ class TestRemoteDeploy(TestCase, TestMixin):
         """
         # GIVEN: a hosted configuration file
         web = 'https://get.openlp.org/webclient/'
-        sha = download_sha256()
+        sha, version = download_sha256()
         callback = MagicMock()
         callback.was_cancelled = False
         f = os.path.join(self.app_root, 'sites.zip')
