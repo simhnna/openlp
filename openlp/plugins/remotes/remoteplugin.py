@@ -44,7 +44,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.icon = build_icon(self.icon_path)
         self.weight = -1
         register_endpoint(remote_endpoint)
-        Registry().register_function('download_website', self.manage_download)
+        Registry().register_function('download_website', self.first_time)
 
     def initialise(self):
         """

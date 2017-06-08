@@ -112,8 +112,7 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
                 time.sleep(0.1)
 
     @staticmethod
-    @asyncio.coroutine
-    def handle_websocket(request, path):
+    async def handle_websocket(request, path):
         """
         Handle web socket requests and return the poll information.
         Check ever 0.2 seconds to get the latest position and send if changed.
@@ -131,13 +130,13 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
             while True:
                 current_poll = poller.poll()
                 if current_poll != previous_poll:
-                    yield from request.send(json.dumps(current_poll).encode())
+                    await request.send(json.dumps(current_poll).encode())
                     previous_poll = current_poll
-                yield from asyncio.sleep(0.2)
+                await asyncio.sleep(0.2)
         elif path == '/live_changed':
             while True:
                 main_poll = poller.main_poll()
                 if main_poll != previous_main_poll:
-                    yield from request.send(main_poll)
+                    await request.send(main_poll)
                     previous_main_poll = main_poll
-                yield from asyncio.sleep(0.2)
+                await asyncio.sleep(0.2)
