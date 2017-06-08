@@ -144,6 +144,7 @@ def upgrade_db(url, upgrade):
     :param url: The url of the database to upgrade.
     :param upgrade: The python module that contains the upgrade instructions.
     """
+    log.debug('Checking upgrades for DB {db}'.format(db=url))
     session, metadata = init_db(url)
 
     class Metadata(BaseModel):
@@ -160,17 +161,15 @@ def upgrade_db(url, upgrade):
     metadata_table.create(checkfirst=True)
     mapper(Metadata, metadata_table)
     version_meta = session.query(Metadata).get('version')
-    if version_meta is None:
-        # Tables have just been created - fill the version field with the most recent version
-        if session.query(Metadata).get('dbversion'):
-            version = 0
-        else:
-            version = upgrade.__version__
+    if version_meta:
+        version = int(version_meta.value)
+    else:
+        # Due to issues with other checks, if the version is not set in the DB then default to 0
+        # and let the upgrade function handle the checks
+        version = 0
         version_meta = Metadata.populate(key='version', value=version)
         session.add(version_meta)
         session.commit()
-    else:
-        version = int(version_meta.value)
     if version > upgrade.__version__:
         session.remove()
         return version, upgrade.__version__
