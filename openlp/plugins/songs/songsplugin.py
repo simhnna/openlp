@@ -54,7 +54,7 @@ __default_settings__ = {
     'songs/db password': '',
     'songs/db hostname': '',
     'songs/db database': '',
-    'songs/last search type': SongSearch.Entire,
+    'songs/last used search type': SongSearch.Entire,
     'songs/last import type': SongFormat.OpenLyrics,
     'songs/update service on edit': False,
     'songs/add song from service': True,

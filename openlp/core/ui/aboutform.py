@@ -40,7 +40,8 @@ class AboutForm(QtWidgets.QDialog, UiAboutDialog):
         """
         Do some initialisation stuff
         """
-        super(AboutForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(AboutForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                        QtCore.Qt.WindowCloseButtonHint)
         self._setup()
 
     def _setup(self):

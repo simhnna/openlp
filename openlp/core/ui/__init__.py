@@ -99,7 +99,7 @@ from .themelayoutform import ThemeLayoutForm
 from .themeform import ThemeForm
 from .filerenameform import FileRenameForm
 from .starttimeform import StartTimeForm
-from .maindisplay import MainDisplay, Display
+from .maindisplay import MainDisplay, Display, AudioPlayer
 from .servicenoteform import ServiceNoteForm
 from .serviceitemeditform import ServiceItemEditForm
 from .slidecontroller import SlideController, DisplayController, PreviewController, LiveController
@@ -120,8 +120,8 @@ from .projector.tab import ProjectorTab
 from .projector.editform import ProjectorEditForm
 
 __all__ = ['SplashScreen', 'AboutForm', 'SettingsForm', 'MainDisplay', 'SlideController', 'ServiceManager', 'ThemeForm',
-           'ThemeManager', 'ServiceItemEditForm', 'FirstTimeForm', 'FirstTimeLanguageForm',
-           'Display', 'ServiceNoteForm', 'ThemeLayoutForm', 'FileRenameForm', 'StartTimeForm', 'MainDisplay',
+           'ThemeManager', 'ServiceItemEditForm', 'FirstTimeForm', 'FirstTimeLanguageForm', 'Display', 'AudioPlayer',
+           'ServiceNoteForm', 'ThemeLayoutForm', 'FileRenameForm', 'StartTimeForm', 'MainDisplay',
            'SlideController', 'DisplayController', 'GeneralTab', 'ThemesTab', 'AdvancedTab', 'PluginForm',
            'FormattingTagForm', 'ShortcutListForm', 'FormattingTagController', 'SingleColumnTableWidget',
            'ProjectorManager', 'ProjectorTab', 'ProjectorEditForm']
