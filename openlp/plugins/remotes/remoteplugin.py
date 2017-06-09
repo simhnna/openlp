@@ -30,6 +30,9 @@ from openlp.plugins.remotes.endpoint import remote_endpoint
 from openlp.plugins.remotes.deploy import download_and_check
 
 log = logging.getLogger(__name__)
+__default_settings__ = {
+    'remotes/download version': '0000_00_00'
+}
 
 
 class RemotesPlugin(Plugin, OpenLPMixin):
@@ -39,7 +42,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         """
         remotes constructor
         """
-        super(RemotesPlugin, self).__init__('remotes', {})
+        super(RemotesPlugin, self).__init__('remotes', __default_settings__, {})
         self.icon_path = ':/plugins/plugin_remote.png'
         self.icon = build_icon(self.icon_path)
         self.weight = -1

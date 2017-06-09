@@ -93,6 +93,7 @@ class ApiTab(SettingsTab):
         self.user_login_group_box.setCheckable(True)
         self.user_login_group_box.setChecked(False)
         self.user_login_group_box.setObjectName('user_login_group_box')
+
         self.user_login_layout = QtWidgets.QFormLayout(self.user_login_group_box)
         self.user_login_layout.setObjectName('user_login_layout')
         self.user_id_label = QtWidgets.QLabel(self.user_login_group_box)
@@ -110,6 +111,18 @@ class ApiTab(SettingsTab):
         self.update_site_group_box.setCheckable(True)
         self.update_site_group_box.setChecked(False)
         self.update_site_group_box.setObjectName('update_site_group_box')
+        self.update_site_layout = QtWidgets.QFormLayout(self.update_site_group_box)
+        self.update_site_layout.setObjectName('update_site_layout')
+        self.current_version_label = QtWidgets.QLabel(self.update_site_group_box)
+        self.current_version_label.setObjectName('current_version_label')
+        self.current_version_value = QtWidgets.QLabel(self.update_site_group_box)
+        self.current_version_value.setObjectName('current_version_value')
+        self.update_site_layout.addRow(self.current_version_label, self.current_version_value)
+        self.master_version_label = QtWidgets.QLabel(self.update_site_group_box)
+        self.master_version_label.setObjectName('master_version_label')
+        self.master_version_value = QtWidgets.QLabel(self.update_site_group_box)
+        self.master_version_value.setObjectName('master_version_value')
+        self.update_site_layout.addRow(self.master_version_label, self.master_version_value)
         self.left_layout.addWidget(self.update_site_group_box)
         self.android_app_group_box = QtWidgets.QGroupBox(self.right_column)
         self.android_app_group_box.setObjectName('android_app_group_box')
@@ -188,9 +201,12 @@ class ApiTab(SettingsTab):
                       'Scan the QR code or click <a href="{qr}">download</a> to install the iOS app from the App '
                       'Store.').format(qr='https://itunes.apple.com/app/id1096218725'))
         self.user_login_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'User Authentication'))
-        self.update_site_group_box.setTitle(str(UiStrings().WebDownloadText))
+        self.aa = UiStrings()
+        self.update_site_group_box.setTitle(UiStrings().WebDownloadText)
         self.user_id_label.setText(translate('RemotePlugin.RemoteTab', 'User id:'))
         self.password_label.setText(translate('RemotePlugin.RemoteTab', 'Password:'))
+        self.current_version_label.setText(translate('RemotePlugin.RemoteTab', 'Current Version number:'))
+        self.master_version_label.setText(translate('RemotePlugin.RemoteTab', 'Latest Version number:'))
 
     def set_urls(self):
         """
@@ -238,6 +254,7 @@ class ApiTab(SettingsTab):
         self.user_login_group_box.setChecked(Settings().value(self.settings_section + '/authentication enabled'))
         self.user_id.setText(Settings().value(self.settings_section + '/user id'))
         self.password.setText(Settings().value(self.settings_section + '/password'))
+        self.current_version_value.setText(Settings().value('remotes/download version'))
         self.set_urls()
 
     def save(self):

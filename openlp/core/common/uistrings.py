@@ -167,7 +167,7 @@ class UiStrings(object):
         self.View = translate('OpenLP.Ui', 'View')
         self.ViewMode = translate('OpenLP.Ui', 'View Mode')
         self.Video = translate('OpenLP.Ui', 'Video')
-        self.WebDownloadText = translate('OpenLP.Ui', 'Web Interface – Download and Install latest Version'),
+        self.WebDownloadText = translate('OpenLP.Ui', 'Web Interface, Download and Install latest Version')
         book_chapter = translate('OpenLP.Ui', 'Book Chapter')
         chapter = translate('OpenLP.Ui', 'Chapter')
         verse = translate('OpenLP.Ui', 'Verse')
