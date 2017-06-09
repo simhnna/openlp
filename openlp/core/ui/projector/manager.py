@@ -662,6 +662,20 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
             message = '%s<b>%s</b>: %s<br />' % (message,
                                                  translate('OpenLP.ProjectorManager', 'Current source input is'),
                                                  projector.link.source)
+            if projector.link.pjlink_class == '2':
+                # Information only available for PJLink Class 2 projectors
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Serial Number'),
+                                                                       data=projector.serial_no)
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Software Version'),
+                                                                       data=projector.sw_version)
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Lamp type'),
+                                                                       data=projector.model_lamp)
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Filter type'),
+                                                                       data=projector.model_filter)
             count = 1
             for item in projector.link.lamp:
                 message += '<b>{title} {count}</b> {status} '.format(title=translate('OpenLP.ProjectorManager',

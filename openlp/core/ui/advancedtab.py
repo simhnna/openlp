@@ -495,9 +495,7 @@ class AdvancedTab(SettingsTab):
                                                           'location of the OpenLP data directory to:\n\n{path}'
                                                           '\n\nThe data directory will be changed when OpenLP is '
                                                           'closed.').format(path=new_data_path),
-                                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                      QtWidgets.QMessageBox.No),
-                                                QtWidgets.QMessageBox.No)
+                                                defaultButton=QtWidgets.QMessageBox.No)
         if answer != QtWidgets.QMessageBox.Yes:
             self.data_directory_path_edit.path = AppLocation.get_data_path()
             return

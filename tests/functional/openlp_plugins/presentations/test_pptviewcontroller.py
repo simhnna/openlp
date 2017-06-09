@@ -42,11 +42,6 @@ class TestPptviewController(TestCase, TestMixin):
     """
     Test the PptviewController Class
     """
-# TODO: Items left to test
-#   PptviewController
-#       start_process(self)
-#       kill
-
     def setUp(self):
         """
         Set up the patches and mocks need for all tests.
@@ -103,24 +98,6 @@ class TestPptviewDocument(TestCase):
     """
     Test the PptviewDocument Class
     """
-    # TODO: Items left to test
-    #   PptviewDocument
-    #       __init__
-    #       create_thumbnails
-    #       close_presentation
-    #       is_loaded
-    #       is_active
-    #       blank_screen
-    #       unblank_screen
-    #       is_blank
-    #       stop_presentation
-    #       start_presentation
-    #       get_slide_number
-    #       get_slide_count
-    #       goto_slide
-    #       next_step
-    #       previous_step
-
     def setUp(self):
         """
         Set up the patches and mocks need for all tests.

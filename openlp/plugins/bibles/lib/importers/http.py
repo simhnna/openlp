@@ -90,6 +90,8 @@ class BGExtract(RegistryProperties):
     """
     Extract verses from BibleGateway
     """
+    NAME = 'BibleGateway'
+
     def __init__(self, proxy_url=None):
         log.debug('BGExtract.init("{url}")'.format(url=proxy_url))
         self.proxy_url = proxy_url
@@ -357,6 +359,8 @@ class BSExtract(RegistryProperties):
     """
     Extract verses from Bibleserver.com
     """
+    NAME = 'BibleServer'
+
     def __init__(self, proxy_url=None):
         log.debug('BSExtract.init("{url}")'.format(url=proxy_url))
         self.proxy_url = proxy_url
@@ -458,6 +462,8 @@ class CWExtract(RegistryProperties):
     """
     Extract verses from CrossWalk/BibleStudyTools
     """
+    NAME = 'Crosswalk'
+
     def __init__(self, proxy_url=None):
         log.debug('CWExtract.init("{url}")'.format(url=proxy_url))
         self.proxy_url = proxy_url

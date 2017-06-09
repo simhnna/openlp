@@ -27,11 +27,15 @@ PREREQUISITE: add_record() and get_all() functions validated.
 """
 import os
 import shutil
-from unittest import TestCase
+from tempfile import mkdtemp
+
+from unittest import TestCase, skip
 from unittest.mock import MagicMock, patch
 
-from openlp.core.lib.projector.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
+from openlp.core.lib.projector import upgrade
+from openlp.core.lib.db import upgrade_db
 from openlp.core.lib.projector.constants import PJLINK_PORT
+from openlp.core.lib.projector.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
 
 from tests.resources.projector.data import TEST_DB_PJLINK1, TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
 from tests.utils.constants import TEST_RESOURCES_PATH
@@ -85,6 +89,42 @@ def add_records(projector_db, test):
     return added
 
 
+class TestProjectorDBUpdate(TestCase):
+    """
+    Test case for upgrading Projector DB.
+    NOTE: Separate class so I don't have to look for upgrade tests.
+    """
+    def setUp(self):
+        """
+        Setup for tests
+        """
+        self.tmp_folder = mkdtemp(prefix='openlp_')
+
+    def tearDown(self):
+        """
+        Clean up after tests
+        """
+        # Ignore errors since windows can have problems with locked files
+        shutil.rmtree(self.tmp_folder, ignore_errors=True)
+
+    def test_upgrade_old_projector_db(self):
+        """
+        Test that we can upgrade an old song db to the current schema
+        """
+        # GIVEN: An old song db
+        old_db = os.path.join(TEST_RESOURCES_PATH, "projector", TEST_DB_PJLINK1)
+        tmp_db = os.path.join(self.tmp_folder, TEST_DB)
+        shutil.copyfile(old_db, tmp_db)
+        db_url = 'sqlite:///{db}'.format(db=tmp_db)
+
+        # WHEN: upgrading the db
+        updated_to_version, latest_version = upgrade_db(db_url, upgrade)
+
+        # THEN: the song db should have been upgraded to the latest version
+        self.assertEqual(updated_to_version, latest_version,
+                         'The projector DB should have been upgrade to the latest version')
+
+
 class TestProjectorDB(TestCase):
     """
     Test case for ProjectorDB
@@ -94,7 +134,9 @@ class TestProjectorDB(TestCase):
         """
         Set up anything necessary for all tests
         """
-        mocked_init_url.return_value = 'sqlite:///{db}'.format(db=TEST_DB)
+        self.tmp_folder = mkdtemp(prefix='openlp_')
+        tmpdb_url = 'sqlite:///{db}'.format(db=os.path.join(self.tmp_folder, TEST_DB))
+        mocked_init_url.return_value = tmpdb_url
         self.projector = ProjectorDB()
 
     def tearDown(self):
@@ -103,15 +145,8 @@ class TestProjectorDB(TestCase):
         """
         self.projector.session.close()
         self.projector = None
-        retries = 0
-        while retries < 5:
-            try:
-                if os.path.exists(TEST_DB):
-                    os.unlink(TEST_DB)
-                break
-            except:
-                time.sleep(1)
-                retries += 1
+        # Ignore errors since windows can have problems with locked files
+        shutil.rmtree(self.tmp_folder, ignore_errors=True)
 
     def test_find_record_by_ip(self):
         """
@@ -271,10 +306,10 @@ class TestProjectorDB(TestCase):
 
         # THEN: __repr__ should return a proper string
         self.assertEqual(str(projector),
-                         '< Projector(id="0", ip="127.0.0.1", port="4352", pin="None", name="Test One", '
-                         'location="Somewhere over the rainbow", notes="Not again", pjlink_name="TEST", '
-                         'manufacturer="IN YOUR DREAMS", model="OpenLP", serial_no="None", other="None", '
-                         'sources="None", source_list="[]", model_filter="None", model_lamp="None", '
+                         '< Projector(id="0", ip="127.0.0.1", port="4352", mac_adx="None", pin="None", '
+                         'name="Test One", location="Somewhere over the rainbow", notes="Not again", '
+                         'pjlink_name="TEST", manufacturer="IN YOUR DREAMS", model="OpenLP", serial_no="None", '
+                         'other="None", sources="None", source_list="[]", model_filter="None", model_lamp="None", '
                          'sw_version="None") >',
                          'Projector.__repr__() should have returned a proper representation string')
 

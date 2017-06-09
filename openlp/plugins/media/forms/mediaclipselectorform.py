@@ -52,7 +52,8 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         """
         Constructor
         """
-        super(MediaClipSelectorForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(MediaClipSelectorForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint |
+                                                    QtCore.Qt.WindowTitleHint | QtCore.Qt.WindowCloseButtonHint)
         self.vlc_instance = None
         self.vlc_media_player = None
         self.vlc_media = None

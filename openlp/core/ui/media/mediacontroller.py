@@ -468,9 +468,10 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         player = self.media_players[used_players[0]]
         if suffix not in player.video_extensions_list and suffix not in player.audio_extensions_list:
             # Media could not be loaded correctly
-            critical_error_message_box(translate('MediaPlugin.MediaItem', 'Unsupported Media File'),
-                                       translate('MediaPlugin.MediaItem', 'File %s not supported using player %s') %
-                                       (service_item.get_frame_path(), used_players[0]))
+            critical_error_message_box(
+                translate('MediaPlugin.MediaItem', 'Unsupported Media File'),
+                translate('MediaPlugin.MediaItem', 'File {file_path} not supported using player {player_name}'
+                          ).format(file_path=service_item.get_frame_path(), player_name=used_players[0]))
             return False
         media_data = MediaInfoWrapper.parse(service_item.get_frame_path())
         # duration returns in milli seconds
