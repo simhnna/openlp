@@ -32,7 +32,7 @@ from openlp.core.common.db import drop_columns
 from openlp.core.lib.db import get_upgrade_op
 
 log = logging.getLogger(__name__)
-__version__ = 6
+__version__ = 7
 
 
 # TODO: When removing an upgrade path the ftw-data needs updating to the minimum supported version
@@ -52,6 +52,7 @@ def upgrade_1(session, metadata):
     :param metadata:
     """
     op = get_upgrade_op(session)
+    metadata.reflect()
     if 'media_files_songs' in [t.name for t in metadata.tables.values()]:
         op.drop_table('media_files_songs')
         op.add_column('media_files', Column('song_id', types.Integer(), server_default=null()))
@@ -119,7 +120,7 @@ def upgrade_6(session, metadata):
     """
     Version 6 upgrade
 
-    This version corrects the errors in upgrades 4 and 5
+    This version corrects the errors in upgrade 4
     """
     op = get_upgrade_op(session)
     # Move upgrade 4 to here and correct it (authors_songs table, not songs table)
@@ -137,7 +138,17 @@ def upgrade_6(session, metadata):
         op.execute('INSERT INTO authors_songs_tmp SELECT author_id, song_id, "" FROM authors_songs')
         op.drop_table('authors_songs')
         op.rename_table('authors_songs_tmp', 'authors_songs')
+
+
+def upgrade_7(session, metadata):
+    """
+    Version 7 upgrade
+
+    Corrects table error in upgrade 5
+    """
     # Move upgrade 5 here to correct it
+    op = get_upgrade_op(session)
+    metadata.reflect()
     if 'songs_songbooks' not in [t.name for t in metadata.tables.values()]:
         # Create the mapping table (songs <-> songbooks)
         op.create_table(
