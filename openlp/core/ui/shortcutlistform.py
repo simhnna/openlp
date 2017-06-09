@@ -44,7 +44,8 @@ class ShortcutListForm(QtWidgets.QDialog, Ui_ShortcutListDialog, RegistryPropert
         """
         Constructor
         """
-        super(ShortcutListForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(ShortcutListForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                               QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
         self.changed_actions = {}
         self.action_list = ActionList.get_instance()

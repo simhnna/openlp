@@ -477,9 +477,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling update_auto_completer
             self.media_item.update_auto_completer()
 
-            # THEN: set_case_insensitive_completer should have been called with the names of the books in order
+            # THEN: set_case_insensitive_completer should have been called with the names of the books + space in order
             mocked_set_case_insensitive_completer.assert_called_once_with(
-                ['Book 1', 'Book 2', 'Book 3'], mocked_search_edit)
+                ['Book 1 ', 'Book 2 ', 'Book 3 '], mocked_search_edit)
 
     def test_update_auto_completer_search_combined_type(self):
         """
@@ -497,11 +497,11 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling update_auto_completer
             self.media_item.update_auto_completer()
 
-            # THEN: set_case_insensitive_completer should have been called with the names of the books in order
+            # THEN: set_case_insensitive_completer should have been called with the names of the books + space in order
             mocked_set_case_insensitive_completer.assert_called_once_with(
-                ['Book 1', 'Book 2', 'Book 3'], mocked_search_edit)
+                ['Book 1 ', 'Book 2 ', 'Book 3 '], mocked_search_edit)
 
-    def test_on_import_click_no_import_wizzard_attr(self):
+    def test_on_import_click_no_import_wizard_attr(self):
         """
         Test on_import_click when media_item does not have the `import_wizard` attribute. And the wizard was canceled.
         """
@@ -518,9 +518,9 @@ class TestMediaItem(TestCase, TestMixin):
             self.assertTrue(mocked_bible_import_form.called)
             self.assertFalse(mocked_reload_bibles.called)
 
-    def test_on_import_click_wizzard_not_canceled(self):
+    def test_on_import_click_wizard_not_canceled(self):
         """
-        Test on_import_click when the media item has the import_wizzard attr set and wizard completes sucessfully.
+        Test on_import_click when the media item has the import_wizard attr set and wizard completes sucessfully.
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and a mocked import_wizard
         mocked_import_wizard = MagicMock(**{'exec.return_value': True})

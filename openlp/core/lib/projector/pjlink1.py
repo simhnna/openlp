@@ -129,7 +129,7 @@ class PJLink(QtNetwork.QTcpSocket):
         self.ip = ip
         self.port = port
         self.pin = pin
-        super(PJLink, self).__init__()
+        super().__init__()
         self.dbid = None
         self.location = None
         self.notes = None
@@ -186,10 +186,15 @@ class PJLink(QtNetwork.QTcpSocket):
         self.pjlink_name = None
         self.manufacturer = None
         self.model = None
+        self.serial_no = None
+        self.sw_version = None
         self.shutter = None
         self.mute = None
         self.lamp = None
+        self.model_lamp = None
         self.fan = None
+        self.filter_time = None
+        self.model_filter = None
         self.source_available = None
         self.source = None
         self.other_info = None
@@ -451,18 +456,18 @@ class PJLink(QtNetwork.QTcpSocket):
             return
         data_split = data.split('=')
         try:
-            (prefix, class_, cmd, data) = (data_split[0][0], data_split[0][1], data_split[0][2:], data_split[1])
+            (prefix, version, cmd, data) = (data_split[0][0], data_split[0][1], data_split[0][2:], data_split[1])
         except ValueError as e:
             log.warning('({ip}) get_data(): Invalid packet - expected header + command + data'.format(ip=self.ip))
             log.warning('({ip}) get_data(): Received data: "{data}"'.format(ip=self.ip, data=data_in.strip()))
             self.change_status(E_INVALID_DATA)
             self.receive_data_signal()
             return
-        if not (cmd in PJLINK_VALID_CMD and class_ in PJLINK_VALID_CMD[cmd]):
+        if cmd not in PJLINK_VALID_CMD:
             log.warning('({ip}) get_data(): Invalid packet - unknown command "{data}"'.format(ip=self.ip, data=cmd))
             self.receive_data_signal()
             return
-        if int(self.pjlink_class) < int(class_):
+        if int(self.pjlink_class) < int(version):
             log.warn('({ip}) get_data(): Projector returned class reply higher '
                      'than projector stated class'.format(ip=self.ip))
         return self.process_command(cmd, data)
@@ -507,14 +512,25 @@ class PJLink(QtNetwork.QTcpSocket):
             log.warning('({ip}) send_command(): Not connected - returning'.format(ip=self.ip))
             self.send_queue = []
             return
+        if cmd not in PJLINK_VALID_CMD:
+            log.error('({ip}) send_command(): Invalid command requested - ignoring.'.format(ip=self.ip))
+            return
         self.projectorNetwork.emit(S_NETWORK_SENDING)
         log.debug('({ip}) send_command(): Building cmd="{command}" opts="{data}"{salt}'.format(ip=self.ip,
                                                                                                command=cmd,
                                                                                                data=opts,
                                                                                                salt='' if salt is None
                                                                                                else ' with hash'))
-        # TODO: Check for class of command rather than default to projector PJLink class
-        header = PJLINK_HEADER.format(linkclass=self.pjlink_class)
+        cmd_ver = PJLINK_VALID_CMD[cmd]['version']
+        if self.pjlink_class in cmd_ver:
+            header = PJLINK_HEADER.format(linkclass=self.pjlink_class)
+        elif len(cmd_ver) == 1 and (int(cmd_ver[0]) < int(self.pjlink_class)):
+            # Typically a class 1 only command
+            header = PJLINK_HEADER.format(linkclass=cmd_ver[0])
+        else:
+            # NOTE: Once we get to version 3 then think about looping
+            log.error('({ip}): send_command(): PJLink class check issue? aborting'.format(ip=self.ip))
+            return
         out = '{salt}{header}{command} {options}{suffix}'.format(salt="" if salt is None else salt,
                                                                  header=header,
                                                                  command=cmd,
@@ -589,10 +605,13 @@ class PJLink(QtNetwork.QTcpSocket):
                                                                                 cmd=cmd,
                                                                                 data=data))
         # Check if we have a future command not available yet
-        if cmd in self.pjlink_future:
-            self._not_implemented(cmd)
+        if cmd not in PJLINK_VALID_CMD:
+            log.error('({ip}) Unknown command received - ignoring'.format(ip=self.ip))
             return
-        if data in PJLINK_ERRORS:
+        elif cmd not in self.pjlink_functions:
+            log.warn('({ip}) Future command received - unable to process yet'.format(ip=self.ip))
+            return
+        elif data in PJLINK_ERRORS:
             # Oops - projector error
             log.error('({ip}) Projector returned error "{data}"'.format(ip=self.ip, data=data))
             if data.upper() == 'ERRA':
@@ -624,14 +643,11 @@ class PJLink(QtNetwork.QTcpSocket):
             self.send_busy = False
             self.projectorReceivedData.emit()
             return
-
-        if cmd in self.pjlink_functions:
-            log.debug('({ip}) Calling function for {cmd}'.format(ip=self.ip, cmd=cmd))
-            self.pjlink_functions[cmd](data)
-        else:
-            log.warning('({ip}) Invalid command {data}'.format(ip=self.ip, data=cmd))
+        # Command checks already passed
+        log.debug('({ip}) Calling function for {cmd}'.format(ip=self.ip, cmd=cmd))
         self.send_busy = False
         self.projectorReceivedData.emit()
+        self.pjlink_functions[cmd](data)
 
     def process_lamp(self, data):
         """

@@ -29,7 +29,7 @@ from tempfile import gettempdir
 # Test data
 TEST_DB_PJLINK1 = 'projector_pjlink1.sqlite'
 
-TEST_DB = os.path.join(gettempdir(), 'openlp-test-projectordb.sql')
+TEST_DB = 'openlp-test-projectordb.sqlite'
 
 TEST_SALT = '498e4a67'
 
@@ -38,8 +38,6 @@ TEST_PIN = 'JBMIAProjectorLink'
 TEST_HASH = '5d8409bc1c3fa39749434aa3a5c38682'
 
 TEST_CONNECT_AUTHENTICATE = 'PJLink 1 {salt}'.format(salt=TEST_SALT)
-
-TEST_DB = os.path.join(gettempdir(), 'openlp-test-projectordb.sql')
 
 TEST1_DATA = dict(ip='111.111.111.111',
                   port='1111',

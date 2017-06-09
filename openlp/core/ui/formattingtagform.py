@@ -51,7 +51,8 @@ class FormattingTagForm(QtWidgets.QDialog, Ui_FormattingTagDialog, FormattingTag
         """
         Constructor
         """
-        super(FormattingTagForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(FormattingTagForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                                QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
         self._setup()
 

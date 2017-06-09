@@ -49,6 +49,7 @@ def add_welcome_page(parent, image):
     parent.title_label = QtWidgets.QLabel(parent.welcome_page)
     parent.title_label.setObjectName('title_label')
     parent.welcome_layout.addWidget(parent.title_label)
+    parent.title_label.setWordWrap(True)
     parent.welcome_layout.addSpacing(40)
     parent.information_label = QtWidgets.QLabel(parent.welcome_page)
     parent.information_label.setWordWrap(True)

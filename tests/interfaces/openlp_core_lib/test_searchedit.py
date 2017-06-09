@@ -88,7 +88,7 @@ class TestSearchEdit(TestCase, TestMixin):
         #       settings
         self.assertEqual(self.search_edit.current_search_type(), SearchTypes.First,
                          "The first search type should be selected.")
-        self.mocked_settings().setValue.assert_called_once_with('settings_section/last search type', 0)
+        self.mocked_settings().setValue.assert_called_once_with('settings_section/last used search type', 0)
 
     def test_set_current_search_type(self):
         """
@@ -105,7 +105,7 @@ class TestSearchEdit(TestCase, TestMixin):
         self.assertEqual(self.search_edit.placeholderText(), SECOND_PLACEHOLDER_TEXT,
                          "The correct placeholder text should be 'Second Placeholder Text'.")
         self.mocked_settings().setValue.assert_has_calls(
-            [call('settings_section/last search type', 0), call('settings_section/last search type', 1)])
+            [call('settings_section/last used search type', 0), call('settings_section/last used search type', 1)])
 
     def test_clear_button_visibility(self):
         """

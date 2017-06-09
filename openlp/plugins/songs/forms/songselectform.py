@@ -81,7 +81,8 @@ class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog):
     """
 
     def __init__(self, parent=None, plugin=None, db_manager=None):
-        QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        QtWidgets.QDialog.__init__(self, parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                   QtCore.Qt.WindowCloseButtonHint)
         self.plugin = plugin
         self.db_manager = db_manager
         self.setup_ui(self)

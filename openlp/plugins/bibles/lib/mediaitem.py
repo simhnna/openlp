@@ -414,7 +414,9 @@ class BibleMediaItem(MediaManagerItem):
             if self.bible:
                 book_data = self.get_common_books(self.bible, self.second_bible)
                 language_selection = self.plugin.manager.get_language_selection(self.bible.name)
-                books = [book.get_name(language_selection) for book in book_data]
+                # Get book names + add a space to the end. Thus Psalm23 becomes Psalm 23
+                # when auto complete is used and user does not need to add the space manually.
+                books = [book.get_name(language_selection) + ' ' for book in book_data]
                 books.sort(key=get_locale_key)
         set_case_insensitive_completer(books, self.search_edit)
 

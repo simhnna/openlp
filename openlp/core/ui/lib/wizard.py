@@ -25,7 +25,7 @@ The :mod:``wizard`` module provides generic wizard tools for OpenLP.
 import logging
 import os
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, Settings, UiStrings, translate, is_macosx
 from openlp.core.lib import build_icon
@@ -93,7 +93,10 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         """
         Constructor
         """
-        super(OpenLPWizard, self).__init__(parent)
+        # QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint  remove the "?" buttons from windows,
+        # QtCore.Qt.WindowCloseButtonHint enables the "x" button to close these windows.
+        super(OpenLPWizard, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                           QtCore.Qt.WindowCloseButtonHint)
         self.plugin = plugin
         self.with_progress_page = add_progress_page
         self.setFixedWidth(640)
