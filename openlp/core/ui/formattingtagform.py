@@ -123,8 +123,7 @@ class FormattingTagForm(QtWidgets.QDialog, Ui_FormattingTagDialog, FormattingTag
                                                     self.tag_table_widget.item(count, 2).text(),
                                                     self.tag_table_widget.item(count, 3).text())
             if error:
-                QtWidgets.QMessageBox.warning(self, translate('OpenLP.FormattingTagForm', 'Validation Error'), error,
-                                              QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, translate('OpenLP.FormattingTagForm', 'Validation Error'), error)
                 self.tag_table_widget.selectRow(count)
                 return
             count += 1
@@ -199,6 +198,5 @@ class FormattingTagForm(QtWidgets.QDialog, Ui_FormattingTagDialog, FormattingTag
                 if tag:
                     self.tag_table_widget.setItem(pre_row, 3, QtWidgets.QTableWidgetItem(tag))
             if errors:
-                QtWidgets.QMessageBox.warning(self, translate('OpenLP.FormattingTagForm', 'Validation Error'), errors,
-                                              QtWidgets.QMessageBox.Ok)
+                QtWidgets.QMessageBox.warning(self, translate('OpenLP.FormattingTagForm', 'Validation Error'), errors)
             self.tag_table_widget.resizeRowsToContents()

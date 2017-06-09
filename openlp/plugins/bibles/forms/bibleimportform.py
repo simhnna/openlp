@@ -421,8 +421,8 @@ class BibleImportForm(OpenLPWizard):
         Allow for localisation of the bible import wizard.
         """
         self.setWindowTitle(translate('BiblesPlugin.ImportWizardForm', 'Bible Import Wizard'))
-        self.title_label.setText(WizardStrings.HeaderStyle % translate('OpenLP.Ui',
-                                                                       'Welcome to the Bible Import Wizard'))
+        self.title_label.setText(WizardStrings.HeaderStyle.format(text=translate('OpenLP.Ui',
+                                                                                 'Welcome to the Bible Import Wizard')))
         self.information_label.setText(
             translate('BiblesPlugin.ImportWizardForm',
                       'This wizard will help you to import Bibles from a variety of '

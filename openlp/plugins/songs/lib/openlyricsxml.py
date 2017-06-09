@@ -70,8 +70,7 @@ from openlp.plugins.songs.lib.db import Author, AuthorType, Book, Song, Topic
 log = logging.getLogger(__name__)
 
 NAMESPACE = 'http://openlyrics.info/namespace/2009/song'
-# TODO: Verify format() with template variable
-NSMAP = '{' + NAMESPACE + '}' + '%s'
+NSMAP = '{{' + NAMESPACE + '}}{tag}'
 
 
 class SongXML(object):
@@ -616,15 +615,13 @@ class OpenLyrics(object):
         text = ''
         use_endtag = True
         # Skip <comment> elements - not yet supported.
-        # TODO: Verify format() with template variables
-        if element.tag == NSMAP % 'comment':
+        if element.tag == NSMAP.format(tag='comment'):
             if element.tail:
                 # Append tail text at comment element.
                 text += element.tail
             return text
         # Convert chords to ChordPro format which OpenLP uses internally
-        # TODO: Verify format() with template variables
-        elif element.tag == NSMAP % 'chord':
+        elif element.tag == NSMAP.format(tag='chord'):
             if Settings().value('songs/enable chords') and not Settings().value('songs/disable chords import'):
                 text += '[{chord}]'.format(chord=element.get('name'))
             if element.tail:
@@ -632,15 +629,13 @@ class OpenLyrics(object):
                 text += element.tail
             return text
         # Convert line breaks <br/> to \n.
-        # TODO: Verify format() with template variables
-        elif newlines and element.tag == NSMAP % 'br':
+        elif newlines and element.tag == NSMAP.format(tag='br'):
             text += '\n'
             if element.tail:
                 text += element.tail
             return text
         # Start formatting tag.
-        # TODO: Verify format() with template variables
-        if element.tag == NSMAP % 'tag':
+        if element.tag == NSMAP.format(tag='tag'):
             text += '{{{name}}}'.format(name=element.get('name'))
             # Some formattings may have only start tag.
             # Handle this case if element has no children and contains no text.
@@ -654,8 +649,7 @@ class OpenLyrics(object):
             # Use recursion since nested formatting tags are allowed.
             text += self._process_lines_mixed_content(child, newlines)
         # Append text from tail and add formatting end tag.
-        # TODO: Verify format() with template variables
-        if element.tag == NSMAP % 'tag' and use_endtag:
+        if element.tag == NSMAP.format(tag='tag') and use_endtag:
             text += '{{/{name}}}'.format(name=element.get('name'))
         # Append text from tail.
         if element.tail:
@@ -682,8 +676,7 @@ class OpenLyrics(object):
             # Loop over the "line" elements removing comments
             for line in element:
                 # Skip comment lines.
-                # TODO: Verify format() with template variables
-                if line.tag == NSMAP % 'comment':
+                if line.tag == NSMAP.format(tag='comment'):
                     continue
                 if text:
                     text += '\n'

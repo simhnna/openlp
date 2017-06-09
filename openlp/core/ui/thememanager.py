@@ -257,10 +257,9 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         Renames an existing theme to a new name
         :param field:
         """
-        # TODO: Check for delayed format() conversions
         if self._validate_theme_action(translate('OpenLP.ThemeManager', 'You must select a theme to rename.'),
                                        translate('OpenLP.ThemeManager', 'Rename Confirmation'),
-                                       translate('OpenLP.ThemeManager', 'Rename %s theme?'), False, False):
+                                       translate('OpenLP.ThemeManager', 'Rename {theme_name} theme?'), False, False):
             item = self.theme_list_widget.currentItem()
             old_theme_name = item.data(QtCore.Qt.UserRole)
             self.file_rename_form.file_name_edit.setText(old_theme_name)
@@ -334,10 +333,9 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         Delete a theme triggered by the UI.
         :param field:
         """
-        # TODO: Verify delayed format() conversions
         if self._validate_theme_action(translate('OpenLP.ThemeManager', 'You must select a theme to delete.'),
                                        translate('OpenLP.ThemeManager', 'Delete Confirmation'),
-                                       translate('OpenLP.ThemeManager', 'Delete %s theme?')):
+                                       translate('OpenLP.ThemeManager', 'Delete {theme_name} theme?')):
             item = self.theme_list_widget.currentItem()
             theme = item.text()
             row = self.theme_list_widget.row(item)
@@ -539,9 +537,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                                              translate('OpenLP.ThemeManager',
                                                        'Theme {name} already exists. '
                                                        'Do you want to replace it?').format(name=theme_name),
-                                             QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                   QtWidgets.QMessageBox.No),
-                                             QtWidgets.QMessageBox.No)
+                                             defaultButton=QtWidgets.QMessageBox.No)
         return ret == QtWidgets.QMessageBox.Yes
 
     def unzip_theme(self, file_name, directory):
@@ -785,9 +781,8 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             # confirm deletion
             if confirm:
                 answer = QtWidgets.QMessageBox.question(
-                    self, confirm_title, confirm_text % theme,
-                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                    QtWidgets.QMessageBox.No)
+                    self, confirm_title, confirm_text.format(theme_name=theme),
+                    defaultButton=QtWidgets.QMessageBox.No)
                 if answer == QtWidgets.QMessageBox.No:
                     return False
             # should be the same unless default

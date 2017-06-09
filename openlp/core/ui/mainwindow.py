@@ -920,8 +920,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         QtWidgets.QMessageBox.information(self, translate('OpenLP.MainWindow', 'Import settings'),
                                           translate('OpenLP.MainWindow',
                                                     'OpenLP will now close.  Imported settings will '
-                                                    'be applied the next time you start OpenLP.'),
-                                          QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
+                                                    'be applied the next time you start OpenLP.'))
         self.settings_imported = True
         self.clean_up()
         QtCore.QCoreApplication.exit()
@@ -1316,7 +1315,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         self.recent_files_menu.clear()
         for file_id, filename in enumerate(recent_files_to_display):
             log.debug('Recent file name: {name}'.format(name=filename))
-            # TODO: Should be good
             action = create_action(self, '',
                                    text='&{n} {name}'.format(n=file_id + 1,
                                                              name=os.path.splitext(os.path.basename(str(filename)))[0]),

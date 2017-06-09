@@ -251,8 +251,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             if QtWidgets.QMessageBox.question(None, translate('OpenLP', 'Backup'),
                                               translate('OpenLP', 'OpenLP has been upgraded, do you want to create\n'
                                                                   'a backup of the old data folder?'),
-                                              QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                              QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
+                                              defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
                 data_folder_path = AppLocation.get_data_path()
                 timestamp = time.strftime("%Y%m%d-%H%M%S")

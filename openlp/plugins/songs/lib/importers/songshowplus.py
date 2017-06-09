@@ -100,8 +100,7 @@ class SongShowPlusImport(SongImport):
             self.other_count = 0
             self.other_list = {}
             file_name = os.path.split(file)[1]
-            # TODO: Verify format() with template variables
-            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType % file_name, 0)
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=file_name), 0)
             song_data = open(file, 'rb')
             while True:
                 block_key, = struct.unpack("I", song_data.read(4))

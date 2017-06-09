@@ -249,8 +249,7 @@ class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog):
                 translate('SongsPlugin.SongSelectForm', 'WARNING: Saving your username and password is INSECURE, your '
                                                         'password is stored in PLAIN TEXT. Click Yes to save your '
                                                         'password or No to cancel this.'),
-                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                QtWidgets.QMessageBox.No)
+                defaultButton=QtWidgets.QMessageBox.No)
             if answer == QtWidgets.QMessageBox.No:
                 self.save_password_checkbox.setChecked(False)
 
@@ -398,8 +397,7 @@ class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog):
                                           translate('SongsPlugin.SongSelectForm',
                                                     'Your song has been imported, would you '
                                                     'like to import more songs?'),
-                                          QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                          QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
+                                          defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
             self.on_back_button_clicked()
         else:
             self.application.process_events()

@@ -246,9 +246,7 @@ class ImageMediaItem(MediaManagerItem):
                                 translate('ImagePlugin.MediaItem', 'Remove group'),
                                 translate('ImagePlugin.MediaItem',
                                           'Are you sure you want to remove "{name}" and everything in it?'
-                                          ).format(name=item_data.group_name),
-                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                      QtWidgets.QMessageBox.No)
+                                          ).format(name=item_data.group_name)
                         ) == QtWidgets.QMessageBox.Yes:
                             self.recursively_delete_group(item_data)
                             self.manager.delete_object(ImageGroups, row_item.data(0, QtCore.Qt.UserRole).id)
@@ -597,8 +595,7 @@ class ImageMediaItem(MediaManagerItem):
                 self, translate('ImagePlugin.MediaItem', 'Missing Image(s)'),
                 translate('ImagePlugin.MediaItem', 'The following image(s) no longer exist: {names}\n'
                           'Do you want to add the other images anyway?'
-                          ).format(names='\n'.join(missing_items_file_names)),
-                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Yes)) == \
+                          ).format(names='\n'.join(missing_items_file_names))) == \
                 QtWidgets.QMessageBox.No:
             return False
         # Continue with the existing images.
