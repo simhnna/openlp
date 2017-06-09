@@ -27,7 +27,7 @@ from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, Registry, OpenLPMixin, check_directory_exists
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.endpoint import remote_endpoint
-from openlp.plugins.remotes.deploy import download_and_check
+from openlp.plugins.remotes.deploy import download_and_check, download_sha256
 
 log = logging.getLogger(__name__)
 __default_settings__ = {
@@ -48,6 +48,8 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.weight = -1
         register_endpoint(remote_endpoint)
         Registry().register_function('download_website', self.first_time)
+        Registry().register_function('get_website_version', self.website_version)
+        Registry().set_flag('website_version', '0001_01_01')
 
     def initialise(self):
         """
@@ -91,3 +93,13 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.application.process_events()
         download_and_check()
         self.application.process_events()
+
+    def website_version(self):
+        """
+        Download and save the website version and sha256
+        :return: None
+        """
+        sha256, version = download_sha256()
+        Registry().set_flag('website_sha256', sha256)
+        Registry().set_flag('website_version', version)
+        Registry().execute('set_website_version')

@@ -25,8 +25,10 @@ The :mod:`openlp.core.utils` module provides the utility libraries for OpenLP.
 import hashlib
 import logging
 import os
+import platform
 import socket
 import sys
+import subprocess
 import time
 import urllib.error
 import urllib.parse
@@ -252,6 +254,19 @@ def url_get_file(callback, url, f_path, sha256=None):
     if callback.was_cancelled:
         os.remove(f_path)
     return True
+
+
+def ping(host):
+    """
+    Returns True if host responds to a ping request
+    """
+    # Ping parameters as function of OS
+    ping_str = "-n 1" if  platform.system().lower()=="windows" else "-c 1"
+    args = "ping " + " " + ping_str + " " + host
+    need_sh = False if  platform.system().lower()=="windows" else True
+
+    # Ping
+    return subprocess.call(args, shell=need_sh) == 0
 
 
 __all__ = ['get_web_page']

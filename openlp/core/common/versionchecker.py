@@ -12,7 +12,8 @@ from subprocess import Popen, PIPE
 
 from PyQt5 import QtCore
 
-from openlp.core.common import AppLocation, Settings
+from openlp.core.common import AppLocation, Registry, Settings
+from openlp.core.common.httputils import ping
 
 log = logging.getLogger(__name__)
 
@@ -42,12 +43,18 @@ class VersionThread(QtCore.QThread):
         """
         self.sleep(1)
         log.debug('Version thread - run')
-        app_version = get_application_version()
-        version = check_latest_version(app_version)
-        log.debug("Versions {version1} and {version2} ".format(version1=LooseVersion(str(version)),
-                                                               version2=LooseVersion(str(app_version['full']))))
-        if LooseVersion(str(version)) > LooseVersion(str(app_version['full'])):
-            self.main_window.openlp_version_check.emit('{version}'.format(version=version))
+        found = ping("openlp.io")
+        Registry().set_flag('internet_present', found)
+        update_check = Settings().value('core/update check')
+        if found:
+            Registry().execute('get_website_version')
+            if update_check:
+                app_version = get_application_version()
+                version = check_latest_version(app_version)
+                log.debug("Versions {version1} and {version2} ".format(version1=LooseVersion(str(version)),
+                                                                       version2=LooseVersion(str(app_version['full']))))
+                if LooseVersion(str(version)) > LooseVersion(str(app_version['full'])):
+                    self.main_window.openlp_version_check.emit('{version}'.format(version=version))
 
 
 def get_application_version():

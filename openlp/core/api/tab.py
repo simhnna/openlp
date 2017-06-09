@@ -22,7 +22,7 @@
 
 from PyQt5 import QtCore, QtGui, QtNetwork, QtWidgets
 
-from openlp.core.common import UiStrings, Settings, translate
+from openlp.core.common import UiStrings, Registry, Settings, translate
 from openlp.core.lib import SettingsTab
 
 ZERO_URL = '0.0.0.0'
@@ -38,6 +38,7 @@ class ApiTab(SettingsTab):
         super(ApiTab, self).__init__(parent, 'api', advanced_translated)
         self.define_main_window_icon()
         self.generate_icon()
+        Registry().register_function('set_website_version', self.set_website_version)
 
     def setupUi(self):
         self.setObjectName('ApiTab')
@@ -93,7 +94,6 @@ class ApiTab(SettingsTab):
         self.user_login_group_box.setCheckable(True)
         self.user_login_group_box.setChecked(False)
         self.user_login_group_box.setObjectName('user_login_group_box')
-
         self.user_login_layout = QtWidgets.QFormLayout(self.user_login_group_box)
         self.user_login_layout.setObjectName('user_login_layout')
         self.user_id_label = QtWidgets.QLabel(self.user_login_group_box)
@@ -180,7 +180,6 @@ class ApiTab(SettingsTab):
 
     def retranslateUi(self):
         self.tab_title_visible = translate('RemotePlugin.RemoteTab', 'Remote Interface')
-
         self.server_settings_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Server Settings'))
         self.address_label.setText(translate('RemotePlugin.RemoteTab', 'Serve on IP address:'))
         self.port_label.setText(translate('RemotePlugin.RemoteTab', 'Port number:'))
@@ -306,3 +305,12 @@ class ApiTab(SettingsTab):
             painter.end()
         self.remote_server_icon.setPixmap(QtGui.QPixmap.fromImage(icon))
         self.remote_server_icon.show()
+
+    def set_website_version(self):
+        """
+        Update the website version when it has been downloaded
+        :return:
+        """
+        self.master_version_value.setText(Registry().get_flag('website_version'))
+        if self.master_version_value.text() == self.current_version_value.text():
+            self.update_site_group_box.setEnabled(False)
