@@ -30,7 +30,7 @@ from urllib.parse import quote_plus as urlquote
 
 from sqlalchemy import Table, MetaData, Column, types, create_engine
 from sqlalchemy.engine.url import make_url
-from sqlalchemy.exc import SQLAlchemyError, InvalidRequestError, DBAPIError, OperationalError
+from sqlalchemy.exc import SQLAlchemyError, InvalidRequestError, DBAPIError, OperationalError, ProgrammingError
 from sqlalchemy.orm import scoped_session, sessionmaker, mapper
 from sqlalchemy.pool import NullPool
 
