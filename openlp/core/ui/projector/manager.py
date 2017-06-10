@@ -279,10 +279,6 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
     """
     Manage the projectors.
     """
-    projector_list = []
-    pjlink_udp = PJLinkUDP()
-    pjlink_udp.projector_list = projector_list
-
     def __init__(self, parent=None, projectordb=None):
         """
         Basic initialization.
@@ -294,7 +290,9 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         super().__init__(parent)
         self.settings_section = 'projector'
         self.projectordb = projectordb
-        self.projector_list = self.__class__.projector_list
+        self.projector_list = []
+        self.pjlink_udp = PJLinkUDP()
+        self.pjlink_udp.projector_list = self.projector_list
         self.source_select_form = None
 
     def bootstrap_initialise(self):
