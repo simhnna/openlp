@@ -94,6 +94,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         download_and_check()
         self.application.process_events()
 
+    @staticmethod
     def website_version(self):
         """
         Download and save the website version and sha256

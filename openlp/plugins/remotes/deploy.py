@@ -53,6 +53,9 @@ def check_for_previous_deployment(app_root, create=False):
 
 
 def download_sha256():
+    """
+    Download the config file to extract the sha256 and version number
+    """
     user_agent = 'OpenLP/' + Registry().get('application').applicationVersion()
     try:
         web_config = get_web_page('{host}{name}'.format(host='https://get.openlp.org/webclient/', name='download.cfg'),
@@ -64,6 +67,9 @@ def download_sha256():
 
 
 def download_and_check(callback=None):
+    """
+    Download the web site and deploy it.
+    """
     sha256, version = download_sha256()
     if url_get_file(callback, '{host}{name}'.format(host='https://get.openlp.org/webclient/', name='site.zip'),
                     os.path.join(AppLocation.get_section_data_path('remotes'), 'site.zip'),

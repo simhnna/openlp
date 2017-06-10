@@ -22,6 +22,7 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.errors import NotFound
 from openlp.core.api.endpoint.pluginhelpers import search, live, service
 from openlp.core.api.http import requires_auth
 
@@ -33,6 +34,15 @@ api_songs_endpoint = Endpoint('api')
 
 
 @songs_endpoint.route('search')
+def songs_search(request):
+    """
+    Handles requests for searching the songs plugin
+
+    :param request: The http request object.
+    """
+    search(request, 'songs', log)
+
+
 @api_songs_endpoint.route('songs/search')
 def songs_search(request):
     """
@@ -40,11 +50,13 @@ def songs_search(request):
 
     :param request: The http request object.
     """
-    return search(request, 'songs', log)
+    try:
+        search(request, 'songs', log)
+    except NotFound:
+        return {'results': {'items': []}}
 
 
 @songs_endpoint.route('live')
-@api_songs_endpoint.route('songs/live')
 @requires_auth
 def songs_live(request):
     """
@@ -52,10 +64,20 @@ def songs_live(request):
 
     :param request: The http request object.
     """
-    return live(request, 'songs', log)
+    live(request, 'songs', log)
 
 
-@songs_endpoint.route('add')
+@songs_endpoint.route('songs/live')
+@requires_auth
+def songs_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    live(request, 'songs', log)
+
+
 @api_songs_endpoint.route('songs/add')
 @requires_auth
 def songs_service(request):
@@ -64,4 +86,16 @@ def songs_service(request):
 
     :param request: The http request object.
     """
-    return service(request, 'songs', log)
+    service(request, 'songs', log)
+    return {'results': {'success': True}}
+
+
+@songs_endpoint.route('songs/add')
+@requires_auth
+def songs_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    service(request, 'songs', log)
