@@ -22,6 +22,7 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.errors import NotFound
 from openlp.core.api.endpoint.pluginhelpers import search, live, service, display_thumbnails
 from openlp.core.api.http import requires_auth
 
@@ -30,41 +31,6 @@ log = logging.getLogger(__name__)
 
 presentations_endpoint = Endpoint('presentations')
 api_presentations_endpoint = Endpoint('api')
-
-
-@presentations_endpoint.route('search')
-@api_presentations_endpoint.route('presentations/search')
-def presentations_search(request):
-    """
-    Handles requests for searching the presentations plugin
-
-    :param request: The http request object.
-    """
-    return search(request, 'presentations', log)
-
-
-@presentations_endpoint.route('live')
-@api_presentations_endpoint.route('presentations/live')
-@requires_auth
-def presentations_live(request):
-    """
-    Handles requests for making a song live
-
-    :param request: The http request object.
-    """
-    return live(request, 'presentations', log)
-
-
-@presentations_endpoint.route('add')
-@api_presentations_endpoint.route('presentations/add')
-@requires_auth
-def presentations_service(request):
-    """
-    Handles requests for adding a song to the service
-
-    :param request: The http request object.
-    """
-    return service(request, 'presentations', log)
 
 
 # /presentations/thumbnails88x88/PA%20Rota.pdf/slide5.png
@@ -79,3 +45,71 @@ def presentations_thumbnails(request, dimensions, file_name, slide):
     :return:
     """
     return display_thumbnails(request, 'presentations', log, dimensions, file_name, slide)
+
+
+@presentations_endpoint.route('search')
+def presentations_search(request):
+    """
+    Handles requests for searching the presentations plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'presentations', log)
+
+
+@presentations_endpoint.route('live')
+@requires_auth
+def presentations_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'presentations', log)
+
+
+@presentations_endpoint.route('add')
+@requires_auth
+def presentations_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    service(request, 'presentations', log)
+
+
+@api_presentations_endpoint.route('presentations/search')
+def presentations_search(request):
+    """
+    Handles requests for searching the presentations plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'presentations', log)
+
+
+@api_presentations_endpoint.route('presentations/live')
+@requires_auth
+def presentations_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'presentations', log)
+
+
+@api_presentations_endpoint.route('presentations/add')
+@requires_auth
+def presentations_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    try:
+        search(request, 'presentations', log)
+    except NotFound:
+        return {'results': {'items': []}}
+

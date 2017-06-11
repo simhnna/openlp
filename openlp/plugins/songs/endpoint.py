@@ -40,20 +40,7 @@ def songs_search(request):
 
     :param request: The http request object.
     """
-    search(request, 'songs', log)
-
-
-@api_songs_endpoint.route('songs/search')
-def songs_search(request):
-    """
-    Handles requests for searching the songs plugin
-
-    :param request: The http request object.
-    """
-    try:
-        search(request, 'songs', log)
-    except NotFound:
-        return {'results': {'items': []}}
+    return search(request, 'songs', log)
 
 
 @songs_endpoint.route('live')
@@ -64,10 +51,31 @@ def songs_live(request):
 
     :param request: The http request object.
     """
-    live(request, 'songs', log)
+    return live(request, 'songs', log)
 
 
-@songs_endpoint.route('songs/live')
+@songs_endpoint.route('add')
+@requires_auth
+def songs_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    service(request, 'songs', log)
+
+
+@api_songs_endpoint.route('songs/search')
+def songs_search(request):
+    """
+    Handles requests for searching the songs plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'songs', log)
+
+
+@api_songs_endpoint.route('songs/live')
 @requires_auth
 def songs_live(request):
     """
@@ -75,7 +83,7 @@ def songs_live(request):
 
     :param request: The http request object.
     """
-    live(request, 'songs', log)
+    return live(request, 'songs', log)
 
 
 @api_songs_endpoint.route('songs/add')
@@ -86,16 +94,7 @@ def songs_service(request):
 
     :param request: The http request object.
     """
-    service(request, 'songs', log)
-    return {'results': {'success': True}}
-
-
-@songs_endpoint.route('songs/add')
-@requires_auth
-def songs_service(request):
-    """
-    Handles requests for adding a song to the service
-
-    :param request: The http request object.
-    """
-    service(request, 'songs', log)
+    try:
+        search(request, 'songs', log)
+    except NotFound:
+        return {'results': {'items': []}}

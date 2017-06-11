@@ -22,6 +22,7 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.errors import NotFound
 from openlp.core.api.endpoint.pluginhelpers import search, live, service
 from openlp.core.api.http import requires_auth
 
@@ -33,7 +34,6 @@ api_bibles_endpoint = Endpoint('api')
 
 
 @bibles_endpoint.route('search')
-@api_bibles_endpoint.route('bibles/search')
 def bibles_search(request):
     """
     Handles requests for searching the bibles plugin
@@ -44,7 +44,6 @@ def bibles_search(request):
 
 
 @bibles_endpoint.route('live')
-@api_bibles_endpoint.route('bibles/live')
 @requires_auth
 def bibles_live(request):
     """
@@ -56,6 +55,37 @@ def bibles_live(request):
 
 
 @bibles_endpoint.route('add')
+@requires_auth
+def bibles_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    service(request, 'bibles', log)
+
+
+@api_bibles_endpoint.route('bibles/search')
+def bibles_search(request):
+    """
+    Handles requests for searching the bibles plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'bibles', log)
+
+
+@api_bibles_endpoint.route('bibles/live')
+@requires_auth
+def bibles_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'bibles', log)
+
+
 @api_bibles_endpoint.route('bibles/add')
 @requires_auth
 def bibles_service(request):
@@ -64,4 +94,7 @@ def bibles_service(request):
 
     :param request: The http request object.
     """
-    return service(request, 'bibles', log)
+    try:
+        search(request, 'bibles', log)
+    except NotFound:
+        return {'results': {'items': []}}

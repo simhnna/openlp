@@ -22,6 +22,7 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.errors import NotFound
 from openlp.core.api.endpoint.pluginhelpers import search, live, service, display_thumbnails
 from openlp.core.api.http import requires_auth
 
@@ -30,41 +31,6 @@ log = logging.getLogger(__name__)
 
 images_endpoint = Endpoint('images')
 api_images_endpoint = Endpoint('api')
-
-
-@images_endpoint.route('search')
-@api_images_endpoint.route('images/search')
-def images_search(request):
-    """
-    Handles requests for searching the images plugin
-
-    :param request: The http request object.
-    """
-    return search(request, 'images', log)
-
-
-@images_endpoint.route('live')
-@api_images_endpoint.route('images/live')
-@requires_auth
-def images_live(request):
-    """
-    Handles requests for making a song live
-
-    :param request: The http request object.
-    """
-    return live(request, 'images', log)
-
-
-@images_endpoint.route('add')
-@api_images_endpoint.route('images/add')
-@requires_auth
-def images_service(request):
-    """
-    Handles requests for adding a song to the service
-
-    :param request: The http request object.
-    """
-    return service(request, 'images', log)
 
 
 # images/thumbnails/320x240/1.jpg
@@ -78,3 +44,70 @@ def images_thumbnails(request, dimensions, file_name):
     :return:
     """
     return display_thumbnails(request, 'images', log, dimensions, file_name)
+
+
+@images_endpoint.route('search')
+def images_search(request):
+    """
+    Handles requests for searching the images plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'images', log)
+
+
+@images_endpoint.route('live')
+@requires_auth
+def images_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'images', log)
+
+
+@images_endpoint.route('add')
+@requires_auth
+def images_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    service(request, 'images', log)
+
+
+@api_images_endpoint.route('images/search')
+def images_search(request):
+    """
+    Handles requests for searching the images plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'images', log)
+
+
+@api_images_endpoint.route('images/live')
+@requires_auth
+def images_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'images', log)
+
+
+@api_images_endpoint.route('images/add')
+@requires_auth
+def images_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    try:
+        search(request, 'images', log)
+    except NotFound:
+        return {'results': {'items': []}}

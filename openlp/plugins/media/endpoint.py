@@ -22,6 +22,7 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.errors import NotFound
 from openlp.core.api.endpoint.pluginhelpers import search, live, service
 from openlp.core.api.http import requires_auth
 
@@ -33,7 +34,6 @@ api_media_endpoint = Endpoint('api')
 
 
 @media_endpoint.route('search')
-@api_media_endpoint.route('media/search')
 def media_search(request):
     """
     Handles requests for searching the media plugin
@@ -44,7 +44,6 @@ def media_search(request):
 
 
 @media_endpoint.route('live')
-@api_media_endpoint.route('media/live')
 @requires_auth
 def media_live(request):
     """
@@ -56,6 +55,37 @@ def media_live(request):
 
 
 @media_endpoint.route('add')
+@requires_auth
+def media_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    service(request, 'media', log)
+
+
+@api_media_endpoint.route('media/search')
+def media_search(request):
+    """
+    Handles requests for searching the media plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'media', log)
+
+
+@api_media_endpoint.route('media/live')
+@requires_auth
+def media_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'media', log)
+
+
 @api_media_endpoint.route('media/add')
 @requires_auth
 def media_service(request):
@@ -64,4 +94,7 @@ def media_service(request):
 
     :param request: The http request object.
     """
-    return service(request, 'media', log)
+    try:
+        search(request, 'media', log)
+    except NotFound:
+        return {'results': {'items': []}}

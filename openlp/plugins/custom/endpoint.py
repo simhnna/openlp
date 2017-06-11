@@ -33,7 +33,6 @@ api_custom_endpoint = Endpoint('api')
 
 
 @custom_endpoint.route('search')
-@api_custom_endpoint.route('custom/search')
 def custom_search(request):
     """
     Handles requests for searching the custom plugin
@@ -44,7 +43,6 @@ def custom_search(request):
 
 
 @custom_endpoint.route('live')
-@api_custom_endpoint.route('custom/live')
 @requires_auth
 def custom_live(request):
     """
@@ -56,6 +54,37 @@ def custom_live(request):
 
 
 @custom_endpoint.route('add')
+@requires_auth
+def custom_service(request):
+    """
+    Handles requests for adding a song to the service
+
+    :param request: The http request object.
+    """
+    service(request, 'custom', log)
+
+
+@api_custom_endpoint.route('custom/search')
+def custom_search(request):
+    """
+    Handles requests for searching the custom plugin
+
+    :param request: The http request object.
+    """
+    return search(request, 'custom', log)
+
+
+@api_custom_endpoint.route('custom/live')
+@requires_auth
+def custom_live(request):
+    """
+    Handles requests for making a song live
+
+    :param request: The http request object.
+    """
+    return live(request, 'custom', log)
+
+
 @api_custom_endpoint.route('custom/add')
 @requires_auth
 def custom_service(request):
@@ -64,4 +93,7 @@ def custom_service(request):
 
     :param request: The http request object.
     """
-    return service(request, 'custom', log)
+    try:
+        search(request, 'custom', log)
+    except NotFound:
+        return {'results': {'items': []}}
