@@ -26,7 +26,7 @@ import os
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import AppLocation, Registry, Settings, OpenLPMixin, check_directory_exists
+from openlp.core.common import AppLocation, Registry, Settings, OpenLPMixin, UiStrings, check_directory_exists
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.endpoint import remote_endpoint
 from openlp.plugins.remotes.deploy import download_and_check, download_sha256
@@ -100,6 +100,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.application.process_events()
         progress.close()
         Settings().setValue('remotes/download version', Registry().set_flag('website_version'))
+        Registry().execute('set_website_version')
 
     def website_version(self):
         """
@@ -120,8 +121,8 @@ class Progress(QtWidgets.QProgressDialog):
         super(Progress, self).__init__(parent.main_window)
         self.parent = parent
         self.setWindowModality(QtCore.Qt.WindowModal)
-        self.setWindowTitle(translate('OpenLP.Ui', 'Importing Website'))
-        self.setLabelText(translate('OpenLP.Ui', 'Starting import...'))
+        self.setWindowTitle(translate('RemotePlugin', 'Importing Website'))
+        self.setLabelText(UiStrings().StartingImport)
         self.setCancelButton(None)
         self.setRange(0, 1)
         self.setMinimumDuration(0)

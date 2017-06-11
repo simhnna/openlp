@@ -254,6 +254,9 @@ class ApiTab(SettingsTab):
         self.user_id.setText(Settings().value(self.settings_section + '/user id'))
         self.password.setText(Settings().value(self.settings_section + '/password'))
         self.current_version_value.setText(Settings().value('remotes/download version'))
+        self.master_version_value.setText(Registry().get_flag('website_version'))
+        if self.master_version_value.text() == self.current_version_value.text():
+            self.update_site_group_box.setEnabled(False)
         self.set_urls()
 
     def save(self):
@@ -311,6 +314,4 @@ class ApiTab(SettingsTab):
         Update the website version when it has been downloaded
         :return:
         """
-        self.master_version_value.setText(Registry().get_flag('website_version'))
-        if self.master_version_value.text() == self.current_version_value.text():
-            self.update_site_group_box.setEnabled(False)
+        self.load()
