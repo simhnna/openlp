@@ -23,8 +23,10 @@
 import logging
 import os
 
+from PyQt5 import QtCore, QtWidgets
+
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import AppLocation, Registry, OpenLPMixin, check_directory_exists
+from openlp.core.common import AppLocation, Registry, Settings, OpenLPMixin, check_directory_exists
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
 from openlp.plugins.remotes.endpoint import remote_endpoint
 from openlp.plugins.remotes.deploy import download_and_check, download_sha256
@@ -59,6 +61,7 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'assets'))
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'images'))
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static', 'index'))
         check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'templates'))
 
     @staticmethod
@@ -91,10 +94,13 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         Import web site code if active
         """
         self.application.process_events()
-        download_and_check()
+        progress = Progress(self)
+        progress.forceShow()
+        download_and_check(progress)
         self.application.process_events()
+        progress.close()
+        Settings().setValue('remotes/download version', Registry().set_flag('website_version'))
 
-    @staticmethod
     def website_version(self):
         """
         Download and save the website version and sha256
@@ -104,3 +110,41 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         Registry().set_flag('website_sha256', sha256)
         Registry().set_flag('website_version', version)
         Registry().execute('set_website_version')
+
+
+class Progress(QtWidgets.QProgressDialog):
+    """
+    Local class to handle download display based and supporting httputils:get_web_page
+    """
+    def __init__(self, parent):
+        super(Progress, self).__init__(parent.main_window)
+        self.parent = parent
+        self.setWindowModality(QtCore.Qt.WindowModal)
+        self.setWindowTitle(translate('OpenLP.Ui', 'Importing Website'))
+        self.setLabelText(translate('OpenLP.Ui', 'Starting import...'))
+        self.setCancelButton(None)
+        self.setRange(0, 1)
+        self.setMinimumDuration(0)
+        self.was_cancelled = False
+        self.previous_size = 0
+
+    def _download_progress(self, count, block_size):
+        """
+        Calculate and display the download progress.
+        """
+        increment = (count * block_size) - self.previous_size
+        self._increment_progress_bar(None, increment)
+        self.previous_size = count * block_size
+
+    def _increment_progress_bar(self, status_text, increment=1):
+        """
+        Update the wizard progress page.
+
+        :param status_text: Current status information to display.
+        :param increment: The value to increment the progress bar by.
+        """
+        if status_text:
+            self.setText(status_text)
+        if increment > 0:
+            self.setValue(self.value() + increment)
+        self.parent.application.process_events()

@@ -25,7 +25,7 @@ import zipfile
 import urllib.error
 
 from openlp.core.common import AppLocation, Registry
-from openlp.core.common.httputils import url_get_file, get_web_page
+from openlp.core.common.httputils import url_get_file, get_web_page, get_url_file_size
 
 
 def deploy_zipfile(app_root, zip_name):
@@ -71,6 +71,8 @@ def download_and_check(callback=None):
     Download the web site and deploy it.
     """
     sha256, version = download_sha256()
+    file_size = get_url_file_size('https://get.openlp.org/webclient/site.zip')
+    callback.setRange(0, file_size)
     if url_get_file(callback, '{host}{name}'.format(host='https://get.openlp.org/webclient/', name='site.zip'),
                     os.path.join(AppLocation.get_section_data_path('remotes'), 'site.zip'),
                     sha256=sha256):
