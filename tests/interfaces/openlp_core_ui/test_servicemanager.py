@@ -28,9 +28,11 @@ from unittest.mock import MagicMock, patch
 from openlp.core.common import Registry
 from openlp.core.lib import ScreenList, ServiceItem, ItemCapabilities
 from openlp.core.ui.mainwindow import MainWindow
+from openlp.core.ui.servicemanager import ServiceManagerList
+from openlp.core.lib.serviceitem import ServiceItem
 
 from tests.helpers.testmixin import TestMixin
-
+from PyQt5 import QtCore, QtGui, QtTest
 
 class TestServiceManager(TestCase, TestMixin):
 
@@ -351,3 +353,38 @@ class TestServiceManager(TestCase, TestMixin):
         new_service.trigger()
 
         assert mocked_event.call_count == 1, 'The on_new_service_clicked method should have been called once'
+
+    def test_keyboard_expand_selection(self):
+        """
+        Test on on_expand_selection method caused by keyboard
+        """
+        # GIVEN A collapsed song selected on the service manager.
+        self.service_manager.setup_ui(self.service_manager)
+        ServiceManagerList(self.service_manager)
+
+        item = ServiceItem()
+        item.title = "test"
+        item.add_from_text("slide 1")
+        item.add_from_text("slide 2")
+        item.add_icon(":/plugins/plugin_songs.png")
+        #SongMediaItem.generate_slide_data(item)
+        self.service_manager.add_service_item(item)
+
+        print(item._raw_frames)
+
+        song_to_expand = self.service_manager.service_manager_list.topLevelItem(0)
+        #print(song_to_expand)
+        self.service_manager.service_manager_list.setCurrentItem(song_to_expand)
+        #print(self.service_manager.service_manager_list.currentItem())
+        #print(self.service_manager.service_manager_list.topLevelItemCount())
+
+        # WHEN Pressing the right arrow key
+        #QtTest.QTest.keyPress(self.service_manager.service_manager_list, QtCore.Qt.Key_Right)
+
+        event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress,QtCore.Qt.Key_Right,QtCore.Qt.NoModifier)
+        ServiceManagerList.keyPressEvent(self.service_manager,event)
+
+        # THEN Should be expanded
+        selected_index = self.service_manager.service_manager_list.currentIndex()
+        above_selection_index = self.service_manager.service_manager_list.indexAbove(selected_index)
+        self.assertTrue(self.service_manager.service_manager_list.isExpanded(above_selection_index), 'Item should have been expanded')
