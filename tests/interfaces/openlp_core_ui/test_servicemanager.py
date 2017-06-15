@@ -497,4 +497,3 @@ class TestServiceManager(TestCase, TestMixin):
                         'Top item should have been selected')
         self.service_manager.collapsed.assert_called_once()
 
-        
