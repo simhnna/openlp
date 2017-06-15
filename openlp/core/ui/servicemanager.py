@@ -1131,7 +1131,8 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         """
         item = self.service_manager_list.currentItem()
 
-        if item.childCount(): # Since we only have 2 levels we find them by checking for children
+        # Since we only have 2 levels we find them by checking for children
+        if item.childCount():
             if not self.service_manager_list.isExpanded(self.service_manager_list.currentIndex()):
                 self.service_manager_list.expandItem(item)
                 self.service_manager.expanded(item)
@@ -1146,7 +1147,8 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         """
         item = self.service_manager_list.currentItem()
 
-        if item.childCount():  # Since we only have 2 levels we find them by checking for children
+        # Since we only have 2 levels we find them by checking for children
+        if item.childCount():
             if self.service_manager_list.isExpanded(self.service_manager_list.currentIndex()):
                 self.service_manager_list.collapseItem(item)
                 self.service_manager.collapsed(item)
