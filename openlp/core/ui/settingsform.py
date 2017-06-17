@@ -63,7 +63,7 @@ class SettingsForm(QtWidgets.QDialog, Ui_SettingsDialog, RegistryProperties):
         """
         Execute the form
         """
-        # load all the
+        # load all the widgets
         self.setting_list_widget.blockSignals(True)
         self.setting_list_widget.clear()
         while self.stacked_layout.count():
@@ -96,6 +96,7 @@ class SettingsForm(QtWidgets.QDialog, Ui_SettingsDialog, RegistryProperties):
             list_item = QtWidgets.QListWidgetItem(build_icon(tab_widget.icon_path), tab_widget.tab_title_visible)
             list_item.setData(QtCore.Qt.UserRole, tab_widget.tab_title)
             self.setting_list_widget.addItem(list_item)
+            tab_widget.load()
 
     def accept(self):
         """

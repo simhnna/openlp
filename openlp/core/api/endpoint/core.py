@@ -52,11 +52,13 @@ FILE_TYPES = {
 remote = translate('RemotePlugin.Mobile', 'Remote')
 stage = translate('RemotePlugin.Mobile', 'Stage View')
 live = translate('RemotePlugin.Mobile', 'Live View')
+chords = translate('RemotePlugin.Mobile', 'Chords View')
 
 TRANSLATED_STRINGS = {
     'app_title': "{main} {remote}".format(main=UiStrings().OLP, remote=remote),
     'stage_title': "{main} {stage}".format(main=UiStrings().OLP, stage=stage),
     'live_title': "{main} {live}".format(main=UiStrings().OLP, live=live),
+    'chords_title': "{main} {chords}".format(main=UiStrings().OLP, chords=chords),
     'service_manager': translate('RemotePlugin.Mobile', 'Service Manager'),
     'slide_controller': translate('RemotePlugin.Mobile', 'Slide Controller'),
     'alerts': translate('RemotePlugin.Mobile', 'Alerts'),

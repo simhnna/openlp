@@ -37,6 +37,7 @@ class Poller(RegistryProperties):
         super(Poller, self).__init__()
         self.live_cache = None
         self.stage_cache = None
+        self.chords_cache = None
 
     def raw_poll(self):
         return {
@@ -50,8 +51,10 @@ class Poller(RegistryProperties):
             'version': 3,
             'isSecure': Settings().value('api/authentication enabled'),
             'isAuthorised': False,
+            'chordNotation': Settings().value('songs/chord notation'),
             'isStagedActive': self.is_stage_active(),
-            'isLiveActive': self.is_live_active()
+            'isLiveActive': self.is_live_active(),
+            'isChordsActive': self.is_chords_active()
         }
 
     def poll(self):
@@ -76,6 +79,7 @@ class Poller(RegistryProperties):
         """
         self.stage_cache = None
         self.live_cache = None
+        self.chords.cache = None
 
     def is_stage_active(self):
         """
@@ -108,3 +112,19 @@ class Poller(RegistryProperties):
             else:
                 self.live_cache = False
         return self.live_cache
+
+    def is_chords_active(self):
+        """
+        Is chords active - call it and see but only once
+        :return: if live is active or not
+        """
+        if self.chords_cache is None:
+            try:
+                page = get_web_page("http://localhost:4316/chords")
+            except:
+                page = None
+            if page:
+                self.chords_cache = True
+            else:
+                self.chords_cache = False
+        return self.chords_cache

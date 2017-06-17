@@ -57,6 +57,7 @@ def controller_text(request):
                     item['tag'] = str(frame['verseTag'])
                 else:
                     item['tag'] = str(index + 1)
+                item['chords_text'] = str(frame['chords_text'])
                 item['text'] = str(frame['text'])
                 item['html'] = str(frame['html'])
             # Handle images, unless a custom thumbnail is given or if thumbnails is disabled
@@ -114,7 +115,6 @@ def controller_set(request):
     return {'results': {'success': True}}
 
 
-@api_controller_endpoint.route('controller/{controller}/{action:next|previous}')
 @controller_endpoint.route('{action:next|previous}')
 @requires_auth
 def controller_direction(request, controller, action):
@@ -128,4 +128,17 @@ def controller_direction(request, controller, action):
     event = getattr(Registry().get('live_controller'), 'slidecontroller_{controller}_{action}'.
                     format(controller=controller, action=action))
     event.emit()
+
+
+@api_controller_endpoint.route('controller/{controller}/{action:next|previous}')
+@requires_auth
+def controller_direction_api(request, controller, action):
+    """
+    Handles requests for setting service items in the slide controller
+11
+    :param request: The http request object.
+    :param controller: the controller slides forward or backward.
+    :param action: the controller slides forward or backward.
+    """
+    controller_direction(request, controller, action)
     return {'results': {'success': True}}

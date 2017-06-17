@@ -38,7 +38,6 @@ class ApiTab(SettingsTab):
         super(ApiTab, self).__init__(parent, 'api', advanced_translated)
         self.define_main_window_icon()
         self.generate_icon()
-        Registry().register_function('set_website_version', self.set_website_version)
 
     def setupUi(self):
         self.setObjectName('ApiTab')
@@ -83,6 +82,12 @@ class ApiTab(SettingsTab):
         self.stage_url.setObjectName('stage_url')
         self.stage_url.setOpenExternalLinks(True)
         self.http_setting_layout.addRow(self.stage_url_label, self.stage_url)
+        self.chords_url_label = QtWidgets.QLabel(self.http_settings_group_box)
+        self.chords_url_label.setObjectName('chords_url_label')
+        self.chords_url = QtWidgets.QLabel(self.http_settings_group_box)
+        self.chords_url.setObjectName('chords_url')
+        self.chords_url.setOpenExternalLinks(True)
+        self.http_setting_layout.addRow(self.chords_url_label, self.chords_url)
         self.live_url_label = QtWidgets.QLabel(self.http_settings_group_box)
         self.live_url_label.setObjectName('live_url_label')
         self.live_url = QtWidgets.QLabel(self.http_settings_group_box)
@@ -186,6 +191,7 @@ class ApiTab(SettingsTab):
         self.remote_url_label.setText(translate('RemotePlugin.RemoteTab', 'Remote URL:'))
         self.stage_url_label.setText(translate('RemotePlugin.RemoteTab', 'Stage view URL:'))
         self.live_url_label.setText(translate('RemotePlugin.RemoteTab', 'Live view URL:'))
+        self.chords_url_label.setText(translate('RemotePlugin.RemoteTab', 'Chords view URL:'))
         self.twelve_hour_check_box.setText(translate('RemotePlugin.RemoteTab', 'Display stage time in 12h format'))
         self.thumbnails_check_box.setText(translate('RemotePlugin.RemoteTab',
                                                     'Show thumbnails of non-text slides in remote and stage view.'))
@@ -308,10 +314,3 @@ class ApiTab(SettingsTab):
             painter.end()
         self.remote_server_icon.setPixmap(QtGui.QPixmap.fromImage(icon))
         self.remote_server_icon.show()
-
-    def set_website_version(self):
-        """
-        Update the website version when it has been downloaded
-        :return:
-        """
-        self.load()
