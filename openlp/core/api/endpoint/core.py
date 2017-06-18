@@ -35,6 +35,7 @@ blank_dir = os.path.join(static_dir, 'index')
 
 log = logging.getLogger(__name__)
 
+chords_endpoint = Endpoint('chords', template_dir=template_dir, static_dir=static_dir)
 stage_endpoint = Endpoint('stage', template_dir=template_dir, static_dir=static_dir)
 main_endpoint = Endpoint('main', template_dir=template_dir, static_dir=static_dir)
 blank_endpoint = Endpoint('', template_dir=template_dir, static_dir=blank_dir)
@@ -90,6 +91,14 @@ def stage_index(request):
     Deliver the page for the /stage url
     """
     return stage_endpoint.render_template('stage.mako', **TRANSLATED_STRINGS)
+
+
+@chords_endpoint.route('')
+def chords_index(request):
+    """
+    Deliver the page for the /chords url
+    """
+    return chords_endpoint.render_template('chords.mako', **TRANSLATED_STRINGS)
 
 
 @main_endpoint.route('')

@@ -22,6 +22,7 @@
 
 import logging
 import os
+import time
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -96,9 +97,14 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         self.application.process_events()
         progress = Progress(self)
         progress.forceShow()
+        self.application.process_events()
+        time.sleep(1)
         download_and_check(progress)
         self.application.process_events()
+        time.sleep(1)
         progress.close()
+        self.application.process_events()
+        aa = Registry().get('website_version')
         Settings().setValue('remotes/download version', Registry().get('website_version'))
 
     def website_version(self):
