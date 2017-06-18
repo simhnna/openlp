@@ -51,56 +51,6 @@ class TestRemoteDeploy(TestCase):
         """
         shutil.rmtree(self.app_root)
 
-    @patch('openlp.plugins.remotes.deploy.os.path.isfile')
-    @patch('openlp.plugins.remotes.deploy.os.mknod')
-    def test_check_for_previous_deployment_false(self, mocked_mknod, mocked_isfile):
-        """
-        Remote Deploy tests - Test when the marker file is missing
-        """
-        # GIVEN: A new setup with no marker file
-        # WHEN: I check for a deployment which does not create the marker file
-        mocked_isfile.return_value = False
-        processed = check_for_previous_deployment(self.app_root)
-
-        # THEN test the see if marker has not been created
-        self.assertFalse(processed, 'should return False as marker does not exist')
-        mocked_isfile.assert_called_once_with(os.path.join(self.app_root, 'marker.txt'))
-        mocked_mknod.assert_not_called()
-
-    @patch('openlp.plugins.remotes.deploy.os.path.isfile')
-    @patch('openlp.plugins.remotes.deploy.os.mknod')
-    def test_check_for_previous_deployment_true(self, mocked_mknod, mocked_isfile):
-        """
-        Remote Deploy tests - Test when the marker file is missing
-        """
-        # GIVEN: A new setup with not market file
-        # WHEN: I check for a deployment which does create the marker file
-        mocked_isfile.return_value = False
-        processed = check_for_previous_deployment(self.app_root, True)
-
-        # THEN test the see if marker has been created
-        marker_file = os.path.join(self.app_root, 'marker.txt')
-        self.assertFalse(processed, 'should return False as marker does not exist')
-        mocked_isfile.assert_called_once_with(marker_file)
-        mocked_mknod.assert_called_once_with(marker_file)
-
-    @patch('openlp.plugins.remotes.deploy.os.path.isfile')
-    @patch('openlp.plugins.remotes.deploy.os.mknod')
-    def test_check_for_previous_deployment_true(self, mocked_mknod, mocked_isfile):
-        """
-        Remote Deploy tests - Test when the marker file is present
-        """
-        # GIVEN: A new setup with not market file
-        # WHEN: I check for a deployment which does not create the marker file
-        mocked_isfile.return_value = True
-        processed = check_for_previous_deployment(self.app_root, True)
-
-        # THEN test the see if marker is present and has not been created
-        marker_file = os.path.join(self.app_root, 'marker.txt')
-        self.assertTrue(processed, 'should return True as marker does exist')
-        mocked_isfile.assert_called_once_with(marker_file)
-        mocked_mknod.assert_not_called()
-
     def test_deploy_zipfile(self):
         """
         Remote Deploy tests - test the dummy zip file is processed correctly

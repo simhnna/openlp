@@ -104,17 +104,16 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         time.sleep(1)
         progress.close()
         self.application.process_events()
-        aa = Registry().get('website_version')
-        Settings().setValue('remotes/download version', Registry().get('website_version'))
+        Settings().setValue('remotes/download version', self.version)
 
     def website_version(self):
         """
         Download and save the website version and sha256
         :return: None
         """
-        sha256, version = download_sha256()
+        sha256, self.version = download_sha256()
         Registry().set_flag('website_sha256', sha256)
-        Registry().set_flag('website_version', version)
+        Registry().set_flag('website_version', self.version)
 
 
 class Progress(QtWidgets.QProgressDialog):

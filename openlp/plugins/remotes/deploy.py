@@ -42,16 +42,6 @@ def deploy_zipfile(app_root, zip_name):
     web_zip.extractall(app_root)
 
 
-def check_for_previous_deployment(app_root, create=False):
-    marker_file = os.path.join(app_root, "marker.txt")
-    if os.path.isfile(marker_file):
-        return True
-    else:
-        if create:
-            os.mknod(marker_file)
-        return False
-
-
 def download_sha256():
     """
     Download the config file to extract the sha256 and version number
