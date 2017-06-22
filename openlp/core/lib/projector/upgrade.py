@@ -26,7 +26,8 @@ backend for the projector setup.
 import logging
 
 # Not all imports used at this time, but keep for future upgrades
-from sqlalchemy import Column, types
+from sqlalchemy import Table, Column, types, inspect
+from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.sql.expression import null
 
 from openlp.core.common.db import drop_columns
@@ -44,7 +45,7 @@ def upgrade_1(session, metadata):
     """
     Version 1 upgrade - old db might/might not be versioned.
     """
-    pass
+    log.debug('Skipping upgrade_1 of projector DB - not used')
 
 
 def upgrade_2(session, metadata):
@@ -53,6 +54,7 @@ def upgrade_2(session, metadata):
 
     Update Projector() table to include new data defined in PJLink version 2 changes
 
+    mac_adx:        Column(String(18))
     serial_no:      Column(String(30))
     sw_version:     Column(String(30))
     model_filter:   Column(String(30))
@@ -61,10 +63,10 @@ def upgrade_2(session, metadata):
     :param session: DB session instance
     :param metadata: Metadata of current DB
     """
-
-    new_op = get_upgrade_op(session)
-    if 'serial_no' not in [t.name for t in metadata.tables.values()]:
+    projector_table = Table('projector', metadata, autoload=True)
+    if 'mac_adx' not in [col.name for col in projector_table.c.values()]:
         log.debug("Upgrading projector DB to version '2'")
+        new_op = get_upgrade_op(session)
         new_op.add_column('projector', Column('mac_adx', types.String(18), server_default=null()))
         new_op.add_column('projector', Column('serial_no', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('sw_version', types.String(30), server_default=null()))
