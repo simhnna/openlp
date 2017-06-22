@@ -360,67 +360,67 @@ class TestServiceManager(TestCase, TestMixin):
         """
         Test that a right arrow key press event calls the on_expand_selection function
         """
-        #GIVEN a mocked expand function
+        # GIVEN a mocked expand function
         self.service_manager.on_expand_selection = MagicMock()
 
-        #WHEN the right arrow key event is called
+        # WHEN the right arrow key event is called
         self.service_manager.setup_ui(self.service_manager)
         event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Right, QtCore.Qt.NoModifier)
         self.service_manager.service_manager_list.keyPressEvent(event)
 
-        #THEN the on_expand_selection function should have been called.
+        # THEN the on_expand_selection function should have been called.
         self.service_manager.on_expand_selection.assert_called_once_with()
 
     def test_collapse_selection_on_left_arrow(self):
         """
         Test that a left arrow key press event calls the on_collapse_selection function
         """
-        #GIVEN a mocked collapse function
+        # GIVEN a mocked collapse function
         self.service_manager.on_collapse_selection = MagicMock()
 
-        #WHEN the left arrow key event is called
+        # WHEN the left arrow key event is called
         self.service_manager.setup_ui(self.service_manager)
         event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Left, QtCore.Qt.NoModifier)
         self.service_manager.service_manager_list.keyPressEvent(event)
 
-        #THEN the on_collapse_selection function should have been called.
+        # THEN the on_collapse_selection function should have been called.
         self.service_manager.on_collapse_selection.assert_called_once_with()
 
     def test_move_selection_down_on_down_arrow(self):
         """
         Test that a down arrow key press event calls the on_move_selection_down function
         """
-        #GIVEN a mocked move down function
+        # GIVEN a mocked move down function
         self.service_manager.on_move_selection_down = MagicMock()
 
-        #WHEN the down arrow key event is called
+        # WHEN the down arrow key event is called
         self.service_manager.setup_ui(self.service_manager)
         event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Down, QtCore.Qt.NoModifier)
         self.service_manager.service_manager_list.keyPressEvent(event)
 
-        #THEN the on_move_selection_down function should have been called.
+        # THEN the on_move_selection_down function should have been called.
         self.service_manager.on_move_selection_down.assert_called_once_with()
 
     def test_move_selection_up_on_up_arrow(self):
         """
         Test that an up arrow key press event calls the on_move_selection_up function
         """
-        #GIVEN a mocked move up function
+        # GIVEN a mocked move up function
         self.service_manager.on_move_selection_up = MagicMock()
 
-        #WHEN the up arrow key event is called
+        # WHEN the up arrow key event is called
         self.service_manager.setup_ui(self.service_manager)
         event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Up, QtCore.Qt.NoModifier)
         self.service_manager.service_manager_list.keyPressEvent(event)
 
-        #THEN the on_move_selection_up function should have been called.
+        # THEN the on_move_selection_up function should have been called.
         self.service_manager.on_move_selection_up.assert_called_once_with()
 
     def test_on_expand_selection(self):
         """
         Test that the on_expand_selection function successfully expands an item and moves to its first child
         """
-        #GIVEN a mocked servicemanager list
+        # GIVEN a mocked servicemanager list
         self.service_manager.expanded = MagicMock()
 
         verse_1 = QtWidgets.QTreeWidgetItem(0)
@@ -434,13 +434,13 @@ class TestServiceManager(TestCase, TestMixin):
 
         self.service_manager.service_manager_list.setCurrentItem(song_item)
 
-        #Reset expanded function in case it has been called and/or changed in initialisation of the service manager.
+        # Reset expanded function in case it has been called and/or changed in initialisation of the service manager.
         self.service_manager.expanded = MagicMock()
 
-        #WHEN on_expand_selection is called
+        # WHEN on_expand_selection is called
         self.service_manager.on_expand_selection()
 
-        #THEN selection should be expanded
+        # THEN selection should be expanded
 
         selected_index = self.service_manager.service_manager_list.currentIndex()
         above_selected_index = self.service_manager.service_manager_list.indexAbove(selected_index)
@@ -519,4 +519,3 @@ class TestServiceManager(TestCase, TestMixin):
         self.assertTrue(self.service_manager.service_manager_list.currentItem() == song_item,
                         'Top item should have been selected')
         self.service_manager.collapsed.assert_called_once_with(song_item)
-
