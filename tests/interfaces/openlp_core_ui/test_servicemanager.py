@@ -35,6 +35,7 @@ from tests.helpers.testmixin import TestMixin
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class TestServiceManager(TestCase, TestMixin):
 
     def setUp(self):
@@ -356,6 +357,9 @@ class TestServiceManager(TestCase, TestMixin):
         assert mocked_event.call_count == 1, 'The on_new_service_clicked method should have been called once'
 
     def test_expand_selection_on_right_arrow(self):
+        """
+        Test that a right arrow key press event calls the on_expand_selection function
+        """
         #GIVEN a mocked expand function
         self.service_manager.on_expand_selection = MagicMock()
 
@@ -368,6 +372,9 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.on_expand_selection.assert_called_once_with()
 
     def test_collapse_selection_on_left_arrow(self):
+        """
+        Test that a left arrow key press event calls the on_collapse_selection function
+        """
         #GIVEN a mocked collapse function
         self.service_manager.on_collapse_selection = MagicMock()
 
@@ -380,6 +387,9 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.on_collapse_selection.assert_called_once_with()
 
     def test_move_selection_down_on_down_arrow(self):
+        """
+        Test that a down arrow key press event calls the on_move_selection_down function
+        """
         #GIVEN a mocked move down function
         self.service_manager.on_move_selection_down = MagicMock()
 
@@ -392,6 +402,9 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.on_move_selection_down.assert_called_once_with()
 
     def test_move_selection_up_on_up_arrow(self):
+        """
+        Test that an up arrow key press event calls the on_move_selection_up function
+        """
         #GIVEN a mocked move up function
         self.service_manager.on_move_selection_up = MagicMock()
 
@@ -404,7 +417,9 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.on_move_selection_up.assert_called_once_with()
 
     def test_on_expand_selection(self):
-
+        """
+        Test that the on_expand_selection function successfully expands an item and moves to its first child
+        """
         #GIVEN a mocked servicemanager list
         self.service_manager.expanded = MagicMock()
 
@@ -434,6 +449,10 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.expanded.assert_called_once_with(song_item)
 
     def test_on_collapse_selection_with_parent_selected(self):
+        """
+        Test that the on_collapse_selection function successfully collapses an item
+        """
+
         # GIVEN a mocked servicemanager list
         self.service_manager.expanded = MagicMock()
         self.service_manager.collapsed = MagicMock()
@@ -466,6 +485,10 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.collapsed.assert_called_once_with(song_item)
 
     def test_on_collapse_selection_with_child_selected(self):
+        """
+        Test that the on_collapse_selection function successfully collapses child's parent item
+        and moves selection to its parent.
+        """
         # GIVEN a mocked servicemanager list
         self.service_manager.expanded = MagicMock()
         self.service_manager.collapsed = MagicMock()
