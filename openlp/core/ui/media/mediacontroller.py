@@ -128,6 +128,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Registry().register_function('media_unblank', self.media_unblank)
         # Signals for background video
         Registry().register_function('songs_hide', self.media_hide)
+        Registry().register_function('songs_blank', self.media_blank)
         Registry().register_function('songs_unblank', self.media_unblank)
         Registry().register_function('mediaitem_media_rebuild', self._set_active_players)
         Registry().register_function('mediaitem_suffixes', self._generate_extensions_lists)
