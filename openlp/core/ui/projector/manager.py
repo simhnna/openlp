@@ -39,6 +39,7 @@ from openlp.core.lib.projector.constants import ERROR_MSG, ERROR_STRING, E_AUTHE
     S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
 from openlp.core.lib.projector.db import ProjectorDB
 from openlp.core.lib.projector.pjlink1 import PJLink
+from openlp.core.lib.projector.pjlink2 import PJLinkUDP
 from openlp.core.ui.projector.editform import ProjectorEditForm
 from openlp.core.ui.projector.sourceselectform import SourceSelectTabs, SourceSelectSingle
 
@@ -290,6 +291,8 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         self.settings_section = 'projector'
         self.projectordb = projectordb
         self.projector_list = []
+        self.pjlink_udp = PJLinkUDP()
+        self.pjlink_udp.projector_list = self.projector_list
         self.source_select_form = None
 
     def bootstrap_initialise(self):
@@ -987,7 +990,7 @@ class ProjectorItem(QtCore.QObject):
         self.poll_time = None
         self.socket_timeout = None
         self.status = S_NOT_CONNECTED
-        super(ProjectorItem, self).__init__()
+        super().__init__()
 
 
 def not_implemented(function):

@@ -118,7 +118,7 @@ PJLINK_VALID_CMD = {
              },
     'LKUP': {'version': ['2', ],
              'description': translate('OpenLP.PJLinkConstants',
-                                      'UDP Status notify. Includes MAC address.')
+                                      'UDP Status - Projector is now available on network. Includes MAC address.')
              },
     'MVOL': {'version': ['2', ],
              'description': translate('OpenLP.PJLinkConstants',

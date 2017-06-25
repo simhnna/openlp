@@ -80,25 +80,8 @@ class PJLink(QtNetwork.QTcpSocket):
     projectorNoAuthentication = QtCore.pyqtSignal(str)  # PIN set and no authentication needed
     projectorReceivedData = QtCore.pyqtSignal()  # Notify when received data finished processing
     projectorUpdateIcons = QtCore.pyqtSignal()  # Update the status icons on toolbar
-    # New commands available in PJLink Class 2
-    pjlink_future = [
-        'ACKN',  # UDP Reply to 'SRCH'
-        'FILT',  # Get current filter usage time
-        'FREZ',  # Set freeze/unfreeze picture being projected
-        'INNM',  # Get Video source input terminal name
-        'IRES',  # Get Video source resolution
-        'LKUP',  # UPD Linkup status notification
-        'MVOL',  # Set microphone volume
-        'RFIL',  # Get replacement air filter model number
-        'RLMP',  # Get lamp replacement model number
-        'RRES',  # Get projector recommended video resolution
-        'SNUM',  # Get projector serial number
-        'SRCH',  # UDP broadcast search for available projectors on local network
-        'SVER',  # Get projector software version
-        'SVOL',  # Set speaker volume
-        'TESTMEONLY'  # For testing when other commands have been implemented
-    ]
 
+    # New commands available in PJLink Class 2
     pjlink_udp_commands = [
         'ACKN',
         'ERST',  # Class 1 or 2
@@ -130,12 +113,13 @@ class PJLink(QtNetwork.QTcpSocket):
         self.port = port
         self.pin = pin
         super().__init__()
+        self.mac_adx = kwargs.get('mac_adx')
         self.dbid = None
         self.location = None
         self.notes = None
-        self.dbid = None if 'dbid' not in kwargs else kwargs['dbid']
-        self.location = None if 'location' not in kwargs else kwargs['location']
-        self.notes = None if 'notes' not in kwargs else kwargs['notes']
+        self.dbid = kwargs.get('dbid')
+        self.location = kwargs.get('location')
+        self.notes = kwargs.get('notes')
         # Poll time 20 seconds unless called with something else
         self.poll_time = 20000 if 'poll_time' not in kwargs else kwargs['poll_time'] * 1000
         # Timeout 5 seconds unless called with something else
