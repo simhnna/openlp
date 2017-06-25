@@ -22,7 +22,7 @@
 """
 Package to test the openlp.core.lib.projector.constants package.
 """
-from unittest import TestCase, skip
+from unittest import TestCase, skip  # noqa: F401
 
 
 class TestProjectorConstants(TestCase):

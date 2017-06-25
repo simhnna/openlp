@@ -59,9 +59,101 @@ class TestPJLink(TestCase):
         self.assertTrue(mock_qmd5_hash.called_with(TEST_PIN,
                                                    "Connection request should have been called with TEST_PIN"))
 
-    def test_projector_class(self):
+    def test_projector_process_rfil_save(self):
         """
-        Test class version from projector
+        Test saving filter type
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.model_filter = None
+        filter_model = 'Filter Type Test'
+
+        # WHEN: Filter model is received
+        pjlink.process_rfil(data=filter_model)
+
+        # THEN: Filter model number should be saved
+        self.assertEquals(pjlink.model_filter, filter_model, 'Filter type should have been saved')
+
+    def test_projector_process_rfil_nosave(self):
+        """
+        Test saving filter type previously saved
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.model_filter = 'Old filter type'
+        filter_model = 'Filter Type Test'
+
+        # WHEN: Filter model is received
+        pjlink.process_rfil(data=filter_model)
+
+        # THEN: Filter model number should be saved
+        self.assertNotEquals(pjlink.model_filter, filter_model, 'Filter type should NOT have been saved')
+
+    def test_projector_process_rlmp_save(self):
+        """
+        Test saving lamp type
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.model_lamp = None
+        lamp_model = 'Lamp Type Test'
+
+        # WHEN: Filter model is received
+        pjlink.process_rlmp(data=lamp_model)
+
+        # THEN: Filter model number should be saved
+        self.assertEquals(pjlink.model_lamp, lamp_model, 'Lamp type should have been saved')
+
+    def test_projector_process_rlmp_nosave(self):
+        """
+        Test saving lamp type previously saved
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.model_lamp = 'Old lamp type'
+        lamp_model = 'Filter Type Test'
+
+        # WHEN: Filter model is received
+        pjlink.process_rlmp(data=lamp_model)
+
+        # THEN: Filter model number should be saved
+        self.assertNotEquals(pjlink.model_lamp, lamp_model, 'Lamp type should NOT have been saved')
+
+    def test_projector_process_snum_set(self):
+        """
+        Test saving serial number from projector
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.serial_no = None
+        test_number = 'Test Serial Number'
+
+        # WHEN: No serial number is set and we receive serial number command
+        pjlink.process_snum(data=test_number)
+
+        # THEN: Serial number should be set
+        self.assertEquals(pjlink.serial_no, test_number,
+                          'Projector serial number should have been set')
+
+    def test_projector_process_snum_different(self):
+        """
+        Test projector serial number different than saved serial number
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.serial_no = 'Previous serial number'
+        test_number = 'Test Serial Number'
+
+        # WHEN: No serial number is set and we receive serial number command
+        pjlink.process_snum(data=test_number)
+
+        # THEN: Serial number should be set
+        self.assertNotEquals(pjlink.serial_no, test_number,
+                             'Projector serial number should NOT have been set')
+
+    def test_projector_clss_one(self):
+        """
+        Test class 1 sent from projector
         """
         # GIVEN: Test object
         pjlink = pjlink_test
@@ -73,9 +165,23 @@ class TestPJLink(TestCase):
         self.assertEquals(pjlink.pjlink_class, '1',
                           'Projector should have returned class=1')
 
-    def test_non_standard_class_reply(self):
+    def test_projector_clss_two(self):
         """
-        Bugfix 1550891: CLSS request returns non-standard 'Class N' reply
+        Test class 2 sent from projector
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+
+        # WHEN: Process class response
+        pjlink.process_clss('2')
+
+        # THEN: Projector class should be set to 1
+        self.assertEquals(pjlink.pjlink_class, '2',
+                          'Projector should have returned class=2')
+
+    def test_bug_1550891_non_standard_class_reply(self):
+        """
+        Bugfix 1550891: CLSS request returns non-standard reply
         """
         # GIVEN: Test object
         pjlink = pjlink_test
@@ -85,7 +191,7 @@ class TestPJLink(TestCase):
 
         # THEN: Projector class should be set with proper value
         self.assertEquals(pjlink.pjlink_class, '1',
-                          'Non-standard class reply should have set proper class')
+                          'Non-standard class reply should have set class=1')
 
     @patch.object(pjlink_test, 'change_status')
     def test_status_change(self, mock_change_status):

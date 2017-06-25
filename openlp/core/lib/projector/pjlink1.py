@@ -44,6 +44,8 @@ log.debug('pjlink1 loaded')
 
 __all__ = ['PJLink']
 
+import re
+
 from codecs import decode
 
 from PyQt5 import QtCore, QtNetwork
@@ -53,8 +55,11 @@ from openlp.core.lib.projector.constants import CONNECTION_ERRORS, CR, ERROR_MSG
     E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_INVALID_DATA, E_NETWORK, E_NOT_CONNECTED, \
     E_PARAMETER, E_PROJECTOR, E_SOCKET_TIMEOUT, E_UNAVAILABLE, E_UNDEFINED, PJLINK_ERRORS, \
     PJLINK_ERST_STATUS, PJLINK_MAX_PACKET, PJLINK_PORT, PJLINK_POWR_STATUS, PJLINK_VALID_CMD, \
-    PJLINK_DEFAULT_CODES, STATUS_STRING, S_CONNECTED, S_CONNECTING, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
+    STATUS_STRING, S_CONNECTED, S_CONNECTING, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
     S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STATUS
+
+# Possible future imports
+# from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES
 
 # Shortcuts
 SocketError = QtNetwork.QAbstractSocket.SocketError
@@ -113,8 +118,13 @@ class PJLink(QtNetwork.QTcpSocket):
         self.port = port
         self.pin = pin
         super().__init__()
+        self.model_lamp = None
+        self.model_filter = None
         self.mac_adx = kwargs.get('mac_adx')
+        self.serial_no = None
+        self.serial_no_received = None  # Used only if saved serial number is different than received serial number
         self.dbid = None
+        self.db_update = False  # Use to check if db needs to be updated prior to exiting
         self.location = None
         self.notes = None
         self.dbid = kwargs.get('dbid')
@@ -158,7 +168,9 @@ class PJLink(QtNetwork.QTcpSocket):
             'LAMP': self.process_lamp,
             'NAME': self.process_name,
             'PJLINK': self.check_login,
-            'POWR': self.process_powr
+            'POWR': self.process_powr,
+            'SNUM': self.process_snum,
+            'SVER': self.process_sver
         }
 
     def reset_information(self):
@@ -166,12 +178,16 @@ class PJLink(QtNetwork.QTcpSocket):
         Reset projector-specific information to default
         """
         log.debug('({ip}) reset_information() connect status is {state}'.format(ip=self.ip, state=self.state()))
+        self.send_queue = []
         self.power = S_OFF
         self.pjlink_name = None
         self.manufacturer = None
         self.model = None
         self.serial_no = None
+        self.serial_no_received = None
         self.sw_version = None
+        self.sw_version_received = None
+        self.mac_adx = None
         self.shutter = None
         self.mute = None
         self.lamp = None
@@ -188,7 +204,6 @@ class PJLink(QtNetwork.QTcpSocket):
         if hasattr(self, 'socket_timer'):
             log.debug('({ip}): Calling socket_timer.stop()'.format(ip=self.ip))
             self.socket_timer.stop()
-        self.send_queue = []
         self.send_busy = False
 
     def thread_started(self):
@@ -249,7 +264,10 @@ class PJLink(QtNetwork.QTcpSocket):
         # Restart timer
         self.timer.start()
         # These commands may change during connetion
-        for command in ['POWR', 'ERST', 'LAMP', 'AVMT', 'INPT']:
+        check_list = ['POWR', 'ERST', 'LAMP', 'AVMT', 'INPT']
+        if self.pjlink_class == '2':
+            check_list.extend(['FILT', 'FREZ'])
+        for command in check_list:
             self.send_command(command, queue=True)
         # The following commands do not change, so only check them once
         if self.power == S_ON and self.source_available is None:
@@ -262,6 +280,38 @@ class PJLink(QtNetwork.QTcpSocket):
             self.send_command('INF2', queue=True)
         if self.pjlink_name is None:
             self.send_command('NAME', queue=True)
+        if self.pjlink_class == '2':
+            # Class 2 specific checks
+            if self.serial_no is None:
+                self.send_command('SNUM', queue=True)
+            if self.sw_version is None:
+                self.send_command('SVER', queue=True)
+            if self.model_filter is None:
+                self.send_command('RFIL', queue=True)
+            if self.model_lamp is None:
+                self.send_command('RLMP', queue=True)
+
+    def process_rfil(self, data):
+        """
+        Process replacement filter type
+        """
+        if self.model_filter is None:
+            self.model_filter = data
+        else:
+            log.warn("({ip}) Filter model already set".format(ip=self.ip))
+            log.warn("({ip}) Saved model: '{old}'".format(ip=self.ip, old=self.model_filter))
+            log.warn("({ip}) New model: '{new}'".format(ip=self.ip, new=data))
+
+    def process_rlmp(self, data):
+        """
+        Process replacement lamp type
+        """
+        if self.model_lamp is None:
+            self.model_lamp = data
+        else:
+            log.warn("({ip}) Lamp model already set".format(ip=self.ip))
+            log.warn("({ip}) Saved lamp: '{old}'".format(ip=self.ip, old=self.model_lamp))
+            log.warn("({ip}) New lamp: '{new}'".format(ip=self.ip, new=data))
 
     def _get_status(self, status):
         """
@@ -341,7 +391,7 @@ class PJLink(QtNetwork.QTcpSocket):
             data = decode(read, 'utf-8')
             # Possibility of extraneous data on input when reading.
             # Clean out extraneous characters in buffer.
-            dontcare = self.readLine(self.max_size)
+            dontcare = self.readLine(self.max_size)  # noqa: F841
             log.debug('({ip}) check_login() read "{data}"'.format(ip=self.ip, data=data.strip()))
         # At this point, we should only have the initial login prompt with
         # possible authentication
@@ -440,7 +490,8 @@ class PJLink(QtNetwork.QTcpSocket):
             return
         data_split = data.split('=')
         try:
-            (prefix, version, cmd, data) = (data_split[0][0], data_split[0][1], data_split[0][2:], data_split[1])
+            (prefix, version, cmd, data) = (data_split[0][0], data_split[0][1],  # noqa: F841
+                                            data_split[0][2:], data_split[1])
         except ValueError as e:
             log.warning('({ip}) get_data(): Invalid packet - expected header + command + data'.format(ip=self.ip))
             log.warning('({ip}) get_data(): Received data: "{data}"'.format(ip=self.ip, data=data_in.strip()))
@@ -729,11 +780,22 @@ class PJLink(QtNetwork.QTcpSocket):
         :param data: Class that projector supports.
         """
         # bug 1550891: Projector returns non-standard class response:
-        #            : Expected: %1CLSS=1
-        #            : Received: %1CLSS=Class 1
+        #            : Expected: '%1CLSS=1'
+        #            : Received: '%1CLSS=Class 1'  (Optoma)
+        #            : Received: '%1CLSS=Version1'  (BenQ)
         if len(data) > 1:
-            # Split non-standard information from response
-            clss = data.split()[-1]
+            log.warn("({ip}) Non-standard CLSS reply: '{data}'".format(ip=self.ip, data=data))
+            # Due to stupid projectors not following standards (Optoma, BenQ comes to mind),
+            # AND the different responses that can be received, the semi-permanent way to
+            # fix the class reply is to just remove all non-digit characters.
+            try:
+                clss = re.findall('\d', data)[0]  # Should only be the first match
+            except IndexError:
+                log.error("({ip}) No numbers found in class version reply - defaulting to class '1'".format(ip=self.ip))
+                clss = '1'
+        elif not data.isdigit():
+            log.error("({ip}) NAN class version reply - defaulting to class '1'".format(ip=self.ip))
+            clss = '1'
         else:
             clss = data
         self.pjlink_class = clss
@@ -844,6 +906,42 @@ class PJLink(QtNetwork.QTcpSocket):
                 self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Other')] =  \
                     PJLINK_ERST_STATUS[data[5]]
         return
+
+    def process_snum(self, data):
+        """
+        Serial number of projector.
+
+        :param data: Serial number from projector.
+        """
+        if self.serial_no is None:
+            log.debug("({ip}) Setting projector serial number to '{data}'".format(ip=self.ip, data=data))
+            self.serial_no = data
+            self.db_update = False
+        else:
+            # Compare serial numbers and see if we got the same projector
+            if self.serial_no != data:
+                log.warn("({ip}) Projector serial number does not match saved serial number".format(ip=self.ip))
+                log.warn("({ip}) Saved:    '{old}'".format(ip=self.ip, old=self.serial_no))
+                log.warn("({ip}) Received: '{new}'".format(ip=self.ip, new=data))
+                log.warn("({ip}) NOT saving serial number".format(ip=self.ip))
+                self.serial_no_received = data
+
+    def process_sver(self, data):
+        """
+        Software version of projector
+        """
+        if self.sw_version is None:
+            log.debug("({ip}) Setting projector software version to '{data}'".format(ip=self.ip, data=data))
+            self.sw_version = data
+            self.db_update = True
+        else:
+            # Compare software version and see if we got the same projector
+            if self.serial_no != data:
+                log.warn("({ip}) Projector software version does not match saved software version".format(ip=self.ip))
+                log.warn("({ip}) Saved:    '{old}'".format(ip=self.ip, old=self.sw_version))
+                log.warn("({ip}) Received: '{new}'".format(ip=self.ip, new=data))
+                log.warn("({ip}) NOT saving serial number".format(ip=self.ip))
+                self.sw_version_received = data
 
     def connect_to_host(self):
         """
