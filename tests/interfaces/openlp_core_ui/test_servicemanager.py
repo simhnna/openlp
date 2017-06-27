@@ -416,24 +416,25 @@ class TestServiceManager(TestCase, TestMixin):
         # THEN the on_move_selection_up function should have been called.
         self.service_manager.on_move_selection_up.assert_called_once_with()
 
-    def test_on_expand_selection(self):
-        """
-        Test that the on_expand_selection function successfully expands an item and moves to its first child
-        """
-        # GIVEN a mocked servicemanager list
+    def _setup_service_manager_list(self):
         self.service_manager.expanded = MagicMock()
-
+        self.service_manager.collapsed = MagicMock()
         verse_1 = QtWidgets.QTreeWidgetItem(0)
         verse_2 = QtWidgets.QTreeWidgetItem(0)
         song_item = QtWidgets.QTreeWidgetItem(0)
         song_item.addChild(verse_1)
         song_item.addChild(verse_2)
-
         self.service_manager.setup_ui(self.service_manager)
         self.service_manager.service_manager_list.addTopLevelItem(song_item)
+        return verse_1, verse_2, song_item
 
+    def test_on_expand_selection(self):
+        """
+        Test that the on_expand_selection function successfully expands an item and moves to its first child
+        """
+        # GIVEN a mocked servicemanager list
+        verse_1, verse_2, song_item = self._setup_service_manager_list()
         self.service_manager.service_manager_list.setCurrentItem(song_item)
-
         # Reset expanded function in case it has been called and/or changed in initialisation of the service manager.
         self.service_manager.expanded = MagicMock()
 
@@ -441,7 +442,6 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.on_expand_selection()
 
         # THEN selection should be expanded
-
         selected_index = self.service_manager.service_manager_list.currentIndex()
         above_selected_index = self.service_manager.service_manager_list.indexAbove(selected_index)
         self.assertTrue(self.service_manager.service_manager_list.isExpanded(above_selected_index),
@@ -452,20 +452,8 @@ class TestServiceManager(TestCase, TestMixin):
         """
         Test that the on_collapse_selection function successfully collapses an item
         """
-
         # GIVEN a mocked servicemanager list
-        self.service_manager.expanded = MagicMock()
-        self.service_manager.collapsed = MagicMock()
-
-        verse_1 = QtWidgets.QTreeWidgetItem(0)
-        verse_2 = QtWidgets.QTreeWidgetItem(0)
-        song_item = QtWidgets.QTreeWidgetItem(0)
-        song_item.addChild(verse_1)
-        song_item.addChild(verse_2)
-
-        self.service_manager.setup_ui(self.service_manager)
-        self.service_manager.service_manager_list.addTopLevelItem(song_item)
-
+        verse_1, verse_2, song_item = self._setup_service_manager_list()
         self.service_manager.service_manager_list.setCurrentItem(song_item)
         self.service_manager.service_manager_list.expandItem(song_item)
 
@@ -476,7 +464,6 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.on_collapse_selection()
 
         # THEN selection should be expanded
-
         selected_index = self.service_manager.service_manager_list.currentIndex()
         self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
                          'Item should have been collapsed')
@@ -490,21 +477,9 @@ class TestServiceManager(TestCase, TestMixin):
         and moves selection to its parent.
         """
         # GIVEN a mocked servicemanager list
-        self.service_manager.expanded = MagicMock()
-        self.service_manager.collapsed = MagicMock()
-
-        verse_1 = QtWidgets.QTreeWidgetItem(0)
-        verse_2 = QtWidgets.QTreeWidgetItem(0)
-        song_item = QtWidgets.QTreeWidgetItem(0)
-        song_item.addChild(verse_1)
-        song_item.addChild(verse_2)
-
-        self.service_manager.setup_ui(self.service_manager)
-        self.service_manager.service_manager_list.addTopLevelItem(song_item)
-
+        verse_1, verse_2, song_item = self._setup_service_manager_list()
         self.service_manager.service_manager_list.setCurrentItem(verse_2)
         self.service_manager.service_manager_list.expandItem(song_item)
-
         # Reset collapsed function in case it has been called and/or changed in initialisation of the service manager.
         self.service_manager.collapsed = MagicMock()
 
@@ -512,7 +487,6 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.on_collapse_selection()
 
         # THEN selection should be expanded
-
         selected_index = self.service_manager.service_manager_list.currentIndex()
         self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
                          'Item should have been collapsed')

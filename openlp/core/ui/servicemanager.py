@@ -1130,14 +1130,12 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         Expands cursor selection on the window. Called by the right arrow
         """
         item = self.service_manager_list.currentItem()
-
         # Since we only have 2 levels we find them by checking for children
         if item.childCount():
             if not self.service_manager_list.isExpanded(self.service_manager_list.currentIndex()):
                 self.service_manager_list.expandItem(item)
                 self.service_manager.expanded(item)
                 # If not expanded, Expand it
-
             self.service_manager_list.setCurrentItem(self.service_manager_list.itemBelow(item))
             # Then move selection down to child whether it needed to be expanded or not
 
@@ -1146,13 +1144,11 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         Collapses cursor selection on the window Called by the left arrow
         """
         item = self.service_manager_list.currentItem()
-
         # Since we only have 2 levels we find them by checking for children
         if item.childCount():
             if self.service_manager_list.isExpanded(self.service_manager_list.currentIndex()):
                 self.service_manager_list.collapseItem(item)
                 self.service_manager.collapsed(item)
-
         else:  # If selection is lower level
             self.service_manager_list.collapseItem(item.parent())
             self.service_manager.collapsed(item.parent())
