@@ -58,9 +58,6 @@ from openlp.core.lib.projector.constants import CONNECTION_ERRORS, CR, ERROR_MSG
     STATUS_STRING, S_CONNECTED, S_CONNECTING, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
     S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STATUS
 
-# Possible future imports
-# from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES
-
 # Shortcuts
 SocketError = QtNetwork.QAbstractSocket.SocketError
 SocketSTate = QtNetwork.QAbstractSocket.SocketState
