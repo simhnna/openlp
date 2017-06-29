@@ -527,7 +527,7 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         self.projector_list = new_list
         list_item = self.projector_list_widget.takeItem(self.projector_list_widget.currentRow())
         list_item = None
-        deleted = self.projectordb.delete_projector(projector.db_item)
+        _ = self.projectordb.delete_projector(projector.db_item)
         for item in self.projector_list:
             log.debug('New projector list - item: {ip} {name}'.format(ip=item.link.ip, name=item.link.name))
 
@@ -662,9 +662,10 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
                                                              data=translate('OpenLP.ProjectorManager', 'Closed')
                                                              if projector.link.shutter
                                                              else translate('OpenLP', 'Open'))
-            message = '%s<b>%s</b>: %s<br />' % (message,
-                                                 translate('OpenLP.ProjectorManager', 'Current source input is'),
-                                                 projector.link.source)
+            message = '{msg}<b>{source}/b>: {selected}<br />'.format(msg=message,
+                                                                     source=translate('OpenLP.ProjectorManager',
+                                                                                      'Current source input is'),
+                                                                     selected=projector.link.source)
             if projector.link.pjlink_class == '2':
                 # Information only available for PJLink Class 2 projectors
                 message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',

@@ -381,7 +381,7 @@ class PJLink(QtNetwork.QTcpSocket):
                 self.change_status(E_SOCKET_TIMEOUT)
                 return
             read = self.readLine(self.max_size)
-            dontcare = self.readLine(self.max_size)  # Clean out the trailing \r\n
+            _ = self.readLine(self.max_size)  # Clean out the trailing \r\n
             if read is None:
                 log.warning('({ip}) read is None - socket error?'.format(ip=self.ip))
                 return
@@ -391,7 +391,7 @@ class PJLink(QtNetwork.QTcpSocket):
             data = decode(read, 'utf-8')
             # Possibility of extraneous data on input when reading.
             # Clean out extraneous characters in buffer.
-            dontcare = self.readLine(self.max_size)  # noqa: F841
+            _ = self.readLine(self.max_size)
             log.debug('({ip}) check_login() read "{data}"'.format(ip=self.ip, data=data.strip()))
         # At this point, we should only have the initial login prompt with
         # possible authentication
@@ -413,24 +413,24 @@ class PJLink(QtNetwork.QTcpSocket):
             # Authentication error
             self.disconnect_from_host()
             self.change_status(E_AUTHENTICATION)
-            log.debug('({ip}) emitting projectorAuthentication() signal'.format(ip=self.name))
+            log.debug('({ip}) emitting projectorAuthentication() signal'.format(ip=self.ip))
             return
         elif data_check[1] == '0' and self.pin is not None:
             # Pin set and no authentication needed
             log.warning('({ip}) Regular connection but PIN set'.format(ip=self.name))
             self.disconnect_from_host()
             self.change_status(E_AUTHENTICATION)
-            log.debug('({ip}) Emitting projectorNoAuthentication() signal'.format(ip=self.name))
+            log.debug('({ip}) Emitting projectorNoAuthentication() signal'.format(ip=self.ip))
             self.projectorNoAuthentication.emit(self.name)
             return
         elif data_check[1] == '1':
             # Authenticated login with salt
             if self.pin is None:
-                log.warning('({ip}) Authenticated connection but no pin set'.format(ip=self.name))
+                log.warning('({ip}) Authenticated connection but no pin set'.format(ip=self.ip))
                 self.disconnect_from_host()
                 self.change_status(E_AUTHENTICATION)
-                log.debug('({ip}) Emitting projectorAuthentication() signal'.format(ip=self.name))
-                self.projectorAuthentication.emit(self.name)
+                log.debug('({ip}) Emitting projectorAuthentication() signal'.format(ip=self.ip))
+                self.projectorAuthentication.emit(self.ip)
                 return
             else:
                 log.debug('({ip}) Setting hash with salt="{data}"'.format(ip=self.ip, data=data_check[2]))
@@ -488,10 +488,13 @@ class PJLink(QtNetwork.QTcpSocket):
             self.check_login(data)
             self.receive_data_signal()
             return
+        elif data[0] != PJLINK_PREFIX:
+            log.debug("({ip}) get_data(): Invalid packet - prefix not equal to '{prefix}'".format(ip=self.ip,
+                                                                                                  prefix=PJLINK_PREFIX))
+            return
         data_split = data.split('=')
         try:
-            (prefix, version, cmd, data) = (data_split[0][0], data_split[0][1],  # noqa: F841
-                                            data_split[0][2:], data_split[1])
+            (version, cmd, data) = (data_split[0][1], data_split[0][2:], data_split[1])
         except ValueError as e:
             log.warning('({ip}) get_data(): Invalid packet - expected header + command + data'.format(ip=self.ip))
             log.warning('({ip}) get_data(): Received data: "{data}"'.format(ip=self.ip, data=data_in.strip()))

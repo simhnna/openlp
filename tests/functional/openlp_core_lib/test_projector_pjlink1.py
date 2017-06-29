@@ -72,7 +72,7 @@ class TestPJLink(TestCase):
         pjlink.process_rfil(data=filter_model)
 
         # THEN: Filter model number should be saved
-        self.assertEquals(pjlink.model_filter, filter_model, 'Filter type should have been saved')
+        self.assertEqual(pjlink.model_filter, filter_model, 'Filter type should have been saved')
 
     def test_projector_process_rfil_nosave(self):
         """
@@ -102,7 +102,7 @@ class TestPJLink(TestCase):
         pjlink.process_rlmp(data=lamp_model)
 
         # THEN: Filter model number should be saved
-        self.assertEquals(pjlink.model_lamp, lamp_model, 'Lamp type should have been saved')
+        self.assertEqual(pjlink.model_lamp, lamp_model, 'Lamp type should have been saved')
 
     def test_projector_process_rlmp_nosave(self):
         """
@@ -132,8 +132,8 @@ class TestPJLink(TestCase):
         pjlink.process_snum(data=test_number)
 
         # THEN: Serial number should be set
-        self.assertEquals(pjlink.serial_no, test_number,
-                          'Projector serial number should have been set')
+        self.assertEqual(pjlink.serial_no, test_number,
+                         'Projector serial number should have been set')
 
     def test_projector_process_snum_different(self):
         """
@@ -162,8 +162,8 @@ class TestPJLink(TestCase):
         pjlink.process_clss('1')
 
         # THEN: Projector class should be set to 1
-        self.assertEquals(pjlink.pjlink_class, '1',
-                          'Projector should have returned class=1')
+        self.assertEqual(pjlink.pjlink_class, '1',
+                         'Projector should have returned class=1')
 
     def test_projector_clss_two(self):
         """
@@ -176,8 +176,8 @@ class TestPJLink(TestCase):
         pjlink.process_clss('2')
 
         # THEN: Projector class should be set to 1
-        self.assertEquals(pjlink.pjlink_class, '2',
-                          'Projector should have returned class=2')
+        self.assertEqual(pjlink.pjlink_class, '2',
+                         'Projector should have returned class=2')
 
     def test_bug_1550891_non_standard_class_reply(self):
         """
@@ -190,8 +190,8 @@ class TestPJLink(TestCase):
         pjlink.process_clss('Class 1')
 
         # THEN: Projector class should be set with proper value
-        self.assertEquals(pjlink.pjlink_class, '1',
-                          'Non-standard class reply should have set class=1')
+        self.assertEqual(pjlink.pjlink_class, '1',
+                         'Non-standard class reply should have set class=1')
 
     @patch.object(pjlink_test, 'change_status')
     def test_status_change(self, mock_change_status):
@@ -237,10 +237,10 @@ class TestPJLink(TestCase):
         pjlink.process_command('LAMP', '22222 1')
 
         # THEN: Lamp should have been set with status=ON and hours=22222
-        self.assertEquals(pjlink.lamp[0]['On'], True,
-                          'Lamp power status should have been set to TRUE')
-        self.assertEquals(pjlink.lamp[0]['Hours'], 22222,
-                          'Lamp hours should have been set to 22222')
+        self.assertEqual(pjlink.lamp[0]['On'], True,
+                         'Lamp power status should have been set to TRUE')
+        self.assertEqual(pjlink.lamp[0]['Hours'], 22222,
+                         'Lamp hours should have been set to 22222')
 
     @patch.object(pjlink_test, 'projectorReceivedData')
     def test_projector_process_multiple_lamp(self, mock_projectorReceivedData):
@@ -254,20 +254,20 @@ class TestPJLink(TestCase):
         pjlink.process_command('LAMP', '11111 1 22222 0 33333 1')
 
         # THEN: Lamp should have been set with proper lamp status
-        self.assertEquals(len(pjlink.lamp), 3,
-                          'Projector should have 3 lamps specified')
-        self.assertEquals(pjlink.lamp[0]['On'], True,
-                          'Lamp 1 power status should have been set to TRUE')
-        self.assertEquals(pjlink.lamp[0]['Hours'], 11111,
-                          'Lamp 1 hours should have been set to 11111')
-        self.assertEquals(pjlink.lamp[1]['On'], False,
-                          'Lamp 2 power status should have been set to FALSE')
-        self.assertEquals(pjlink.lamp[1]['Hours'], 22222,
-                          'Lamp 2 hours should have been set to 22222')
-        self.assertEquals(pjlink.lamp[2]['On'], True,
-                          'Lamp 3 power status should have been set to TRUE')
-        self.assertEquals(pjlink.lamp[2]['Hours'], 33333,
-                          'Lamp 3 hours should have been set to 33333')
+        self.assertEqual(len(pjlink.lamp), 3,
+                         'Projector should have 3 lamps specified')
+        self.assertEqual(pjlink.lamp[0]['On'], True,
+                         'Lamp 1 power status should have been set to TRUE')
+        self.assertEqual(pjlink.lamp[0]['Hours'], 11111,
+                         'Lamp 1 hours should have been set to 11111')
+        self.assertEqual(pjlink.lamp[1]['On'], False,
+                         'Lamp 2 power status should have been set to FALSE')
+        self.assertEqual(pjlink.lamp[1]['Hours'], 22222,
+                         'Lamp 2 hours should have been set to 22222')
+        self.assertEqual(pjlink.lamp[2]['On'], True,
+                         'Lamp 3 power status should have been set to TRUE')
+        self.assertEqual(pjlink.lamp[2]['Hours'], 33333,
+                         'Lamp 3 hours should have been set to 33333')
 
     @patch.object(pjlink_test, 'projectorReceivedData')
     @patch.object(pjlink_test, 'projectorUpdateIcons')
@@ -288,9 +288,9 @@ class TestPJLink(TestCase):
         pjlink.process_command('POWR', PJLINK_POWR_STATUS[S_ON])
 
         # THEN: Power should be set to ON
-        self.assertEquals(pjlink.power, S_ON, 'Power should have been set to ON')
+        self.assertEqual(pjlink.power, S_ON, 'Power should have been set to ON')
         mock_send_command.assert_called_once_with('INST')
-        self.assertEquals(mock_UpdateIcons.emit.called, True, 'projectorUpdateIcons should have been called')
+        self.assertEqual(mock_UpdateIcons.emit.called, True, 'projectorUpdateIcons should have been called')
 
     @patch.object(pjlink_test, 'projectorReceivedData')
     @patch.object(pjlink_test, 'projectorUpdateIcons')
@@ -311,9 +311,9 @@ class TestPJLink(TestCase):
         pjlink.process_command('POWR', PJLINK_POWR_STATUS[S_STANDBY])
 
         # THEN: Power should be set to STANDBY
-        self.assertEquals(pjlink.power, S_STANDBY, 'Power should have been set to STANDBY')
-        self.assertEquals(mock_send_command.called, False, 'send_command should not have been called')
-        self.assertEquals(mock_UpdateIcons.emit.called, True, 'projectorUpdateIcons should have been called')
+        self.assertEqual(pjlink.power, S_STANDBY, 'Power should have been set to STANDBY')
+        self.assertEqual(mock_send_command.called, False, 'send_command should not have been called')
+        self.assertEqual(mock_UpdateIcons.emit.called, True, 'projectorUpdateIcons should have been called')
 
     @patch.object(pjlink_test, 'projectorUpdateIcons')
     def test_projector_process_avmt_closed_unmuted(self, mock_projectorReceivedData):
@@ -395,7 +395,7 @@ class TestPJLink(TestCase):
         pjlink.process_inpt('1')
 
         # THEN: Input selected should reflect current input
-        self.assertEquals(pjlink.source, '1', 'Input source should be set to "1"')
+        self.assertEqual(pjlink.source, '1', 'Input source should be set to "1"')
 
     def test_projector_reset_information(self):
         """
@@ -424,7 +424,7 @@ class TestPJLink(TestCase):
                 pjlink.reset_information()
 
         # THEN: All information should be reset and timers stopped
-        self.assertEquals(pjlink.power, S_OFF, 'Projector power should be OFF')
+        self.assertEqual(pjlink.power, S_OFF, 'Projector power should be OFF')
         self.assertIsNone(pjlink.pjlink_name, 'Projector pjlink_name should be None')
         self.assertIsNone(pjlink.manufacturer, 'Projector manufacturer should be None')
         self.assertIsNone(pjlink.model, 'Projector model should be None')
@@ -435,7 +435,7 @@ class TestPJLink(TestCase):
         self.assertIsNone(pjlink.source_available, 'Projector source_available should be None')
         self.assertIsNone(pjlink.source, 'Projector source should be None')
         self.assertIsNone(pjlink.other_info, 'Projector other_info should be None')
-        self.assertEquals(pjlink.send_queue, [], 'Projector send_queue should be an empty list')
+        self.assertEqual(pjlink.send_queue, [], 'Projector send_queue should be an empty list')
         self.assertFalse(pjlink.send_busy, 'Projector send_busy should be False')
         self.assertTrue(mock_timer.called, 'Projector timer.stop()  should have been called')
         self.assertTrue(mock_socket_timer.called, 'Projector socket_timer.stop() should have been called')
@@ -461,8 +461,8 @@ class TestPJLink(TestCase):
         # WHEN: call with authentication request and pin not set
         pjlink.check_login(data=TEST_CONNECT_AUTHENTICATE)
 
-        # THEN: No Authentication signal should have been sent
-        mock_authentication.emit.assert_called_with(pjlink.name)
+        # THEN: 'No Authentication' signal should have been sent
+        mock_authentication.emit.assert_called_with(pjlink.ip)
 
     @patch.object(pjlink_test, 'waitForReadyRead')
     @patch.object(pjlink_test, 'state')
@@ -487,8 +487,8 @@ class TestPJLink(TestCase):
         pjlink.check_login(data=TEST_CONNECT_AUTHENTICATE)
 
         # THEN: send_command should have the proper authentication
-        self.assertEquals("{test}".format(test=mock_send_command.call_args),
-                          "call(data='{hash}%1CLSS ?\\r')".format(hash=TEST_HASH))
+        self.assertEqual("{test}".format(test=mock_send_command.call_args),
+                         "call(data='{hash}%1CLSS ?\\r')".format(hash=TEST_HASH))
 
     @patch.object(pjlink_test, 'disconnect_from_host')
     def socket_abort_test(self, mock_disconnect):
