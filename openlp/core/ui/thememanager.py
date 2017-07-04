@@ -31,7 +31,7 @@ from xml.etree.ElementTree import ElementTree, XML
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, OpenLPMixin, RegistryMixin, \
-    check_directory_exists, UiStrings, translate, is_win, get_filesystem_encoding, delete_file
+    UiStrings, check_directory_exists, translate, is_win, get_filesystem_encoding, delete_file
 from openlp.core.lib import FileDialog, ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType

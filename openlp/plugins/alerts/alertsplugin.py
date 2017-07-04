@@ -24,12 +24,12 @@ import logging
 
 from PyQt5 import QtGui
 
-from openlp.core.common import Settings, translate
+from openlp.core.common import Settings, UiStrings, translate
 from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.core.lib.theme import VerticalType
-from openlp.core.lib.ui import create_action, UiStrings
+from openlp.core.lib.ui import create_action
 from openlp.core.ui import AlertLocation
 from openlp.plugins.alerts.forms import AlertForm
 from openlp.plugins.alerts.lib import AlertsManager, AlertsTab
