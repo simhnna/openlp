@@ -32,11 +32,6 @@ from openlp.core.lib.db import get_upgrade_op
 
 log = logging.getLogger(__name__)
 
-# Possible future imports
-# from sqlalchemy.exc import NoSuchTableError
-# from sqlalchemy import inspect
-# from openlp.core.common.db import drop_columns
-
 # Initial projector DB was unversioned
 __version__ = 2
 
