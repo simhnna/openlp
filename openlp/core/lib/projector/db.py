@@ -44,6 +44,7 @@ from sqlalchemy.orm import relationship
 
 from openlp.core.lib.db import Manager, init_db, init_url
 from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES
+from openlp.core.lib.projector import upgrade
 
 Base = declarative_base(MetaData())
 
@@ -166,13 +167,14 @@ class Projector(CommonBase, Base):
         """
         Return basic representation of Source table entry.
         """
-        return '< Projector(id="{data}", ip="{ip}", port="{port}", pin="{pin}", name="{name}", ' \
+        return '< Projector(id="{data}", ip="{ip}", port="{port}", mac_adx="{mac}", pin="{pin}", name="{name}", ' \
             'location="{location}", notes="{notes}", pjlink_name="{pjlink_name}", ' \
             'manufacturer="{manufacturer}", model="{model}", serial_no="{serial}", other="{other}", ' \
             'sources="{sources}", source_list="{source_list}", model_filter="{mfilter}", ' \
             'model_lamp="{mlamp}", sw_version="{sw_ver}") >'.format(data=self.id,
                                                                     ip=self.ip,
                                                                     port=self.port,
+                                                                    mac=self.mac_adx,
                                                                     pin=self.pin,
                                                                     name=self.name,
                                                                     location=self.location,
@@ -189,6 +191,7 @@ class Projector(CommonBase, Base):
                                                                     sw_ver=self.sw_version)
     ip = Column(String(100))
     port = Column(String(8))
+    mac_adx = Column(String(18))
     pin = Column(String(20))
     name = Column(String(20))
     location = Column(String(30))
@@ -243,7 +246,9 @@ class ProjectorDB(Manager):
     """
     def __init__(self, *args, **kwargs):
         log.debug('ProjectorDB().__init__(args="{arg}", kwargs="{kwarg}")'.format(arg=args, kwarg=kwargs))
-        super().__init__(plugin_name='projector', init_schema=self.init_schema)
+        super().__init__(plugin_name='projector',
+                         init_schema=self.init_schema,
+                         upgrade_mod=upgrade)
         log.debug('ProjectorDB() Initialized using db url {db}'.format(db=self.db_url))
         log.debug('Session: {session}'.format(session=self.session))
 

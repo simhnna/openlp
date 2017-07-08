@@ -231,9 +231,14 @@ class SongMediaItem(MediaManagerItem):
 
     def search_entire(self, search_keywords):
         search_string = '%{text}%'.format(text=clean_string(search_keywords))
-        return self.plugin.manager.get_all_objects(
-            Song, or_(Song.search_title.like(search_string), Song.search_lyrics.like(search_string),
-                      Song.comments.like(search_string)))
+        return self.plugin.manager.session.query(Song) \
+            .join(SongBookEntry, isouter=True) \
+            .join(Book, isouter=True) \
+            .filter(or_(Book.name.like(search_string), SongBookEntry.entry.like(search_string),
+                        # hint: search_title contains alternate title
+                        Song.search_title.like(search_string), Song.search_lyrics.like(search_string),
+                        Song.comments.like(search_string))) \
+            .all()
 
     def on_song_list_load(self):
         """
@@ -500,8 +505,7 @@ class SongMediaItem(MediaManagerItem):
                     translate('SongsPlugin.MediaItem',
                               'Are you sure you want to delete the "{items:d}" '
                               'selected song(s)?').format(items=len(items)),
-                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                    QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.No:
+                    defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.No:
                 return
             self.application.set_busy_cursor()
             self.main_window.display_progress_bar(len(items))

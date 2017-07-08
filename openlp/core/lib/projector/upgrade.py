@@ -21,38 +21,56 @@
 ###############################################################################
 """
 The :mod:`upgrade` module provides a way for the database and schema that is the
-backend for the SongsUsage plugin
+backend for the projector setup.
 """
 import logging
 
-from sqlalchemy import Table, Column, types
+# Not all imports used at this time, but keep for future upgrades
+from sqlalchemy import Table, Column, types, inspect
+from sqlalchemy.exc import NoSuchTableError
+from sqlalchemy.sql.expression import null
 
+from openlp.core.common.db import drop_columns
 from openlp.core.lib.db import get_upgrade_op
 
 log = logging.getLogger(__name__)
+
+# Initial projector DB was unversioned
 __version__ = 2
+
+log.debug('Projector DB upgrade module loading')
 
 
 def upgrade_1(session, metadata):
     """
-    Version 1 upgrade
-
-    Skip due to possible missed update from a 2.4-2.6 upgrade
+    Version 1 upgrade - old db might/might not be versioned.
     """
-    pass
+    log.debug('Skipping upgrade_1 of projector DB - not used')
 
 
 def upgrade_2(session, metadata):
     """
     Version 2 upgrade.
 
-    This upgrade adds two new fields to the songusage database
+    Update Projector() table to include new data defined in PJLink version 2 changes
 
-    :param session: SQLAlchemy Session object
-    :param metadata: SQLAlchemy MetaData object
+    mac_adx:        Column(String(18))
+    serial_no:      Column(String(30))
+    sw_version:     Column(String(30))
+    model_filter:   Column(String(30))
+    model_lamp:     Column(String(30))
+
+    :param session: DB session instance
+    :param metadata: Metadata of current DB
     """
-    op = get_upgrade_op(session)
-    songusage_table = Table('songusage_data', metadata, autoload=True)
-    if 'plugin_name' not in [col.name for col in songusage_table.c.values()]:
-        op.add_column('songusage_data', Column('plugin_name', types.Unicode(20), server_default=''))
-        op.add_column('songusage_data', Column('source', types.Unicode(10), server_default=''))
+    projector_table = Table('projector', metadata, autoload=True)
+    if 'mac_adx' not in [col.name for col in projector_table.c.values()]:
+        log.debug("Upgrading projector DB to version '2'")
+        new_op = get_upgrade_op(session)
+        new_op.add_column('projector', Column('mac_adx', types.String(18), server_default=null()))
+        new_op.add_column('projector', Column('serial_no', types.String(30), server_default=null()))
+        new_op.add_column('projector', Column('sw_version', types.String(30), server_default=null()))
+        new_op.add_column('projector', Column('model_filter', types.String(30), server_default=null()))
+        new_op.add_column('projector', Column('model_lamp', types.String(30), server_default=null()))
+    else:
+        log.warn("Skipping upgrade_2 of projector DB")

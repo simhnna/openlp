@@ -27,12 +27,6 @@ from unittest.mock import MagicMock, patch, call
 
 from openlp.core.ui.formattingtagform import FormattingTagForm
 
-# TODO: Tests Still TODO
-# __init__
-# exec
-# on_saved_clicked
-# _reloadTable
-
 
 class TestFormattingTagForm(TestCase):
 

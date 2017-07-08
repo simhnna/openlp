@@ -130,8 +130,7 @@ class FormattingTagController(object):
                     elif not match.group('empty'):
                         end_tags.append(tag)
                 match = self.html_tag_regex.search(start_html, match.end())
-            # TODO: Verify format() works with lambda
-            return ''.join(map(lambda tag: '</%s>' % tag, reversed(end_tags)))
+            return ''.join(map(lambda tag: '</{tag}>'.format(tag=tag), reversed(end_tags)))
 
     def start_tag_changed(self, start_html, end_html):
         """

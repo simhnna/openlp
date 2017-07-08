@@ -253,15 +253,14 @@ class PdfDocument(PresentationDocument):
         try:
             if not os.path.isdir(self.get_temp_folder()):
                 os.makedirs(self.get_temp_folder())
+            # The %03d in the file name is handled by each binary
             if self.controller.mudrawbin:
                 log.debug('loading presentation using mudraw')
-                # TODO: Find out where the string conversion actually happens
                 runlog = check_output([self.controller.mudrawbin, '-w', str(size.width()), '-h', str(size.height()),
                                        '-o', os.path.join(self.get_temp_folder(), 'mainslide%03d.png'), self.file_path],
                                       startupinfo=self.startupinfo)
             elif self.controller.mutoolbin:
                 log.debug('loading presentation using mutool')
-                # TODO: Find out where the string convertsion actually happens
                 runlog = check_output([self.controller.mutoolbin, 'draw', '-w', str(size.width()), '-h',
                                        str(size.height()),
                                        '-o', os.path.join(self.get_temp_folder(), 'mainslide%03d.png'), self.file_path],
@@ -269,7 +268,6 @@ class PdfDocument(PresentationDocument):
             elif self.controller.gsbin:
                 log.debug('loading presentation using gs')
                 resolution = self.gs_get_resolution(size)
-                # TODO: Find out where the string conversion actually happens
                 runlog = check_output([self.controller.gsbin, '-dSAFER', '-dNOPAUSE', '-dBATCH', '-sDEVICE=png16m',
                                        '-r' + str(resolution), '-dTextAlphaBits=4', '-dGraphicsAlphaBits=4',
                                        '-sOutputFile=' + os.path.join(self.get_temp_folder(), 'mainslide%03d.png'),

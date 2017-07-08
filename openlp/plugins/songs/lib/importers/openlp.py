@@ -275,11 +275,9 @@ class OpenLPSongImport(SongImport):
             self.manager.save_object(new_song)
             if progress_dialog:
                 progress_dialog.setValue(progress_dialog.value() + 1)
-                # TODO: Verify format() with template strings
-                progress_dialog.setLabelText(WizardStrings.ImportingType % new_song.title)
+                progress_dialog.setLabelText(WizardStrings.ImportingType.format(source=new_song.title))
             else:
-                # TODO: Verify format() with template strings
-                self.import_wizard.increment_progress_bar(WizardStrings.ImportingType % new_song.title)
+                self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=new_song.title))
             if self.stop_import_flag:
                 break
         self.source_session.close()

@@ -38,7 +38,7 @@ __default_settings__ = {
     'bibles/db password': '',
     'bibles/db hostname': '',
     'bibles/db database': '',
-    'bibles/last search type': BibleSearch.Combined,
+    'bibles/last used search type': BibleSearch.Combined,
     'bibles/reset to combined quick search': True,
     'bibles/verse layout style': LayoutStyle.VersePerSlide,
     'bibles/book name language': LanguageSelection.Bible,

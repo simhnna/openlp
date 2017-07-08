@@ -140,8 +140,8 @@ class LanguageManager(object):
             reg_ex = QtCore.QRegExp("^.*i18n/(.*).qm")
             if reg_ex.exactMatch(qmf):
                 name = '{regex}'.format(regex=reg_ex.cap(1))
-                # TODO: Test before converting to python3 string format
-                LanguageManager.__qm_list__['%#2i %s' % (counter + 1, LanguageManager.language_name(qmf))] = name
+                LanguageManager.__qm_list__[
+                    '{count:>2i} {name}'.format(count=counter + 1, name=LanguageManager.language_name(qmf))] = name
 
     @staticmethod
     def get_qm_list():

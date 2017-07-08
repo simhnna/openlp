@@ -347,8 +347,7 @@ class SongImport(QtCore.QObject):
         song = Song()
         song.title = self.title
         if self.import_wizard is not None:
-            # TODO: Verify format() with template variables
-            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType % song.title)
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=song.title))
         song.alternate_title = self.alternate_title
         # Values will be set when cleaning the song.
         song.search_title = ''

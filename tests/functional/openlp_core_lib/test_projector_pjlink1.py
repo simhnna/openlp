@@ -384,21 +384,6 @@ class TestPJLink(TestCase):
         self.assertEquals("{test}".format(test=mock_send_command.call_args),
                           "call(data='{hash}%1CLSS ?\\r')".format(hash=TEST_HASH))
 
-    @patch.object(pjlink_test, '_not_implemented')
-    def not_implemented_test(self, mock_not_implemented):
-        """
-        Test PJLink._not_implemented method being called
-        """
-        # GIVEN: test object
-        pjlink = pjlink_test
-        test_cmd = 'TESTMEONLY'
-
-        # WHEN: A future command is called that is not implemented yet
-        pjlink.process_command(test_cmd, "Garbage data for test only")
-
-        # THEN: PJLink.__not_implemented should have been called with test_cmd
-        mock_not_implemented.assert_called_with(test_cmd)
-
     @patch.object(pjlink_test, 'disconnect_from_host')
     def socket_abort_test(self, mock_disconnect):
         """
