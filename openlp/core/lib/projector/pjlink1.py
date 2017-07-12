@@ -378,7 +378,6 @@ class PJLink(QtNetwork.QTcpSocket):
                 self.change_status(E_SOCKET_TIMEOUT)
                 return
             read = self.readLine(self.max_size)
-            # _ = self.readLine(self.max_size)  # Clean out the trailing \r\n
             self.readLine(self.max_size)  # Clean out the trailing \r\n
             if read is None:
                 log.warning('({ip}) read is None - socket error?'.format(ip=self.ip))
@@ -389,7 +388,6 @@ class PJLink(QtNetwork.QTcpSocket):
             data = decode(read, 'utf-8')
             # Possibility of extraneous data on input when reading.
             # Clean out extraneous characters in buffer.
-            # _ = self.readLine(self.max_size)
             self.readLine(self.max_size)
             log.debug('({ip}) check_login() read "{data}"'.format(ip=self.ip, data=data.strip()))
         # At this point, we should only have the initial login prompt with
