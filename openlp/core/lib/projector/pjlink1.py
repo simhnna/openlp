@@ -166,7 +166,9 @@ class PJLink(QtNetwork.QTcpSocket):
             'PJLINK': self.check_login,
             'POWR': self.process_powr,
             'SNUM': self.process_snum,
-            'SVER': self.process_sver
+            'SVER': self.process_sver,
+            'RFIL': self.process_rfil,
+            'RLMP': self.process_rlmp
         }
 
     def reset_information(self):
