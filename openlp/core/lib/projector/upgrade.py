@@ -25,12 +25,9 @@ backend for the projector setup.
 """
 import logging
 
-# Not all imports used at this time, but keep for future upgrades
-from sqlalchemy import Table, Column, types, inspect
-from sqlalchemy.exc import NoSuchTableError
+from sqlalchemy import Table, Column, types
 from sqlalchemy.sql.expression import null
 
-from openlp.core.common.db import drop_columns
 from openlp.core.lib.db import get_upgrade_op
 
 log = logging.getLogger(__name__)
