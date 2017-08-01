@@ -120,7 +120,7 @@ class AppLocation(object):
             path = path / section
         try:
             file_paths = path.glob('*' + extension)
-            return [file_path.relative_to(path) for file_path in file_paths]  # TODO: Could/should this be an iterator?
+            return [file_path.relative_to(path) for file_path in file_paths]
         except OSError:
             return []
 
