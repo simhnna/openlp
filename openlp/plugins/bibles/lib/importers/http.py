@@ -325,7 +325,7 @@ class BGExtract(RegistryProperties):
         returns a list in the form [(biblename, biblekey, language_code)]
         """
         log.debug('BGExtract.get_bibles_from_http')
-        bible_url = 'https://biblegateway.com/versions/'
+        bible_url = 'https://www.biblegateway.com/versions/'
         soup = get_soup_for_bible_ref(bible_url)
         if not soup:
             return None
