@@ -87,7 +87,7 @@ class AppLocation(object):
     def get_data_path():
         """
         Return the path OpenLP stores all its data under.
-        
+
         :return: The data path to use.
         :rtype: pathlib.Path
         """
@@ -103,15 +103,15 @@ class AppLocation(object):
     def get_files(section=None, extension=''):
         """
         Get a list of files from the data files path.
-        
-        :param section: Defaults to *None*. The section of code getting the files - used to load from a section's data 
+
+        :param section: Defaults to *None*. The section of code getting the files - used to load from a section's data
         subdirectory.
         :type section: None | str
 
         :param extension: Defaults to ''. The extension to search for. For example::
             '.png'
         :type extension: str
-        
+
         :return: List of files found.
         :rtype: list[pathlib.Path]
         """
@@ -141,10 +141,10 @@ class AppLocation(object):
 def _get_os_dir_path(dir_type):
     """
     Return a path based on which OS and environment we are running in.
-    
+
     :param dir_type: AppLocation Enum of the requested path type
     :type dir_type: AppLocation Enum
-    
+
     :return: The requested path
     :rtype: pathlib.Path
     """

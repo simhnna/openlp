@@ -533,7 +533,8 @@ class SongMediaItem(MediaManagerItem):
                                                                       'copy', 'For song cloning'))
             # Copy audio files from the old to the new song
             if len(old_song.media_files) > 0:
-                save_path = os.path.join(str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(new_song.id))
+                save_path = os.path.join(
+                    str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(new_song.id))
                 check_directory_exists(save_path)
                 for media_file in old_song.media_files:
                     new_media_file_name = os.path.join(save_path, os.path.basename(media_file.file_name))
