@@ -132,11 +132,11 @@ class TestInitFunctions(TestCase):
         self.assertEquals(args.rargs, 'dummy_temp', 'The service file should not be blank')
 
 
+@skip('Figure out why this is causing a segfault')
 class TestOpenLP(TestCase):
     """
     Test the OpenLP app class
     """
-    @skip('Figure out why this is causing a segfault')
     @patch('openlp.core.QtWidgets.QApplication.exec')
     def test_exec(self, mocked_exec):
         """
@@ -156,7 +156,6 @@ class TestOpenLP(TestCase):
         app.shared_memory.detach.assert_called_once_with()
         assert result is False
 
-    @skip('Figure out why this is causing a segfault')
     @patch('openlp.core.QtCore.QSharedMemory')
     def test_is_already_running_not_running(self, MockedSharedMemory):
         """
@@ -177,7 +176,6 @@ class TestOpenLP(TestCase):
         mocked_shared_memory.create.assert_called_once_with(1)
         assert result is False
 
-    @skip('Figure out why this is causing a segfault')
     @patch('openlp.core.QtWidgets.QMessageBox.critical')
     @patch('openlp.core.QtWidgets.QMessageBox.StandardButtons')
     @patch('openlp.core.QtCore.QSharedMemory')
@@ -203,7 +201,6 @@ class TestOpenLP(TestCase):
         mocked_critical.assert_called_once_with(None, 'Error', 'OpenLP is already running. Do you wish to continue?', 0)
         assert result is False
 
-    @skip('Figure out why this is causing a segfault')
     @patch('openlp.core.QtWidgets.QMessageBox.critical')
     @patch('openlp.core.QtWidgets.QMessageBox.StandardButtons')
     @patch('openlp.core.QtCore.QSharedMemory')
