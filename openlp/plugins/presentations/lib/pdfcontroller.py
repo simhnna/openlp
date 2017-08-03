@@ -122,10 +122,10 @@ class PdfController(PresentationController):
                 self.mutoolbin = pdf_program
         else:
             # Fallback to autodetection
-            application_path = AppLocation.get_directory(AppLocation.AppDir)
+            application_path = str(AppLocation.get_directory(AppLocation.AppDir))
             if is_win():
                 # for windows we only accept mudraw.exe or mutool.exe in the base folder
-                application_path = AppLocation.get_directory(AppLocation.AppDir)
+                application_path = str(AppLocation.get_directory(AppLocation.AppDir))
                 if os.path.isfile(os.path.join(application_path, 'mudraw.exe')):
                     self.mudrawbin = os.path.join(application_path, 'mudraw.exe')
                 elif os.path.isfile(os.path.join(application_path, 'mutool.exe')):
@@ -142,7 +142,7 @@ class PdfController(PresentationController):
                         self.gsbin = which('gs')
                 # Last option: check if mudraw or mutool is placed in OpenLP base folder
                 if not self.mudrawbin and not self.mutoolbin and not self.gsbin:
-                    application_path = AppLocation.get_directory(AppLocation.AppDir)
+                    application_path = str(AppLocation.get_directory(AppLocation.AppDir))
                     if os.path.isfile(os.path.join(application_path, 'mudraw')):
                         self.mudrawbin = os.path.join(application_path, 'mudraw')
                     elif os.path.isfile(os.path.join(application_path, 'mutool')):
@@ -199,8 +199,8 @@ class PdfDocument(PresentationDocument):
         :return: The resolution dpi to be used.
         """
         # Use a postscript script to get size of the pdf. It is assumed that all pages have same size
-        gs_resolution_script = AppLocation.get_directory(
-            AppLocation.PluginsDir) + '/presentations/lib/ghostscript_get_resolution.ps'
+        gs_resolution_script = str(AppLocation.get_directory(
+            AppLocation.PluginsDir)) + '/presentations/lib/ghostscript_get_resolution.ps'
         # Run the script on the pdf to get the size
         runlog = []
         try:

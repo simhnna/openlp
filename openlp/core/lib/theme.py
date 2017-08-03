@@ -158,7 +158,7 @@ class Theme(object):
         Initialise the theme object.
         """
         # basic theme object with defaults
-        json_dir = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'core', 'lib', 'json')
+        json_dir = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)), 'core', 'lib', 'json')
         json_file = os.path.join(json_dir, 'theme.json')
         jsn = get_text_file_string(json_file)
         jsn = json.loads(jsn)

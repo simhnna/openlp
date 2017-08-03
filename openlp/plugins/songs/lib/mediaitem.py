@@ -88,9 +88,9 @@ class SongMediaItem(MediaManagerItem):
         song.media_files = []
         for i, bga in enumerate(item.background_audio):
             dest_file = os.path.join(
-                AppLocation.get_section_data_path(self.plugin.name), 'audio', str(song.id), os.path.split(bga)[1])
+                str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(song.id), os.path.split(bga)[1])
             check_directory_exists(os.path.split(dest_file)[0])
-            shutil.copyfile(os.path.join(AppLocation.get_section_data_path('servicemanager'), bga), dest_file)
+            shutil.copyfile(os.path.join(str(AppLocation.get_section_data_path('servicemanager')), bga), dest_file)
             song.media_files.append(MediaFile.populate(weight=i, file_name=dest_file))
         self.plugin.manager.save_object(song, True)
 
@@ -533,7 +533,8 @@ class SongMediaItem(MediaManagerItem):
                                                                       'copy', 'For song cloning'))
             # Copy audio files from the old to the new song
             if len(old_song.media_files) > 0:
-                save_path = os.path.join(AppLocation.get_section_data_path(self.plugin.name), 'audio', str(new_song.id))
+                save_path = os.path.join(
+                    str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(new_song.id))
                 check_directory_exists(save_path)
                 for media_file in old_song.media_files:
                     new_media_file_name = os.path.join(save_path, os.path.basename(media_file.file_name))
