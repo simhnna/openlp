@@ -79,7 +79,7 @@ class TestCommonFunctions(TestCase):
         Test the `extension_loader` function when no files are found
         """
         # GIVEN: A mocked `Path.glob` method which does not match any files
-        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
+        with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
                 patch.object(common.Path, 'glob', return_value=[]), \
                 patch('openlp.core.common.importlib.import_module') as mocked_import_module:
 
@@ -94,11 +94,12 @@ class TestCommonFunctions(TestCase):
         Test the `extension_loader` function when it successfully finds and loads some files
         """
         # GIVEN: A mocked `Path.glob` method which returns a list of files
-        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
-                patch.object(common.Path, 'glob', return_value=[Path('/app/dir/openlp/import_dir/file1.py'),
-                                                                Path('/app/dir/openlp/import_dir/file2.py'),
-                                                                Path('/app/dir/openlp/import_dir/file3.py'),
-                                                                Path('/app/dir/openlp/import_dir/file4.py')]), \
+        with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
+                patch.object(common.Path, 'glob', return_value=[
+                    Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file1.py'),
+                    Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file2.py'),
+                    Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file3.py'),
+                    Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file4.py')]), \
                 patch('openlp.core.common.importlib.import_module') as mocked_import_module:
 
             # WHEN: Calling `extension_loader` with a list of files to exclude
@@ -113,8 +114,9 @@ class TestCommonFunctions(TestCase):
         Test the `extension_loader` function when `SourceFileLoader` raises a `ImportError`
         """
         # GIVEN: A mocked `import_module` which raises an `ImportError`
-        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
-                patch.object(common.Path, 'glob', return_value=[Path('/app/dir/openlp/import_dir/file1.py')]), \
+        with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
+                patch.object(common.Path, 'glob', return_value=[
+                    Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file1.py')]), \
                 patch('openlp.core.common.importlib.import_module', side_effect=ImportError()), \
                 patch('openlp.core.common.log') as mocked_logger:
 
@@ -129,8 +131,9 @@ class TestCommonFunctions(TestCase):
         Test the `extension_loader` function when `import_module` raises a `ImportError`
         """
         # GIVEN: A mocked `SourceFileLoader` which raises an `OSError`
-        with patch('openlp.core.common.AppLocation.get_directory', return_value='/app/dir/openlp'), \
-                patch.object(common.Path, 'glob', return_value=[Path('/app/dir/openlp/import_dir/file1.py')]), \
+        with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
+                patch.object(common.Path, 'glob', return_value=[
+                    Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file1.py')]), \
                 patch('openlp.core.common.importlib.import_module', side_effect=OSError()), \
                 patch('openlp.core.common.log') as mocked_logger:
 

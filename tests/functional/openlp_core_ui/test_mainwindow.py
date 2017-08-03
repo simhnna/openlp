@@ -28,9 +28,8 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
+from openlp.core.common import Registry, UiStrings
 from openlp.core.ui.mainwindow import MainWindow
-from openlp.core.lib.ui import UiStrings
-from openlp.core.common.registry import Registry
 
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH
@@ -111,9 +110,9 @@ class TestMainWindow(TestCase, TestMixin):
 
         # WHEN no changes are made to the service
 
-        # THEN the main window's title shoud be the same as the OLP string in the UiStrings class
-        self.assertEqual(self.main_window.windowTitle(), UiStrings().OLP,
-                         'The main window\'s title should be the same as the OLP string in UiStrings class')
+        # THEN the main window's title shoud be the same as the OpenLP string in the UiStrings class
+        self.assertEqual(self.main_window.windowTitle(), UiStrings().OpenLP,
+                         'The main window\'s title should be the same as the OpenLP string in UiStrings class')
 
     def test_set_service_modifed(self):
         """
@@ -125,8 +124,8 @@ class TestMainWindow(TestCase, TestMixin):
         self.main_window.set_service_modified(True, 'test.osz')
 
         # THEN the main window's title should be set to the
-        self.assertEqual(self.main_window.windowTitle(), '%s - %s*' % (UiStrings().OLP, 'test.osz'),
-                         'The main window\'s title should be set to "<the contents of UiStrings().OLP> - test.osz*"')
+        self.assertEqual(self.main_window.windowTitle(), '%s - %s*' % (UiStrings().OpenLP, 'test.osz'),
+                         'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz*"')
 
     def test_set_service_unmodified(self):
         """
@@ -138,8 +137,8 @@ class TestMainWindow(TestCase, TestMixin):
         self.main_window.set_service_modified(False, 'test.osz')
 
         # THEN the main window's title should be set to the
-        self.assertEqual(self.main_window.windowTitle(), '%s - %s' % (UiStrings().OLP, 'test.osz'),
-                         'The main window\'s title should be set to "<the contents of UiStrings().OLP> - test.osz"')
+        self.assertEqual(self.main_window.windowTitle(), '%s - %s' % (UiStrings().OpenLP, 'test.osz'),
+                         'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz"')
 
     def test_mainwindow_configuration(self):
         """

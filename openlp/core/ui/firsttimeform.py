@@ -552,8 +552,8 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         """
         # Build directories for downloads
         songs_destination = os.path.join(gettempdir(), 'openlp')
-        bibles_destination = AppLocation.get_section_data_path('bibles')
-        themes_destination = AppLocation.get_section_data_path('themes')
+        bibles_destination = str(AppLocation.get_section_data_path('bibles'))
+        themes_destination = str(AppLocation.get_section_data_path('themes'))
         missed_files = []
         # Download songs
         for i in range(self.songs_list_widget.count()):

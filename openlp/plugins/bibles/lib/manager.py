@@ -111,7 +111,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         self.settings_section = 'bibles'
         self.web = 'Web'
         self.db_cache = None
-        self.path = AppLocation.get_section_data_path(self.settings_section)
+        self.path = str(AppLocation.get_section_data_path(self.settings_section))
         self.proxy_name = Settings().value(self.settings_section + '/proxy name')
         self.suffix = '.sqlite'
         self.import_wizard = None
@@ -124,7 +124,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         of HTTPBible is loaded instead of the BibleDB class.
         """
         log.debug('Reload bibles')
-        files = AppLocation.get_files(self.settings_section, self.suffix)
+        files = [str(file) for file in AppLocation.get_files(self.settings_section, self.suffix)]
         if 'alternative_book_names.sqlite' in files:
             files.remove('alternative_book_names.sqlite')
         log.debug('Bible Files {text}'.format(text=files))

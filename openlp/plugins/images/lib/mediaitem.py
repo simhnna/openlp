@@ -98,7 +98,7 @@ class ImageMediaItem(MediaManagerItem):
         self.list_view.setIconSize(QtCore.QSize(88, 50))
         self.list_view.setIndentation(self.list_view.default_indentation)
         self.list_view.allow_internal_dnd = True
-        self.service_path = os.path.join(AppLocation.get_section_data_path(self.settings_section), 'thumbnails')
+        self.service_path = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
         check_directory_exists(self.service_path)
         # Load images from the database
         self.load_full_list(

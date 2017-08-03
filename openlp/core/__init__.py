@@ -179,7 +179,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         """
         Check if the data folder path exists.
         """
-        data_folder_path = AppLocation.get_data_path()
+        data_folder_path = str(AppLocation.get_data_path())
         if not os.path.exists(data_folder_path):
             log.critical('Database was not found in: ' + data_folder_path)
             status = QtWidgets.QMessageBox.critical(None, translate('OpenLP', 'Data Directory Error'),
@@ -251,7 +251,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                                                   'a backup of the old data folder?'),
                                               defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
-                data_folder_path = AppLocation.get_data_path()
+                data_folder_path = str(AppLocation.get_data_path())
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 data_folder_backup_path = data_folder_path + '-' + timestamp
                 try:
@@ -390,7 +390,7 @@ def main(args=None):
         application.setApplicationName('OpenLPPortable')
         Settings.setDefaultFormat(Settings.IniFormat)
         # Get location OpenLPPortable.ini
-        application_path = AppLocation.get_directory(AppLocation.AppDir)
+        application_path = str(AppLocation.get_directory(AppLocation.AppDir))
         set_up_logging(os.path.abspath(os.path.join(application_path, '..', '..', 'Other')))
         log.info('Running portable')
         portable_settings_file = os.path.abspath(os.path.join(application_path, '..', '..', 'Data', 'OpenLP.ini'))
@@ -407,7 +407,7 @@ def main(args=None):
         portable_settings.sync()
     else:
         application.setApplicationName('OpenLP')
-        set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
+        set_up_logging(str(AppLocation.get_directory(AppLocation.CacheDir)))
     Registry.create()
     Registry().register('application', application)
     Registry().set_flag('no_web_server', args.no_web_server)

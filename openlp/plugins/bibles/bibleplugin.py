@@ -23,10 +23,11 @@
 import logging
 
 from openlp.core.api.http import register_endpoint
+from openlp.core.common import UiStrings
 from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon, translate
-from openlp.core.lib.ui import UiStrings, create_action
 from openlp.plugins.bibles.endpoint import api_bibles_endpoint, bibles_endpoint
+from openlp.core.lib.ui import create_action
 from openlp.plugins.bibles.lib import BibleManager, BiblesTab, BibleMediaItem, LayoutStyle, DisplayStyle, \
     LanguageSelection
 from openlp.plugins.bibles.lib.mediaitem import BibleSearch

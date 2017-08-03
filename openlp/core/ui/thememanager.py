@@ -31,7 +31,7 @@ from xml.etree.ElementTree import ElementTree, XML
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, OpenLPMixin, RegistryMixin, \
-    check_directory_exists, UiStrings, translate, is_win, get_filesystem_encoding, delete_file
+    UiStrings, check_directory_exists, translate, is_win, get_filesystem_encoding, delete_file
 from openlp.core.lib import FileDialog, ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType
@@ -159,7 +159,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         Set up the theme path variables
         """
-        self.path = AppLocation.get_section_data_path(self.settings_section)
+        self.path = str(AppLocation.get_section_data_path(self.settings_section))
         check_directory_exists(self.path)
         self.thumb_path = os.path.join(self.path, 'thumbnails')
         check_directory_exists(self.thumb_path)
@@ -445,7 +445,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         self.application.set_busy_cursor()
         files = AppLocation.get_files(self.settings_section, '.otz')
         for theme_file in files:
-            theme_file = os.path.join(self.path, theme_file)
+            theme_file = os.path.join(self.path, str(theme_file))
             self.unzip_theme(theme_file, self.path)
             delete_file(theme_file)
         files = AppLocation.get_files(self.settings_section, '.png')
@@ -470,6 +470,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         files.sort(key=lambda file_name: get_locale_key(str(file_name)))
         # now process the file list of png files
         for name in files:
+            name = str(name)
             # check to see file is in theme root directory
             theme = os.path.join(self.path, name)
             if os.path.exists(theme):

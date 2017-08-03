@@ -303,7 +303,7 @@ class ProjectorDB(Manager):
         :param ip: Host IP/Name
         :returns: Projector() instance
         """
-        log.debug('get_projector_by_ip(ip="%s")' % ip)
+        log.debug('get_projector_by_ip(ip="{ip}")'.format(ip=ip))
         projector = self.get_object_filtered(Projector, Projector.ip == ip)
         if projector is None:
             # Not found

@@ -95,9 +95,9 @@ def extension_loader(glob_pattern, excluded_files=[]):
     :return: None
     :rtype: None
     """
-    app_dir = Path(AppLocation.get_directory(AppLocation.AppDir)).parent
-    for extension_path in app_dir.glob(glob_pattern):
-        extension_path = extension_path.relative_to(app_dir)
+    base_dir_path = AppLocation.get_directory(AppLocation.AppDir).parent
+    for extension_path in base_dir_path.glob(glob_pattern):
+        extension_path = extension_path.relative_to(base_dir_path)
         if extension_path.name in excluded_files:
             continue
         module_name = path_to_module(extension_path)

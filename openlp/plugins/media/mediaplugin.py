@@ -78,7 +78,7 @@ class MediaPlugin(Plugin):
         exists = process_check_binary('mediainfo')
         # If mediainfo is not in the path, try to find it in the application folder
         if not exists:
-            exists = process_check_binary(os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'mediainfo'))
+            exists = process_check_binary(os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)), 'mediainfo'))
         return exists
 
     def app_startup(self):

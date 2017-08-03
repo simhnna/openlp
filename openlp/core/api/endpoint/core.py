@@ -56,10 +56,10 @@ live = translate('RemotePlugin.Mobile', 'Live View')
 chords = translate('RemotePlugin.Mobile', 'Chords View')
 
 TRANSLATED_STRINGS = {
-    'app_title': "{main} {remote}".format(main=UiStrings().OLP, remote=remote),
-    'stage_title': "{main} {stage}".format(main=UiStrings().OLP, stage=stage),
-    'live_title': "{main} {live}".format(main=UiStrings().OLP, live=live),
-    'chords_title': "{main} {chords}".format(main=UiStrings().OLP, chords=chords),
+    'app_title': "{main} {remote}".format(main=UiStrings().OpenLP, remote=remote),
+    'stage_title': "{main} {stage}".format(main=UiStrings().OpenLP, stage=stage),
+    'live_title': "{main} {live}".format(main=UiStrings().OpenLP, live=live),
+    'chords_title': "{main} {chords}".format(main=UiStrings().OpenLP, chords=chords),
     'service_manager': translate('RemotePlugin.Mobile', 'Service Manager'),
     'slide_controller': translate('RemotePlugin.Mobile', 'Slide Controller'),
     'alerts': translate('RemotePlugin.Mobile', 'Alerts'),

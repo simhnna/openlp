@@ -66,6 +66,12 @@ class ServiceManagerList(QtWidgets.QTreeWidget):
             elif event.key() == QtCore.Qt.Key_Down:
                 self.service_manager.on_move_selection_down()
                 event.accept()
+            elif event.key() == QtCore.Qt.Key_Right:
+                self.service_manager.on_expand_selection()
+                event.accept()
+            elif event.key() == QtCore.Qt.Key_Left:
+                self.service_manager.on_collapse_selection()
+                event.accept()
             elif event.key() == QtCore.Qt.Key_Delete:
                 self.service_manager.on_delete_from_service()
                 event.accept()
@@ -217,7 +223,7 @@ class Ui_ServiceManager(object):
         self.service_manager_list.itemExpanded.connect(self.expanded)
         # Last little bits of setting up
         self.service_theme = Settings().value(self.main_window.service_manager_settings_section + '/service theme')
-        self.service_path = AppLocation.get_section_data_path('servicemanager')
+        self.service_path = str(AppLocation.get_section_data_path('servicemanager'))
         # build the drag and drop context menu
         self.dnd_menu = QtWidgets.QMenu()
         self.new_action = self.dnd_menu.addAction(translate('OpenLP.ServiceManager', '&Add New Item'))
@@ -1118,6 +1124,35 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         if item_after is None:
             return
         self.service_manager_list.setCurrentItem(item_after)
+
+    def on_expand_selection(self):
+        """
+        Expands cursor selection on the window. Called by the right arrow
+        """
+        item = self.service_manager_list.currentItem()
+        # Since we only have 2 levels we find them by checking for children
+        if item.childCount():
+            if not self.service_manager_list.isExpanded(self.service_manager_list.currentIndex()):
+                self.service_manager_list.expandItem(item)
+                self.service_manager.expanded(item)
+                # If not expanded, Expand it
+            self.service_manager_list.setCurrentItem(self.service_manager_list.itemBelow(item))
+            # Then move selection down to child whether it needed to be expanded or not
+
+    def on_collapse_selection(self):
+        """
+        Collapses cursor selection on the window Called by the left arrow
+        """
+        item = self.service_manager_list.currentItem()
+        # Since we only have 2 levels we find them by checking for children
+        if item.childCount():
+            if self.service_manager_list.isExpanded(self.service_manager_list.currentIndex()):
+                self.service_manager_list.collapseItem(item)
+                self.service_manager.collapsed(item)
+        else:  # If selection is lower level
+            self.service_manager_list.collapseItem(item.parent())
+            self.service_manager.collapsed(item.parent())
+            self.service_manager_list.setCurrentItem(item.parent())
 
     def on_collapse_all(self, field=None):
         """

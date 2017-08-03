@@ -126,7 +126,7 @@ def get_application_version():
             full_version = '{tag}-bzr{tree}'.format(tag=tag_version.strip(), tree=tree_revision.strip())
     else:
         # We're not running the development version, let's use the file.
-        file_path = AppLocation.get_directory(AppLocation.VersionDir)
+        file_path = str(AppLocation.get_directory(AppLocation.VersionDir))
         file_path = os.path.join(file_path, '.version')
         version_file = None
         try:
