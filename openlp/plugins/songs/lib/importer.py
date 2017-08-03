@@ -206,7 +206,7 @@ class SongFormat(object):
         },
         OpenLP2: {
             'class': OpenLPSongImport,
-            'name': UiStrings().OLPV2,
+            'name': UiStrings().OpenLPv2AndUp,
             'prefix': 'openLP2',
             'selectMode': SongFormatSelect.SingleFile,
             'filter': '{text} (*.sqlite)'.format(text=translate('SongsPlugin.ImportWizardForm', 'OpenLP 2 Databases'))

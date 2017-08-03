@@ -277,7 +277,7 @@ class HttpRouter(RegistryProperties):
         Create a needs authorisation http header.
         """
         self.send_response(401)
-        header = 'Basic realm=\"{}\"'.format(UiStrings().OLPV2)
+        header = 'Basic realm=\"{}\"'.format(UiStrings().OpenLP)
         self.send_header('WWW-Authenticate', header)
         self.send_header('Content-type', 'text/html')
         self.set_cache_headers()
@@ -322,10 +322,10 @@ class HttpRouter(RegistryProperties):
         chords = translate('RemotePlugin.Mobile', 'Chords View')
         live = translate('RemotePlugin.Mobile', 'Live View')
         self.template_vars = {
-            'app_title': "{main} {remote}".format(main=UiStrings().OLPV2x, remote=remote),
-            'stage_title': "{main} {stage}".format(main=UiStrings().OLPV2x, stage=stage),
-            'chords_title': "{main} {chords}".format(main=UiStrings().OLPV2x, chords=chords),
-            'live_title': "{main} {live}".format(main=UiStrings().OLPV2x, live=live),
+            'app_title': "{main} {remote}".format(main=UiStrings().OpenLP, remote=remote),
+            'stage_title': "{main} {stage}".format(main=UiStrings().OpenLP, stage=stage),
+            'chords_title': "{main} {chords}".format(main=UiStrings().OpenLP, chords=chords),
+            'live_title': "{main} {live}".format(main=UiStrings().OpenLP, live=live),
             'service_manager': translate('RemotePlugin.Mobile', 'Service Manager'),
             'slide_controller': translate('RemotePlugin.Mobile', 'Slide Controller'),
             'alerts': translate('RemotePlugin.Mobile', 'Alerts'),

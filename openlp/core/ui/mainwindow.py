@@ -34,12 +34,12 @@ from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, \
+from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, translate, is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.versionchecker import get_application_version
 from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
-from openlp.core.lib.ui import UiStrings, create_action
+from openlp.core.lib.ui import create_action
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
@@ -370,7 +370,7 @@ class Ui_MainWindow(object):
         """
         Set up the translation system
         """
-        main_window.setWindowTitle(UiStrings().OLP)
+        main_window.setWindowTitle(UiStrings().OpenLP)
         self.file_menu.setTitle(translate('OpenLP.MainWindow', '&File'))
         self.file_import_menu.setTitle(translate('OpenLP.MainWindow', '&Import'))
         self.file_export_menu.setTitle(translate('OpenLP.MainWindow', '&Export'))
@@ -1150,9 +1150,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         :param file_name: The file name of the service file.
         """
         if modified:
-            title = '{title} - {name}*'.format(title=UiStrings().OLP, name=file_name)
+            title = '{title} - {name}*'.format(title=UiStrings().OpenLP, name=file_name)
         else:
-            title = '{title} - {name}'.format(title=UiStrings().OLP, name=file_name)
+            title = '{title} - {name}'.format(title=UiStrings().OpenLP, name=file_name)
         self.setWindowTitle(title)
 
     def show_status_message(self, message):

@@ -23,7 +23,7 @@ import sys
 from unittest import TestCase, skip
 from unittest.mock import MagicMock, patch
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from openlp.core import OpenLP, parse_options
 
@@ -225,3 +225,49 @@ class TestOpenLP(TestCase):
         MockedStandardButtons.assert_called_once_with(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
         mocked_critical.assert_called_once_with(None, 'Error', 'OpenLP is already running. Do you wish to continue?', 0)
         assert result is True
+
+    def test_process_events(self):
+        """
+        Test that the app.process_events() method simply calls the Qt method
+        """
+        # GIVEN: An app
+        app = OpenLP([])
+
+        # WHEN: process_events() is called
+        with patch.object(app, 'processEvents') as mocked_processEvents:
+            app.process_events()
+
+        # THEN: processEvents was called
+        mocked_processEvents.assert_called_once_with()
+
+    def test_set_busy_cursor(self):
+        """
+        Test that the set_busy_cursor() method sets the cursor
+        """
+        # GIVEN: An app
+        app = OpenLP([])
+
+        # WHEN: set_busy_cursor() is called
+        with patch.object(app, 'setOverrideCursor') as mocked_setOverrideCursor, \
+                patch.object(app, 'processEvents') as mocked_processEvents:
+            app.set_busy_cursor()
+
+        # THEN: The cursor should have been set
+        mocked_setOverrideCursor.assert_called_once_with(QtCore.Qt.BusyCursor)
+        mocked_processEvents.assert_called_once_with()
+
+    def test_set_normal_cursor(self):
+        """
+        Test that the set_normal_cursor() method resets the cursor
+        """
+        # GIVEN: An app
+        app = OpenLP([])
+
+        # WHEN: set_normal_cursor() is called
+        with patch.object(app, 'restoreOverrideCursor') as mocked_restoreOverrideCursor, \
+                patch.object(app, 'processEvents') as mocked_processEvents:
+            app.set_normal_cursor()
+
+        # THEN: The cursor should have been set
+        mocked_restoreOverrideCursor.assert_called_once_with()
+        mocked_processEvents.assert_called_once_with()
