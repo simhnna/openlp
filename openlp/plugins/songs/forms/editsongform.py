@@ -1065,7 +1065,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         self.manager.save_object(self.song)
         audio_files = [a.file_name for a in self.song.media_files]
         log.debug(audio_files)
-        save_path = os.path.join(AppLocation.get_section_data_path(self.media_item.plugin.name), 'audio',
+        save_path = os.path.join(str(AppLocation.get_section_data_path(self.media_item.plugin.name)), 'audio',
                                  str(self.song.id))
         check_directory_exists(save_path)
         self.song.media_files = []

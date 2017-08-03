@@ -415,8 +415,9 @@ class PresentationController(object):
         self.document_class = document_class
         self.settings_section = self.plugin.settings_section
         self.available = None
-        self.temp_folder = os.path.join(AppLocation.get_section_data_path(self.settings_section), name)
-        self.thumbnail_folder = os.path.join(AppLocation.get_section_data_path(self.settings_section), 'thumbnails')
+        self.temp_folder = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), name)
+        self.thumbnail_folder = os.path.join(
+            str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
         self.thumbnail_prefix = 'slide'
         check_directory_exists(self.thumbnail_folder)
         check_directory_exists(self.temp_folder)

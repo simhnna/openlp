@@ -484,7 +484,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
                 service_item = ServiceItem()
                 service_item.title = 'webkit'
                 service_item.processor = 'webkit'
-                path = os.path.join(AppLocation.get_section_data_path('themes'),
+                path = os.path.join(str(AppLocation.get_section_data_path('themes')),
                                     self.service_item.theme_data.theme_name)
                 service_item.add_from_command(path,
                                               self.service_item.theme_data.background_filename,

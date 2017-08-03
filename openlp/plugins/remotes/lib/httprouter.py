@@ -171,8 +171,8 @@ class HttpRouter(RegistryProperties):
         ]
         self.settings_section = 'remotes'
         self.translate()
-        self.html_dir = os.path.join(AppLocation.get_directory(AppLocation.PluginsDir), 'remotes', 'html')
-        self.config_dir = os.path.join(AppLocation.get_data_path(), 'stages')
+        self.html_dir = os.path.join(str(AppLocation.get_directory(AppLocation.PluginsDir)), 'remotes', 'html')
+        self.config_dir = os.path.join(str(AppLocation.get_data_path()), 'stages')
 
     def do_post_processor(self):
         """
@@ -456,7 +456,7 @@ class HttpRouter(RegistryProperties):
             if controller_name in supported_controllers:
                 full_path = urllib.parse.unquote(file_name)
                 if '..' not in full_path:  # no hacking please
-                    full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
+                    full_path = os.path.normpath(os.path.join(str(AppLocation.get_section_data_path(controller_name)),
                                                               'thumbnails/' + full_path))
                     if os.path.exists(full_path):
                         path, just_file_name = os.path.split(full_path)
@@ -565,7 +565,7 @@ class HttpRouter(RegistryProperties):
                 elif current_item.is_image() and not frame.get('image', '') and Settings().value('remotes/thumbnails'):
                     item['tag'] = str(index + 1)
                     thumbnail_path = os.path.join('images', 'thumbnails', frame['title'])
-                    full_thumbnail_path = os.path.join(AppLocation.get_data_path(), thumbnail_path)
+                    full_thumbnail_path = os.path.join(str(AppLocation.get_data_path()), thumbnail_path)
                     # Create thumbnail if it doesn't exists
                     if not os.path.exists(full_thumbnail_path):
                         create_thumb(current_item.get_frame_path(index), full_thumbnail_path, False)
@@ -582,7 +582,7 @@ class HttpRouter(RegistryProperties):
                     if current_item.is_capable(ItemCapabilities.HasThumbnails) and \
                             Settings().value('remotes/thumbnails'):
                         # If the file is under our app directory tree send the portion after the match
-                        data_path = AppLocation.get_data_path()
+                        data_path = str(AppLocation.get_data_path())
                         if frame['image'][0:len(data_path)] == data_path:
                             item['img'] = urllib.request.pathname2url(frame['image'][len(data_path):])
                     item['text'] = str(frame['title'])

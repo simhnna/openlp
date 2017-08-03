@@ -71,10 +71,10 @@ log = logging.getLogger(__name__)
 
 log.debug('pjlink2 loaded')
 
-from PyQt5 import QtCore, QtNetwork
+from PyQt5 import QtNetwork
 
 
-class PJLinkUDP(QtNetwork.QTcpSocket):
+class PJLinkUDP(QtNetwork.QUdpSocket):
     """
     Socket service for handling datagram (UDP) sockets.
     """

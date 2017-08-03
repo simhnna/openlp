@@ -584,7 +584,7 @@ class BibleImportForm(OpenLPWizard):
         elif self.currentPage() == self.license_details_page:
             license_version = self.field('license_version')
             license_copyright = self.field('license_copyright')
-            path = AppLocation.get_section_data_path('bibles')
+            path = str(AppLocation.get_section_data_path('bibles'))
             if not license_version:
                 critical_error_message_box(
                     UiStrings().EmptyField,

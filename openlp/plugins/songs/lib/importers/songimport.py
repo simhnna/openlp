@@ -421,7 +421,7 @@ class SongImport(QtCore.QObject):
         :param filename: The file to copy.
         """
         if not hasattr(self, 'save_path'):
-            self.save_path = os.path.join(AppLocation.get_section_data_path(self.import_wizard.plugin.name),
+            self.save_path = os.path.join(str(AppLocation.get_section_data_path(self.import_wizard.plugin.name)),
                                           'audio', str(song_id))
         check_directory_exists(self.save_path)
         if not filename.startswith(self.save_path):

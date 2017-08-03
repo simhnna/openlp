@@ -305,9 +305,9 @@ class Ui_MainWindow(object):
         # Give QT Extra Hint that this is an About Menu Item
         self.about_item.setMenuRole(QtWidgets.QAction.AboutRole)
         if is_win():
-            self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'OpenLP.chm')
+            self.local_help_file = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)), 'OpenLP.chm')
         elif is_macosx():
-            self.local_help_file = os.path.join(AppLocation.get_directory(AppLocation.AppDir),
+            self.local_help_file = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)),
                                                 '..', 'Resources', 'OpenLP.help')
         self.user_manual_item = create_action(main_window, 'userManualItem', icon=':/system/system_help_contents.png',
                                               can_shortcuts=True, category=UiStrings().Help,
@@ -788,7 +788,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         """
         Open data folder
         """
-        path = AppLocation.get_data_path()
+        path = str(AppLocation.get_data_path())
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(path))
 
     def on_update_theme_images(self):
@@ -1438,7 +1438,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         settings = QtCore.QSettings()
         settings.setValue('advanced/data path', self.new_data_path)
         # Check if the new data path is our default.
-        if self.new_data_path == AppLocation.get_directory(AppLocation.DataDir):
+        if self.new_data_path == str(AppLocation.get_directory(AppLocation.DataDir)):
             settings.remove('advanced/data path')
         self.application.set_normal_cursor()
 
