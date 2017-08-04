@@ -28,14 +28,13 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, UiStrings, translate, get_images_filter, is_not_image_file
-from openlp.core.common.path import path_to_str
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.lib.theme import BackgroundType, BackgroundGradientType
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui import ThemeLayoutForm
 from openlp.core.ui.media.webkitplayer import VIDEO_EXT
 from .themewizard import Ui_ThemeWizard
 
-from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -319,11 +318,11 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
             self.setField('background_type', 1)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Image):
             self.image_color_button.color = self.theme.background_border_color
-            self.image_path_edit.path = path_to_str(self.theme.background_filename)
+            self.image_path_edit.path = str_to_path(self.theme.background_filename)
             self.setField('background_type', 2)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Video):
             self.video_color_button.color = self.theme.background_border_color
-            self.video_path_edit.path = path_to_str(self.theme.background_filename)
+            self.video_path_edit.path = str_to_path(self.theme.background_filename)
             self.setField('background_type', 4)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Transparent):
             self.setField('background_type', 3)

@@ -224,6 +224,7 @@ class PresentationTab(SettingsTab):
         """
         Select the mudraw or ghostscript binary that should be used.
         """
+        new_path = path_to_str(new_path)
         if new_path:
             if not PdfController.process_check_binary(new_path):
                 critical_error_message_box(UiStrings().Error,
