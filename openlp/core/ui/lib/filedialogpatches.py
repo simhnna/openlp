@@ -36,10 +36,10 @@ class PQFileDialog(QtWidgets.QFileDialog):
         """
         Reimplement `getExistingDirectory` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None 
+        :type parent: QtWidgets.QWidget or None
         :type caption: str
         :type directory: pathlib.Path
-        :type options: QtWidgets.QFileDialog.Options 
+        :type options: QtWidgets.QFileDialog.Options
         :rtype: tuple[Path, str]
         """
 
@@ -57,12 +57,12 @@ class PQFileDialog(QtWidgets.QFileDialog):
         """
         Reimplement `getOpenFileName` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None 
+        :type parent: QtWidgets.QWidget or None
         :type caption: str
         :type directory: pathlib.Path
         :type filter: str
         :type initialFilter: str
-        :type options: QtWidgets.QFileDialog.Options 
+        :type options: QtWidgets.QFileDialog.Options
         :rtype: tuple[Path, str]
         """
 
@@ -79,12 +79,12 @@ class PQFileDialog(QtWidgets.QFileDialog):
         """
         Reimplement `getOpenFileNames` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None 
+        :type parent: QtWidgets.QWidget or None
         :type caption: str
         :type directory: pathlib.Path
         :type filter: str
         :type initialFilter: str
-        :type options: QtWidgets.QFileDialog.Options 
+        :type options: QtWidgets.QFileDialog.Options
         :rtype: tuple[list[Path], str]
         """
         args, kwargs = replace_params(args, kwargs, ((2, 'directory', path_to_str),))
@@ -101,12 +101,12 @@ class PQFileDialog(QtWidgets.QFileDialog):
         """
         Reimplement `getSaveFileName` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None 
+        :type parent: QtWidgets.QWidget or None
         :type caption: str
         :type directory: pathlib.Path
         :type filter: str
         :type initialFilter: str
-        :type options: QtWidgets.QFileDialog.Options 
+        :type options: QtWidgets.QFileDialog.Options
         :rtype: tuple[Path or None, str]
         """
         args, kwargs = replace_params(args, kwargs, ((2, 'directory', path_to_str),))

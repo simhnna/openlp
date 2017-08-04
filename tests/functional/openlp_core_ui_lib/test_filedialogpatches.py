@@ -18,8 +18,6 @@ class TestFileDialogPatches(TestCase):
         """
         Test that the :class:`PQFileDialog` instantiates correctly
         """
-        #app = QtWidgets.QApplication(sys.argv)
-
         # GIVEN: The PQFileDialog class
         # WHEN: Creating an instance
         instance = PQFileDialog()
