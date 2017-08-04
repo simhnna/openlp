@@ -30,6 +30,8 @@ from openlp.core.lib.theme import HorizontalType, BackgroundType, BackgroundGrad
 from openlp.core.lib.ui import add_welcome_page, create_valign_selection_widgets
 from openlp.core.ui.lib import ColorButton, PathEdit
 
+from pathlib import Path
+
 
 class Ui_ThemeWizard(object):
     """

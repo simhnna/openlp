@@ -19,35 +19,43 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-"""
-Package to test the openlp.core.ui.themeform package.
-"""
+
 from pathlib import Path
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
-
-from openlp.core.ui import ThemeForm
 
 
-class TestThemeManager(TestCase):
+def path_to_str(path):
     """
-    Test the functions in the ThemeManager Class
+    A utility function to convert a Path object or NoneType to a string equivalent.
+
+    :param path: The value to convert to a string
+    :type: pathlib.Path or None
+
+    :return: An empty string if :param:`path` is None, else a string representation of the :param:`path`
+    :rtype: str
     """
-    def setUp(self):
-        with patch('openlp.core.ui.ThemeForm._setup'):
-            self.instance = ThemeForm(None)
+    if not isinstance(path, Path) and path is not None:
+        raise TypeError('parameter \'path\' must be of type Path or NoneType')
+    if path is None:
+        return ''
+    else:
+        return str(path)
 
-    def test_on_image_path_edit_path_changed(self):
-        """
-        Test the `image_path_edit.pathChanged` handler
-        """
-        # GIVEN: An instance of Theme Form
-        with patch.object(self.instance, 'set_background_page_values') as mocked_set_background_page_values:
-            self.instance.theme = MagicMock()
 
-            # WHEN: `on_image_path_edit_path_changed` is clicked
-            self.instance.on_image_path_edit_path_changed(Path('/', 'new', 'pat.h'))
+def str_to_path(string):
+    """
+    A utility function to convert a str object to a Path or NoneType.
 
-            # THEN: The theme background file should be set and `set_background_page_values` should have been called
-            self.assertEqual(self.instance.theme.background_filename, '/new/pat.h')
-            mocked_set_background_page_values.assert_called_once_with()
+    This function is of particular use because initating a Path object with an empty string causes the Path object to
+    point to the current working directory.
+
+    :param string: The string to convert
+    :type string: str
+
+    :return: None if :param:`string` is empty, or a Path object representation of :param:`string`
+    :rtype: pathlib.Path or None
+    """
+    if not isinstance(string, str):
+        raise TypeError('parameter \'string\' must be of type str')
+    if string == '':
+        return None
+    return Path(string)

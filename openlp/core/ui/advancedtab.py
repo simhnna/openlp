@@ -30,6 +30,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import AppLocation, Settings, SlideLimits, UiStrings, translate
 from openlp.core.common.languagemanager import format_time
+from openlp.core.common.path import path_to_str
 from openlp.core.lib import SettingsTab, build_icon
 from openlp.core.ui.lib import PathEdit, PathType
 
@@ -156,7 +157,7 @@ class AdvancedTab(SettingsTab):
         self.data_directory_new_label = QtWidgets.QLabel(self.data_directory_group_box)
         self.data_directory_new_label.setObjectName('data_directory_current_label')
         self.data_directory_path_edit = PathEdit(self.data_directory_group_box, path_type=PathType.Directories,
-                                                 default_path=str(AppLocation.get_directory(AppLocation.DataDir)))
+                                                 default_path=AppLocation.get_directory(AppLocation.DataDir))
         self.data_directory_layout.addRow(self.data_directory_new_label, self.data_directory_path_edit)
         self.new_data_directory_has_files_label = QtWidgets.QLabel(self.data_directory_group_box)
         self.new_data_directory_has_files_label.setObjectName('new_data_directory_has_files_label')
@@ -373,7 +374,7 @@ class AdvancedTab(SettingsTab):
         self.new_data_directory_has_files_label.hide()
         self.data_directory_cancel_button.hide()
         # Since data location can be changed, make sure the path is present.
-        self.data_directory_path_edit.path = str(AppLocation.get_data_path())
+        self.data_directory_path_edit.path = AppLocation.get_data_path()
         # Don't allow data directory move if running portable.
         if settings.value('advanced/is portable'):
             self.data_directory_group_box.hide()
@@ -497,12 +498,12 @@ class AdvancedTab(SettingsTab):
                                                           'closed.').format(path=new_data_path),
                                                 defaultButton=QtWidgets.QMessageBox.No)
         if answer != QtWidgets.QMessageBox.Yes:
-            self.data_directory_path_edit.path = str(AppLocation.get_data_path())
+            self.data_directory_path_edit.path = AppLocation.get_data_path()
             return
         # Check if data already exists here.
-        self.check_data_overwrite(new_data_path)
+        self.check_data_overwrite(path_to_str(new_data_path))
         # Save the new location.
-        self.main_window.set_new_data_path(new_data_path)
+        self.main_window.set_new_data_path(path_to_str(new_data_path))
         self.data_directory_cancel_button.show()
 
     def on_data_directory_copy_check_box_toggled(self):
@@ -550,7 +551,7 @@ class AdvancedTab(SettingsTab):
         """
         Cancel the data directory location change
         """
-        self.data_directory_path_edit.path = str(AppLocation.get_data_path())
+        self.data_directory_path_edit.path = AppLocation.get_data_path()
         self.data_directory_copy_check_box.setChecked(False)
         self.main_window.set_new_data_path(None)
         self.main_window.set_copy_data(False)

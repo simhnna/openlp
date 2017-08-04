@@ -608,6 +608,41 @@ def create_separated_list(string_list):
     return list_to_string
 
 
+def replace_params(args, kwargs, params):
+    """
+    Apply a transformation function to the specified args or kwargs
+
+    :param args: Positional arguments
+    :type args: (,)
+
+    :param kwargs: Key Word arguments
+    :type kwargs: dict
+
+    :param params: A tuple of tuples with the position and the key word to replace.
+    :type params: ((int, str, path_to_str),)
+
+    :return: The modified positional and keyword arguments
+    :rtype: (tuple, dict)
+
+
+    Usage:
+        Take a method with the following signature, and assume we which to apply the str function to arg2:
+            def method(arg1=None, arg2=None, arg3=None)
+
+        As arg2 can be specified postitionally as the second argument (1 with a zero index) or as a keyword, the we
+        would call this function as follows:
+
+        replace_params(args, kwargs, ((1, 'arg2', str),))
+    """
+    args = list(args)
+    for position, key_word, transform in params:
+        if len(args) > position:
+            args[position] = transform(args[position])
+        elif key_word in kwargs:
+            kwargs[key_word] = transform(kwargs[key_word])
+    return tuple(args), kwargs
+
+
 from .exceptions import ValidationError
 from .filedialog import FileDialog
 from .screen import ScreenList
