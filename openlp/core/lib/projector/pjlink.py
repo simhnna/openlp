@@ -149,38 +149,40 @@ class PJLinkCommands(object):
                                                                                 cmd=cmd,
                                                                                 data=data))
         # Check if we have a future command not available yet
-        if cmd not in PJLINK_VALID_CMD:
+        _cmd = cmd.upper()
+        _data = data.upper()
+        if _cmd not in PJLINK_VALID_CMD:
             log.error("({ip}) Ignoring command='{cmd}' (Invalid/Unknown)".format(ip=self.ip, cmd=cmd))
             return
-        elif cmd not in self.pjlink_functions:
+        elif _cmd not in self.pjlink_functions:
             log.warn("({ip}) Unable to process command='{cmd}' (Future option)".format(ip=self.ip, cmd=cmd))
             return
-        elif data in PJLINK_ERRORS:
+        elif _data in PJLINK_ERRORS:
             # Oops - projector error
             log.error('({ip}) Projector returned error "{data}"'.format(ip=self.ip, data=data))
-            if data.upper() == 'ERRA':
+            if _data == 'ERRA':
                 # Authentication error
                 self.disconnect_from_host()
                 self.change_status(E_AUTHENTICATION)
                 log.debug('({ip}) emitting projectorAuthentication() signal'.format(ip=self.ip))
                 self.projectorAuthentication.emit(self.name)
-            elif data.upper() == 'ERR1':
+            elif _data == 'ERR1':
                 # Undefined command
                 self.change_status(E_UNDEFINED, '{error}: "{data}"'.format(error=ERROR_MSG[E_UNDEFINED],
                                                                            data=cmd))
-            elif data.upper() == 'ERR2':
+            elif _data == 'ERR2':
                 # Invalid parameter
                 self.change_status(E_PARAMETER)
-            elif data.upper() == 'ERR3':
+            elif _data == 'ERR3':
                 # Projector busy
                 self.change_status(E_UNAVAILABLE)
-            elif data.upper() == 'ERR4':
+            elif _data == 'ERR4':
                 # Projector/display error
                 self.change_status(E_PROJECTOR)
             self.receive_data_signal()
             return
         # Command succeeded - no extra information
-        elif data.upper() == 'OK':
+        elif _data == 'OK':
             log.debug('({ip}) Command returned OK'.format(ip=self.ip))
             # A command returned successfully
             self.receive_data_signal()
@@ -188,7 +190,7 @@ class PJLinkCommands(object):
         # Command checks already passed
         log.debug('({ip}) Calling function for {cmd}'.format(ip=self.ip, cmd=cmd))
         self.receive_data_signal()
-        self.pjlink_functions[cmd](data)
+        self.pjlink_functions[_cmd](data)
 
     def process_avmt(self, data):
         """
@@ -197,26 +199,20 @@ class PJLinkCommands(object):
 
         :param data: Shutter and audio status
         """
-        shutter = self.shutter
-        mute = self.mute
-        if data == '11':
-            shutter = True
-            mute = False
-        elif data == '21':
-            shutter = False
-            mute = True
-        elif data == '30':
-            shutter = False
-            mute = False
-        elif data == '31':
-            shutter = True
-            mute = True
+        settings = {'11': {'shutter': True, 'mute': self.mute},
+                    '21': {'shutter': self.shutter, 'mute': True},
+                    '30': {'shutter': False, 'mute': False},
+                    '31': {'shutter': True, 'mute': True}
+                    }
+        if data in settings:
+            shutter = settings[data]['shutter']
+            mute = settings[data]['mute']
+            # Check if we need to update the icons
+            update_icons = (shutter != self.shutter) or (mute != self.mute)
+            self.shutter = shutter
+            self.mute = mute
         else:
             log.warning('({ip}) Unknown shutter response: {data}'.format(ip=self.ip, data=data))
-        update_icons = shutter != self.shutter
-        update_icons = update_icons or mute != self.mute
-        self.shutter = shutter
-        self.mute = mute
         if update_icons:
             self.projectorUpdateIcons.emit()
         return
