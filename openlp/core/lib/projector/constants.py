@@ -154,7 +154,7 @@ PJLINK_VALID_CMD = {
              },
     'SRCH': {'version': ['2', ],
              'description': translate('OpenLP.PJLinkConstants',
-                                      'UDP broadcast search request for available projectors.')
+                                      'UDP broadcast search request for available projectors. Reply is ACKN.')
              },
     'SVER': {'version': ['2', ],
              'description': translate('OpenLP.PJLinkConstants',
