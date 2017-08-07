@@ -20,11 +20,10 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.lib.filedialog package.
+Package to test the openlp.core.ui.lib.filedialog package.
 """
 from unittest import TestCase
-from unittest.mock import MagicMock, call, patch
-
+from unittest.mock import MagicMock, patch
 
 
 class TestFileDialog(TestCase):
@@ -32,9 +31,9 @@ class TestFileDialog(TestCase):
     Test the functions in the :mod:`filedialog` module.
     """
     def setUp(self):
-        self.os_patcher = patch('openlp.core.lib.filedialog.os')
-        self.qt_gui_patcher = patch('openlp.core.lib.filedialog.QtWidgets')
-        self.ui_strings_patcher = patch('openlp.core.lib.filedialog.UiStrings')
+        self.os_patcher = patch('openlp.core.ui.lib.filedialog.os')
+        self.qt_gui_patcher = patch('openlp.core.ui.lib.filedialog.QtWidgets')
+        self.ui_strings_patcher = patch('openlp.core.ui.lib.filedialog.UiStrings')
         self.mocked_os = self.os_patcher.start()
         self.mocked_qt_gui = self.qt_gui_patcher.start()
         self.mocked_ui_strings = self.ui_strings_patcher.start()
