@@ -27,7 +27,7 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common import UiStrings, translate
 from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.lib import build_icon
-from openlp.core.ui.lib.filedialogpatches import PQFileDialog
+from openlp.core.ui.lib.filedialog import FileDialog
 
 
 class PathType(Enum):
@@ -40,7 +40,6 @@ class PathEdit(QtWidgets.QWidget):
     The :class:`~openlp.core.ui.lib.pathedit.PathEdit` class subclasses QWidget to create a custom widget for use when
     a file or directory needs to be selected.
     """
-
     pathChanged = QtCore.pyqtSignal(Path)
 
     def __init__(self, parent=None, path_type=PathType.Files, default_path=None, dialog_caption=None, show_revert=True):
@@ -176,11 +175,11 @@ class PathEdit(QtWidgets.QWidget):
         if self._path_type == PathType.Directories:
             if not caption:
                 caption = translate('OpenLP.PathEdit', 'Select Directory')
-            path = PQFileDialog.getExistingDirectory(self, caption, self._path, PQFileDialog.ShowDirsOnly)
+            path = FileDialog.getExistingDirectory(self, caption, self._path, FileDialog.ShowDirsOnly)
         elif self._path_type == PathType.Files:
             if not caption:
                 caption = self.dialog_caption = translate('OpenLP.PathEdit', 'Select File')
-            path, filter_used = PQFileDialog.getOpenFileName(self, caption, self._path, self.filters)
+            path, filter_used = FileDialog.getOpenFileName(self, caption, self._path, self.filters)
         if path:
             self.on_new_path(path)
 

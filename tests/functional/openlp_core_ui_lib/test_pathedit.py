@@ -28,7 +28,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, patch
 
 from openlp.core.ui.lib import PathEdit, PathType
-from openlp.core.ui.lib.filedialogpatches import PQFileDialog
+from openlp.core.ui.lib.filedialog import FileDialog
 
 
 class TestPathEdit(TestCase):
@@ -126,9 +126,9 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Directories` and a mocked
         #        QFileDialog.getExistingDirectory
-        with patch('openlp.core.ui.lib.pathedit.PQFileDialog.getExistingDirectory', return_value=None) as \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory', return_value=None) as \
                 mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.PQFileDialog.getOpenFileName') as mocked_get_open_file_name:
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName') as mocked_get_open_file_name:
             self.widget._path_type = PathType.Directories
             self.widget._path = Path('test', 'path')
 
@@ -138,7 +138,7 @@ class TestPathEdit(TestCase):
             # THEN: The FileDialog.getExistingDirectory should have been called with the default caption
             mocked_get_existing_directory.assert_called_once_with(self.widget, 'Select Directory',
                                                                   Path('test', 'path'),
-                                                                  PQFileDialog.ShowDirsOnly)
+                                                                  FileDialog.ShowDirsOnly)
             self.assertFalse(mocked_get_open_file_name.called)
 
     def test_on_browse_button_clicked_directory_custom_caption(self):
@@ -148,9 +148,9 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Directories` and a mocked
         #        QFileDialog.getExistingDirectory with `default_caption` set.
-        with patch('openlp.core.ui.lib.pathedit.PQFileDialog.getExistingDirectory', return_value=None) as \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory', return_value=None) as \
                 mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.PQFileDialog.getOpenFileName') as mocked_get_open_file_name:
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName') as mocked_get_open_file_name:
             self.widget._path_type = PathType.Directories
             self.widget._path = Path('test', 'path')
             self.widget.dialog_caption = 'Directory Caption'
@@ -161,7 +161,7 @@ class TestPathEdit(TestCase):
             # THEN: The FileDialog.getExistingDirectory should have been called with the custom caption
             mocked_get_existing_directory.assert_called_once_with(self.widget, 'Directory Caption',
                                                                   Path('test', 'path'),
-                                                                  PQFileDialog.ShowDirsOnly)
+                                                                  FileDialog.ShowDirsOnly)
             self.assertFalse(mocked_get_open_file_name.called)
 
     def test_on_browse_button_clicked_file(self):
@@ -169,8 +169,8 @@ class TestPathEdit(TestCase):
         Test the `browse_button` `clicked` handler on_browse_button_clicked when the `path_type` is set to Files.
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Files` and a mocked QFileDialog.getOpenFileName
-        with patch('openlp.core.ui.lib.pathedit.PQFileDialog.getExistingDirectory') as mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.PQFileDialog.getOpenFileName', return_value=(None, '')) as \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
                 mocked_get_open_file_name:
             self.widget._path_type = PathType.Files
             self.widget._path = Path('test', 'pat.h')
@@ -190,8 +190,8 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Files` and a mocked QFileDialog.getOpenFileName
         #        with `default_caption` set.
-        with patch('openlp.core.ui.lib.pathedit.PQFileDialog.getExistingDirectory') as mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.PQFileDialog.getOpenFileName', return_value=(None, '')) as \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
                 mocked_get_open_file_name:
             self.widget._path_type = PathType.Files
             self.widget._path = Path('test', 'pat.h')
@@ -212,7 +212,7 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked QFileDialog.getOpenFileName which returns an empty str for the
         #        file path.
-        with patch('openlp.core.ui.lib.pathedit.PQFileDialog.getOpenFileName', return_value=(None, '')) as \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
                 mocked_get_open_file_name:
 
             # WHEN: Calling on_browse_button_clicked
@@ -228,7 +228,7 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked QFileDialog.getOpenFileName which returns a str for the file
         #        path.
-        with patch('openlp.core.ui.lib.pathedit.PQFileDialog.getOpenFileName',
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName',
                    return_value=(Path('test', 'pat.h'), '')) as mocked_get_open_file_name, \
                 patch.object(self.widget, 'on_new_path'):
 

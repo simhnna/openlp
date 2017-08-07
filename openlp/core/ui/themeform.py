@@ -35,7 +35,6 @@ from openlp.core.ui import ThemeLayoutForm
 from openlp.core.ui.media.webkitplayer import VIDEO_EXT
 from .themewizard import Ui_ThemeWizard
 
-
 log = logging.getLogger(__name__)
 
 
