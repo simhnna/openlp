@@ -29,8 +29,8 @@ import os
 import shutil
 from tempfile import mkdtemp
 
-from unittest import TestCase, skip
-from unittest.mock import MagicMock, patch
+from unittest import TestCase
+from unittest.mock import patch
 
 from openlp.core.lib.projector import upgrade
 from openlp.core.lib.db import upgrade_db
@@ -413,7 +413,7 @@ class TestProjectorDB(TestCase):
         Test add_projector() fail
         """
         # GIVEN: Test entry in the database
-        ignore_result = self.projector.add_projector(Projector(**TEST1_DATA))
+        self.projector.add_projector(Projector(**TEST1_DATA))
 
         # WHEN: Attempt to add same projector entry
         results = self.projector.add_projector(Projector(**TEST1_DATA))
@@ -439,7 +439,7 @@ class TestProjectorDB(TestCase):
         Test update_projector() when entry not in database
         """
         # GIVEN: Projector entry in database
-        ignore_result = self.projector.add_projector(Projector(**TEST1_DATA))
+        self.projector.add_projector(Projector(**TEST1_DATA))
         projector = Projector(**TEST2_DATA)
 
         # WHEN: Attempt to update data with a different ID
