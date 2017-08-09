@@ -53,8 +53,8 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.verse_type_combo_box.currentIndexChanged.connect(self.on_verse_type_combo_box_changed)
         self.force_split_button.clicked.connect(self.on_force_split_button_clicked)
         if Settings().value('songs/enable chords'):
-            self.transpose_down_button.clicked.connect(self.on_transepose_down_button_clicked)
-            self.transpose_up_button.clicked.connect(self.on_transepose_up_button_clicked)
+            self.transpose_down_button.clicked.connect(self.on_transpose_down_button_clicked)
+            self.transpose_up_button.clicked.connect(self.on_transpose_up_button_clicked)
 
     def insert_verse(self, verse_tag, verse_num=1):
         """
@@ -89,7 +89,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         text = self.verse_text_edit.toPlainText()
         position = self.verse_text_edit.textCursor().position()
-        insert_string = '[##-divide-##]'
+        insert_string = '[--}{--]'
         if position and text[position - 1] != '\n':
             insert_string = '\n' + insert_string
         if position == len(text) or text[position] != '\n':
@@ -116,7 +116,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         self.update_suggested_verse_number()
 
-    def on_transepose_up_button_clicked(self):
+    def on_transpose_up_button_clicked(self):
         """
         The transpose up button clicked
         """
@@ -133,7 +133,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.verse_text_edit.setFocus()
         self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)
 
-    def on_transepose_down_button_clicked(self):
+    def on_transpose_down_button_clicked(self):
         """
         The transpose down button clicked
         """

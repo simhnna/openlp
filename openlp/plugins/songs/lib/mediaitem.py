@@ -589,7 +589,7 @@ class SongMediaItem(MediaManagerItem):
                     verse_index = VerseType.from_tag(verse_tag)
                 verse_tag = VerseType.translated_tags[verse_index].upper()
                 verse_def = '{tag}{label}'.format(tag=verse_tag, label=verse[0]['label'])
-                force_verse = verse[1].split('[##-divide-##]\n', 2)
+                force_verse = verse[1].split('[--}{--]\n', 2)
                 for split_verse in force_verse:
                     service_item.add_from_text(split_verse, verse_def)
         else:
