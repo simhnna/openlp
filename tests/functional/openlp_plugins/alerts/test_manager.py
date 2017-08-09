@@ -22,12 +22,11 @@
 """
 This module contains tests for the CSV Bible importer.
 """
-
 import os
 import json
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from tests.functional import MagicMock, patch
 from openlp.core.common.registry import Registry
 from openlp.plugins.alerts.lib.alertsmanager import AlertsManager
 

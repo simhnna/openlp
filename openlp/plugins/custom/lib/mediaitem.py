@@ -190,9 +190,7 @@ class CustomMediaItem(MediaManagerItem):
                     translate('CustomPlugin.MediaItem',
                               'Are you sure you want to delete the "{items:d}" '
                               'selected custom slide(s)?').format(items=len(items)),
-                    QtWidgets.QMessageBox.StandardButtons(
-                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                    QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.No:
+                    defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.No:
                 return
             row_list = [item.row() for item in self.list_view.selectedIndexes()]
             row_list.sort(reverse=True)

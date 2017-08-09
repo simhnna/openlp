@@ -34,8 +34,7 @@
     <file>bibles_search_text.png</file>
     <file>bibles_search_reference.png</file>
     <file>bibles_search_clear.png</file>
-    <file>bibles_search_unlock.png</file>
-    <file>bibles_search_lock.png</file>
+    <file>bibles_save_results.png</file>
   </qresource>
   <qresource prefix="plugins">
     <file>plugin_alerts.png</file>
@@ -144,7 +143,6 @@
     </qresource>
   <qresource prefix="remote">
     <file>network_server.png</file>
-    <file>network_ssl.png</file>
     <file>network_auth.png</file>
   </qresource>
   <qresource prefix="songusage">

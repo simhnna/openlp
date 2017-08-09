@@ -23,15 +23,15 @@
 This module contains tests for the lib submodule of the Images plugin.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
+
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Settings
-
-from openlp.core.common import Registry
+from openlp.core.common import Registry, Settings
 from openlp.plugins.images.lib.db import ImageFilenames, ImageGroups
 from openlp.plugins.images.lib.mediaitem import ImageMediaItem
 from openlp.plugins.images.lib import ImageTab
-from tests.functional import MagicMock, patch
+
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {

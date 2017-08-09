@@ -35,8 +35,9 @@ import sys
 import time
 from subprocess import Popen, PIPE
 
-appveyor_build_url = 'https://ci.appveyor.com/project/TomasGroth/openlp/build'
-appveyor_api_url = 'https://ci.appveyor.com/api/projects/TomasGroth/openlp'
+appveyor_build_url = 'https://ci.appveyor.com/project/OpenLP/{project}/build'
+appveyor_api_url = 'https://ci.appveyor.com/api/projects/OpenLP/{project}'
+appveyor_log_url = 'https://ci.appveyor.com/api/buildjobs/{buildid}/log'
 
 webhook_element = \
     {
@@ -84,7 +85,7 @@ def get_version():
     return version_string, version
 
 
-def get_yml(branch):
+def get_yml(branch, build_type):
     """
     Returns the content of appveyor.yml and inserts the branch to be build
     """
@@ -92,7 +93,7 @@ def get_yml(branch):
     yml_text = f.read()
     f.close()
     yml_text = yml_text.replace('BRANCHNAME', branch)
-    if 'openlp-core/openlp/trunk' in branch:
+    if build_type in ['openlp', 'trunk']:
         yml_text = yml_text.replace('BUILD_DOCS', '$TRUE')
     else:
         yml_text = yml_text.replace('BUILD_DOCS', '$FALSE')
@@ -115,23 +116,28 @@ def hook(webhook_url, yml):
         print(responce.read().decode('utf-8'))
 
 
-def get_appveyor_build_url(branch):
+def get_appveyor_build_url(build_type):
     """
     Get the url of the build.
     """
-    responce = urllib.request.urlopen(appveyor_api_url)
+    responce = urllib.request.urlopen(appveyor_api_url.format(project=build_type))
     json_str = responce.read().decode('utf-8')
     build_json = json.loads(json_str)
-    build_url = '%s/%s' % (appveyor_build_url, build_json['build']['version'])
-    print('Check this URL for build status: %s' % build_url)
+    build_url = '%s/%s' % (appveyor_build_url.format(project=build_type), build_json['build']['version'])
+    print(build_url.format(project=build_type))
+    print(appveyor_log_url.format(buildid=build_json['build']['jobs'][0]['jobId']))
 
 
-if len(sys.argv) != 3:
-    print('Usage: %s <webhook-url> <branch>' % sys.argv[0])
+if len(sys.argv) != 4:
+    print('Invalid number of arguments\nUsage: %s <webhook-url> <branch> <dev|trunk|openlp>' % sys.argv[0])
 else:
     webhook_url = sys.argv[1]
     branch = sys.argv[2]
-    hook(webhook_url, get_yml(branch))
+    build_type = sys.argv[3]
+    if build_type not in ['dev', 'trunk', 'openlp']:
+        print('Invalid build type\nUsage: %s <webhook-url> <branch> <dev|trunk|openlp>' % sys.argv[0])
+        exit()
+    hook(webhook_url, get_yml(branch, build_type))
     # Wait 5 seconds to make sure the hook has been triggered
     time.sleep(5)
-    get_appveyor_build_url(branch)
+    get_appveyor_build_url(build_type)

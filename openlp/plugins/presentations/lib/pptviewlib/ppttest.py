@@ -197,6 +197,7 @@ class PPTViewer(QtWidgets.QWidget):
     def openDialog(self):
         self.pptEdit.setText(QtWidgets.QFileDialog.getOpenFileName(self, 'Open file')[0])
 
+
 if __name__ == '__main__':
     pptdll = cdll.LoadLibrary(r'pptviewlib.dll')
     pptdll.SetDebug(1)

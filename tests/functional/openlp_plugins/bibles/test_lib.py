@@ -23,10 +23,11 @@
 This module contains tests for the lib submodule of the Bibles plugin.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.plugins.bibles import lib
 from openlp.plugins.bibles.lib import SearchResults, get_reference_match
-from tests.functional import MagicMock, patch
+
 from tests.helpers.testmixin import TestMixin
 
 
@@ -67,7 +68,8 @@ class TestLib(TestCase, TestMixin):
         """
         # GIVEN: Some test data which contains different references to parse, with the expected results.
         with patch('openlp.plugins.bibles.lib.Settings', return_value=MagicMock(**{'value.return_value': ''})):
-            # The following test data tests with 222 variants when using the default 'separators'
+            # The following test data tests with about 240 variants when using the default 'separators'
+            # The amount is exactly 222 without '1. John 23' and'1. John. 23'
             test_data = [
                 # Input reference, book name, chapter + verse reference
                 ('Psalm 23', 'Psalm', '23'),
@@ -83,6 +85,8 @@ class TestLib(TestCase, TestMixin):
                 ('Psalm 23{_and}24', 'Psalm', '23,24'),
                 ('1 John 23', '1 John', '23'),
                 ('1 John. 23', '1 John', '23'),
+                ('1. John 23', '1. John', '23'),
+                ('1. John. 23', '1. John', '23'),
                 ('1 John 23{to}24', '1 John', '23-24'),
                 ('1 John 23{verse}1{to}2', '1 John', '23:1-2'),
                 ('1 John 23{verse}1{to}{end}', '1 John', '23:1-end'),

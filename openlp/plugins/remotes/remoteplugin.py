@@ -122,5 +122,4 @@ class RemotesPlugin(Plugin):
                                           translate('RemotePlugin', 'Server Config Change'),
                                           translate('RemotePlugin',
                                                     'Server configuration changes will require a restart '
-                                                    'to take effect.'),
-                                          QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
+                                                    'to take effect.'))

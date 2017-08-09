@@ -23,15 +23,15 @@
 This module contains tests for the lib submodule of the Songs plugin.
 """
 from unittest import TestCase
-from unittest.mock import call
+from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtCore
 
 from openlp.core.common import Registry, Settings
 from openlp.core.lib import ServiceItem
-from openlp.plugins.songs.lib.mediaitem import SongMediaItem
 from openlp.plugins.songs.lib.db import AuthorType, Song
-from tests.functional import patch, MagicMock
+from openlp.plugins.songs.lib.mediaitem import SongMediaItem
+
 from tests.helpers.testmixin import TestMixin
 
 
@@ -46,9 +46,10 @@ class TestMediaItem(TestCase, TestMixin):
         Registry.create()
         Registry().register('service_list', MagicMock())
         Registry().register('main_window', MagicMock())
+        self.mocked_plugin = MagicMock()
         with patch('openlp.core.lib.mediamanageritem.MediaManagerItem._setup'), \
                 patch('openlp.plugins.songs.forms.editsongform.EditSongForm.__init__'):
-            self.media_item = SongMediaItem(None, MagicMock())
+            self.media_item = SongMediaItem(None, self.mocked_plugin)
             self.media_item.save_auto_select_id = MagicMock()
             self.media_item.list_view = MagicMock()
             self.media_item.list_view.save_auto_select_id = MagicMock()
@@ -558,3 +559,35 @@ class TestMediaItem(TestCase, TestMixin):
 
         # THEN: The correct formatted results are returned
         self.assertEqual(search_results, [[123, 'My Song', 'My alternative']])
+
+    @patch('openlp.plugins.songs.lib.mediaitem.Book')
+    @patch('openlp.plugins.songs.lib.mediaitem.SongBookEntry')
+    @patch('openlp.plugins.songs.lib.mediaitem.Song')
+    @patch('openlp.plugins.songs.lib.mediaitem.or_')
+    def test_entire_song_search(self, mocked_or, MockedSong, MockedSongBookEntry, MockedBook):
+        """
+        Test that searching the entire song does the right queries
+        """
+        # GIVEN: A song media item, a keyword and some mocks
+        keyword = 'Jesus'
+        mocked_song = MagicMock()
+        mocked_or.side_effect = lambda a, b, c, d, e: ' '.join([a, b, c, d, e])
+        MockedSong.search_title.like.side_effect = lambda a: a
+        MockedSong.search_lyrics.like.side_effect = lambda a: a
+        MockedSong.comments.like.side_effect = lambda a: a
+        MockedSongBookEntry.entry.like.side_effect = lambda a: a
+        MockedBook.name.like.side_effect = lambda a: a
+
+        # WHEN: search_entire_song() is called with the keyword
+        self.media_item.search_entire(keyword)
+
+        # THEN: The correct calls were made
+        MockedSong.search_title.like.assert_called_once_with('%jesus%')
+        MockedSong.search_lyrics.like.assert_called_once_with('%jesus%')
+        MockedSong.comments.like.assert_called_once_with('%jesus%')
+        MockedSongBookEntry.entry.like.assert_called_once_with('%jesus%')
+        MockedBook.name.like.assert_called_once_with('%jesus%')
+        mocked_or.assert_called_once_with('%jesus%', '%jesus%', '%jesus%', '%jesus%', '%jesus%')
+        self.mocked_plugin.manager.session.query.assert_called_once_with(MockedSong)
+
+        self.assertEqual(self.mocked_plugin.manager.session.query.mock_calls[4][0], '().join().join().filter().all')

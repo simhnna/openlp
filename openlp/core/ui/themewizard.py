@@ -28,7 +28,7 @@ from openlp.core.common import UiStrings, translate, is_macosx
 from openlp.core.lib import build_icon
 from openlp.core.lib.theme import HorizontalType, BackgroundType, BackgroundGradientType
 from openlp.core.lib.ui import add_welcome_page, create_valign_selection_widgets
-from openlp.core.ui.lib.colorbutton import ColorButton
+from openlp.core.ui.lib import ColorButton, PathEdit
 
 
 class Ui_ThemeWizard(object):
@@ -116,16 +116,10 @@ class Ui_ThemeWizard(object):
         self.image_layout.addRow(self.image_color_label, self.image_color_button)
         self.image_label = QtWidgets.QLabel(self.image_widget)
         self.image_label.setObjectName('image_label')
-        self.image_file_layout = QtWidgets.QHBoxLayout()
-        self.image_file_layout.setObjectName('image_file_layout')
-        self.image_file_edit = QtWidgets.QLineEdit(self.image_widget)
-        self.image_file_edit.setObjectName('image_file_edit')
-        self.image_file_layout.addWidget(self.image_file_edit)
-        self.image_browse_button = QtWidgets.QToolButton(self.image_widget)
-        self.image_browse_button.setObjectName('image_browse_button')
-        self.image_browse_button.setIcon(build_icon(':/general/general_open.png'))
-        self.image_file_layout.addWidget(self.image_browse_button)
-        self.image_layout.addRow(self.image_label, self.image_file_layout)
+        self.image_path_edit = PathEdit(self.image_widget,
+                                        dialog_caption=translate('OpenLP.ThemeWizard', 'Select Image'),
+                                        show_revert=False)
+        self.image_layout.addRow(self.image_label, self.image_path_edit)
         self.image_layout.setItem(2, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.background_stack.addWidget(self.image_widget)
         self.transparent_widget = QtWidgets.QWidget(self.background_page)
@@ -147,16 +141,10 @@ class Ui_ThemeWizard(object):
         self.video_layout.addRow(self.video_color_label, self.video_color_button)
         self.video_label = QtWidgets.QLabel(self.video_widget)
         self.video_label.setObjectName('video_label')
-        self.video_file_layout = QtWidgets.QHBoxLayout()
-        self.video_file_layout.setObjectName('video_file_layout')
-        self.video_file_edit = QtWidgets.QLineEdit(self.video_widget)
-        self.video_file_edit.setObjectName('video_file_edit')
-        self.video_file_layout.addWidget(self.video_file_edit)
-        self.video_browse_button = QtWidgets.QToolButton(self.video_widget)
-        self.video_browse_button.setObjectName('video_browse_button')
-        self.video_browse_button.setIcon(build_icon(':/general/general_open.png'))
-        self.video_file_layout.addWidget(self.video_browse_button)
-        self.video_layout.addRow(self.video_label, self.video_file_layout)
+        self.video_path_edit = PathEdit(self.video_widget,
+                                        dialog_caption=translate('OpenLP.ThemeWizard', 'Select Video'),
+                                        show_revert=False)
+        self.video_layout.addRow(self.video_label, self.video_path_edit)
         self.video_layout.setItem(2, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.background_stack.addWidget(self.video_widget)
         theme_wizard.addPage(self.background_page)

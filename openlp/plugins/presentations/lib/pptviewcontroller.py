@@ -35,7 +35,7 @@ if is_win():
 
 from openlp.core.common import AppLocation
 from openlp.core.lib import ScreenList
-from .presentationcontroller import PresentationController, PresentationDocument
+from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
 
 log = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ class PptviewController(PresentationController):
             if self.process:
                 return
             log.debug('start PPTView')
-            dll_path = os.path.join(AppLocation.get_directory(AppLocation.AppDir),
+            dll_path = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)),
                                     'plugins', 'presentations', 'lib', 'pptviewlib', 'pptviewlib.dll')
             self.process = cdll.LoadLibrary(dll_path)
             if log.isEnabledFor(logging.DEBUG):

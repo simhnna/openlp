@@ -23,50 +23,17 @@
 This module contains tests for the http module of the Bibles plugin.
 """
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
+
 from bs4 import BeautifulSoup
 
-from tests.functional import patch, MagicMock
 from openlp.plugins.bibles.lib.importers.http import BSExtract
-
-# TODO: Items left to test
-#   BGExtract
-#       __init__
-#       _remove_elements
-#       _extract_verse
-#       _clean_soup
-#       _extract_verses
-#       _extract_verses_old
-#       get_bible_chapter
-#       get_books_from_http
-#       _get_application
-#   CWExtract
-#       __init__
-#       get_bible_chapter
-#       get_books_from_http
-#       _get_application
-#   HTTPBible
-#       __init__
-#       do_import
-#       get_verses
-#       get_chapter
-#       get_books
-#       get_chapter_count
-#       get_verse_count
-#       _get_application
-#   get_soup_for_bible_ref
-#   send_error_message
 
 
 class TestBSExtract(TestCase):
     """
     Test the BSExtractClass
     """
-    # TODO: Items left to test
-    #   BSExtract
-    #       __init__
-    #       get_bible_chapter
-    #       get_books_from_http
-    #       _get_application
     def setUp(self):
         self.get_soup_for_bible_ref_patcher = patch('openlp.plugins.bibles.lib.importers.http.get_soup_for_bible_ref')
         self.log_patcher = patch('openlp.plugins.bibles.lib.importers.http.log')

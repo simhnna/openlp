@@ -22,19 +22,19 @@
 """
 This module contains tests for the OpenLyrics song importer.
 """
-
 import os
 import json
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
+
 from lxml import etree, objectify
 
-from tests.functional import MagicMock, patch
-from tests.helpers.testmixin import TestMixin
 from openlp.plugins.songs.lib.importers.openlyrics import OpenLyricsImport
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
 from openlp.core.common import Registry, Settings
 
+from tests.helpers.testmixin import TestMixin
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                          '..', '..', '..', 'resources', 'openlyricssongs'))

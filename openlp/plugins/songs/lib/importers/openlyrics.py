@@ -58,8 +58,8 @@ class OpenLyricsImport(SongImport):
         for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            # TODO: Verify format() with template strings
-            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType % os.path.basename(file_path))
+            self.import_wizard.increment_progress_bar(
+                WizardStrings.ImportingType.format(source=os.path.basename(file_path)))
             try:
                 # Pass a file object, because lxml does not cope with some
                 # special characters in the path (see lp:757673 and lp:744337).

@@ -35,7 +35,8 @@ class AddGroupForm(QtWidgets.QDialog, Ui_AddGroupDialog):
         """
         Constructor
         """
-        super(AddGroupForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(AddGroupForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                           QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
 
     def exec(self, clear=True, show_top_level_group=False, selected_group=None):

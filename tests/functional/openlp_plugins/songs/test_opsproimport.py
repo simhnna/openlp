@@ -25,6 +25,7 @@ This module contains tests for the WorshipCenter Pro song importer.
 import os
 import json
 from unittest import TestCase, skipUnless
+from unittest.mock import patch, MagicMock
 
 try:
     from openlp.core.common import Registry
@@ -32,8 +33,6 @@ try:
     CAN_RUN_TESTS = True
 except ImportError:
     CAN_RUN_TESTS = False
-
-from tests.functional import patch, MagicMock
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'opsprosongs'))
 

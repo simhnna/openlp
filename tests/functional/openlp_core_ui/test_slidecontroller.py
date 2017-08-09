@@ -22,15 +22,15 @@
 """
 Package to test the openlp.core.ui.slidecontroller package.
 """
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
+
 from PyQt5 import QtCore, QtGui
 
-from unittest import TestCase
 from openlp.core import Registry
 from openlp.core.lib import ImageSource, ServiceItemAction
 from openlp.core.ui import SlideController, LiveController, PreviewController
 from openlp.core.ui.slidecontroller import InfoLabel, WIDE_MENU, NON_TEXT_MENU
-
-from tests.functional import MagicMock, patch
 
 
 class TestSlideController(TestCase):
@@ -658,7 +658,7 @@ class TestSlideController(TestCase):
         slide_controller._process_item(mocked_media_item, 0)
 
         # THEN: Registry.execute should have been called to stop the presentation
-        self.assertEqual(3, mocked_execute.call_count, 'Execute should have been called 3 times')
+        self.assertEqual(2, mocked_execute.call_count, 'Execute should have been called 2 times')
         self.assertEqual('mocked_presentation_item_stop', mocked_execute.call_args_list[1][0][0],
                          'The presentation should have been stopped.')
 

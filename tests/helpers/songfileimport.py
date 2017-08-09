@@ -26,11 +26,10 @@ song files from third party applications.
 import json
 import logging
 from unittest import TestCase
+from unittest.mock import MagicMock, patch, call
 
-from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
 from openlp.core.common import Registry
-
-from tests.functional import patch, MagicMock, call
+from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
 
 log = logging.getLogger(__name__)
 

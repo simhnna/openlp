@@ -23,8 +23,8 @@
 Functional tests to test the AppLocation class and related methods.
 """
 from unittest import TestCase
+from unittest.mock import patch
 
-from tests.functional import patch
 from openlp.core.common.languagemanager import get_locale_key, get_natural_key
 
 

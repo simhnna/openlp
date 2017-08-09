@@ -206,7 +206,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 trace_error_handler(log)
         self.update_screen_list_combo()
         self.application.process_events()
-        # TODO: Tested at home
         self.downloading = translate('OpenLP.FirstTimeWizard', 'Downloading {name}...')
         if self.has_run_wizard:
             self.songs_check_box.setChecked(self.plugin_manager.get_plugin_by_name('songs').is_active())
@@ -555,15 +554,14 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         """
         # Build directories for downloads
         songs_destination = os.path.join(gettempdir(), 'openlp')
-        bibles_destination = AppLocation.get_section_data_path('bibles')
-        themes_destination = AppLocation.get_section_data_path('themes')
+        bibles_destination = str(AppLocation.get_section_data_path('bibles'))
+        themes_destination = str(AppLocation.get_section_data_path('themes'))
         missed_files = []
         # Download songs
         for i in range(self.songs_list_widget.count()):
             item = self.songs_list_widget.item(i)
             if item.checkState() == QtCore.Qt.Checked:
                 filename, sha256 = item.data(QtCore.Qt.UserRole)
-                # TODO: Tested at home
                 self._increment_progress_bar(self.downloading.format(name=filename), 0)
                 self.previous_size = 0
                 destination = os.path.join(songs_destination, str(filename))
@@ -576,7 +574,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
             item = bibles_iterator.value()
             if item.parent() and item.checkState(0) == QtCore.Qt.Checked:
                 bible, sha256 = item.data(0, QtCore.Qt.UserRole)
-                # TODO: Tested at home
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
                 if not url_get_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
@@ -589,7 +586,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
             item = self.themes_list_widget.item(i)
             if item.checkState() == QtCore.Qt.Checked:
                 theme, sha256 = item.data(QtCore.Qt.UserRole)
-                # TODO: Tested at home
                 self._increment_progress_bar(self.downloading.format(name=theme), 0)
                 self.previous_size = 0
                 if not url_get_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),

@@ -1,0 +1,96 @@
+/******************************************************************************
+* OpenLP - Open Source Lyrics Projection                                      *
+* --------------------------------------------------------------------------- *
+* Copyright (c) 2008-2017 OpenLP Developers                                   *
+* --------------------------------------------------------------------------- *
+* This program is free software; you can redistribute it and/or modify it     *
+* under the terms of the GNU General Public License as published by the Free  *
+* Software Foundation; version 2 of the License.                              *
+*                                                                             *
+* This program is distributed in the hope that it will be useful, but WITHOUT *
+* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       *
+* FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for    *
+* more details.                                                               *
+*                                                                             *
+* You should have received a copy of the GNU General Public License along     *
+* with this program; if not, write to the Free Software Foundation, Inc., 59  *
+* Temple Place, Suite 330, Boston, MA 02111-1307 USA                          *
+******************************************************************************/
+
+#header {
+  padding-bottom: 1em;
+}
+
+#transpose,
+#transposevalue,
+#capodisplay {
+  display: inline-block;
+  font-size: 30pt;
+  color: gray;
+  vertical-align: middle;
+}
+
+.button {
+  display: inline-block;
+  box-sizing: border-box;
+  border: 1px solid gray;
+  border-radius: .3em;
+  padding: 0 .2em;
+  min-width: 1.2em;
+  line-height: 1.2em;
+  font-size: 25pt;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px white;
+  color: black;
+  background: linear-gradient(to bottom, white 5%, gray 100%);
+  background-color: gray;
+  cursor: pointer;
+}
+.button:hover {
+  background: linear-gradient(to bottom, white 10%, gray 150%);
+  color: darkslategray ;
+  background-color: gray;
+}
+.button:active {
+  position:relative;
+  top:1px;
+}
+
+/* Extending existing definition in stage.css */
+#verseorder {
+  line-height: 1.5;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.chordline {
+  line-height: 2.0;
+}
+
+.chordline1 {
+  line-height: 1.0
+}
+
+.chordline span.chord span {
+  position: relative;
+}
+
+.chordline span.chord span strong {
+  position: absolute;
+  top: -0.8em;
+  left: 0;
+  font-size: 30pt;
+  font-weight: normal;
+  line-height: normal;
+  color: yellow;
+}
+
+.ws {
+  white-space: pre-wrap;
+}
+
+#nextslide .chordline span.chord span strong {
+  color: gray;
+}

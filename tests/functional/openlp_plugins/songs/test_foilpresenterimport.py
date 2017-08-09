@@ -22,10 +22,9 @@
 """
 This module contains tests for the SongShow Plus song importer.
 """
-
 import os
 from unittest import TestCase
-from tests.functional import patch, MagicMock
+from unittest.mock import patch, MagicMock
 
 from openlp.plugins.songs.lib.importers.foilpresenter import FoilPresenter
 
@@ -37,18 +36,6 @@ class TestFoilPresenter(TestCase):
     """
     Test the functions in the :mod:`foilpresenterimport` module.
     """
-    # TODO: The following modules still need tests written for
-    #   xml_to_song
-    #   to_str
-    #   _process_authors
-    #   _process_cclinumber
-    #   _process_comments
-    #   _process_copyright
-    #   _process_lyrics
-    #   _process_songbooks
-    #   _process_titles
-    #   _process_topics
-
     def setUp(self):
         self.to_str_patcher = patch('openlp.plugins.songs.lib.importers.foilpresenter.to_str')
         self.clean_song_patcher = patch('openlp.plugins.songs.lib.importers.foilpresenter.clean_song')

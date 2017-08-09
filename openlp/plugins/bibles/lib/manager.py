@@ -111,7 +111,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         self.settings_section = 'bibles'
         self.web = 'Web'
         self.db_cache = None
-        self.path = AppLocation.get_section_data_path(self.settings_section)
+        self.path = str(AppLocation.get_section_data_path(self.settings_section))
         self.proxy_name = Settings().value(self.settings_section + '/proxy name')
         self.suffix = '.sqlite'
         self.import_wizard = None
@@ -124,7 +124,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         of HTTPBible is loaded instead of the BibleDB class.
         """
         log.debug('Reload bibles')
-        files = AppLocation.get_files(self.settings_section, self.suffix)
+        files = [str(file) for file in AppLocation.get_files(self.settings_section, self.suffix)]
         if 'alternative_book_names.sqlite' in files:
             files.remove('alternative_book_names.sqlite')
         log.debug('Bible Files {text}'.format(text=files))
@@ -142,8 +142,8 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             log.debug('Bible Name: "{name}"'.format(name=name))
             self.db_cache[name] = bible
             # Look to see if lazy load bible exists and get create getter.
-            source = self.db_cache[name].get_object(BibleMeta, 'download_source')
-            if source:
+            if self.db_cache[name].is_web_bible:
+                source = self.db_cache[name].get_object(BibleMeta, 'download_source')
                 download_name = self.db_cache[name].get_object(BibleMeta, 'download_name').value
                 meta_proxy = self.db_cache[name].get_object(BibleMeta, 'proxy_server')
                 web_bible = HTTPBible(self.parent, path=self.path, file=filename, download_source=source.value,
@@ -278,7 +278,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         :param show_error:
         """
         if not bible or not ref_list:
-            return None
+            return []
         return self.db_cache[bible].get_verses(ref_list, show_error)
 
     def get_language_selection(self, bible):
@@ -305,11 +305,17 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         """
         Does a verse search for the given bible and text.
 
-        :param bible: The bible to search in (unicode).
-        :param second_bible: The second bible (unicode). We do not search in this bible.
-        :param text: The text to search for (unicode).
+        :param bible: The bible to search
+        :type bible: str
+        :param text: The text to search for
+        :type text: str
+
+        :return: The search results if valid, or None if the search is invalid.
+        :rtype: None, list
         """
         log.debug('BibleManager.verse_search("{bible}", "{text}")'.format(bible=bible, text=text))
+        if not text:
+            return None
         # If no bibles are installed, message is given.
         if not bible:
             self.main_window.information_message(
@@ -317,8 +323,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
                 UiStrings().BibleNoBibles)
             return None
         # Check if the bible or second_bible is a web bible.
-        web_bible = self.db_cache[bible].get_object(BibleMeta, 'download_source')
-        if web_bible:
+        if self.db_cache[bible].is_web_bible:
             # If either Bible is Web, cursor is reset to normal and message is given.
             self.application.set_normal_cursor()
             self.main_window.information_message(
@@ -328,41 +333,8 @@ class BibleManager(OpenLPMixin, RegistryProperties):
                                                        'This means that the currently selected Bible is a Web Bible.')
             )
             return None
-        # Shorter than 3 char searches break OpenLP with very long search times, thus they are blocked.
-        if len(text) - text.count(' ') < 3:
-            return None
         # Fetch the results from db. If no results are found, return None, no message is given for this.
-        elif text:
-            return self.db_cache[bible].verse_search(text)
-        else:
-            return None
-
-    def verse_search_while_typing(self, bible, second_bible, text):
-        """
-        Does a verse search for the given bible and text.
-        This is used during "Search while typing"
-        It's the same thing as the normal text search, but it does not show the web Bible error.
-        (It would result in the error popping every time a char is entered or removed)
-        It also does not have a minimum text len, this is set in mediaitem.py
-
-        :param bible: The bible to search in (unicode).
-        :param second_bible: The second bible (unicode). We do not search in this bible.
-        :param text: The text to search for (unicode).
-        """
-        # If no bibles are installed, message is given.
-        if not bible:
-            return None
-        # Check if the bible or second_bible is a web bible.
-        web_bible = self.db_cache[bible].get_object(BibleMeta, 'download_source')
-        second_web_bible = ''
-        if second_bible:
-            second_web_bible = self.db_cache[second_bible].get_object(BibleMeta, 'download_source')
-        if web_bible or second_web_bible:
-            # If either Bible is Web, cursor is reset to normal and search ends w/o any message.
-            self.application.set_normal_cursor()
-            return None
-        # Fetch the results from db. If no results are found, return None, no message is given for this.
-        elif text:
+        if text:
             return self.db_cache[bible].verse_search(text)
         else:
             return None
@@ -428,5 +400,6 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         """
         for bible in self.db_cache:
             self.db_cache[bible].finalise()
+
 
 __all__ = ['BibleFormat']

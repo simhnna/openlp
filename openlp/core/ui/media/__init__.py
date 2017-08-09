@@ -143,6 +143,7 @@ def format_milliseconds(milliseconds):
                                                                          seconds=seconds,
                                                                          millis=millis)
 
+
 from .mediacontroller import MediaController
 from .playertab import PlayerTab
 

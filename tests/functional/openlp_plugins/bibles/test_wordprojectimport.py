@@ -22,15 +22,12 @@
 """
 This module contains tests for the WordProject Bible importer.
 """
-
 import os
-import json
 from unittest import TestCase
+from unittest.mock import MagicMock, patch, call
 
 from openlp.plugins.bibles.lib.importers.wordproject import WordProjectBible
-from openlp.plugins.bibles.lib.db import BibleDB
 
-from tests.functional import MagicMock, patch, call
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
                                          '..', '..', '..', 'resources', 'bibles'))

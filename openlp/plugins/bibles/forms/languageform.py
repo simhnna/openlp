@@ -47,7 +47,8 @@ class LanguageForm(QDialog, Ui_LanguageDialog):
         """
         Constructor
         """
-        super(LanguageForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(LanguageForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                           QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
 
     def exec(self, bible_name):

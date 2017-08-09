@@ -23,10 +23,10 @@
     Package to test the openlp.plugin.bible.lib.https package.
 """
 from unittest import TestCase, skip
+from unittest.mock import MagicMock
 
 from openlp.core.common import Registry
 from openlp.plugins.bibles.lib.importers.http import BGExtract, CWExtract, BSExtract
-from tests.interfaces import MagicMock
 
 
 class TestBibleHTTP(TestCase):

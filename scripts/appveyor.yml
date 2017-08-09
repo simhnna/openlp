@@ -12,21 +12,21 @@ environment:
 
 install:
   # Install dependencies from pypi
-  - "%PYTHON%\\python.exe -m pip install sqlalchemy alembic chardet beautifulsoup4 Mako nose mock pyodbc psycopg2 pypiwin32 pyenchant"
+  - "%PYTHON%\\python.exe -m pip install sqlalchemy alembic chardet beautifulsoup4 Mako nose mock pyodbc==4.0.8 psycopg2 pypiwin32 pyenchant"
   # Install mysql dependency
   - "%PYTHON%\\python.exe -m pip install http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.0.4.zip#md5=3df394d89300db95163f17c843ef49df"
   # Download and install lxml and pyicu (originally from http://www.lfd.uci.edu/~gohlke/pythonlibs/)
   - "%PYTHON%\\python.exe -m pip install https://get.openlp.org/win-sdk/lxml-3.6.4-cp34-cp34m-win32.whl"
   - "%PYTHON%\\python.exe -m pip install https://get.openlp.org/win-sdk/PyICU-1.9.5-cp34-cp34m-win32.whl"
   # Download and install PyQt5
-  - curl -L -O http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt5-5.5.1-gpl-Py3.4-Qt5.5.1-x32.exe
+  - appveyor DownloadFile http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt5-5.5.1-gpl-Py3.4-Qt5.5.1-x32.exe
   - PyQt5-5.5.1-gpl-Py3.4-Qt5.5.1-x32.exe /S
   # Download and unpack mupdf
-  - curl -O http://mupdf.com/downloads/archive/mupdf-1.9a-windows.zip
+  - appveyor DownloadFile http://mupdf.com/downloads/archive/mupdf-1.9a-windows.zip
   - 7z x mupdf-1.9a-windows.zip
   - cp mupdf-1.9a-windows/mupdf.exe openlp-branch/mupdf.exe
   # Download and unpack mediainfo
-  - curl -O https://mediaarea.net/download/binary/mediainfo/0.7.90/MediaInfo_CLI_0.7.90_Windows_i386.zip
+  - appveyor DownloadFile https://mediaarea.net/download/binary/mediainfo/0.7.90/MediaInfo_CLI_0.7.90_Windows_i386.zip
   - mkdir MediaInfo
   - 7z x -oMediaInfo MediaInfo_CLI_0.7.90_Windows_i386.zip
   - cp MediaInfo\\MediaInfo.exe openlp-branch\\MediaInfo.exe
@@ -43,15 +43,15 @@ test_script:
 after_test:
   # This is where we create a package using PyInstaller
   # First get PyInstaller
-  - curl -L -O https://github.com/pyinstaller/pyinstaller/releases/download/v3.2/PyInstaller-3.2.zip
+  - appveyor DownloadFile  https://github.com/pyinstaller/pyinstaller/releases/download/v3.2/PyInstaller-3.2.zip
   - 7z x PyInstaller-3.2.zip
   # Install PyInstaller dependencies
   - "%PYTHON%\\python.exe -m pip install future pefile"
   # Download and install Inno Setup - used for packaging
-  - curl -L -O http://www.jrsoftware.org/download.php/is-unicode.exe
+  - appveyor DownloadFile http://www.jrsoftware.org/download.php/is-unicode.exe
   - is-unicode.exe /VERYSILENT /SUPPRESSMSGBOXES /SP-
   # Download and unpack portable-bundle
-  - curl -O https://get.openlp.org/win-sdk/portable-setup.7z
+  - appveyor DownloadFile https://get.openlp.org/win-sdk/portable-setup.7z
   - 7z x portable-setup.7z
   # Disabled portable installers - can't figure out how to make them silent
   # - curl -L -O http://downloads.sourceforge.net/project/portableapps/PortableApps.com%20Installer/PortableApps.comInstaller_3.4.4.paf.exe
@@ -61,7 +61,7 @@ after_test:
   # - curl -L -O http://downloads.sourceforge.net/project/portableapps/NSIS%20Portable/NSISPortable_3.0_English.paf.exe
   # - NSISPortable_3.0_English.paf.exe /S
   # Get the packaging code
-  - curl -L http://bazaar.launchpad.net/~openlp-core/openlp/packaging/tarball -o packaging.tar.gz
+  - appveyor DownloadFile http://bazaar.launchpad.net/~openlp-core/openlp/packaging/tarball -FileName packaging.tar.gz
   - 7z e packaging.tar.gz
   - 7z x packaging.tar
   - mv ~openlp-core/openlp/packaging packaging
@@ -74,7 +74,7 @@ after_test:
         7z x documentation.tar
         mv ~openlp-core/openlp/documentation documentation
         cd packaging
-        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable
+        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable
       } else {
         cd packaging
         &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch --portable

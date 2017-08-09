@@ -22,18 +22,17 @@
 """
 This module contains tests for the bibleimport module.
 """
-
 from io import BytesIO
-from lxml import etree, objectify
-
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
+
+from lxml import etree, objectify
 from PyQt5.QtWidgets import QDialog
 
 from openlp.core.common.languages import Language
 from openlp.core.lib.exceptions import ValidationError
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB
-from tests.functional import MagicMock, patch
 
 
 class TestBibleImport(TestCase):

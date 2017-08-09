@@ -90,6 +90,8 @@ class BGExtract(RegistryProperties):
     """
     Extract verses from BibleGateway
     """
+    NAME = 'BibleGateway'
+
     def __init__(self, proxy_url=None):
         log.debug('BGExtract.init("{url}")'.format(url=proxy_url))
         self.proxy_url = proxy_url
@@ -323,7 +325,7 @@ class BGExtract(RegistryProperties):
         returns a list in the form [(biblename, biblekey, language_code)]
         """
         log.debug('BGExtract.get_bibles_from_http')
-        bible_url = 'https://biblegateway.com/versions/'
+        bible_url = 'https://www.biblegateway.com/versions/'
         soup = get_soup_for_bible_ref(bible_url)
         if not soup:
             return None
@@ -357,6 +359,8 @@ class BSExtract(RegistryProperties):
     """
     Extract verses from Bibleserver.com
     """
+    NAME = 'BibleServer'
+
     def __init__(self, proxy_url=None):
         log.debug('BSExtract.init("{url}")'.format(url=proxy_url))
         self.proxy_url = proxy_url
@@ -458,6 +462,8 @@ class CWExtract(RegistryProperties):
     """
     Extract verses from CrossWalk/BibleStudyTools
     """
+    NAME = 'Crosswalk'
+
     def __init__(self, proxy_url=None):
         log.debug('CWExtract.init("{url}")'.format(url=proxy_url))
         self.proxy_url = proxy_url
@@ -767,7 +773,7 @@ def get_soup_for_bible_ref(reference_url, header=None, pre_parse_regex=None, pre
         return None
     try:
         page = get_web_page(reference_url, header, True)
-    except:
+    except Exception as e:
         page = None
     if not page:
         send_error_message('download')

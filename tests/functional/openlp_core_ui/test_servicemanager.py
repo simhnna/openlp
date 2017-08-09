@@ -24,15 +24,14 @@ Package to test the openlp.core.ui.slidecontroller package.
 """
 import os
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 import PyQt5
 
 from openlp.core.common import Registry, ThemeLevel
-from openlp.core.ui.lib.toolbar import OpenLPToolbar
 from openlp.core.lib import ServiceItem, ServiceItemType, ItemCapabilities
 from openlp.core.ui import ServiceManager
-
-from tests.functional import MagicMock, patch
+from openlp.core.ui.lib.toolbar import OpenLPToolbar
 
 
 class TestServiceManager(TestCase):

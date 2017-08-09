@@ -612,8 +612,7 @@ class TestSongSelectForm(TestCase, TestMixin):
         mocked_song_select_importer.save_song.assert_called_with(None)
         mocked_question.assert_called_with(ssform, 'Song Imported',
                                            'Your song has been imported, would you like to import more songs?',
-                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                           QtWidgets.QMessageBox.Yes)
+                                           defaultButton=QtWidgets.QMessageBox.Yes)
         mocked_on_back_button_clicked.assert_called_with()
         self.assertIsNone(ssform.song)
 
@@ -639,8 +638,7 @@ class TestSongSelectForm(TestCase, TestMixin):
         mocked_song_select_importer.save_song.assert_called_with(None)
         mocked_question.assert_called_with(ssform, 'Song Imported',
                                            'Your song has been imported, would you like to import more songs?',
-                                           QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                           QtWidgets.QMessageBox.Yes)
+                                           defaultButton=QtWidgets.QMessageBox.Yes)
         mocked_done.assert_called_with(QtWidgets.QDialog.Accepted)
         self.assertIsNone(ssform.song)
 

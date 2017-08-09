@@ -242,7 +242,7 @@ class SongImport(QtCore.QObject):
             self.copyright += ' '
         self.copyright += copyright
 
-    def parse_author(self, text):
+    def parse_author(self, text, type=None):
         """
         Add the author. OpenLP stores them individually so split by 'and', '&' and comma. However need to check
         for 'Mr and Mrs Smith' and turn it to 'Mr Smith' and 'Mrs Smith'.
@@ -256,7 +256,10 @@ class SongImport(QtCore.QObject):
                 if author2.endswith('.'):
                     author2 = author2[:-1]
                 if author2:
-                    self.add_author(author2)
+                    if type:
+                        self.add_author(author2, type)
+                    else:
+                        self.add_author(author2)
 
     def add_author(self, author, type=None):
         """
@@ -304,12 +307,23 @@ class SongImport(QtCore.QObject):
         if verse_def not in self.verse_order_list_generated:
             self.verse_order_list_generated.append(verse_def)
 
-    def repeat_verse(self):
+    def repeat_verse(self, verse_def=None):
         """
-        Repeat the previous verse in the verse order
+        Repeat the verse with the given verse_def or default to repeating the previous verse in the verse order
+
+        :param verse_def: verse_def of the verse to be repeated
         """
         if self.verse_order_list_generated:
-            self.verse_order_list_generated.append(self.verse_order_list_generated[-1])
+            if verse_def:
+                # If the given verse_def is only one char (like 'v' or 'c'), postfix it with '1'
+                if len(verse_def) == 1:
+                    verse_def += '1'
+                if verse_def in self.verse_order_list_generated:
+                    self.verse_order_list_generated.append(verse_def)
+                else:
+                    log.warning('Trying to add unknown verse_def "%s"' % verse_def)
+            else:
+                self.verse_order_list_generated.append(self.verse_order_list_generated[-1])
             self.verse_order_list_generated_useful = True
 
     def check_complete(self):
@@ -333,8 +347,7 @@ class SongImport(QtCore.QObject):
         song = Song()
         song.title = self.title
         if self.import_wizard is not None:
-            # TODO: Verify format() with template variables
-            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType % song.title)
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=song.title))
         song.alternate_title = self.alternate_title
         # Values will be set when cleaning the song.
         song.search_title = ''
@@ -408,7 +421,7 @@ class SongImport(QtCore.QObject):
         :param filename: The file to copy.
         """
         if not hasattr(self, 'save_path'):
-            self.save_path = os.path.join(AppLocation.get_section_data_path(self.import_wizard.plugin.name),
+            self.save_path = os.path.join(str(AppLocation.get_section_data_path(self.import_wizard.plugin.name)),
                                           'audio', str(song_id))
         check_directory_exists(self.save_path)
         if not filename.startswith(self.save_path):

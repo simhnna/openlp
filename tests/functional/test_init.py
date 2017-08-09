@@ -24,6 +24,7 @@ Package to test the openlp.core.__init__ package.
 """
 import os
 from unittest import TestCase
+from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -31,7 +32,6 @@ from openlp.core import OpenLP, parse_options
 from openlp.core.common import Settings
 
 from tests.helpers.testmixin import TestMixin
-from tests.functional import MagicMock, patch, call
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
 

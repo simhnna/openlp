@@ -21,14 +21,16 @@
 ###############################################################################
 
 from .colorbutton import ColorButton
-from .listwidgetwithdnd import ListWidgetWithDnD
-from .treewidgetwithdnd import TreeWidgetWithDnD
-from .toolbar import OpenLPToolbar
-from .dockwidget import OpenLPDockWidget
-from .wizard import OpenLPWizard, WizardStrings
-from .mediadockmanager import MediaDockManager
 from .listpreviewwidget import ListPreviewWidget
+from .listwidgetwithdnd import ListWidgetWithDnD
+from .mediadockmanager import MediaDockManager
+from .dockwidget import OpenLPDockWidget
+from .toolbar import OpenLPToolbar
+from .wizard import OpenLPWizard, WizardStrings
+from .pathedit import PathEdit, PathType
 from .spelltextedit import SpellTextEdit
+from .treewidgetwithdnd import TreeWidgetWithDnD
 
-__all__ = ['ColorButton', 'ListPreviewWidget', 'ListWidgetWithDnD', 'OpenLPToolbar', 'OpenLPDockWidget',
-           'OpenLPWizard', 'WizardStrings', 'MediaDockManager', 'ListPreviewWidget', 'SpellTextEdit']
+__all__ = ['ColorButton', 'ListPreviewWidget', 'ListWidgetWithDnD', 'MediaDockManager', 'OpenLPDockWidget',
+           'OpenLPToolbar', 'OpenLPWizard', 'PathEdit', 'PathType', 'SpellTextEdit', 'TreeWidgetWithDnD',
+           'WizardStrings']

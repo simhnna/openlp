@@ -48,6 +48,7 @@ from .importers.powerpraise import PowerPraiseImport
 from .importers.presentationmanager import PresentationManagerImport
 from .importers.lyrix import LyrixImport
 from .importers.videopsalm import VideoPsalmImport
+from .importers.chordpro import ChordProImport
 
 log = logging.getLogger(__name__)
 
@@ -155,29 +156,31 @@ class SongFormat(object):
     OpenLP2 = 1
     Generic = 2
     CCLI = 3
-    DreamBeam = 4
-    EasySlides = 5
-    EasyWorshipDB = 6
-    EasyWorshipService = 7
-    FoilPresenter = 8
-    Lyrix = 9
-    MediaShout = 10
-    OpenSong = 11
-    OPSPro = 12
-    PowerPraise = 13
-    PowerSong = 14
-    PresentationManager = 15
-    ProPresenter = 16
-    SongBeamer = 17
-    SongPro = 18
-    SongShowPlus = 19
-    SongsOfFellowship = 20
-    SundayPlus = 21
-    VideoPsalm = 22
-    WordsOfWorship = 23
-    WorshipAssistant = 24
-    WorshipCenterPro = 25
-    ZionWorx = 26
+    ChordPro = 4
+    DreamBeam = 5
+    EasySlides = 6
+    EasyWorshipDB = 7
+    EasyWorshipSqliteDB = 8
+    EasyWorshipService = 9
+    FoilPresenter = 10
+    Lyrix = 11
+    MediaShout = 12
+    OpenSong = 13
+    OPSPro = 14
+    PowerPraise = 15
+    PowerSong = 16
+    PresentationManager = 17
+    ProPresenter = 18
+    SongBeamer = 19
+    SongPro = 20
+    SongShowPlus = 21
+    SongsOfFellowship = 22
+    SundayPlus = 23
+    VideoPsalm = 24
+    WordsOfWorship = 25
+    WorshipAssistant = 26
+    WorshipCenterPro = 27
+    ZionWorx = 28
 
     # Set optional attribute defaults
     __defaults__ = {
@@ -203,7 +206,7 @@ class SongFormat(object):
         },
         OpenLP2: {
             'class': OpenLPSongImport,
-            'name': UiStrings().OLPV2,
+            'name': UiStrings().OpenLPv2AndUp,
             'prefix': 'openLP2',
             'selectMode': SongFormatSelect.SingleFile,
             'filter': '{text} (*.sqlite)'.format(text=translate('SongsPlugin.ImportWizardForm', 'OpenLP 2 Databases'))
@@ -224,6 +227,13 @@ class SongFormat(object):
             'filter': '{text} (*.usr *.txt *.bin)'.format(text=translate('SongsPlugin.ImportWizardForm',
                                                                          'CCLI SongSelect Files'))
         },
+        ChordPro: {
+            'class': ChordProImport,
+            'name': 'ChordPro',
+            'prefix': 'chordPro',
+            'filter': '{text} (*.cho  *.crd *.chordpro *.chopro *.txt)'.format(
+                text=translate('SongsPlugin.ImportWizardForm', 'ChordPro Files'))
+        },
         DreamBeam: {
             'class': DreamBeamImport,
             'name': 'DreamBeam',
@@ -242,12 +252,20 @@ class SongFormat(object):
             'name': 'EasyWorship Song Database',
             'prefix': 'ew',
             'selectMode': SongFormatSelect.SingleFile,
-            'filter': '{text} (*.db)'.format(text=translate('SongsPlugin.ImportWizardForm',
+            'filter': '{text} (*.DB)'.format(text=translate('SongsPlugin.ImportWizardForm',
                                                             'EasyWorship Song Database'))
+        },
+        EasyWorshipSqliteDB: {
+            'class': EasyWorshipSongImport,
+            'name': 'EasyWorship 6 Song Database',
+            'prefix': 'ew',
+            'selectMode': SongFormatSelect.SingleFolder,
+            'filter': '{text} (*.db)'.format(text=translate('SongsPlugin.ImportWizardForm',
+                                                            'EasyWorship 6 Song Data Directory'))
         },
         EasyWorshipService: {
             'class': EasyWorshipSongImport,
-            'name': 'EasyWorship Service File',
+            'name': 'EasyWorship Service',
             'prefix': 'ew',
             'selectMode': SongFormatSelect.SingleFile,
             'filter': '{text} (*.ews)'.format(text=translate('SongsPlugin.ImportWizardForm',
@@ -427,9 +445,11 @@ class SongFormat(object):
             SongFormat.OpenLP2,
             SongFormat.Generic,
             SongFormat.CCLI,
+            SongFormat.ChordPro,
             SongFormat.DreamBeam,
             SongFormat.EasySlides,
             SongFormat.EasyWorshipDB,
+            SongFormat.EasyWorshipSqliteDB,
             SongFormat.EasyWorshipService,
             SongFormat.FoilPresenter,
             SongFormat.Lyrix,

@@ -158,6 +158,7 @@ class BibleDB(Manager):
                 self.get_name()
         if 'path' in kwargs:
             self.path = kwargs['path']
+        self._is_web_bible = None
 
     def get_name(self):
         """
@@ -305,9 +306,8 @@ class BibleDB(Manager):
         book_escaped = book
         for character in RESERVED_CHARACTERS:
             book_escaped = book_escaped.replace(character, '\\' + character)
-        # TODO: Verify regex patters before using format()
-        regex_book = re.compile('\s*%s\s*' % '\s*'.join(
-            book_escaped.split()), re.UNICODE | re.IGNORECASE)
+        regex_book = re.compile('\\s*{book}\\s*'.format(book='\\s*'.join(book_escaped.split())),
+                                re.UNICODE | re.IGNORECASE)
         if language_selection == LanguageSelection.Bible:
             db_book = self.get_book(book)
             if db_book:
@@ -426,6 +426,18 @@ class BibleDB(Manager):
             return 0
         return count
 
+    @property
+    def is_web_bible(self):
+        """
+        A read only property indicating if the bible is a 'web bible'
+
+        :return: If the bible is a web bible.
+        :rtype: bool
+        """
+        if self._is_web_bible is None:
+            self._is_web_bible = bool(self.get_object(BibleMeta, 'download_source'))
+        return self._is_web_bible
+
     def dump_bible(self):
         """
         Utility debugging method to dump the contents of a bible.
@@ -458,7 +470,7 @@ class BiblesResourcesDB(QtCore.QObject, Manager):
         Return the cursor object. Instantiate one if it doesn't exist yet.
         """
         if BiblesResourcesDB.cursor is None:
-            file_path = os.path.join(AppLocation.get_directory(AppLocation.PluginsDir),
+            file_path = os.path.join(str(AppLocation.get_directory(AppLocation.PluginsDir)),
                                      'bibles', 'resources', 'bibles_resources.sqlite')
             conn = sqlite3.connect(file_path)
             BiblesResourcesDB.cursor = conn.cursor()
@@ -747,7 +759,7 @@ class AlternativeBookNamesDB(QtCore.QObject, Manager):
         """
         if AlternativeBookNamesDB.cursor is None:
             file_path = os.path.join(
-                AppLocation.get_directory(AppLocation.DataDir), 'bibles', 'alternative_book_names.sqlite')
+                str(AppLocation.get_directory(AppLocation.DataDir)), 'bibles', 'alternative_book_names.sqlite')
             if not os.path.exists(file_path):
                 # create new DB, create table alternative_book_names
                 AlternativeBookNamesDB.conn = sqlite3.connect(file_path)

@@ -44,6 +44,7 @@ from sqlalchemy.orm import relationship
 
 from openlp.core.lib.db import Manager, init_db, init_url
 from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES
+from openlp.core.lib.projector import upgrade
 
 Base = declarative_base(MetaData())
 
@@ -150,11 +151,15 @@ class Projector(CommonBase, Base):
         name:           Column(String(20))
         location:       Column(String(30))
         notes:          Column(String(200))
-        pjlink_name:    Column(String(128))  # From projector (future)
-        manufacturer:   Column(String(128))  # From projector (future)
-        model:          Column(String(128))  # From projector (future)
-        other:          Column(String(128))  # From projector (future)
-        sources:        Column(String(128))  # From projector (future)
+        pjlink_name:    Column(String(128))  # From projector
+        manufacturer:   Column(String(128))  # From projector
+        model:          Column(String(128))  # From projector
+        other:          Column(String(128))  # From projector
+        sources:        Column(String(128))  # From projector
+        serial_no:      Column(String(30))   # From projector (Class 2)
+        sw_version:     Column(String(30))   # From projector (Class 2)
+        model_filter:   Column(String(30))   # From projector (Class 2)
+        model_lamp:     Column(String(30))   # From projector (Class 2)
 
         ProjectorSource relates
     """
@@ -162,24 +167,31 @@ class Projector(CommonBase, Base):
         """
         Return basic representation of Source table entry.
         """
-        return '< Projector(id="{data}", ip="{ip}", port="{port}", pin="{pin}", name="{name}", ' \
+        return '< Projector(id="{data}", ip="{ip}", port="{port}", mac_adx="{mac}", pin="{pin}", name="{name}", ' \
             'location="{location}", notes="{notes}", pjlink_name="{pjlink_name}", ' \
-            'manufacturer="{manufacturer}", model="{model}", other="{other}", ' \
-            'sources="{sources}", source_list="{source_list}") >'.format(data=self.id,
-                                                                         ip=self.ip,
-                                                                         port=self.port,
-                                                                         pin=self.pin,
-                                                                         name=self.name,
-                                                                         location=self.location,
-                                                                         notes=self.notes,
-                                                                         pjlink_name=self.pjlink_name,
-                                                                         manufacturer=self.manufacturer,
-                                                                         model=self.model,
-                                                                         other=self.other,
-                                                                         sources=self.sources,
-                                                                         source_list=self.source_list)
+            'manufacturer="{manufacturer}", model="{model}", serial_no="{serial}", other="{other}", ' \
+            'sources="{sources}", source_list="{source_list}", model_filter="{mfilter}", ' \
+            'model_lamp="{mlamp}", sw_version="{sw_ver}") >'.format(data=self.id,
+                                                                    ip=self.ip,
+                                                                    port=self.port,
+                                                                    mac=self.mac_adx,
+                                                                    pin=self.pin,
+                                                                    name=self.name,
+                                                                    location=self.location,
+                                                                    notes=self.notes,
+                                                                    pjlink_name=self.pjlink_name,
+                                                                    manufacturer=self.manufacturer,
+                                                                    model=self.model,
+                                                                    other=self.other,
+                                                                    sources=self.sources,
+                                                                    source_list=self.source_list,
+                                                                    serial=self.serial_no,
+                                                                    mfilter=self.model_filter,
+                                                                    mlamp=self.model_lamp,
+                                                                    sw_ver=self.sw_version)
     ip = Column(String(100))
     port = Column(String(8))
+    mac_adx = Column(String(18))
     pin = Column(String(20))
     name = Column(String(20))
     location = Column(String(30))
@@ -189,6 +201,10 @@ class Projector(CommonBase, Base):
     model = Column(String(128))
     other = Column(String(128))
     sources = Column(String(128))
+    serial_no = Column(String(30))
+    sw_version = Column(String(30))
+    model_filter = Column(String(30))
+    model_lamp = Column(String(30))
     source_list = relationship('ProjectorSource',
                                order_by='ProjectorSource.code',
                                backref='projector',
@@ -230,7 +246,9 @@ class ProjectorDB(Manager):
     """
     def __init__(self, *args, **kwargs):
         log.debug('ProjectorDB().__init__(args="{arg}", kwargs="{kwarg}")'.format(arg=args, kwarg=kwargs))
-        super().__init__(plugin_name='projector', init_schema=self.init_schema)
+        super().__init__(plugin_name='projector',
+                         init_schema=self.init_schema,
+                         upgrade_mod=upgrade)
         log.debug('ProjectorDB() Initialized using db url {db}'.format(db=self.db_url))
         log.debug('Session: {session}'.format(session=self.session))
 
@@ -285,7 +303,7 @@ class ProjectorDB(Manager):
         :param ip: Host IP/Name
         :returns: Projector() instance
         """
-        log.debug('get_projector_by_ip(ip="%s")' % ip)
+        log.debug('get_projector_by_ip(ip="{ip}")'.format(ip=ip))
         projector = self.get_object_filtered(Projector, Projector.ip == ip)
         if projector is None:
             # Not found
@@ -359,6 +377,10 @@ class ProjectorDB(Manager):
         old_projector.model = projector.model
         old_projector.other = projector.other
         old_projector.sources = projector.sources
+        old_projector.serial_no = projector.serial_no
+        old_projector.sw_version = projector.sw_version
+        old_projector.model_filter = projector.model_filter
+        old_projector.model_lamp = projector.model_lamp
         return self.save_object(old_projector)
 
     def delete_projector(self, projector):

@@ -69,10 +69,16 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
         self.video_color_button.colorChanged.connect(self.on_video_color_changed)
         self.gradient_start_button.colorChanged.connect(self.on_gradient_start_color_changed)
         self.gradient_end_button.colorChanged.connect(self.on_gradient_end_color_changed)
-        self.image_browse_button.clicked.connect(self.on_image_browse_button_clicked)
-        self.image_file_edit.editingFinished.connect(self.on_image_file_edit_editing_finished)
-        self.video_browse_button.clicked.connect(self.on_video_browse_button_clicked)
-        self.video_file_edit.editingFinished.connect(self.on_video_file_edit_editing_finished)
+        self.image_path_edit.filters = \
+            '{name};;{text} (*)'.format(name=get_images_filter(), text=UiStrings().AllFiles)
+        self.image_path_edit.pathChanged.connect(self.on_image_path_edit_path_changed)
+        # TODO: Should work
+        visible_formats = '({name})'.format(name='; '.join(VIDEO_EXT))
+        actual_formats = '({name})'.format(name=' '.join(VIDEO_EXT))
+        video_filter = '{trans} {visible} {actual}'.format(trans=translate('OpenLP', 'Video Files'),
+                                                           visible=visible_formats, actual=actual_formats)
+        self.video_path_edit.filters = '{video};;{ui} (*)'.format(video=video_filter, ui=UiStrings().AllFiles)
+        self.video_path_edit.pathChanged.connect(self.on_video_path_edit_path_changed)
         self.main_color_button.colorChanged.connect(self.on_main_color_changed)
         self.outline_color_button.colorChanged.connect(self.on_outline_color_changed)
         self.shadow_color_button.colorChanged.connect(self.on_shadow_color_changed)
@@ -112,7 +118,8 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
         self.background_page.registerField('color', self.color_button)
         self.background_page.registerField('gradient_start', self.gradient_start_button)
         self.background_page.registerField('gradient_end', self.gradient_end_button)
-        self.background_page.registerField('background_image', self.image_file_edit)
+        self.background_page.registerField('background_image', self.image_path_edit,
+                                           'path', self.image_path_edit.pathChanged)
         self.background_page.registerField('gradient', self.gradient_combo_box)
         self.main_area_page.registerField('main_color_button', self.main_color_button)
         self.main_area_page.registerField('main_size_spin_box', self.main_size_spin_box)
@@ -309,11 +316,11 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
             self.setField('background_type', 1)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Image):
             self.image_color_button.color = self.theme.background_border_color
-            self.image_file_edit.setText(self.theme.background_filename)
+            self.image_path_edit.path = self.theme.background_filename
             self.setField('background_type', 2)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Video):
             self.video_color_button.color = self.theme.background_border_color
-            self.video_file_edit.setText(self.theme.background_filename)
+            self.video_path_edit.path = self.theme.background_filename
             self.setField('background_type', 4)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Transparent):
             self.setField('background_type', 3)
@@ -441,47 +448,19 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
         """
         self.theme.background_end_color = color
 
-    def on_image_browse_button_clicked(self):
+    def on_image_path_edit_path_changed(self, filename):
         """
         Background Image button pushed.
         """
-        images_filter = get_images_filter()
-        images_filter = '{name};;{text} (*.*)'.format(name=images_filter, text=UiStrings().AllFiles)
-        filename, filter_used = QtWidgets.QFileDialog.getOpenFileName(
-            self, translate('OpenLP.ThemeWizard', 'Select Image'),
-            self.image_file_edit.text(), images_filter)
-        if filename:
-            self.theme.background_filename = filename
+        self.theme.background_filename = filename
         self.set_background_page_values()
 
-    def on_image_file_edit_editing_finished(self):
-        """
-        Background image path edited
-        """
-        self.theme.background_filename = str(self.image_file_edit.text())
-
-    def on_video_browse_button_clicked(self):
+    def on_video_path_edit_path_changed(self, filename):
         """
         Background video button pushed.
         """
-        # TODO: Should work
-        visible_formats = '({name})'.format(name='; '.join(VIDEO_EXT))
-        actual_formats = '({name})'.format(name=' '.join(VIDEO_EXT))
-        video_filter = '{trans} {visible} {actual}'.format(trans=translate('OpenLP', 'Video Files'),
-                                                           visible=visible_formats, actual=actual_formats)
-        video_filter = '{video};;{ui} (*.*)'.format(video=video_filter, ui=UiStrings().AllFiles)
-        filename, filter_used = QtWidgets.QFileDialog.getOpenFileName(
-            self, translate('OpenLP.ThemeWizard', 'Select Video'),
-            self.video_file_edit.text(), video_filter)
-        if filename:
-            self.theme.background_filename = filename
+        self.theme.background_filename = filename
         self.set_background_page_values()
-
-    def on_video_file_edit_editing_finished(self):
-        """
-        Background video path edited
-        """
-        self.theme.background_filename = str(self.image_file_edit.text())
 
     def on_main_color_changed(self, color):
         """

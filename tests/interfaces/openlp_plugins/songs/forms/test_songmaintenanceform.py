@@ -25,7 +25,7 @@ Package to test the openlp.plugins.songs.forms.songmaintenanceform package.
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
-from PyQt5 import QtCore, QtTest, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, UiStrings
 from openlp.plugins.songs.forms.songmaintenanceform import SongMaintenanceForm
@@ -89,6 +89,7 @@ class TestSongMaintenanceForm(TestCase, TestMixin):
         mocked_reset_song_books.assert_called_once_with()
         mocked_type_list_widget.setFocus.assert_called_once_with()
         mocked_exec.assert_called_once_with(self.form)
+        assert result is True
 
     def test_get_current_item_id_no_item(self):
         """
@@ -290,3 +291,131 @@ class TestSongMaintenanceForm(TestCase, TestMixin):
         MockedQListWidgetItem.assert_called_once_with('Hymnal (Hymns and Psalms, Inc.)')
         mocked_song_book_item.setData.assert_called_once_with(QtCore.Qt.UserRole, 1)
         mocked_song_book_list_widget.addItem.assert_called_once_with(mocked_song_book_item)
+
+    @patch('openlp.plugins.songs.forms.songmaintenanceform.and_')
+    @patch('openlp.plugins.songs.forms.songmaintenanceform.Author')
+    def test_check_author_exists(self, MockedAuthor, mocked_and):
+        """
+        Test the check_author_exists() method
+        """
+        # GIVEN: A bunch of mocked out stuff
+        MockedAuthor.first_name = 'John'
+        MockedAuthor.last_name = 'Newton'
+        MockedAuthor.display_name = 'John Newton'
+        mocked_new_author = MagicMock()
+        mocked_new_author.first_name = 'John'
+        mocked_new_author.last_name = 'Newton'
+        mocked_new_author.display_name = 'John Newton'
+        mocked_and.return_value = True
+        mocked_authors = [MagicMock(), MagicMock()]
+        self.mocked_manager.get_all_objects.return_value = mocked_authors
+
+        # WHEN: check_author_exists() is called
+        with patch.object(self.form, '_check_object_exists') as mocked_check_object_exists:
+            mocked_check_object_exists.return_value = True
+            result = self.form.check_author_exists(mocked_new_author, edit=True)
+
+        # THEN: The correct result is returned
+        mocked_and.assert_called_once_with(True, True, True)
+        self.mocked_manager.get_all_objects.assert_called_once_with(MockedAuthor, True)
+        mocked_check_object_exists.assert_called_once_with(mocked_authors, mocked_new_author, True)
+        assert result is True
+
+    @patch('openlp.plugins.songs.forms.songmaintenanceform.Topic')
+    def test_check_topic_exists(self, MockedTopic):
+        """
+        Test the check_topic_exists() method
+        """
+        # GIVEN: Some mocked stuff
+        MockedTopic.name = 'Grace'
+        mocked_new_topic = MagicMock()
+        mocked_new_topic.name = 'Grace'
+        mocked_topics = [MagicMock(), MagicMock()]
+        self.mocked_manager.get_all_objects.return_value = mocked_topics
+
+        # WHEN: check_topic_exists() is run
+        with patch.object(self.form, '_check_object_exists') as mocked_check_object_exists:
+            mocked_check_object_exists.return_value = True
+            result = self.form.check_topic_exists(mocked_new_topic, True)
+
+        # THEN: The correct things should have been called
+        self.mocked_manager.get_all_objects.assert_called_once_with(MockedTopic, True)
+        mocked_check_object_exists.assert_called_once_with(mocked_topics, mocked_new_topic, True)
+        assert result is True
+
+    @patch('openlp.plugins.songs.forms.songmaintenanceform.and_')
+    @patch('openlp.plugins.songs.forms.songmaintenanceform.Book')
+    def test_check_song_book_exists(self, MockedBook, mocked_and):
+        """
+        Test the check_song_book_exists() method
+        """
+        # GIVEN: Some mocked stuff
+        MockedBook.name = 'Hymns'
+        MockedBook.publisher = 'Christian Songs'
+        mocked_new_book = MagicMock()
+        mocked_new_book.name = 'Hymns'
+        mocked_new_book.publisher = 'Christian Songs'
+        mocked_and.return_value = True
+        mocked_books = [MagicMock(), MagicMock()]
+        self.mocked_manager.get_all_objects.return_value = mocked_books
+
+        # WHEN: check_book_exists() is run
+        with patch.object(self.form, '_check_object_exists') as mocked_check_object_exists:
+            mocked_check_object_exists.return_value = True
+            result = self.form.check_song_book_exists(mocked_new_book, True)
+
+        # THEN: The correct things should have been called
+        mocked_and.assert_called_once_with(True, True)
+        self.mocked_manager.get_all_objects.assert_called_once_with(MockedBook, True)
+        mocked_check_object_exists.assert_called_once_with(mocked_books, mocked_new_book, True)
+        assert result is True
+
+    def test_check_object_exists_no_existing_objects(self):
+        """
+        Test the _check_object_exists() method when there are no existing objects
+        """
+        # GIVEN: A SongMaintenanceForm instance
+        # WHEN: _check_object_exists() is called without existing objects
+        result = self.form._check_object_exists([], None, False)
+
+        # THEN: The result should be True
+        assert result is True
+
+    def test_check_object_exists_without_edit(self):
+        """
+        Test the _check_object_exists() method when edit is false
+        """
+        # GIVEN: A SongMaintenanceForm instance
+        # WHEN: _check_object_exists() is called with edit set to false
+        result = self.form._check_object_exists([MagicMock()], None, False)
+
+        # THEN: The result should be False
+        assert result is False
+
+    def test_check_object_exists_not_found(self):
+        """
+        Test the _check_object_exists() method when the object is not found
+        """
+        # GIVEN: A SongMaintenanceForm instance and some mocked objects
+        mocked_existing_objects = [MagicMock(id=1)]
+        mocked_new_object = MagicMock(id=2)
+
+        # WHEN: _check_object_exists() is called with edit set to false
+        result = self.form._check_object_exists(mocked_existing_objects, mocked_new_object, True)
+
+        # THEN: The result should be False
+        assert result is False
+
+    def test_check_object_exists(self):
+        """
+        Test the _check_object_exists() method
+        """
+        # GIVEN: A SongMaintenanceForm instance and some mocked objects
+        mocked_existing_objects = [MagicMock(id=1)]
+        mocked_new_object = MagicMock(id=1)
+
+        # WHEN: _check_object_exists() is called with edit set to false
+        result = self.form._check_object_exists(mocked_existing_objects, mocked_new_object, True)
+
+        # THEN: The result should be False
+        assert result is True

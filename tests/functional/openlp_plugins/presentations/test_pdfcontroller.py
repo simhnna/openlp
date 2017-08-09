@@ -24,14 +24,16 @@ This module contains tests for the PdfController
 """
 import os
 import shutil
-from unittest import TestCase, SkipTest
 from tempfile import mkdtemp
+from unittest import TestCase, SkipTest
+from unittest.mock import MagicMock, patch
+
 from PyQt5 import QtCore, QtGui
 
 from openlp.plugins.presentations.lib.pdfcontroller import PdfController, PdfDocument
-from tests.functional import MagicMock, patch
 from openlp.core.common import Settings
 from openlp.core.lib import ScreenList
+
 from tests.utils.constants import TEST_RESOURCES_PATH
 from tests.helpers.testmixin import TestMixin
 

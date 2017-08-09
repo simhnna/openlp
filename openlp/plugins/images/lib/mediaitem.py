@@ -98,7 +98,7 @@ class ImageMediaItem(MediaManagerItem):
         self.list_view.setIconSize(QtCore.QSize(88, 50))
         self.list_view.setIndentation(self.list_view.default_indentation)
         self.list_view.allow_internal_dnd = True
-        self.service_path = os.path.join(AppLocation.get_section_data_path(self.settings_section), 'thumbnails')
+        self.service_path = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
         check_directory_exists(self.service_path)
         # Load images from the database
         self.load_full_list(
@@ -246,9 +246,7 @@ class ImageMediaItem(MediaManagerItem):
                                 translate('ImagePlugin.MediaItem', 'Remove group'),
                                 translate('ImagePlugin.MediaItem',
                                           'Are you sure you want to remove "{name}" and everything in it?'
-                                          ).format(name=item_data.group_name),
-                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                      QtWidgets.QMessageBox.No)
+                                          ).format(name=item_data.group_name)
                         ) == QtWidgets.QMessageBox.Yes:
                             self.recursively_delete_group(item_data)
                             self.manager.delete_object(ImageGroups, row_item.data(0, QtCore.Qt.UserRole).id)
@@ -597,8 +595,7 @@ class ImageMediaItem(MediaManagerItem):
                 self, translate('ImagePlugin.MediaItem', 'Missing Image(s)'),
                 translate('ImagePlugin.MediaItem', 'The following image(s) no longer exist: {names}\n'
                           'Do you want to add the other images anyway?'
-                          ).format(names='\n'.join(missing_items_file_names)),
-                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Yes)) == \
+                          ).format(names='\n'.join(missing_items_file_names))) == \
                 QtWidgets.QMessageBox.No:
             return False
         # Continue with the existing images.

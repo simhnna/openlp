@@ -41,7 +41,8 @@ class PluginForm(QtWidgets.QDialog, Ui_PluginViewDialog, RegistryProperties):
         """
         Constructor
         """
-        super(PluginForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(PluginForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                         QtCore.Qt.WindowCloseButtonHint)
         self.active_plugin = None
         self.programatic_change = False
         self.setupUi(self)
@@ -60,7 +61,6 @@ class PluginForm(QtWidgets.QDialog, Ui_PluginViewDialog, RegistryProperties):
         self._clear_details()
         self.programatic_change = True
         plugin_list_width = 0
-        # TODO: Tested at home
         for plugin in self.plugin_manager.plugins:
             item = QtWidgets.QListWidgetItem(self.plugin_list_widget)
             # We do this just to make 100% sure the status is an integer as
@@ -137,7 +137,6 @@ class PluginForm(QtWidgets.QDialog, Ui_PluginViewDialog, RegistryProperties):
             self.active_plugin.app_startup()
         else:
             self.active_plugin.toggle_status(PluginStatus.Inactive)
-        # TODO: Tested at home
         status_text = translate('OpenLP.PluginForm', '{name} (Inactive)')
         if self.active_plugin.status == PluginStatus.Active:
             status_text = translate('OpenLP.PluginForm', '{name} (Active)')

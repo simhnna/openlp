@@ -19,10 +19,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import sys
 from unittest import TestCase, skip
 from unittest.mock import MagicMock, patch
+
+from PyQt5 import QtCore, QtWidgets
 
 from openlp.core import OpenLP, parse_options
 
@@ -131,11 +132,11 @@ class TestInitFunctions(TestCase):
         self.assertEquals(args.rargs, 'dummy_temp', 'The service file should not be blank')
 
 
+@skip('Figure out why this is causing a segfault')
 class TestOpenLP(TestCase):
     """
     Test the OpenLP app class
     """
-    @skip('Figure out why this is causing a segfault')
     @patch('openlp.core.QtWidgets.QApplication.exec')
     def test_exec(self, mocked_exec):
         """
@@ -155,4 +156,118 @@ class TestOpenLP(TestCase):
         app.shared_memory.detach.assert_called_once_with()
         assert result is False
 
-        del app
+    @patch('openlp.core.QtCore.QSharedMemory')
+    def test_is_already_running_not_running(self, MockedSharedMemory):
+        """
+        Test the is_already_running() method when OpenLP is NOT running
+        """
+        # GIVEN: An OpenLP app and some mocks
+        mocked_shared_memory = MagicMock()
+        mocked_shared_memory.attach.return_value = False
+        MockedSharedMemory.return_value = mocked_shared_memory
+        app = OpenLP([])
+
+        # WHEN: is_already_running() is called
+        result = app.is_already_running()
+
+        # THEN: The result should be false
+        MockedSharedMemory.assert_called_once_with('OpenLP')
+        mocked_shared_memory.attach.assert_called_once_with()
+        mocked_shared_memory.create.assert_called_once_with(1)
+        assert result is False
+
+    @patch('openlp.core.QtWidgets.QMessageBox.critical')
+    @patch('openlp.core.QtWidgets.QMessageBox.StandardButtons')
+    @patch('openlp.core.QtCore.QSharedMemory')
+    def test_is_already_running_is_running_continue(self, MockedSharedMemory, MockedStandardButtons, mocked_critical):
+        """
+        Test the is_already_running() method when OpenLP IS running and the user chooses to continue
+        """
+        # GIVEN: An OpenLP app and some mocks
+        mocked_shared_memory = MagicMock()
+        mocked_shared_memory.attach.return_value = True
+        MockedSharedMemory.return_value = mocked_shared_memory
+        MockedStandardButtons.return_value = 0
+        mocked_critical.return_value = QtWidgets.QMessageBox.Yes
+        app = OpenLP([])
+
+        # WHEN: is_already_running() is called
+        result = app.is_already_running()
+
+        # THEN: The result should be false
+        MockedSharedMemory.assert_called_once_with('OpenLP')
+        mocked_shared_memory.attach.assert_called_once_with()
+        MockedStandardButtons.assert_called_once_with(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        mocked_critical.assert_called_once_with(None, 'Error', 'OpenLP is already running. Do you wish to continue?', 0)
+        assert result is False
+
+    @patch('openlp.core.QtWidgets.QMessageBox.critical')
+    @patch('openlp.core.QtWidgets.QMessageBox.StandardButtons')
+    @patch('openlp.core.QtCore.QSharedMemory')
+    def test_is_already_running_is_running_stop(self, MockedSharedMemory, MockedStandardButtons, mocked_critical):
+        """
+        Test the is_already_running() method when OpenLP IS running and the user chooses to stop
+        """
+        # GIVEN: An OpenLP app and some mocks
+        mocked_shared_memory = MagicMock()
+        mocked_shared_memory.attach.return_value = True
+        MockedSharedMemory.return_value = mocked_shared_memory
+        MockedStandardButtons.return_value = 0
+        mocked_critical.return_value = QtWidgets.QMessageBox.No
+        app = OpenLP([])
+
+        # WHEN: is_already_running() is called
+        result = app.is_already_running()
+
+        # THEN: The result should be false
+        MockedSharedMemory.assert_called_once_with('OpenLP')
+        mocked_shared_memory.attach.assert_called_once_with()
+        MockedStandardButtons.assert_called_once_with(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        mocked_critical.assert_called_once_with(None, 'Error', 'OpenLP is already running. Do you wish to continue?', 0)
+        assert result is True
+
+    def test_process_events(self):
+        """
+        Test that the app.process_events() method simply calls the Qt method
+        """
+        # GIVEN: An app
+        app = OpenLP([])
+
+        # WHEN: process_events() is called
+        with patch.object(app, 'processEvents') as mocked_processEvents:
+            app.process_events()
+
+        # THEN: processEvents was called
+        mocked_processEvents.assert_called_once_with()
+
+    def test_set_busy_cursor(self):
+        """
+        Test that the set_busy_cursor() method sets the cursor
+        """
+        # GIVEN: An app
+        app = OpenLP([])
+
+        # WHEN: set_busy_cursor() is called
+        with patch.object(app, 'setOverrideCursor') as mocked_setOverrideCursor, \
+                patch.object(app, 'processEvents') as mocked_processEvents:
+            app.set_busy_cursor()
+
+        # THEN: The cursor should have been set
+        mocked_setOverrideCursor.assert_called_once_with(QtCore.Qt.BusyCursor)
+        mocked_processEvents.assert_called_once_with()
+
+    def test_set_normal_cursor(self):
+        """
+        Test that the set_normal_cursor() method resets the cursor
+        """
+        # GIVEN: An app
+        app = OpenLP([])
+
+        # WHEN: set_normal_cursor() is called
+        with patch.object(app, 'restoreOverrideCursor') as mocked_restoreOverrideCursor, \
+                patch.object(app, 'processEvents') as mocked_processEvents:
+            app.set_normal_cursor()
+
+        # THEN: The cursor should have been set
+        mocked_restoreOverrideCursor.assert_called_once_with()
+        mocked_processEvents.assert_called_once_with()

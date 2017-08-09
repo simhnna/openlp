@@ -23,14 +23,13 @@
 Package to test the openlp.core.ui.lib.listpreviewwidget package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtGui
 
 from openlp.core.common import Settings
 from openlp.core.ui.lib.listpreviewwidget import ListPreviewWidget
 from openlp.core.lib import ImageSource, ServiceItem
-
-from tests.functional import MagicMock, patch, call
 
 
 class TestListPreviewWidget(TestCase):

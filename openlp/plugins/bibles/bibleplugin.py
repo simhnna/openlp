@@ -22,9 +22,10 @@
 
 import logging
 
+from openlp.core.common import UiStrings
 from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon, translate
-from openlp.core.lib.ui import UiStrings, create_action
+from openlp.core.lib.ui import create_action
 from openlp.plugins.bibles.lib import BibleManager, BiblesTab, BibleMediaItem, LayoutStyle, DisplayStyle, \
     LanguageSelection
 from openlp.plugins.bibles.lib.mediaitem import BibleSearch
@@ -38,7 +39,7 @@ __default_settings__ = {
     'bibles/db password': '',
     'bibles/db hostname': '',
     'bibles/db database': '',
-    'bibles/last search type': BibleSearch.Combined,
+    'bibles/last used search type': BibleSearch.Combined,
     'bibles/reset to combined quick search': True,
     'bibles/verse layout style': LayoutStyle.VersePerSlide,
     'bibles/book name language': LanguageSelection.Bible,

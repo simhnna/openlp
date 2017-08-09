@@ -181,7 +181,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         """
         Check if the data folder path exists.
         """
-        data_folder_path = AppLocation.get_data_path()
+        data_folder_path = str(AppLocation.get_data_path())
         if not os.path.exists(data_folder_path):
             log.critical('Database was not found in: ' + data_folder_path)
             status = QtWidgets.QMessageBox.critical(None, translate('OpenLP', 'Data Directory Error'),
@@ -246,15 +246,14 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
             Settings().setValue('core/application version', openlp_version)
         # If data_version is different from the current version ask if we should backup the data folder
         elif data_version != openlp_version:
-            if self.splash.isVisible():
+            if can_show_splash and self.splash.isVisible():
                 self.splash.hide()
             if QtWidgets.QMessageBox.question(None, translate('OpenLP', 'Backup'),
                                               translate('OpenLP', 'OpenLP has been upgraded, do you want to create\n'
                                                                   'a backup of the old data folder?'),
-                                              QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
-                                              QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
+                                              defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
-                data_folder_path = AppLocation.get_data_path()
+                data_folder_path = str(AppLocation.get_data_path())
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
                 data_folder_backup_path = data_folder_path + '-' + timestamp
                 try:
@@ -391,7 +390,7 @@ def main(args=None):
         application.setApplicationName('OpenLPPortable')
         Settings.setDefaultFormat(Settings.IniFormat)
         # Get location OpenLPPortable.ini
-        application_path = AppLocation.get_directory(AppLocation.AppDir)
+        application_path = str(AppLocation.get_directory(AppLocation.AppDir))
         set_up_logging(os.path.abspath(os.path.join(application_path, '..', '..', 'Other')))
         log.info('Running portable')
         portable_settings_file = os.path.abspath(os.path.join(application_path, '..', '..', 'Data', 'OpenLP.ini'))
@@ -408,7 +407,7 @@ def main(args=None):
         portable_settings.sync()
     else:
         application.setApplicationName('OpenLP')
-        set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
+        set_up_logging(str(AppLocation.get_directory(AppLocation.CacheDir)))
     Registry.create()
     Registry().register('application', application)
     application.setApplicationVersion(get_application_version()['version'])
@@ -428,13 +427,12 @@ def main(args=None):
             sys.exit()
     # i18n Set Language
     language = LanguageManager.get_language()
-    application_translator, default_translator = LanguageManager.get_translator(language)
-    if not application_translator.isEmpty():
-        application.installTranslator(application_translator)
-    if not default_translator.isEmpty():
-        application.installTranslator(default_translator)
-    else:
-        log.debug('Could not find default_translator.')
+    translators = LanguageManager.get_translators(language)
+    for translator in translators:
+        if not translator.isEmpty():
+            application.installTranslator(translator)
+    if not translators:
+        log.debug('Could not find translators.')
     if args and not args.no_error_form:
         sys.excepthook = application.hook_exception
     sys.exit(application.run(qt_args))

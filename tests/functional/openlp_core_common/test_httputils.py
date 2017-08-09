@@ -26,10 +26,10 @@ import os
 import tempfile
 import socket
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file
 
-from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
 

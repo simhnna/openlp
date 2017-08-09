@@ -54,7 +54,7 @@ __default_settings__ = {
     'songs/db password': '',
     'songs/db hostname': '',
     'songs/db database': '',
-    'songs/last search type': SongSearch.Entire,
+    'songs/last used search type': SongSearch.Entire,
     'songs/last import type': SongFormat.OpenLyrics,
     'songs/update service on edit': False,
     'songs/add song from service': True,
@@ -66,7 +66,11 @@ __default_settings__ = {
     'songs/last directory export': '',
     'songs/songselect username': '',
     'songs/songselect password': '',
-    'songs/songselect searches': ''
+    'songs/songselect searches': '',
+    'songs/enable chords': True,
+    'songs/chord notation': 'english',  # Can be english, german or neo-latin
+    'songs/mainview chords': False,
+    'songs/disable chords import': False,
 }
 
 

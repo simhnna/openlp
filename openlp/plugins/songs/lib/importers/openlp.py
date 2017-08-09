@@ -150,7 +150,12 @@ class OpenLPSongImport(SongImport):
                 class_mapper(OldSongBookEntry)
             except UnmappedClassError:
                 mapper(OldSongBookEntry, source_songs_songbooks_table, properties={'songbook': relation(OldBook)})
-        if has_authors_songs and 'author_type' in source_authors_songs_table.c.values():
+        if has_authors_songs:
+            try:
+                class_mapper(OldAuthorSong)
+            except UnmappedClassError:
+                mapper(OldAuthorSong, source_authors_songs_table)
+        if has_authors_songs and 'author_type' in source_authors_songs_table.c.keys():
             has_author_type = True
         else:
             has_author_type = False
@@ -191,11 +196,6 @@ class OpenLPSongImport(SongImport):
             class_mapper(OldTopic)
         except UnmappedClassError:
             mapper(OldTopic, source_topics_table)
-        if has_authors_songs:
-            try:
-                class_mapper(OldTopic)
-            except UnmappedClassError:
-                mapper(OldTopic, source_topics_table)
 
         source_songs = self.source_session.query(OldSong).all()
         if self.import_wizard:
@@ -275,11 +275,9 @@ class OpenLPSongImport(SongImport):
             self.manager.save_object(new_song)
             if progress_dialog:
                 progress_dialog.setValue(progress_dialog.value() + 1)
-                # TODO: Verify format() with template strings
-                progress_dialog.setLabelText(WizardStrings.ImportingType % new_song.title)
+                progress_dialog.setLabelText(WizardStrings.ImportingType.format(source=new_song.title))
             else:
-                # TODO: Verify format() with template strings
-                self.import_wizard.increment_progress_bar(WizardStrings.ImportingType % new_song.title)
+                self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=new_song.title))
             if self.stop_import_flag:
                 break
         self.source_session.close()

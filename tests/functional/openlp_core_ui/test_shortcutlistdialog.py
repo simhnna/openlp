@@ -22,11 +22,11 @@
 """
 Package to test the openlp.core.ui.shortcutlistdialog package.
 """
-from PyQt5 import QtCore, QtGui, QtWidgets
+from unittest.mock import MagicMock
+
+from PyQt5 import QtCore
 
 from openlp.core.ui.shortcutlistdialog import CaptureShortcutButton, ShortcutTreeWidget
-
-from tests.interfaces import MagicMock, patch
 
 
 def test_key_press_event():

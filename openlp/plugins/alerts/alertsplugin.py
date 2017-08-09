@@ -24,12 +24,12 @@ import logging
 
 from PyQt5 import QtGui
 
-from openlp.core.common import Settings, translate
+from openlp.core.common import Settings, UiStrings, translate
 from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.core.lib.theme import VerticalType
-from openlp.core.lib.ui import create_action, UiStrings
+from openlp.core.lib.ui import create_action
 from openlp.core.ui import AlertLocation
 from openlp.plugins.alerts.forms import AlertForm
 from openlp.plugins.alerts.lib import AlertsManager, AlertsTab
@@ -88,21 +88,20 @@ JAVASCRIPT = """
         }
     }
 """
-# TODO: Verify format() with variable templates
 CSS = """
-    #alert {
+    #alert {{
         position: absolute;
         left: 0px;
         top: 0px;
         z-index: 10;
-        width: 100%%;
-        vertical-align: %s;
-        font-family: %s;
-        font-size: %spt;
-        color: %s;
-        background-color: %s;
+        width: 100%;
+        vertical-align: {vertical_align};
+        font-family: {font_family};
+        font-size: {font_size:d}pt;
+        color: {color};
+        background-color: {background_color};
         word-wrap: break-word;
-    }
+    }}
 """
 
 HTML = """
@@ -228,8 +227,11 @@ class AlertsPlugin(Plugin):
         Add CSS to the main display.
         """
         align = VerticalType.Names[self.settings_tab.location]
-        return CSS % (align, self.settings_tab.font_face, self.settings_tab.font_size, self.settings_tab.font_color,
-                      self.settings_tab.background_color)
+        return CSS.format(vertical_align=align,
+                          font_family=self.settings_tab.font_face,
+                          font_size=self.settings_tab.font_size,
+                          color=self.settings_tab.font_color,
+                          background_color=self.settings_tab.background_color)
 
     @staticmethod
     def get_display_html():

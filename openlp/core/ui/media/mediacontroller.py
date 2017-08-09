@@ -28,7 +28,8 @@ import os
 import datetime
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties, Settings, UiStrings, translate
+from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties, Settings, UiStrings, \
+    extension_loader, translate
 from openlp.core.lib import ItemCapabilities
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.common import AppLocation
@@ -38,6 +39,7 @@ from openlp.core.ui.media.mediaplayer import MediaPlayer
 from openlp.core.ui.media import MediaState, MediaInfo, MediaType, get_media_players, set_media_players,\
     parse_optical_path
 from openlp.core.ui.lib.toolbar import OpenLPToolbar
+
 
 log = logging.getLogger(__name__)
 
@@ -172,19 +174,9 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Check to see if we have any media Player's available.
         """
         log.debug('_check_available_media_players')
-        controller_dir = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'core', 'ui', 'media')
-        for filename in os.listdir(controller_dir):
-            if filename.endswith('player.py') and filename != 'mediaplayer.py':
-                path = os.path.join(controller_dir, filename)
-                if os.path.isfile(path):
-                    module_name = 'openlp.core.ui.media.' + os.path.splitext(filename)[0]
-                    log.debug('Importing controller %s', module_name)
-                    try:
-                        __import__(module_name, globals(), locals(), [])
-                    # On some platforms importing vlc.py might cause
-                    # also OSError exceptions. (e.g. Mac OS X)
-                    except (ImportError, OSError):
-                        log.warning('Failed to import %s on path %s', module_name, path)
+        controller_dir = os.path.join('openlp', 'core', 'ui', 'media')
+        glob_pattern = os.path.join(controller_dir, '*player.py')
+        extension_loader(glob_pattern, ['mediaplayer.py'])
         player_classes = MediaPlayer.__subclasses__()
         for player_class in player_classes:
             self.register_players(player_class(self))
@@ -474,9 +466,10 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         player = self.media_players[used_players[0]]
         if suffix not in player.video_extensions_list and suffix not in player.audio_extensions_list:
             # Media could not be loaded correctly
-            critical_error_message_box(translate('MediaPlugin.MediaItem', 'Unsupported Media File'),
-                                       translate('MediaPlugin.MediaItem', 'File %s not supported using player %s') %
-                                       (service_item.get_frame_path(), used_players[0]))
+            critical_error_message_box(
+                translate('MediaPlugin.MediaItem', 'Unsupported Media File'),
+                translate('MediaPlugin.MediaItem', 'File {file_path} not supported using player {player_name}'
+                          ).format(file_path=service_item.get_frame_path(), player_name=used_players[0]))
             return False
         media_data = MediaInfoWrapper.parse(service_item.get_frame_path())
         # duration returns in milli seconds

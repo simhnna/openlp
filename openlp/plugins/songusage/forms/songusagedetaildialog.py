@@ -25,6 +25,7 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common import translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.lib import PathEdit, PathType
 
 
 class Ui_SongUsageDetailDialog(object):
@@ -68,20 +69,13 @@ class Ui_SongUsageDetailDialog(object):
         self.file_horizontal_layout.setSpacing(8)
         self.file_horizontal_layout.setContentsMargins(8, 8, 8, 8)
         self.file_horizontal_layout.setObjectName('file_horizontal_layout')
-        self.file_line_edit = QtWidgets.QLineEdit(self.file_group_box)
-        self.file_line_edit.setObjectName('file_line_edit')
-        self.file_line_edit.setReadOnly(True)
-        self.file_horizontal_layout.addWidget(self.file_line_edit)
-        self.save_file_push_button = QtWidgets.QPushButton(self.file_group_box)
-        self.save_file_push_button.setMaximumWidth(self.save_file_push_button.size().height())
-        self.save_file_push_button.setIcon(build_icon(':/general/general_open.png'))
-        self.save_file_push_button.setObjectName('save_file_push_button')
-        self.file_horizontal_layout.addWidget(self.save_file_push_button)
+        self.report_path_edit = PathEdit(self.file_group_box, path_type=PathType.Directories, show_revert=False)
+        self.file_horizontal_layout.addWidget(self.report_path_edit)
         self.vertical_layout.addWidget(self.file_group_box)
         self.button_box = create_button_box(song_usage_detail_dialog, 'button_box', ['cancel', 'ok'])
         self.vertical_layout.addWidget(self.button_box)
         self.retranslateUi(song_usage_detail_dialog)
-        self.save_file_push_button.clicked.connect(song_usage_detail_dialog.define_output_location)
+        self.report_path_edit.pathChanged.connect(song_usage_detail_dialog.on_report_path_edit_path_changed)
 
     def retranslateUi(self, song_usage_detail_dialog):
         """

@@ -27,12 +27,13 @@ import shutil
 import gc
 from tempfile import mkdtemp
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
 from openlp.core.common import Registry, Settings
 from openlp.core.lib.pluginmanager import PluginManager
-from tests.interfaces import MagicMock, patch
+
 from tests.helpers.testmixin import TestMixin
 
 

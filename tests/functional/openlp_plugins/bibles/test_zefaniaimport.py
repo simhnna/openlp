@@ -22,12 +22,11 @@
 """
 This module contains tests for the Zefania Bible importer.
 """
-
 import os
 import json
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from tests.functional import MagicMock, patch
 from openlp.plugins.bibles.lib.importers.zefania import ZefaniaBible
 from openlp.plugins.bibles.lib.db import BibleDB
 

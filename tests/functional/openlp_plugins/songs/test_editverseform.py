@@ -23,15 +23,18 @@
 This module contains tests for the editverseform of the Songs plugin.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt5 import QtCore
 
-from openlp.core.common import Registry, Settings
-from openlp.core.lib import ServiceItem
+from openlp.core.common import Settings
 from openlp.plugins.songs.forms.editverseform import EditVerseForm
-from openlp.plugins.songs.lib.db import AuthorType
-from tests.functional import patch, MagicMock
+
 from tests.helpers.testmixin import TestMixin
+
+__default_settings__ = {
+    'songs/enable chords': True,
+}
 
 
 class TestEditVerseForm(TestCase, TestMixin):
@@ -42,9 +45,10 @@ class TestEditVerseForm(TestCase, TestMixin):
         """
         Set up the components need for all tests.
         """
-        self.edit_verse_form = EditVerseForm(None)
         self.setup_application()
         self.build_settings()
+        Settings().extend_default_settings(__default_settings__)
+        self.edit_verse_form = EditVerseForm(None)
         QtCore.QLocale.setDefault(QtCore.QLocale('en_GB'))
 
     def tearDown(self):

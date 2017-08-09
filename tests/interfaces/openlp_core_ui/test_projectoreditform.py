@@ -25,12 +25,12 @@ class and methods.
 """
 import os
 from unittest import TestCase
+from unittest.mock import patch
 
 from openlp.core.common import Registry
 from openlp.core.lib.projector.db import Projector, ProjectorDB
 from openlp.core.ui import ProjectorEditForm
 
-from tests.functional import patch
 from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB, TEST1_DATA, TEST2_DATA
 
@@ -45,8 +45,8 @@ class TestProjectorEditForm(TestCase, TestMixin):
 
         :return: None
         """
-        self.build_settings()
         self.setup_application()
+        self.build_settings()
         Registry.create()
         with patch('openlp.core.lib.projector.db.init_url') as mocked_init_url:
             if os.path.exists(TEST_DB):

@@ -34,7 +34,7 @@ import ntpath
 from PyQt5 import QtGui
 
 from openlp.core.common import RegistryProperties, Settings, translate, AppLocation, md5_hash
-from openlp.core.lib import ImageSource, build_icon, clean_tags, expand_tags
+from openlp.core.lib import ImageSource, build_icon, clean_tags, expand_tags, expand_chords, create_thumb
 
 log = logging.getLogger(__name__)
 
@@ -117,7 +117,6 @@ class ItemCapabilities(object):
 
     ``HasThumbnails``
             The item has related thumbnails available
-
     """
     CanPreview = 1
     CanEdit = 2
@@ -247,6 +246,8 @@ class ServiceItem(RegistryProperties):
             self.renderer.set_item_theme(self.theme)
             self.theme_data, self.main, self.footer = self.renderer.pre_render()
         if self.service_item_type == ServiceItemType.Text:
+            expand_chord_tags = hasattr(self, 'name') and self.name == 'songs' and Settings().value(
+                'songs/enable chords')
             log.debug('Formatting slides: {title}'.format(title=self.title))
             # Save rendered pages to this dict. In the case that a slide is used twice we can use the pages saved to
             # the dict instead of rendering them again.
@@ -260,13 +261,16 @@ class ServiceItem(RegistryProperties):
                     previous_pages[verse_tag] = (slide['raw_slide'], pages)
                 for page in pages:
                     page = page.replace('<br>', '{br}')
-                    html_data = expand_tags(html.escape(page.rstrip()))
-                    self._display_frames.append({
+                    html_data = expand_tags(page.rstrip(), expand_chord_tags)
+                    new_frame = {
                         'title': clean_tags(page),
-                        'text': clean_tags(page.rstrip()),
+                        'text': clean_tags(page.rstrip(), expand_chord_tags),
+                        'chords_text': expand_chords(clean_tags(page.rstrip(), False)),
                         'html': html_data.replace('&amp;nbsp;', '&nbsp;'),
-                        'verseTag': verse_tag
-                    })
+                        'printing_html': expand_tags(html.escape(page.rstrip()), expand_chord_tags, True),
+                        'verseTag': verse_tag,
+                    }
+                    self._display_frames.append(new_frame)
         elif self.service_item_type == ServiceItemType.Image or self.service_item_type == ServiceItemType.Command:
             pass
         else:
@@ -331,7 +335,7 @@ class ServiceItem(RegistryProperties):
         if image and not self.has_original_files and self.name == 'presentations':
             file_location = os.path.join(path, file_name)
             file_location_hash = md5_hash(file_location.encode('utf-8'))
-            image = os.path.join(AppLocation.get_section_data_path(self.name), 'thumbnails',
+            image = os.path.join(str(AppLocation.get_section_data_path(self.name)), 'thumbnails',
                                  file_location_hash, ntpath.basename(image))
         self._raw_frames.append({'title': file_name, 'image': image, 'path': path,
                                  'display_title': display_title, 'notes': notes})

@@ -95,7 +95,7 @@ class Ui_PrintServiceDialog(object):
         self.main_layout.addWidget(self.preview_widget)
         self.options_widget = QtWidgets.QWidget(print_service_dialog)
         self.options_widget.hide()
-        self.options_widget.resize(400, 300)
+        self.options_widget.resize(400, 350)
         self.options_widget.setAutoFillBackground(True)
         self.options_layout = QtWidgets.QVBoxLayout(self.options_widget)
         self.options_layout.setContentsMargins(8, 8, 8, 8)
@@ -121,6 +121,8 @@ class Ui_PrintServiceDialog(object):
         self.group_layout.addWidget(self.notes_check_box)
         self.meta_data_check_box = QtWidgets.QCheckBox()
         self.group_layout.addWidget(self.meta_data_check_box)
+        self.show_chords_check_box = QtWidgets.QCheckBox()
+        self.group_layout.addWidget(self.show_chords_check_box)
         self.group_layout.addStretch(1)
         self.options_group_box.setLayout(self.group_layout)
         self.options_layout.addWidget(self.options_group_box)
@@ -144,6 +146,7 @@ class Ui_PrintServiceDialog(object):
         self.page_break_after_text.setText(translate('OpenLP.PrintServiceForm', 'Add page break before each text item'))
         self.notes_check_box.setText(translate('OpenLP.PrintServiceForm', 'Include service item notes'))
         self.meta_data_check_box.setText(translate('OpenLP.PrintServiceForm', 'Include play length of media items'))
+        self.show_chords_check_box.setText(translate('OpenLP.PrintServiceForm', 'Show chords'))
         self.title_line_edit.setText(translate('OpenLP.PrintServiceForm', 'Service Sheet'))
         # Do not change the order.
         self.zoom_combo_box.addItems([

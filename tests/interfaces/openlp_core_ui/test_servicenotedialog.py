@@ -23,12 +23,13 @@
 Package to test the openlp.core.ui package.
 """
 from unittest import TestCase
+from unittest.mock import patch
 
 from PyQt5 import QtCore, QtTest, QtWidgets
 
 from openlp.core.common import Registry
 from openlp.core.ui import servicenoteform
-from tests.interfaces import patch
+
 from tests.helpers.testmixin import TestMixin
 
 

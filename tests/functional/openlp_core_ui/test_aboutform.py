@@ -24,10 +24,10 @@ Package to test the openlp.core.ui.firsttimeform package.
 """
 import datetime
 from unittest import TestCase
+from unittest.mock import patch
 
 from openlp.core.ui.aboutform import AboutForm
 
-from tests.functional import patch
 from tests.helpers.testmixin import TestMixin
 
 

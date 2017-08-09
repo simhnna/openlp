@@ -23,10 +23,9 @@
 Test the registry properties
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry, RegistryProperties
-
-from tests.functional import MagicMock, patch
 
 
 class TestRegistryProperties(TestCase, RegistryProperties):

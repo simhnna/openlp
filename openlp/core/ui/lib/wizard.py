@@ -25,7 +25,7 @@ The :mod:``wizard`` module provides generic wizard tools for OpenLP.
 import logging
 import os
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, Settings, UiStrings, translate, is_macosx
 from openlp.core.lib import build_icon
@@ -50,13 +50,13 @@ class WizardStrings(object):
     # These strings should need a good reason to be retranslated elsewhere.
     FinishedImport = translate('OpenLP.Ui', 'Finished import.')
     FormatLabel = translate('OpenLP.Ui', 'Format:')
-    HeaderStyle = '<span style="font-size:14pt; font-weight:600;">%s</span>'
+    HeaderStyle = '<span style="font-size:14pt; font-weight:600;">{text}</span>'
     Importing = translate('OpenLP.Ui', 'Importing')
-    ImportingType = translate('OpenLP.Ui', 'Importing "%s"...')
+    ImportingType = translate('OpenLP.Ui', 'Importing "{source}"...')
     ImportSelect = translate('OpenLP.Ui', 'Select Import Source')
     ImportSelectLong = translate('OpenLP.Ui', 'Select the import format and the location to import from.')
-    OpenTypeFile = translate('OpenLP.Ui', 'Open %s File')
-    OpenTypeFolder = translate('OpenLP.Ui', 'Open %s Folder')
+    OpenTypeFile = translate('OpenLP.Ui', 'Open {file_type} File')
+    OpenTypeFolder = translate('OpenLP.Ui', 'Open {folder_name} Folder')
     PercentSymbolFormat = translate('OpenLP.Ui', '%p%')
     Ready = translate('OpenLP.Ui', 'Ready.')
     StartingImport = translate('OpenLP.Ui', 'Starting import...')
@@ -93,7 +93,10 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         """
         Constructor
         """
-        super(OpenLPWizard, self).__init__(parent)
+        # QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint  remove the "?" buttons from windows,
+        # QtCore.Qt.WindowCloseButtonHint enables the "x" button to close these windows.
+        super(OpenLPWizard, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                           QtCore.Qt.WindowCloseButtonHint)
         self.plugin = plugin
         self.with_progress_page = add_progress_page
         self.setFixedWidth(640)

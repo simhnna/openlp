@@ -120,9 +120,8 @@ class UiStrings(object):
         self.NISs = translate('OpenLP.Ui', 'No Item Selected', 'Singular')
         self.NISp = translate('OpenLP.Ui', 'No Items Selected', 'Plural')
         self.NoResults = translate('OpenLP.Ui', 'No Search Results')
-        self.OLP = translate('OpenLP.Ui', 'OpenLP')
-        self.OLPV2 = "{name} {version}".format(name=self.OLP, version="2")
-        self.OLPV2x = "{name} {version}".format(name=self.OLP, version="2.4")
+        self.OpenLP = translate('OpenLP.Ui', 'OpenLP')
+        self.OpenLPv2AndUp = translate('OpenLP.Ui', 'OpenLP 2.0 and up')
         self.OpenLPStart = translate('OpenLP.Ui', 'OpenLP is already running. Do you wish to continue?')
         self.OpenService = translate('OpenLP.Ui', 'Open service.')
         self.OptionalShowInFooter = translate('OpenLP.Ui', 'Optional, this will be displayed in footer.')
@@ -154,8 +153,6 @@ class UiStrings(object):
         self.Split = translate('OpenLP.Ui', 'Optional &Split')
         self.SplitToolTip = translate('OpenLP.Ui',
                                       'Split a slide into two only if it does not fit on the screen as one slide.')
-        # TODO: WHERE is this used at? cannot find where it's used at in code.
-        self.StartTimeCode = translate('OpenLP.Ui', 'Start {code}')
         self.StopPlaySlidesInLoop = translate('OpenLP.Ui', 'Stop Play Slides in Loop')
         self.StopPlaySlidesToEnd = translate('OpenLP.Ui', 'Stop Play Slides to End')
         self.Theme = translate('OpenLP.Ui', 'Theme', 'Singular')

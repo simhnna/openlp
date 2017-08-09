@@ -421,8 +421,8 @@ class BibleImportForm(OpenLPWizard):
         Allow for localisation of the bible import wizard.
         """
         self.setWindowTitle(translate('BiblesPlugin.ImportWizardForm', 'Bible Import Wizard'))
-        self.title_label.setText(WizardStrings.HeaderStyle % translate('OpenLP.Ui',
-                                                                       'Welcome to the Bible Import Wizard'))
+        self.title_label.setText(WizardStrings.HeaderStyle.format(text=translate('OpenLP.Ui',
+                                                                                 'Welcome to the Bible Import Wizard')))
         self.information_label.setText(
             translate('BiblesPlugin.ImportWizardForm',
                       'This wizard will help you to import Bibles from a variety of '
@@ -584,7 +584,7 @@ class BibleImportForm(OpenLPWizard):
         elif self.currentPage() == self.license_details_page:
             license_version = self.field('license_version')
             license_copyright = self.field('license_copyright')
-            path = AppLocation.get_section_data_path('bibles')
+            path = str(AppLocation.get_section_data_path('bibles'))
             if not license_version:
                 critical_error_message_box(
                     UiStrings().EmptyField,

@@ -27,7 +27,7 @@ from PyQt5 import QtGui, QtCore, QtWebKitWidgets
 
 from openlp.core.common import Registry, RegistryProperties, OpenLPMixin, RegistryMixin, Settings
 from openlp.core.lib import FormattingTags, ImageSource, ItemCapabilities, ScreenList, ServiceItem, expand_tags, \
-    build_lyrics_format_css, build_lyrics_outline_css
+    build_lyrics_format_css, build_lyrics_outline_css, build_chords_css
 from openlp.core.common import ThemeLevel
 from openlp.core.ui import MainDisplay
 
@@ -383,13 +383,14 @@ class Renderer(OpenLPMixin, RegistryMixin, RegistryProperties):
             </script>
             <style>
                 *{margin: 0; padding: 0; border: 0;}
-                #main {position: absolute; top: 0px; ${format_css} ${outline_css}}
+                #main {position: absolute; top: 0px; ${format_css} ${outline_css}} ${chords_css}
             </style></head>
             <body><div id="main"></div></body></html>""")
         self.web.setHtml(html.substitute(format_css=build_lyrics_format_css(theme_data,
                                                                             self.page_width,
                                                                             self.page_height),
-                                         outline_css=build_lyrics_outline_css(theme_data)))
+                                         outline_css=build_lyrics_outline_css(theme_data),
+                                         chords_css=build_chords_css()))
         self.empty_height = self.web_frame.contentsSize().height()
 
     def _paginate_slide(self, lines, line_end):

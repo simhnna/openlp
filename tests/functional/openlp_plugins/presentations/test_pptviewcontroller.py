@@ -24,16 +24,15 @@ This module contains tests for the pptviewcontroller module of the Presentations
 """
 import os
 import shutil
-
 from tempfile import mkdtemp
 from unittest import TestCase
-
-from tests.functional import MagicMock, patch
-from tests.helpers.testmixin import TestMixin
-from tests.utils.constants import TEST_RESOURCES_PATH
+from unittest.mock import MagicMock, patch
 
 from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from openlp.core.common import is_win
+
+from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import TEST_RESOURCES_PATH
 
 if is_win():
     from ctypes import cdll
@@ -43,11 +42,6 @@ class TestPptviewController(TestCase, TestMixin):
     """
     Test the PptviewController Class
     """
-# TODO: Items left to test
-#   PptviewController
-#       start_process(self)
-#       kill
-
     def setUp(self):
         """
         Set up the patches and mocks need for all tests.
@@ -104,24 +98,6 @@ class TestPptviewDocument(TestCase):
     """
     Test the PptviewDocument Class
     """
-    # TODO: Items left to test
-    #   PptviewDocument
-    #       __init__
-    #       create_thumbnails
-    #       close_presentation
-    #       is_loaded
-    #       is_active
-    #       blank_screen
-    #       unblank_screen
-    #       is_blank
-    #       stop_presentation
-    #       start_presentation
-    #       get_slide_number
-    #       get_slide_count
-    #       goto_slide
-    #       next_step
-    #       previous_step
-
     def setUp(self):
         """
         Set up the patches and mocks need for all tests.

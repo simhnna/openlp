@@ -250,5 +250,6 @@ def main():
     print_qt_image_formats()
     print_enchant_backends_and_languages()
 
+
 if __name__ == '__main__':
     main()

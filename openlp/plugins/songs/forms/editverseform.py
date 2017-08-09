@@ -25,7 +25,9 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.plugins.songs.lib import VerseType
+from openlp.plugins.songs.lib import VerseType, transpose_lyrics
+from openlp.core.lib.ui import critical_error_message_box
+from openlp.core.common import translate, Settings
 from .editversedialog import Ui_EditVerseDialog
 
 log = logging.getLogger(__name__)
@@ -41,7 +43,8 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         Constructor
         """
-        super(EditVerseForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(EditVerseForm, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                            QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
         self.has_single_verse = False
         self.insert_button.clicked.connect(self.on_insert_button_clicked)
@@ -49,6 +52,9 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.verse_text_edit.cursorPositionChanged.connect(self.on_cursor_position_changed)
         self.verse_type_combo_box.currentIndexChanged.connect(self.on_verse_type_combo_box_changed)
         self.force_split_button.clicked.connect(self.on_force_split_button_clicked)
+        if Settings().value('songs/enable chords'):
+            self.transpose_down_button.clicked.connect(self.on_transepose_down_button_clicked)
+            self.transpose_up_button.clicked.connect(self.on_transepose_up_button_clicked)
 
     def insert_verse(self, verse_tag, verse_num=1):
         """
@@ -109,6 +115,41 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         The cursor position has been changed
         """
         self.update_suggested_verse_number()
+
+    def on_transepose_up_button_clicked(self):
+        """
+        The transpose up button clicked
+        """
+        try:
+            transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
+            self.verse_text_edit.setPlainText(transposed_lyrics)
+        except ValueError as ve:
+            # Transposing failed
+            critical_error_message_box(title=translate('SongsPlugin.EditVerseForm', 'Transposing failed'),
+                                       message=translate('SongsPlugin.EditVerseForm',
+                                                         'Transposing failed because of invalid chord:\n{err_msg}'
+                                                         .format(err_msg=ve)))
+            return
+        self.verse_text_edit.setFocus()
+        self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)
+
+    def on_transepose_down_button_clicked(self):
+        """
+        The transpose down button clicked
+        """
+        try:
+            transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), -1)
+            self.verse_text_edit.setPlainText(transposed_lyrics)
+        except ValueError as ve:
+            # Transposing failed
+            critical_error_message_box(title=translate('SongsPlugin.EditVerseForm', 'Transposing failed'),
+                                       message=translate('SongsPlugin.EditVerseForm',
+                                                         'Transposing failed because of invalid chord:\n{err_msg}'
+                                                         .format(err_msg=ve)))
+            return
+        self.verse_text_edit.setPlainText(transposed_lyrics)
+        self.verse_text_edit.setFocus()
+        self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)
 
     def update_suggested_verse_number(self):
         """
@@ -184,3 +225,20 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         if not text.startswith('---['):
             text = '---[{tag}:1]---\n{text}'.format(tag=VerseType.translated_names[VerseType.Verse], text=text)
         return text
+
+    def accept(self):
+        """
+        Test if any invalid chords has been entered before closing the verse editor
+        """
+        if Settings().value('songs/enable chords'):
+            try:
+                transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
+                super(EditVerseForm, self).accept()
+            except ValueError as ve:
+                # Transposing failed
+                critical_error_message_box(title=translate('SongsPlugin.EditVerseForm', 'Invalid Chord'),
+                                           message=translate('SongsPlugin.EditVerseForm',
+                                                             'An invalid chord was detected:\n{err_msg}'
+                                                             .format(err_msg=ve)))
+        else:
+            super(EditVerseForm, self).accept()

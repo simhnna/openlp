@@ -22,12 +22,11 @@
 """
 This module contains tests for the OSIS Bible importer.
 """
-
 import os
 import json
 from unittest import TestCase
+from unittest.mock import MagicMock, call, patch
 
-from tests.functional import MagicMock, call, patch
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB
 from openlp.plugins.bibles.lib.importers.osis import OSISBible

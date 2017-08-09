@@ -23,16 +23,19 @@
 The :mod:`lib` module contains most of the components and libraries that make
 OpenLP work.
 """
-
+import html
 import logging
 import os
-from distutils.version import LooseVersion
+import re
+import math
 
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 
 from openlp.core.common import translate
 
 log = logging.getLogger(__name__ + '.__init__')
+
+SLIMCHARS = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
 
 
 class ServiceItemContext(object):
@@ -281,11 +284,12 @@ def check_item_selected(list_widget, message):
     return True
 
 
-def clean_tags(text):
+def clean_tags(text, remove_chords=False):
     """
     Remove Tags from text for display
 
     :param text: Text to be cleaned
+    :param remove_chords: Clean ChordPro tags
     """
     text = text.replace('<br>', '\n')
     text = text.replace('{br}', '\n')
@@ -293,19 +297,294 @@ def clean_tags(text):
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], '')
         text = text.replace(tag['end tag'], '')
+    # Remove ChordPro tags
+    if remove_chords:
+        text = re.sub(r'\[.+?\]', r'', text)
     return text
 
 
-def expand_tags(text):
+def expand_tags(text, expand_chord_tags=False, for_printing=False):
     """
     Expand tags HTML for display
 
     :param text: The text to be expanded.
     """
+    if expand_chord_tags:
+        if for_printing:
+            text = expand_chords_for_printing(text, '{br}')
+        else:
+            text = expand_chords(text)
     for tag in FormattingTags.get_html_tags():
         text = text.replace(tag['start tag'], tag['start html'])
         text = text.replace(tag['end tag'], tag['end html'])
     return text
+
+
+def expand_and_align_chords_in_line(match):
+    """
+    Expand the chords in the line and align them using whitespaces.
+    NOTE: There is equivalent javascript code in chords.js, in the updateSlide function. Make sure to update both!
+
+    :param match:
+    :return: The line with expanded html-chords
+    """
+    whitespaces = ''
+    chordlen = 0
+    taillen = 0
+    # The match could be "[G]sweet the " from a line like "A[D]mazing [D7]grace! How [G]sweet the [D]sound!"
+    # The actual chord, would be "G" in match "[G]sweet the "
+    chord = match.group(1)
+    # The tailing word of the chord, would be "sweet" in match "[G]sweet the "
+    tail = match.group(2)
+    # The remainder of the line, until line end or next chord. Would be " the " in match "[G]sweet the "
+    remainder = match.group(3)
+    # Line end if found, else None
+    end = match.group(4)
+    # Based on char width calculate width of chord
+    for chord_char in chord:
+        if chord_char not in SLIMCHARS:
+            chordlen += 2
+        else:
+            chordlen += 1
+    # Based on char width calculate width of tail
+    for tail_char in tail:
+        if tail_char not in SLIMCHARS:
+            taillen += 2
+        else:
+            taillen += 1
+    # Based on char width calculate width of remainder
+    for remainder_char in remainder:
+        if remainder_char not in SLIMCHARS:
+            taillen += 2
+        else:
+            taillen += 1
+    # If the chord is wider than the tail+remainder and the line goes on, some padding is needed
+    if chordlen >= taillen and end is None:
+        # Decide if the padding should be "_" for drawing out words or spaces
+        if tail:
+            if not remainder:
+                for c in range(math.ceil((chordlen - taillen) / 2) + 2):
+                    whitespaces += '_'
+            else:
+                for c in range(chordlen - taillen + 1):
+                    whitespaces += '&nbsp;'
+        else:
+            if not remainder:
+                for c in range(math.floor((chordlen - taillen) / 2)):
+                    whitespaces += '_'
+            else:
+                for c in range(chordlen - taillen + 1):
+                    whitespaces += '&nbsp;'
+    else:
+        if not tail and remainder and remainder[0] == ' ':
+            for c in range(chordlen):
+                whitespaces += '&nbsp;'
+    if whitespaces:
+        if '_' in whitespaces:
+            ws_length = len(whitespaces)
+            if ws_length == 1:
+                whitespaces = '&ndash;'
+            else:
+                wsl_mod = ws_length // 2
+                ws_right = ws_left = ' ' * wsl_mod
+                whitespaces = ws_left + '&ndash;' + ws_right
+        whitespaces = '<span class="ws">' + whitespaces + '</span>'
+    return '<span class="chord"><span><strong>' + html.escape(chord) + '</strong></span></span>' + html.escape(tail) + \
+           whitespaces + html.escape(remainder)
+
+
+def expand_chords(text):
+    """
+    Expand ChordPro tags
+
+    :param text:
+    """
+    text_lines = text.split('{br}')
+    expanded_text_lines = []
+    chords_on_prev_line = False
+    for line in text_lines:
+        # If a ChordPro is detected in the line, replace it with a html-span tag and wrap the line in a span tag.
+        if '[' in line and ']' in line:
+            if chords_on_prev_line:
+                new_line = '<span class="chordline">'
+            else:
+                new_line = '<span class="chordline firstchordline">'
+                chords_on_prev_line = True
+            # Matches a chord, a tail, a remainder and a line end. See expand_and_align_chords_in_line() for more info.
+            new_line += re.sub(r'\[(.*?)\]([\u0080-\uFFFF,\w]*)'
+                               '([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?',
+                               expand_and_align_chords_in_line, line)
+            new_line += '</span>'
+            expanded_text_lines.append(new_line)
+        else:
+            chords_on_prev_line = False
+            expanded_text_lines.append(html.escape(line))
+    return '{br}'.join(expanded_text_lines)
+
+
+def compare_chord_lyric(chord, lyric):
+    """
+    Compare the width of chord and lyrics. If chord width is greater than the lyric width the diff is returned.
+
+    :param chord:
+    :param lyric:
+    :return:
+    """
+    chordlen = 0
+    if chord == '&nbsp;':
+        return 0
+    chord = re.sub(r'\{.*?\}', r'', chord)
+    lyric = re.sub(r'\{.*?\}', r'', lyric)
+    for chord_char in chord:
+        if chord_char not in SLIMCHARS:
+            chordlen += 2
+        else:
+            chordlen += 1
+    lyriclen = 0
+    for lyric_char in lyric:
+        if lyric_char not in SLIMCHARS:
+            lyriclen += 2
+        else:
+            lyriclen += 1
+    if chordlen > lyriclen:
+        return chordlen - lyriclen
+    else:
+        return 0
+
+
+def find_formatting_tags(text, active_formatting_tags):
+    """
+    Look for formatting tags in lyrics and adds/removes them to/from the given list. Returns the update list.
+
+    :param text:
+    :param active_formatting_tags:
+    :return:
+    """
+    if not re.search(r'\{.*?\}', text):
+        return active_formatting_tags
+    word_it = iter(text)
+    # Loop through lyrics to find any formatting tags
+    for char in word_it:
+        if char == '{':
+            tag = ''
+            char = next(word_it)
+            start_tag = True
+            if char == '/':
+                start_tag = False
+                char = next(word_it)
+            while char != '}':
+                tag += char
+                char = next(word_it)
+            # See if the found tag has an end tag
+            for formatting_tag in FormattingTags.get_html_tags():
+                if formatting_tag['start tag'] == '{' + tag + '}':
+                    if formatting_tag['end tag']:
+                        if start_tag:
+                            # prepend the new tag to the list of active formatting tags
+                            active_formatting_tags[:0] = [tag]
+                        else:
+                            # remove the tag from the list
+                            active_formatting_tags.remove(tag)
+                    # Break out of the loop matching the found tag against the tag list.
+                    break
+    return active_formatting_tags
+
+
+def expand_chords_for_printing(text, line_split):
+    """
+    Expand ChordPro tags
+
+    :param text:
+    :param line_split:
+    """
+    if not re.search(r'\[.*?\]', text):
+        return text
+    text_lines = text.split(line_split)
+    expanded_text_lines = []
+    for line in text_lines:
+        # If a ChordPro is detected in the line, build html tables.
+        new_line = '<table class="line" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td>'
+        active_formatting_tags = []
+        if re.search(r'\[.*?\]', line):
+            words = line.split(' ')
+            in_chord = False
+            for word in words:
+                chords = []
+                lyrics = []
+                new_line += '<table class="segment" cellpadding="0" cellspacing="0" border="0" align="left">'
+                # If the word contains a chord, we need to handle it.
+                if re.search(r'\[.*?\]', word):
+                    chord = ''
+                    lyric = ''
+                    # Loop over each character of the word
+                    for char in word:
+                        if char == '[':
+                            in_chord = True
+                            if lyric != '':
+                                if chord == '':
+                                    chord = '&nbsp;'
+                                chords.append(chord)
+                                lyrics.append(lyric)
+                                chord = ''
+                                lyric = ''
+                        elif char == ']' and in_chord:
+                            in_chord = False
+                        elif in_chord:
+                            chord += char
+                        else:
+                            lyric += char
+                    if lyric != '' or chord != '':
+                        if chord == '':
+                            chord = '&nbsp;'
+                        if lyric == '':
+                            lyric = '&nbsp;'
+                        chords.append(chord)
+                        lyrics.append(lyric)
+                    new_chord_line = '<tr class="chordrow">'
+                    new_lyric_line = '</tr><tr>'
+                    for i in range(len(lyrics)):
+                        spacer = compare_chord_lyric(chords[i], lyrics[i])
+                        # Handle formatting tags
+                        start_formatting_tags = ''
+                        if active_formatting_tags:
+                            start_formatting_tags = '{' + '}{'.join(active_formatting_tags) + '}'
+                        # Update list of active formatting tags
+                        active_formatting_tags = find_formatting_tags(lyrics[i], active_formatting_tags)
+                        end_formatting_tags = ''
+                        if active_formatting_tags:
+                            end_formatting_tags = '{/' + '}{/'.join(active_formatting_tags) + '}'
+                        new_chord_line += '<td class="chord">%s</td>' % chords[i]
+                        # Check if this is the last column, if so skip spacing calc and instead insert a single space
+                        if i + 1 == len(lyrics):
+                            new_lyric_line += '<td class="lyrics">{starttags}{lyrics}&nbsp;{endtags}</td>'.format(
+                                starttags=start_formatting_tags, lyrics=lyrics[i], endtags=end_formatting_tags)
+                        else:
+                            spacing = ''
+                            if spacer > 0:
+                                space = '&nbsp;' * int(math.ceil(spacer / 2))
+                                spacing = '<span class="chordspacing">%s-%s</span>' % (space, space)
+                            new_lyric_line += '<td class="lyrics">{starttags}{lyrics}{spacing}{endtags}</td>'.format(
+                                starttags=start_formatting_tags, lyrics=lyrics[i], spacing=spacing,
+                                endtags=end_formatting_tags)
+                    new_line += new_chord_line + new_lyric_line + '</tr>'
+                else:
+                    start_formatting_tags = ''
+                    if active_formatting_tags:
+                        start_formatting_tags = '{' + '}{'.join(active_formatting_tags) + '}'
+                    active_formatting_tags = find_formatting_tags(word, active_formatting_tags)
+                    end_formatting_tags = ''
+                    if active_formatting_tags:
+                        end_formatting_tags = '{/' + '}{/'.join(active_formatting_tags) + '}'
+                    new_line += '<tr class="chordrow"><td class="chord">&nbsp;</td></tr><tr><td class="lyrics">' \
+                                '{starttags}{lyrics}&nbsp;{endtags}</td></tr>'.format(
+                                    starttags=start_formatting_tags, lyrics=word, endtags=end_formatting_tags)
+                new_line += '</table>'
+        else:
+            new_line += line
+        new_line += '</td></tr></table>'
+        expanded_text_lines.append(new_line)
+    # the {br} tag used to split lines is not inserted again since the style of the line-tables makes them redundant.
+    return ''.join(expanded_text_lines)
 
 
 def create_separated_list(string_list):
@@ -337,10 +616,10 @@ from .plugin import PluginStatus, StringContent, Plugin
 from .pluginmanager import PluginManager
 from .settingstab import SettingsTab
 from .serviceitem import ServiceItem, ServiceItemType, ItemCapabilities
-from .htmlbuilder import build_html, build_lyrics_format_css, build_lyrics_outline_css
+from .htmlbuilder import build_html, build_lyrics_format_css, build_lyrics_outline_css, build_chords_css
 from .imagemanager import ImageManager
 from .renderer import Renderer
 from .mediamanageritem import MediaManagerItem
 from .projector.db import ProjectorDB, Projector
-from .projector.pjlink1 import PJLink1
+from .projector.pjlink import PJLink
 from .projector.constants import PJLINK_PORT, ERROR_MSG, ERROR_STRING

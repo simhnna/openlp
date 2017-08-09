@@ -24,7 +24,6 @@ The :mod:`~openlp.core.lib.exceptions` module contains custom exceptions
 """
 
 
-# TODO: Test  __init__ & __str__
 class ValidationError(Exception):
     """
     The :class:`~openlp.core.lib.exceptions.ValidationError` exception provides a custom exception for validating

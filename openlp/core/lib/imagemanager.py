@@ -110,6 +110,8 @@ class Image(object):
         :param width: The width of the image, defaults to -1 meaning that the screen width will be used.
         :param height: The height of the image, defaults to -1 meaning that the screen height will be used.
         """
+        if not os.path.exists(path):
+            raise FileNotFoundError('{path} not found'.format(path=path))
         self.path = path
         self.image = None
         self.image_bytes = None
@@ -119,9 +121,7 @@ class Image(object):
         self.timestamp = 0
         self.width = width
         self.height = height
-        # FIXME: We assume that the path exist. The caller has to take care that it exists!
-        if os.path.exists(path):
-            self.timestamp = os.stat(path).st_mtime
+        self.timestamp = os.stat(path).st_mtime
         self.secondary_priority = Image.secondary_priority
         Image.secondary_priority += 1
 

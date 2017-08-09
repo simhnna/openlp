@@ -26,13 +26,14 @@ This module contains tests for the SWORD Bible importer.
 import os
 import json
 from unittest import TestCase, skipUnless
+from unittest.mock import MagicMock, patch
 
-from tests.functional import MagicMock, patch
 try:
     from openlp.plugins.bibles.lib.importers.sword import SwordBible
     HAS_PYSWORD = True
 except ImportError:
     HAS_PYSWORD = False
+
 from openlp.plugins.bibles.lib.db import BibleDB
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),

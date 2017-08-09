@@ -22,9 +22,10 @@
 
 from PyQt5 import QtWidgets
 
-from openlp.core.ui.lib import SpellTextEdit
+from openlp.core.common import Settings, UiStrings
 from openlp.core.lib import build_icon, translate
-from openlp.core.lib.ui import UiStrings, create_button_box
+from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.lib import SpellTextEdit
 from openlp.plugins.songs.lib import VerseType
 
 
@@ -67,6 +68,21 @@ class Ui_EditVerseDialog(object):
         self.verse_type_layout.addWidget(self.insert_button)
         self.verse_type_layout.addStretch()
         self.dialog_layout.addLayout(self.verse_type_layout)
+        if Settings().value('songs/enable chords'):
+            self.transpose_layout = QtWidgets.QHBoxLayout()
+            self.transpose_layout.setObjectName('transpose_layout')
+            self.transpose_label = QtWidgets.QLabel(edit_verse_dialog)
+            self.transpose_label.setObjectName('transpose_label')
+            self.transpose_layout.addWidget(self.transpose_label)
+            self.transpose_up_button = QtWidgets.QPushButton(edit_verse_dialog)
+            self.transpose_up_button.setIcon(build_icon(':/services/service_up.png'))
+            self.transpose_up_button.setObjectName('transpose_up')
+            self.transpose_layout.addWidget(self.transpose_up_button)
+            self.transpose_down_button = QtWidgets.QPushButton(edit_verse_dialog)
+            self.transpose_down_button.setIcon(build_icon(':/services/service_down.png'))
+            self.transpose_down_button.setObjectName('transpose_down')
+            self.transpose_layout.addWidget(self.transpose_down_button)
+            self.dialog_layout.addLayout(self.transpose_layout)
         self.button_box = create_button_box(edit_verse_dialog, 'button_box', ['cancel', 'ok'])
         self.dialog_layout.addWidget(self.button_box)
         self.retranslateUi(edit_verse_dialog)
@@ -89,3 +105,7 @@ class Ui_EditVerseDialog(object):
         self.insert_button.setText(translate('SongsPlugin.EditVerseForm', '&Insert'))
         self.insert_button.setToolTip(translate('SongsPlugin.EditVerseForm',
                                       'Split a slide into two by inserting a verse splitter.'))
+        if Settings().value('songs/enable chords'):
+            self.transpose_label.setText(translate('SongsPlugin.EditVerseForm', 'Transpose:'))
+            self.transpose_up_button.setText(translate('SongsPlugin.EditVerseForm', 'Up'))
+            self.transpose_down_button.setText(translate('SongsPlugin.EditVerseForm', 'Down'))

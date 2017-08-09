@@ -25,15 +25,15 @@ Functional tests to test the PowerPointController class and related methods.
 import os
 import shutil
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 from tempfile import mkdtemp
-
-from tests.functional import patch, MagicMock
-from tests.helpers.testmixin import TestMixin
-from tests.utils.constants import TEST_RESOURCES_PATH
 
 from openlp.plugins.presentations.lib.powerpointcontroller import PowerpointController, PowerpointDocument,\
     _get_text_from_shapes
 from openlp.core.common import is_win, Settings
+
+from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import TEST_RESOURCES_PATH
 
 if is_win():
     import pywintypes

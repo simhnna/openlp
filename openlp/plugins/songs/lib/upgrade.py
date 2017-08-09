@@ -52,6 +52,7 @@ def upgrade_1(session, metadata):
     :param metadata:
     """
     op = get_upgrade_op(session)
+    metadata.reflect()
     if 'media_files_songs' in [t.name for t in metadata.tables.values()]:
         op.drop_table('media_files_songs')
         op.add_column('media_files', Column('song_id', types.Integer(), server_default=null()))
@@ -122,6 +123,7 @@ def upgrade_6(session, metadata):
     This version corrects the errors in upgrades 4 and 5
     """
     op = get_upgrade_op(session)
+    metadata.reflect()
     # Move upgrade 4 to here and correct it (authors_songs table, not songs table)
     authors_songs = Table('authors_songs', metadata, autoload=True)
     if 'author_type' not in [col.name for col in authors_songs.c.values()]:

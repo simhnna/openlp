@@ -26,9 +26,13 @@ from unittest import TestCase
 
 from PyQt5 import QtCore, QtTest, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common import Registry, Settings
 from openlp.plugins.songs.forms.editverseform import EditVerseForm
 from tests.helpers.testmixin import TestMixin
+
+__default_settings__ = {
+    'songs/enable chords': True,
+}
 
 
 class TestEditVerseForm(TestCase, TestMixin):
@@ -44,12 +48,15 @@ class TestEditVerseForm(TestCase, TestMixin):
         self.setup_application()
         self.main_window = QtWidgets.QMainWindow()
         Registry().register('main_window', self.main_window)
+        self.build_settings()
+        Settings().extend_default_settings(__default_settings__)
         self.form = EditVerseForm()
 
     def tearDown(self):
         """
         Delete all the C++ objects at the end so that we don't have a segfault
         """
+        self.destroy_settings()
         del self.form
         del self.main_window
 

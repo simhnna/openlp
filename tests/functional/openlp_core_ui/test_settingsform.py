@@ -22,13 +22,13 @@
 """
 Package to test the openlp.core.ui.settingsform package.
 """
-from PyQt5 import QtWidgets
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
+
+from PyQt5 import QtWidgets
 
 from openlp.core.common import Registry
 from openlp.core.ui.settingsform import SettingsForm
-
-from tests.functional import MagicMock, patch
 
 
 class TestSettingsForm(TestCase):

@@ -22,14 +22,15 @@
 """
 Package to test the openlp.core.lib.ui package.
 """
-from PyQt5 import QtCore, QtGui, QtWidgets
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
+
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import UiStrings, translate
 from openlp.core.lib.ui import add_welcome_page, create_button_box, create_horizontal_adjusting_combo_box, \
     create_button, create_action, create_valign_selection_widgets, find_and_set_in_combo_box, create_widget_action, \
     set_case_insensitive_completer
-from tests.functional import MagicMock, patch
 
 
 class TestUi(TestCase):

@@ -23,12 +23,12 @@
 Package to test the openlp.core.lib.screenlist package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry
 from openlp.core.lib import ScreenList
-from tests.functional import MagicMock
 
 SCREEN = {
     'primary': False,

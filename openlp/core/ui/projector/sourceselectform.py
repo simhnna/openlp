@@ -233,7 +233,8 @@ class SourceSelectTabs(QtWidgets.QDialog):
         :param projectordb: ProjectorDB session to use
         """
         log.debug('Initializing SourceSelectTabs()')
-        super(SourceSelectTabs, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(SourceSelectTabs, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                               QtCore.Qt.WindowCloseButtonHint)
         self.setMinimumWidth(350)
         self.projectordb = projectordb
         self.edit = edit
@@ -388,12 +389,13 @@ class SourceSelectSingle(QtWidgets.QDialog):
         """
         log.debug('Initializing SourceSelectSingle()')
         self.projectordb = projectordb
-        super(SourceSelectSingle, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint)
+        super(SourceSelectSingle, self).__init__(parent, QtCore.Qt.WindowSystemMenuHint | QtCore.Qt.WindowTitleHint |
+                                                 QtCore.Qt.WindowCloseButtonHint)
         self.edit = edit
         if self.edit:
-            title = translate('OpenLP.SourceSelectForm', 'Edit Projector Source Text')
+            self.title = translate('OpenLP.SourceSelectForm', 'Edit Projector Source Text')
         else:
-            title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
+            self.title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
         self.setObjectName('source_select_single')
         self.setWindowIcon(build_icon(':/icon/openlp-log.svg'))
         self.setModal(True)

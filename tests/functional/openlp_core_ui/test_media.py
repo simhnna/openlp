@@ -22,12 +22,13 @@
 """
 Package to test the openlp.core.ui package.
 """
-from PyQt5 import QtCore
 from unittest import TestCase
+from unittest.mock import patch
+
+from PyQt5 import QtCore
 
 from openlp.core.ui.media import get_media_players, parse_optical_path
 
-from tests.functional import MagicMock, patch
 from tests.helpers.testmixin import TestMixin
 
 

@@ -105,7 +105,7 @@ class SearchEdit(QtWidgets.QLineEdit):
                 self.setPlaceholderText(action.placeholder_text)
                 self.menu_button.setDefaultAction(action)
                 self._current_search_type = identifier
-                Settings().setValue('{section}/last search type'.format(section=self.settings_section), identifier)
+                Settings().setValue('{section}/last used search type'.format(section=self.settings_section), identifier)
                 self.searchTypeChanged.emit(identifier)
                 return True
 
@@ -141,7 +141,7 @@ class SearchEdit(QtWidgets.QLineEdit):
             self.menu_button.resize(QtCore.QSize(28, 18))
         self.menu_button.setMenu(menu)
         self.set_current_search_type(
-            Settings().value('{section}/last search type'.format(section=self.settings_section)))
+            Settings().value('{section}/last used search type'.format(section=self.settings_section)))
         self.menu_button.show()
         self._update_style_sheet()
 

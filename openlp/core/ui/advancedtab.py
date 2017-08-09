@@ -25,13 +25,13 @@ The :mod:`advancedtab` provides an advanced settings facility.
 from datetime import datetime, timedelta
 import logging
 import os
-import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import AppLocation, Settings, SlideLimits, UiStrings, translate
-from openlp.core.lib import SettingsTab, build_icon
 from openlp.core.common.languagemanager import format_time
+from openlp.core.lib import SettingsTab, build_icon
+from openlp.core.ui.lib import PathEdit, PathType
 
 log = logging.getLogger(__name__)
 
@@ -153,32 +153,17 @@ class AdvancedTab(SettingsTab):
         self.data_directory_group_box.setObjectName('data_directory_group_box')
         self.data_directory_layout = QtWidgets.QFormLayout(self.data_directory_group_box)
         self.data_directory_layout.setObjectName('data_directory_layout')
-        self.data_directory_current_label = QtWidgets.QLabel(self.data_directory_group_box)
-        self.data_directory_current_label.setObjectName('data_directory_current_label')
-        self.data_directory_label = QtWidgets.QLabel(self.data_directory_group_box)
-        self.data_directory_label.setObjectName('data_directory_label')
         self.data_directory_new_label = QtWidgets.QLabel(self.data_directory_group_box)
         self.data_directory_new_label.setObjectName('data_directory_current_label')
-        self.new_data_directory_edit = QtWidgets.QLineEdit(self.data_directory_group_box)
-        self.new_data_directory_edit.setObjectName('new_data_directory_edit')
-        self.new_data_directory_edit.setReadOnly(True)
+        self.data_directory_path_edit = PathEdit(self.data_directory_group_box, path_type=PathType.Directories,
+                                                 default_path=str(AppLocation.get_directory(AppLocation.DataDir)))
+        self.data_directory_layout.addRow(self.data_directory_new_label, self.data_directory_path_edit)
         self.new_data_directory_has_files_label = QtWidgets.QLabel(self.data_directory_group_box)
         self.new_data_directory_has_files_label.setObjectName('new_data_directory_has_files_label')
         self.new_data_directory_has_files_label.setWordWrap(True)
-        self.data_directory_browse_button = QtWidgets.QToolButton(self.data_directory_group_box)
-        self.data_directory_browse_button.setObjectName('data_directory_browse_button')
-        self.data_directory_browse_button.setIcon(build_icon(':/general/general_open.png'))
-        self.data_directory_default_button = QtWidgets.QToolButton(self.data_directory_group_box)
-        self.data_directory_default_button.setObjectName('data_directory_default_button')
-        self.data_directory_default_button.setIcon(build_icon(':/general/general_revert.png'))
         self.data_directory_cancel_button = QtWidgets.QToolButton(self.data_directory_group_box)
         self.data_directory_cancel_button.setObjectName('data_directory_cancel_button')
         self.data_directory_cancel_button.setIcon(build_icon(':/general/general_delete.png'))
-        self.new_data_directory_label_layout = QtWidgets.QHBoxLayout()
-        self.new_data_directory_label_layout.setObjectName('new_data_directory_label_layout')
-        self.new_data_directory_label_layout.addWidget(self.new_data_directory_edit)
-        self.new_data_directory_label_layout.addWidget(self.data_directory_browse_button)
-        self.new_data_directory_label_layout.addWidget(self.data_directory_default_button)
         self.data_directory_copy_check_layout = QtWidgets.QHBoxLayout()
         self.data_directory_copy_check_layout.setObjectName('data_directory_copy_check_layout')
         self.data_directory_copy_check_box = QtWidgets.QCheckBox(self.data_directory_group_box)
@@ -186,8 +171,6 @@ class AdvancedTab(SettingsTab):
         self.data_directory_copy_check_layout.addWidget(self.data_directory_copy_check_box)
         self.data_directory_copy_check_layout.addStretch()
         self.data_directory_copy_check_layout.addWidget(self.data_directory_cancel_button)
-        self.data_directory_layout.addRow(self.data_directory_current_label, self.data_directory_label)
-        self.data_directory_layout.addRow(self.data_directory_new_label, self.new_data_directory_label_layout)
         self.data_directory_layout.addRow(self.data_directory_copy_check_layout)
         self.data_directory_layout.addRow(self.new_data_directory_has_files_label)
         self.left_layout.addWidget(self.data_directory_group_box)
@@ -239,8 +222,7 @@ class AdvancedTab(SettingsTab):
         self.service_name_edit.textChanged.connect(self.update_service_name_example)
         self.service_name_revert_button.clicked.connect(self.on_service_name_revert_button_clicked)
         self.alternate_rows_check_box.toggled.connect(self.on_alternate_rows_check_box_toggled)
-        self.data_directory_browse_button.clicked.connect(self.on_data_directory_browse_button_clicked)
-        self.data_directory_default_button.clicked.connect(self.on_data_directory_default_button_clicked)
+        self.data_directory_path_edit.pathChanged.connect(self.on_data_directory_path_edit_path_changed)
         self.data_directory_cancel_button.clicked.connect(self.on_data_directory_cancel_button_clicked)
         self.data_directory_copy_check_box.toggled.connect(self.on_data_directory_copy_check_box_toggled)
         self.end_slide_radio_button.clicked.connect(self.on_end_slide_button_clicked)
@@ -317,12 +299,7 @@ class AdvancedTab(SettingsTab):
         self.service_name_example_label.setText(translate('OpenLP.AdvancedTab', 'Example:'))
         self.hide_mouse_group_box.setTitle(translate('OpenLP.AdvancedTab', 'Mouse Cursor'))
         self.hide_mouse_check_box.setText(translate('OpenLP.AdvancedTab', 'Hide mouse cursor when over display window'))
-        self.data_directory_current_label.setText(translate('OpenLP.AdvancedTab', 'Current path:'))
-        self.data_directory_new_label.setText(translate('OpenLP.AdvancedTab', 'Custom path:'))
-        self.data_directory_browse_button.setToolTip(translate('OpenLP.AdvancedTab',
-                                                               'Browse for new data file location.'))
-        self.data_directory_default_button.setToolTip(
-            translate('OpenLP.AdvancedTab', 'Set the data location to the default.'))
+        self.data_directory_new_label.setText(translate('OpenLP.AdvancedTab', 'Path:'))
         self.data_directory_cancel_button.setText(translate('OpenLP.AdvancedTab', 'Cancel'))
         self.data_directory_cancel_button.setToolTip(
             translate('OpenLP.AdvancedTab', 'Cancel OpenLP data directory location change.'))
@@ -396,8 +373,7 @@ class AdvancedTab(SettingsTab):
         self.new_data_directory_has_files_label.hide()
         self.data_directory_cancel_button.hide()
         # Since data location can be changed, make sure the path is present.
-        self.current_data_path = AppLocation.get_data_path()
-        self.data_directory_label.setText(os.path.abspath(self.current_data_path))
+        self.data_directory_path_edit.path = str(AppLocation.get_data_path())
         # Don't allow data directory move if running portable.
         if settings.value('advanced/is portable'):
             self.data_directory_group_box.hide()
@@ -509,69 +485,25 @@ class AdvancedTab(SettingsTab):
         self.service_name_edit.setText(UiStrings().DefaultServiceName)
         self.service_name_edit.setFocus()
 
-    def on_data_directory_browse_button_clicked(self):
+    def on_data_directory_path_edit_path_changed(self, new_data_path):
         """
         Browse for a new data directory location.
         """
-        old_root_path = str(self.data_directory_label.text())
-        # Get the new directory location.
-        new_data_path = QtWidgets.QFileDialog.getExistingDirectory(self, translate('OpenLP.AdvancedTab',
-                                                                                   'Select Data Directory Location'),
-                                                                   old_root_path,
-                                                                   options=QtWidgets.QFileDialog.ShowDirsOnly)
-        # Set the new data path.
-        if new_data_path:
-            new_data_path = os.path.normpath(new_data_path)
-            if self.current_data_path.lower() == new_data_path.lower():
-                self.on_data_directory_cancel_button_clicked()
-                return
-        else:
-            return
         # Make sure they want to change the data.
         answer = QtWidgets.QMessageBox.question(self, translate('OpenLP.AdvancedTab', 'Confirm Data Directory Change'),
                                                 translate('OpenLP.AdvancedTab', 'Are you sure you want to change the '
                                                           'location of the OpenLP data directory to:\n\n{path}'
                                                           '\n\nThe data directory will be changed when OpenLP is '
                                                           'closed.').format(path=new_data_path),
-                                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                      QtWidgets.QMessageBox.No),
-                                                QtWidgets.QMessageBox.No)
+                                                defaultButton=QtWidgets.QMessageBox.No)
         if answer != QtWidgets.QMessageBox.Yes:
+            self.data_directory_path_edit.path = str(AppLocation.get_data_path())
             return
         # Check if data already exists here.
         self.check_data_overwrite(new_data_path)
         # Save the new location.
         self.main_window.set_new_data_path(new_data_path)
-        self.new_data_directory_edit.setText(new_data_path)
         self.data_directory_cancel_button.show()
-
-    def on_data_directory_default_button_clicked(self):
-        """
-        Re-set the data directory location to the 'default' location.
-        """
-        new_data_path = AppLocation.get_directory(AppLocation.DataDir)
-        if self.current_data_path.lower() != new_data_path.lower():
-            # Make sure they want to change the data location back to the
-            # default.
-            answer = QtWidgets.QMessageBox.question(self, translate('OpenLP.AdvancedTab', 'Reset Data Directory'),
-                                                    translate('OpenLP.AdvancedTab', 'Are you sure you want to change '
-                                                                                    'the location of the OpenLP data '
-                                                                                    'directory to the default location?'
-                                                                                    '\n\nThis location will be used '
-                                                                                    'after OpenLP is closed.'),
-                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                          QtWidgets.QMessageBox.No),
-                                                    QtWidgets.QMessageBox.No)
-            if answer != QtWidgets.QMessageBox.Yes:
-                return
-            self.check_data_overwrite(new_data_path)
-            # Save the new location.
-            self.main_window.set_new_data_path(new_data_path)
-            self.new_data_directory_edit.setText(os.path.abspath(new_data_path))
-            self.data_directory_cancel_button.show()
-        else:
-            # We cancel the change in case user changed their mind.
-            self.on_data_directory_cancel_button_clicked()
 
     def on_data_directory_copy_check_box_toggled(self):
         """
@@ -589,7 +521,6 @@ class AdvancedTab(SettingsTab):
         Check if there's already data in the target directory.
         """
         test_path = os.path.join(data_path, 'songs')
-        self.data_directory_copy_check_box.show()
         if os.path.exists(test_path):
             self.data_exists = True
             # Check is they want to replace existing data.
@@ -603,6 +534,7 @@ class AdvancedTab(SettingsTab):
                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
                                                                                          QtWidgets.QMessageBox.No),
                                                    QtWidgets.QMessageBox.No)
+            self.data_directory_copy_check_box.show()
             if answer == QtWidgets.QMessageBox.Yes:
                 self.data_directory_copy_check_box.setChecked(True)
                 self.new_data_directory_has_files_label.show()
@@ -618,7 +550,7 @@ class AdvancedTab(SettingsTab):
         """
         Cancel the data directory location change
         """
-        self.new_data_directory_edit.clear()
+        self.data_directory_path_edit.path = str(AppLocation.get_data_path())
         self.data_directory_copy_check_box.setChecked(False)
         self.main_window.set_new_data_path(None)
         self.main_window.set_copy_data(False)

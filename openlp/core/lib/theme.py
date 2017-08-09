@@ -26,7 +26,6 @@ import os
 import logging
 import json
 
-from xml.dom.minidom import Document
 from lxml import etree, objectify
 from openlp.core.common import AppLocation, de_hump
 
@@ -150,7 +149,7 @@ INTEGER_LIST = ['size', 'line_adjustment', 'x', 'height', 'y', 'width', 'shadow_
                 'horizontal_align', 'vertical_align', 'wrap_style']
 
 
-class ThemeXML(object):
+class Theme(object):
     """
     A class to encapsulate the Theme XML.
     """
@@ -159,12 +158,12 @@ class ThemeXML(object):
         Initialise the theme object.
         """
         # basic theme object with defaults
-        json_dir = os.path.join(AppLocation.get_directory(AppLocation.AppDir), 'core', 'lib', 'json')
+        json_dir = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)), 'core', 'lib', 'json')
         json_file = os.path.join(json_dir, 'theme.json')
         jsn = get_text_file_string(json_file)
         jsn = json.loads(jsn)
         self.expand_json(jsn)
-        self.background_filename = None
+        self.background_filename = ''
 
     def expand_json(self, var, prev=None):
         """
@@ -195,184 +194,6 @@ class ThemeXML(object):
                 self.background_filename = self.background_filename.strip()
                 self.background_filename = os.path.join(path, self.theme_name, self.background_filename)
 
-    def _new_document(self, name):
-        """
-        Create a new theme XML document.
-        """
-        self.theme_xml = Document()
-        self.theme = self.theme_xml.createElement('theme')
-        self.theme_xml.appendChild(self.theme)
-        self.theme.setAttribute('version', '2.0')
-        self.name = self.theme_xml.createElement('name')
-        text_node = self.theme_xml.createTextNode(name)
-        self.name.appendChild(text_node)
-        self.theme.appendChild(self.name)
-
-    def add_background_transparent(self):
-        """
-        Add a transparent background.
-        """
-        background = self.theme_xml.createElement('background')
-        background.setAttribute('type', 'transparent')
-        self.theme.appendChild(background)
-
-    def add_background_solid(self, bkcolor):
-        """
-        Add a Solid background.
-
-        :param bkcolor: The color of the background.
-        """
-        background = self.theme_xml.createElement('background')
-        background.setAttribute('type', 'solid')
-        self.theme.appendChild(background)
-        self.child_element(background, 'color', str(bkcolor))
-
-    def add_background_gradient(self, startcolor, endcolor, direction):
-        """
-        Add a gradient background.
-
-        :param startcolor: The gradient's starting colour.
-        :param endcolor: The gradient's ending colour.
-        :param direction: The direction of the gradient.
-        """
-        background = self.theme_xml.createElement('background')
-        background.setAttribute('type', 'gradient')
-        self.theme.appendChild(background)
-        # Create startColor element
-        self.child_element(background, 'startColor', str(startcolor))
-        # Create endColor element
-        self.child_element(background, 'endColor', str(endcolor))
-        # Create direction element
-        self.child_element(background, 'direction', str(direction))
-
-    def add_background_image(self, filename, border_color):
-        """
-        Add a image background.
-
-        :param filename: The file name of the image.
-        :param border_color:
-        """
-        background = self.theme_xml.createElement('background')
-        background.setAttribute('type', 'image')
-        self.theme.appendChild(background)
-        # Create Filename element
-        self.child_element(background, 'filename', filename)
-        # Create endColor element
-        self.child_element(background, 'borderColor', str(border_color))
-
-    def add_background_video(self, filename, border_color):
-        """
-        Add a video background.
-
-        :param filename: The file name of the video.
-        :param border_color:
-        """
-        background = self.theme_xml.createElement('background')
-        background.setAttribute('type', 'video')
-        self.theme.appendChild(background)
-        # Create Filename element
-        self.child_element(background, 'filename', filename)
-        # Create endColor element
-        self.child_element(background, 'borderColor', str(border_color))
-
-    def add_font(self, name, color, size, override, fonttype='main', bold='False', italics='False',
-                 line_adjustment=0, xpos=0, ypos=0, width=0, height=0, outline='False', outline_color='#ffffff',
-                 outline_pixel=2, shadow='False', shadow_color='#ffffff', shadow_pixel=5):
-        """
-        Add a Font.
-
-        :param name: The name of the font.
-        :param color: The colour of the font.
-        :param size: The size of the font.
-        :param override: Whether or not to override the default positioning of the theme.
-        :param fonttype: The type of font, ``main`` or ``footer``. Defaults to ``main``.
-        :param bold:
-        :param italics: The weight of then font Defaults to 50 Normal
-        :param line_adjustment: Does the font render to italics Defaults to 0 Normal
-        :param xpos: The X position of the text block.
-        :param ypos: The Y position of the text block.
-        :param width: The width of the text block.
-        :param height: The height of the text block.
-        :param outline: Whether or not to show an outline.
-        :param outline_color: The colour of the outline.
-        :param outline_pixel:  How big the Shadow is
-        :param shadow: Whether or not to show a shadow.
-        :param shadow_color: The colour of the shadow.
-        :param shadow_pixel: How big the Shadow is
-        """
-        background = self.theme_xml.createElement('font')
-        background.setAttribute('type', fonttype)
-        self.theme.appendChild(background)
-        # Create Font name element
-        self.child_element(background, 'name', name)
-        # Create Font color element
-        self.child_element(background, 'color', str(color))
-        # Create Proportion name element
-        self.child_element(background, 'size', str(size))
-        # Create weight name element
-        self.child_element(background, 'bold', str(bold))
-        # Create italics name element
-        self.child_element(background, 'italics', str(italics))
-        # Create indentation name element
-        self.child_element(background, 'line_adjustment', str(line_adjustment))
-        # Create Location element
-        element = self.theme_xml.createElement('location')
-        element.setAttribute('override', str(override))
-        element.setAttribute('x', str(xpos))
-        element.setAttribute('y', str(ypos))
-        element.setAttribute('width', str(width))
-        element.setAttribute('height', str(height))
-        background.appendChild(element)
-        # Shadow
-        element = self.theme_xml.createElement('shadow')
-        element.setAttribute('shadowColor', str(shadow_color))
-        element.setAttribute('shadowSize', str(shadow_pixel))
-        value = self.theme_xml.createTextNode(str(shadow))
-        element.appendChild(value)
-        background.appendChild(element)
-        # Outline
-        element = self.theme_xml.createElement('outline')
-        element.setAttribute('outlineColor', str(outline_color))
-        element.setAttribute('outlineSize', str(outline_pixel))
-        value = self.theme_xml.createTextNode(str(outline))
-        element.appendChild(value)
-        background.appendChild(element)
-
-    def add_display(self, horizontal, vertical, transition):
-        """
-        Add a Display options.
-
-        :param horizontal: The horizontal alignment of the text.
-        :param vertical: The vertical alignment of the text.
-        :param transition: Whether the slide transition is active.
-        """
-        background = self.theme_xml.createElement('display')
-        self.theme.appendChild(background)
-        # Horizontal alignment
-        element = self.theme_xml.createElement('horizontalAlign')
-        value = self.theme_xml.createTextNode(str(horizontal))
-        element.appendChild(value)
-        background.appendChild(element)
-        # Vertical alignment
-        element = self.theme_xml.createElement('verticalAlign')
-        value = self.theme_xml.createTextNode(str(vertical))
-        element.appendChild(value)
-        background.appendChild(element)
-        # Slide Transition
-        element = self.theme_xml.createElement('slideTransition')
-        value = self.theme_xml.createTextNode(str(transition))
-        element.appendChild(value)
-        background.appendChild(element)
-
-    def child_element(self, element, tag, value):
-        """
-        Generic child element creator.
-        """
-        child = self.theme_xml.createElement(tag)
-        child.appendChild(self.theme_xml.createTextNode(value))
-        element.appendChild(child)
-        return child
-
     def set_default_header_footer(self):
         """
         Set the header and footer size into the current primary screen.
@@ -386,25 +207,24 @@ class ThemeXML(object):
         self.font_footer_y = current_screen['size'].height() * 9 / 10
         self.font_footer_height = current_screen['size'].height() / 10
 
-    def dump_xml(self):
+    def load_theme(self, theme):
         """
-        Dump the XML to file used for debugging
-        """
-        return self.theme_xml.toprettyxml(indent='  ')
+        Convert the JSON file and expand it.
 
-    def extract_xml(self):
+        :param theme: the theme string
         """
-        Print out the XML string.
-        """
-        self._build_xml_from_attrs()
-        return self.theme_xml.toxml('utf-8').decode('utf-8')
+        jsn = json.loads(theme)
+        self.expand_json(jsn)
 
-    def extract_formatted_xml(self):
+    def export_theme(self):
         """
-        Pull out the XML string formatted for human consumption
+        Loop through the fields and build a dictionary of them
+
         """
-        self._build_xml_from_attrs()
-        return self.theme_xml.toprettyxml(indent='    ', newl='\n', encoding='utf-8')
+        theme_data = {}
+        for attr, value in self.__dict__.items():
+            theme_data["{attr}".format(attr=attr)] = value
+        return json.dumps(theme_data)
 
     def parse(self, xml):
         """
@@ -461,7 +281,8 @@ class ThemeXML(object):
                 if element.tag == 'name':
                     self._create_attr('theme', element.tag, element.text)
 
-    def _translate_tags(self, master, element, value):
+    @staticmethod
+    def _translate_tags(master, element, value):
         """
         Clean up XML removing and redefining tags
         """
@@ -514,71 +335,5 @@ class ThemeXML(object):
         theme_strings = []
         for key in dir(self):
             if key[0:1] != '_':
-                # TODO: Due to bound methods returned, I don't know how to write a proper test
                 theme_strings.append('{key:>30}: {value}'.format(key=key, value=getattr(self, key)))
         return '\n'.join(theme_strings)
-
-    def _build_xml_from_attrs(self):
-        """
-        Build the XML from the varables in the object
-        """
-        self._new_document(self.theme_name)
-        if self.background_type == BackgroundType.to_string(BackgroundType.Solid):
-            self.add_background_solid(self.background_color)
-        elif self.background_type == BackgroundType.to_string(BackgroundType.Gradient):
-            self.add_background_gradient(
-                self.background_start_color,
-                self.background_end_color,
-                self.background_direction
-            )
-        elif self.background_type == BackgroundType.to_string(BackgroundType.Image):
-            filename = os.path.split(self.background_filename)[1]
-            self.add_background_image(filename, self.background_border_color)
-        elif self.background_type == BackgroundType.to_string(BackgroundType.Video):
-            filename = os.path.split(self.background_filename)[1]
-            self.add_background_video(filename, self.background_border_color)
-        elif self.background_type == BackgroundType.to_string(BackgroundType.Transparent):
-            self.add_background_transparent()
-        self.add_font(
-            self.font_main_name,
-            self.font_main_color,
-            self.font_main_size,
-            self.font_main_override, 'main',
-            self.font_main_bold,
-            self.font_main_italics,
-            self.font_main_line_adjustment,
-            self.font_main_x,
-            self.font_main_y,
-            self.font_main_width,
-            self.font_main_height,
-            self.font_main_outline,
-            self.font_main_outline_color,
-            self.font_main_outline_size,
-            self.font_main_shadow,
-            self.font_main_shadow_color,
-            self.font_main_shadow_size
-        )
-        self.add_font(
-            self.font_footer_name,
-            self.font_footer_color,
-            self.font_footer_size,
-            self.font_footer_override, 'footer',
-            self.font_footer_bold,
-            self.font_footer_italics,
-            0,  # line adjustment
-            self.font_footer_x,
-            self.font_footer_y,
-            self.font_footer_width,
-            self.font_footer_height,
-            self.font_footer_outline,
-            self.font_footer_outline_color,
-            self.font_footer_outline_size,
-            self.font_footer_shadow,
-            self.font_footer_shadow_color,
-            self.font_footer_shadow_size
-        )
-        self.add_display(
-            self.display_horizontal_align,
-            self.display_vertical_align,
-            self.display_slide_transition
-        )

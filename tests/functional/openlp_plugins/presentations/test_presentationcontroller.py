@@ -23,10 +23,11 @@
 Functional tests to test the PresentationController and PresentationDocument
 classes and related methods.
 """
-from unittest import TestCase
 import os
+from unittest import TestCase
+from unittest.mock import MagicMock, mock_open, patch
+
 from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
-from tests.functional import MagicMock, mock_open, patch
 
 FOLDER_TO_PATCH = 'openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument.get_thumbnail_folder'
 
@@ -35,19 +36,6 @@ class TestPresentationController(TestCase):
     """
     Test the PresentationController.
     """
-    # TODO: Items left to test
-    #   PresentationController
-    #       __init__
-    #       enabled
-    #       is_available
-    #       check_available
-    #       start_process
-    #       kill
-    #       add_document
-    #       remove_doc
-    #       close_presentation
-    #       _get_plugin_manager
-
     def setUp(self):
         self.get_thumbnail_folder_patcher = \
             patch('openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument.get_thumbnail_folder')
@@ -182,32 +170,6 @@ class TestPresentationDocument(TestCase):
     """
     Test the PresentationDocument Class
     """
-    # TODO: Items left to test
-    #   PresentationDocument
-    #       __init__
-    #       presentation_deleted
-    #       get_thumbnail_folder
-    #       get_temp_folder
-    #       check_thumbnails
-    #       close_presentation
-    #       is_active
-    #       is_loaded
-    #       blank_screen
-    #       unblank_screen
-    #       is_blank
-    #       stop_presentation
-    #       start_presentation
-    #       get_slide_number
-    #       get_slide_count
-    #       goto_slide
-    #       next_step
-    #       previous_step
-    #       convert_thumbnail
-    #       get_thumbnail_path
-    #       poll_slidenumber
-    #       get_slide_text
-    #       get_slide_notes
-
     def setUp(self):
         """
         Set up the patches and mocks need for all tests.

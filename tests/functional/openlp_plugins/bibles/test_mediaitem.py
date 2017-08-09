@@ -31,7 +31,8 @@ from tests.helpers.testmixin import TestMixin
 
 from openlp.core.common import Registry
 from openlp.core.lib import MediaManagerItem
-from openlp.plugins.bibles.lib.mediaitem import BibleMediaItem, BibleSearch, get_reference_separators, VALID_TEXT_SEARCH
+from openlp.plugins.bibles.lib.mediaitem import BibleMediaItem, BibleSearch, ResultsTab, SearchStatus, SearchTabs, \
+    get_reference_separators, VALID_TEXT_SEARCH
 
 
 class TestBibleMediaItemModulefunctions(TestCase):
@@ -143,6 +144,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item = BibleMediaItem(None, self.mocked_plugin)
 
         self.media_item.settings_section = 'bibles'
+        self.media_item.results_view_tab = MagicMock()
 
         self.mocked_book_1 = MagicMock(**{'get_name.return_value': 'Book 1', 'book_reference_id': 1})
         self.mocked_book_2 = MagicMock(**{'get_name.return_value': 'Book 2', 'book_reference_id': 2})
@@ -197,36 +199,67 @@ class TestMediaItem(TestCase, TestMixin):
         self.assertTrue(self.media_item.has_delete_icon, 'Check that the icon is called as True.')
         self.assertFalse(self.media_item.add_to_service_item, 'Check that the icon is called as False')
 
-    # TODO: Test add_end_header_bar
-    # TODO: Test setupUi
-
     def test_on_focus_search_tab_visible(self):
         """
         Test the correct widget gets focus when the BibleMediaItem receives focus
         """
-        # GIVEN: An instance of :class:`MediaManagerItem` and a mocked out search_tab  and search_edit
+        # GIVEN: An instance of :class:`MediaManagerItem` and mocked out tabs and primary widgets
         self.media_item.search_tab = MagicMock(**{'isVisible.return_value': True})
         self.media_item.search_edit = MagicMock()
+        self.media_item.select_tab = MagicMock(**{'isVisible.return_value': False})
+        self.media_item.select_book_combo_box = MagicMock()
+        self.media_item.options_tab = MagicMock(**{'isVisible.return_value': False})
+        self.media_item.version_combo_box = MagicMock()
 
         # WHEN: Calling on_focus
         self.media_item.on_focus()
 
-        # THEN: setFocus and selectAll should have been called on search_edit
-        self.assertEqual(self.media_item.search_edit.mock_calls, [call.setFocus(), call.selectAll()])
+        # THEN: search_edit should now have focus and its text selected
+        self.media_item.search_edit.assert_has_calls([call.setFocus(), call.selectAll()])
+        self.media_item.select_book_combo_box.assert_not_called()
+        self.media_item.version_combo_box.setFocus.assert_not_called()
 
-    def test_on_focus_search_tab_not_visible(self):
+    def test_on_focus_select_tab_visible(self):
         """
         Test the correct widget gets focus when the BibleMediaItem receives focus
         """
-        # GIVEN: An instance of :class:`MediaManagerItem` and a mocked out search_tab and select_book_combo_box
+        # GIVEN: An instance of :class:`MediaManagerItem` and mocked out tabs and primary widgets
         self.media_item.search_tab = MagicMock(**{'isVisible.return_value': False})
+        self.media_item.search_edit = MagicMock()
+        self.media_item.select_tab = MagicMock(**{'isVisible.return_value': True})
         self.media_item.select_book_combo_box = MagicMock()
+        self.media_item.options_tab = MagicMock(**{'isVisible.return_value': False})
+        self.media_item.version_combo_box = MagicMock()
 
         # WHEN: Calling on_focus
         self.media_item.on_focus()
 
-        # THEN: setFocus should have been called on select_book_combo_box
-        self.assertTrue(self.media_item.select_book_combo_box.setFocus.called)
+        # THEN: select_book_combo_box should have focus
+        self.media_item.search_edit.setFocus.assert_not_called()
+        self.media_item.search_edit.selectAll.assert_not_called()
+        self.media_item.select_book_combo_box.setFocus.assert_called_once_with()
+        self.media_item.version_combo_box.setFocus.assert_not_called()
+
+    def test_on_focus_options_tab_visible(self):
+        """
+        Test the correct widget gets focus when the BibleMediaItem receives focus
+        """
+        # GIVEN: An instance of :class:`MediaManagerItem` and mocked out tabs and primary widgets
+        self.media_item.search_tab = MagicMock(**{'isVisible.return_value': False})
+        self.media_item.search_edit = MagicMock()
+        self.media_item.select_tab = MagicMock(**{'isVisible.return_value': False})
+        self.media_item.select_book_combo_box = MagicMock()
+        self.media_item.options_tab = MagicMock(**{'isVisible.return_value': True})
+        self.media_item.version_combo_box = MagicMock()
+
+        # WHEN: Calling on_focus
+        self.media_item.on_focus()
+
+        # THEN: version_combo_box have received focus
+        self.media_item.search_edit.setFocus.assert_not_called()
+        self.media_item.search_edit.selectAll.assert_not_called()
+        self.media_item.select_book_combo_box.setFocus.assert_not_called()
+        self.media_item.version_combo_box.setFocus.assert_called_once_with()
 
     def test_config_update_show_second_bible(self):
         """
@@ -444,9 +477,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling update_auto_completer
             self.media_item.update_auto_completer()
 
-            # THEN: set_case_insensitive_completer should have been called with the names of the books in order
+            # THEN: set_case_insensitive_completer should have been called with the names of the books + space in order
             mocked_set_case_insensitive_completer.assert_called_once_with(
-                ['Book 1', 'Book 2', 'Book 3'], mocked_search_edit)
+                ['Book 1 ', 'Book 2 ', 'Book 3 '], mocked_search_edit)
 
     def test_update_auto_completer_search_combined_type(self):
         """
@@ -464,11 +497,11 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling update_auto_completer
             self.media_item.update_auto_completer()
 
-            # THEN: set_case_insensitive_completer should have been called with the names of the books in order
+            # THEN: set_case_insensitive_completer should have been called with the names of the books + space in order
             mocked_set_case_insensitive_completer.assert_called_once_with(
-                ['Book 1', 'Book 2', 'Book 3'], mocked_search_edit)
+                ['Book 1 ', 'Book 2 ', 'Book 3 '], mocked_search_edit)
 
-    def test_on_import_click_no_import_wizzard_attr(self):
+    def test_on_import_click_no_import_wizard_attr(self):
         """
         Test on_import_click when media_item does not have the `import_wizard` attribute. And the wizard was canceled.
         """
@@ -485,9 +518,9 @@ class TestMediaItem(TestCase, TestMixin):
             self.assertTrue(mocked_bible_import_form.called)
             self.assertFalse(mocked_reload_bibles.called)
 
-    def test_on_import_click_wizzard_not_canceled(self):
+    def test_on_import_click_wizard_not_canceled(self):
         """
-        Test on_import_click when the media item has the import_wizzard attr set and wizard completes sucessfully.
+        Test on_import_click when the media item has the import_wizard attr set and wizard completes sucessfully.
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and a mocked import_wizard
         mocked_import_wizard = MagicMock(**{'exec.return_value': True})
@@ -609,12 +642,15 @@ class TestMediaItem(TestCase, TestMixin):
         # GIVEN: An instance of :class:`MediaManagerItem` and mocked out search_tab and select_tab
         self.media_item.search_tab = MagicMock()
         self.media_item.select_tab = MagicMock()
+        self.media_item.options_tab = MagicMock()
+        self.media_item.search_button = MagicMock()
         with patch.object(self.media_item, 'on_focus'):
 
             # WHEN: The search_tab has been selected
-            self.media_item.on_search_tab_bar_current_changed(0)
+            self.media_item.on_search_tab_bar_current_changed(SearchTabs.Search)
 
-            # THEN: search_tab should be setVisible and select_tab should be hidder
+            # THEN: The search_button should be enabled, search_tab should be setVisible and select_tab should be hidden
+            self.media_item.search_button.setEnabled.assert_called_once_with(True)
             self.media_item.search_tab.setVisible.assert_called_once_with(True)
             self.media_item.select_tab.setVisible.assert_called_once_with(False)
 
@@ -625,12 +661,15 @@ class TestMediaItem(TestCase, TestMixin):
         # GIVEN: An instance of :class:`MediaManagerItem` and mocked out search_tab and select_tab
         self.media_item.search_tab = MagicMock()
         self.media_item.select_tab = MagicMock()
+        self.media_item.options_tab = MagicMock()
+        self.media_item.search_button = MagicMock()
         with patch.object(self.media_item, 'on_focus'):
 
             # WHEN: The select_tab has been selected
-            self.media_item.on_search_tab_bar_current_changed(1)
+            self.media_item.on_search_tab_bar_current_changed(SearchTabs.Select)
 
-            # THEN: search_tab should be setVisible and select_tab should be hidder
+            # THEN: The search_button should be enabled, select_tab should be setVisible and search_tab should be hidden
+            self.media_item.search_button.setEnabled.assert_called_once_with(True)
             self.media_item.search_tab.setVisible.assert_called_once_with(False)
             self.media_item.select_tab.setVisible.assert_called_once_with(True)
 
@@ -660,54 +699,42 @@ class TestMediaItem(TestCase, TestMixin):
 
     def test_on_clear_button_clicked(self):
         """
-        Test on_clear_button_clicked
+        Test on_clear_button_clicked when the search tab is selected
         """
         # GIVEN: An instance of :class:`MediaManagerItem` and mocked out search_tab and select_tab and a mocked out
         #        list_view and search_edit
-        self.media_item.list_view = MagicMock()
-        self.media_item.search_edit = MagicMock()
-        with patch.object(self.media_item, 'on_focus'):
+        self.media_item.list_view = MagicMock(**{'selectedItems.return_value': ['Some', 'Results']})
+        self.media_item.results_view_tab = MagicMock(**{'currentIndex.return_value': ResultsTab.Search})
+        with patch.object(self.media_item, 'on_results_view_tab_total_update'):
 
             # WHEN: Calling on_clear_button_clicked
             self.media_item.on_clear_button_clicked()
 
             # THEN: The list_view and the search_edit should be cleared
-            self.media_item.list_view.clear.assert_called_once_with()
-            self.media_item.search_edit.clear.assert_called_once_with()
+            self.assertEqual(self.media_item.current_results, [])
+            self.assertEqual(self.media_item.list_view.takeItem.call_count, 2)
+            self.media_item.list_view.row.assert_has_calls([call('Some'), call('Results')])
 
-    def test_on_lock_button_toggled_search_tab_lock_icon(self):
+    def test_on_save_results_button_clicked(self):
         """
-        Test that "on_lock_button_toggled" toggles the lock properly.
+        Test that "on_save_results_button_clicked" saves the results.
         """
-        # GIVEN: An instance of :class:`MediaManagerItem` a mocked sender and list_view
-        self.media_item.list_view = MagicMock()
-        self.media_item.lock_icon = 'lock icon'
-        mocked_sender_instance = MagicMock()
-        with patch.object(self.media_item, 'sender', return_value=mocked_sender_instance):
+        # GIVEN: An instance of :class:`MediaManagerItem` and a mocked list_view
+        result_1 = MagicMock(**{'data.return_value': 'R1'})
+        result_2 = MagicMock(**{'data.return_value': 'R2'})
+        result_3 = MagicMock(**{'data.return_value': 'R3'})
+        self.media_item.list_view = MagicMock(**{'selectedItems.return_value': [result_1, result_2, result_3]})
 
-            # WHEN: When the lock_button is checked
-            self.media_item.on_lock_button_toggled(True)
+        with patch.object(self.media_item, 'on_results_view_tab_total_update') as \
+                mocked_on_results_view_tab_total_update:
 
-            # THEN: list_view should be 'locked' and the lock icon set
-            self.assertTrue(self.media_item.list_view.locked)
-            mocked_sender_instance.setIcon.assert_called_once_with('lock icon')
+            # WHEN: When the save_results_button is clicked
+            self.media_item.on_save_results_button_clicked()
 
-    def test_on_lock_button_toggled_unlock_icon(self):
-        """
-        Test that "on_lock_button_toggled" toggles the lock properly.
-        """
-        # GIVEN: An instance of :class:`MediaManagerItem` a mocked sender and list_view
-        self.media_item.list_view = MagicMock()
-        self.media_item.unlock_icon = 'unlock icon'
-        mocked_sender_instance = MagicMock()
-        with patch.object(self.media_item, 'sender', return_value=mocked_sender_instance):
-
-            # WHEN: When the lock_button is unchecked
-            self.media_item.on_lock_button_toggled(False)
-
-            # THEN: list_view should be 'unlocked' and the unlock icon set
-            self.assertFalse(self.media_item.list_view.locked)
-            mocked_sender_instance.setIcon.assert_called_once_with('unlock icon')
+            # THEN: The selected results in the list_view should be added to the 'saved_results' list. And the saved_tab
+            #       total should be updated.
+            self.assertEqual(self.media_item.saved_results, ['R1', 'R2', 'R3'])
+            mocked_on_results_view_tab_total_update.assert_called_once_with(ResultsTab.Saved)
 
     def test_on_style_combo_box_changed(self):
         """
@@ -798,6 +825,7 @@ class TestMediaItem(TestCase, TestMixin):
             #       to the dialog box
             self.media_item.second_bible = None
             self.media_item.second_combo_box = MagicMock(**{'currentData.return_value': self.mocked_bible_1})
+            self.media_item.saved_results = ['saved_results']
             self.media_item.on_second_combo_box_index_changed(5)
 
             # THEN: The list_view should be cleared and the currently selected bible should not be channged
@@ -815,7 +843,9 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.list_view = MagicMock(**{'count.return_value': 5})
         self.media_item.style_combo_box = MagicMock()
         self.media_item.select_book_combo_box = MagicMock()
+        self.media_item.search_results = ['list', 'of', 'results']
         with patch.object(self.media_item, 'initialise_advanced_bible') as mocked_initialise_advanced_bible, \
+                patch.object(self.media_item, 'display_results'), \
                 patch('openlp.plugins.bibles.lib.mediaitem.critical_error_message_box',
                       return_value=QtWidgets.QMessageBox.Yes) as mocked_critical_error_message_box:
 
@@ -823,11 +853,11 @@ class TestMediaItem(TestCase, TestMixin):
             #       to the dialog box
             self.media_item.second_bible = None
             self.media_item.second_combo_box = MagicMock(**{'currentData.return_value': self.mocked_bible_1})
+            self.media_item.saved_results = ['saved_results']
             self.media_item.on_second_combo_box_index_changed(5)
 
-            # THEN: The list_view should be cleared and the selected bible should be set as the current bible
+            # THEN: The selected bible should be set as the current bible
             self.assertTrue(mocked_critical_error_message_box.called)
-            self.media_item.list_view.clear.assert_called_once_with(override_lock=True)
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(False)
             self.assertTrue(mocked_initialise_advanced_bible.called)
             self.assertEqual(self.media_item.second_bible, self.mocked_bible_1)
@@ -841,18 +871,20 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.list_view = MagicMock(**{'count.return_value': 5})
         self.media_item.style_combo_box = MagicMock()
         self.media_item.select_book_combo_box = MagicMock()
+        self.media_item.search_results = ['list', 'of', 'results']
         with patch.object(self.media_item, 'initialise_advanced_bible') as mocked_initialise_advanced_bible, \
+                patch.object(self.media_item, 'display_results'), \
                 patch('openlp.plugins.bibles.lib.mediaitem.critical_error_message_box',
                       return_value=QtWidgets.QMessageBox.Yes) as mocked_critical_error_message_box:
             # WHEN: The previously is a bible new selection is None and the user selects yes
             #       to the dialog box
             self.media_item.second_bible = self.mocked_bible_1
             self.media_item.second_combo_box = MagicMock(**{'currentData.return_value': None})
+            self.media_item.saved_results = ['saved_results']
             self.media_item.on_second_combo_box_index_changed(0)
 
-            # THEN: The list_view should be cleared and the selected bible should be set as the current bible
+            # THEN: The selected bible should be set as the current bible
             self.assertTrue(mocked_critical_error_message_box.called)
-            self.media_item.list_view.clear.assert_called_once_with(override_lock=True)
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(True)
             self.assertFalse(mocked_initialise_advanced_bible.called)
             self.assertEqual(self.media_item.second_bible, None)
@@ -889,6 +921,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.select_book_combo_box = MagicMock(**{'currentData.return_value': 2})
         self.media_item.bible = self.mocked_bible_1
         self.mocked_plugin.manager.get_verse_count_by_book_ref_id.return_value = 6
+        self.media_item.select_tab = MagicMock(**{'isVisible.return_value': True})
         self.media_item.search_button = MagicMock()
         with patch.object(self.media_item, 'adjust_combo_box') as mocked_adjust_combo_box:
             # WHEN: Calling on_advanced_book_combo_box
@@ -1345,8 +1378,6 @@ class TestMediaItem(TestCase, TestMixin):
             self.assertTrue(self.mocked_main_window.information_message.called)
             mocked_display_results.assert_called_once_with()
 
-    # TODO: Test text_search
-
     def test_on_search_edit_text_changed_search_while_typing_disabled(self):
         """
         Test on_search_edit_text_changed when 'search while typing' is disabled
@@ -1370,6 +1401,8 @@ class TestMediaItem(TestCase, TestMixin):
         #       'bibles/is search while typing enabled' is requested
         self.setting_values = {'bibles/is search while typing enabled': True}
         self.media_item.search_timer.isActive.return_value = False
+        self.media_item.bible = self.mocked_bible_1
+        self.media_item.bible.is_web_bible = False
 
         # WHEN: Calling on_search_edit_text_changed
         self.media_item.on_search_edit_text_changed()
@@ -1388,8 +1421,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling on_search_timer_timeout
             self.media_item.on_search_timer_timeout()
 
-            # THEN: The text_search method should have been called with True
-            mocked_text_search.assert_called_once_with(True)
+            # THEN: The search_status should be set to SearchAsYouType and text_search should have been called
+            self.assertEqual(self.media_item.search_status, SearchStatus.SearchAsYouType)
+            mocked_text_search.assert_called_once_with()
 
     def test_display_results_no_results(self):
         """
@@ -1407,7 +1441,6 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.display_results()
 
             # THEN: No items should be added to the list
-            self.media_item.list_view.clear.assert_called_once_with()
             self.assertFalse(self.media_item.list_view.addItem.called)
 
     def test_display_results_results(self):
@@ -1415,7 +1448,10 @@ class TestMediaItem(TestCase, TestMixin):
         Test the display_results method when there are items to display
         """
         # GIVEN: An instance of BibleMediaItem and a mocked build_display_results which returns a list of results
-        with patch.object(self.media_item, 'build_display_results', return_value=['list', 'items']):
+        with patch.object(self.media_item, 'build_display_results', return_value=[
+            {'item_title': 'Title 1'}, {'item_title': 'Title 2'}]), \
+            patch.object(self.media_item, 'add_built_results_to_list_widget') as \
+                mocked_add_built_results_to_list_widget:
             self.media_item.search_results = ['results']
             self.media_item.list_view = MagicMock()
 
@@ -1423,5 +1459,5 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.display_results()
 
             # THEN: addItem should have been with the display items
-            self.media_item.list_view.clear.assert_called_once_with()
-            self.assertEqual(self.media_item.list_view.addItem.call_args_list, [call('list'), call('items')])
+            mocked_add_built_results_to_list_widget.assert_called_once_with(
+                [{'item_title': 'Title 1'}, {'item_title': 'Title 2'}])

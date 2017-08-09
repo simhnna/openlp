@@ -20,12 +20,12 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-This module contains tests for the openlp.core.lib.filedialog module
+This module contains tests for the openlp.core.ui.lib.colorbutton module
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, call, patch
 
-from openlp.core.ui.lib.colorbutton import ColorButton
-from tests.functional import MagicMock, call, patch
+from openlp.core.ui.lib import ColorButton
 
 
 class TestColorDialog(TestCase):
@@ -148,11 +148,10 @@ class TestColorDialog(TestCase):
         widget.on_clicked()
 
         # THEN: change_color should not have been called and the colorChanged signal should not have been emitted
-        self.assertEqual(
-            self.mocked_change_color.call_count, 0, 'change_color should not have been called with an invalid color')
-        self.assertEqual(
-            self.mocked_color_changed.emit.call_count, 0,
-            'colorChange signal should not have been emitted with an invalid color')
+        self.assertFalse(self.mocked_change_color.called,
+                         'change_color should not have been called with an invalid color')
+        self.assertFalse(self.mocked_color_changed.emit.called,
+                         'colorChange signal should not have been emitted with an invalid color')
 
     def test_on_clicked_same_color(self):
         """
@@ -171,12 +170,10 @@ class TestColorDialog(TestCase):
         widget.on_clicked()
 
         # THEN: change_color should not have been called and the colorChanged signal should not have been emitted
-        self.assertEqual(
-            self.mocked_change_color.call_count, 0,
-            'change_color should not have been called when the color has not changed')
-        self.assertEqual(
-            self.mocked_color_changed.emit.call_count, 0,
-            'colorChange signal should not have been emitted when the color has not changed')
+        self.assertFalse(self.mocked_change_color.called,
+                         'change_color should not have been called when the color has not changed')
+        self.assertFalse(self.mocked_color_changed.emit.called,
+                         'colorChange signal should not have been emitted when the color has not changed')
 
     def test_on_clicked_new_color(self):
         """

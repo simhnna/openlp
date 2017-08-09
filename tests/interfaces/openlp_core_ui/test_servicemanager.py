@@ -22,14 +22,18 @@
 """
     Package to test the openlp.core.lib package.
 """
-
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry
 from openlp.core.lib import ScreenList, ServiceItem, ItemCapabilities
 from openlp.core.ui.mainwindow import MainWindow
-from tests.interfaces import MagicMock, patch
+from openlp.core.ui.servicemanager import ServiceManagerList
+from openlp.core.lib.serviceitem import ServiceItem
+
 from tests.helpers.testmixin import TestMixin
+
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class TestServiceManager(TestCase, TestMixin):
@@ -351,3 +355,141 @@ class TestServiceManager(TestCase, TestMixin):
         new_service.trigger()
 
         assert mocked_event.call_count == 1, 'The on_new_service_clicked method should have been called once'
+
+    def test_expand_selection_on_right_arrow(self):
+        """
+        Test that a right arrow key press event calls the on_expand_selection function
+        """
+        # GIVEN a mocked expand function
+        self.service_manager.on_expand_selection = MagicMock()
+
+        # WHEN the right arrow key event is called
+        self.service_manager.setup_ui(self.service_manager)
+        event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Right, QtCore.Qt.NoModifier)
+        self.service_manager.service_manager_list.keyPressEvent(event)
+
+        # THEN the on_expand_selection function should have been called.
+        self.service_manager.on_expand_selection.assert_called_once_with()
+
+    def test_collapse_selection_on_left_arrow(self):
+        """
+        Test that a left arrow key press event calls the on_collapse_selection function
+        """
+        # GIVEN a mocked collapse function
+        self.service_manager.on_collapse_selection = MagicMock()
+
+        # WHEN the left arrow key event is called
+        self.service_manager.setup_ui(self.service_manager)
+        event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Left, QtCore.Qt.NoModifier)
+        self.service_manager.service_manager_list.keyPressEvent(event)
+
+        # THEN the on_collapse_selection function should have been called.
+        self.service_manager.on_collapse_selection.assert_called_once_with()
+
+    def test_move_selection_down_on_down_arrow(self):
+        """
+        Test that a down arrow key press event calls the on_move_selection_down function
+        """
+        # GIVEN a mocked move down function
+        self.service_manager.on_move_selection_down = MagicMock()
+
+        # WHEN the down arrow key event is called
+        self.service_manager.setup_ui(self.service_manager)
+        event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Down, QtCore.Qt.NoModifier)
+        self.service_manager.service_manager_list.keyPressEvent(event)
+
+        # THEN the on_move_selection_down function should have been called.
+        self.service_manager.on_move_selection_down.assert_called_once_with()
+
+    def test_move_selection_up_on_up_arrow(self):
+        """
+        Test that an up arrow key press event calls the on_move_selection_up function
+        """
+        # GIVEN a mocked move up function
+        self.service_manager.on_move_selection_up = MagicMock()
+
+        # WHEN the up arrow key event is called
+        self.service_manager.setup_ui(self.service_manager)
+        event = QtGui.QKeyEvent(QtCore.QEvent.KeyPress, QtCore.Qt.Key_Up, QtCore.Qt.NoModifier)
+        self.service_manager.service_manager_list.keyPressEvent(event)
+
+        # THEN the on_move_selection_up function should have been called.
+        self.service_manager.on_move_selection_up.assert_called_once_with()
+
+    def _setup_service_manager_list(self):
+        self.service_manager.expanded = MagicMock()
+        self.service_manager.collapsed = MagicMock()
+        verse_1 = QtWidgets.QTreeWidgetItem(0)
+        verse_2 = QtWidgets.QTreeWidgetItem(0)
+        song_item = QtWidgets.QTreeWidgetItem(0)
+        song_item.addChild(verse_1)
+        song_item.addChild(verse_2)
+        self.service_manager.setup_ui(self.service_manager)
+        self.service_manager.service_manager_list.addTopLevelItem(song_item)
+        return verse_1, verse_2, song_item
+
+    def test_on_expand_selection(self):
+        """
+        Test that the on_expand_selection function successfully expands an item and moves to its first child
+        """
+        # GIVEN a mocked servicemanager list
+        verse_1, verse_2, song_item = self._setup_service_manager_list()
+        self.service_manager.service_manager_list.setCurrentItem(song_item)
+        # Reset expanded function in case it has been called and/or changed in initialisation of the service manager.
+        self.service_manager.expanded = MagicMock()
+
+        # WHEN on_expand_selection is called
+        self.service_manager.on_expand_selection()
+
+        # THEN selection should be expanded
+        selected_index = self.service_manager.service_manager_list.currentIndex()
+        above_selected_index = self.service_manager.service_manager_list.indexAbove(selected_index)
+        self.assertTrue(self.service_manager.service_manager_list.isExpanded(above_selected_index),
+                        'Item should have been expanded')
+        self.service_manager.expanded.assert_called_once_with(song_item)
+
+    def test_on_collapse_selection_with_parent_selected(self):
+        """
+        Test that the on_collapse_selection function successfully collapses an item
+        """
+        # GIVEN a mocked servicemanager list
+        verse_1, verse_2, song_item = self._setup_service_manager_list()
+        self.service_manager.service_manager_list.setCurrentItem(song_item)
+        self.service_manager.service_manager_list.expandItem(song_item)
+
+        # Reset collapsed function in case it has been called and/or changed in initialisation of the service manager.
+        self.service_manager.collapsed = MagicMock()
+
+        # WHEN on_expand_selection is called
+        self.service_manager.on_collapse_selection()
+
+        # THEN selection should be expanded
+        selected_index = self.service_manager.service_manager_list.currentIndex()
+        self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
+                         'Item should have been collapsed')
+        self.assertTrue(self.service_manager.service_manager_list.currentItem() == song_item,
+                        'Top item should have been selected')
+        self.service_manager.collapsed.assert_called_once_with(song_item)
+
+    def test_on_collapse_selection_with_child_selected(self):
+        """
+        Test that the on_collapse_selection function successfully collapses child's parent item
+        and moves selection to its parent.
+        """
+        # GIVEN a mocked servicemanager list
+        verse_1, verse_2, song_item = self._setup_service_manager_list()
+        self.service_manager.service_manager_list.setCurrentItem(verse_2)
+        self.service_manager.service_manager_list.expandItem(song_item)
+        # Reset collapsed function in case it has been called and/or changed in initialisation of the service manager.
+        self.service_manager.collapsed = MagicMock()
+
+        # WHEN on_expand_selection is called
+        self.service_manager.on_collapse_selection()
+
+        # THEN selection should be expanded
+        selected_index = self.service_manager.service_manager_list.currentIndex()
+        self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
+                         'Item should have been collapsed')
+        self.assertTrue(self.service_manager.service_manager_list.currentItem() == song_item,
+                        'Top item should have been selected')
+        self.service_manager.collapsed.assert_called_once_with(song_item)

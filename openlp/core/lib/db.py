@@ -25,12 +25,15 @@ The :mod:`db` module provides the core database functionality for OpenLP
 """
 import logging
 import os
+from copy import copy
 from urllib.parse import quote_plus as urlquote
 
 from sqlalchemy import Table, MetaData, Column, types, create_engine
-from sqlalchemy.exc import SQLAlchemyError, InvalidRequestError, DBAPIError, OperationalError
+from sqlalchemy.engine.url import make_url
+from sqlalchemy.exc import SQLAlchemyError, InvalidRequestError, DBAPIError, OperationalError, ProgrammingError
 from sqlalchemy.orm import scoped_session, sessionmaker, mapper
 from sqlalchemy.pool import NullPool
+
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 
@@ -38,6 +41,66 @@ from openlp.core.common import AppLocation, Settings, translate, delete_file
 from openlp.core.lib.ui import critical_error_message_box
 
 log = logging.getLogger(__name__)
+
+
+def database_exists(url):
+    """Check if a database exists.
+
+    :param url: A SQLAlchemy engine URL.
+
+    Performs backend-specific testing to quickly determine if a database
+    exists on the server. ::
+
+        database_exists('postgres://postgres@localhost/name')  #=> False
+        create_database('postgres://postgres@localhost/name')
+        database_exists('postgres://postgres@localhost/name')  #=> True
+
+    Supports checking against a constructed URL as well. ::
+
+        engine = create_engine('postgres://postgres@localhost/name')
+        database_exists(engine.url)  #=> False
+        create_database(engine.url)
+        database_exists(engine.url)  #=> True
+
+    Borrowed from SQLAlchemy_Utils (v0.32.14 )since we only need this one function.
+    """
+
+    url = copy(make_url(url))
+    database = url.database
+    if url.drivername.startswith('postgresql'):
+        url.database = 'template1'
+    else:
+        url.database = None
+
+    engine = create_engine(url)
+
+    if engine.dialect.name == 'postgresql':
+        text = "SELECT 1 FROM pg_database WHERE datname='{db}'".format(db=database)
+        return bool(engine.execute(text).scalar())
+
+    elif engine.dialect.name == 'mysql':
+        text = ("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA "
+                "WHERE SCHEMA_NAME = '{db}'".format(db=database))
+        return bool(engine.execute(text).scalar())
+
+    elif engine.dialect.name == 'sqlite':
+        if database:
+            return database == ':memory:' or os.path.exists(database)
+        else:
+            # The default SQLAlchemy database is in memory,
+            # and :memory is not required, thus we should support that use-case
+            return True
+
+    else:
+        text = 'SELECT 1'
+        try:
+            url.database = database
+            engine = create_engine(url)
+            engine.execute(text)
+            return True
+
+        except (ProgrammingError, OperationalError):
+            return False
 
 
 def init_db(url, auto_flush=True, auto_commit=False, base=None):
@@ -144,6 +207,12 @@ def upgrade_db(url, upgrade):
     :param url: The url of the database to upgrade.
     :param upgrade: The python module that contains the upgrade instructions.
     """
+    if not database_exists(url):
+        log.warn("Database {db} doesn't exist - skipping upgrade checks".format(db=url))
+        return (0, 0)
+
+    log.debug('Checking upgrades for DB {db}'.format(db=url))
+
     session, metadata = init_db(url)
 
     class Metadata(BaseModel):
@@ -160,18 +229,17 @@ def upgrade_db(url, upgrade):
     metadata_table.create(checkfirst=True)
     mapper(Metadata, metadata_table)
     version_meta = session.query(Metadata).get('version')
-    if version_meta is None:
-        # Tables have just been created - fill the version field with the most recent version
-        if session.query(Metadata).get('dbversion'):
-            version = 0
-        else:
-            version = upgrade.__version__
+    if version_meta:
+        version = int(version_meta.value)
+    else:
+        # Due to issues with other checks, if the version is not set in the DB then default to 0
+        # and let the upgrade function handle the checks
+        version = 0
         version_meta = Metadata.populate(key='version', value=version)
         session.add(version_meta)
         session.commit()
-    else:
-        version = int(version_meta.value)
     if version > upgrade.__version__:
+        session.remove()
         return version, upgrade.__version__
     version += 1
     try:
@@ -194,7 +262,7 @@ def upgrade_db(url, upgrade):
         session.commit()
     upgrade_version = upgrade.__version__
     version = int(version_meta.value)
-    session.close()
+    session.remove()
     return version, upgrade_version
 
 
@@ -206,9 +274,9 @@ def delete_database(plugin_name, db_file_name=None):
     :param db_file_name: The database file name. Defaults to None resulting in the plugin_name being used.
     """
     if db_file_name:
-        db_file_path = os.path.join(AppLocation.get_section_data_path(plugin_name), db_file_name)
+        db_file_path = os.path.join(str(AppLocation.get_section_data_path(plugin_name)), db_file_name)
     else:
-        db_file_path = os.path.join(AppLocation.get_section_data_path(plugin_name), plugin_name)
+        db_file_path = os.path.join(str(AppLocation.get_section_data_path(plugin_name)), plugin_name)
     return delete_file(db_file_path)
 
 

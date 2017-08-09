@@ -38,7 +38,8 @@ from openlp.core.lib.projector.constants import ERROR_MSG, ERROR_STRING, E_AUTHE
     E_NETWORK, E_NOT_CONNECTED, E_UNKNOWN_SOCKET_ERROR, STATUS_STRING, S_CONNECTED, S_CONNECTING, S_COOLDOWN, \
     S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
 from openlp.core.lib.projector.db import ProjectorDB
-from openlp.core.lib.projector.pjlink1 import PJLink1
+from openlp.core.lib.projector.pjlink import PJLink
+from openlp.core.lib.projector.pjlink2 import PJLinkUDP
 from openlp.core.ui.projector.editform import ProjectorEditForm
 from openlp.core.ui.projector.sourceselectform import SourceSelectTabs, SourceSelectSingle
 
@@ -290,6 +291,8 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         self.settings_section = 'projector'
         self.projectordb = projectordb
         self.projector_list = []
+        self.pjlink_udp = PJLinkUDP()
+        self.pjlink_udp.projector_list = self.projector_list
         self.source_select_form = None
 
     def bootstrap_initialise(self):
@@ -417,9 +420,7 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         :param opt: Needed by PyQt5
         """
         try:
-            ip = opt.link.ip
-            projector = opt
-            projector.link.set_shutter_closed()
+            opt.link.set_shutter_closed()
         except AttributeError:
             for list_item in self.projector_list_widget.selectedItems():
                 if list_item is None:
@@ -452,9 +453,7 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         :param opt: Needed by PyQt5
         """
         try:
-            ip = opt.link.ip
-            projector = opt
-            projector.link.connect_to_host()
+            opt.link.connect_to_host()
         except AttributeError:
             for list_item in self.projector_list_widget.selectedItems():
                 if list_item is None:
@@ -524,7 +523,8 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         self.projector_list = new_list
         list_item = self.projector_list_widget.takeItem(self.projector_list_widget.currentRow())
         list_item = None
-        deleted = self.projectordb.delete_projector(projector.db_item)
+        if not self.projectordb.delete_projector(projector.db_item):
+            log.warning('Delete projector {item} failed'.format(item=projector.db_item))
         for item in self.projector_list:
             log.debug('New projector list - item: {ip} {name}'.format(ip=item.link.ip, name=item.link.name))
 
@@ -535,9 +535,7 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         :param opt: Needed by PyQt5
         """
         try:
-            ip = opt.link.ip
-            projector = opt
-            projector.link.disconnect_from_host()
+            opt.link.disconnect_from_host()
         except AttributeError:
             for list_item in self.projector_list_widget.selectedItems():
                 if list_item is None:
@@ -570,9 +568,7 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         :param opt: Needed by PyQt5
         """
         try:
-            ip = opt.link.ip
-            projector = opt
-            projector.link.set_power_off()
+            opt.link.set_power_off()
         except AttributeError:
             for list_item in self.projector_list_widget.selectedItems():
                 if list_item is None:
@@ -590,9 +586,7 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         :param opt: Needed by PyQt5
         """
         try:
-            ip = opt.link.ip
-            projector = opt
-            projector.link.set_power_on()
+            opt.link.set_power_on()
         except AttributeError:
             for list_item in self.projector_list_widget.selectedItems():
                 if list_item is None:
@@ -610,9 +604,7 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         :param opt: Needed by PyQt5
         """
         try:
-            ip = opt.link.ip
-            projector = opt
-            projector.link.set_shutter_open()
+            opt.link.set_shutter_open()
         except AttributeError:
             for list_item in self.projector_list_widget.selectedItems():
                 if list_item is None:
@@ -659,19 +651,34 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
                                                              data=translate('OpenLP.ProjectorManager', 'Closed')
                                                              if projector.link.shutter
                                                              else translate('OpenLP', 'Open'))
-            message = '%s<b>%s</b>: %s<br />' % (message,
-                                                 translate('OpenLP.ProjectorManager', 'Current source input is'),
-                                                 projector.link.source)
+            message = '{msg}<b>{source}</b>: {selected}<br />'.format(msg=message,
+                                                                      source=translate('OpenLP.ProjectorManager',
+                                                                                       'Current source input is'),
+                                                                      selected=projector.link.source)
+            if projector.link.pjlink_class == '2':
+                # Information only available for PJLink Class 2 projectors
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Serial Number'),
+                                                                       data=projector.serial_no)
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Software Version'),
+                                                                       data=projector.sw_version)
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Lamp type'),
+                                                                       data=projector.model_lamp)
+                message += '<b>{title}</b>: {data}<br /><br />'.format(title=translate('OpenLP.ProjectorManager',
+                                                                                       'Filter type'),
+                                                                       data=projector.model_filter)
             count = 1
             for item in projector.link.lamp:
                 message += '<b>{title} {count}</b> {status} '.format(title=translate('OpenLP.ProjectorManager',
                                                                                      'Lamp'),
                                                                      count=count,
                                                                      status=translate('OpenLP.ProjectorManager',
-                                                                                      ' is on')
+                                                                                      'ON')
                                                                      if item['On']
                                                                      else translate('OpenLP.ProjectorManager',
-                                                                                    'is off'))
+                                                                                    'OFF'))
 
                 message += '<b>{title}</b>: {hours}<br />'.format(title=translate('OpenLP.ProjectorManager', 'Hours'),
                                                                   hours=item['Hours'])
@@ -690,19 +697,19 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         Helper app to build a projector instance
 
         :param projector: Dict of projector database information
-        :returns: PJLink1() instance
+        :returns: PJLink() instance
         """
         log.debug('_add_projector()')
-        return PJLink1(dbid=projector.id,
-                       ip=projector.ip,
-                       port=int(projector.port),
-                       name=projector.name,
-                       location=projector.location,
-                       notes=projector.notes,
-                       pin=None if projector.pin == '' else projector.pin,
-                       poll_time=self.poll_time,
-                       socket_timeout=self.socket_timeout
-                       )
+        return PJLink(dbid=projector.id,
+                      ip=projector.ip,
+                      port=int(projector.port),
+                      name=projector.name,
+                      location=projector.location,
+                      notes=projector.notes,
+                      pin=None if projector.pin == '' else projector.pin,
+                      poll_time=self.poll_time,
+                      socket_timeout=self.socket_timeout
+                      )
 
     def add_projector(self, projector, start=False):
         """
@@ -961,7 +968,7 @@ class ProjectorItem(QtCore.QObject):
         """
         Initialization for ProjectorItem instance
 
-        :param link: PJLink1 instance for QListWidgetItem
+        :param link: PJLink instance for QListWidgetItem
         """
         self.link = link
         self.thread = None
@@ -973,7 +980,7 @@ class ProjectorItem(QtCore.QObject):
         self.poll_time = None
         self.socket_timeout = None
         self.status = S_NOT_CONNECTED
-        super(ProjectorItem, self).__init__()
+        super().__init__()
 
 
 def not_implemented(function):
