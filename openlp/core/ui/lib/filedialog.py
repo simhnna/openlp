@@ -31,10 +31,9 @@ from openlp.core.lib import replace_params
 
 class FileDialog(QtWidgets.QFileDialog):
     @classmethod
-    @wraps(QtWidgets.QFileDialog.getExistingDirectory)
     def getExistingDirectory(cls, *args, **kwargs):
         """
-        Reimplement `getExistingDirectory` so that it can be called with, and return Path objects
+        Wraps `getExistingDirectory` so that it can be called with, and return Path objects
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
@@ -51,10 +50,9 @@ class FileDialog(QtWidgets.QFileDialog):
         return str_to_path(return_value)
 
     @classmethod
-    @wraps(QtWidgets.QFileDialog.getOpenFileName)
     def getOpenFileName(cls, *args, **kwargs):
         """
-        Reimplement `getOpenFileName` so that it can be called with, and return Path objects
+        Wraps `getOpenFileName` so that it can be called with, and return Path objects
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
@@ -75,7 +73,7 @@ class FileDialog(QtWidgets.QFileDialog):
     @classmethod
     def getOpenFileNames(cls, *args, **kwargs):
         """
-        Reimplement `getOpenFileNames` so that it can be called with, and return Path objects
+        Wrap `getOpenFileNames` so that it can be called with, and return Path objects
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
@@ -97,7 +95,7 @@ class FileDialog(QtWidgets.QFileDialog):
     @classmethod
     def getSaveFileName(cls, *args, **kwargs):
         """
-        Reimplement `getSaveFileName` so that it can be called with, and return Path objects
+        Wrap `getSaveFileName` so that it can be called with, and return Path objects
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
