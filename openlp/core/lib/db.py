@@ -208,7 +208,7 @@ def upgrade_db(url, upgrade):
     :param upgrade: The python module that contains the upgrade instructions.
     """
     if not database_exists(url):
-        log.warn("Database {db} doesn't exist - skipping upgrade checks".format(db=url))
+        log.warning("Database {db} doesn't exist - skipping upgrade checks".format(db=url))
         return (0, 0)
 
     log.debug('Checking upgrades for DB {db}'.format(db=url))
