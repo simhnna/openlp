@@ -20,7 +20,6 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """ Patch the QFileDialog so it accepts and returns Path objects"""
-from functools import wraps
 from pathlib import Path
 
 from PyQt5 import QtWidgets
@@ -73,7 +72,7 @@ class FileDialog(QtWidgets.QFileDialog):
     @classmethod
     def getOpenFileNames(cls, *args, **kwargs):
         """
-        Wrap `getOpenFileNames` so that it can be called with, and return Path objects
+        Wraps `getOpenFileNames` so that it can be called with, and return Path objects
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
@@ -95,7 +94,7 @@ class FileDialog(QtWidgets.QFileDialog):
     @classmethod
     def getSaveFileName(cls, *args, **kwargs):
         """
-        Wrap `getSaveFileName` so that it can be called with, and return Path objects
+        Wraps `getSaveFileName` so that it can be called with, and return Path objects
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
