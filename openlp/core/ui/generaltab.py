@@ -23,10 +23,12 @@
 The general tab of the configuration dialog.
 """
 import logging
+from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, Settings, UiStrings, translate, get_images_filter
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.lib import SettingsTab, ScreenList
 from openlp.core.ui.lib import ColorButton, PathEdit
 
@@ -172,7 +174,8 @@ class GeneralTab(SettingsTab):
         self.logo_layout.setObjectName('logo_layout')
         self.logo_file_label = QtWidgets.QLabel(self.logo_group_box)
         self.logo_file_label.setObjectName('logo_file_label')
-        self.logo_file_path_edit = PathEdit(self.logo_group_box, default_path=':/graphics/openlp-splash-screen.png')
+        self.logo_file_path_edit = PathEdit(self.logo_group_box,
+                                            default_path=Path(':/graphics/openlp-splash-screen.png'))
         self.logo_layout.addRow(self.logo_file_label, self.logo_file_path_edit)
         self.logo_color_label = QtWidgets.QLabel(self.logo_group_box)
         self.logo_color_label.setObjectName('logo_color_label')
@@ -266,7 +269,7 @@ class GeneralTab(SettingsTab):
         self.audio_group_box.setTitle(translate('OpenLP.GeneralTab', 'Background Audio'))
         self.start_paused_check_box.setText(translate('OpenLP.GeneralTab', 'Start background audio paused'))
         self.repeat_list_check_box.setText(translate('OpenLP.GeneralTab', 'Repeat track list'))
-        self.logo_file_path_edit.dialog_caption = dialog_caption = translate('OpenLP.AdvancedTab', 'Select Logo File')
+        self.logo_file_path_edit.dialog_caption = translate('OpenLP.AdvancedTab', 'Select Logo File')
         self.logo_file_path_edit.filters = '{text};;{names} (*)'.format(
             text=get_images_filter(), names=UiStrings().AllFiles)
 
@@ -291,7 +294,7 @@ class GeneralTab(SettingsTab):
         self.auto_open_check_box.setChecked(settings.value('auto open'))
         self.show_splash_check_box.setChecked(settings.value('show splash'))
         self.logo_background_color = settings.value('logo background color')
-        self.logo_file_path_edit.path = settings.value('logo file')
+        self.logo_file_path_edit.path = str_to_path(settings.value('logo file'))
         self.logo_hide_on_startup_check_box.setChecked(settings.value('logo hide on startup'))
         self.logo_color_button.color = self.logo_background_color
         self.check_for_updates_check_box.setChecked(settings.value('update check'))
@@ -325,7 +328,7 @@ class GeneralTab(SettingsTab):
         settings.setValue('auto open', self.auto_open_check_box.isChecked())
         settings.setValue('show splash', self.show_splash_check_box.isChecked())
         settings.setValue('logo background color', self.logo_background_color)
-        settings.setValue('logo file', self.logo_file_path_edit.path)
+        settings.setValue('logo file', path_to_str(self.logo_file_path_edit.path))
         settings.setValue('logo hide on startup', self.logo_hide_on_startup_check_box.isChecked())
         settings.setValue('update check', self.check_for_updates_check_box.isChecked())
         settings.setValue('save prompt', self.save_check_service_check_box.isChecked())

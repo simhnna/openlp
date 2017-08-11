@@ -29,8 +29,9 @@ import os
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import RegistryProperties, Settings, UiStrings, translate
-from openlp.core.lib import FileDialog
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.lib.ui import critical_error_message_box
+from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.songs.lib.importer import SongFormat, SongFormatSelect
 
@@ -237,10 +238,11 @@ class SongImportForm(OpenLPWizard, RegistryProperties):
         if filters:
             filters += ';;'
         filters += '{text} (*)'.format(text=UiStrings().AllFiles)
-        file_names = FileDialog.getOpenFileNames(
+        file_paths, selected_filter = FileDialog.getOpenFileNames(
             self, title,
-            Settings().value(self.plugin.settings_section + '/last directory import'), filters)
-        if file_names:
+            str_to_path(Settings().value(self.plugin.settings_section + '/last directory import')), filters)
+        if file_paths:
+            file_names = [path_to_str(file_path) for file_path in file_paths]
             listbox.addItems(file_names)
             Settings().setValue(self.plugin.settings_section + '/last directory import',
                                 os.path.split(str(file_names[0]))[0])

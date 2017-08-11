@@ -28,6 +28,7 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, UiStrings, translate, get_images_filter, is_not_image_file
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.lib.theme import BackgroundType, BackgroundGradientType
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui import ThemeLayoutForm
@@ -316,11 +317,11 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
             self.setField('background_type', 1)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Image):
             self.image_color_button.color = self.theme.background_border_color
-            self.image_path_edit.path = self.theme.background_filename
+            self.image_path_edit.path = str_to_path(self.theme.background_filename)
             self.setField('background_type', 2)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Video):
             self.video_color_button.color = self.theme.background_border_color
-            self.video_path_edit.path = self.theme.background_filename
+            self.video_path_edit.path = str_to_path(self.theme.background_filename)
             self.setField('background_type', 4)
         elif self.theme.background_type == BackgroundType.to_string(BackgroundType.Transparent):
             self.setField('background_type', 3)
@@ -448,18 +449,18 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
         """
         self.theme.background_end_color = color
 
-    def on_image_path_edit_path_changed(self, filename):
+    def on_image_path_edit_path_changed(self, file_path):
         """
         Background Image button pushed.
         """
-        self.theme.background_filename = filename
+        self.theme.background_filename = path_to_str(file_path)
         self.set_background_page_values()
 
-    def on_video_path_edit_path_changed(self, filename):
+    def on_video_path_edit_path_changed(self, file_path):
         """
         Background video button pushed.
         """
-        self.theme.background_filename = filename
+        self.theme.background_filename = path_to_str(file_path)
         self.set_background_page_values()
 
     def on_main_color_changed(self, color):

@@ -28,12 +28,15 @@ import logging
 import re
 import os
 import shutil
+from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, UiStrings, check_directory_exists, translate
-from openlp.core.lib import FileDialog, PluginStatus, MediaType, create_separated_list
+from openlp.core.common.path import path_to_str
+from openlp.core.lib import PluginStatus, MediaType, create_separated_list
 from openlp.core.lib.ui import set_case_insensitive_completer, critical_error_message_box, find_and_set_in_combo_box
+from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.common.languagemanager import get_natural_key
 from openlp.plugins.songs.lib import VerseType, clean_song
 from openlp.plugins.songs.lib.db import Book, Song, Author, AuthorType, Topic, MediaFile, SongBookEntry
@@ -925,9 +928,10 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         Loads file(s) from the filesystem.
         """
         filters = '{text} (*)'.format(text=UiStrings().AllFiles)
-        file_names = FileDialog.getOpenFileNames(self, translate('SongsPlugin.EditSongForm', 'Open File(s)'), '',
-                                                 filters)
-        for filename in file_names:
+        file_paths, selected_filter = FileDialog.getOpenFileNames(
+            self, translate('SongsPlugin.EditSongForm', 'Open File(s)'), Path(), filters)
+        for file_path in file_paths:
+            filename = path_to_str(file_path)
             item = QtWidgets.QListWidgetItem(os.path.split(str(filename))[1])
             item.setData(QtCore.Qt.UserRole, filename)
             self.audio_list_widget.addItem(item)
