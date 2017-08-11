@@ -22,12 +22,13 @@
 """
 This module contains tests for the openlp.core.ui.lib.pathedit module
 """
+import os
+from pathlib import Path
 from unittest import TestCase
-
-from PyQt5 import QtWidgets
+from unittest.mock import MagicMock, PropertyMock, patch
 
 from openlp.core.ui.lib import PathEdit, PathType
-from unittest.mock import MagicMock, PropertyMock, patch
+from openlp.core.ui.lib.filedialog import FileDialog
 
 
 class TestPathEdit(TestCase):
@@ -43,11 +44,11 @@ class TestPathEdit(TestCase):
         Test the `path` property getter.
         """
         # GIVEN: An instance of PathEdit with the `_path` instance variable set
-        self.widget._path = 'getter/test/pat.h'
+        self.widget._path = Path('getter', 'test', 'pat.h')
 
         # WHEN: Reading the `path` property
         # THEN: The value that we set should be returned
-        self.assertEqual(self.widget.path, 'getter/test/pat.h')
+        self.assertEqual(self.widget.path, Path('getter', 'test', 'pat.h'))
 
     def test_path_setter(self):
         """
@@ -57,13 +58,13 @@ class TestPathEdit(TestCase):
         self.widget.line_edit = MagicMock()
 
         # WHEN: Writing to the `path` property
-        self.widget.path = 'setter/test/pat.h'
+        self.widget.path = Path('setter', 'test', 'pat.h')
 
         # THEN: The `_path` instance variable should be set with the test data. The `line_edit` text and tooltip
         #       should have also been set.
-        self.assertEqual(self.widget._path, 'setter/test/pat.h')
-        self.widget.line_edit.setToolTip.assert_called_once_with('setter/test/pat.h')
-        self.widget.line_edit.setText.assert_called_once_with('setter/test/pat.h')
+        self.assertEqual(self.widget._path, Path('setter', 'test', 'pat.h'))
+        self.widget.line_edit.setToolTip.assert_called_once_with(os.path.join('setter', 'test', 'pat.h'))
+        self.widget.line_edit.setText.assert_called_once_with(os.path.join('setter', 'test', 'pat.h'))
 
     def test_path_type_getter(self):
         """
@@ -125,22 +126,20 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Directories` and a mocked
         #        QFileDialog.getExistingDirectory
-        with patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getExistingDirectory', return_value='') as \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory', return_value=None) as \
                 mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getOpenFileName') as \
-                mocked_get_open_file_name, \
-                patch('openlp.core.ui.lib.pathedit.os.path.normpath') as mocked_normpath:
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName') as mocked_get_open_file_name:
             self.widget._path_type = PathType.Directories
-            self.widget._path = 'test/path/'
+            self.widget._path = Path('test', 'path')
 
             # WHEN: Calling on_browse_button_clicked
             self.widget.on_browse_button_clicked()
 
             # THEN: The FileDialog.getExistingDirectory should have been called with the default caption
-            mocked_get_existing_directory.assert_called_once_with(self.widget, 'Select Directory', 'test/path/',
-                                                                  QtWidgets.QFileDialog.ShowDirsOnly)
+            mocked_get_existing_directory.assert_called_once_with(self.widget, 'Select Directory',
+                                                                  Path('test', 'path'),
+                                                                  FileDialog.ShowDirsOnly)
             self.assertFalse(mocked_get_open_file_name.called)
-            self.assertFalse(mocked_normpath.called)
 
     def test_on_browse_button_clicked_directory_custom_caption(self):
         """
@@ -149,45 +148,40 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Directories` and a mocked
         #        QFileDialog.getExistingDirectory with `default_caption` set.
-        with patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getExistingDirectory', return_value='') as \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory', return_value=None) as \
                 mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getOpenFileName') as \
-                mocked_get_open_file_name, \
-                patch('openlp.core.ui.lib.pathedit.os.path.normpath') as mocked_normpath:
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName') as mocked_get_open_file_name:
             self.widget._path_type = PathType.Directories
-            self.widget._path = 'test/path/'
+            self.widget._path = Path('test', 'path')
             self.widget.dialog_caption = 'Directory Caption'
 
             # WHEN: Calling on_browse_button_clicked
             self.widget.on_browse_button_clicked()
 
             # THEN: The FileDialog.getExistingDirectory should have been called with the custom caption
-            mocked_get_existing_directory.assert_called_once_with(self.widget, 'Directory Caption', 'test/path/',
-                                                                  QtWidgets.QFileDialog.ShowDirsOnly)
+            mocked_get_existing_directory.assert_called_once_with(self.widget, 'Directory Caption',
+                                                                  Path('test', 'path'),
+                                                                  FileDialog.ShowDirsOnly)
             self.assertFalse(mocked_get_open_file_name.called)
-            self.assertFalse(mocked_normpath.called)
 
     def test_on_browse_button_clicked_file(self):
         """
         Test the `browse_button` `clicked` handler on_browse_button_clicked when the `path_type` is set to Files.
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Files` and a mocked QFileDialog.getOpenFileName
-        with patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getExistingDirectory') as \
-                mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getOpenFileName', return_value=('', '')) as \
-                mocked_get_open_file_name, \
-                patch('openlp.core.ui.lib.pathedit.os.path.normpath') as mocked_normpath:
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
+                mocked_get_open_file_name:
             self.widget._path_type = PathType.Files
-            self.widget._path = 'test/pat.h'
+            self.widget._path = Path('test', 'pat.h')
 
             # WHEN: Calling on_browse_button_clicked
             self.widget.on_browse_button_clicked()
 
             # THEN: The FileDialog.getOpenFileName should have been called with the default caption
-            mocked_get_open_file_name.assert_called_once_with(self.widget, 'Select File', 'test/pat.h',
+            mocked_get_open_file_name.assert_called_once_with(self.widget, 'Select File', Path('test', 'pat.h'),
                                                               self.widget.filters)
             self.assertFalse(mocked_get_existing_directory.called)
-            self.assertFalse(mocked_normpath.called)
 
     def test_on_browse_button_clicked_file_custom_caption(self):
         """
@@ -196,23 +190,20 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Files` and a mocked QFileDialog.getOpenFileName
         #        with `default_caption` set.
-        with patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getExistingDirectory') as \
-                mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getOpenFileName', return_value=('', '')) as \
-                mocked_get_open_file_name, \
-                patch('openlp.core.ui.lib.pathedit.os.path.normpath') as mocked_normpath:
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
+                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
+                mocked_get_open_file_name:
             self.widget._path_type = PathType.Files
-            self.widget._path = 'test/pat.h'
+            self.widget._path = Path('test', 'pat.h')
             self.widget.dialog_caption = 'File Caption'
 
             # WHEN: Calling on_browse_button_clicked
             self.widget.on_browse_button_clicked()
 
             # THEN: The FileDialog.getOpenFileName should have been called with the custom caption
-            mocked_get_open_file_name.assert_called_once_with(self.widget, 'File Caption', 'test/pat.h',
+            mocked_get_open_file_name.assert_called_once_with(self.widget, 'File Caption', Path('test', 'pat.h'),
                                                               self.widget.filters)
             self.assertFalse(mocked_get_existing_directory.called)
-            self.assertFalse(mocked_normpath.called)
 
     def test_on_browse_button_clicked_user_cancels(self):
         """
@@ -221,16 +212,14 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked QFileDialog.getOpenFileName which returns an empty str for the
         #        file path.
-        with patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getOpenFileName', return_value=('', '')) as \
-                mocked_get_open_file_name, \
-                patch('openlp.core.ui.lib.pathedit.os.path.normpath') as mocked_normpath:
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
+                mocked_get_open_file_name:
 
             # WHEN: Calling on_browse_button_clicked
             self.widget.on_browse_button_clicked()
 
             # THEN: normpath should not have been called
             self.assertTrue(mocked_get_open_file_name.called)
-            self.assertFalse(mocked_normpath.called)
 
     def test_on_browse_button_clicked_user_accepts(self):
         """
@@ -239,9 +228,8 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked QFileDialog.getOpenFileName which returns a str for the file
         #        path.
-        with patch('openlp.core.ui.lib.pathedit.QtWidgets.QFileDialog.getOpenFileName',
-                   return_value=('/test/pat.h', '')) as mocked_get_open_file_name, \
-                patch('openlp.core.ui.lib.pathedit.os.path.normpath') as mocked_normpath, \
+        with patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName',
+                   return_value=(Path('test', 'pat.h'), '')) as mocked_get_open_file_name, \
                 patch.object(self.widget, 'on_new_path'):
 
             # WHEN: Calling on_browse_button_clicked
@@ -249,7 +237,6 @@ class TestPathEdit(TestCase):
 
             # THEN: normpath and `on_new_path` should have been called
             self.assertTrue(mocked_get_open_file_name.called)
-            mocked_normpath.assert_called_once_with('/test/pat.h')
             self.assertTrue(self.widget.on_new_path.called)
 
     def test_on_revert_button_clicked(self):
@@ -258,13 +245,13 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked `on_new_path`, and the `default_path` set.
         with patch.object(self.widget, 'on_new_path') as mocked_on_new_path:
-            self.widget.default_path = '/default/pat.h'
+            self.widget.default_path = Path('default', 'pat.h')
 
             # WHEN: Calling `on_revert_button_clicked`
             self.widget.on_revert_button_clicked()
 
             # THEN: on_new_path should have been called with the default path
-            mocked_on_new_path.assert_called_once_with('/default/pat.h')
+            mocked_on_new_path.assert_called_once_with(Path('default', 'pat.h'))
 
     def test_on_line_edit_editing_finished(self):
         """
@@ -272,13 +259,13 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked `line_edit` and `on_new_path`.
         with patch.object(self.widget, 'on_new_path') as mocked_on_new_path:
-            self.widget.line_edit = MagicMock(**{'text.return_value': '/test/pat.h'})
+            self.widget.line_edit = MagicMock(**{'text.return_value': 'test/pat.h'})
 
             # WHEN: Calling `on_line_edit_editing_finished`
             self.widget.on_line_edit_editing_finished()
 
             # THEN: on_new_path should have been called with the path enetered in `line_edit`
-            mocked_on_new_path.assert_called_once_with('/test/pat.h')
+            mocked_on_new_path.assert_called_once_with(Path('test', 'pat.h'))
 
     def test_on_new_path_no_change(self):
         """
@@ -286,11 +273,11 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a test path and mocked `pathChanged` signal
         with patch('openlp.core.ui.lib.pathedit.PathEdit.path', new_callable=PropertyMock):
-            self.widget._path = '/old/test/pat.h'
+            self.widget._path = Path('/old', 'test', 'pat.h')
             self.widget.pathChanged = MagicMock()
 
             # WHEN: Calling `on_new_path` with the same path as the existing path
-            self.widget.on_new_path('/old/test/pat.h')
+            self.widget.on_new_path(Path('/old', 'test', 'pat.h'))
 
             # THEN: The `pathChanged` signal should not be emitted
             self.assertFalse(self.widget.pathChanged.emit.called)
@@ -301,11 +288,11 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a test path and mocked `pathChanged` signal
         with patch('openlp.core.ui.lib.pathedit.PathEdit.path', new_callable=PropertyMock):
-            self.widget._path = '/old/test/pat.h'
+            self.widget._path = Path('/old', 'test', 'pat.h')
             self.widget.pathChanged = MagicMock()
 
             # WHEN: Calling `on_new_path` with the a new path
-            self.widget.on_new_path('/new/test/pat.h')
+            self.widget.on_new_path(Path('/new', 'test', 'pat.h'))
 
             # THEN: The `pathChanged` signal should be emitted
-            self.widget.pathChanged.emit.assert_called_once_with('/new/test/pat.h')
+            self.widget.pathChanged.emit.assert_called_once_with(Path('/new', 'test', 'pat.h'))

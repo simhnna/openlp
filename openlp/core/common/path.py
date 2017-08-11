@@ -19,40 +19,43 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-"""
-Provide a work around for a bug in QFileDialog <https://bugs.launchpad.net/openlp/+bug/1209515>
-"""
-import logging
-import os
-from urllib import parse
 
-from PyQt5 import QtWidgets
-
-from openlp.core.common import UiStrings
-
-log = logging.getLogger(__name__)
+from pathlib import Path
 
 
-class FileDialog(QtWidgets.QFileDialog):
+def path_to_str(path):
     """
-    Subclass QFileDialog to work round a bug
+    A utility function to convert a Path object or NoneType to a string equivalent.
+
+    :param path: The value to convert to a string
+    :type: pathlib.Path or None
+
+    :return: An empty string if :param:`path` is None, else a string representation of the :param:`path`
+    :rtype: str
     """
-    @staticmethod
-    def getOpenFileNames(parent, *args, **kwargs):
-        """
-        Reimplement getOpenFileNames to fix the way it returns some file names that url encoded when selecting multiple
-        files
-        """
-        files, filter_used = QtWidgets.QFileDialog.getOpenFileNames(parent, *args, **kwargs)
-        file_list = []
-        for file in files:
-            if not os.path.exists(file):
-                log.info('File not found. Attempting to unquote.')
-                file = parse.unquote(file)
-                if not os.path.exists(file):
-                    log.error('File {text} not found.'.format(text=file))
-                    QtWidgets.QMessageBox.information(parent, UiStrings().FileNotFound,
-                                                      UiStrings().FileNotFoundMessage.format(name=file))
-                    continue
-            file_list.append(file)
-        return file_list
+    if not isinstance(path, Path) and path is not None:
+        raise TypeError('parameter \'path\' must be of type Path or NoneType')
+    if path is None:
+        return ''
+    else:
+        return str(path)
+
+
+def str_to_path(string):
+    """
+    A utility function to convert a str object to a Path or NoneType.
+
+    This function is of particular use because initating a Path object with an empty string causes the Path object to
+    point to the current working directory.
+
+    :param string: The string to convert
+    :type string: str
+
+    :return: None if :param:`string` is empty, or a Path object representation of :param:`string`
+    :rtype: pathlib.Path or None
+    """
+    if not isinstance(string, str):
+        raise TypeError('parameter \'string\' must be of type str')
+    if string == '':
+        return None
+    return Path(string)

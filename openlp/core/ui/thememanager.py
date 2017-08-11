@@ -22,7 +22,6 @@
 """
 The Theme Manager manages adding, deleteing and modifying of themes.
 """
-import json
 import os
 import zipfile
 import shutil
@@ -32,12 +31,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, OpenLPMixin, RegistryMixin, \
     UiStrings, check_directory_exists, translate, is_win, get_filesystem_encoding, delete_file
-from openlp.core.lib import FileDialog, ImageSource, ValidationError, get_text_file_string, build_icon, \
+from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.lib import ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action
 from openlp.core.ui import FileRenameForm, ThemeForm
 from openlp.core.ui.lib import OpenLPToolbar
+from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.common.languagemanager import get_locale_key
 
 
@@ -424,15 +425,17 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         those files. This process will only load version 2 themes.
         :param field:
         """
-        files = FileDialog.getOpenFileNames(self,
-                                            translate('OpenLP.ThemeManager', 'Select Theme Import File'),
-                                            Settings().value(self.settings_section + '/last directory import'),
-                                            translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
-        self.log_info('New Themes {name}'.format(name=str(files)))
-        if not files:
+        file_paths, selected_filter = FileDialog.getOpenFileNames(
+            self,
+            translate('OpenLP.ThemeManager', 'Select Theme Import File'),
+            str_to_path(Settings().value(self.settings_section + '/last directory import')),
+            translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
+        self.log_info('New Themes {file_paths}'.format(file_paths=file_paths))
+        if not file_paths:
             return
         self.application.set_busy_cursor()
-        for file_name in files:
+        for file_path in file_paths:
+            file_name = path_to_str(file_path)
             Settings().setValue(self.settings_section + '/last directory import', str(file_name))
             self.unzip_theme(file_name, self.path)
         self.load_themes()

@@ -22,6 +22,8 @@
 """
 The Create/Edit theme wizard
 """
+from pathlib import Path
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import UiStrings, translate, is_macosx
