@@ -71,25 +71,25 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
 
     def on_split_button_clicked(self):
         """
-        The split button has been pressed
+        The optional split button has been pressed so we need add the split
         """
-        text = self.verse_text_edit.toPlainText()
-        position = self.verse_text_edit.textCursor().position()
-        insert_string = '[---]'
-        if position and text[position - 1] != '\n':
-            insert_string = '\n' + insert_string
-        if position == len(text) or text[position] != '\n':
-            insert_string += '\n'
-        self.verse_text_edit.insertPlainText(insert_string)
-        self.verse_text_edit.setFocus()
+        self._add_splitter_to_text('[---]')
 
     def on_divide_split_button_clicked(self):
         """
         The force split button has been pressed so we need add the split 
         """
+        self._add_splitter_to_text('[--}{--]')
+
+    def _add_splitter_to_text(self, insert_string):
+        """
+        Add a custom splitter to the song text
+
+        :param insert_string: The string to insert
+        :return:
+        """
         text = self.verse_text_edit.toPlainText()
         position = self.verse_text_edit.textCursor().position()
-        insert_string = '[--}{--]'
         if position and text[position - 1] != '\n':
             insert_string = '\n' + insert_string
         if position == len(text) or text[position] != '\n':
