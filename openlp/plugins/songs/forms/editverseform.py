@@ -77,7 +77,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
 
     def on_divide_split_button_clicked(self):
         """
-        The force split button has been pressed so we need add the split 
+        The force split button has been pressed so we need add the split
         """
         self._add_splitter_to_text('[--}{--]')
 
