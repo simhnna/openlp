@@ -25,16 +25,20 @@ Package to test the openlp.core.lib.projector.pjlink commands package.
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
+import openlp.core.lib.projector.pjlink
 from openlp.core.lib.projector.pjlink import PJLink
-from openlp.core.lib.projector.constants import PJLINK_ERST_STATUS, PJLINK_POWR_STATUS, \
-    S_OFF, S_STANDBY, S_ON
+from openlp.core.lib.projector.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
+    PJLINK_POWR_STATUS, E_WARN, E_ERROR, S_OFF, S_STANDBY, S_ON
 
 from tests.resources.projector.data import TEST_PIN
 
 pjlink_test = PJLink(name='test', ip='127.0.0.1', pin=TEST_PIN, no_poll=True)
 
-# ERST status codes
-ERST_OK, ERST_WARN, ERST_ERR = '0', '1', '2'
+# Create a list of ERST positional data so we don't have to redo the same buildup multiple times
+PJLINK_ERST_POSITIONS = []
+for pos in range(0, len(PJLINK_ERST_DATA)):
+    if pos in PJLINK_ERST_DATA:
+        PJLINK_ERST_POSITIONS.append(PJLINK_ERST_DATA[pos])
 
 
 class TestPJLinkCommands(TestCase):
@@ -85,7 +89,25 @@ class TestPJLinkCommands(TestCase):
         self.assertTrue(mock_socket_timer.called, 'Projector socket_timer.stop() should have been called')
 
     @patch.object(pjlink_test, 'projectorUpdateIcons')
-    def test_projector_process_avmt_closed_muted(self, mock_projectorReceivedData):
+    def test_projector_process_avmt_bad_data(self, mock_UpdateIcons):
+        """
+        Test avmt bad data fail
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.shutter = True
+        pjlink.mute = True
+
+        # WHEN: Called with an invalid setting
+        pjlink.process_avmt('36')
+
+        # THEN: Shutter should be closed and mute should be True
+        self.assertTrue(pjlink.shutter, 'Shutter should changed')
+        self.assertTrue(pjlink.mute, 'Audio should not have changed')
+        self.assertFalse(mock_UpdateIcons.emit.called, 'Update icons should NOT have been called')
+
+    @patch.object(pjlink_test, 'projectorUpdateIcons')
+    def test_projector_process_avmt_closed_muted(self, mock_UpdateIcons):
         """
         Test avmt status shutter closed and mute off
         """
@@ -99,12 +121,13 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: Shutter should be closed and mute should be True
         self.assertTrue(pjlink.shutter, 'Shutter should have been set to closed')
-        self.assertTrue(pjlink.mute, 'Audio should be off')
+        self.assertTrue(pjlink.mute, 'Audio should be muted')
+        self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
 
     @patch.object(pjlink_test, 'projectorUpdateIcons')
-    def test_projector_process_avmt_shutter_closed(self, mock_projectorReceivedData):
+    def test_projector_process_avmt_shutter_closed(self, mock_UpdateIcons):
         """
-        Test avmt status shutter closed and audio muted
+        Test avmt status shutter closed and audio unchanged
         """
         # GIVEN: Test object
         pjlink = pjlink_test
@@ -117,11 +140,12 @@ class TestPJLinkCommands(TestCase):
         # THEN: Shutter should be True and mute should be False
         self.assertTrue(pjlink.shutter, 'Shutter should have been set to closed')
         self.assertTrue(pjlink.mute, 'Audio should not have changed')
+        self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
 
     @patch.object(pjlink_test, 'projectorUpdateIcons')
-    def test_projector_process_avmt_audio_muted(self, mock_projectorReceivedData):
+    def test_projector_process_avmt_audio_muted(self, mock_UpdateIcons):
         """
-        Test avmt status shutter open and mute on
+        Test avmt status shutter unchanged and mute on
         """
         # GIVEN: Test object
         pjlink = pjlink_test
@@ -134,11 +158,12 @@ class TestPJLinkCommands(TestCase):
         # THEN: Shutter should be closed and mute should be True
         self.assertTrue(pjlink.shutter, 'Shutter should not have changed')
         self.assertTrue(pjlink.mute, 'Audio should be off')
+        self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
 
     @patch.object(pjlink_test, 'projectorUpdateIcons')
-    def test_projector_process_avmt_open_unmuted(self, mock_projectorReceivedData):
+    def test_projector_process_avmt_open_unmuted(self, mock_UpdateIcons):
         """
-        Test avmt status shutter open and mute off off
+        Test avmt status shutter open and mute off
         """
         # GIVEN: Test object
         pjlink = pjlink_test
@@ -151,6 +176,7 @@ class TestPJLinkCommands(TestCase):
         # THEN: Shutter should be closed and mute should be True
         self.assertFalse(pjlink.shutter, 'Shutter should have been set to open')
         self.assertFalse(pjlink.mute, 'Audio should be on')
+        self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
 
     def test_projector_process_clss_one(self):
         """
@@ -164,7 +190,7 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: Projector class should be set to 1
         self.assertEqual(pjlink.pjlink_class, '1',
-                         'Projector should have returned class=1')
+                         'Projector should have set class=1')
 
     def test_projector_process_clss_two(self):
         """
@@ -178,11 +204,11 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: Projector class should be set to 1
         self.assertEqual(pjlink.pjlink_class, '2',
-                         'Projector should have returned class=2')
+                         'Projector should have set class=2')
 
-    def test_projector_process_clss_nonstandard_reply(self):
+    def test_projector_process_clss_nonstandard_reply_optoma(self):
         """
-        Bugfix 1550891: CLSS request returns non-standard reply
+        Bugfix 1550891: CLSS request returns non-standard reply with Optoma projector
         """
         # GIVEN: Test object
         pjlink = pjlink_test
@@ -194,24 +220,105 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(pjlink.pjlink_class, '1',
                          'Non-standard class reply should have set class=1')
 
+    def test_projector_process_clss_nonstandard_reply_benq(self):
+        """
+        Bugfix 1550891: CLSS request returns non-standard reply with BenQ projector
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+
+        # WHEN: Process non-standard reply
+        pjlink.process_clss('Version2')
+
+        # THEN: Projector class should be set with proper value
+        # NOTE: At this time BenQ is Class 1, but we're trying a different value to verify
+        self.assertEqual(pjlink.pjlink_class, '2',
+                         'Non-standard class reply should have set class=2')
+
+    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    def test_projector_process_clss_invalid_nan(self, mock_log):
+        """
+        Test CLSS reply has no class number
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+
+        # WHEN: Process invalid reply
+        pjlink.process_clss('Z')
+        log_warn_text = "(127.0.0.1) NAN clss version reply 'Z' - defaulting to class '1'"
+
+        # THEN: Projector class should be set with default value
+        self.assertEqual(pjlink.pjlink_class, '1',
+                         'Non-standard class reply should have set class=1')
+        mock_log.error.assert_called_once_with(log_warn_text)
+
+    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    def test_projector_process_clss_invalid_no_version(self, mock_log):
+        """
+        Test CLSS reply has no class number
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+
+        # WHEN: Process invalid reply
+        pjlink.process_clss('Invalid')
+        log_warn_text = "(127.0.0.1) No numbers found in class version reply 'Invalid' - defaulting to class '1'"
+
+        # THEN: Projector class should be set with default value
+        self.assertEqual(pjlink.pjlink_class, '1',
+                         'Non-standard class reply should have set class=1')
+        mock_log.error.assert_called_once_with(log_warn_text)
+
     def test_projector_process_erst_all_ok(self):
         """
         Test test_projector_process_erst_all_ok
         """
         # GIVEN: Test object
         pjlink = pjlink_test
-        chk_test = ERST_OK
+        chk_test = PJLINK_ERST_STATUS['OK']
+        chk_param = chk_test * len(PJLINK_ERST_POSITIONS)
 
         # WHEN: process_erst with no errors
-        pjlink.process_erst('{fan}{lamp}{temp}{cover}{filter}{other}'.format(fan=chk_test,
-                                                                             lamp=chk_test,
-                                                                             temp=chk_test,
-                                                                             cover=chk_test,
-                                                                             filter=chk_test,
-                                                                             other=chk_test))
+        pjlink.process_erst(chk_param)
 
-        # PJLink instance errors should be None
+        # THEN: PJLink instance errors should be None
         self.assertIsNone(pjlink.projector_errors, 'projector_errors should have been set to None')
+
+    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    def test_projector_process_erst_data_invalid_length(self, mock_log):
+        """
+        Test test_projector_process_erst_data_invalid_length
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.projector_errors = None
+        log_warn_text = "127.0.0.1) Invalid error status response '11111111': length != 6"
+
+        # WHEN: process_erst called with invalid data (too many values
+        pjlink.process_erst('11111111')
+
+        # THEN: pjlink.projector_errors should be empty and warning logged
+        self.assertIsNone(pjlink.projector_errors, 'There should be no errors')
+        self.assertTrue(mock_log.warn.called, 'Warning should have been logged')
+        mock_log.warn.assert_called_once_with(log_warn_text)
+
+    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    def test_projector_process_erst_data_invalid_nan(self, mock_log):
+        """
+        Test test_projector_process_erst_data_invalid_nan
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        pjlink.projector_errors = None
+        log_warn_text = "(127.0.0.1) Invalid error status response '1111Z1'"
+
+        # WHEN: process_erst called with invalid data (too many values
+        pjlink.process_erst('1111Z1')
+
+        # THEN: pjlink.projector_errors should be empty and warning logged
+        self.assertIsNone(pjlink.projector_errors, 'There should be no errors')
+        self.assertTrue(mock_log.warn.called, 'Warning should have been logged')
+        mock_log.warn.assert_called_once_with(log_warn_text)
 
     def test_projector_process_erst_all_warn(self):
         """
@@ -219,27 +326,18 @@ class TestPJLinkCommands(TestCase):
         """
         # GIVEN: Test object
         pjlink = pjlink_test
-        chk_test = ERST_WARN
-        chk_code = PJLINK_ERST_STATUS[chk_test]
-        chk_value = {'Fan': chk_code,
-                     'Lamp': chk_code,
-                     'Temperature': chk_code,
-                     'Cover': chk_code,
-                     'Filter': chk_code,
-                     'Other': chk_code
-                     }
+        chk_test = PJLINK_ERST_STATUS[E_WARN]
+        chk_string = ERROR_STRING[E_WARN]
+        chk_param = chk_test * len(PJLINK_ERST_POSITIONS)
 
         # WHEN: process_erst with status set to WARN
-        pjlink.process_erst('{fan}{lamp}{temp}{cover}{filter}{other}'.format(fan=chk_test,
-                                                                             lamp=chk_test,
-                                                                             temp=chk_test,
-                                                                             cover=chk_test,
-                                                                             filter=chk_test,
-                                                                             other=chk_test))
+        pjlink.process_erst(chk_param)
 
-        # PJLink instance errors should match chk_value
-        self.assertEqual(pjlink.projector_errors, chk_value,
-                         'projector_errors should have been set to all {err}'.format(err=chk_code))
+        # THEN: PJLink instance errors should match chk_value
+        for chk in pjlink.projector_errors:
+            self.assertEqual(pjlink.projector_errors[chk], chk_string,
+                             "projector_errors['{chk}'] should have been set to {err}".format(chk=chk,
+                                                                                              err=chk_string))
 
     def test_projector_process_erst_all_error(self):
         """
@@ -247,27 +345,45 @@ class TestPJLinkCommands(TestCase):
         """
         # GIVEN: Test object
         pjlink = pjlink_test
-        chk_test = ERST_ERR
-        chk_code = PJLINK_ERST_STATUS[chk_test]
-        chk_value = {'Fan': chk_code,
-                     'Lamp': chk_code,
-                     'Temperature': chk_code,
-                     'Cover': chk_code,
-                     'Filter': chk_code,
-                     'Other': chk_code
-                     }
+        chk_test = PJLINK_ERST_STATUS[E_ERROR]
+        chk_string = ERROR_STRING[E_ERROR]
+        chk_param = chk_test * len(PJLINK_ERST_POSITIONS)
 
-        # WHEN: process_erst with status set to ERROR
-        pjlink.process_erst('{fan}{lamp}{temp}{cover}{filter}{other}'.format(fan=chk_test,
-                                                                             lamp=chk_test,
-                                                                             temp=chk_test,
-                                                                             cover=chk_test,
-                                                                             filter=chk_test,
-                                                                             other=chk_test))
+        # WHEN: process_erst with status set to WARN
+        pjlink.process_erst(chk_param)
 
-        # PJLink instance errors should be set to chk_value
-        self.assertEqual(pjlink.projector_errors, chk_value,
-                         'projector_errors should have been set to all {err}'.format(err=chk_code))
+        # THEN: PJLink instance errors should match chk_value
+        for chk in pjlink.projector_errors:
+            self.assertEqual(pjlink.projector_errors[chk], chk_string,
+                             "projector_errors['{chk}'] should have been set to {err}".format(chk=chk,
+                                                                                              err=chk_string))
+
+    def test_projector_process_erst_warn_cover_only(self):
+        """
+        Test test_projector_process_erst_warn_cover_only
+        """
+        # GIVEN: Test object
+        pjlink = pjlink_test
+        chk_test = PJLINK_ERST_STATUS[E_WARN]
+        chk_string = ERROR_STRING[E_WARN]
+        pos = PJLINK_ERST_DATA['COVER']
+        build_chk = []
+        for check in range(0, len(PJLINK_ERST_POSITIONS)):
+            if check == pos:
+                build_chk.append(chk_test)
+            else:
+                build_chk.append(PJLINK_ERST_STATUS['OK'])
+        chk_param = ''.join(build_chk)
+
+        # WHEN: process_erst with cover only set to WARN and all others set to OK
+        pjlink.process_erst(chk_param)
+
+        # THEN: Only COVER should have an error
+        self.assertEqual(len(pjlink.projector_errors), 1, 'projector_errors should only have 1 error')
+        self.assertTrue(('Cover' in pjlink.projector_errors), 'projector_errors should have an error for "Cover"')
+        self.assertEqual(pjlink.projector_errors['Cover'],
+                         chk_string,
+                         'projector_errors["Cover"] should have error "{err}"'.format(err=chk_string))
 
     def test_projector_process_inpt(self):
         """

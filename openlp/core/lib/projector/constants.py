@@ -46,7 +46,7 @@ __all__ = ['S_OK', 'E_GENERAL', 'E_NOT_CONNECTED', 'E_FAN', 'E_LAMP', 'E_TEMP',
            'S_NOT_CONNECTED', 'S_CONNECTING', 'S_CONNECTED',
            'S_STATUS', 'S_OFF', 'S_INITIALIZE', 'S_STANDBY', 'S_WARMUP', 'S_ON', 'S_COOLDOWN',
            'S_INFO', 'S_NETWORK_SENDING', 'S_NETWORK_RECEIVED',
-           'ERROR_STRING', 'CR', 'LF', 'PJLINK_ERST_STATUS', 'PJLINK_POWR_STATUS',
+           'ERROR_STRING', 'CR', 'LF', 'PJLINK_ERST_DATA', 'PJLINK_ERST_STATUS', 'PJLINK_POWR_STATUS',
            'PJLINK_PORT', 'PJLINK_MAX_PACKET', 'TIMEOUT', 'ERROR_MSG', 'PJLINK_ERRORS',
            'STATUS_STRING', 'PJLINK_VALID_CMD', 'CONNECTION_ERRORS',
            'PJLINK_DEFAULT_SOURCES', 'PJLINK_DEFAULT_CODES', 'PJLINK_DEFAULT_ITEMS']
@@ -393,11 +393,32 @@ ERROR_MSG = {
     S_NETWORK_RECEIVED: translate('OpenLP.ProjectorConstants', 'Received data')
 }
 
+# Map ERST return code positions to equipment
+PJLINK_ERST_DATA = {
+    'DATA_LENGTH': 6,
+    0: 'FAN',
+    1: 'LAMP',
+    2: 'TEMP',
+    3: 'COVER',
+    4: 'FILTER',
+    5: 'OTHER',
+    'FAN': 0,
+    'LAMP': 1,
+    'TEMP': 2,
+    'COVER': 3,
+    'FILTER': 4,
+    'OTHER': 5
+}
+
 # Map for ERST return codes to string
 PJLINK_ERST_STATUS = {
-    '0': ERROR_STRING[E_OK],
+    '0': 'OK',
     '1': ERROR_STRING[E_WARN],
-    '2': ERROR_STRING[E_ERROR]
+    '2': ERROR_STRING[E_ERROR],
+    'OK': '0',
+    E_OK: '0',
+    E_WARN: '1',
+    E_ERROR: '2'
 }
 
 # Map for POWR return codes to status code

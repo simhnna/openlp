@@ -54,8 +54,8 @@ from PyQt5 import QtCore, QtNetwork
 
 from openlp.core.common import translate, qmd5_hash
 from openlp.core.lib.projector.constants import CONNECTION_ERRORS, CR, ERROR_MSG, ERROR_STRING, \
-    E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_INVALID_DATA, E_NETWORK, E_NOT_CONNECTED, \
-    E_PARAMETER, E_PROJECTOR, E_SOCKET_TIMEOUT, E_UNAVAILABLE, E_UNDEFINED, PJLINK_ERRORS, \
+    E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_INVALID_DATA, E_NETWORK, E_NOT_CONNECTED, E_OK, \
+    E_PARAMETER, E_PROJECTOR, E_SOCKET_TIMEOUT, E_UNAVAILABLE, E_UNDEFINED, PJLINK_ERRORS, PJLINK_ERST_DATA, \
     PJLINK_ERST_STATUS, PJLINK_MAX_PACKET, PJLINK_PORT, PJLINK_POWR_STATUS, PJLINK_VALID_CMD, \
     STATUS_STRING, S_CONNECTED, S_CONNECTING, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
     S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STATUS
@@ -154,37 +154,35 @@ class PJLinkCommands(object):
         if _cmd not in PJLINK_VALID_CMD:
             log.error("({ip}) Ignoring command='{cmd}' (Invalid/Unknown)".format(ip=self.ip, cmd=cmd))
             return
+        elif _data == 'OK':
+            log.debug('({ip}) Command "{cmd}" returned OK'.format(ip=self.ip, cmd=cmd))
+            # A command returned successfully, no further processing needed
+            return
         elif _cmd not in self.pjlink_functions:
             log.warn("({ip}) Unable to process command='{cmd}' (Future option)".format(ip=self.ip, cmd=cmd))
             return
         elif _data in PJLINK_ERRORS:
             # Oops - projector error
             log.error('({ip}) Projector returned error "{data}"'.format(ip=self.ip, data=data))
-            if _data == 'ERRA':
+            if _data == PJLINK_ERRORS[E_AUTHENTICATION]:
                 # Authentication error
                 self.disconnect_from_host()
                 self.change_status(E_AUTHENTICATION)
                 log.debug('({ip}) emitting projectorAuthentication() signal'.format(ip=self.ip))
                 self.projectorAuthentication.emit(self.name)
-            elif _data == 'ERR1':
-                # Undefined command
+            elif _data == PJLINK_ERRORS[E_UNDEFINED]:
+                # Projector does not recognize command
                 self.change_status(E_UNDEFINED, '{error}: "{data}"'.format(error=ERROR_MSG[E_UNDEFINED],
                                                                            data=cmd))
-            elif _data == 'ERR2':
+            elif _data == PJLINK_ERRORS[E_PARAMETER]:
                 # Invalid parameter
                 self.change_status(E_PARAMETER)
-            elif _data == 'ERR3':
+            elif _data == PJLINK_ERRORS[E_UNAVAILABLE]:
                 # Projector busy
                 self.change_status(E_UNAVAILABLE)
-            elif _data == 'ERR4':
+            elif _data == PJLINK_ERRORS[E_PROJECTOR]:
                 # Projector/display error
                 self.change_status(E_PROJECTOR)
-            self.receive_data_signal()
-            return
-        # Command succeeded - no extra information
-        elif _data == 'OK':
-            log.debug('({ip}) Command returned OK'.format(ip=self.ip))
-            # A command returned successfully
             self.receive_data_signal()
             return
         # Command checks already passed
@@ -196,6 +194,10 @@ class PJLinkCommands(object):
         """
         Process shutter and speaker status. See PJLink specification for format.
         Update self.mute (audio) and self.shutter (video shutter).
+        11 = Shutter closed, audio unchanged
+        21 = Shutter unchanged, Audio muted
+        30 = Shutter closed, audio muted
+        31 = Shutter open,  audio normal
 
         :param data: Shutter and audio status
         """
@@ -204,15 +206,15 @@ class PJLinkCommands(object):
                     '30': {'shutter': False, 'mute': False},
                     '31': {'shutter': True, 'mute': True}
                     }
-        if data in settings:
-            shutter = settings[data]['shutter']
-            mute = settings[data]['mute']
-            # Check if we need to update the icons
-            update_icons = (shutter != self.shutter) or (mute != self.mute)
-            self.shutter = shutter
-            self.mute = mute
-        else:
-            log.warning('({ip}) Unknown shutter response: {data}'.format(ip=self.ip, data=data))
+        if data not in settings:
+            log.warning('({ip}) Invalid shutter response: {data}'.format(ip=self.ip, data=data))
+            return
+        shutter = settings[data]['shutter']
+        mute = settings[data]['mute']
+        # Check if we need to update the icons
+        update_icons = (shutter != self.shutter) or (mute != self.mute)
+        self.shutter = shutter
+        self.mute = mute
         if update_icons:
             self.projectorUpdateIcons.emit()
         return
@@ -236,10 +238,12 @@ class PJLinkCommands(object):
             try:
                 clss = re.findall('\d', data)[0]  # Should only be the first match
             except IndexError:
-                log.error("({ip}) No numbers found in class version reply - defaulting to class '1'".format(ip=self.ip))
+                log.error("({ip}) No numbers found in class version reply '{data}' - "
+                          "defaulting to class '1'".format(ip=self.ip, data=data))
                 clss = '1'
         elif not data.isdigit():
-            log.error("({ip}) NAN class version reply - defaulting to class '1'".format(ip=self.ip))
+            log.error("({ip}) NAN clss version reply '{data}' - "
+                      "defaulting to class '1'".format(ip=self.ip, data=data))
             clss = '1'
         else:
             clss = data
@@ -253,41 +257,50 @@ class PJLinkCommands(object):
         Error status. See PJLink Specifications for format.
         Updates self.projector_errors
 
-\        :param data: Error status
+        :param data: Error status
         """
+        if len(data) != PJLINK_ERST_DATA['DATA_LENGTH']:
+            count = PJLINK_ERST_DATA['DATA_LENGTH']
+            log.warn("{ip}) Invalid error status response '{data}': length != {count}".format(ip=self.ip,
+                                                                                              data=data,
+                                                                                              count=count))
+            return
         try:
             datacheck = int(data)
         except ValueError:
             # Bad data - ignore
+            log.warn("({ip}) Invalid error status response '{data}'".format(ip=self.ip, data=data))
             return
         if datacheck == 0:
             self.projector_errors = None
-        else:
-            self.projector_errors = {}
-            # Fan
-            if data[0] != '0':
-                self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Fan')] = \
-                    PJLINK_ERST_STATUS[data[0]]
-            # Lamp
-            if data[1] != '0':
-                self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Lamp')] =  \
-                    PJLINK_ERST_STATUS[data[1]]
-            # Temp
-            if data[2] != '0':
-                self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Temperature')] =  \
-                    PJLINK_ERST_STATUS[data[2]]
-            # Cover
-            if data[3] != '0':
-                self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Cover')] =  \
-                    PJLINK_ERST_STATUS[data[3]]
-            # Filter
-            if data[4] != '0':
-                self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Filter')] =  \
-                    PJLINK_ERST_STATUS[data[4]]
-            # Other
-            if data[5] != '0':
-                self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Other')] =  \
-                    PJLINK_ERST_STATUS[data[5]]
+            # No errors
+            return
+        # We have some sort of status error, so check out what it/they are
+        self.projector_errors = {}
+        fan, lamp, temp, cover, filt, other = (data[PJLINK_ERST_DATA['FAN']],
+                                               data[PJLINK_ERST_DATA['LAMP']],
+                                               data[PJLINK_ERST_DATA['TEMP']],
+                                               data[PJLINK_ERST_DATA['COVER']],
+                                               data[PJLINK_ERST_DATA['FILTER']],
+                                               data[PJLINK_ERST_DATA['OTHER']])
+        if fan != PJLINK_ERST_STATUS[E_OK]:
+            self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Fan')] = \
+                PJLINK_ERST_STATUS[fan]
+        if lamp != PJLINK_ERST_STATUS[E_OK]:
+            self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Lamp')] =  \
+                PJLINK_ERST_STATUS[lamp]
+        if temp != PJLINK_ERST_STATUS[E_OK]:
+            self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Temperature')] =  \
+                PJLINK_ERST_STATUS[temp]
+        if cover != PJLINK_ERST_STATUS[E_OK]:
+            self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Cover')] =  \
+                PJLINK_ERST_STATUS[cover]
+        if filt != PJLINK_ERST_STATUS[E_OK]:
+            self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Filter')] =  \
+                PJLINK_ERST_STATUS[filt]
+        if other != PJLINK_ERST_STATUS[E_OK]:
+            self.projector_errors[translate('OpenLP.ProjectorPJLink', 'Other')] =  \
+                PJLINK_ERST_STATUS[other]
         return
 
     def process_inf1(self, data):
