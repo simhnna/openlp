@@ -138,7 +138,7 @@ class WSGIApplication(object):
         Add a static directory as a route
         """
         if route not in self.static_routes:
-            root = os.path.join(AppLocation.get_section_data_path('remotes'))
+            root = os.path.join(str(AppLocation.get_section_data_path('remotes')))
             self.static_routes[route] = DirectoryApp(os.path.abspath(os.path.join(root, static_dir)))
 
     def dispatch(self, request):
