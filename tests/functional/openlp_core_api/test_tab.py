@@ -41,7 +41,8 @@ __default_settings__ = {
     'api/password': 'password',
     'api/authentication enabled': False,
     'api/ip address': '0.0.0.0',
-    'api/thumbnails': True
+    'api/thumbnails': True,
+    'remotes/download version': '0000_00_00'
 }
 ZERO_URL = '0.0.0.0'
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
