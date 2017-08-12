@@ -57,7 +57,7 @@ from openlp.core.lib.projector.constants import CONNECTION_ERRORS, CR, ERROR_MSG
     E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_INVALID_DATA, E_NETWORK, E_NOT_CONNECTED, E_OK, \
     E_PARAMETER, E_PROJECTOR, E_SOCKET_TIMEOUT, E_UNAVAILABLE, E_UNDEFINED, PJLINK_ERRORS, PJLINK_ERST_DATA, \
     PJLINK_ERST_STATUS, PJLINK_MAX_PACKET, PJLINK_PORT, PJLINK_POWR_STATUS, PJLINK_VALID_CMD, \
-    STATUS_STRING, S_CONNECTED, S_CONNECTING, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
+    STATUS_STRING, S_CONNECTED, S_CONNECTING, S_INFO, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
     S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STATUS
 
 # Shortcuts
@@ -467,7 +467,11 @@ class PJLinkCommands(object):
         """
         Software version of projector
         """
-        if self.sw_version is None:
+        if len(data) > 32:
+            # Defined in specs max version is 32 characters
+            log.warn("Invalid software version - too long")
+            return
+        elif self.sw_version is None:
             log.debug("({ip}) Setting projector software version to '{data}'".format(ip=self.ip, data=data))
             self.sw_version = data
             self.db_update = True
@@ -477,7 +481,7 @@ class PJLinkCommands(object):
                 log.warn("({ip}) Projector software version does not match saved software version".format(ip=self.ip))
                 log.warn("({ip}) Saved:    '{old}'".format(ip=self.ip, old=self.sw_version))
                 log.warn("({ip}) Received: '{new}'".format(ip=self.ip, new=data))
-                log.warn("({ip}) NOT saving serial number".format(ip=self.ip))
+                log.warn("({ip}) Saving new serial number as sw_version_received".format(ip=self.ip))
                 self.sw_version_received = data
 
 
@@ -649,7 +653,9 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         :param status: Status/Error code
         :returns: (Status/Error code, String)
         """
-        if status in ERROR_STRING:
+        if not isinstance(status, int):
+            return -1, 'Invalid status code'
+        elif status in ERROR_STRING:
             return ERROR_STRING[status], ERROR_MSG[status]
         elif status in STATUS_STRING:
             return STATUS_STRING[status], ERROR_MSG[status]
@@ -674,7 +680,7 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         elif status >= S_NOT_CONNECTED and status < S_STATUS:
             self.status_connect = status
             self.projector_status = S_NOT_CONNECTED
-        elif status < S_NETWORK_SENDING:
+        elif status <= S_INFO:
             self.status_connect = S_CONNECTED
             self.projector_status = status
         (status_code, status_message) = self._get_status(self.status_connect)
@@ -803,7 +809,8 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
             log.debug('({ip}) get_data(): Not connected - returning'.format(ip=self.ip))
             self.send_busy = False
             return
-        read = self.readLine(self.max_size)
+        # Although we have a packet length limit, go ahead and use a larger buffer
+        read = self.readLine(1024)
         log.debug("({ip}) get_data(): '{buff}'".format(ip=self.ip, buff=read))
         if read == -1:
             # No data available
@@ -816,6 +823,8 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         data = data_in.strip()
         if (len(data) < 7) or (not data.startswith(PJLINK_PREFIX)):
             return self._trash_buffer(msg='get_data(): Invalid packet - length or prefix')
+        elif len(data) > self.max_size:
+            return self._trash_buffer(msg='get_data(): Invalid packet - too long')
         elif '=' not in data:
             return self._trash_buffer(msg='get_data(): Invalid packet does not have equal')
         log.debug('({ip}) get_data(): Checking new data "{data}"'.format(ip=self.ip, data=data))
@@ -993,6 +1002,13 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         self.reset_information()
         self.projectorUpdateIcons.emit()
 
+    def get_av_mute_status(self):
+        """
+        Send command to retrieve shutter status.
+        """
+        log.debug('({ip}) Sending AVMT command'.format(ip=self.ip))
+        return self.send_command(cmd='AVMT')
+
     def get_available_inputs(self):
         """
         Send command to retrieve available source inputs.
@@ -1055,13 +1071,6 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         """
         log.debug('({ip}) Sending POWR command'.format(ip=self.ip))
         return self.send_command(cmd='POWR')
-
-    def get_shutter_status(self):
-        """
-        Send command to retrieve shutter status.
-        """
-        log.debug('({ip}) Sending AVMT command'.format(ip=self.ip))
-        return self.send_command(cmd='AVMT')
 
     def set_input_source(self, src=None):
         """
