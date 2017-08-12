@@ -38,7 +38,8 @@ __default_settings__ = {
     'api/password': 'password',
     'api/authentication enabled': False,
     'api/ip address': '0.0.0.0',
-    'api/thumbnails': True
+    'api/thumbnails': True,
+    'songs/chord notation': True
 }
 
 

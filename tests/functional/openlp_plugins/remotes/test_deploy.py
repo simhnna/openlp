@@ -23,12 +23,10 @@
 import os
 import shutil
 
-from unittest.mock import patch
-
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from openlp.plugins.remotes.deploy import check_for_previous_deployment, deploy_zipfile
+from openlp.plugins.remotes.deploy import deploy_zipfile
 
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
