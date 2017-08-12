@@ -44,6 +44,7 @@ class TestServiceManager(TestCase):
         Create the UI
         """
         Registry.create()
+        Registry().set_flag('no_web_server', False)
 
     def test_initial_service_manager(self):
         """
