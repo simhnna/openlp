@@ -482,31 +482,3 @@ class Settings(QtCore.QSettings):
         if isinstance(default_value, int):
             return int(setting)
         return setting
-
-    def get_files_from_config(self, plugin):
-        """
-        This removes the settings needed for old way we saved files (e. g. the image paths for the image plugin). A list
-        of file paths are returned.
-
-         **Note**: Only a list of paths is returned; this does not convert anything!
-
-         :param plugin: The Plugin object.The caller has to convert/save the list himself; o
-        """
-        files_list = []
-        # We need QSettings instead of Settings here to bypass our central settings dict.
-        # Do NOT do this anywhere else!
-        settings = QtCore.QSettings(self.fileName(), Settings.IniFormat)
-        settings.beginGroup(plugin.settings_section)
-        if settings.contains('{name} count'.format(name=plugin.name)):
-            # Get the count.
-            list_count = int(settings.value('{name} count'.format(name=plugin.name), 0))
-            if list_count:
-                for counter in range(list_count):
-                    # The keys were named e. g.: "image 0"
-                    item = settings.value('{name} {counter:d}'.format(name=plugin.name, counter=counter), '')
-                    if item:
-                        files_list.append(item)
-                    settings.remove('{name} {counter:d}'.format(name=plugin.name, counter=counter))
-            settings.remove('{name} count'.format(name=plugin.name))
-        settings.endGroup()
-        return files_list

@@ -22,6 +22,7 @@
 
 import logging
 import os
+from pathlib import Path
 
 from openlp.core.common import AppLocation, OpenLPMixin, RegistryProperties, Settings, translate, delete_file, UiStrings
 from openlp.plugins.bibles.lib import LanguageSelection, parse_reference
@@ -137,7 +138,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             # Remove corrupted files.
             if name is None:
                 bible.session.close_all()
-                delete_file(os.path.join(self.path, filename))
+                delete_file(Path(self.path, filename))
                 continue
             log.debug('Bible Name: "{name}"'.format(name=name))
             self.db_cache[name] = bible
@@ -185,7 +186,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         bible = self.db_cache[name]
         bible.session.close_all()
         bible.session = None
-        return delete_file(os.path.join(bible.path, bible.file))
+        return delete_file(Path(bible.path, bible.file))
 
     def get_bibles(self):
         """

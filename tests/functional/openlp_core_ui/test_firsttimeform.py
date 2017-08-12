@@ -25,6 +25,7 @@ Package to test the openlp.core.ui.firsttimeform package.
 import os
 import tempfile
 import urllib
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -116,7 +117,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
             mocked_settings.value.return_value = True
             MockedSettings.return_value = mocked_settings
             mocked_gettempdir.return_value = 'temp'
-            expected_temp_path = os.path.join('temp', 'openlp')
+            expected_temp_path = Path('temp', 'openlp')
 
             # WHEN: The set_defaults() method is run
             frw.set_defaults()

@@ -121,7 +121,7 @@ class PresentationPlugin(Plugin):
         Check to see if we have any presentation software available. If not do not install the plugin.
         """
         log.debug('check_pre_conditions')
-        controller_dir = os.path.join('openlp', 'plugins', 'presentations', 'lib')
+        controller_dir = os.path.join('plugins', 'presentations', 'lib')
         glob_pattern = os.path.join(controller_dir, '*controller.py')
         extension_loader(glob_pattern, ['presentationcontroller.py'])
         controller_classes = PresentationController.__subclasses__()

@@ -30,6 +30,7 @@ import time
 from datetime import datetime
 from distutils import dir_util
 from distutils.errors import DistutilsFileError
+from pathlib import Path
 from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -864,7 +865,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         setting_sections.extend([plugin.name for plugin in self.plugin_manager.plugins])
         # Copy the settings file to the tmp dir, because we do not want to change the original one.
         temp_directory = os.path.join(str(gettempdir()), 'openlp')
-        check_directory_exists(temp_directory)
+        check_directory_exists(Path(temp_directory))
         temp_config = os.path.join(temp_directory, os.path.basename(import_file_name))
         shutil.copyfile(import_file_name, temp_config)
         settings = Settings()

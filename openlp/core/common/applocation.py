@@ -96,7 +96,7 @@ class AppLocation(object):
             path = Path(Settings().value('advanced/data path'))
         else:
             path = AppLocation.get_directory(AppLocation.DataDir)
-            check_directory_exists(str(path))
+            check_directory_exists(path)
         return path
 
     @staticmethod
@@ -134,7 +134,7 @@ class AppLocation(object):
         :rtype: pathlib.Path
         """
         path = AppLocation.get_data_path() / section
-        check_directory_exists(str(path))
+        check_directory_exists(path)
         return path
 
 

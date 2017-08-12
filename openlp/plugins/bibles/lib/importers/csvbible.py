@@ -51,6 +51,7 @@ All CSV files are expected to use a comma (',') as the delimiter and double quot
 """
 import csv
 from collections import namedtuple
+from pathlib import Path
 
 from openlp.core.common import get_file_encoding, translate
 from openlp.core.lib.exceptions import ValidationError
@@ -100,7 +101,7 @@ class CSVBible(BibleImport):
         :return: An iterable yielding namedtuples of type results_tuple
         """
         try:
-            encoding = get_file_encoding(filename)['encoding']
+            encoding = get_file_encoding(Path(filename))['encoding']
             with open(filename, 'r', encoding=encoding, newline='') as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',', quotechar='"')
                 return [results_tuple(*line) for line in csv_reader]

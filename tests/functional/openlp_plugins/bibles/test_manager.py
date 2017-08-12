@@ -22,6 +22,7 @@
 """
 This module contains tests for the manager submodule of the Bibles plugin.
 """
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -50,7 +51,6 @@ class TestManager(TestCase):
         """
         # GIVEN: An instance of BibleManager and a mocked bible
         with patch.object(BibleManager, 'reload_bibles'), \
-                patch('openlp.plugins.bibles.lib.manager.os.path.join', side_effect=lambda x, y: '{}/{}'.format(x, y)),\
                 patch('openlp.plugins.bibles.lib.manager.delete_file', return_value=True) as mocked_delete_file:
             instance = BibleManager(MagicMock())
             # We need to keep a reference to the mock for close_all as it gets set to None later on!
@@ -66,4 +66,4 @@ class TestManager(TestCase):
             self.assertTrue(result)
             mocked_close_all.assert_called_once_with()
             self.assertIsNone(mocked_bible.session)
-            mocked_delete_file.assert_called_once_with('bibles/KJV.sqlite')
+            mocked_delete_file.assert_called_once_with(Path('bibles', 'KJV.sqlite'))

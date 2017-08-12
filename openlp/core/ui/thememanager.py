@@ -25,6 +25,7 @@ The Theme Manager manages adding, deleteing and modifying of themes.
 import os
 import zipfile
 import shutil
+from pathlib import Path
 
 from xml.etree.ElementTree import ElementTree, XML
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -161,9 +162,9 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         Set up the theme path variables
         """
         self.path = str(AppLocation.get_section_data_path(self.settings_section))
-        check_directory_exists(self.path)
+        check_directory_exists(Path(self.path))
         self.thumb_path = os.path.join(self.path, 'thumbnails')
-        check_directory_exists(self.thumb_path)
+        check_directory_exists(Path(self.thumb_path))
 
     def check_list_state(self, item, field=None):
         """
@@ -355,8 +356,8 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         self.theme_list.remove(theme)
         thumb = '{name}.png'.format(name=theme)
-        delete_file(os.path.join(self.path, thumb))
-        delete_file(os.path.join(self.thumb_path, thumb))
+        delete_file(Path(self.path, thumb))
+        delete_file(Path(self.thumb_path, thumb))
         try:
             # Windows is always unicode, so no need to encode filenames
             if is_win():
@@ -450,7 +451,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         for theme_file in files:
             theme_file = os.path.join(self.path, str(theme_file))
             self.unzip_theme(theme_file, self.path)
-            delete_file(theme_file)
+            delete_file(Path(theme_file))
         files = AppLocation.get_files(self.settings_section, '.png')
         # No themes have been found so create one
         if not files:
@@ -514,12 +515,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :return: The theme object.
         """
         self.log_debug('get theme data for theme {name}'.format(name=theme_name))
-        theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.json')
-        theme_data = get_text_file_string(theme_file)
+        theme_file_path = Path(self.path, str(theme_name), '{file_name}.json'.format(file_name=theme_name))
+        theme_data = get_text_file_string(theme_file_path)
         jsn = True
         if not theme_data:
-            theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
-            theme_data = get_text_file_string(theme_file)
+            theme_file_path = theme_file_path.with_suffix('.xml')
+            theme_data = get_text_file_string(theme_file_path)
             jsn = False
         if not theme_data:
             self.log_debug('No theme data - using default theme')
@@ -592,7 +593,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     # is directory or preview file
                     continue
                 full_name = os.path.join(directory, out_name)
-                check_directory_exists(os.path.dirname(full_name))
+                check_directory_exists(Path(os.path.dirname(full_name)))
                 if os.path.splitext(name)[1].lower() == '.xml' or os.path.splitext(name)[1].lower() == '.json':
                     file_xml = str(theme_zip.read(name), 'utf-8')
                     out_file = open(full_name, 'w', encoding='utf-8')
@@ -670,10 +671,10 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         name = theme.theme_name
         theme_pretty = theme.export_theme()
         theme_dir = os.path.join(self.path, name)
-        check_directory_exists(theme_dir)
+        check_directory_exists(Path(theme_dir))
         theme_file = os.path.join(theme_dir, name + '.json')
         if self.old_background_image and image_to != self.old_background_image:
-            delete_file(self.old_background_image)
+            delete_file(Path(self.old_background_image))
         out_file = None
         try:
             out_file = open(theme_file, 'w', encoding='utf-8')

@@ -33,6 +33,7 @@ import os
 import shutil
 import sys
 import time
+from pathlib import Path
 from traceback import format_exception
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -346,15 +347,18 @@ def set_up_logging(log_path):
     """
     Setup our logging using log_path
 
-    :param log_path: the path
+    :param pathlib.Path log_path: The file to save the log to
+    :return: None
+    :rtype: None
     """
     check_directory_exists(log_path, True)
-    filename = os.path.join(log_path, 'openlp.log')
-    logfile = logging.FileHandler(filename, 'w', encoding="UTF-8")
+    file_path = log_path / 'openlp.log'
+    # TODO: FileHandler accepts a Path object in Py3.6
+    logfile = logging.FileHandler(str(file_path), 'w', encoding='UTF-8')
     logfile.setFormatter(logging.Formatter('%(asctime)s %(name)-55s %(levelname)-8s %(message)s'))
     log.addHandler(logfile)
     if log.isEnabledFor(logging.DEBUG):
-        print('Logging to: {name}'.format(name=filename))
+        print('Logging to: {name}'.format(name=file_path))
 
 
 def main(args=None):
@@ -391,7 +395,7 @@ def main(args=None):
         Settings.setDefaultFormat(Settings.IniFormat)
         # Get location OpenLPPortable.ini
         application_path = str(AppLocation.get_directory(AppLocation.AppDir))
-        set_up_logging(os.path.abspath(os.path.join(application_path, '..', '..', 'Other')))
+        set_up_logging(Path(os.path.abspath(os.path.join(application_path, '..', '..', 'Other'))))
         log.info('Running portable')
         portable_settings_file = os.path.abspath(os.path.join(application_path, '..', '..', 'Data', 'OpenLP.ini'))
         # Make this our settings file
@@ -407,7 +411,7 @@ def main(args=None):
         portable_settings.sync()
     else:
         application.setApplicationName('OpenLP')
-        set_up_logging(str(AppLocation.get_directory(AppLocation.CacheDir)))
+        set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
     Registry.create()
     Registry().register('application', application)
     application.setApplicationVersion(get_application_version()['version'])

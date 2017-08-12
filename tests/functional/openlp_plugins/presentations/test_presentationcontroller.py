@@ -24,6 +24,7 @@ Functional tests to test the PresentationController and PresentationDocument
 classes and related methods.
 """
 import os
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, mock_open, patch
 
@@ -38,7 +39,8 @@ class TestPresentationController(TestCase):
     """
     def setUp(self):
         self.get_thumbnail_folder_patcher = \
-            patch('openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument.get_thumbnail_folder')
+            patch('openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument.get_thumbnail_folder',
+                  return_value=Path())
         self.get_thumbnail_folder_patcher.start()
         mocked_plugin = MagicMock()
         mocked_plugin.settings_section = 'presentations'
@@ -225,7 +227,7 @@ class TestPresentationDocument(TestCase):
         PresentationDocument(self.mock_controller, 'Name')
 
         # THEN: check_directory_exists should have been called with 'returned/path/'
-        self.mock_check_directory_exists.assert_called_once_with('returned/path/')
+        self.mock_check_directory_exists.assert_called_once_with(Path('returned', 'path'))
 
         self._setup_patcher.start()
 

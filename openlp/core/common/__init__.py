@@ -32,7 +32,6 @@ import sys
 import traceback
 from chardet.universaldetector import UniversalDetector
 from ipaddress import IPv4Address, IPv6Address, AddressValueError
-from pathlib import Path
 from shutil import which
 from subprocess import check_output, CalledProcessError, STDOUT
 
@@ -65,17 +64,19 @@ def trace_error_handler(logger):
 
 def check_directory_exists(directory, do_not_log=False):
     """
-    Check a theme directory exists and if not create it
+    Check a directory exists and if not create it
 
-    :param directory: The directory to make sure exists
-    :param do_not_log: To not log anything. This is need for the start up, when the log isn't ready.
+    :param pathlib.Path directory: The directory to make sure exists
+    :param bool do_not_log: To not log anything. This is need for the start up, when the log isn't ready.
+    :return: None
+    :rtype: None
     """
     if not do_not_log:
         log.debug('check_directory_exists {text}'.format(text=directory))
     try:
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-    except IOError as e:
+        if not directory.exists():
+            directory.mkdir(parents=True)
+    except IOError:
         if not do_not_log:
             log.exception('failed to check if directory exists or create directory')
 
@@ -85,19 +86,15 @@ def extension_loader(glob_pattern, excluded_files=[]):
     A utility function to find and load OpenLP extensions, such as plugins, presentation and media controllers and
     importers.
 
-    :param glob_pattern: A glob pattern used to find the extension(s) to be imported. Should be relative to the
-        application directory. i.e. openlp/plugins/*/*plugin.py
-    :type glob_pattern: str
-
-    :param excluded_files: A list of file names to exclude that the glob pattern may find.
-    :type excluded_files: list of strings
-
+    :param str glob_pattern: A glob pattern used to find the extension(s) to be imported. Should be relative to the
+        application directory. i.e. plugins/*/*plugin.py
+    :param list[str] excluded_files: A list of file names to exclude that the glob pattern may find.
     :return: None
     :rtype: None
     """
-    base_dir_path = AppLocation.get_directory(AppLocation.AppDir).parent
-    for extension_path in base_dir_path.glob(glob_pattern):
-        extension_path = extension_path.relative_to(base_dir_path)
+    app_dir = AppLocation.get_directory(AppLocation.AppDir)
+    for extension_path in app_dir.glob(glob_pattern):
+        extension_path = extension_path.relative_to(app_dir)
         if extension_path.name in excluded_files:
             continue
         module_name = path_to_module(extension_path)
@@ -106,21 +103,19 @@ def extension_loader(glob_pattern, excluded_files=[]):
         except (ImportError, OSError):
             # On some platforms importing vlc.py might cause OSError exceptions. (e.g. Mac OS X)
             log.warning('Failed to import {module_name} on path {extension_path}'
-                        .format(module_name=module_name, extension_path=str(extension_path)))
+                        .format(module_name=module_name, extension_path=extension_path))
 
 
 def path_to_module(path):
     """
     Convert a path to a module name (i.e openlp.core.common)
 
-    :param path: The path to convert to a module name.
-    :type path: Path
-
+    :param pathlib.Path path: The path to convert to a module name.
     :return: The module name.
     :rtype: str
     """
     module_path = path.with_suffix('')
-    return '.'.join(module_path.parts)
+    return 'openlp.' + '.'.join(module_path.parts)
 
 
 def get_frozen_path(frozen_option, non_frozen_option):
@@ -378,20 +373,22 @@ def split_filename(path):
         return os.path.split(path)
 
 
-def delete_file(file_path_name):
+def delete_file(file_path):
     """
     Deletes a file from the system.
 
-    :param file_path_name: The file, including path, to delete.
+    :param pathlib.Path file_path: The file, including path, to delete.
+    :return: True if the deletion was successful, or the file never existed. False otherwise.
+    :rtype: bool
     """
-    if not file_path_name:
+    if not file_path:
         return False
     try:
-        if os.path.exists(file_path_name):
-            os.remove(file_path_name)
+        if file_path.exists():
+            file_path.unlink()
         return True
     except (IOError, OSError):
-        log.exception("Unable to delete file {text}".format(text=file_path_name))
+        log.exception('Unable to delete file {file_path}'.format(file_path=file_path))
         return False
 
 
@@ -411,18 +408,19 @@ def get_images_filter():
     return IMAGES_FILTER
 
 
-def is_not_image_file(file_name):
+def is_not_image_file(file_path):
     """
     Validate that the file is not an image file.
 
-    :param file_name: File name to be checked.
+    :param pathlib.Path file_path: The file to be checked.
+    :return: If the file is not an image
+    :rtype: bool
     """
-    if not file_name:
+    if not (file_path and file_path.exists()):
         return True
     else:
         formats = [bytes(fmt).decode().lower() for fmt in QtGui.QImageReader.supportedImageFormats()]
-        file_part, file_extension = os.path.splitext(str(file_name))
-        if file_extension[1:].lower() in formats and os.path.exists(file_name):
+        if file_path.suffix[1:].lower() in formats:
             return False
         return True
 
@@ -431,10 +429,10 @@ def clean_filename(filename):
     """
     Removes invalid characters from the given ``filename``.
 
-    :param filename:  The "dirty" file name to clean.
+    :param str filename:  The "dirty" file name to clean.
+    :return: The cleaned string
+    :rtype: str
     """
-    if not isinstance(filename, str):
-        filename = str(filename, 'utf-8')
     return INVALID_FILE_CHARS.sub('_', CONTROL_CHARS.sub('', filename))
 
 
@@ -442,8 +440,9 @@ def check_binary_exists(program_path):
     """
     Function that checks whether a binary exists.
 
-    :param program_path: The full path to the binary to check.
+    :param pathlib.Path program_path: The full path to the binary to check.
     :return: program output to be parsed
+    :rtype: bytes
     """
     log.debug('testing program_path: {text}'.format(text=program_path))
     try:
@@ -453,26 +452,27 @@ def check_binary_exists(program_path):
             startupinfo.dwFlags |= STARTF_USESHOWWINDOW
         else:
             startupinfo = None
-        runlog = check_output([program_path, '--help'], stderr=STDOUT, startupinfo=startupinfo)
+        run_log = check_output([str(program_path), '--help'], stderr=STDOUT, startupinfo=startupinfo)
     except CalledProcessError as e:
-        runlog = e.output
+        run_log = e.output
     except Exception:
         trace_error_handler(log)
-        runlog = ''
-    log.debug('check_output returned: {text}'.format(text=runlog))
-    return runlog
+        run_log = ''
+    log.debug('check_output returned: {text}'.format(text=run_log))
+    return run_log
 
 
-def get_file_encoding(filename):
+def get_file_encoding(file_path):
     """
     Utility function to incrementally detect the file encoding.
 
-    :param filename: Filename for the file to determine the encoding for. Str
+    :param pathlib.Path file_path: Filename for the file to determine the encoding for.
     :return: A dict with the keys 'encoding' and 'confidence'
+    :rtype: dict[str, float]
     """
     detector = UniversalDetector()
     try:
-        with open(filename, 'rb') as detect_file:
+        with file_path.open('rb') as detect_file:
             while not detector.done:
                 chunk = detect_file.read(1024)
                 if not chunk:

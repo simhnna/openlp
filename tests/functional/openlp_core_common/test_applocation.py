@@ -43,14 +43,12 @@ class TestAppLocation(TestCase):
         """
         with patch('openlp.core.common.applocation.Settings') as mocked_class, \
                 patch('openlp.core.common.AppLocation.get_directory') as mocked_get_directory, \
-                patch('openlp.core.common.applocation.check_directory_exists') as mocked_check_directory_exists, \
-                patch('openlp.core.common.applocation.os') as mocked_os:
+                patch('openlp.core.common.applocation.check_directory_exists') as mocked_check_directory_exists:
             # GIVEN: A mocked out Settings class and a mocked out AppLocation.get_directory()
             mocked_settings = mocked_class.return_value
             mocked_settings.contains.return_value = False
-            mocked_get_directory.return_value = os.path.join('test', 'dir')
+            mocked_get_directory.return_value = Path('test', 'dir')
             mocked_check_directory_exists.return_value = True
-            mocked_os.path.normpath.return_value = os.path.join('test', 'dir')
 
             # WHEN: we call AppLocation.get_data_path()
             data_path = AppLocation.get_data_path()
@@ -58,8 +56,8 @@ class TestAppLocation(TestCase):
             # THEN: check that all the correct methods were called, and the result is correct
             mocked_settings.contains.assert_called_with('advanced/data path')
             mocked_get_directory.assert_called_with(AppLocation.DataDir)
-            mocked_check_directory_exists.assert_called_with(os.path.join('test', 'dir'))
-            self.assertEqual(os.path.join('test', 'dir'), data_path, 'Result should be "test/dir"')
+            mocked_check_directory_exists.assert_called_with(Path('test', 'dir'))
+            self.assertEqual(Path('test', 'dir'), data_path, 'Result should be "test/dir"')
 
     def test_get_data_path_with_custom_location(self):
         """
@@ -125,7 +123,7 @@ class TestAppLocation(TestCase):
             data_path = AppLocation.get_section_data_path('section')
 
             # THEN: check that all the correct methods were called, and the result is correct
-            mocked_check_directory_exists.assert_called_with(os.path.join('test', 'dir', 'section'))
+            mocked_check_directory_exists.assert_called_with(Path('test', 'dir', 'section'))
             self.assertEqual(Path('test', 'dir', 'section'), data_path, 'Result should be "test/dir/section"')
 
     def test_get_directory_for_app_dir(self):
