@@ -43,6 +43,7 @@ class TestServiceManager(TestCase, TestMixin):
         Create the UI
         """
         Registry.create()
+        Registry().set_flag('no_web_server', False)
         self.setup_application()
         ScreenList.create(self.app.desktop())
         Registry().register('application', MagicMock())
