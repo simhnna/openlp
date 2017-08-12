@@ -25,12 +25,12 @@ This module contains tests for the lib submodule of the Remotes plugin.
 import os
 import re
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 from PyQt5 import QtWidgets
 
 
-from openlp.core.common import Settings
+from openlp.core.common import Registry, Settings
 from openlp.core.api.tab import ApiTab
 from tests.helpers.testmixin import TestMixin
 
@@ -63,6 +63,7 @@ class TestApiTab(TestCase, TestMixin):
         Settings().extend_default_settings(__default_settings__)
         self.parent = QtWidgets.QMainWindow()
         self.form = ApiTab(self.parent)
+        Registry().set_flag('no_web_server', False)
 
     def tearDown(self):
         """
