@@ -62,8 +62,9 @@ class TestApiTab(TestCase, TestMixin):
         self.build_settings()
         Settings().extend_default_settings(__default_settings__)
         self.parent = QtWidgets.QMainWindow()
-        self.form = ApiTab(self.parent)
+        Registry().create()
         Registry().set_flag('website_version', '00-00-0000')
+        self.form = ApiTab(self.parent)
 
     def tearDown(self):
         """
