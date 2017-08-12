@@ -179,7 +179,7 @@ class TestPJLinkRouting(TestCase):
 
         # THEN: Error should be logged and no command called
         self.assertFalse(mock_functions.called, 'Should not have gotten to the end of the method')
-        mock_log.warn.assert_called_once_with(log_text)
+        mock_log.warning.assert_called_once_with(log_text)
 
     @patch.object(pjlink_test, 'pjlink_functions')
     @patch.object(openlp.core.lib.projector.pjlink, 'log')

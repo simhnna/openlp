@@ -607,12 +607,12 @@ class TestPJLinkCommands(TestCase):
 
         # WHEN: Process invalid reply
         pjlink.process_clss('Z')
-        log_warn_text = "(127.0.0.1) NAN clss version reply 'Z' - defaulting to class '1'"
+        log_text = "(127.0.0.1) NAN clss version reply 'Z' - defaulting to class '1'"
 
         # THEN: Projector class should be set with default value
         self.assertEqual(pjlink.pjlink_class, '1',
                          'Non-standard class reply should have set class=1')
-        mock_log.error.assert_called_once_with(log_warn_text)
+        mock_log.error.assert_called_once_with(log_text)
 
     @patch.object(openlp.core.lib.projector.pjlink, 'log')
     def test_projector_process_clss_invalid_no_version(self, mock_log):
@@ -624,12 +624,12 @@ class TestPJLinkCommands(TestCase):
 
         # WHEN: Process invalid reply
         pjlink.process_clss('Invalid')
-        log_warn_text = "(127.0.0.1) No numbers found in class version reply 'Invalid' - defaulting to class '1'"
+        log_text = "(127.0.0.1) No numbers found in class version reply 'Invalid' - defaulting to class '1'"
 
         # THEN: Projector class should be set with default value
         self.assertEqual(pjlink.pjlink_class, '1',
                          'Non-standard class reply should have set class=1')
-        mock_log.error.assert_called_once_with(log_warn_text)
+        mock_log.error.assert_called_once_with(log_text)
 
     def test_projector_process_erst_all_ok(self):
         """
@@ -654,15 +654,15 @@ class TestPJLinkCommands(TestCase):
         # GIVEN: Test object
         pjlink = pjlink_test
         pjlink.projector_errors = None
-        log_warn_text = "127.0.0.1) Invalid error status response '11111111': length != 6"
+        log_text = "127.0.0.1) Invalid error status response '11111111': length != 6"
 
         # WHEN: process_erst called with invalid data (too many values
         pjlink.process_erst('11111111')
 
         # THEN: pjlink.projector_errors should be empty and warning logged
         self.assertIsNone(pjlink.projector_errors, 'There should be no errors')
-        self.assertTrue(mock_log.warn.called, 'Warning should have been logged')
-        mock_log.warn.assert_called_once_with(log_warn_text)
+        self.assertTrue(mock_log.warning.called, 'Warning should have been logged')
+        mock_log.warning.assert_called_once_with(log_text)
 
     @patch.object(openlp.core.lib.projector.pjlink, 'log')
     def test_projector_process_erst_data_invalid_nan(self, mock_log):
@@ -672,15 +672,15 @@ class TestPJLinkCommands(TestCase):
         # GIVEN: Test object
         pjlink = pjlink_test
         pjlink.projector_errors = None
-        log_warn_text = "(127.0.0.1) Invalid error status response '1111Z1'"
+        log_text = "(127.0.0.1) Invalid error status response '1111Z1'"
 
         # WHEN: process_erst called with invalid data (too many values
         pjlink.process_erst('1111Z1')
 
         # THEN: pjlink.projector_errors should be empty and warning logged
         self.assertIsNone(pjlink.projector_errors, 'There should be no errors')
-        self.assertTrue(mock_log.warn.called, 'Warning should have been logged')
-        mock_log.warn.assert_called_once_with(log_warn_text)
+        self.assertTrue(mock_log.warning.called, 'Warning should have been logged')
+        mock_log.warning.assert_called_once_with(log_text)
 
     def test_projector_process_erst_all_warn(self):
         """
@@ -1080,9 +1080,9 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(pjlink.sw_version, test_data_old, 'Software version should not have been updated')
         self.assertEqual(pjlink.sw_version_received, test_data_new,
                          'Received software version should have been changed')
-        self.assertEqual(mock_log.warn.call_count, 4, 'log.warn should have been called 4 times')
+        self.assertEqual(mock_log.warning.call_count, 4, 'log.warn should have been called 4 times')
         # There was 4 calls, but only the last one is checked with this method
-        mock_log.warn.assert_called_with(test_log)
+        mock_log.warning.assert_called_with(test_log)
 
     @patch.object(openlp.core.lib.projector.pjlink, 'log')
     def test_projector_process_sver_invalid(self, mock_log):
@@ -1103,7 +1103,7 @@ class TestPJLinkCommands(TestCase):
         # THEN: Version information should not change
         self.assertIsNone(pjlink.sw_version, 'Software version should not have changed')
         self.assertIsNone(pjlink.sw_version_received, 'Received software version should not have changed')
-        mock_log.warn.assert_called_once_with(test_log)
+        mock_log.warning.assert_called_once_with(test_log)
 
     def test_projector_reset_information(self):
         """
