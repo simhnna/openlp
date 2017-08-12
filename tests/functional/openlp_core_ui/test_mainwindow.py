@@ -46,6 +46,7 @@ class TestMainWindow(TestCase, TestMixin):
         self.app.set_normal_cursor = MagicMock()
         self.app.args = []
         Registry().register('application', self.app)
+        Registry().set_flag('no_web_server', False)
         # Mock classes and methods used by mainwindow.
         with patch('openlp.core.ui.mainwindow.SettingsForm') as mocked_settings_form, \
                 patch('openlp.core.ui.mainwindow.ImageManager') as mocked_image_manager, \
