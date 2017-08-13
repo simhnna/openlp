@@ -66,7 +66,7 @@ def songs_service(request):
 
 
 @api_songs_endpoint.route('songs/search')
-def songs_search(request):
+def songs_search_api(request):
     """
     Handles requests for searching the songs plugin
 
@@ -77,7 +77,7 @@ def songs_search(request):
 
 @api_songs_endpoint.route('songs/live')
 @requires_auth
-def songs_live(request):
+def songs_live_api(request):
     """
     Handles requests for making a song live
 
@@ -88,7 +88,7 @@ def songs_live(request):
 
 @api_songs_endpoint.route('songs/add')
 @requires_auth
-def songs_service(request):
+def songs_service_api(request):
     """
     Handles requests for adding a song to the service
 

@@ -65,7 +65,7 @@ def custom_service(request):
 
 
 @api_custom_endpoint.route('custom/search')
-def custom_search(request):
+def custom_search_api(request):
     """
     Handles requests for searching the custom plugin
 
@@ -76,7 +76,7 @@ def custom_search(request):
 
 @api_custom_endpoint.route('custom/live')
 @requires_auth
-def custom_live(request):
+def custom_live_api(request):
     """
     Handles requests for making a song live
 
@@ -87,7 +87,7 @@ def custom_live(request):
 
 @api_custom_endpoint.route('custom/add')
 @requires_auth
-def custom_service(request):
+def custom_service_api(request):
     """
     Handles requests for adding a song to the service
 

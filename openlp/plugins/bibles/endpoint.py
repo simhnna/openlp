@@ -66,7 +66,7 @@ def bibles_service(request):
 
 
 @api_bibles_endpoint.route('bibles/search')
-def bibles_search(request):
+def bibles_search_api(request):
     """
     Handles requests for searching the bibles plugin
 
@@ -77,7 +77,7 @@ def bibles_search(request):
 
 @api_bibles_endpoint.route('bibles/live')
 @requires_auth
-def bibles_live(request):
+def bibles_live_api(request):
     """
     Handles requests for making a song live
 
@@ -88,7 +88,7 @@ def bibles_live(request):
 
 @api_bibles_endpoint.route('bibles/add')
 @requires_auth
-def bibles_service(request):
+def bibles_service_api(request):
     """
     Handles requests for adding a song to the service
 

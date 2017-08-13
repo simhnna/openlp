@@ -79,7 +79,7 @@ def images_service(request):
 
 
 @api_images_endpoint.route('images/search')
-def images_search(request):
+def images_search_api(request):
     """
     Handles requests for searching the images plugin
 
@@ -90,7 +90,7 @@ def images_search(request):
 
 @api_images_endpoint.route('images/live')
 @requires_auth
-def images_live(request):
+def images_live_api(request):
     """
     Handles requests for making a song live
 
@@ -101,7 +101,7 @@ def images_live(request):
 
 @api_images_endpoint.route('images/add')
 @requires_auth
-def images_service(request):
+def images_service_api(request):
     """
     Handles requests for adding a song to the service
 

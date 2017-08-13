@@ -80,7 +80,7 @@ def presentations_service(request):
 
 
 @api_presentations_endpoint.route('presentations/search')
-def presentations_search(request):
+def presentations_search_api(request):
     """
     Handles requests for searching the presentations plugin
 
@@ -91,7 +91,7 @@ def presentations_search(request):
 
 @api_presentations_endpoint.route('presentations/live')
 @requires_auth
-def presentations_live(request):
+def presentations_live_api(request):
     """
     Handles requests for making a song live
 
@@ -102,7 +102,7 @@ def presentations_live(request):
 
 @api_presentations_endpoint.route('presentations/add')
 @requires_auth
-def presentations_service(request):
+def presentations_service_api(request):
     """
     Handles requests for adding a song to the service
 

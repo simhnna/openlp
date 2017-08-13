@@ -66,7 +66,7 @@ def media_service(request):
 
 
 @api_media_endpoint.route('media/search')
-def media_search(request):
+def media_search_api(request):
     """
     Handles requests for searching the media plugin
 
@@ -77,7 +77,7 @@ def media_search(request):
 
 @api_media_endpoint.route('media/live')
 @requires_auth
-def media_live(request):
+def media_live_api(request):
     """
     Handles requests for making a song live
 
@@ -88,7 +88,7 @@ def media_live(request):
 
 @api_media_endpoint.route('media/add')
 @requires_auth
-def media_service(request):
+def media_service_api(request):
     """
     Handles requests for adding a song to the service
 
