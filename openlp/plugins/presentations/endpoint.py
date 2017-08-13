@@ -112,4 +112,3 @@ def presentations_service(request):
         search(request, 'presentations', log)
     except NotFound:
         return {'results': {'items': []}}
-

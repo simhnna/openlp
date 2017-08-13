@@ -261,9 +261,9 @@ def ping(host):
     Returns True if host responds to a ping request
     """
     # Ping parameters as function of OS
-    ping_str = "-n 1" if  platform.system().lower()=="windows" else "-c 1"
+    ping_str = "-n 1" if platform.system().lower() == "windows" else "-c 1"
     args = "ping " + " " + ping_str + " " + host
-    need_sh = False if  platform.system().lower()=="windows" else True
+    need_sh = False if platform.system().lower() == "windows" else True
 
     # Ping
     return subprocess.call(args, shell=need_sh) == 0
