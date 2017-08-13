@@ -68,7 +68,7 @@ class Endpoint(object):
         """
         Render a mako template
         """
-        root = os.path.join(AppLocation.get_section_data_path('remotes'))
+        root = os.path.join(str(AppLocation.get_section_data_path('remotes')))
         if not self.template_dir:
             raise Exception('No template directory specified')
         path = os.path.join(root, self.template_dir, filename)
