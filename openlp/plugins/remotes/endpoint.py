@@ -28,7 +28,7 @@ from openlp.core.api.endpoint.core import TRANSLATED_STRINGS
 from openlp.core.common import AppLocation
 
 
-static_dir = os.path.join(AppLocation.get_section_data_path('remotes'))
+static_dir = os.path.join(str(AppLocation.get_section_data_path('remotes')))
 
 log = logging.getLogger(__name__)
 
