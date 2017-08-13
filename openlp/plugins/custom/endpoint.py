@@ -22,6 +22,7 @@
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.api.http.errors import NotFound
 from openlp.core.api.endpoint.pluginhelpers import search, live, service
 from openlp.core.api.http import requires_auth
 
