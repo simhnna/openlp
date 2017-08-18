@@ -394,24 +394,24 @@ def main(args=None):
         application.setApplicationName('OpenLPPortable')
         Settings.setDefaultFormat(Settings.IniFormat)
         # Get location OpenLPPortable.ini
-        application_path = str(AppLocation.get_directory(AppLocation.AppDir))
-        set_up_logging(Path(os.path.abspath(os.path.join(application_path, '..', '..', 'Other'))))
+        portable_path = (AppLocation.get_directory(AppLocation.AppDir) / '..' / '..').resolve()
+        data_path = portable_path / 'Data'
+        set_up_logging(portable_path / 'Other')
         log.info('Running portable')
-        portable_settings_file = os.path.abspath(os.path.join(application_path, '..', '..', 'Data', 'OpenLP.ini'))
+        portable_settings_path = data_path / 'OpenLP.ini'
         # Make this our settings file
-        log.info('INI file: {name}'.format(name=portable_settings_file))
-        Settings.set_filename(portable_settings_file)
+        log.info('INI file: {name}'.format(name=portable_settings_path))
+        Settings.set_filename(str(portable_settings_path))
         portable_settings = Settings()
         # Set our data path
-        data_path = os.path.abspath(os.path.join(application_path, '..', '..', 'Data',))
         log.info('Data path: {name}'.format(name=data_path))
         # Point to our data path
-        portable_settings.setValue('advanced/data path', data_path)
+        portable_settings.setValue('advanced/data path', str(data_path))
         portable_settings.setValue('advanced/is portable', True)
         portable_settings.sync()
     else:
         application.setApplicationName('OpenLP')
-        set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
+    set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
     Registry.create()
     Registry().register('application', application)
     application.setApplicationVersion(get_application_version()['version'])

@@ -58,9 +58,6 @@ class AppLocation(object):
     CacheDir = 5
     LanguageDir = 6
 
-    # Base path where data/config/cache dir is located
-    BaseDir = None
-
     @staticmethod
     def get_directory(dir_type=AppDir):
         """
@@ -78,8 +75,6 @@ class AppLocation(object):
             return get_frozen_path(FROZEN_APP_PATH, APP_PATH) / 'plugins'
         elif dir_type == AppLocation.LanguageDir:
             return get_frozen_path(FROZEN_APP_PATH, _get_os_dir_path(dir_type)) / 'i18n'
-        elif dir_type == AppLocation.DataDir and AppLocation.BaseDir:
-            return Path(AppLocation.BaseDir, 'data')
         else:
             return _get_os_dir_path(dir_type)
 
@@ -104,14 +99,10 @@ class AppLocation(object):
         """
         Get a list of files from the data files path.
 
-        :param section: Defaults to *None*. The section of code getting the files - used to load from a section's data
-        subdirectory.
-        :type section: None | str
-
-        :param extension: Defaults to ''. The extension to search for. For example::
+        :param None | str section: Defaults to *None*. The section of code getting the files - used to load from a
+        section's data subdirectory.
+        :param str extension: Defaults to ''. The extension to search for. For example::
             '.png'
-        :type extension: str
-
         :return: List of files found.
         :rtype: list[pathlib.Path]
         """
@@ -143,14 +134,12 @@ def _get_os_dir_path(dir_type):
     Return a path based on which OS and environment we are running in.
 
     :param dir_type: AppLocation Enum of the requested path type
-    :type dir_type: AppLocation Enum
-
     :return: The requested path
     :rtype: pathlib.Path
     """
     # If running from source, return the language directory from the source directory
     if dir_type == AppLocation.LanguageDir:
-        directory = Path(os.path.abspath(os.path.join(os.path.dirname(openlp.__file__), '..', 'resources')))
+        directory = Path(openlp.__file__, '..', '..').resolve() / 'resources'
         if directory.exists():
             return directory
     if is_win():
@@ -158,14 +147,14 @@ def _get_os_dir_path(dir_type):
         if dir_type == AppLocation.DataDir:
             return openlp_folder_path / 'data'
         elif dir_type == AppLocation.LanguageDir:
-            return os.path.dirname(openlp.__file__)
+            return Path(openlp.__file__).parent
         return openlp_folder_path
     elif is_macosx():
         openlp_folder_path = Path(os.getenv('HOME'), 'Library', 'Application Support', 'openlp')
         if dir_type == AppLocation.DataDir:
             return openlp_folder_path / 'Data'
         elif dir_type == AppLocation.LanguageDir:
-            return os.path.dirname(openlp.__file__)
+            return Path(openlp.__file__).parent
         return openlp_folder_path
     else:
         if dir_type == AppLocation.LanguageDir:
