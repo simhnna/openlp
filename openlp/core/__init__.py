@@ -411,7 +411,7 @@ def main(args=None):
         portable_settings.sync()
     else:
         application.setApplicationName('OpenLP')
-    set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
+        set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
     Registry.create()
     Registry().register('application', application)
     application.setApplicationVersion(get_application_version()['version'])
