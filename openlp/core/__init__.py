@@ -153,10 +153,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         self.processEvents()
         if not has_run_wizard:
             self.main_window.first_time()
-        # update_check = Settings().value('core/update check')
-        # if update_check:
-        #     version = VersionThread(self.main_window)
-        #     version.start()
+        version = VersionThread(self.main_window)
+        version.start()
         self.main_window.is_display_blank()
         self.main_window.app_startup()
         return self.exec()
@@ -337,6 +335,8 @@ def parse_options(args=None):
     parser.add_argument('-d', '--dev-version', dest='dev_version', action='store_true',
                         help='Ignore the version file and pull the version directly from Bazaar')
     parser.add_argument('-s', '--style', dest='style', help='Set the Qt5 style (passed directly to Qt5).')
+    parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_false',
+                        help='Turn off the Web and Socket Server ')
     parser.add_argument('rargs', nargs='?', default=[])
     # Parse command line options and deal with them. Use args supplied pragmatically if possible.
     return parser.parse_args(args) if args else parser.parse_args()
@@ -410,6 +410,7 @@ def main(args=None):
         set_up_logging(str(AppLocation.get_directory(AppLocation.CacheDir)))
     Registry.create()
     Registry().register('application', application)
+    Registry().set_flag('no_web_server', args.no_web_server)
     application.setApplicationVersion(get_application_version()['version'])
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     if application.is_already_running():

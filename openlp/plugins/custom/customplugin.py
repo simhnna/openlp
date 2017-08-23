@@ -26,8 +26,10 @@ for the Custom Slides plugin.
 
 import logging
 
+from openlp.core.api.http import register_endpoint
 from openlp.core.lib import Plugin, StringContent, build_icon, translate
 from openlp.core.lib.db import Manager
+from openlp.plugins.custom.endpoint import api_custom_endpoint, custom_endpoint
 from openlp.plugins.custom.lib import CustomMediaItem, CustomTab
 from openlp.plugins.custom.lib.db import CustomSlide, init_schema
 from openlp.plugins.custom.lib.mediaitem import CustomSearch
@@ -61,6 +63,8 @@ class CustomPlugin(Plugin):
         self.db_manager = Manager('custom', init_schema)
         self.icon_path = ':/plugins/plugin_custom.png'
         self.icon = build_icon(self.icon_path)
+        register_endpoint(custom_endpoint)
+        register_endpoint(api_custom_endpoint)
 
     @staticmethod
     def about():
