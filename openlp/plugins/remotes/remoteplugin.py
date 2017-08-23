@@ -21,82 +21,59 @@
 ###############################################################################
 
 import logging
+import os
+import time
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
+from openlp.core.api.http import register_endpoint
+from openlp.core.common import AppLocation, Registry, Settings, OpenLPMixin, UiStrings, check_directory_exists
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
-from openlp.plugins.remotes.lib import RemoteTab, OpenLPServer
+from openlp.plugins.remotes.endpoint import remote_endpoint
+from openlp.plugins.remotes.deploy import download_and_check, download_sha256
 
 log = logging.getLogger(__name__)
-
 __default_settings__ = {
-    'remotes/twelve hour': True,
-    'remotes/port': 4316,
-    'remotes/https port': 4317,
-    'remotes/https enabled': False,
-    'remotes/user id': 'openlp',
-    'remotes/password': 'password',
-    'remotes/authentication enabled': False,
-    'remotes/ip address': '0.0.0.0',
-    'remotes/thumbnails': True
+    'remotes/download version': '0000_00_00'
 }
 
 
-class RemotesPlugin(Plugin):
-    log.info('Remote Plugin loaded')
+class RemotesPlugin(Plugin, OpenLPMixin):
+    log.info('Remotes Plugin loaded')
 
     def __init__(self):
         """
         remotes constructor
         """
-        super(RemotesPlugin, self).__init__('remotes', __default_settings__, settings_tab_class=RemoteTab)
+        super(RemotesPlugin, self).__init__('remotes', __default_settings__, {})
         self.icon_path = ':/plugins/plugin_remote.png'
         self.icon = build_icon(self.icon_path)
         self.weight = -1
-        self.server = None
+        register_endpoint(remote_endpoint)
+        Registry().register_function('download_website', self.first_time)
+        Registry().register_function('get_website_version', self.website_version)
+        Registry().set_flag('website_version', '0001_01_01')
 
     def initialise(self):
         """
-        Initialise the remotes plugin, and start the http server
+        Create the internal file structure if it does not exist
+        :return:
         """
-        log.debug('initialise')
-        super(RemotesPlugin, self).initialise()
-        self.server = OpenLPServer()
-        if not hasattr(self, 'remote_server_icon'):
-            self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
-            size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-            size_policy.setHorizontalStretch(0)
-            size_policy.setVerticalStretch(0)
-            size_policy.setHeightForWidth(self.remote_server_icon.sizePolicy().hasHeightForWidth())
-            self.remote_server_icon.setSizePolicy(size_policy)
-            self.remote_server_icon.setFrameShadow(QtWidgets.QFrame.Plain)
-            self.remote_server_icon.setLineWidth(1)
-            self.remote_server_icon.setScaledContents(True)
-            self.remote_server_icon.setFixedSize(20, 20)
-            self.remote_server_icon.setObjectName('remote_server_icon')
-            self.main_window.status_bar.insertPermanentWidget(2, self.remote_server_icon)
-            self.settings_tab.remote_server_icon = self.remote_server_icon
-        self.settings_tab.generate_icon()
-
-    def finalise(self):
-        """
-        Tidy up and close down the http server
-        """
-        log.debug('finalise')
-        super(RemotesPlugin, self).finalise()
-        if self.server:
-            self.server.stop_server()
-            self.server = None
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'assets'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'images'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static', 'index'))
+        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'templates'))
 
     @staticmethod
     def about():
         """
         Information about this plugin
         """
-        about_text = translate('RemotePlugin', '<strong>Remote Plugin</strong>'
-                               '<br />The remote plugin provides the ability to send messages to '
-                               'a running version of OpenLP on a different computer via a web '
-                               'browser or through the remote API.')
+        about_text = translate('RemotePlugin', '<strong>Web Interface</strong>'
+                                               '<br />The web interface plugin provides the ability develop web based '
+                                               'interfaces using openlp web services. \nPredefined interfaces can be '
+                                               'download as well as custom developed interfaces')
         return about_text
 
     def set_plugin_text_strings(self):
@@ -105,21 +82,73 @@ class RemotesPlugin(Plugin):
         """
         # Name PluginList
         self.text_strings[StringContent.Name] = {
-            'singular': translate('RemotePlugin', 'Remote', 'name singular'),
-            'plural': translate('RemotePlugin', 'Remotes', 'name plural')
+            'singular': translate('RemotePlugin', 'Web Interface', 'name singular'),
+            'plural': translate('RemotePlugin', 'Web Interface', 'name plural')
         }
         # Name for MediaDockManager, SettingsManager
         self.text_strings[StringContent.VisibleName] = {
-            'title': translate('RemotePlugin', 'Remote', 'container title')
+            'title': translate('RemotePlugin', 'Web Remote', 'container title')
         }
 
-    def config_update(self):
+    def first_time(self):
         """
-        Called when Config is changed to requests a restart with the server on new address or port
+        Import web site code if active
         """
-        log.debug('remote config changed')
-        QtWidgets.QMessageBox.information(self.main_window,
-                                          translate('RemotePlugin', 'Server Config Change'),
-                                          translate('RemotePlugin',
-                                                    'Server configuration changes will require a restart '
-                                                    'to take effect.'))
+        self.application.process_events()
+        progress = Progress(self)
+        progress.forceShow()
+        self.application.process_events()
+        time.sleep(1)
+        download_and_check(progress)
+        self.application.process_events()
+        time.sleep(1)
+        progress.close()
+        self.application.process_events()
+        Settings().setValue('remotes/download version', self.version)
+
+    def website_version(self):
+        """
+        Download and save the website version and sha256
+        :return: None
+        """
+        sha256, self.version = download_sha256()
+        Registry().set_flag('website_sha256', sha256)
+        Registry().set_flag('website_version', self.version)
+
+
+class Progress(QtWidgets.QProgressDialog):
+    """
+    Local class to handle download display based and supporting httputils:get_web_page
+    """
+    def __init__(self, parent):
+        super(Progress, self).__init__(parent.main_window)
+        self.parent = parent
+        self.setWindowModality(QtCore.Qt.WindowModal)
+        self.setWindowTitle(translate('RemotePlugin', 'Importing Website'))
+        self.setLabelText(UiStrings().StartingImport)
+        self.setCancelButton(None)
+        self.setRange(0, 1)
+        self.setMinimumDuration(0)
+        self.was_cancelled = False
+        self.previous_size = 0
+
+    def _download_progress(self, count, block_size):
+        """
+        Calculate and display the download progress.
+        """
+        increment = (count * block_size) - self.previous_size
+        self._increment_progress_bar(None, increment)
+        self.previous_size = count * block_size
+
+    def _increment_progress_bar(self, status_text, increment=1):
+        """
+        Update the wizard progress page.
+
+        :param status_text: Current status information to display.
+        :param increment: The value to increment the progress bar by.
+        """
+        if status_text:
+            self.setText(status_text)
+        if increment > 0:
+            self.setValue(self.value() + increment)
+        self.parent.application.process_events()

@@ -35,6 +35,8 @@ from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from openlp.core.api import websockets
+from openlp.core.api.http import server
 from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, translate, is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
@@ -49,6 +51,7 @@ from openlp.core.ui.printserviceform import PrintServiceForm
 from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+
 
 log = logging.getLogger(__name__)
 
@@ -514,6 +517,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Settings().set_up_default_values()
         self.about_form = AboutForm(self)
         MediaController()
+        if Registry().get_flag('no_web_server'):
+            websockets.WebSocketServer()
+            server.HttpServer()
         SettingsForm(self)
         self.formatting_tag_form = FormattingTagForm(self)
         self.shortcut_form = ShortcutListForm(self)
@@ -541,7 +547,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         self.tools_first_time_wizard.triggered.connect(self.on_first_time_wizard_clicked)
         self.update_theme_images.triggered.connect(self.on_update_theme_images)
         self.formatting_tag_item.triggered.connect(self.on_formatting_tag_item_clicked)
-        self.settings_configure_item.triggered.connect(self.on_settings_configure_iem_clicked)
+        self.settings_configure_item.triggered.connect(self.on_settings_configure_item_clicked)
         self.settings_shortcuts_item.triggered.connect(self.on_settings_shortcuts_item_clicked)
         self.settings_import_item.triggered.connect(self.on_settings_import_item_clicked)
         self.settings_export_item.triggered.connect(self.on_settings_export_item_clicked)
@@ -804,7 +810,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         """
         self.formatting_tag_form.exec()
 
-    def on_settings_configure_iem_clicked(self):
+    def on_settings_configure_item_clicked(self):
         """
         Show the Settings dialog
         """

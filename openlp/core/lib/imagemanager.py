@@ -56,7 +56,7 @@ class ImageThread(QtCore.QThread):
         """
         Run the thread.
         """
-        self.image_manager._process()
+        self.image_manager.process()
 
 
 class Priority(object):
@@ -235,8 +235,15 @@ class ImageManager(QtCore.QObject):
     def get_image(self, path, source, width=-1, height=-1):
         """
         Return the ``QImage`` from the cache. If not present wait for the background thread to process it.
+
+        :param: path: The image path
+        :param: source: The source of the image
+        :param: background: The image background colour
+        :param: width: The processed image width
+        :param: height: The processed image height
         """
-        log.debug('getImage {path}'.format(path=path))
+        log.debug('get_image {path} {source} {width} {height}'.format(path=path, source=source,
+                                                                      width=width, height=height))
         image = self._cache[(path, source, width, height)]
         if image.image is None:
             self._conversion_queue.modify_priority(image, Priority.High)
@@ -255,8 +262,15 @@ class ImageManager(QtCore.QObject):
     def get_image_bytes(self, path, source, width=-1, height=-1):
         """
         Returns the byte string for an image. If not present wait for the background thread to process it.
+
+        :param: path: The image path
+        :param: source: The source of the image
+        :param: background: The image background colour
+        :param: width: The processed image width
+        :param: height: The processed image height
         """
-        log.debug('get_image_bytes {path}'.format(path=path))
+        log.debug('get_image_bytes {path} {source} {width} {height}'.format(path=path, source=source,
+                                                                            width=width, height=height))
         image = self._cache[(path, source, width, height)]
         if image.image_bytes is None:
             self._conversion_queue.modify_priority(image, Priority.Urgent)
@@ -270,9 +284,16 @@ class ImageManager(QtCore.QObject):
     def add_image(self, path, source, background, width=-1, height=-1):
         """
         Add image to cache if it is not already there.
+
+        :param: path: The image path
+        :param: source: The source of the image
+        :param: background: The image background colour
+        :param: width: The processed image width
+        :param: height: The processed image height
         """
-        log.debug('add_image {path}'.format(path=path))
-        if (path, source, width, height) not in self._cache:
+        log.debug('add_image {path} {source} {width} {height}'.format(path=path, source=source,
+                                                                      width=width, height=height))
+        if not (path, source, width, height) in self._cache:
             image = Image(path, source, background, width, height)
             self._cache[(path, source, width, height)] = image
             self._conversion_queue.put((image.priority, image.secondary_priority, image))
@@ -286,11 +307,11 @@ class ImageManager(QtCore.QObject):
         if not self.image_thread.isRunning():
             self.image_thread.start()
 
-    def _process(self):
+    def process(self):
         """
         Controls the processing called from a ``QtCore.QThread``.
         """
-        log.debug('_process - started')
+        log.debug('process - started')
         while not self._conversion_queue.empty() and not self.stop_manager:
             self._process_cache()
         log.debug('_process - ended')

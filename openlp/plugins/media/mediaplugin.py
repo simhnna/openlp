@@ -30,8 +30,10 @@ from pathlib import Path
 
 from PyQt5 import QtCore
 
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, translate, check_binary_exists
 from openlp.core.lib import Plugin, StringContent, build_icon
+from openlp.plugins.media.endpoint import api_media_endpoint, media_endpoint
 from openlp.plugins.media.lib import MediaMediaItem, MediaTab
 
 
@@ -58,6 +60,8 @@ class MediaPlugin(Plugin):
         self.icon = build_icon(self.icon_path)
         # passed with drag and drop messages
         self.dnd_id = 'Media'
+        register_endpoint(media_endpoint)
+        register_endpoint(api_media_endpoint)
 
     def initialise(self):
         """

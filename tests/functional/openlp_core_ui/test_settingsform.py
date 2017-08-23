@@ -89,6 +89,8 @@ class TestSettingsForm(TestCase):
         general_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_general_save = MagicMock()
         general_tab.save = mocked_general_save
+        mocked_general_load = MagicMock()
+        general_tab.load = mocked_general_load
         settings_form.insert_tab(general_tab, is_visible=True)
         themes_tab = QtWidgets.QWidget(None)
         themes_tab.tab_title = 'mock-themes'
@@ -96,6 +98,8 @@ class TestSettingsForm(TestCase):
         themes_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_theme_save = MagicMock()
         themes_tab.save = mocked_theme_save
+        mocked_theme_load = MagicMock()
+        themes_tab.load = mocked_theme_load
         settings_form.insert_tab(themes_tab, is_visible=False)
 
         # WHEN: The accept() method is called
@@ -115,6 +119,8 @@ class TestSettingsForm(TestCase):
         general_tab.tab_title = 'mock'
         general_tab.tab_title_visible = 'Mock'
         general_tab.icon_path = ':/icon/openlp-logo.svg'
+        mocked_general_load = MagicMock()
+        general_tab.load = mocked_general_load
         settings_form.insert_tab(general_tab, is_visible=True)
 
         with patch.object(settings_form.stacked_layout, 'count') as mocked_count:
@@ -136,6 +142,8 @@ class TestSettingsForm(TestCase):
         general_tab.icon_path = ':/icon/openlp-logo.svg'
         mocked_general_cancel = MagicMock()
         general_tab.cancel = mocked_general_cancel
+        mocked_general_load = MagicMock()
+        general_tab.load = mocked_general_load
         settings_form.insert_tab(general_tab, is_visible=True)
         themes_tab = QtWidgets.QWidget(None)
         themes_tab.tab_title = 'mock-themes'
