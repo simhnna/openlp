@@ -230,7 +230,7 @@ def validate_thumb(file_path, thumb_path):
     return image_date <= thumb_date
 
 
-def resize_image(image_path, width, height, background='#000000'):
+def resize_image(image_path, width, height, background='#000000', ignore_aspect_ratio=False):
     """
     Resize an image to fit on the current screen.
 
@@ -247,7 +247,7 @@ def resize_image(image_path, width, height, background='#000000'):
     image_ratio = reader.size().width() / reader.size().height()
     resize_ratio = width / height
     # Figure out the size we want to resize the image to (keep aspect ratio).
-    if image_ratio == resize_ratio:
+    if image_ratio == resize_ratio or ignore_aspect_ratio:
         size = QtCore.QSize(width, height)
     elif image_ratio < resize_ratio:
         # Use the image's height as reference for the new size.

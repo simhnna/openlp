@@ -704,6 +704,27 @@ class TestLib(TestCase):
         self.assertEqual(wanted_width, result_size.width(), 'The image should have the requested width.')
         self.assertEqual(image.pixel(0, 0), wanted_background_rgb, 'The background should be white.')
 
+    def test_resize_thumb_ignoring_aspect_ratio(self):
+        """
+        Test the resize_thumb() function ignoring aspect ratio
+        """
+        # GIVEN: A path to an image.
+        image_path = os.path.join(TEST_PATH, 'church.jpg')
+        wanted_width = 1000
+        wanted_height = 1000
+        # We want the background to be white.
+        wanted_background_hex = '#FFFFFF'
+        wanted_background_rgb = QtGui.QColor(wanted_background_hex).rgb()
+
+        # WHEN: Resize the image and add a background.
+        image = resize_image(image_path, wanted_width, wanted_height, wanted_background_hex, True)
+
+        # THEN: Check if the size is correct and the background was set.
+        result_size = image.size()
+        self.assertEqual(wanted_height, result_size.height(), 'The image should have the requested height.')
+        self.assertEqual(wanted_width, result_size.width(), 'The image should have the requested width.')
+        self.assertEqual(image.pixel(0, 0), wanted_background_rgb, 'The background should be white.')
+
     def test_create_separated_list_qlocate(self):
         """
         Test the create_separated_list function using the Qt provided method
