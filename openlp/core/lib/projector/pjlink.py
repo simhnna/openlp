@@ -57,7 +57,7 @@ from openlp.core.lib.projector.constants import CONNECTION_ERRORS, CR, ERROR_MSG
     E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_INVALID_DATA, E_NETWORK, E_NOT_CONNECTED, E_OK, \
     E_PARAMETER, E_PROJECTOR, E_SOCKET_TIMEOUT, E_UNAVAILABLE, E_UNDEFINED, PJLINK_ERRORS, PJLINK_ERST_DATA, \
     PJLINK_ERST_STATUS, PJLINK_MAX_PACKET, PJLINK_PORT, PJLINK_POWR_STATUS, PJLINK_VALID_CMD, \
-    STATUS_STRING, S_CONNECTED, S_CONNECTING, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
+    STATUS_STRING, S_CONNECTED, S_CONNECTING, S_INFO, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
     S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STATUS
 
 # Shortcuts
@@ -159,7 +159,7 @@ class PJLinkCommands(object):
             # A command returned successfully, no further processing needed
             return
         elif _cmd not in self.pjlink_functions:
-            log.warn("({ip}) Unable to process command='{cmd}' (Future option)".format(ip=self.ip, cmd=cmd))
+            log.warning("({ip}) Unable to process command='{cmd}' (Future option)".format(ip=self.ip, cmd=cmd))
             return
         elif _data in PJLINK_ERRORS:
             # Oops - projector error
@@ -231,7 +231,7 @@ class PJLinkCommands(object):
         #            : Received: '%1CLSS=Class 1'  (Optoma)
         #            : Received: '%1CLSS=Version1'  (BenQ)
         if len(data) > 1:
-            log.warn("({ip}) Non-standard CLSS reply: '{data}'".format(ip=self.ip, data=data))
+            log.warning("({ip}) Non-standard CLSS reply: '{data}'".format(ip=self.ip, data=data))
             # Due to stupid projectors not following standards (Optoma, BenQ comes to mind),
             # AND the different responses that can be received, the semi-permanent way to
             # fix the class reply is to just remove all non-digit characters.
@@ -261,15 +261,15 @@ class PJLinkCommands(object):
         """
         if len(data) != PJLINK_ERST_DATA['DATA_LENGTH']:
             count = PJLINK_ERST_DATA['DATA_LENGTH']
-            log.warn("{ip}) Invalid error status response '{data}': length != {count}".format(ip=self.ip,
-                                                                                              data=data,
-                                                                                              count=count))
+            log.warning("{ip}) Invalid error status response '{data}': length != {count}".format(ip=self.ip,
+                                                                                                 data=data,
+                                                                                                 count=count))
             return
         try:
             datacheck = int(data)
         except ValueError:
             # Bad data - ignore
-            log.warn("({ip}) Invalid error status response '{data}'".format(ip=self.ip, data=data))
+            log.warning("({ip}) Invalid error status response '{data}'".format(ip=self.ip, data=data))
             return
         if datacheck == 0:
             self.projector_errors = None
@@ -429,9 +429,9 @@ class PJLinkCommands(object):
         if self.model_filter is None:
             self.model_filter = data
         else:
-            log.warn("({ip}) Filter model already set".format(ip=self.ip))
-            log.warn("({ip}) Saved model: '{old}'".format(ip=self.ip, old=self.model_filter))
-            log.warn("({ip}) New model: '{new}'".format(ip=self.ip, new=data))
+            log.warning("({ip}) Filter model already set".format(ip=self.ip))
+            log.warning("({ip}) Saved model: '{old}'".format(ip=self.ip, old=self.model_filter))
+            log.warning("({ip}) New model: '{new}'".format(ip=self.ip, new=data))
 
     def process_rlmp(self, data):
         """
@@ -440,9 +440,9 @@ class PJLinkCommands(object):
         if self.model_lamp is None:
             self.model_lamp = data
         else:
-            log.warn("({ip}) Lamp model already set".format(ip=self.ip))
-            log.warn("({ip}) Saved lamp: '{old}'".format(ip=self.ip, old=self.model_lamp))
-            log.warn("({ip}) New lamp: '{new}'".format(ip=self.ip, new=data))
+            log.warning("({ip}) Lamp model already set".format(ip=self.ip))
+            log.warning("({ip}) Saved lamp: '{old}'".format(ip=self.ip, old=self.model_lamp))
+            log.warning("({ip}) New lamp: '{new}'".format(ip=self.ip, new=data))
 
     def process_snum(self, data):
         """
@@ -457,27 +457,32 @@ class PJLinkCommands(object):
         else:
             # Compare serial numbers and see if we got the same projector
             if self.serial_no != data:
-                log.warn("({ip}) Projector serial number does not match saved serial number".format(ip=self.ip))
-                log.warn("({ip}) Saved:    '{old}'".format(ip=self.ip, old=self.serial_no))
-                log.warn("({ip}) Received: '{new}'".format(ip=self.ip, new=data))
-                log.warn("({ip}) NOT saving serial number".format(ip=self.ip))
+                log.warning("({ip}) Projector serial number does not match saved serial number".format(ip=self.ip))
+                log.warning("({ip}) Saved:    '{old}'".format(ip=self.ip, old=self.serial_no))
+                log.warning("({ip}) Received: '{new}'".format(ip=self.ip, new=data))
+                log.warning("({ip}) NOT saving serial number".format(ip=self.ip))
                 self.serial_no_received = data
 
     def process_sver(self, data):
         """
         Software version of projector
         """
-        if self.sw_version is None:
+        if len(data) > 32:
+            # Defined in specs max version is 32 characters
+            log.warning("Invalid software version - too long")
+            return
+        elif self.sw_version is None:
             log.debug("({ip}) Setting projector software version to '{data}'".format(ip=self.ip, data=data))
             self.sw_version = data
             self.db_update = True
         else:
             # Compare software version and see if we got the same projector
             if self.serial_no != data:
-                log.warn("({ip}) Projector software version does not match saved software version".format(ip=self.ip))
-                log.warn("({ip}) Saved:    '{old}'".format(ip=self.ip, old=self.sw_version))
-                log.warn("({ip}) Received: '{new}'".format(ip=self.ip, new=data))
-                log.warn("({ip}) NOT saving serial number".format(ip=self.ip))
+                log.warning("({ip}) Projector software version does not match saved "
+                            "software version".format(ip=self.ip))
+                log.warning("({ip}) Saved:    '{old}'".format(ip=self.ip, old=self.sw_version))
+                log.warning("({ip}) Received: '{new}'".format(ip=self.ip, new=data))
+                log.warning("({ip}) Saving new serial number as sw_version_received".format(ip=self.ip))
                 self.sw_version_received = data
 
 
@@ -605,7 +610,7 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         Normally called by timer().
         """
         if self.state() != self.ConnectedState:
-            log.warn("({ip}) poll_loop(): Not connected - returning".format(ip=self.ip))
+            log.warning("({ip}) poll_loop(): Not connected - returning".format(ip=self.ip))
             return
         log.debug('({ip}) Updating projector status'.format(ip=self.ip))
         # Reset timer in case we were called from a set command
@@ -649,7 +654,9 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         :param status: Status/Error code
         :returns: (Status/Error code, String)
         """
-        if status in ERROR_STRING:
+        if not isinstance(status, int):
+            return -1, 'Invalid status code'
+        elif status in ERROR_STRING:
             return ERROR_STRING[status], ERROR_MSG[status]
         elif status in STATUS_STRING:
             return STATUS_STRING[status], ERROR_MSG[status]
@@ -674,7 +681,7 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         elif status >= S_NOT_CONNECTED and status < S_STATUS:
             self.status_connect = status
             self.projector_status = S_NOT_CONNECTED
-        elif status < S_NETWORK_SENDING:
+        elif status <= S_INFO:
             self.status_connect = S_CONNECTED
             self.projector_status = status
         (status_code, status_message) = self._get_status(self.status_connect)
@@ -803,7 +810,8 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
             log.debug('({ip}) get_data(): Not connected - returning'.format(ip=self.ip))
             self.send_busy = False
             return
-        read = self.readLine(self.max_size)
+        # Although we have a packet length limit, go ahead and use a larger buffer
+        read = self.readLine(1024)
         log.debug("({ip}) get_data(): '{buff}'".format(ip=self.ip, buff=read))
         if read == -1:
             # No data available
@@ -816,6 +824,8 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         data = data_in.strip()
         if (len(data) < 7) or (not data.startswith(PJLINK_PREFIX)):
             return self._trash_buffer(msg='get_data(): Invalid packet - length or prefix')
+        elif len(data) > self.max_size:
+            return self._trash_buffer(msg='get_data(): Invalid packet - too long')
         elif '=' not in data:
             return self._trash_buffer(msg='get_data(): Invalid packet does not have equal')
         log.debug('({ip}) get_data(): Checking new data "{data}"'.format(ip=self.ip, data=data))
@@ -830,8 +840,8 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
             log.warning('({ip}) get_data(): Invalid packet - unknown command "{data}"'.format(ip=self.ip, data=cmd))
             return self._trash_buffer(msg='get_data(): Unknown command "{data}"'.format(data=cmd))
         if int(self.pjlink_class) < int(version):
-            log.warn('({ip}) get_data(): Projector returned class reply higher '
-                     'than projector stated class'.format(ip=self.ip))
+            log.warning('({ip}) get_data(): Projector returned class reply higher '
+                        'than projector stated class'.format(ip=self.ip))
         return self.process_command(cmd, data)
 
     @QtCore.pyqtSlot(QtNetwork.QAbstractSocket.SocketError)
@@ -993,6 +1003,13 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         self.reset_information()
         self.projectorUpdateIcons.emit()
 
+    def get_av_mute_status(self):
+        """
+        Send command to retrieve shutter status.
+        """
+        log.debug('({ip}) Sending AVMT command'.format(ip=self.ip))
+        return self.send_command(cmd='AVMT')
+
     def get_available_inputs(self):
         """
         Send command to retrieve available source inputs.
@@ -1055,13 +1072,6 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         """
         log.debug('({ip}) Sending POWR command'.format(ip=self.ip))
         return self.send_command(cmd='POWR')
-
-    def get_shutter_status(self):
-        """
-        Send command to retrieve shutter status.
-        """
-        log.debug('({ip}) Sending AVMT command'.format(ip=self.ip))
-        return self.send_command(cmd='AVMT')
 
     def set_input_source(self, src=None):
         """
