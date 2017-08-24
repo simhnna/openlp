@@ -125,12 +125,9 @@ def display_thumbnails(request, controller_name, log, dimensions, file_name, sli
         file_name = urllib.parse.unquote(file_name)
         if '..' not in file_name:  # no hacking please
             if slide:
-                full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
-                                                          'thumbnails', file_name, slide))
+                full_path = str(AppLocation.get_section_data_path(controller_name) / 'thumbnails' / file_name / slide)
             else:
-                full_path = os.path.normpath(os.path.join(AppLocation.get_section_data_path(controller_name),
-
-                                                          'thumbnails', file_name))
+                full_path = str(AppLocation.get_section_data_path(controller_name) / 'thumbnails' / file_name)
             if os.path.exists(full_path):
                 path, just_file_name = os.path.split(full_path)
                 Registry().get('image_manager').add_image(full_path, just_file_name, None, width, height)

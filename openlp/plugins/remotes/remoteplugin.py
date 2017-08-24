@@ -59,21 +59,22 @@ class RemotesPlugin(Plugin, OpenLPMixin):
         Create the internal file structure if it does not exist
         :return:
         """
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'assets'))
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'images'))
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static'))
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'static', 'index'))
-        check_directory_exists(os.path.join(AppLocation.get_section_data_path('remotes'), 'templates'))
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'assets')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'images')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'static')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'static', 'index')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'templates')
 
     @staticmethod
     def about():
         """
         Information about this plugin
         """
-        about_text = translate('RemotePlugin', '<strong>Web Interface</strong>'
-                                               '<br />The web interface plugin provides the ability develop web based '
-                                               'interfaces using openlp web services. \nPredefined interfaces can be '
-                                               'download as well as custom developed interfaces')
+        about_text = translate(
+            'RemotePlugin',
+            '<strong>Web Interface</strong>'
+            '<br />The web interface plugin provides the ability to develop web based interfaces using OpenLP web '
+            'services.\nPredefined interfaces can be download as well as custom developed interfaces.')
         return about_text
 
     def set_plugin_text_strings(self):

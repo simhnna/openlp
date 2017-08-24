@@ -64,7 +64,7 @@ def controller_text(request):
             elif current_item.is_image() and not frame.get('image', '') and Settings().value('api/thumbnails'):
                 item['tag'] = str(index + 1)
                 thumbnail_path = os.path.join('images', 'thumbnails', frame['title'])
-                full_thumbnail_path = os.path.join(AppLocation.get_data_path(), thumbnail_path)
+                full_thumbnail_path = str(AppLocation.get_data_path() / thumbnail_path)
                 # Create thumbnail if it doesn't exists
                 if not os.path.exists(full_thumbnail_path):
                     create_thumb(current_item.get_frame_path(index), full_thumbnail_path, False)
@@ -82,7 +82,7 @@ def controller_text(request):
                 if current_item.is_capable(ItemCapabilities.HasThumbnails) and \
                         Settings().value('api/thumbnails'):
                     # If the file is under our app directory tree send the portion after the match
-                    data_path = AppLocation.get_data_path()
+                    data_path = str(AppLocation.get_data_path())
                     if frame['image'][0:len(data_path)] == data_path:
                         item['img'] = urllib.request.pathname2url(frame['image'][len(data_path):])
                     Registry().get('image_manager').add_image(frame['image'], frame['title'], None, 88, 88)
