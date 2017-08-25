@@ -22,10 +22,10 @@
 """
 Package to test the openlp.core.ui.themeform package.
 """
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from openlp.core.common.path import Path
 from openlp.core.ui import ThemeForm
 
 

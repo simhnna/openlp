@@ -22,13 +22,12 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
-import copy
 import os
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common import AppLocation, get_frozen_path
+from openlp.core.common.path import Path
 
 FILE_LIST = ['file1', 'file2', 'file3.txt', 'file4.txt', 'file5.mp3', 'file6.mp3']
 

@@ -22,12 +22,12 @@
 
 import logging
 import os
-from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, AppLocation, Settings, UiStrings, check_directory_exists, translate, \
     delete_file, get_images_filter
+from openlp.core.common.path import Path
 from openlp.core.lib import ItemCapabilities, MediaManagerItem, ServiceItemContext, StringContent, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box

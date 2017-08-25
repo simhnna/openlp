@@ -20,12 +20,11 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 from enum import Enum
-from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import UiStrings, translate
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib import build_icon
 from openlp.core.ui.lib.filedialog import FileDialog
 
@@ -46,19 +45,10 @@ class PathEdit(QtWidgets.QWidget):
         """
         Initialise the PathEdit widget
 
-        :param parent: The parent of the widget. This is just passed to the super method.
-        :type parent: QWidget or None
-
-        :param dialog_caption: Used to customise the caption in the QFileDialog.
-        :type dialog_caption: str
-
-        :param default_path: The default path. This is set as the path when the revert button is clicked
-        :type default_path: pathlib.Path
-
-        :param show_revert: Used to determine if the 'revert button' should be visible.
-        :type show_revert: bool
-
-        :return: None
+        :param QtWidget.QWidget | None: The parent of the widget. This is just passed to the super method.
+        :param str dialog_caption: Used to customise the caption in the QFileDialog.
+        :param openlp.core.common.path.Path default_path: The default path. This is set as the path when the revert button is clicked
+        :param bool show_revert: Used to determine if the 'revert button' should be visible.
         :rtype: None
         """
         super().__init__(parent)
@@ -72,10 +62,7 @@ class PathEdit(QtWidgets.QWidget):
     def _setup(self, show_revert):
         """
         Set up the widget
-        :param show_revert: Show or hide the revert button
-        :type show_revert: bool
-
-        :return: None
+        :param bool show_revert: Show or hide the revert button
         :rtype: None
         """
         widget_layout = QtWidgets.QHBoxLayout()
@@ -102,7 +89,7 @@ class PathEdit(QtWidgets.QWidget):
         A property getter method to return the selected path.
 
         :return: The selected path
-        :rtype: pathlib.Path
+        :rtype: openlp.core.common.path.Path
         """
         return self._path
 
@@ -111,10 +98,7 @@ class PathEdit(QtWidgets.QWidget):
         """
         A Property setter method to set the selected path
 
-        :param path: The path to set the widget to
-        :type path: pathlib.Path
-
-        :return: None
+        :param openlp.core.common.path.Path path: The path to set the widget to
         :rtype: None
         """
         self._path = path
@@ -138,10 +122,7 @@ class PathEdit(QtWidgets.QWidget):
         """
         A Property setter method to set the path type
 
-        :param path_type: The type of path to select
-        :type path_type: PathType
-
-        :return: None
+        :param PathType path_type: The type of path to select
         :rtype: None
         """
         self._path_type = path_type
@@ -151,7 +132,6 @@ class PathEdit(QtWidgets.QWidget):
         """
         Called to update the tooltips on the buttons. This is changing path types, and when the widget is initalised
 
-        :return: None
         :rtype: None
         """
         if self._path_type == PathType.Directories:
@@ -167,7 +147,6 @@ class PathEdit(QtWidgets.QWidget):
 
         Show the QFileDialog and process the input from the user
 
-        :return: None
         :rtype: None
         """
         caption = self.dialog_caption
@@ -189,7 +168,6 @@ class PathEdit(QtWidgets.QWidget):
 
         Set the new path to the value of the default_path instance variable.
 
-        :return: None
         :rtype: None
         """
         self.on_new_path(self.default_path)
@@ -198,7 +176,6 @@ class PathEdit(QtWidgets.QWidget):
         """
         A handler to handle when the line edit has finished being edited.
 
-        :return: None
         :rtype: None
         """
         path = str_to_path(self.line_edit.text())
@@ -210,10 +187,7 @@ class PathEdit(QtWidgets.QWidget):
 
         Emits the pathChanged Signal
 
-        :param path: The new path
-        :type path: pathlib.Path
-
-        :return: None
+        :param openlp.core.common.path.Path path: The new path
         :rtype: None
         """
         if self._path != path:

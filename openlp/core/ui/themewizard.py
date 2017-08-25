@@ -22,11 +22,10 @@
 """
 The Create/Edit theme wizard
 """
-from pathlib import Path
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import UiStrings, translate, is_macosx
+from openlp.core.common.path import Path
 from openlp.core.lib import build_icon
 from openlp.core.lib.theme import HorizontalType, BackgroundType, BackgroundGradientType
 from openlp.core.lib.ui import add_welcome_page, create_valign_selection_widgets

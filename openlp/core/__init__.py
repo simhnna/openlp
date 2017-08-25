@@ -33,13 +33,13 @@ import os
 import shutil
 import sys
 import time
-from pathlib import Path
 from traceback import format_exception
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
+from openlp.core.common.path import Path
 from openlp.core.common.versionchecker import VersionThread, get_application_version
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
@@ -347,8 +347,7 @@ def set_up_logging(log_path):
     """
     Setup our logging using log_path
 
-    :param pathlib.Path log_path: The file to save the log to
-    :return: None
+    :param openlp.core.common.path.Path log_path: The file to save the log to.
     :rtype: None
     """
     check_directory_exists(log_path, True)

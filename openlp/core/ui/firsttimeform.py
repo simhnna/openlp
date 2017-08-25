@@ -30,13 +30,13 @@ import urllib.request
 import urllib.parse
 import urllib.error
 from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
-from pathlib import Path
 from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, \
     translate, clean_button_text, trace_error_handler
+from openlp.core.common.path import Path
 from openlp.core.lib import PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.common.httputils import get_web_page, get_url_file_size, url_get_file, CONNECTION_TIMEOUT

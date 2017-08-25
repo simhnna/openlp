@@ -22,13 +22,12 @@
 
 import logging
 import os
-from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_
 
 from openlp.core.common import RegistryProperties, Settings, check_directory_exists, translate
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songusage.lib.db import SongUsageItem
 from .songusagedetaildialog import Ui_SongUsageDetailDialog

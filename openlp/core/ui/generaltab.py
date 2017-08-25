@@ -23,12 +23,11 @@
 The general tab of the configuration dialog.
 """
 import logging
-from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, Settings, UiStrings, translate, get_images_filter
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib import SettingsTab, ScreenList
 from openlp.core.ui.lib import ColorButton, PathEdit
 

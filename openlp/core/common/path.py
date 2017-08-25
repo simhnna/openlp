@@ -19,17 +19,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import pathlib
+from contextlib import suppress
 
-from pathlib import Path
+from openlp.core.common import is_win
 
 
-def path_to_str(path):
+if is_win():
+    path_variant = pathlib.WindowsPath
+else:
+    path_variant = pathlib.PosixPath
+
+
+def path_to_str(path=None):
     """
     A utility function to convert a Path object or NoneType to a string equivalent.
 
-    :param path: The value to convert to a string
-    :type: pathlib.Path or None
-
+    :param openlp.core.common.path.Path | None path: The value to convert to a string
     :return: An empty string if :param:`path` is None, else a string representation of the :param:`path`
     :rtype: str
     """
@@ -48,14 +54,49 @@ def str_to_path(string):
     This function is of particular use because initating a Path object with an empty string causes the Path object to
     point to the current working directory.
 
-    :param string: The string to convert
-    :type string: str
-
+    :param str string: The string to convert
     :return: None if :param:`string` is empty, or a Path object representation of :param:`string`
-    :rtype: pathlib.Path or None
+    :rtype: openlp.core.common.path.Path | None
     """
     if not isinstance(string, str):
         raise TypeError('parameter \'string\' must be of type str')
     if string == '':
         return None
     return Path(string)
+
+
+class Path(path_variant):
+    """
+    Subclass pathlib.Path, so we can add json conversion methods
+    """
+    @staticmethod
+    def encode_json(obj, base_path=None, **kwargs):
+        """
+        Create a Path object from a dictionary representation. The dictionary has been constructed by JSON encoding of
+        a JSON reprensation of a Path object.
+
+        :param dict[str] obj: The dictionary representation
+        :param openlp.core.common.path.Path base_path: If specified, an absolute path to base the relative path off of.
+        :param kwargs: Contains any extra parameters. Not used!
+        :return: The reconstructed Path object
+        :rtype: openlp.core.common.path.Path
+        """
+        path = Path(*obj['__Path__'])
+        if base_path and not path.is_absolute():
+            return base_path / path
+        return path
+
+    def json_object(self, base_path=None, **kwargs):
+        """
+        Create a dictionary that can be JSON decoded.
+
+        :param openlp.core.common.path.Path base_path: If specified, an absolute path to make a relative path from.
+        :param kwargs: Contains any extra parameters. Not used!
+        :return: The dictionary representation of this Path object.
+        :rtype: dict[tuple]
+        """
+        path = self
+        if base_path:
+            with suppress(ValueError):
+                path = path.relative_to(base_path)
+        return {'__Path__': path.parts}

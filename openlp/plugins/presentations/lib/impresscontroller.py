@@ -34,9 +34,9 @@
 import logging
 import os
 import time
-from pathlib import Path
 
-from openlp.core.common import is_win, Registry, get_uno_command, get_uno_instance, delete_file
+from openlp.core.common import is_win, Registry, delete_file
+from openlp.core.common.path import Path
 
 if is_win():
     from win32com.client import Dispatch

@@ -23,12 +23,12 @@
 import os
 import logging
 import re
-from pathlib import Path
 from shutil import which
 from subprocess import check_output, CalledProcessError
 
 from openlp.core.common import AppLocation, check_binary_exists
 from openlp.core.common import Settings, is_win
+from openlp.core.common.path import Path
 from openlp.core.lib import ScreenList
 from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
