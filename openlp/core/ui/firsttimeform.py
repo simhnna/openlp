@@ -29,8 +29,9 @@ import time
 import urllib.request
 import urllib.parse
 import urllib.error
+from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
+from pathlib import Path
 from tempfile import gettempdir
-from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -282,7 +283,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self.no_internet_cancel_button.setVisible(False)
         # Check if this is a re-run of the wizard.
         self.has_run_wizard = Settings().value('core/has run wizard')
-        check_directory_exists(os.path.join(gettempdir(), 'openlp'))
+        check_directory_exists(Path(gettempdir(), 'openlp'))
 
     def update_screen_list_combo(self):
         """

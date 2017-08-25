@@ -22,6 +22,7 @@
 
 import logging
 import os
+from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_
@@ -78,7 +79,7 @@ class SongUsageDetailForm(QtWidgets.QDialog, Ui_SongUsageDetailDialog, RegistryP
                           ' song usage report. \nPlease select an existing path on your computer.')
             )
             return
-        check_directory_exists(path)
+        check_directory_exists(Path(path))
         file_name = translate('SongUsagePlugin.SongUsageDetailForm',
                               'usage_detail_{old}_{new}.txt'
                               ).format(old=self.from_date_calendar.selectedDate().toString('ddMMyyyy'),

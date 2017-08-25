@@ -26,6 +26,7 @@ The Media plugin
 import logging
 import os
 import re
+from pathlib import Path
 
 from PyQt5 import QtCore
 
@@ -165,8 +166,7 @@ def process_check_binary(program_path):
     :param program_path:The full path to the binary to check.
     :return: If exists or not
     """
-    program_type = None
-    runlog = check_binary_exists(program_path)
+    runlog = check_binary_exists(Path(program_path))
     # Analyse the output to see it the program is mediainfo
     for line in runlog.splitlines():
         decoded_line = line.decode()

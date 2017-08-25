@@ -24,6 +24,7 @@ The Theme wizard
 """
 import logging
 import os
+from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -188,7 +189,8 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
         """
         background_image = BackgroundType.to_string(BackgroundType.Image)
         if self.page(self.currentId()) == self.background_page and \
-                self.theme.background_type == background_image and is_not_image_file(self.theme.background_filename):
+                self.theme.background_type == background_image and \
+                is_not_image_file(Path(self.theme.background_filename)):
             QtWidgets.QMessageBox.critical(self, translate('OpenLP.ThemeWizard', 'Background Image Empty'),
                                            translate('OpenLP.ThemeWizard', 'You have not selected a '
                                                      'background image. Please select one before continuing.'))

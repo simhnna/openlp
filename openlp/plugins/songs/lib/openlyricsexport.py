@@ -25,6 +25,7 @@ format.
 """
 import logging
 import os
+from pathlib import Path
 
 from lxml import etree
 
@@ -47,7 +48,7 @@ class OpenLyricsExport(RegistryProperties):
         self.manager = parent.plugin.manager
         self.songs = songs
         self.save_path = save_path
-        check_directory_exists(self.save_path)
+        check_directory_exists(Path(self.save_path))
 
     def do_export(self):
         """

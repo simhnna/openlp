@@ -69,7 +69,7 @@ class PluginManager(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         Scan a directory for objects inheriting from the ``Plugin`` class.
         """
-        glob_pattern = os.path.join('openlp', 'plugins', '*', '*plugin.py')
+        glob_pattern = os.path.join('plugins', '*', '*plugin.py')
         extension_loader(glob_pattern)
         plugin_classes = Plugin.__subclasses__()
         plugin_objects = []

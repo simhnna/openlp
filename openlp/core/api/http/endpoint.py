@@ -68,11 +68,10 @@ class Endpoint(object):
         """
         Render a mako template
         """
-        root = os.path.join(str(AppLocation.get_section_data_path('remotes')))
+        root = str(AppLocation.get_section_data_path('remotes'))
         if not self.template_dir:
             raise Exception('No template directory specified')
         path = os.path.join(root, self.template_dir, filename)
-        # path = os.path.abspath(os.path.join(self.template_dir, filename))
         if self.static_dir:
             kwargs['static_url'] = '/{prefix}/static'.format(prefix=self.url_prefix)
             kwargs['static_url'] = kwargs['static_url'].replace('//', '/')

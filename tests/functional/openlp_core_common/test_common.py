@@ -35,44 +35,70 @@ class TestCommonFunctions(TestCase):
     """
     A test suite to test out various functions in the openlp.core.common module.
     """
-    def test_check_directory_exists(self):
+    def test_check_directory_exists_dir_exists(self):
         """
-        Test the check_directory_exists() function
+        Test the check_directory_exists() function when the path already exists
         """
-        with patch('openlp.core.lib.os.path.exists') as mocked_exists, \
-                patch('openlp.core.lib.os.makedirs') as mocked_makedirs:
-            # GIVEN: A directory to check and a mocked out os.makedirs and os.path.exists
-            directory_to_check = 'existing/directory'
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        with patch.object(Path, 'exists') as mocked_exists, \
+                patch.object(Path, 'mkdir') as mocked_mkdir, \
+                patch('openlp.core.common.log'):
 
-            # WHEN: os.path.exists returns True and we check to see if the directory exists
+            # WHEN: `check_directory_exists` is called and the path exists
             mocked_exists.return_value = True
-            check_directory_exists(directory_to_check)
+            check_directory_exists(Path('existing', 'directory'))
 
-            # THEN: Only os.path.exists should have been called
-            mocked_exists.assert_called_with(directory_to_check)
-            self.assertIsNot(mocked_makedirs.called, 'os.makedirs should not have been called')
+            # THEN: The function should not attempt to create the directory
+            mocked_exists.assert_called_with()
+            self.assertFalse(mocked_mkdir.called)
 
-            # WHEN: os.path.exists returns False and we check the directory exists
+    def test_check_directory_exists_dir_doesnt_exists(self):
+        """
+        Test the check_directory_exists() function when the path does not already exist
+        """
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        with patch.object(Path, 'exists') as mocked_exists, \
+                patch.object(Path, 'mkdir') as mocked_mkdir, \
+                patch('openlp.core.common.log'):
+
+            # WHEN: `check_directory_exists` is called and the path does not exist
             mocked_exists.return_value = False
-            check_directory_exists(directory_to_check)
+            check_directory_exists(Path('existing', 'directory'))
 
-            # THEN: Both the mocked functions should have been called
-            mocked_exists.assert_called_with(directory_to_check)
-            mocked_makedirs.assert_called_with(directory_to_check)
+            # THEN: The directory should have been created
+            mocked_exists.assert_called_with()
+            mocked_mkdir.assert_called_with(parents=True)
 
-            # WHEN: os.path.exists raises an IOError
+    def test_check_directory_exists_dir_io_error(self):
+        """
+        Test the check_directory_exists() when an IOError is raised
+        """
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        with patch.object(Path, 'exists') as mocked_exists, \
+                patch.object(Path, 'mkdir'), \
+                patch('openlp.core.common.log') as mocked_logger:
+
+            # WHEN: An IOError is raised when checking the if the path exists.
             mocked_exists.side_effect = IOError()
-            check_directory_exists(directory_to_check)
+            check_directory_exists(Path('existing', 'directory'))
 
-            # THEN: We shouldn't get an exception though the mocked exists has been called
-            mocked_exists.assert_called_with(directory_to_check)
+            # THEN: The Error should have been logged
+            mocked_logger.exception.assert_called_once_with('failed to check if directory exists or create directory')
+
+    def test_check_directory_exists_dir_value_error(self):
+        """
+        Test the check_directory_exists() when an error other than IOError is raised
+        """
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        with patch.object(Path, 'exists') as mocked_exists, \
+                patch.object(Path, 'mkdir'), \
+                patch('openlp.core.common.log'):
 
             # WHEN: Some other exception is raised
             mocked_exists.side_effect = ValueError()
 
-            # THEN: check_directory_exists raises an exception
-            mocked_exists.assert_called_with(directory_to_check)
-            self.assertRaises(ValueError, check_directory_exists, directory_to_check)
+            # THEN: `check_directory_exists` raises an exception
+            self.assertRaises(ValueError, check_directory_exists, Path('existing', 'directory'))
 
     def test_extension_loader_no_files_found(self):
         """
@@ -80,7 +106,7 @@ class TestCommonFunctions(TestCase):
         """
         # GIVEN: A mocked `Path.glob` method which does not match any files
         with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
-                patch.object(common.Path, 'glob', return_value=[]), \
+                patch.object(Path, 'glob', return_value=[]), \
                 patch('openlp.core.common.importlib.import_module') as mocked_import_module:
 
             # WHEN: Calling `extension_loader`
@@ -95,7 +121,7 @@ class TestCommonFunctions(TestCase):
         """
         # GIVEN: A mocked `Path.glob` method which returns a list of files
         with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
-                patch.object(common.Path, 'glob', return_value=[
+                patch.object(Path, 'glob', return_value=[
                     Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file1.py'),
                     Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file2.py'),
                     Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file3.py'),
@@ -115,7 +141,7 @@ class TestCommonFunctions(TestCase):
         """
         # GIVEN: A mocked `import_module` which raises an `ImportError`
         with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
-                patch.object(common.Path, 'glob', return_value=[
+                patch.object(Path, 'glob', return_value=[
                     Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file1.py')]), \
                 patch('openlp.core.common.importlib.import_module', side_effect=ImportError()), \
                 patch('openlp.core.common.log') as mocked_logger:
@@ -132,7 +158,7 @@ class TestCommonFunctions(TestCase):
         """
         # GIVEN: A mocked `SourceFileLoader` which raises an `OSError`
         with patch('openlp.core.common.AppLocation.get_directory', return_value=Path('/', 'app', 'dir', 'openlp')), \
-                patch.object(common.Path, 'glob', return_value=[
+                patch.object(Path, 'glob', return_value=[
                     Path('/', 'app', 'dir', 'openlp', 'import_dir', 'file1.py')]), \
                 patch('openlp.core.common.importlib.import_module', side_effect=OSError()), \
                 patch('openlp.core.common.log') as mocked_logger:
@@ -174,7 +200,7 @@ class TestCommonFunctions(TestCase):
         Test `path_to_module` when supplied with a `Path` object
         """
         # GIVEN: A `Path` object
-        path = Path('openlp/core/ui/media/webkitplayer.py')
+        path = Path('core', 'ui', 'media', 'webkitplayer.py')
 
         # WHEN: Calling path_to_module with the `Path` object
         result = path_to_module(path)

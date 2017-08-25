@@ -23,6 +23,7 @@
 import logging
 import os
 import shutil
+from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_, or_
@@ -89,7 +90,7 @@ class SongMediaItem(MediaManagerItem):
         for i, bga in enumerate(item.background_audio):
             dest_file = os.path.join(
                 str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(song.id), os.path.split(bga)[1])
-            check_directory_exists(os.path.split(dest_file)[0])
+            check_directory_exists(Path(os.path.split(dest_file)[0]))
             shutil.copyfile(os.path.join(str(AppLocation.get_section_data_path('servicemanager')), bga), dest_file)
             song.media_files.append(MediaFile.populate(weight=i, file_name=dest_file))
         self.plugin.manager.save_object(song, True)
@@ -535,7 +536,7 @@ class SongMediaItem(MediaManagerItem):
             if len(old_song.media_files) > 0:
                 save_path = os.path.join(
                     str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(new_song.id))
-                check_directory_exists(save_path)
+                check_directory_exists(Path(save_path))
                 for media_file in old_song.media_files:
                     new_media_file_name = os.path.join(save_path, os.path.basename(media_file.file_name))
                     shutil.copyfile(media_file.file_name, new_media_file_name)

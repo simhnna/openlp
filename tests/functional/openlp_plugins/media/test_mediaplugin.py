@@ -38,20 +38,18 @@ class MediaPluginTest(TestCase, TestMixin):
     def setUp(self):
         Registry.create()
 
-    @patch(u'openlp.plugins.media.mediaplugin.Plugin.initialise')
+    @patch('openlp.plugins.media.mediaplugin.Plugin.initialise')
     def test_initialise(self, mocked_initialise):
         """
         Test that the initialise() method overwrites the built-in one, but still calls it
         """
-        # GIVEN: A media plugin instance and a mocked settings object
+        # GIVEN: A media plugin instance
         media_plugin = MediaPlugin()
-        mocked_settings = MagicMock()
-        mocked_settings.get_files_from_config.return_value = True  # Not the real value, just need something "true-ish"
 
         # WHEN: initialise() is called
         media_plugin.initialise()
 
-        # THEN: The settings should be upgraded and the base initialise() method should be called
+        # THEN: The the base initialise() method should be called
         mocked_initialise.assert_called_with()
 
     def test_about_text(self):

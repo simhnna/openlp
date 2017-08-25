@@ -24,6 +24,7 @@ import logging
 import re
 import shutil
 import os
+from pathlib import Path
 
 from PyQt5 import QtCore
 
@@ -423,7 +424,7 @@ class SongImport(QtCore.QObject):
         if not hasattr(self, 'save_path'):
             self.save_path = os.path.join(str(AppLocation.get_section_data_path(self.import_wizard.plugin.name)),
                                           'audio', str(song_id))
-        check_directory_exists(self.save_path)
+        check_directory_exists(Path(self.save_path))
         if not filename.startswith(self.save_path):
             old_file, filename = filename, os.path.join(self.save_path, os.path.split(filename)[1])
             shutil.copyfile(old_file, filename)

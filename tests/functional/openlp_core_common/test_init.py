@@ -24,6 +24,7 @@ Functional tests to test the AppLocation class and related methods.
 """
 import os
 from io import BytesIO
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, call, patch
 
@@ -296,10 +297,10 @@ class TestInit(TestCase, TestMixin):
         """
         # GIVEN: A blank path
         # WEHN: Calling delete_file
-        result = delete_file('')
+        result = delete_file(None)
 
         # THEN: delete_file should return False
-        self.assertFalse(result, "delete_file should return False when called with ''")
+        self.assertFalse(result, "delete_file should return False when called with None")
 
     def test_delete_file_path_success(self):
         """
@@ -309,84 +310,87 @@ class TestInit(TestCase, TestMixin):
         with patch('openlp.core.common.os', **{'path.exists.return_value': False}):
 
             # WHEN: Calling delete_file with a file path
-            result = delete_file('path/file.ext')
+            result = delete_file(Path('path', 'file.ext'))
 
             # THEN: delete_file should return True
             self.assertTrue(result, 'delete_file should return True when it successfully deletes a file')
 
     def test_delete_file_path_no_file_exists(self):
         """
-        Test the delete_file function when the file to remove does not exist
+        Test the `delete_file` function when the file to remove does not exist
         """
-        # GIVEN: A mocked os which returns False when os.path.exists is called
-        with patch('openlp.core.common.os', **{'path.exists.return_value': False}):
+        # GIVEN: A patched `exists` methods on the Path object, which returns False
+        with patch.object(Path, 'exists', return_value=False), \
+                patch.object(Path, 'unlink') as mocked_unlink:
 
-            # WHEN: Calling delete_file with a file path
-            result = delete_file('path/file.ext')
+            # WHEN: Calling `delete_file with` a file path
+            result = delete_file(Path('path', 'file.ext'))
 
-            # THEN: delete_file should return True
+            # THEN: The function should not attempt to delete the file and it should return True
+            self.assertFalse(mocked_unlink.called)
             self.assertTrue(result, 'delete_file should return True when the file doesnt exist')
 
     def test_delete_file_path_exception(self):
         """
-        Test the delete_file function when os.remove raises an exception
+        Test the delete_file function when an exception is raised
         """
-        # GIVEN: A mocked os which returns True when os.path.exists is called and raises an OSError when os.remove is
+        # GIVEN: A test `Path` object with a patched exists method which raises an OSError
         #       called.
-        with patch('openlp.core.common.os', **{'path.exists.return_value': True, 'path.exists.side_effect': OSError}), \
+        with patch.object(Path, 'exists') as mocked_exists, \
                 patch('openlp.core.common.log') as mocked_log:
+            mocked_exists.side_effect = OSError
 
-            # WHEN: Calling delete_file with a file path
-            result = delete_file('path/file.ext')
+            # WHEN: Calling delete_file with a the test Path object
+            result = delete_file(Path('path', 'file.ext'))
 
-            # THEN: delete_file should log and exception and return False
-            self.assertEqual(mocked_log.exception.call_count, 1)
-            self.assertFalse(result, 'delete_file should return False when os.remove raises an OSError')
+            # THEN: The exception should be logged and `delete_file` should return False
+            self.assertTrue(mocked_log.exception.called)
+            self.assertFalse(result, 'delete_file should return False when an OSError is raised')
 
-    def test_get_file_name_encoding_done_test(self):
+    def test_get_file_encoding_done_test(self):
         """
         Test get_file_encoding when the detector sets done to True
         """
         # GIVEN: A mocked UniversalDetector instance with done attribute set to True after first iteration
         with patch('openlp.core.common.UniversalDetector') as mocked_universal_detector, \
-                patch('builtins.open', return_value=BytesIO(b"data" * 260)) as mocked_open:
+                patch.object(Path, 'open', return_value=BytesIO(b"data" * 260)) as mocked_open:
             encoding_result = {'encoding': 'UTF-8', 'confidence': 0.99}
             mocked_universal_detector_inst = MagicMock(result=encoding_result)
             type(mocked_universal_detector_inst).done = PropertyMock(side_effect=[False, True])
             mocked_universal_detector.return_value = mocked_universal_detector_inst
 
             # WHEN: Calling get_file_encoding
-            result = get_file_encoding('file name')
+            result = get_file_encoding(Path('file name'))
 
             # THEN: The feed method of UniversalDetector should only br called once before returning a result
-            mocked_open.assert_called_once_with('file name', 'rb')
+            mocked_open.assert_called_once_with('rb')
             self.assertEqual(mocked_universal_detector_inst.feed.mock_calls, [call(b"data" * 256)])
             mocked_universal_detector_inst.close.assert_called_once_with()
             self.assertEqual(result, encoding_result)
 
-    def test_get_file_name_encoding_eof_test(self):
+    def test_get_file_encoding_eof_test(self):
         """
         Test get_file_encoding when the end of the file is reached
         """
         # GIVEN: A mocked UniversalDetector instance which isn't set to done and a mocked open, with 1040 bytes of test
         #       data (enough to run the iterator twice)
         with patch('openlp.core.common.UniversalDetector') as mocked_universal_detector, \
-                patch('builtins.open', return_value=BytesIO(b"data" * 260)) as mocked_open:
+                patch.object(Path, 'open', return_value=BytesIO(b"data" * 260)) as mocked_open:
             encoding_result = {'encoding': 'UTF-8', 'confidence': 0.99}
             mocked_universal_detector_inst = MagicMock(mock=mocked_universal_detector,
                                                        **{'done': False, 'result': encoding_result})
             mocked_universal_detector.return_value = mocked_universal_detector_inst
 
             # WHEN: Calling get_file_encoding
-            result = get_file_encoding('file name')
+            result = get_file_encoding(Path('file name'))
 
             # THEN: The feed method of UniversalDetector should have been called twice before returning a result
-            mocked_open.assert_called_once_with('file name', 'rb')
+            mocked_open.assert_called_once_with('rb')
             self.assertEqual(mocked_universal_detector_inst.feed.mock_calls, [call(b"data" * 256), call(b"data" * 4)])
             mocked_universal_detector_inst.close.assert_called_once_with()
             self.assertEqual(result, encoding_result)
 
-    def test_get_file_name_encoding_oserror_test(self):
+    def test_get_file_encoding_oserror_test(self):
         """
         Test get_file_encoding when the end of the file is reached
         """
@@ -397,7 +401,7 @@ class TestInit(TestCase, TestMixin):
                 patch('openlp.core.common.log') as mocked_log:
 
             # WHEN: Calling get_file_encoding
-            result = get_file_encoding('file name')
+            result = get_file_encoding(Path('file name'))
 
             # THEN: log.exception should be called and get_file_encoding should return None
             mocked_log.exception.assert_called_once_with('Error detecting file encoding')

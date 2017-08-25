@@ -83,30 +83,28 @@ class ServiceItemAction(object):
     Next = 3
 
 
-def get_text_file_string(text_file):
+def get_text_file_string(text_file_path):
     """
-    Open a file and return its content as unicode string. If the supplied file name is not a file then the function
+    Open a file and return its content as a string. If the supplied file path is not a file then the function
     returns False. If there is an error loading the file or the content can't be decoded then the function will return
     None.
 
-    :param text_file: The name of the file.
-    :return: The file as a single string
+    :param pathlib.Path text_file_path: The path to the file.
+    :return: The contents of the file, False if the file does not exist, or None if there is an Error reading or
+    decoding the file.
+    :rtype: str | False | None
     """
-    if not os.path.isfile(text_file):
+    if not text_file_path.is_file():
         return False
-    file_handle = None
     content = None
     try:
-        file_handle = open(text_file, 'r', encoding='utf-8')
-        if file_handle.read(3) != '\xEF\xBB\xBF':
-            # no BOM was found
-            file_handle.seek(0)
-        content = file_handle.read()
+        with text_file_path.open('r', encoding='utf-8') as file_handle:
+            if file_handle.read(3) != '\xEF\xBB\xBF':
+                # no BOM was found
+                file_handle.seek(0)
+            content = file_handle.read()
     except (IOError, UnicodeError):
-        log.exception('Failed to open text file {text}'.format(text=text_file))
-    finally:
-        if file_handle:
-            file_handle.close()
+        log.exception('Failed to open text file {text}'.format(text=text_file_path))
     return content
 
 

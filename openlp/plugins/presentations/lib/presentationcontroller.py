@@ -23,6 +23,7 @@
 import logging
 import os
 import shutil
+from pathlib import Path
 
 from PyQt5 import QtCore
 
@@ -98,7 +99,7 @@ class PresentationDocument(object):
         """
         self.slide_number = 0
         self.file_path = name
-        check_directory_exists(self.get_thumbnail_folder())
+        check_directory_exists(Path(self.get_thumbnail_folder()))
 
     def load_presentation(self):
         """
@@ -419,8 +420,8 @@ class PresentationController(object):
         self.thumbnail_folder = os.path.join(
             str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
         self.thumbnail_prefix = 'slide'
-        check_directory_exists(self.thumbnail_folder)
-        check_directory_exists(self.temp_folder)
+        check_directory_exists(Path(self.thumbnail_folder))
+        check_directory_exists(Path(self.temp_folder))
 
     def enabled(self):
         """

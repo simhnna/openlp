@@ -23,6 +23,7 @@
 import os
 import logging
 import re
+from pathlib import Path
 from shutil import which
 from subprocess import check_output, CalledProcessError
 
@@ -69,7 +70,7 @@ class PdfController(PresentationController):
         :return: Type of the binary, 'gs' if ghostscript, 'mudraw' if mudraw, None if invalid.
         """
         program_type = None
-        runlog = check_binary_exists(program_path)
+        runlog = check_binary_exists(Path(program_path))
         # Analyse the output to see it the program is mudraw, ghostscript or neither
         for line in runlog.splitlines():
             decoded_line = line.decode()
