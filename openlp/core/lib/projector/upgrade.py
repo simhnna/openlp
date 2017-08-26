@@ -25,12 +25,9 @@ backend for the projector setup.
 """
 import logging
 
-# Not all imports used at this time, but keep for future upgrades
-from sqlalchemy import Table, Column, types, inspect
-from sqlalchemy.exc import NoSuchTableError
+from sqlalchemy import Table, Column, types
 from sqlalchemy.sql.expression import null
 
-from openlp.core.common.db import drop_columns
 from openlp.core.lib.db import get_upgrade_op
 
 log = logging.getLogger(__name__)
@@ -45,7 +42,7 @@ def upgrade_1(session, metadata):
     """
     Version 1 upgrade - old db might/might not be versioned.
     """
-    log.debug('Skipping upgrade_1 of projector DB - not used')
+    log.debug('Skipping projector DB upgrade to version 1 - not used')
 
 
 def upgrade_2(session, metadata):
@@ -63,14 +60,14 @@ def upgrade_2(session, metadata):
     :param session: DB session instance
     :param metadata: Metadata of current DB
     """
+    log.debug('Checking projector DB upgrade to version 2')
     projector_table = Table('projector', metadata, autoload=True)
-    if 'mac_adx' not in [col.name for col in projector_table.c.values()]:
-        log.debug("Upgrading projector DB to version '2'")
+    upgrade_db = 'mac_adx' not in [col.name for col in projector_table.c.values()]
+    if upgrade_db:
         new_op = get_upgrade_op(session)
         new_op.add_column('projector', Column('mac_adx', types.String(18), server_default=null()))
         new_op.add_column('projector', Column('serial_no', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('sw_version', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('model_filter', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('model_lamp', types.String(30), server_default=null()))
-    else:
-        log.warn("Skipping upgrade_2 of projector DB")
+    log.debug('{status} projector DB upgrade to version 2'.format(status='Updated' if upgrade_db else 'Skipping'))

@@ -20,12 +20,14 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 from enum import Enum
-import os.path
+from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import UiStrings, translate
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.lib import build_icon
+from openlp.core.ui.lib.filedialog import FileDialog
 
 
 class PathType(Enum):
@@ -38,11 +40,11 @@ class PathEdit(QtWidgets.QWidget):
     The :class:`~openlp.core.ui.lib.pathedit.PathEdit` class subclasses QWidget to create a custom widget for use when
     a file or directory needs to be selected.
     """
-    pathChanged = QtCore.pyqtSignal(str)
+    pathChanged = QtCore.pyqtSignal(Path)
 
     def __init__(self, parent=None, path_type=PathType.Files, default_path=None, dialog_caption=None, show_revert=True):
         """
-        Initalise the PathEdit widget
+        Initialise the PathEdit widget
 
         :param parent: The parent of the widget. This is just passed to the super method.
         :type parent: QWidget or None
@@ -51,9 +53,9 @@ class PathEdit(QtWidgets.QWidget):
         :type dialog_caption: str
 
         :param default_path: The default path. This is set as the path when the revert button is clicked
-        :type default_path: str
+        :type default_path: pathlib.Path
 
-        :param show_revert: Used to determin if the 'revert button' should be visible.
+        :param show_revert: Used to determine if the 'revert button' should be visible.
         :type show_revert: bool
 
         :return: None
@@ -79,7 +81,6 @@ class PathEdit(QtWidgets.QWidget):
         widget_layout = QtWidgets.QHBoxLayout()
         widget_layout.setContentsMargins(0, 0, 0, 0)
         self.line_edit = QtWidgets.QLineEdit(self)
-        self.line_edit.setText(self._path)
         widget_layout.addWidget(self.line_edit)
         self.browse_button = QtWidgets.QToolButton(self)
         self.browse_button.setIcon(build_icon(':/general/general_open.png'))
@@ -101,7 +102,7 @@ class PathEdit(QtWidgets.QWidget):
         A property getter method to return the selected path.
 
         :return: The selected path
-        :rtype: str
+        :rtype: pathlib.Path
         """
         return self._path
 
@@ -111,11 +112,15 @@ class PathEdit(QtWidgets.QWidget):
         A Property setter method to set the selected path
 
         :param path: The path to set the widget to
-        :type path: str
+        :type path: pathlib.Path
+
+        :return: None
+        :rtype: None
         """
         self._path = path
-        self.line_edit.setText(path)
-        self.line_edit.setToolTip(path)
+        text = path_to_str(path)
+        self.line_edit.setText(text)
+        self.line_edit.setToolTip(text)
 
     @property
     def path_type(self):
@@ -124,7 +129,7 @@ class PathEdit(QtWidgets.QWidget):
         selecting a file or directory.
 
         :return: The type selected
-        :rtype: Enum of PathEdit
+        :rtype: PathType
         """
         return self._path_type
 
@@ -133,8 +138,11 @@ class PathEdit(QtWidgets.QWidget):
         """
         A Property setter method to set the path type
 
-        :param path: The type of path to select
-        :type path: Enum of PathEdit
+        :param path_type: The type of path to select
+        :type path_type: PathType
+
+        :return: None
+        :rtype: None
         """
         self._path_type = path_type
         self.update_button_tool_tips()
@@ -142,7 +150,9 @@ class PathEdit(QtWidgets.QWidget):
     def update_button_tool_tips(self):
         """
         Called to update the tooltips on the buttons. This is changing path types, and when the widget is initalised
+
         :return: None
+        :rtype: None
         """
         if self._path_type == PathType.Directories:
             self.browse_button.setToolTip(translate('OpenLP.PathEdit', 'Browse for directory.'))
@@ -156,21 +166,21 @@ class PathEdit(QtWidgets.QWidget):
         A handler to handle a click on the browse button.
 
         Show the QFileDialog and process the input from the user
+
         :return: None
+        :rtype: None
         """
         caption = self.dialog_caption
-        path = ''
+        path = None
         if self._path_type == PathType.Directories:
             if not caption:
                 caption = translate('OpenLP.PathEdit', 'Select Directory')
-            path = QtWidgets.QFileDialog.getExistingDirectory(self, caption,
-                                                              self._path, QtWidgets.QFileDialog.ShowDirsOnly)
+            path = FileDialog.getExistingDirectory(self, caption, self._path, FileDialog.ShowDirsOnly)
         elif self._path_type == PathType.Files:
             if not caption:
                 caption = self.dialog_caption = translate('OpenLP.PathEdit', 'Select File')
-            path, filter_used = QtWidgets.QFileDialog.getOpenFileName(self, caption, self._path, self.filters)
+            path, filter_used = FileDialog.getOpenFileName(self, caption, self._path, self.filters)
         if path:
-            path = os.path.normpath(path)
             self.on_new_path(path)
 
     def on_revert_button_clicked(self):
@@ -178,16 +188,21 @@ class PathEdit(QtWidgets.QWidget):
         A handler to handle a click on the revert button.
 
         Set the new path to the value of the default_path instance variable.
+
         :return: None
+        :rtype: None
         """
         self.on_new_path(self.default_path)
 
     def on_line_edit_editing_finished(self):
         """
         A handler to handle when the line edit has finished being edited.
+
         :return: None
+        :rtype: None
         """
-        self.on_new_path(self.line_edit.text())
+        path = str_to_path(self.line_edit.text())
+        self.on_new_path(path)
 
     def on_new_path(self, path):
         """
@@ -196,9 +211,10 @@ class PathEdit(QtWidgets.QWidget):
         Emits the pathChanged Signal
 
         :param path: The new path
-        :type path: str
+        :type path: pathlib.Path
 
         :return: None
+        :rtype: None
         """
         if self._path != path:
             self.path = path

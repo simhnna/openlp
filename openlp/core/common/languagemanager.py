@@ -53,7 +53,7 @@ class LanguageManager(object):
         """
         if LanguageManager.auto_language:
             language = QtCore.QLocale.system().name()
-        lang_path = AppLocation.get_directory(AppLocation.LanguageDir)
+        lang_path = str(AppLocation.get_directory(AppLocation.LanguageDir))
         app_translator = QtCore.QTranslator()
         app_translator.load(language, lang_path)
         # A translator for buttons and other default strings provided by Qt.
@@ -72,7 +72,7 @@ class LanguageManager(object):
         Find all available language files in this OpenLP install
         """
         log.debug('Translation files: {files}'.format(files=AppLocation.get_directory(AppLocation.LanguageDir)))
-        trans_dir = QtCore.QDir(AppLocation.get_directory(AppLocation.LanguageDir))
+        trans_dir = QtCore.QDir(str(AppLocation.get_directory(AppLocation.LanguageDir)))
         file_names = trans_dir.entryList(['*.qm'], QtCore.QDir.Files, QtCore.QDir.Name)
         # Remove qm files from the list which start with "qt".
         file_names = [file_ for file_ in file_names if not file_.startswith('qt')]

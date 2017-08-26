@@ -22,7 +22,7 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
-import os
+from pathlib import Path
 from unittest import TestCase
 
 from openlp.core.common import is_not_image_file
@@ -59,7 +59,7 @@ class TestUtils(TestCase, TestMixin):
         Test the method handles an image file
         """
         # Given and empty string
-        file_name = os.path.join(TEST_RESOURCES_PATH, 'church.jpg')
+        file_name = Path(TEST_RESOURCES_PATH, 'church.jpg')
 
         # WHEN testing for it
         result = is_not_image_file(file_name)
@@ -72,7 +72,7 @@ class TestUtils(TestCase, TestMixin):
         Test the method handles a non image file
         """
         # Given and empty string
-        file_name = os.path.join(TEST_RESOURCES_PATH, 'serviceitem_custom_1.osj')
+        file_name = Path(TEST_RESOURCES_PATH, 'serviceitem_custom_1.osj')
 
         # WHEN testing for it
         result = is_not_image_file(file_name)

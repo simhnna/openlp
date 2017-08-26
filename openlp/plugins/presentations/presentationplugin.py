@@ -28,8 +28,10 @@ import logging
 
 from PyQt5 import QtCore
 
-from openlp.core.common import AppLocation, extension_loader, translate
+from openlp.core.api.http import register_endpoint
+from openlp.core.common import extension_loader, translate
 from openlp.core.lib import Plugin, StringContent, build_icon
+from openlp.plugins.presentations.endpoint import api_presentations_endpoint, presentations_endpoint
 from openlp.plugins.presentations.lib import PresentationController, PresentationMediaItem, PresentationTab
 
 log = logging.getLogger(__name__)
@@ -66,6 +68,8 @@ class PresentationPlugin(Plugin):
         self.weight = -8
         self.icon_path = ':/plugins/plugin_presentations.png'
         self.icon = build_icon(self.icon_path)
+        register_endpoint(presentations_endpoint)
+        register_endpoint(api_presentations_endpoint)
 
     def create_settings_tab(self, parent):
         """
@@ -121,7 +125,7 @@ class PresentationPlugin(Plugin):
         Check to see if we have any presentation software available. If not do not install the plugin.
         """
         log.debug('check_pre_conditions')
-        controller_dir = os.path.join('openlp', 'plugins', 'presentations', 'lib')
+        controller_dir = os.path.join('plugins', 'presentations', 'lib')
         glob_pattern = os.path.join(controller_dir, '*controller.py')
         extension_loader(glob_pattern, ['presentationcontroller.py'])
         controller_classes = PresentationController.__subclasses__()

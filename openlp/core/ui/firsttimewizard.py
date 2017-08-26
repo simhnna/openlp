@@ -24,6 +24,7 @@ The UI widgets for the first time wizard.
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from openlp.core.common.uistrings import UiStrings
 from openlp.core.common import translate, is_macosx, clean_button_text, Settings
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import add_welcome_page
@@ -254,8 +255,7 @@ class UiFirstTimeWizard(object):
         self.presentation_check_box.setText(translate('OpenLP.FirstTimeWizard',
                                                       'Presentations – Show .ppt, .odp and .pdf files'))
         self.media_check_box.setText(translate('OpenLP.FirstTimeWizard', 'Media – Playback of Audio and Video files'))
-        self.remote_check_box.setText(translate('OpenLP.FirstTimeWizard', 'Remote – Control OpenLP via browser or smart'
-                                                                          'phone app'))
+        self.remote_check_box.setText(str(UiStrings().WebDownloadText))
         self.song_usage_check_box.setText(translate('OpenLP.FirstTimeWizard', 'Song Usage Monitor'))
         self.alert_check_box.setText(translate('OpenLP.FirstTimeWizard',
                                                'Alerts – Display informative messages while showing other slides'))

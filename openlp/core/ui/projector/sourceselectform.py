@@ -393,9 +393,9 @@ class SourceSelectSingle(QtWidgets.QDialog):
                                                  QtCore.Qt.WindowCloseButtonHint)
         self.edit = edit
         if self.edit:
-            title = translate('OpenLP.SourceSelectForm', 'Edit Projector Source Text')
+            self.title = translate('OpenLP.SourceSelectForm', 'Edit Projector Source Text')
         else:
-            title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
+            self.title = translate('OpenLP.SourceSelectForm', 'Select Projector Source')
         self.setObjectName('source_select_single')
         self.setWindowIcon(build_icon(':/icon/openlp-log.svg'))
         self.setModal(True)

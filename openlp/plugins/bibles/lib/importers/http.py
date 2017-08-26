@@ -255,7 +255,7 @@ class BGExtract(RegistryProperties):
                                                                         chapter=chapter,
                                                                         version=version)
         soup = get_soup_for_bible_ref(
-            'http://biblegateway.com/passage/?{url}'.format(url=url_params),
+            'http://www.biblegateway.com/passage/?{url}'.format(url=url_params),
             pre_parse_regex=r'<meta name.*?/>', pre_parse_substitute='')
         if not soup:
             return None
@@ -284,7 +284,7 @@ class BGExtract(RegistryProperties):
         """
         log.debug('BGExtract.get_books_from_http("{version}")'.format(version=version))
         url_params = urllib.parse.urlencode({'action': 'getVersionInfo', 'vid': '{version}'.format(version=version)})
-        reference_url = 'http://biblegateway.com/versions/?{url}#books'.format(url=url_params)
+        reference_url = 'http://www.biblegateway.com/versions/?{url}#books'.format(url=url_params)
         page = get_web_page(reference_url)
         if not page:
             send_error_message('download')
@@ -325,7 +325,7 @@ class BGExtract(RegistryProperties):
         returns a list in the form [(biblename, biblekey, language_code)]
         """
         log.debug('BGExtract.get_bibles_from_http')
-        bible_url = 'https://biblegateway.com/versions/'
+        bible_url = 'https://www.biblegateway.com/versions/'
         soup = get_soup_for_bible_ref(bible_url)
         if not soup:
             return None
@@ -773,7 +773,7 @@ def get_soup_for_bible_ref(reference_url, header=None, pre_parse_regex=None, pre
         return None
     try:
         page = get_web_page(reference_url, header, True)
-    except:
+    except Exception as e:
         page = None
     if not page:
         send_error_message('download')

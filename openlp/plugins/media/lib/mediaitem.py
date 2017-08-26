@@ -22,6 +22,7 @@
 
 import logging
 import os
+from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -300,8 +301,8 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         Initialize media item.
         """
         self.list_view.clear()
-        self.service_path = os.path.join(AppLocation.get_section_data_path(self.settings_section), 'thumbnails')
-        check_directory_exists(self.service_path)
+        self.service_path = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
+        check_directory_exists(Path(self.service_path))
         self.load_list(Settings().value(self.settings_section + '/media files'))
         self.rebuild_players()
 

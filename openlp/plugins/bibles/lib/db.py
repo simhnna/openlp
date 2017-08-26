@@ -470,7 +470,7 @@ class BiblesResourcesDB(QtCore.QObject, Manager):
         Return the cursor object. Instantiate one if it doesn't exist yet.
         """
         if BiblesResourcesDB.cursor is None:
-            file_path = os.path.join(AppLocation.get_directory(AppLocation.PluginsDir),
+            file_path = os.path.join(str(AppLocation.get_directory(AppLocation.PluginsDir)),
                                      'bibles', 'resources', 'bibles_resources.sqlite')
             conn = sqlite3.connect(file_path)
             BiblesResourcesDB.cursor = conn.cursor()
@@ -759,7 +759,7 @@ class AlternativeBookNamesDB(QtCore.QObject, Manager):
         """
         if AlternativeBookNamesDB.cursor is None:
             file_path = os.path.join(
-                AppLocation.get_directory(AppLocation.DataDir), 'bibles', 'alternative_book_names.sqlite')
+                str(AppLocation.get_directory(AppLocation.DataDir)), 'bibles', 'alternative_book_names.sqlite')
             if not os.path.exists(file_path):
                 # create new DB, create table alternative_book_names
                 AlternativeBookNamesDB.conn = sqlite3.connect(file_path)

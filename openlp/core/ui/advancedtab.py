@@ -30,6 +30,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import AppLocation, Settings, SlideLimits, UiStrings, translate
 from openlp.core.common.languagemanager import format_time
+from openlp.core.common.path import path_to_str
 from openlp.core.lib import SettingsTab, build_icon
 from openlp.core.ui.lib import PathEdit, PathType
 
@@ -207,6 +208,9 @@ class AdvancedTab(SettingsTab):
         self.display_workaround_group_box.setObjectName('display_workaround_group_box')
         self.display_workaround_layout = QtWidgets.QVBoxLayout(self.display_workaround_group_box)
         self.display_workaround_layout.setObjectName('display_workaround_layout')
+        self.ignore_aspect_ratio_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
+        self.ignore_aspect_ratio_check_box.setObjectName('ignore_aspect_ratio_check_box')
+        self.display_workaround_layout.addWidget(self.ignore_aspect_ratio_check_box)
         self.x11_bypass_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
         self.x11_bypass_check_box.setObjectName('x11_bypass_check_box')
         self.display_workaround_layout.addWidget(self.x11_bypass_check_box)
@@ -310,6 +314,7 @@ class AdvancedTab(SettingsTab):
             translate('OpenLP.AdvancedTab', '<strong>WARNING:</strong> New data directory location contains '
                       'OpenLP data files.  These files WILL be replaced during a copy.'))
         self.display_workaround_group_box.setTitle(translate('OpenLP.AdvancedTab', 'Display Workarounds'))
+        self.ignore_aspect_ratio_check_box.setText(translate('OpenLP.AdvancedTab', 'Ignore Aspect Ratio'))
         self.x11_bypass_check_box.setText(translate('OpenLP.AdvancedTab', 'Bypass X11 Window Manager'))
         self.alternate_rows_check_box.setText(translate('OpenLP.AdvancedTab', 'Use alternating row colours in lists'))
         # Slide Limits
@@ -354,6 +359,7 @@ class AdvancedTab(SettingsTab):
         default_service_enabled = settings.value('default service enabled')
         self.service_name_check_box.setChecked(default_service_enabled)
         self.service_name_check_box_toggled(default_service_enabled)
+        self.ignore_aspect_ratio_check_box.setChecked(settings.value('ignore aspect ratio'))
         self.x11_bypass_check_box.setChecked(settings.value('x11 bypass wm'))
         self.slide_limits = settings.value('slide limits')
         self.is_search_as_you_type_enabled = settings.value('search as type')
@@ -409,6 +415,7 @@ class AdvancedTab(SettingsTab):
         settings.setValue('hide mouse', self.hide_mouse_check_box.isChecked())
         settings.setValue('alternate rows', self.alternate_rows_check_box.isChecked())
         settings.setValue('slide limits', self.slide_limits)
+        settings.setValue('ignore aspect ratio', self.ignore_aspect_ratio_check_box.isChecked())
         if self.x11_bypass_check_box.isChecked() != settings.value('x11 bypass wm'):
             settings.setValue('x11 bypass wm', self.x11_bypass_check_box.isChecked())
             self.settings_form.register_post_process('config_screen_changed')
@@ -500,9 +507,9 @@ class AdvancedTab(SettingsTab):
             self.data_directory_path_edit.path = AppLocation.get_data_path()
             return
         # Check if data already exists here.
-        self.check_data_overwrite(new_data_path)
+        self.check_data_overwrite(path_to_str(new_data_path))
         # Save the new location.
-        self.main_window.set_new_data_path(new_data_path)
+        self.main_window.set_new_data_path(path_to_str(new_data_path))
         self.data_directory_cancel_button.show()
 
     def on_data_directory_copy_check_box_toggled(self):

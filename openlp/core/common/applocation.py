@@ -25,6 +25,7 @@ The :mod:`openlp.core.common.applocation` module provides an utility for OpenLP 
 import logging
 import os
 import sys
+from pathlib import Path
 
 from openlp.core.common import Settings, is_win, is_macosx
 
@@ -42,6 +43,9 @@ from openlp.core.common import check_directory_exists, get_frozen_path
 
 log = logging.getLogger(__name__)
 
+FROZEN_APP_PATH = Path(sys.argv[0]).parent
+APP_PATH = Path(openlp.__file__).parent
+
 
 class AppLocation(object):
     """
@@ -54,29 +58,23 @@ class AppLocation(object):
     CacheDir = 5
     LanguageDir = 6
 
-    # Base path where data/config/cache dir is located
-    BaseDir = None
-
     @staticmethod
     def get_directory(dir_type=AppDir):
         """
         Return the appropriate directory according to the directory type.
 
         :param dir_type: The directory type you want, for instance the data directory. Default *AppLocation.AppDir*
+        :type dir_type: AppLocation Enum
+
+        :return: The requested path
+        :rtype: pathlib.Path
         """
-        if dir_type == AppLocation.AppDir:
-            return get_frozen_path(os.path.abspath(os.path.dirname(sys.argv[0])), os.path.dirname(openlp.__file__))
+        if dir_type == AppLocation.AppDir or dir_type == AppLocation.VersionDir:
+            return get_frozen_path(FROZEN_APP_PATH, APP_PATH)
         elif dir_type == AppLocation.PluginsDir:
-            app_path = os.path.abspath(os.path.dirname(sys.argv[0]))
-            return get_frozen_path(os.path.join(app_path, 'plugins'),
-                                   os.path.join(os.path.dirname(openlp.__file__), 'plugins'))
-        elif dir_type == AppLocation.VersionDir:
-            return get_frozen_path(os.path.abspath(os.path.dirname(sys.argv[0])), os.path.dirname(openlp.__file__))
+            return get_frozen_path(FROZEN_APP_PATH, APP_PATH) / 'plugins'
         elif dir_type == AppLocation.LanguageDir:
-            app_path = get_frozen_path(os.path.abspath(os.path.dirname(sys.argv[0])), _get_os_dir_path(dir_type))
-            return os.path.join(app_path, 'i18n')
-        elif dir_type == AppLocation.DataDir and AppLocation.BaseDir:
-            return os.path.join(AppLocation.BaseDir, 'data')
+            return get_frozen_path(FROZEN_APP_PATH, _get_os_dir_path(dir_type)) / 'i18n'
         else:
             return _get_os_dir_path(dir_type)
 
@@ -84,47 +82,49 @@ class AppLocation(object):
     def get_data_path():
         """
         Return the path OpenLP stores all its data under.
+
+        :return: The data path to use.
+        :rtype: pathlib.Path
         """
         # Check if we have a different data location.
         if Settings().contains('advanced/data path'):
-            path = Settings().value('advanced/data path')
+            path = Path(Settings().value('advanced/data path'))
         else:
             path = AppLocation.get_directory(AppLocation.DataDir)
             check_directory_exists(path)
-        return os.path.normpath(path)
+        return path
 
     @staticmethod
-    def get_files(section=None, extension=None):
+    def get_files(section=None, extension=''):
         """
         Get a list of files from the data files path.
 
-        :param section: Defaults to *None*. The section of code getting the files - used to load from a section's
-            data subdirectory.
-        :param extension:
-            Defaults to *None*. The extension to search for. For example::
-
-                '.png'
+        :param None | str section: Defaults to *None*. The section of code getting the files - used to load from a
+        section's data subdirectory.
+        :param str extension: Defaults to ''. The extension to search for. For example::
+            '.png'
+        :return: List of files found.
+        :rtype: list[pathlib.Path]
         """
         path = AppLocation.get_data_path()
         if section:
-            path = os.path.join(path, section)
+            path = path / section
         try:
-            files = os.listdir(path)
+            file_paths = path.glob('*' + extension)
+            return [file_path.relative_to(path) for file_path in file_paths]
         except OSError:
             return []
-        if extension:
-            return [filename for filename in files if extension == os.path.splitext(filename)[1]]
-        else:
-            # no filtering required
-            return files
 
     @staticmethod
     def get_section_data_path(section):
         """
         Return the path a particular module stores its data under.
+
+        :type section: str
+
+        :rtype: pathlib.Path
         """
-        data_path = AppLocation.get_data_path()
-        path = os.path.join(data_path, section)
+        path = AppLocation.get_data_path() / section
         check_directory_exists(path)
         return path
 
@@ -132,36 +132,41 @@ class AppLocation(object):
 def _get_os_dir_path(dir_type):
     """
     Return a path based on which OS and environment we are running in.
+
+    :param dir_type: AppLocation Enum of the requested path type
+    :return: The requested path
+    :rtype: pathlib.Path
     """
     # If running from source, return the language directory from the source directory
     if dir_type == AppLocation.LanguageDir:
-        directory = os.path.abspath(os.path.join(os.path.dirname(openlp.__file__), '..', 'resources'))
-        if os.path.exists(directory):
+        directory = Path(openlp.__file__, '..', '..').resolve() / 'resources'
+        if directory.exists():
             return directory
     if is_win():
+        openlp_folder_path = Path(os.getenv('APPDATA'), 'openlp')
         if dir_type == AppLocation.DataDir:
-            return os.path.join(str(os.getenv('APPDATA')), 'openlp', 'data')
+            return openlp_folder_path / 'data'
         elif dir_type == AppLocation.LanguageDir:
-            return os.path.dirname(openlp.__file__)
-        return os.path.join(str(os.getenv('APPDATA')), 'openlp')
+            return Path(openlp.__file__).parent
+        return openlp_folder_path
     elif is_macosx():
+        openlp_folder_path = Path(os.getenv('HOME'), 'Library', 'Application Support', 'openlp')
         if dir_type == AppLocation.DataDir:
-            return os.path.join(str(os.getenv('HOME')), 'Library', 'Application Support', 'openlp', 'Data')
+            return openlp_folder_path / 'Data'
         elif dir_type == AppLocation.LanguageDir:
-            return os.path.dirname(openlp.__file__)
-        return os.path.join(str(os.getenv('HOME')), 'Library', 'Application Support', 'openlp')
+            return Path(openlp.__file__).parent
+        return openlp_folder_path
     else:
         if dir_type == AppLocation.LanguageDir:
-            for prefix in ['/usr/local', '/usr']:
-                directory = os.path.join(prefix, 'share', 'openlp')
-                if os.path.exists(directory):
-                    return directory
-            return os.path.join('/usr', 'share', 'openlp')
+            directory = Path('/usr', 'local', 'share', 'openlp')
+            if directory.exists():
+                return directory
+            return Path('/usr', 'share', 'openlp')
         if XDG_BASE_AVAILABLE:
-            if dir_type == AppLocation.DataDir:
-                return os.path.join(str(BaseDirectory.xdg_data_home), 'openlp')
+            if dir_type == AppLocation.DataDir or dir_type == AppLocation.CacheDir:
+                return Path(BaseDirectory.xdg_data_home, 'openlp')
             elif dir_type == AppLocation.CacheDir:
-                return os.path.join(str(BaseDirectory.xdg_cache_home), 'openlp')
+                return Path(BaseDirectory.xdg_cache_home, 'openlp')
         if dir_type == AppLocation.DataDir:
-            return os.path.join(str(os.getenv('HOME')), '.openlp', 'data')
-        return os.path.join(str(os.getenv('HOME')), '.openlp')
+            return Path(os.getenv('HOME'), '.openlp', 'data')
+        return Path(os.getenv('HOME'), '.openlp')

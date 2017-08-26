@@ -22,11 +22,13 @@
 
 import logging
 import os
+from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_
 
 from openlp.core.common import RegistryProperties, Settings, check_directory_exists, translate
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songusage.lib.db import SongUsageItem
 from .songusagedetaildialog import Ui_SongUsageDetailDialog
@@ -55,20 +57,21 @@ class SongUsageDetailForm(QtWidgets.QDialog, Ui_SongUsageDetailDialog, RegistryP
         """
         self.from_date_calendar.setSelectedDate(Settings().value(self.plugin.settings_section + '/from date'))
         self.to_date_calendar.setSelectedDate(Settings().value(self.plugin.settings_section + '/to date'))
-        self.report_path_edit.path = Settings().value(self.plugin.settings_section + '/last directory export')
+        self.report_path_edit.path = str_to_path(
+            Settings().value(self.plugin.settings_section + '/last directory export'))
 
     def on_report_path_edit_path_changed(self, file_path):
         """
         Triggered when the Directory selection button is clicked
         """
-        Settings().setValue(self.plugin.settings_section + '/last directory export', file_path)
+        Settings().setValue(self.plugin.settings_section + '/last directory export', path_to_str(file_path))
 
     def accept(self):
         """
         Ok was triggered so lets save the data and run the report
         """
         log.debug('accept')
-        path = self.report_path_edit.path
+        path = path_to_str(self.report_path_edit.path)
         if not path:
             self.main_window.error_message(
                 translate('SongUsagePlugin.SongUsageDetailForm', 'Output Path Not Selected'),
@@ -76,7 +79,7 @@ class SongUsageDetailForm(QtWidgets.QDialog, Ui_SongUsageDetailDialog, RegistryP
                           ' song usage report. \nPlease select an existing path on your computer.')
             )
             return
-        check_directory_exists(path)
+        check_directory_exists(Path(path))
         file_name = translate('SongUsagePlugin.SongUsageDetailForm',
                               'usage_detail_{old}_{new}.txt'
                               ).format(old=self.from_date_calendar.selectedDate().toString('ddMMyyyy'),

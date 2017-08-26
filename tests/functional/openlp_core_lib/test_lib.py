@@ -24,15 +24,15 @@ Package to test the openlp.core.lib package.
 """
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtGui
 
-from openlp.core.lib import FormattingTags, expand_chords_for_printing
-from openlp.core.lib import build_icon, check_item_selected, clean_tags, create_thumb, create_separated_list, \
-    expand_tags, get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb, expand_chords, \
-    compare_chord_lyric, find_formatting_tags
+from openlp.core.lib import FormattingTags, build_icon, check_item_selected, clean_tags, compare_chord_lyric, \
+    create_separated_list, create_thumb, expand_chords, expand_chords_for_printing, expand_tags, find_formatting_tags, \
+    get_text_file_string, image_to_byte, replace_params, resize_image, str_to_bool, validate_thumb
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
 
@@ -149,35 +149,34 @@ class TestLib(TestCase):
         """
         Test the get_text_file_string() function when a file does not exist
         """
-        with patch('openlp.core.lib.os.path.isfile') as mocked_isfile:
-            # GIVEN: A mocked out isfile which returns true, and a text file name
-            filename = 'testfile.txt'
-            mocked_isfile.return_value = False
+        # GIVEN: A patched is_file which returns False, and a file path
+        with patch.object(Path, 'is_file', return_value=False):
+            file_path = Path('testfile.txt')
 
             # WHEN: get_text_file_string is called
-            result = get_text_file_string(filename)
+            result = get_text_file_string(file_path)
 
             # THEN: The result should be False
-            mocked_isfile.assert_called_with(filename)
+            file_path.is_file.assert_called_with()
             self.assertFalse(result, 'False should be returned if no file exists')
 
     def test_get_text_file_string_read_error(self):
         """
         Test the get_text_file_string() method when a read error happens
         """
-        with patch('openlp.core.lib.os.path.isfile') as mocked_isfile, \
-                patch('openlp.core.lib.open', create=True) as mocked_open:
-            # GIVEN: A mocked-out open() which raises an exception and isfile returns True
-            filename = 'testfile.txt'
-            mocked_isfile.return_value = True
-            mocked_open.side_effect = IOError()
+        # GIVEN: A patched open which raises an exception and is_file which returns True
+        with patch.object(Path, 'is_file'), \
+                patch.object(Path, 'open'):
+            file_path = Path('testfile.txt')
+            file_path.is_file.return_value = True
+            file_path.open.side_effect = IOError()
 
             # WHEN: get_text_file_string is called
-            result = get_text_file_string(filename)
+            result = get_text_file_string(file_path)
 
             # THEN: None should be returned
-            mocked_isfile.assert_called_with(filename)
-            mocked_open.assert_called_with(filename, 'r', encoding='utf-8')
+            file_path.is_file.assert_called_once_with()
+            file_path.open.assert_called_once_with('r', encoding='utf-8')
             self.assertIsNone(result, 'None should be returned if the file cannot be opened')
 
     def test_get_text_file_string_decode_error(self):
@@ -652,6 +651,38 @@ class TestLib(TestCase):
             mocked_os.stat.assert_any_call(thumb_path)
             assert result is False, 'The result should be False'
 
+    def test_replace_params_no_params(self):
+        """
+        Test replace_params when called with and empty tuple instead of parameters to replace
+        """
+        # GIVEN: Some test data
+        test_args = (1, 2)
+        test_kwargs = {'arg3': 3, 'arg4': 4}
+        test_params = tuple()
+
+        # WHEN: Calling replace_params
+        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
+
+        # THEN: The positional and keyword args should not have changed
+        self.assertEqual(test_args, result_args)
+        self.assertEqual(test_kwargs, result_kwargs)
+
+    def test_replace_params_params(self):
+        """
+        Test replace_params when given a positional and a keyword argument to change
+        """
+        # GIVEN: Some test data
+        test_args = (1, 2)
+        test_kwargs = {'arg3': 3, 'arg4': 4}
+        test_params = ((1, 'arg2', str), (2, 'arg3', str))
+
+        # WHEN: Calling replace_params
+        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
+
+        # THEN: The positional and keyword args should have have changed
+        self.assertEqual(result_args, (1, '2'))
+        self.assertEqual(result_kwargs, {'arg3': '3', 'arg4': 4})
+
     def test_resize_thumb(self):
         """
         Test the resize_thumb() function
@@ -666,6 +697,27 @@ class TestLib(TestCase):
 
         # WHEN: Resize the image and add a background.
         image = resize_image(image_path, wanted_width, wanted_height, wanted_background_hex)
+
+        # THEN: Check if the size is correct and the background was set.
+        result_size = image.size()
+        self.assertEqual(wanted_height, result_size.height(), 'The image should have the requested height.')
+        self.assertEqual(wanted_width, result_size.width(), 'The image should have the requested width.')
+        self.assertEqual(image.pixel(0, 0), wanted_background_rgb, 'The background should be white.')
+
+    def test_resize_thumb_ignoring_aspect_ratio(self):
+        """
+        Test the resize_thumb() function ignoring aspect ratio
+        """
+        # GIVEN: A path to an image.
+        image_path = os.path.join(TEST_PATH, 'church.jpg')
+        wanted_width = 1000
+        wanted_height = 1000
+        # We want the background to be white.
+        wanted_background_hex = '#FFFFFF'
+        wanted_background_rgb = QtGui.QColor(wanted_background_hex).rgb()
+
+        # WHEN: Resize the image and add a background.
+        image = resize_image(image_path, wanted_width, wanted_height, wanted_background_hex, True)
 
         # THEN: Check if the size is correct and the background was set.
         result_size = image.size()

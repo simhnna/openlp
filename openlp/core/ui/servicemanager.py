@@ -28,6 +28,7 @@ import os
 import shutil
 import zipfile
 from datetime import datetime, timedelta
+from pathlib import Path
 from tempfile import mkstemp
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -223,7 +224,7 @@ class Ui_ServiceManager(object):
         self.service_manager_list.itemExpanded.connect(self.expanded)
         # Last little bits of setting up
         self.service_theme = Settings().value(self.main_window.service_manager_settings_section + '/service theme')
-        self.service_path = AppLocation.get_section_data_path('servicemanager')
+        self.service_path = str(AppLocation.get_section_data_path('servicemanager'))
         # build the drag and drop context menu
         self.dnd_menu = QtWidgets.QMenu()
         self.new_action = self.dnd_menu.addAction(translate('OpenLP.ServiceManager', '&Add New Item'))
@@ -587,7 +588,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                     audio_from = os.path.join(self.service_path, audio_from)
                 save_file = os.path.join(self.service_path, audio_to)
                 save_path = os.path.split(save_file)[0]
-                check_directory_exists(save_path)
+                check_directory_exists(Path(save_path))
                 if not os.path.exists(save_file):
                     shutil.copy(audio_from, save_file)
                 zip_file.write(audio_from, audio_to)
@@ -614,7 +615,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 success = False
             self.main_window.add_recent_file(path_file_name)
             self.set_modified(False)
-        delete_file(temp_file_name)
+        delete_file(Path(temp_file_name))
         return success
 
     def save_local_file(self):
@@ -669,7 +670,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 return self.save_file_as()
             self.main_window.add_recent_file(path_file_name)
             self.set_modified(False)
-        delete_file(temp_file_name)
+        delete_file(Path(temp_file_name))
         return success
 
     def save_file_as(self, field=None):
@@ -774,7 +775,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 self.set_file_name(file_name)
                 self.main_window.display_progress_bar(len(items))
                 self.process_service_items(items)
-                delete_file(p_file)
+                delete_file(Path(p_file))
                 self.main_window.add_recent_file(file_name)
                 self.set_modified(False)
                 Settings().setValue('servicemanager/last file', file_name)
@@ -1343,7 +1344,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         Empties the service_path of temporary files on system exit.
         """
         for file_name in os.listdir(self.service_path):
-            file_path = os.path.join(self.service_path, file_name)
+            file_path = Path(self.service_path, file_name)
             delete_file(file_path)
         if os.path.exists(os.path.join(self.service_path, 'audio')):
             shutil.rmtree(os.path.join(self.service_path, 'audio'), True)

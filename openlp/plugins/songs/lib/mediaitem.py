@@ -23,6 +23,7 @@
 import logging
 import os
 import shutil
+from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_, or_
@@ -88,9 +89,9 @@ class SongMediaItem(MediaManagerItem):
         song.media_files = []
         for i, bga in enumerate(item.background_audio):
             dest_file = os.path.join(
-                AppLocation.get_section_data_path(self.plugin.name), 'audio', str(song.id), os.path.split(bga)[1])
-            check_directory_exists(os.path.split(dest_file)[0])
-            shutil.copyfile(os.path.join(AppLocation.get_section_data_path('servicemanager'), bga), dest_file)
+                str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(song.id), os.path.split(bga)[1])
+            check_directory_exists(Path(os.path.split(dest_file)[0]))
+            shutil.copyfile(os.path.join(str(AppLocation.get_section_data_path('servicemanager')), bga), dest_file)
             song.media_files.append(MediaFile.populate(weight=i, file_name=dest_file))
         self.plugin.manager.save_object(song, True)
 
@@ -533,8 +534,9 @@ class SongMediaItem(MediaManagerItem):
                                                                       'copy', 'For song cloning'))
             # Copy audio files from the old to the new song
             if len(old_song.media_files) > 0:
-                save_path = os.path.join(AppLocation.get_section_data_path(self.plugin.name), 'audio', str(new_song.id))
-                check_directory_exists(save_path)
+                save_path = os.path.join(
+                    str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(new_song.id))
+                check_directory_exists(Path(save_path))
                 for media_file in old_song.media_files:
                     new_media_file_name = os.path.join(save_path, os.path.basename(media_file.file_name))
                     shutil.copyfile(media_file.file_name, new_media_file_name)
@@ -602,7 +604,7 @@ class SongMediaItem(MediaManagerItem):
                         else:
                             verse_index = VerseType.from_tag(verse[0]['type'])
                         verse_tag = VerseType.translated_tags[verse_index]
-                        verse_def = '{tag}{text}'.format(tag=verse_tag, text=verse[0]['label'])
+                        verse_def = '{tag}{label}'.format(tag=verse_tag, label=verse[0]['label'])
                         service_item.add_from_text(verse[1], verse_def)
         service_item.title = song.title
         author_list = self.generate_footer(service_item, song)

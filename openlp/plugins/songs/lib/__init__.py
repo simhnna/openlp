@@ -538,7 +538,7 @@ def delete_song(song_id, song_plugin):
         except OSError:
             log.exception('Could not remove file: {name}'.format(name=media_file.file_name))
     try:
-        save_path = os.path.join(AppLocation.get_section_data_path(song_plugin.name), 'audio', str(song_id))
+        save_path = os.path.join(str(AppLocation.get_section_data_path(song_plugin.name)), 'audio', str(song_id))
         if os.path.exists(save_path):
             os.rmdir(save_path)
     except OSError:

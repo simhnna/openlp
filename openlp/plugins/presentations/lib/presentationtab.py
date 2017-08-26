@@ -20,10 +20,11 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtWidgets
 
 from openlp.core.common import Settings, UiStrings, translate
-from openlp.core.lib import SettingsTab, build_icon
+from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.lib import SettingsTab
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.lib import PathEdit
 from openlp.plugins.presentations.lib.pdfcontroller import PdfController
@@ -156,7 +157,7 @@ class PresentationTab(SettingsTab):
         self.program_path_edit.setEnabled(enable_pdf_program)
         pdf_program = Settings().value(self.settings_section + '/pdf_program')
         if pdf_program:
-            self.program_path_edit.path = pdf_program
+            self.program_path_edit.path = str_to_path(pdf_program)
 
     def save(self):
         """
@@ -192,7 +193,7 @@ class PresentationTab(SettingsTab):
             Settings().setValue(setting_key, self.ppt_window_check_box.checkState())
             changed = True
         # Save pdf-settings
-        pdf_program = self.program_path_edit.path
+        pdf_program = path_to_str(self.program_path_edit.path)
         enable_pdf_program = self.pdf_program_check_box.checkState()
         # If the given program is blank disable using the program
         if pdf_program == '':
@@ -219,12 +220,13 @@ class PresentationTab(SettingsTab):
             checkbox.setEnabled(controller.is_available())
             self.set_controller_text(checkbox, controller)
 
-    def on_program_path_edit_path_changed(self, filename):
+    def on_program_path_edit_path_changed(self, new_path):
         """
         Select the mudraw or ghostscript binary that should be used.
         """
-        if filename:
-            if not PdfController.process_check_binary(filename):
+        new_path = path_to_str(new_path)
+        if new_path:
+            if not PdfController.process_check_binary(new_path):
                 critical_error_message_box(UiStrings().Error,
                                            translate('PresentationPlugin.PresentationTab',
                                                      'The program is not ghostscript or mudraw which is required.'))

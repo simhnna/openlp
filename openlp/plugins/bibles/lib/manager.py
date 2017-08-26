@@ -22,6 +22,7 @@
 
 import logging
 import os
+from pathlib import Path
 
 from openlp.core.common import AppLocation, OpenLPMixin, RegistryProperties, Settings, translate, delete_file, UiStrings
 from openlp.plugins.bibles.lib import LanguageSelection, parse_reference
@@ -111,7 +112,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         self.settings_section = 'bibles'
         self.web = 'Web'
         self.db_cache = None
-        self.path = AppLocation.get_section_data_path(self.settings_section)
+        self.path = str(AppLocation.get_section_data_path(self.settings_section))
         self.proxy_name = Settings().value(self.settings_section + '/proxy name')
         self.suffix = '.sqlite'
         self.import_wizard = None
@@ -124,7 +125,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         of HTTPBible is loaded instead of the BibleDB class.
         """
         log.debug('Reload bibles')
-        files = AppLocation.get_files(self.settings_section, self.suffix)
+        files = [str(file) for file in AppLocation.get_files(self.settings_section, self.suffix)]
         if 'alternative_book_names.sqlite' in files:
             files.remove('alternative_book_names.sqlite')
         log.debug('Bible Files {text}'.format(text=files))
@@ -137,7 +138,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
             # Remove corrupted files.
             if name is None:
                 bible.session.close_all()
-                delete_file(os.path.join(self.path, filename))
+                delete_file(Path(self.path, filename))
                 continue
             log.debug('Bible Name: "{name}"'.format(name=name))
             self.db_cache[name] = bible
@@ -185,7 +186,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         bible = self.db_cache[name]
         bible.session.close_all()
         bible.session = None
-        return delete_file(os.path.join(bible.path, bible.file))
+        return delete_file(Path(bible.path, bible.file))
 
     def get_bibles(self):
         """

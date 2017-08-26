@@ -28,12 +28,13 @@ import os
 import datetime
 from PyQt5 import QtCore, QtWidgets
 
+from openlp.core.api.http import register_endpoint
 from openlp.core.common import OpenLPMixin, Registry, RegistryMixin, RegistryProperties, Settings, UiStrings, \
     extension_loader, translate
 from openlp.core.lib import ItemCapabilities
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.common import AppLocation
 from openlp.core.ui import DisplayControllerType
+from openlp.core.ui.media.endpoint import media_endpoint
 from openlp.core.ui.media.vendor.mediainfoWrapper import MediaInfoWrapper
 from openlp.core.ui.media.mediaplayer import MediaPlayer
 from openlp.core.ui.media import MediaState, MediaInfo, MediaType, get_media_players, set_media_players,\
@@ -127,9 +128,11 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Registry().register_function('media_unblank', self.media_unblank)
         # Signals for background video
         Registry().register_function('songs_hide', self.media_hide)
+        Registry().register_function('songs_blank', self.media_blank)
         Registry().register_function('songs_unblank', self.media_unblank)
         Registry().register_function('mediaitem_media_rebuild', self._set_active_players)
         Registry().register_function('mediaitem_suffixes', self._generate_extensions_lists)
+        register_endpoint(media_endpoint)
 
     def _set_active_players(self):
         """
@@ -174,7 +177,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         Check to see if we have any media Player's available.
         """
         log.debug('_check_available_media_players')
-        controller_dir = os.path.join('openlp', 'core', 'ui', 'media')
+        controller_dir = os.path.join('core', 'ui', 'media')
         glob_pattern = os.path.join(controller_dir, '*player.py')
         extension_loader(glob_pattern, ['mediaplayer.py'])
         player_classes = MediaPlayer.__subclasses__()
@@ -613,6 +616,14 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         self.media_play(msg[0], status)
 
+    def on_media_play(self):
+        """
+        Responds to the request to play a loaded video from the web.
+
+        :param msg: First element is the controller which should be used
+        """
+        self.media_play(Registry().get('live_controller'), False)
+
     def media_play(self, controller, first_time=True):
         """
         Responds to the request to play a loaded video
@@ -687,6 +698,14 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         self.media_pause(msg[0])
 
+    def on_media_pause(self):
+        """
+        Responds to the request to pause a loaded video from the web.
+
+        :param msg: First element is the controller which should be used
+        """
+        self.media_pause(Registry().get('live_controller'))
+
     def media_pause(self, controller):
         """
         Responds to the request to pause a loaded video
@@ -726,6 +745,14 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         :param msg: First element is the controller which should be used
         """
         self.media_stop(msg[0])
+
+    def on_media_stop(self):
+        """
+        Responds to the request to stop a loaded video from the web.
+
+        :param msg: First element is the controller which should be used
+        """
+        self.media_stop(Registry().get('live_controller'))
 
     def media_stop(self, controller, looping_background=False):
         """

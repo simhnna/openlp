@@ -22,6 +22,7 @@
 
 import logging
 import os
+from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -98,8 +99,8 @@ class ImageMediaItem(MediaManagerItem):
         self.list_view.setIconSize(QtCore.QSize(88, 50))
         self.list_view.setIndentation(self.list_view.default_indentation)
         self.list_view.allow_internal_dnd = True
-        self.service_path = os.path.join(AppLocation.get_section_data_path(self.settings_section), 'thumbnails')
-        check_directory_exists(self.service_path)
+        self.service_path = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
+        check_directory_exists(Path(self.service_path))
         # Load images from the database
         self.load_full_list(
             self.manager.get_all_objects(ImageFilenames, order_by_ref=ImageFilenames.filename), initial_load=True)
@@ -210,8 +211,8 @@ class ImageMediaItem(MediaManagerItem):
         """
         images = self.manager.get_all_objects(ImageFilenames, ImageFilenames.group_id == image_group.id)
         for image in images:
-            delete_file(os.path.join(self.service_path, os.path.split(image.filename)[1]))
-            delete_file(self.generate_thumbnail_path(image))
+            delete_file(Path(self.service_path, os.path.split(image.filename)[1]))
+            delete_file(Path(self.generate_thumbnail_path(image)))
             self.manager.delete_object(ImageFilenames, image.id)
         image_groups = self.manager.get_all_objects(ImageGroups, ImageGroups.parent_id == image_group.id)
         for group in image_groups:
@@ -233,8 +234,8 @@ class ImageMediaItem(MediaManagerItem):
                 if row_item:
                     item_data = row_item.data(0, QtCore.Qt.UserRole)
                     if isinstance(item_data, ImageFilenames):
-                        delete_file(os.path.join(self.service_path, row_item.text(0)))
-                        delete_file(self.generate_thumbnail_path(item_data))
+                        delete_file(Path(self.service_path, row_item.text(0)))
+                        delete_file(Path(self.generate_thumbnail_path(item_data)))
                         if item_data.group_id == 0:
                             self.list_view.takeTopLevelItem(self.list_view.indexOfTopLevelItem(row_item))
                         else:

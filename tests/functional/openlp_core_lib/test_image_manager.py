@@ -56,6 +56,8 @@ class TestImageManager(TestCase, TestMixin):
         """
         Delete all the C++ objects at the end so that we don't have a segfault
         """
+        self.image_manager.stop_manager = True
+        self.image_manager.image_thread.wait()
         del self.app
 
     def test_basic_image_manager(self):

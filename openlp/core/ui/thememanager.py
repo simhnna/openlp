@@ -22,22 +22,24 @@
 """
 The Theme Manager manages adding, deleteing and modifying of themes.
 """
-import json
 import os
 import zipfile
 import shutil
+from pathlib import Path
 
 from xml.etree.ElementTree import ElementTree, XML
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, OpenLPMixin, RegistryMixin, \
-    check_directory_exists, UiStrings, translate, is_win, get_filesystem_encoding, delete_file
-from openlp.core.lib import FileDialog, ImageSource, ValidationError, get_text_file_string, build_icon, \
+    UiStrings, check_directory_exists, translate, is_win, get_filesystem_encoding, delete_file
+from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.lib import ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action
 from openlp.core.ui import FileRenameForm, ThemeForm
 from openlp.core.ui.lib import OpenLPToolbar
+from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.common.languagemanager import get_locale_key
 
 
@@ -159,10 +161,10 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         Set up the theme path variables
         """
-        self.path = AppLocation.get_section_data_path(self.settings_section)
-        check_directory_exists(self.path)
+        self.path = str(AppLocation.get_section_data_path(self.settings_section))
+        check_directory_exists(Path(self.path))
         self.thumb_path = os.path.join(self.path, 'thumbnails')
-        check_directory_exists(self.thumb_path)
+        check_directory_exists(Path(self.thumb_path))
 
     def check_list_state(self, item, field=None):
         """
@@ -354,8 +356,8 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         self.theme_list.remove(theme)
         thumb = '{name}.png'.format(name=theme)
-        delete_file(os.path.join(self.path, thumb))
-        delete_file(os.path.join(self.thumb_path, thumb))
+        delete_file(Path(self.path, thumb))
+        delete_file(Path(self.thumb_path, thumb))
         try:
             # Windows is always unicode, so no need to encode filenames
             if is_win():
@@ -424,15 +426,17 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         those files. This process will only load version 2 themes.
         :param field:
         """
-        files = FileDialog.getOpenFileNames(self,
-                                            translate('OpenLP.ThemeManager', 'Select Theme Import File'),
-                                            Settings().value(self.settings_section + '/last directory import'),
-                                            translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
-        self.log_info('New Themes {name}'.format(name=str(files)))
-        if not files:
+        file_paths, selected_filter = FileDialog.getOpenFileNames(
+            self,
+            translate('OpenLP.ThemeManager', 'Select Theme Import File'),
+            str_to_path(Settings().value(self.settings_section + '/last directory import')),
+            translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
+        self.log_info('New Themes {file_paths}'.format(file_paths=file_paths))
+        if not file_paths:
             return
         self.application.set_busy_cursor()
-        for file_name in files:
+        for file_path in file_paths:
+            file_name = path_to_str(file_path)
             Settings().setValue(self.settings_section + '/last directory import', str(file_name))
             self.unzip_theme(file_name, self.path)
         self.load_themes()
@@ -445,9 +449,9 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         self.application.set_busy_cursor()
         files = AppLocation.get_files(self.settings_section, '.otz')
         for theme_file in files:
-            theme_file = os.path.join(self.path, theme_file)
+            theme_file = os.path.join(self.path, str(theme_file))
             self.unzip_theme(theme_file, self.path)
-            delete_file(theme_file)
+            delete_file(Path(theme_file))
         files = AppLocation.get_files(self.settings_section, '.png')
         # No themes have been found so create one
         if not files:
@@ -470,6 +474,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         files.sort(key=lambda file_name: get_locale_key(str(file_name)))
         # now process the file list of png files
         for name in files:
+            name = str(name)
             # check to see file is in theme root directory
             theme = os.path.join(self.path, name)
             if os.path.exists(theme):
@@ -510,12 +515,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :return: The theme object.
         """
         self.log_debug('get theme data for theme {name}'.format(name=theme_name))
-        theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.json')
-        theme_data = get_text_file_string(theme_file)
+        theme_file_path = Path(self.path, str(theme_name), '{file_name}.json'.format(file_name=theme_name))
+        theme_data = get_text_file_string(theme_file_path)
         jsn = True
         if not theme_data:
-            theme_file = os.path.join(self.path, str(theme_name), str(theme_name) + '.xml')
-            theme_data = get_text_file_string(theme_file)
+            theme_file_path = theme_file_path.with_suffix('.xml')
+            theme_data = get_text_file_string(theme_file_path)
             jsn = False
         if not theme_data:
             self.log_debug('No theme data - using default theme')
@@ -588,7 +593,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     # is directory or preview file
                     continue
                 full_name = os.path.join(directory, out_name)
-                check_directory_exists(os.path.dirname(full_name))
+                check_directory_exists(Path(os.path.dirname(full_name)))
                 if os.path.splitext(name)[1].lower() == '.xml' or os.path.splitext(name)[1].lower() == '.json':
                     file_xml = str(theme_zip.read(name), 'utf-8')
                     out_file = open(full_name, 'w', encoding='utf-8')
@@ -666,10 +671,10 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         name = theme.theme_name
         theme_pretty = theme.export_theme()
         theme_dir = os.path.join(self.path, name)
-        check_directory_exists(theme_dir)
+        check_directory_exists(Path(theme_dir))
         theme_file = os.path.join(theme_dir, name + '.json')
         if self.old_background_image and image_to != self.old_background_image:
-            delete_file(self.old_background_image)
+            delete_file(Path(self.old_background_image))
         out_file = None
         try:
             out_file = open(theme_file, 'w', encoding='utf-8')

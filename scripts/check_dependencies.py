@@ -93,7 +93,11 @@ MODULES = [
     'bs4',
     'mako',
     'uno',
-    'six'
+    'websockets',
+    'asyncio',
+    'waitress',
+    'six',
+    'webob'
 ]
 
 

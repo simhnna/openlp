@@ -1,3 +1,27 @@
+# -*- coding: utf-8 -*-
+# vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
+
+###############################################################################
+# OpenLP - Open Source Lyrics Projection                                      #
+# --------------------------------------------------------------------------- #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# --------------------------------------------------------------------------- #
+# This program is free software; you can redistribute it and/or modify it     #
+# under the terms of the GNU General Public License as published by the Free  #
+# Software Foundation; version 2 of the License.                              #
+#                                                                             #
+# This program is distributed in the hope that it will be useful, but WITHOUT #
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or       #
+# FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for    #
+# more details.                                                               #
+#                                                                             #
+# You should have received a copy of the GNU General Public License along     #
+# with this program; if not, write to the Free Software Foundation, Inc., 59  #
+# Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
+###############################################################################
+"""
+The :mod:`openlp.core.common` module downloads the version details for OpenLP.
+"""
 import logging
 import os
 import platform
@@ -12,7 +36,8 @@ from subprocess import Popen, PIPE
 
 from PyQt5 import QtCore
 
-from openlp.core.common import AppLocation, Settings
+from openlp.core.common import AppLocation, Registry, Settings
+from openlp.core.common.httputils import ping
 
 log = logging.getLogger(__name__)
 
@@ -42,12 +67,18 @@ class VersionThread(QtCore.QThread):
         """
         self.sleep(1)
         log.debug('Version thread - run')
-        app_version = get_application_version()
-        version = check_latest_version(app_version)
-        log.debug("Versions {version1} and {version2} ".format(version1=LooseVersion(str(version)),
-                                                               version2=LooseVersion(str(app_version['full']))))
-        if LooseVersion(str(version)) > LooseVersion(str(app_version['full'])):
-            self.main_window.openlp_version_check.emit('{version}'.format(version=version))
+        found = ping("openlp.io")
+        Registry().set_flag('internet_present', found)
+        update_check = Settings().value('core/update check')
+        if found:
+            Registry().execute('get_website_version')
+            if update_check:
+                app_version = get_application_version()
+                version = check_latest_version(app_version)
+                log.debug("Versions {version1} and {version2} ".format(version1=LooseVersion(str(version)),
+                                                                       version2=LooseVersion(str(app_version['full']))))
+                if LooseVersion(str(version)) > LooseVersion(str(app_version['full'])):
+                    self.main_window.openlp_version_check.emit('{version}'.format(version=version))
 
 
 def get_application_version():
@@ -95,7 +126,7 @@ def get_application_version():
             full_version = '{tag}-bzr{tree}'.format(tag=tag_version.strip(), tree=tree_revision.strip())
     else:
         # We're not running the development version, let's use the file.
-        file_path = AppLocation.get_directory(AppLocation.VersionDir)
+        file_path = str(AppLocation.get_directory(AppLocation.VersionDir))
         file_path = os.path.join(file_path, '.version')
         version_file = None
         try:

@@ -24,6 +24,7 @@ Package to test the openlp.core.lib package.
 """
 import os
 import shutil
+from pathlib import Path
 
 from tempfile import mkdtemp
 from unittest import TestCase
@@ -129,10 +130,10 @@ class TestDB(TestCase):
         # GIVEN: Mocked out AppLocation class and delete_file method, a test plugin name and a db location
         with patch('openlp.core.lib.db.AppLocation') as MockedAppLocation, \
                 patch('openlp.core.lib.db.delete_file') as mocked_delete_file:
-            MockedAppLocation.get_section_data_path.return_value = 'test-dir'
+            MockedAppLocation.get_section_data_path.return_value = Path('test-dir')
             mocked_delete_file.return_value = True
             test_plugin = 'test'
-            test_location = os.path.join('test-dir', test_plugin)
+            test_location = Path('test-dir', test_plugin)
 
             # WHEN: delete_database is run without a database file
             result = delete_database(test_plugin)
@@ -149,11 +150,11 @@ class TestDB(TestCase):
         # GIVEN: Mocked out AppLocation class and delete_file method, a test plugin name and a db location
         with patch('openlp.core.lib.db.AppLocation') as MockedAppLocation, \
                 patch('openlp.core.lib.db.delete_file') as mocked_delete_file:
-            MockedAppLocation.get_section_data_path.return_value = 'test-dir'
+            MockedAppLocation.get_section_data_path.return_value = Path('test-dir')
             mocked_delete_file.return_value = False
             test_plugin = 'test'
             test_db_file = 'mydb.sqlite'
-            test_location = os.path.join('test-dir', test_db_file)
+            test_location = Path('test-dir', test_db_file)
 
             # WHEN: delete_database is run without a database file
             result = delete_database(test_plugin, test_db_file)
