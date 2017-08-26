@@ -27,7 +27,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, UiStrings,\
     translate
-from openlp.core.common.path import Path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib import ItemCapabilities, MediaManagerItem, MediaType, ServiceItem, ServiceItemContext, \
     build_icon, check_item_selected
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box, create_horizontal_adjusting_combo_box
@@ -303,7 +303,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         self.list_view.clear()
         self.service_path = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
         check_directory_exists(Path(self.service_path))
-        self.load_list(Settings().value(self.settings_section + '/media files'))
+        self.load_list([path_to_str(file) for file in Settings().value(self.settings_section + '/media files')])
         self.rebuild_players()
 
     def rebuild_players(self):
@@ -401,14 +401,14 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         :param media_type: Type to get, defaults to audio.
         :return: The media list
         """
-        media = Settings().value(self.settings_section + '/media files')
-        media.sort(key=lambda filename: get_locale_key(os.path.split(str(filename))[1]))
+        media_file_paths = Settings().value(self.settings_section + '/media files')
+        media_file_paths.sort(key=lambda file_path: get_locale_key(file_path.name))
         if media_type == MediaType.Audio:
             extension = self.media_controller.audio_extensions_list
         else:
             extension = self.media_controller.video_extensions_list
         extension = [x[1:] for x in extension]
-        media = [x for x in media if os.path.splitext(x)[1] in extension]
+        media = [x for x in media_file_paths if x.suffix in extension]
         return media
 
     def search(self, string, show_error):
@@ -419,13 +419,12 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         :param show_error: Should the error be shown (True)
         :return: The search result.
         """
-        files = Settings().value(self.settings_section + '/media files')
         results = []
         string = string.lower()
-        for file in files:
-            filename = os.path.split(str(file))[1]
-            if filename.lower().find(string) > -1:
-                results.append([file, filename])
+        for file_path in Settings().value(self.settings_section + '/media files'):
+            file_name = file_path.name
+            if file_name.lower().find(string) > -1:
+                results.append([str(file_path), file_name])
         return results
 
     def on_load_optical(self):
@@ -446,13 +445,13 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
 
         :param optical: The clip to add.
         """
-        full_list = self.get_file_list()
+        file_paths = self.get_file_list()
         # If the clip already is in the media list it isn't added and an error message is displayed.
-        if optical in full_list:
+        if optical in file_paths:
             critical_error_message_box(translate('MediaPlugin.MediaItem', 'Mediaclip already saved'),
                                        translate('MediaPlugin.MediaItem', 'This mediaclip has already been saved'))
             return
         # Append the optical string to the media list
-        full_list.append(optical)
+        file_paths.append(optical)
         self.load_list([optical])
-        Settings().setValue(self.settings_section + '/media files', self.get_file_list())
+        Settings().setValue(self.settings_section + '/media files', file_paths)

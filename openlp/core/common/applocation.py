@@ -86,7 +86,7 @@ class AppLocation(object):
         """
         # Check if we have a different data location.
         if Settings().contains('advanced/data path'):
-            path = Path(Settings().value('advanced/data path'))
+            path = Settings().value('advanced/data path')
         else:
             path = AppLocation.get_directory(AppLocation.DataDir)
             check_directory_exists(path)
@@ -118,7 +118,7 @@ class AppLocation(object):
         """
         Return the path a particular module stores its data under.
 
-        :type section: str
+        :param str section:
         :rtype: openlp.core.common.path.Path
         """
         path = AppLocation.get_data_path() / section

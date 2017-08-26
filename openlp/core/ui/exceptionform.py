@@ -70,9 +70,9 @@ try:
 except ImportError:
     VLC_VERSION = '-'
 
-from openlp.core.common import Settings, UiStrings, translate
+from openlp.core.common import RegistryProperties, Settings, UiStrings, is_linux, translate
 from openlp.core.common.versionchecker import get_application_version
-from openlp.core.common import RegistryProperties, is_linux
+from openlp.core.ui.lib.filedialog import FileDialog
 
 from .exceptiondialog import Ui_ExceptionDialog
 
@@ -139,17 +139,17 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
         """
         Saving exception log and system information to a file.
         """
-        filename = QtWidgets.QFileDialog.getSaveFileName(
+        file_path, filter_used = FileDialog.getSaveFileName(
             self,
             translate('OpenLP.ExceptionForm', 'Save Crash Report'),
             Settings().value(self.settings_section + '/last directory'),
-            translate('OpenLP.ExceptionForm', 'Text files (*.txt *.log *.text)'))[0]
-        if filename:
-            filename = str(filename).replace('/', os.path.sep)
-            Settings().setValue(self.settings_section + '/last directory', os.path.dirname(filename))
+            translate('OpenLP.ExceptionForm', 'Text files (*.txt *.log *.text)'))
+        if file_path:
+            Settings().setValue(self.settings_section + '/last directory', file_path.parent)
             opts = self._create_report()
             report_text = self.report_text.format(version=opts['version'], description=opts['description'],
                                                   traceback=opts['traceback'], libs=opts['libs'], system=opts['system'])
+            filename = str(file_path)
             try:
                 report_file = open(filename, 'w')
                 try:
@@ -212,17 +212,16 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
 
     def on_attach_file_button_clicked(self):
         """
-        Attache files to the bug report e-mail.
+        Attach files to the bug report e-mail.
         """
-        files, filter_used = QtWidgets.QFileDialog.getOpenFileName(self,
-                                                                   translate('ImagePlugin.ExceptionDialog',
-                                                                             'Select Attachment'),
-                                                                   Settings().value(self.settings_section +
-                                                                                    '/last directory'),
-                                                                   '{text} (*)'.format(text=UiStrings().AllFiles))
-        log.info('New files(s) {files}'.format(files=str(files)))
-        if files:
-            self.file_attachment = str(files)
+        file_path, filter_used = \
+            FileDialog.getOpenFileName(self,
+                                       translate('ImagePlugin.ExceptionDialog', 'Select Attachment'),
+                                       Settings().value(self.settings_section + '/last directory'),
+                                       '{text} (*)'.format(text=UiStrings().AllFiles))
+        log.info('New file {file}'.format(file=file_path))
+        if file_path:
+            self.file_attachment = str(file_path)
 
     def __button_state(self, state):
         """

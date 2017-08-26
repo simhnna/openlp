@@ -39,7 +39,7 @@ from openlp.core.api.http import server
 from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, translate, is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
-from openlp.core.common.path import Path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.common.versionchecker import get_application_version
 from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
 from openlp.core.lib.ui import create_action
@@ -879,8 +879,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # Convert image files
         log.info('hook upgrade_plugin_settings')
         self.plugin_manager.hook_upgrade_plugin_settings(import_settings)
-        # Remove/rename old settings to prepare the import.
-        import_settings.remove_obsolete_settings()
+        # Upgrade settings to prepare the import.
+        import_settings.upgrade_settings()
         # Lets do a basic sanity check. If it contains this string we can assume it was created by OpenLP and so we'll
         # load what we can from it, and just silently ignore anything we don't recognise.
         if import_settings.value('SettingsImport/type') != 'OpenLP_settings_export':
@@ -1277,7 +1277,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         settings.remove('custom slide')
         settings.remove('service')
         settings.beginGroup(self.general_settings_section)
-        self.recent_files = settings.value('recent files')
+        self.recent_files = [path_to_str(file_path) for file_path in settings.value('recent files')]
         settings.endGroup()
         settings.beginGroup(self.ui_settings_section)
         self.move(settings.value('main window position'))
@@ -1301,7 +1301,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         log.debug('Saving QSettings')
         settings = Settings()
         settings.beginGroup(self.general_settings_section)
-        settings.setValue('recent files', self.recent_files)
+        settings.setValue('recent files', [str_to_path(file) for file in self.recent_files])
         settings.endGroup()
         settings.beginGroup(self.ui_settings_section)
         settings.setValue('main window position', self.pos())
@@ -1443,7 +1443,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             log.info('No data copy requested')
         # Change the location of data directory in config file.
         settings = QtCore.QSettings()
-        settings.setValue('advanced/data path', self.new_data_path)
+        settings.setValue('advanced/data path', Path(self.new_data_path))
         # Check if the new data path is our default.
         if self.new_data_path == str(AppLocation.get_directory(AppLocation.DataDir)):
             settings.remove('advanced/data path')

@@ -239,13 +239,11 @@ class SongImportForm(OpenLPWizard, RegistryProperties):
             filters += ';;'
         filters += '{text} (*)'.format(text=UiStrings().AllFiles)
         file_paths, selected_filter = FileDialog.getOpenFileNames(
-            self, title,
-            str_to_path(Settings().value(self.plugin.settings_section + '/last directory import')), filters)
+            self, title, Settings().value(self.plugin.settings_section + '/last directory import'), filters)
         if file_paths:
             file_names = [path_to_str(file_path) for file_path in file_paths]
             listbox.addItems(file_names)
-            Settings().setValue(self.plugin.settings_section + '/last directory import',
-                                os.path.split(str(file_names[0]))[0])
+            Settings().setValue(self.plugin.settings_section + '/last directory import', file_paths[0].parent)
 
     def get_list_of_files(self, list_box):
         """
@@ -363,14 +361,15 @@ class SongImportForm(OpenLPWizard, RegistryProperties):
     def on_error_save_to_button_clicked(self):
         """
         Save the error report to a file.
+
+        :rtype: None
         """
-        filename, filter_used = QtWidgets.QFileDialog.getSaveFileName(
+        file_path, filter_used = FileDialog.getSaveFileName(
             self, Settings().value(self.plugin.settings_section + '/last directory import'))
-        if not filename:
+        if not file_path:
             return
-        report_file = codecs.open(filename, 'w', 'utf-8')
-        report_file.write(self.error_report_text_edit.toPlainText())
-        report_file.close()
+        with file_path.open('w', encoding='utf-8') as report_file:
+            report_file.write(self.error_report_text_edit.toPlainText())
 
     def add_file_select_item(self):
         """

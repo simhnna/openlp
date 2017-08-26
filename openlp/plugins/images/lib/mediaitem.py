@@ -390,7 +390,7 @@ class ImageMediaItem(MediaManagerItem):
         self.application.set_normal_cursor()
         self.load_list(files, target_group)
         last_dir = os.path.split(files[0])[0]
-        Settings().setValue(self.settings_section + '/last directory', last_dir)
+        Settings().setValue(self.settings_section + '/last directory', Path(last_dir))
 
     def load_list(self, images, target_group=None, initial_load=False):
         """

@@ -405,7 +405,7 @@ def main(args=None):
         # Set our data path
         log.info('Data path: {name}'.format(name=data_path))
         # Point to our data path
-        portable_settings.setValue('advanced/data path', str(data_path))
+        portable_settings.setValue('advanced/data path', data_path)
         portable_settings.setValue('advanced/is portable', True)
         portable_settings.sync()
     else:
@@ -422,8 +422,8 @@ def main(args=None):
     if application.is_data_path_missing():
         application.shared_memory.detach()
         sys.exit()
-    # Remove/convert obsolete settings.
-    Settings().remove_obsolete_settings()
+    # Upgrade settings.
+    Settings().upgrade_settings()
     # First time checks in settings
     if not Settings().value('core/has run wizard'):
         if not FirstTimeLanguageForm().exec():

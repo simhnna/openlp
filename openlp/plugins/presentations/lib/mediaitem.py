@@ -26,10 +26,11 @@ import os
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, Settings, UiStrings, translate
+from openlp.core.common.languagemanager import get_locale_key
+from openlp.core.common.path import path_to_str
 from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext,\
     build_icon, check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import critical_error_message_box, create_horizontal_adjusting_combo_box
-from openlp.core.common.languagemanager import get_locale_key
 from openlp.plugins.presentations.lib import MessageListener
 from openlp.plugins.presentations.lib.pdfcontroller import PDF_CONTROLLER_FILETYPES
 
@@ -126,8 +127,8 @@ class PresentationMediaItem(MediaManagerItem):
         Populate the media manager tab
         """
         self.list_view.setIconSize(QtCore.QSize(88, 50))
-        files = Settings().value(self.settings_section + '/presentations files')
-        self.load_list(files, initial_load=True)
+        file_paths = Settings().value(self.settings_section + '/presentations files')
+        self.load_list([path_to_str(file) for file in file_paths], initial_load=True)
         self.populate_display_types()
 
     def populate_display_types(self):
@@ -157,7 +158,7 @@ class PresentationMediaItem(MediaManagerItem):
         existing files, and when the user adds new files via the media manager.
         """
         current_list = self.get_file_list()
-        titles = [os.path.split(file)[1] for file in current_list]
+        titles = [file_path.name for file_path in current_list]
         self.application.set_busy_cursor()
         if not initial_load:
             self.main_window.display_progress_bar(len(files))
@@ -410,11 +411,11 @@ class PresentationMediaItem(MediaManagerItem):
         :param show_error: not used
         :return:
         """
-        files = Settings().value(self.settings_section + '/presentations files')
+        file_paths = Settings().value(self.settings_section + '/presentations files')
         results = []
         string = string.lower()
-        for file in files:
-            filename = os.path.split(str(file))[1]
-            if filename.lower().find(string) > -1:
-                results.append([file, filename])
+        for file_path in file_paths:
+            file_name = file_path.name
+            if file_name.lower().find(string) > -1:
+                results.append([path_to_str(file_path), file_name])
         return results
