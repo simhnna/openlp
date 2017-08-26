@@ -47,7 +47,8 @@ class PathEdit(QtWidgets.QWidget):
 
         :param QtWidget.QWidget | None: The parent of the widget. This is just passed to the super method.
         :param str dialog_caption: Used to customise the caption in the QFileDialog.
-        :param openlp.core.common.path.Path default_path: The default path. This is set as the path when the revert button is clicked
+        :param openlp.core.common.path.Path default_path: The default path. This is set as the path when the revert
+            button is clicked
         :param bool show_revert: Used to determine if the 'revert button' should be visible.
         :rtype: None
         """
