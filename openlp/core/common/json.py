@@ -38,11 +38,11 @@ class OpenLPJsonDecoder(JSONDecoder):
         instance and are passed to custom objects upon encoding or decoding.
         """
         self.kwargs = kwargs
-        if not object_hook:
-            object_hook = self.object_hook
+        if object_hook is None:
+            object_hook = self.custom_object_hook
         super().__init__(object_hook, parse_float, parse_int, parse_constant, strict, object_pairs_hook)
 
-    def object_hook(self, obj):
+    def custom_object_hook(self, obj):
         """
         Implement a custom Path object decoder.
 
@@ -69,9 +69,11 @@ class OpenLPJsonEncoder(JSONEncoder):
         to custom objects upon encoding or decoding.
         """
         self.kwargs = kwargs
+        if default is None:
+            default = self.custom_default
         super().__init__(skipkeys, ensure_ascii, check_circular, allow_nan, sort_keys, indent, separators, default)
 
-    def default(self, obj):
+    def custom_default(self, obj):
         """
         Convert any Path objects into a dictionary object which can be serialized.
 
