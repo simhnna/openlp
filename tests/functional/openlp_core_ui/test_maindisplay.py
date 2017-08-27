@@ -154,9 +154,9 @@ class TestMainDisplay(TestCase, TestMixin):
         main_display = MainDisplay(display)
 
         # THEN: The window flags should be the same as those needed on Mac OS X.
-        self.assertEqual(QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint,
+        self.assertEqual(QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint,
                          main_display.windowFlags(),
-                         'The window flags should be Qt.Window, and Qt.FramelessWindowHint.')
+                         'The window flags should be Qt.Window, Qt.FramelessWindowHint, and Qt.NoDropShadowWindowHint.')
 
     @skipUnless(is_macosx(), 'Can only run test on Mac OS X due to pyobjc dependency.')
     def test_macosx_display(self):
