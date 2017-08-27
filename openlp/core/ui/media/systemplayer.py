@@ -258,7 +258,7 @@ class SystemPlayer(MediaPlayer):
         :param display: The display where the media is
         """
         if display.media_player.state() == QtMultimedia.QMediaPlayer.PausedState and self.state != MediaState.Paused:
-            self.stop(display)
+            self.pause(display)
         controller = display.controller
         if controller.media_info.end_time > 0:
             if display.media_player.position() > controller.media_info.end_time:

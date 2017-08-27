@@ -157,7 +157,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
         # platforms. For OpenLP 2.0 keep it only for OS X to not cause any
         # regressions on other platforms.
         if is_macosx():
-            window_flags = QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window
+            window_flags = QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.NoDropShadowWindowHint
         self.setWindowFlags(window_flags)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.set_transparency(False)
