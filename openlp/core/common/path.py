@@ -19,16 +19,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import pathlib
 from contextlib import suppress
 
 from openlp.core.common import is_win
 
-
 if is_win():
-    path_variant = pathlib.WindowsPath
+    from pathlib import WindowsPath as PathVariant
 else:
-    path_variant = pathlib.PosixPath
+    from pathlib import PosixPath as PathVariant
 
 
 def path_to_str(path=None):
@@ -65,7 +63,7 @@ def str_to_path(string):
     return Path(string)
 
 
-class Path(path_variant):
+class Path(PathVariant):
     """
     Subclass pathlib.Path, so we can add json conversion methods
     """
