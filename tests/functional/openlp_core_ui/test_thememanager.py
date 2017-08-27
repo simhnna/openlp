@@ -90,7 +90,7 @@ class TestThemeManager(TestCase):
         #        theme, check_directory_exists and thememanager-attributes.
         with patch('builtins.open') as mocked_open, \
                 patch('openlp.core.ui.thememanager.shutil.copyfile') as mocked_copyfile, \
-                patch('openlp.core.ui.thememanager.check_directory_exists') as mocked_check_directory_exists:
+                patch('openlp.core.ui.thememanager.check_directory_exists'):
             mocked_open.return_value = MagicMock()
             theme_manager = ThemeManager(None)
             theme_manager.old_background_image = None
@@ -118,7 +118,7 @@ class TestThemeManager(TestCase):
         #        theme, check_directory_exists and thememanager-attributes.
         with patch('builtins.open') as mocked_open, \
                 patch('openlp.core.ui.thememanager.shutil.copyfile') as mocked_copyfile, \
-                patch('openlp.core.ui.thememanager.check_directory_exists') as mocked_check_directory_exists:
+                patch('openlp.core.ui.thememanager.check_directory_exists'):
             mocked_open.return_value = MagicMock()
             theme_manager = ThemeManager(None)
             theme_manager.old_background_image = None

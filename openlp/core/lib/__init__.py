@@ -83,30 +83,28 @@ class ServiceItemAction(object):
     Next = 3
 
 
-def get_text_file_string(text_file):
+def get_text_file_string(text_file_path):
     """
-    Open a file and return its content as unicode string. If the supplied file name is not a file then the function
+    Open a file and return its content as a string. If the supplied file path is not a file then the function
     returns False. If there is an error loading the file or the content can't be decoded then the function will return
     None.
 
-    :param text_file: The name of the file.
-    :return: The file as a single string
+    :param pathlib.Path text_file_path: The path to the file.
+    :return: The contents of the file, False if the file does not exist, or None if there is an Error reading or
+    decoding the file.
+    :rtype: str | False | None
     """
-    if not os.path.isfile(text_file):
+    if not text_file_path.is_file():
         return False
-    file_handle = None
     content = None
     try:
-        file_handle = open(text_file, 'r', encoding='utf-8')
-        if file_handle.read(3) != '\xEF\xBB\xBF':
-            # no BOM was found
-            file_handle.seek(0)
-        content = file_handle.read()
+        with text_file_path.open('r', encoding='utf-8') as file_handle:
+            if file_handle.read(3) != '\xEF\xBB\xBF':
+                # no BOM was found
+                file_handle.seek(0)
+            content = file_handle.read()
     except (IOError, UnicodeError):
-        log.exception('Failed to open text file {text}'.format(text=text_file))
-    finally:
-        if file_handle:
-            file_handle.close()
+        log.exception('Failed to open text file {text}'.format(text=text_file_path))
     return content
 
 
@@ -230,7 +228,7 @@ def validate_thumb(file_path, thumb_path):
     return image_date <= thumb_date
 
 
-def resize_image(image_path, width, height, background='#000000'):
+def resize_image(image_path, width, height, background='#000000', ignore_aspect_ratio=False):
     """
     Resize an image to fit on the current screen.
 
@@ -247,7 +245,7 @@ def resize_image(image_path, width, height, background='#000000'):
     image_ratio = reader.size().width() / reader.size().height()
     resize_ratio = width / height
     # Figure out the size we want to resize the image to (keep aspect ratio).
-    if image_ratio == resize_ratio:
+    if image_ratio == resize_ratio or ignore_aspect_ratio:
         size = QtCore.QSize(width, height)
     elif image_ratio < resize_ratio:
         # Use the image's height as reference for the new size.
@@ -608,8 +606,42 @@ def create_separated_list(string_list):
     return list_to_string
 
 
+def replace_params(args, kwargs, params):
+    """
+    Apply a transformation function to the specified args or kwargs
+
+    :param args: Positional arguments
+    :type args: (,)
+
+    :param kwargs: Key Word arguments
+    :type kwargs: dict
+
+    :param params: A tuple of tuples with the position and the key word to replace.
+    :type params: ((int, str, path_to_str),)
+
+    :return: The modified positional and keyword arguments
+    :rtype: (tuple, dict)
+
+
+    Usage:
+        Take a method with the following signature, and assume we which to apply the str function to arg2:
+            def method(arg1=None, arg2=None, arg3=None)
+
+        As arg2 can be specified postitionally as the second argument (1 with a zero index) or as a keyword, the we
+        would call this function as follows:
+
+        replace_params(args, kwargs, ((1, 'arg2', str),))
+    """
+    args = list(args)
+    for position, key_word, transform in params:
+        if len(args) > position:
+            args[position] = transform(args[position])
+        elif key_word in kwargs:
+            kwargs[key_word] = transform(kwargs[key_word])
+    return tuple(args), kwargs
+
+
 from .exceptions import ValidationError
-from .filedialog import FileDialog
 from .screen import ScreenList
 from .formattingtags import FormattingTags
 from .plugin import PluginStatus, StringContent, Plugin

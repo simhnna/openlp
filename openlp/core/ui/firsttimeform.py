@@ -29,8 +29,9 @@ import time
 import urllib.request
 import urllib.parse
 import urllib.error
+from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
+from pathlib import Path
 from tempfile import gettempdir
-from configparser import ConfigParser, MissingSectionHeaderError, NoSectionError, NoOptionError
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -202,7 +203,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self.themes_url = self.web + self.config.get('themes', 'directory') + '/'
                 self.web_access = True
             except (NoSectionError, NoOptionError, MissingSectionHeaderError):
-                log.debug('A problem occured while parsing the downloaded config file')
+                log.debug('A problem occurred while parsing the downloaded config file')
                 trace_error_handler(log)
         self.update_screen_list_combo()
         self.application.process_events()
@@ -213,7 +214,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
             self.presentation_check_box.setChecked(self.plugin_manager.get_plugin_by_name('presentations').is_active())
             self.image_check_box.setChecked(self.plugin_manager.get_plugin_by_name('images').is_active())
             self.media_check_box.setChecked(self.plugin_manager.get_plugin_by_name('media').is_active())
-            self.remote_check_box.setChecked(self.plugin_manager.get_plugin_by_name('remotes').is_active())
             self.custom_check_box.setChecked(self.plugin_manager.get_plugin_by_name('custom').is_active())
             self.song_usage_check_box.setChecked(self.plugin_manager.get_plugin_by_name('songusage').is_active())
             self.alert_check_box.setChecked(self.plugin_manager.get_plugin_by_name('alerts').is_active())
@@ -283,7 +283,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self.no_internet_cancel_button.setVisible(False)
         # Check if this is a re-run of the wizard.
         self.has_run_wizard = Settings().value('core/has run wizard')
-        check_directory_exists(os.path.join(gettempdir(), 'openlp'))
+        check_directory_exists(Path(gettempdir(), 'openlp'))
 
     def update_screen_list_combo(self):
         """
@@ -530,7 +530,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self._set_plugin_status(self.presentation_check_box, 'presentations/status')
         self._set_plugin_status(self.image_check_box, 'images/status')
         self._set_plugin_status(self.media_check_box, 'media/status')
-        self._set_plugin_status(self.remote_check_box, 'remotes/status')
         self._set_plugin_status(self.custom_check_box, 'custom/status')
         self._set_plugin_status(self.song_usage_check_box, 'songusage/status')
         self._set_plugin_status(self.alert_check_box, 'alerts/status')

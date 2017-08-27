@@ -274,9 +274,9 @@ def delete_database(plugin_name, db_file_name=None):
     :param db_file_name: The database file name. Defaults to None resulting in the plugin_name being used.
     """
     if db_file_name:
-        db_file_path = os.path.join(str(AppLocation.get_section_data_path(plugin_name)), db_file_name)
+        db_file_path = AppLocation.get_section_data_path(plugin_name) / db_file_name
     else:
-        db_file_path = os.path.join(str(AppLocation.get_section_data_path(plugin_name)), plugin_name)
+        db_file_path = AppLocation.get_section_data_path(plugin_name) / plugin_name
     return delete_file(db_file_path)
 
 

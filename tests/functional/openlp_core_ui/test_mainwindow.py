@@ -46,6 +46,7 @@ class TestMainWindow(TestCase, TestMixin):
         self.app.set_normal_cursor = MagicMock()
         self.app.args = []
         Registry().register('application', self.app)
+        Registry().set_flag('no_web_server', False)
         # Mock classes and methods used by mainwindow.
         with patch('openlp.core.ui.mainwindow.SettingsForm') as mocked_settings_form, \
                 patch('openlp.core.ui.mainwindow.ImageManager') as mocked_image_manager, \
@@ -55,7 +56,9 @@ class TestMainWindow(TestCase, TestMixin):
                 patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox') as mocked_q_tool_box_class, \
                 patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget') as mocked_add_dock_method, \
                 patch('openlp.core.ui.mainwindow.ThemeManager') as mocked_theme_manager, \
-                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer:
+                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer, \
+                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer') as mocked_websocketserver, \
+                patch('openlp.core.ui.mainwindow.server.HttpServer') as mocked_httpserver:
             self.mocked_settings_form = mocked_settings_form
             self.mocked_image_manager = mocked_image_manager
             self.mocked_live_controller = mocked_live_controller
@@ -148,7 +151,7 @@ class TestMainWindow(TestCase, TestMixin):
 
         # THEN: the following registry functions should have been registered
         self.assertEqual(len(self.registry.service_list), 6, 'The registry should have 6 services.')
-        self.assertEqual(len(self.registry.functions_list), 17, 'The registry should have 17 functions')
+        self.assertEqual(len(self.registry.functions_list), 18, 'The registry should have 18 functions')
         self.assertTrue('application' in self.registry.service_list, 'The application should have been registered.')
         self.assertTrue('main_window' in self.registry.service_list, 'The main_window should have been registered.')
         self.assertTrue('media_controller' in self.registry.service_list, 'The media_controller should have been '

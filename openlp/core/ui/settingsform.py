@@ -26,6 +26,7 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 
+from openlp.core.api import ApiTab
 from openlp.core.common import Registry, RegistryProperties
 from openlp.core.lib import build_icon
 from openlp.core.ui import AdvancedTab, GeneralTab, ThemesTab
@@ -56,12 +57,13 @@ class SettingsForm(QtWidgets.QDialog, Ui_SettingsDialog, RegistryProperties):
         self.projector_tab = None
         self.advanced_tab = None
         self.player_tab = None
+        self.api_tab = None
 
     def exec(self):
         """
         Execute the form
         """
-        # load all the
+        # load all the widgets
         self.setting_list_widget.blockSignals(True)
         self.setting_list_widget.clear()
         while self.stacked_layout.count():
@@ -72,6 +74,7 @@ class SettingsForm(QtWidgets.QDialog, Ui_SettingsDialog, RegistryProperties):
         self.insert_tab(self.advanced_tab)
         self.insert_tab(self.player_tab)
         self.insert_tab(self.projector_tab)
+        self.insert_tab(self.api_tab)
         for plugin in self.plugin_manager.plugins:
             if plugin.settings_tab:
                 self.insert_tab(plugin.settings_tab, plugin.is_active())
@@ -93,6 +96,7 @@ class SettingsForm(QtWidgets.QDialog, Ui_SettingsDialog, RegistryProperties):
             list_item = QtWidgets.QListWidgetItem(build_icon(tab_widget.icon_path), tab_widget.tab_title_visible)
             list_item.setData(QtCore.Qt.UserRole, tab_widget.tab_title)
             self.setting_list_widget.addItem(list_item)
+            tab_widget.load()
 
     def accept(self):
         """
@@ -154,10 +158,13 @@ class SettingsForm(QtWidgets.QDialog, Ui_SettingsDialog, RegistryProperties):
         self.advanced_tab = AdvancedTab(self)
         # Advanced tab
         self.player_tab = PlayerTab(self)
+        # Api tab
+        self.api_tab = ApiTab(self)
         self.general_tab.post_set_up()
         self.themes_tab.post_set_up()
         self.advanced_tab.post_set_up()
         self.player_tab.post_set_up()
+        self.api_tab.post_set_up()
         for plugin in self.plugin_manager.plugins:
             if plugin.settings_tab:
                 plugin.settings_tab.post_set_up()

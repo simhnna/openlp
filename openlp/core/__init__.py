@@ -33,6 +33,7 @@ import os
 import shutil
 import sys
 import time
+from pathlib import Path
 from traceback import format_exception
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -153,10 +154,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         self.processEvents()
         if not has_run_wizard:
             self.main_window.first_time()
-        # update_check = Settings().value('core/update check')
-        # if update_check:
-        #     version = VersionThread(self.main_window)
-        #     version.start()
+        version = VersionThread(self.main_window)
+        version.start()
         self.main_window.is_display_blank()
         self.main_window.app_startup()
         return self.exec()
@@ -337,6 +336,8 @@ def parse_options(args=None):
     parser.add_argument('-d', '--dev-version', dest='dev_version', action='store_true',
                         help='Ignore the version file and pull the version directly from Bazaar')
     parser.add_argument('-s', '--style', dest='style', help='Set the Qt5 style (passed directly to Qt5).')
+    parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_false',
+                        help='Turn off the Web and Socket Server ')
     parser.add_argument('rargs', nargs='?', default=[])
     # Parse command line options and deal with them. Use args supplied pragmatically if possible.
     return parser.parse_args(args) if args else parser.parse_args()
@@ -346,15 +347,18 @@ def set_up_logging(log_path):
     """
     Setup our logging using log_path
 
-    :param log_path: the path
+    :param pathlib.Path log_path: The file to save the log to
+    :return: None
+    :rtype: None
     """
     check_directory_exists(log_path, True)
-    filename = os.path.join(log_path, 'openlp.log')
-    logfile = logging.FileHandler(filename, 'w', encoding="UTF-8")
+    file_path = log_path / 'openlp.log'
+    # TODO: FileHandler accepts a Path object in Py3.6
+    logfile = logging.FileHandler(str(file_path), 'w', encoding='UTF-8')
     logfile.setFormatter(logging.Formatter('%(asctime)s %(name)-55s %(levelname)-8s %(message)s'))
     log.addHandler(logfile)
     if log.isEnabledFor(logging.DEBUG):
-        print('Logging to: {name}'.format(name=filename))
+        print('Logging to: {name}'.format(name=file_path))
 
 
 def main(args=None):
@@ -390,26 +394,27 @@ def main(args=None):
         application.setApplicationName('OpenLPPortable')
         Settings.setDefaultFormat(Settings.IniFormat)
         # Get location OpenLPPortable.ini
-        application_path = str(AppLocation.get_directory(AppLocation.AppDir))
-        set_up_logging(os.path.abspath(os.path.join(application_path, '..', '..', 'Other')))
+        portable_path = (AppLocation.get_directory(AppLocation.AppDir) / '..' / '..').resolve()
+        data_path = portable_path / 'Data'
+        set_up_logging(portable_path / 'Other')
         log.info('Running portable')
-        portable_settings_file = os.path.abspath(os.path.join(application_path, '..', '..', 'Data', 'OpenLP.ini'))
+        portable_settings_path = data_path / 'OpenLP.ini'
         # Make this our settings file
-        log.info('INI file: {name}'.format(name=portable_settings_file))
-        Settings.set_filename(portable_settings_file)
+        log.info('INI file: {name}'.format(name=portable_settings_path))
+        Settings.set_filename(str(portable_settings_path))
         portable_settings = Settings()
         # Set our data path
-        data_path = os.path.abspath(os.path.join(application_path, '..', '..', 'Data',))
         log.info('Data path: {name}'.format(name=data_path))
         # Point to our data path
-        portable_settings.setValue('advanced/data path', data_path)
+        portable_settings.setValue('advanced/data path', str(data_path))
         portable_settings.setValue('advanced/is portable', True)
         portable_settings.sync()
     else:
         application.setApplicationName('OpenLP')
-        set_up_logging(str(AppLocation.get_directory(AppLocation.CacheDir)))
+        set_up_logging(AppLocation.get_directory(AppLocation.CacheDir))
     Registry.create()
     Registry().register('application', application)
+    Registry().set_flag('no_web_server', args.no_web_server)
     application.setApplicationVersion(get_application_version()['version'])
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     if application.is_already_running():

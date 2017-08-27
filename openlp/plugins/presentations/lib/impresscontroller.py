@@ -34,6 +34,7 @@
 import logging
 import os
 import time
+from pathlib import Path
 
 from openlp.core.common import is_win, Registry, get_uno_command, get_uno_instance, delete_file
 
@@ -275,7 +276,7 @@ class ImpressDocument(PresentationDocument):
             try:
                 doc.storeToURL(url_path, properties)
                 self.convert_thumbnail(path, index + 1)
-                delete_file(path)
+                delete_file(Path(path))
             except ErrorCodeIOException as exception:
                 log.exception('ERROR! ErrorCodeIOException {error:d}'.format(error=exception.ErrCode))
             except:

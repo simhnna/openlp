@@ -121,6 +121,7 @@ class Settings(QtCore.QSettings):
         'advanced/enable exit confirmation': True,
         'advanced/expand service item': False,
         'advanced/hide mouse': True,
+        'advanced/ignore aspect ratio': False,
         'advanced/is portable': False,
         'advanced/max recent files': 20,
         'advanced/print file meta data': False,
@@ -134,6 +135,14 @@ class Settings(QtCore.QSettings):
         'advanced/single click service preview': False,
         'advanced/x11 bypass wm': X11_BYPASS_DEFAULT,
         'advanced/search as type': True,
+        'api/twelve hour': True,
+        'api/port': 4316,
+        'api/websocket port': 4317,
+        'api/user id': 'openlp',
+        'api/password': 'password',
+        'api/authentication enabled': False,
+        'api/ip address': '0.0.0.0',
+        'api/thumbnails': True,
         'crashreport/last directory': '',
         'formattingTags/html_tags': '',
         'core/audio repeat list': False,
@@ -214,6 +223,17 @@ class Settings(QtCore.QSettings):
         ('media/players', 'media/players_temp', [(media_players_conv, None)]),  # Convert phonon to system
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
+        ('advanced/default image', '/core/logo file', []),  # Default image renamed + moved to general after 2.4.
+        ('remotes/https enabled', '', []),
+        ('remotes/https port', '', []),
+        ('remotes/twelve hour', 'api/twelve hour', []),
+        ('remotes/port', 'api/port', []),
+        ('remotes/websocket port', 'api/websocket port', []),
+        ('remotes/user id', 'api/user id', []),
+        ('remotes/password', 'api/password', []),
+        ('remotes/authentication enabled', 'api/authentication enabled', []),
+        ('remotes/ip address', 'api/ip address', []),
+        ('remotes/thumbnails', 'api/thumbnails', []),
         ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('shortcuts/escapeItem', 'shortcuts/desktopScreenEnable', []),  # Escape item was removed in 2.6.
         ('shortcuts/offlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
@@ -482,31 +502,3 @@ class Settings(QtCore.QSettings):
         if isinstance(default_value, int):
             return int(setting)
         return setting
-
-    def get_files_from_config(self, plugin):
-        """
-        This removes the settings needed for old way we saved files (e. g. the image paths for the image plugin). A list
-        of file paths are returned.
-
-         **Note**: Only a list of paths is returned; this does not convert anything!
-
-         :param plugin: The Plugin object.The caller has to convert/save the list himself; o
-        """
-        files_list = []
-        # We need QSettings instead of Settings here to bypass our central settings dict.
-        # Do NOT do this anywhere else!
-        settings = QtCore.QSettings(self.fileName(), Settings.IniFormat)
-        settings.beginGroup(plugin.settings_section)
-        if settings.contains('{name} count'.format(name=plugin.name)):
-            # Get the count.
-            list_count = int(settings.value('{name} count'.format(name=plugin.name), 0))
-            if list_count:
-                for counter in range(list_count):
-                    # The keys were named e. g.: "image 0"
-                    item = settings.value('{name} {counter:d}'.format(name=plugin.name, counter=counter), '')
-                    if item:
-                        files_list.append(item)
-                    settings.remove('{name} {counter:d}'.format(name=plugin.name, counter=counter))
-            settings.remove('{name} count'.format(name=plugin.name))
-        settings.endGroup()
-        return files_list
