@@ -69,7 +69,8 @@ def file_names_conv(file_names):
     :return: The list converted to file paths
     :rtype: openlp.core.common.path.Path
     """
-    return [str_to_path(file_name) for file_name in file_names]
+    if file_names:
+        return [str_to_path(file_name) for file_name in file_names]
 
 
 class Settings(QtCore.QSettings):
