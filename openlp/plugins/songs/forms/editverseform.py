@@ -48,10 +48,10 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.setupUi(self)
         self.has_single_verse = False
         self.insert_button.clicked.connect(self.on_insert_button_clicked)
-        self.split_button.clicked.connect(self.on_split_button_clicked)
+        self.overflow_split_button.clicked.connect(self.on_overflow_split_button_clicked)
         self.verse_text_edit.cursorPositionChanged.connect(self.on_cursor_position_changed)
         self.verse_type_combo_box.currentIndexChanged.connect(self.on_verse_type_combo_box_changed)
-        self.divide_split_button.clicked.connect(self.on_divide_split_button_clicked)
+        self.forced_split_button.clicked.connect(self.on_forced_split_button_clicked)
         if Settings().value('songs/enable chords'):
             self.transpose_down_button.clicked.connect(self.on_transpose_down_button_clicked)
             self.transpose_up_button.clicked.connect(self.on_transpose_up_button_clicked)
@@ -69,13 +69,13 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.verse_text_edit.insertPlainText('---[{tag}:{number}]---\n'.format(tag=verse_tag, number=verse_num))
         self.verse_text_edit.setFocus()
 
-    def on_split_button_clicked(self):
+    def on_overflow_split_button_clicked(self):
         """
         The optional split button has been pressed so we need add the split
         """
         self._add_splitter_to_text('[---]')
 
-    def on_divide_split_button_clicked(self):
+    def on_forced_split_button_clicked(self):
         """
         The force split button has been pressed so we need add the split
         """

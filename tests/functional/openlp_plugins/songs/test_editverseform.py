@@ -82,7 +82,7 @@ class TestEditVerseForm(TestCase, TestMixin):
         self.edit_verse_form.verse_text_edit.setPlainText('Text\n')
 
         # WHEN the method is called
-        self.edit_verse_form.on_divide_split_button_clicked()
+        self.edit_verse_form.on_forced_split_button_clicked()
         # THEN the verse number must not be changed
         self.assertEqual('[--}{--]\nText\n', self.edit_verse_form.verse_text_edit.toPlainText(),
                          'The verse number should be [--}{--]\nText\n')
@@ -96,7 +96,7 @@ class TestEditVerseForm(TestCase, TestMixin):
         self.edit_verse_form.verse_text_edit.setPlainText('Text\n')
 
         # WHEN the method is called
-        self.edit_verse_form.on_split_button_clicked()
+        self.edit_verse_form.on_overflow_split_button_clicked()
         # THEN the verse number must not be changed
         self.assertEqual('[---]\nText\n', self.edit_verse_form.verse_text_edit.toPlainText(),
                          'The verse number should be [---]\nText\n')
