@@ -435,7 +435,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         log.debug('video mediatype: ' + str(controller.media_info.media_type))
         # dont care about actual theme, set a black background
         if controller.is_live and not controller.media_info.is_background:
-            display.frame.evaluateJavaScript('show_video( "setBackBoard", null, null,"visible");')
+            display.frame.evaluateJavaScript('show_video("setBackBoard", null, null,"visible");')
         # now start playing - Preview is autoplay!
         autoplay = False
         # Preview requested
