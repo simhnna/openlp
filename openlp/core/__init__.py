@@ -33,6 +33,7 @@ import os
 import shutil
 import sys
 import time
+from datetime import datetime
 from traceback import format_exception
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -423,7 +424,20 @@ def main(args=None):
         application.shared_memory.detach()
         sys.exit()
     # Upgrade settings.
-    Settings().upgrade_settings()
+    settings = Settings()
+    if settings.can_upgrade():
+        now = datetime.now()
+        # Only back up if OpenLP has previously run.
+        if settings.value('core/has run wizard'):
+            back_up_path = AppLocation.get_data_path() / (now.strftime('%Y-%m-%d %H-%M') + '.conf')
+            log.info('Settings about to be upgraded. Existing settings are being backed up to {back_up_path}'
+                     .format(back_up_path=back_up_path))
+            QtWidgets.QMessageBox.information(
+                None, translate('OpenLP', 'Settings Upgrade'),
+                translate('OpenLP', 'Your settings are about to upgraded. A backup will be created at {back_up_path}')
+                     .format(back_up_path=back_up_path))
+            settings.export(back_up_path)
+        settings.upgrade_settings()
     # First time checks in settings
     if not Settings().value('core/has run wizard'):
         if not FirstTimeLanguageForm().exec():

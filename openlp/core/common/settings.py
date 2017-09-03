@@ -26,12 +26,13 @@ import datetime
 import logging
 import json
 import os
+from tempfile import gettempdir
 
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import SlideLimits, ThemeLevel, UiStrings, is_linux, is_win
+from openlp.core.common import SlideLimits, ThemeLevel, UiStrings, is_linux, is_win, translate
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
-from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.path import Path, str_to_path
 
 log = logging.getLogger(__name__)
 
@@ -452,14 +453,20 @@ class Settings(QtCore.QSettings):
             key = self.group() + '/' + key
         return Settings.__default_settings__[key]
 
+    def can_upgrade(self):
+        """
+        Can / should the settings be upgraded
+
+        :rtype: bool
+        """
+        return __version__ != self.value('settings/version')
+
     def upgrade_settings(self):
         """
         This method is only called to clean up the config. It removes old settings and it renames settings. See
         ``__obsolete_settings__`` for more details.
         """
         current_version = self.value('settings/version')
-        if __version__ == current_version:
-            return
         for version in range(current_version, __version__):
             version += 1
             upgrade_list = getattr(self, '__setting_upgrade_{version}__'.format(version=version))
@@ -549,3 +556,59 @@ class Settings(QtCore.QSettings):
         if isinstance(default_value, int):
             return int(setting)
         return setting
+
+    def export(self, dest_path):
+        """
+        Export the settings to file.
+
+        :param openlp.core.common.path.Path dest_path: The file path to create the export file.
+        :return: Success
+        :rtype: bool
+        """
+        temp_path = Path(gettempdir(), 'openlp', 'exportConf.tmp')
+        # Delete old files if found.
+        if temp_path.exists():
+            temp_path.unlink()
+        if dest_path.exists():
+            dest_path.unlink()
+        self.remove('SettingsImport')
+        # Get the settings.
+        keys = self.allKeys()
+        export_settings = QtCore.QSettings(str(temp_path), Settings.IniFormat)
+        # Add a header section.
+        # This is to insure it's our conf file for import.
+        now = datetime.datetime.now()
+        # Write INI format using QSettings.
+        # Write our header.
+        export_settings.beginGroup('SettingsImport')
+        export_settings.setValue('Make_Changes', 'At_Own_RISK')
+        export_settings.setValue('type', 'OpenLP_settings_export')
+        export_settings.setValue('file_date_created', now.strftime("%Y-%m-%d %H:%M"))
+        export_settings.endGroup()
+        # Write all the sections and keys.
+        for section_key in keys:
+            # FIXME: We are conflicting with the standard "General" section.
+            if 'eneral' in section_key:
+                section_key = section_key.lower()
+            key_value = super().value(section_key)
+            if key_value is not None:
+                export_settings.setValue(section_key, key_value)
+        export_settings.sync()
+        # Temp CONF file has been written.  Blanks in keys are now '%20'.
+        # Read the  temp file and output the user's CONF file with blanks to
+        # make it more readable.
+        try:
+            with dest_path.open('w') as export_conf_file, temp_path.open('r') as temp_conf:
+                for file_record in temp_conf:
+                    # Get rid of any invalid entries.
+                    if file_record.find('@Invalid()') == -1:
+                        file_record = file_record.replace('%20', ' ')
+                        export_conf_file.write(file_record)
+        except OSError as ose:
+            QtWidgets.QMessageBox.critical(self, translate('OpenLP.MainWindow', 'Export setting error'),
+                                           translate('OpenLP.MainWindow',
+                                                     'An error occurred while exporting the settings: {err}'
+                                                     ).format(err=ose.strerror),
+                                           QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
+        finally:
+            temp_path.unlink()

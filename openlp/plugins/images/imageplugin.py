@@ -71,14 +71,6 @@ class ImagePlugin(Plugin):
                                'provided by the theme.')
         return about_text
 
-    def upgrade_settings(self, settings):
-        """
-        Upgrade the settings of this plugin.
-
-        :param settings: The Settings object containing the old settings.
-        """
-        pass
-
     def set_plugin_text_strings(self):
         """
         Called to define all translatable texts of the plugin.
