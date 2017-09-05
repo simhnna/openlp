@@ -22,10 +22,10 @@
 """
 This module contains tests for the manager submodule of the Bibles plugin.
 """
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.manager import BibleManager
 
 

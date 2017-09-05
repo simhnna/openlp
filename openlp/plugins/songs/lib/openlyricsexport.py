@@ -25,11 +25,11 @@ format.
 """
 import logging
 import os
-from pathlib import Path
 
 from lxml import etree
 
 from openlp.core.common import RegistryProperties, check_directory_exists, translate, clean_filename
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
 
 log = logging.getLogger(__name__)

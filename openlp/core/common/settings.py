@@ -24,15 +24,19 @@ This class contains the core default settings.
 """
 import datetime
 import logging
+import json
 import os
+from tempfile import gettempdir
 
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import ThemeLevel, SlideLimits, UiStrings, is_win, is_linux
-
+from openlp.core.common import SlideLimits, ThemeLevel, UiStrings, is_linux, is_win, translate
+from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
+from openlp.core.common.path import Path, str_to_path
 
 log = logging.getLogger(__name__)
 
+__version__ = 2
 
 # Fix for bug #1014422.
 X11_BYPASS_DEFAULT = True
@@ -42,21 +46,6 @@ if is_linux():
     # Default to False on Xfce.
     if os.environ.get('DESKTOP_SESSION') == 'xfce':
         X11_BYPASS_DEFAULT = False
-
-
-def recent_files_conv(value):
-    """
-    If the value is not a list convert it to a list
-    :param value: Value to convert
-    :return: value as a List
-    """
-    if isinstance(value, list):
-        return value
-    elif isinstance(value, str):
-        return [value]
-    elif isinstance(value, bytes):
-        return [value.decode()]
-    return []
 
 
 def media_players_conv(string):
@@ -73,14 +62,25 @@ def media_players_conv(string):
     return string
 
 
+def file_names_conv(file_names):
+    """
+    Convert a list of file names in to a list of file paths.
+
+    :param list[str] file_names: The list of file names to convert.
+    :return: The list converted to file paths
+    :rtype: openlp.core.common.path.Path
+    """
+    if file_names:
+        return [str_to_path(file_name) for file_name in file_names]
+
+
 class Settings(QtCore.QSettings):
     """
     Class to wrap QSettings.
 
     * Exposes all the methods of QSettings.
-    * Adds functionality for OpenLP Portable. If the ``defaultFormat`` is set to
-      ``IniFormat``, and the path to the Ini file is set using ``set_filename``,
-      then the Settings constructor (without any arguments) will create a Settings
+    * Adds functionality for OpenLP Portable. If the ``defaultFormat`` is set to ``IniFormat``, and the path to the Ini
+      file is set using ``set_filename``, then the Settings constructor (without any arguments) will create a Settings
       object for accessing settings stored in that Ini file.
 
     ``__default_settings__``
@@ -91,7 +91,7 @@ class Settings(QtCore.QSettings):
 
             ('general/enable slide loop', 'advanced/slide limits', [(SlideLimits.Wrap, True), (SlideLimits.End, False)])
 
-        The first entry is the *old key*; it will be removed.
+        The first entry is the *old key*; if it is different from the *new key* it will be removed.
 
         The second entry is the *new key*; we will add it to the config. If this is just an empty string, we just remove
         the old key. The last entry is a list containing two-pair tuples. If the list is empty, no conversion is made.
@@ -105,11 +105,12 @@ class Settings(QtCore.QSettings):
         So, if the type of the old value is bool, then there must be two rules.
     """
     __default_settings__ = {
+        'settings/version': 0,
         'advanced/add page break': False,
         'advanced/alternate rows': not is_win(),
         'advanced/autoscrolling': {'dist': 1, 'pos': 0},
         'advanced/current media plugin': -1,
-        'advanced/data path': '',
+        'advanced/data path': None,
         # 7 stands for now, 0 to 6 is Monday to Sunday.
         'advanced/default service day': 7,
         'advanced/default service enabled': True,
@@ -143,7 +144,7 @@ class Settings(QtCore.QSettings):
         'api/authentication enabled': False,
         'api/ip address': '0.0.0.0',
         'api/thumbnails': True,
-        'crashreport/last directory': '',
+        'crashreport/last directory': None,
         'formattingTags/html_tags': '',
         'core/audio repeat list': False,
         'core/auto open': False,
@@ -162,7 +163,7 @@ class Settings(QtCore.QSettings):
         'core/screen blank': False,
         'core/show splash': True,
         'core/logo background color': '#ffffff',
-        'core/logo file': ':/graphics/openlp-splash-screen.png',
+        'core/logo file': Path(':/graphics/openlp-splash-screen.png'),
         'core/logo hide on startup': False,
         'core/songselect password': '',
         'core/songselect username': '',
@@ -177,17 +178,17 @@ class Settings(QtCore.QSettings):
         'media/players': 'system,webkit',
         'media/override player': QtCore.Qt.Unchecked,
         'players/background color': '#000000',
-        'servicemanager/last directory': '',
-        'servicemanager/last file': '',
-        'servicemanager/service theme': '',
+        'servicemanager/last directory': None,
+        'servicemanager/last file': None,
+        'servicemanager/service theme': None,
         'SettingsImport/file_date_created': datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
         'SettingsImport/Make_Changes': 'At_Own_RISK',
         'SettingsImport/type': 'OpenLP_settings_export',
         'SettingsImport/version': '',
         'themes/global theme': '',
-        'themes/last directory': '',
-        'themes/last directory export': '',
-        'themes/last directory import': '',
+        'themes/last directory': None,
+        'themes/last directory export': None,
+        'themes/last directory import': None,
         'themes/theme level': ThemeLevel.Song,
         'themes/wrap footer': False,
         'user interface/live panel': True,
@@ -208,22 +209,20 @@ class Settings(QtCore.QSettings):
         'projector/db database': '',
         'projector/enable': True,
         'projector/connect on start': False,
-        'projector/last directory import': '',
-        'projector/last directory export': '',
+        'projector/last directory import': None,
+        'projector/last directory export': None,
         'projector/poll time': 20,  # PJLink  timeout is 30 seconds
         'projector/socket timeout': 5,  # 5 second socket timeout
         'projector/source dialog type': 0  # Source select dialog box type
     }
     __file_path__ = ''
-    __obsolete_settings__ = [
+    __setting_upgrade_1__ = [
         # Changed during 2.2.x development.
-        # ('advanced/stylesheet fix', '', []),
-        # ('general/recent files', 'core/recent files', [(recent_files_conv, None)]),
         ('songs/search as type', 'advanced/search as type', []),
         ('media/players', 'media/players_temp', [(media_players_conv, None)]),  # Convert phonon to system
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
-        ('advanced/default image', '/core/logo file', []),  # Default image renamed + moved to general after 2.4.
+        ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('remotes/https enabled', '', []),
         ('remotes/https port', '', []),
         ('remotes/twelve hour', 'api/twelve hour', []),
@@ -234,7 +233,6 @@ class Settings(QtCore.QSettings):
         ('remotes/authentication enabled', 'api/authentication enabled', []),
         ('remotes/ip address', 'api/ip address', []),
         ('remotes/thumbnails', 'api/thumbnails', []),
-        ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('shortcuts/escapeItem', 'shortcuts/desktopScreenEnable', []),  # Escape item was removed in 2.6.
         ('shortcuts/offlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
         ('shortcuts/onlineHelpItem', 'shortcuts/userManualItem', []),  # Online and Offline help were combined in 2.6.
@@ -243,7 +241,28 @@ class Settings(QtCore.QSettings):
         # Last search type was renamed to last used search type in 2.6 since Bible search value type changed in 2.6.
         ('songs/last search type', 'songs/last used search type', []),
         ('bibles/last search type', '', []),
-        ('custom/last search type', 'custom/last used search type', [])
+        ('custom/last search type', 'custom/last used search type', [])]
+
+    __setting_upgrade_2__ = [
+        # The following changes are being made for the conversion to using Path objects made in 2.6 development
+        ('advanced/data path', 'advanced/data path', [(str_to_path, None)]),
+        ('crashreport/last directory', 'crashreport/last directory', [(str_to_path, None)]),
+        ('servicemanager/last directory', 'servicemanager/last directory', [(str_to_path, None)]),
+        ('servicemanager/last file', 'servicemanager/last file', [(str_to_path, None)]),
+        ('themes/last directory', 'themes/last directory', [(str_to_path, None)]),
+        ('themes/last directory export', 'themes/last directory export', [(str_to_path, None)]),
+        ('themes/last directory import', 'themes/last directory import', [(str_to_path, None)]),
+        ('projector/last directory import', 'projector/last directory import', [(str_to_path, None)]),
+        ('projector/last directory export', 'projector/last directory export', [(str_to_path, None)]),
+        ('bibles/last directory import', 'bibles/last directory import', [(str_to_path, None)]),
+        ('presentations/pdf_program', 'presentations/pdf_program', [(str_to_path, None)]),
+        ('songs/last directory import', 'songs/last directory import', [(str_to_path, None)]),
+        ('songs/last directory export', 'songs/last directory export', [(str_to_path, None)]),
+        ('songusage/last directory export', 'songusage/last directory export', [(str_to_path, None)]),
+        ('core/recent files', 'core/recent files', [(file_names_conv, None)]),
+        ('media/media files', 'media/media files', [(file_names_conv, None)]),
+        ('presentations/presentations files', 'presentations/presentations files', [(file_names_conv, None)]),
+        ('core/logo file', 'core/logo file', [(str_to_path, None)])
     ]
 
     @staticmethod
@@ -256,13 +275,16 @@ class Settings(QtCore.QSettings):
         Settings.__default_settings__.update(default_values)
 
     @staticmethod
-    def set_filename(ini_file):
+    def set_filename(ini_path):
         """
         Sets the complete path to an Ini file to be used by Settings objects.
 
         Does not affect existing Settings objects.
+
+        :param openlp.core.common.path.Path ini_path: ini file path
+        :rtype: None
         """
-        Settings.__file_path__ = ini_file
+        Settings.__file_path__ = str(ini_path)
 
     @staticmethod
     def set_up_default_values():
@@ -431,14 +453,28 @@ class Settings(QtCore.QSettings):
             key = self.group() + '/' + key
         return Settings.__default_settings__[key]
 
-    def remove_obsolete_settings(self):
+    def can_upgrade(self):
+        """
+        Can / should the settings be upgraded
+
+        :rtype: bool
+        """
+        return __version__ != self.value('settings/version')
+
+    def upgrade_settings(self):
         """
         This method is only called to clean up the config. It removes old settings and it renames settings. See
         ``__obsolete_settings__`` for more details.
         """
-        for old_key, new_key, rules in Settings.__obsolete_settings__:
-            # Once removed we don't have to do this again.
-            if self.contains(old_key):
+        current_version = self.value('settings/version')
+        for version in range(current_version, __version__):
+            version += 1
+            upgrade_list = getattr(self, '__setting_upgrade_{version}__'.format(version=version))
+            for old_key, new_key, rules in upgrade_list:
+                # Once removed we don't have to do this again. - Can be removed once fully switched to the versioning
+                # system.
+                if not self.contains(old_key):
+                    continue
                 if new_key:
                     # Get the value of the old_key.
                     old_value = super(Settings, self).value(old_key)
@@ -457,14 +493,17 @@ class Settings(QtCore.QSettings):
                             old_value = new
                             break
                     self.setValue(new_key, old_value)
-                self.remove(old_key)
+                if new_key != old_key:
+                    self.remove(old_key)
+        self.setValue('settings/version', version)
 
     def value(self, key):
         """
         Returns the value for the given ``key``. The returned ``value`` is of the same type as the default value in the
         *Settings.__default_settings__* dict.
 
-        :param key: The key to return the value from.
+        :param str key: The key to return the value from.
+        :return: The value stored by the setting.
         """
         # if group() is not empty the group has not been specified together with the key.
         if self.group():
@@ -473,6 +512,18 @@ class Settings(QtCore.QSettings):
             default_value = Settings.__default_settings__[key]
         setting = super(Settings, self).value(key, default_value)
         return self._convert_value(setting, default_value)
+
+    def setValue(self, key, value):
+        """
+        Reimplement the setValue method to handle Path objects.
+
+        :param str key: The key of the setting to save
+        :param value: The value to save
+        :rtype: None
+        """
+        if isinstance(value, Path) or (isinstance(value, list) and value and isinstance(value[0], Path)):
+            value = json.dumps(value, cls=OpenLPJsonEncoder)
+        super().setValue(key, value)
 
     def _convert_value(self, setting, default_value):
         """
@@ -491,8 +542,11 @@ class Settings(QtCore.QSettings):
             if isinstance(default_value, str):
                 return ''
             # An empty list saved to the settings results in a None type being returned.
-            else:
+            elif isinstance(default_value, list):
                 return []
+        elif isinstance(setting, str):
+            if '__Path__' in setting:
+                return json.loads(setting, cls=OpenLPJsonDecoder)
         # Convert the setting to the correct type.
         if isinstance(default_value, bool):
             if isinstance(setting, bool):
@@ -502,3 +556,59 @@ class Settings(QtCore.QSettings):
         if isinstance(default_value, int):
             return int(setting)
         return setting
+
+    def export(self, dest_path):
+        """
+        Export the settings to file.
+
+        :param openlp.core.common.path.Path dest_path: The file path to create the export file.
+        :return: Success
+        :rtype: bool
+        """
+        temp_path = Path(gettempdir(), 'openlp', 'exportConf.tmp')
+        # Delete old files if found.
+        if temp_path.exists():
+            temp_path.unlink()
+        if dest_path.exists():
+            dest_path.unlink()
+        self.remove('SettingsImport')
+        # Get the settings.
+        keys = self.allKeys()
+        export_settings = QtCore.QSettings(str(temp_path), Settings.IniFormat)
+        # Add a header section.
+        # This is to insure it's our conf file for import.
+        now = datetime.datetime.now()
+        # Write INI format using QSettings.
+        # Write our header.
+        export_settings.beginGroup('SettingsImport')
+        export_settings.setValue('Make_Changes', 'At_Own_RISK')
+        export_settings.setValue('type', 'OpenLP_settings_export')
+        export_settings.setValue('file_date_created', now.strftime("%Y-%m-%d %H:%M"))
+        export_settings.endGroup()
+        # Write all the sections and keys.
+        for section_key in keys:
+            # FIXME: We are conflicting with the standard "General" section.
+            if 'eneral' in section_key:
+                section_key = section_key.lower()
+            key_value = super().value(section_key)
+            if key_value is not None:
+                export_settings.setValue(section_key, key_value)
+        export_settings.sync()
+        # Temp CONF file has been written.  Blanks in keys are now '%20'.
+        # Read the  temp file and output the user's CONF file with blanks to
+        # make it more readable.
+        try:
+            with dest_path.open('w') as export_conf_file, temp_path.open('r') as temp_conf:
+                for file_record in temp_conf:
+                    # Get rid of any invalid entries.
+                    if file_record.find('@Invalid()') == -1:
+                        file_record = file_record.replace('%20', ' ')
+                        export_conf_file.write(file_record)
+        except OSError as ose:
+            QtWidgets.QMessageBox.critical(self, translate('OpenLP.MainWindow', 'Export setting error'),
+                                           translate('OpenLP.MainWindow',
+                                                     'An error occurred while exporting the settings: {err}'
+                                                     ).format(err=ose.strerror),
+                                           QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
+        finally:
+            temp_path.unlink()

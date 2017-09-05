@@ -30,6 +30,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import Registry, RegistryProperties, Settings, UiStrings, translate, is_macosx
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import add_welcome_page
+from openlp.core.ui.lib.filedialog import FileDialog
 
 log = logging.getLogger(__name__)
 
@@ -278,37 +279,38 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
 
     def get_file_name(self, title, editbox, setting_name, filters=''):
         """
-        Opens a QFileDialog and saves the filename to the given editbox.
+        Opens a FileDialog and saves the filename to the given editbox.
 
-        :param title: The title of the dialog (unicode).
-        :param editbox:  An editbox (QLineEdit).
-        :param setting_name: The place where to save the last opened directory.
-        :param filters: The file extension filters. It should contain the file description
+        :param str title: The title of the dialog.
+        :param QtWidgets.QLineEdit editbox:  An QLineEdit.
+        :param str setting_name: The place where to save the last opened directory.
+        :param str filters: The file extension filters. It should contain the file description
             as well as the file extension. For example::
 
                 'OpenLP 2 Databases (*.sqlite)'
+        :rtype: None
         """
         if filters:
             filters += ';;'
         filters += '%s (*)' % UiStrings().AllFiles
-        filename, filter_used = QtWidgets.QFileDialog.getOpenFileName(
-            self, title, os.path.dirname(Settings().value(self.plugin.settings_section + '/' + setting_name)),
-            filters)
-        if filename:
-            editbox.setText(filename)
-        Settings().setValue(self.plugin.settings_section + '/' + setting_name, filename)
+        file_path, filter_used = FileDialog.getOpenFileName(
+            self, title, Settings().value(self.plugin.settings_section + '/' + setting_name), filters)
+        if file_path:
+            editbox.setText(str(file_path))
+            Settings().setValue(self.plugin.settings_section + '/' + setting_name, file_path.parent)
 
     def get_folder(self, title, editbox, setting_name):
         """
-        Opens a QFileDialog and saves the selected folder to the given editbox.
+        Opens a FileDialog and saves the selected folder to the given editbox.
 
-        :param title: The title of the dialog (unicode).
-        :param editbox: An editbox (QLineEdit).
-        :param setting_name: The place where to save the last opened directory.
+        :param str title: The title of the dialog.
+        :param QtWidgets.QLineEdit editbox: An QLineEditbox.
+        :param str setting_name: The place where to save the last opened directory.
+        :rtype: None
         """
-        folder = QtWidgets.QFileDialog.getExistingDirectory(
+        folder_path = FileDialog.getExistingDirectory(
             self, title, Settings().value(self.plugin.settings_section + '/' + setting_name),
             QtWidgets.QFileDialog.ShowDirsOnly)
-        if folder:
-            editbox.setText(folder)
-        Settings().setValue(self.plugin.settings_section + '/' + setting_name, folder)
+        if folder_path:
+            editbox.setText(str(folder_path))
+            Settings().setValue(self.plugin.settings_section + '/' + setting_name, folder_path)

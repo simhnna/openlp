@@ -89,7 +89,7 @@ def get_text_file_string(text_file_path):
     returns False. If there is an error loading the file or the content can't be decoded then the function will return
     None.
 
-    :param pathlib.Path text_file_path: The path to the file.
+    :param openlp.core.common.path.Path text_file_path: The path to the file.
     :return: The contents of the file, False if the file does not exist, or None if there is an Error reading or
     decoding the file.
     :rtype: str | False | None
@@ -610,17 +610,11 @@ def replace_params(args, kwargs, params):
     """
     Apply a transformation function to the specified args or kwargs
 
-    :param args: Positional arguments
-    :type args: (,)
-
-    :param kwargs: Key Word arguments
-    :type kwargs: dict
-
+    :param tuple args: Positional arguments
+    :param dict kwargs: Key Word arguments
     :param params: A tuple of tuples with the position and the key word to replace.
-    :type params: ((int, str, path_to_str),)
-
     :return: The modified positional and keyword arguments
-    :rtype: (tuple, dict)
+    :rtype: tuple[tuple, dict]
 
 
     Usage:

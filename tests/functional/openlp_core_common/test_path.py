@@ -23,10 +23,9 @@
 Package to test the openlp.core.common.path package.
 """
 import os
-from pathlib import Path
 from unittest import TestCase
 
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 
 
 class TestPath(TestCase):
@@ -86,3 +85,54 @@ class TestPath(TestCase):
 
         # THEN: `path_to_str` should return None
         self.assertEqual(result, None)
+
+    def test_path_encode_json(self):
+        """
+        Test that `Path.encode_json` returns a Path object from a dictionary representation of a Path object decoded
+        from JSON
+        """
+        # GIVEN: A Path object from openlp.core.common.path
+        # WHEN: Calling encode_json, with a dictionary representation
+        path = Path.encode_json({'__Path__': ['path', 'to', 'fi.le']}, extra=1, args=2)
+
+        # THEN: A Path object should have been returned
+        self.assertEqual(path, Path('path', 'to', 'fi.le'))
+
+    def test_path_encode_json_base_path(self):
+        """
+        Test that `Path.encode_json` returns a Path object from a dictionary representation of a Path object decoded
+        from JSON when the base_path arg is supplied.
+        """
+        # GIVEN: A Path object from openlp.core.common.path
+        # WHEN: Calling encode_json, with a dictionary representation
+        path = Path.encode_json({'__Path__': ['path', 'to', 'fi.le']}, base_path=Path('/base'))
+
+        # THEN: A Path object should have been returned with an absolute path
+        self.assertEqual(path, Path('/', 'base', 'path', 'to', 'fi.le'))
+
+    def test_path_json_object(self):
+        """
+        Test that `Path.json_object` creates a JSON decode-able object from a Path object
+        """
+        # GIVEN: A Path object from openlp.core.common.path
+        path = Path('/base', 'path', 'to', 'fi.le')
+
+        # WHEN: Calling json_object
+        obj = path.json_object(extra=1, args=2)
+
+        # THEN: A JSON decodable object should have been returned.
+        self.assertEqual(obj, {'__Path__': ('/', 'base', 'path', 'to', 'fi.le')})
+
+    def test_path_json_object_base_path(self):
+        """
+        Test that `Path.json_object` creates a JSON decode-able object from a Path object, that is relative to the
+        base_path
+        """
+        # GIVEN: A Path object from openlp.core.common.path
+        path = Path('/base', 'path', 'to', 'fi.le')
+
+        # WHEN: Calling json_object with a base_path
+        obj = path.json_object(base_path=Path('/', 'base'))
+
+        # THEN: A JSON decodable object should have been returned.
+        self.assertEqual(obj, {'__Path__': ('path', 'to', 'fi.le')})

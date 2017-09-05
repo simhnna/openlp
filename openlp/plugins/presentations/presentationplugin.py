@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 
 __default_settings__ = {'presentations/override app': QtCore.Qt.Unchecked,
                         'presentations/enable_pdf_program': QtCore.Qt.Unchecked,
-                        'presentations/pdf_program': '',
+                        'presentations/pdf_program': None,
                         'presentations/Impress': QtCore.Qt.Checked,
                         'presentations/Powerpoint': QtCore.Qt.Checked,
                         'presentations/Powerpoint Viewer': QtCore.Qt.Checked,

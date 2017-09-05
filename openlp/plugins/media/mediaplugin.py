@@ -26,12 +26,11 @@ The Media plugin
 import logging
 import os
 import re
-from pathlib import Path
-
 from PyQt5 import QtCore
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, translate, check_binary_exists
+from openlp.core.common.path import Path
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.media.endpoint import api_media_endpoint, media_endpoint
 from openlp.plugins.media.lib import MediaMediaItem, MediaTab

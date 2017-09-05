@@ -22,9 +22,7 @@
 """
 Package to test the openlp.core.lib package.
 """
-import os
 import shutil
-from pathlib import Path
 
 from tempfile import mkdtemp
 from unittest import TestCase
@@ -34,6 +32,7 @@ from sqlalchemy.pool import NullPool
 from sqlalchemy.orm.scoping import ScopedSession
 from sqlalchemy import MetaData
 
+from openlp.core.common.path import Path
 from openlp.core.lib.db import init_db, get_upgrade_op, delete_database, upgrade_db
 from openlp.core.lib.projector import upgrade as pjlink_upgrade
 

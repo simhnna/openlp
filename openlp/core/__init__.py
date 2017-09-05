@@ -33,13 +33,14 @@ import os
 import shutil
 import sys
 import time
-from pathlib import Path
+from datetime import datetime
 from traceback import format_exception
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
+from openlp.core.common.path import Path
 from openlp.core.common.versionchecker import VersionThread, get_application_version
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
@@ -347,8 +348,7 @@ def set_up_logging(log_path):
     """
     Setup our logging using log_path
 
-    :param pathlib.Path log_path: The file to save the log to
-    :return: None
+    :param openlp.core.common.path.Path log_path: The file to save the log to.
     :rtype: None
     """
     check_directory_exists(log_path, True)
@@ -406,7 +406,7 @@ def main(args=None):
         # Set our data path
         log.info('Data path: {name}'.format(name=data_path))
         # Point to our data path
-        portable_settings.setValue('advanced/data path', str(data_path))
+        portable_settings.setValue('advanced/data path', data_path)
         portable_settings.setValue('advanced/is portable', True)
         portable_settings.sync()
     else:
@@ -423,8 +423,21 @@ def main(args=None):
     if application.is_data_path_missing():
         application.shared_memory.detach()
         sys.exit()
-    # Remove/convert obsolete settings.
-    Settings().remove_obsolete_settings()
+    # Upgrade settings.
+    settings = Settings()
+    if settings.can_upgrade():
+        now = datetime.now()
+        # Only back up if OpenLP has previously run.
+        if settings.value('core/has run wizard'):
+            back_up_path = AppLocation.get_data_path() / (now.strftime('%Y-%m-%d %H-%M') + '.conf')
+            log.info('Settings about to be upgraded. Existing settings are being backed up to {back_up_path}'
+                     .format(back_up_path=back_up_path))
+            QtWidgets.QMessageBox.information(
+                None, translate('OpenLP', 'Settings Upgrade'),
+                translate('OpenLP', 'Your settings are about to upgraded. A backup will be created at {back_up_path}')
+                     .format(back_up_path=back_up_path))
+            settings.export(back_up_path)
+        settings.upgrade_settings()
     # First time checks in settings
     if not Settings().value('core/has run wizard'):
         if not FirstTimeLanguageForm().exec():

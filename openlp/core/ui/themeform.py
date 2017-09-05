@@ -24,12 +24,11 @@ The Theme wizard
 """
 import logging
 import os
-from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, UiStrings, translate, get_images_filter, is_not_image_file
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib.theme import BackgroundType, BackgroundGradientType
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui import ThemeLayoutForm

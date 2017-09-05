@@ -465,8 +465,7 @@ class BibleMediaItem(MediaManagerItem):
         """
         Show the selected tab and set focus to it
 
-        :param index: The tab selected
-        :type index: int
+        :param int index: The tab selected
         :return: None
         """
         if index == SearchTabs.Search or index == SearchTabs.Select:
@@ -483,7 +482,7 @@ class BibleMediaItem(MediaManagerItem):
         Update list_widget with the contents of the selected list
 
         :param index: The index of the tab that has been changed to. (int)
-        :return: None
+        :rtype: None
         """
         if index == ResultsTab.Saved:
             self.add_built_results_to_list_widget(self.saved_results)
