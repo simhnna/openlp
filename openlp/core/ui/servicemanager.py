@@ -366,16 +366,17 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         """
         return self._modified
 
-    def set_file_name(self, file_name):
+    def set_file_name(self, file_path):
         """
         Setter for service file.
 
-        :param file_name: The service file name
+        :param openlp.core.common.path.Path file_path: The service file name
+        :rtype: None
         """
-        self._file_name = str(file_name)
+        self._file_name = path_to_str(file_path)
         self.main_window.set_service_modified(self.is_modified(), self.short_file_name())
-        Settings().setValue('servicemanager/last file', Path(file_name))
-        self._save_lite = self._file_name.endswith('.oszl')
+        Settings().setValue('servicemanager/last file', file_path)
+        self._save_lite = file_path.suffix() == '.oszl'
 
     def file_name(self):
         """
@@ -474,7 +475,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         """
         self.service_manager_list.clear()
         self.service_items = []
-        self.set_file_name('')
+        self.set_file_name(None)
         self.service_id += 1
         self.set_modified(False)
         Settings().setValue('servicemanager/last file', None)
@@ -695,27 +696,23 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
             default_file_name = format_time(default_pattern, local_time)
         else:
             default_file_name = ''
-        directory = path_to_str(Settings().value(self.main_window.service_manager_settings_section + '/last directory'))
-        path = os.path.join(directory, default_file_name)
+        directory_path = Settings().value(self.main_window.service_manager_settings_section + '/last directory')
+        file_path = directory_path / default_file_name
         # SaveAs from osz to oszl is not valid as the files will be deleted on exit which is not sensible or usable in
         # the long term.
         if self._file_name.endswith('oszl') or self.service_has_all_original_files:
-            file_name, filter_used = QtWidgets.QFileDialog.getSaveFileName(
-                self.main_window, UiStrings().SaveService, path,
+            file_path, filter_used = FileDialog.getSaveFileName(
+                self.main_window, UiStrings().SaveService, file_path,
                 translate('OpenLP.ServiceManager',
                           'OpenLP Service Files (*.osz);; OpenLP Service Files - lite (*.oszl)'))
         else:
-            file_name, filter_used = QtWidgets.QFileDialog.getSaveFileName(
-                self.main_window, UiStrings().SaveService, path,
+            file_path, filter_used = FileDialog.getSaveFileName(
+                self.main_window, UiStrings().SaveService, file_path,
                 translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz);;'))
-        if not file_name:
+        if not file_path:
             return False
-        if os.path.splitext(file_name)[1] == '':
-            file_name += '.osz'
-        else:
-            ext = os.path.splitext(file_name)[1]
-            file_name.replace(ext, '.osz')
-        self.set_file_name(file_name)
+        file_path.with_suffix('.osz')
+        self.set_file_name(file_path)
         self.decide_save_method()
 
     def decide_save_method(self, field=None):
@@ -772,7 +769,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                     return
                 file_to.close()
                 self.new_file()
-                self.set_file_name(file_name)
+                self.set_file_name(str_to_path(file_name))
                 self.main_window.display_progress_bar(len(items))
                 self.process_service_items(items)
                 delete_file(Path(p_file))
