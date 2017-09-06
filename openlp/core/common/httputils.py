@@ -218,10 +218,10 @@ def url_get_file(callback, url, f_path, sha256=None):
     block_size = 4096
     retries = 0
     log.debug("url_get_file: " + url)
-    if sha256:
-        hasher = hashlib.sha256()
     while True:
         try:
+            if sha256:
+                hasher = hashlib.sha256()
             with f_path.open('wb') as file:
                 url_file = urllib.request.urlopen(url, timeout=CONNECTION_TIMEOUT)
                 # Download until finished or canceled.
