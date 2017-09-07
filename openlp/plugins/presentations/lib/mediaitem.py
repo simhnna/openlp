@@ -187,7 +187,7 @@ class PresentationMediaItem(MediaManagerItem):
                 if controller_name:
                     controller = self.controllers[controller_name]
                     doc = controller.add_document(file)
-                    thumb = os.path.join(doc.get_thumbnail_folder(), 'icon.png')
+                    thumb = str(doc.get_thumbnail_folder() / 'icon.png')
                     preview = doc.get_thumbnail_path(1, True)
                     if not preview and not initial_load:
                         doc.load_presentation()
@@ -304,17 +304,17 @@ class PresentationMediaItem(MediaManagerItem):
                     controller = self.controllers[processor]
                     service_item.processor = None
                     doc = controller.add_document(filename)
-                    if doc.get_thumbnail_path(1, True) is None or not os.path.isfile(
-                            os.path.join(doc.get_temp_folder(), 'mainslide001.png')):
+                    if doc.get_thumbnail_path(1, True) is None or \
+                    not (doc.get_temp_folder() / 'mainslide001.png').is_file():
                         doc.load_presentation()
                     i = 1
-                    image = os.path.join(doc.get_temp_folder(), 'mainslide{number:0>3d}.png'.format(number=i))
-                    thumbnail = os.path.join(doc.get_thumbnail_folder(), 'slide%d.png' % i)
+                    image = str(doc.get_temp_folder() / 'mainslide{number:0>3d}.png'.format(number=i))
+                    thumbnail = str(doc.get_thumbnail_folder() / 'slide{number:d}.png'.format(number=i))
                     while os.path.isfile(image):
                         service_item.add_from_image(image, name, thumbnail=thumbnail)
                         i += 1
-                        image = os.path.join(doc.get_temp_folder(), 'mainslide{number:0>3d}.png'.format(number=i))
-                        thumbnail = os.path.join(doc.get_thumbnail_folder(), 'slide{number:d}.png'.format(number=i))
+                        image = str(doc.get_temp_folder() / 'mainslide{number:0>3d}.png'.format(number=i))
+                        thumbnail = str(doc.get_thumbnail_folder() / 'slide{number:d}.png'.format(number=i))
                     service_item.add_capability(ItemCapabilities.HasThumbnails)
                     doc.close_presentation()
                     return True

@@ -255,10 +255,10 @@ class ImpressDocument(PresentationDocument):
         if self.check_thumbnails():
             return
         if is_win():
-            thumb_dir_url = 'file:///' + self.get_temp_folder().replace('\\', '/') \
+            thumb_dir_url = 'file:///' + str(self.get_temp_folder()).replace('\\', '/') \
                 .replace(':', '|').replace(' ', '%20')
         else:
-            thumb_dir_url = uno.systemPathToFileUrl(self.get_temp_folder())
+            thumb_dir_url = uno.systemPathToFileUrl(str(self.get_temp_folder()))
         properties = []
         properties.append(self.create_property('FilterName', 'impress_png_Export'))
         properties = tuple(properties)
@@ -266,17 +266,18 @@ class ImpressDocument(PresentationDocument):
         pages = doc.getDrawPages()
         if not pages:
             return
-        if not os.path.isdir(self.get_temp_folder()):
-            os.makedirs(self.get_temp_folder())
+        temp_folder_path = self.get_temp_folder()
+        if not temp_folder_path.isdir():
+            temp_folder_path.mkdir()
         for index in range(pages.getCount()):
             page = pages.getByIndex(index)
             doc.getCurrentController().setCurrentPage(page)
             url_path = '{path}/{name}.png'.format(path=thumb_dir_url, name=str(index + 1))
-            path = os.path.join(self.get_temp_folder(), str(index + 1) + '.png')
+            path = temp_folder_path / '{number).png'.format(number=index + 1)
             try:
                 doc.storeToURL(url_path, properties)
-                self.convert_thumbnail(path, index + 1)
-                delete_file(Path(path))
+                self.convert_thumbnail(str(path), index + 1)
+                delete_file(path)
             except ErrorCodeIOException as exception:
                 log.exception('ERROR! ErrorCodeIOException {error:d}'.format(error=exception.ErrCode))
             except:

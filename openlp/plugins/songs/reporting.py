@@ -48,7 +48,7 @@ def report_song_list():
         Path(translate('SongPlugin.ReportSongList', 'song_extract.csv')),
         translate('SongPlugin.ReportSongList', 'CSV format (*.csv)'))
 
-    if not report_file_path:
+    if report_file_path is None:
         main_window.error_message(
             translate('SongPlugin.ReportSongList', 'Output Path Not Selected'),
             translate('SongPlugin.ReportSongList', 'You have not set a valid output location for your report. \n'

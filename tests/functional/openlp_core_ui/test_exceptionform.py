@@ -103,7 +103,7 @@ class TestExceptionForm(TestMixin, TestCase):
             os.remove(self.tempfile)
 
     @patch("openlp.core.ui.exceptionform.Ui_ExceptionDialog")
-    @patch("openlp.core.ui.exceptionform.QtWidgets.QFileDialog")
+    @patch("openlp.core.ui.exceptionform.FileDialog")
     @patch("openlp.core.ui.exceptionform.QtCore.QUrl")
     @patch("openlp.core.ui.exceptionform.QtCore.QUrlQuery.addQueryItem")
     @patch("openlp.core.ui.exceptionform.Qt")

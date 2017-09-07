@@ -240,46 +240,46 @@ class PdfDocument(PresentationDocument):
         :return: True is loading succeeded, otherwise False.
         """
         log.debug('load_presentation pdf')
+        temp_dir_path = self.get_temp_folder()
         # Check if the images has already been created, and if yes load them
-        if os.path.isfile(os.path.join(self.get_temp_folder(), 'mainslide001.png')):
-            created_files = sorted(os.listdir(self.get_temp_folder()))
-            for fn in created_files:
-                if os.path.isfile(os.path.join(self.get_temp_folder(), fn)):
-                    self.image_files.append(os.path.join(self.get_temp_folder(), fn))
+        if (temp_dir_path / 'mainslide001.png').is_file():
+            created_files = sorted(temp_dir_path.glob('*'))
+            for image_path in created_files:
+                if image_path.is_file():
+                    self.image_files.append(str(image_path))
             self.num_pages = len(self.image_files)
             return True
         size = ScreenList().current['size']
         # Generate images from PDF that will fit the frame.
         runlog = ''
         try:
-            if not os.path.isdir(self.get_temp_folder()):
-                os.makedirs(self.get_temp_folder())
+            if not temp_dir_path.is_dir():
+                temp_dir_path.mkdir(parents=True)
             # The %03d in the file name is handled by each binary
             if self.controller.mudrawbin:
                 log.debug('loading presentation using mudraw')
                 runlog = check_output([self.controller.mudrawbin, '-w', str(size.width()), '-h', str(size.height()),
-                                       '-o', os.path.join(self.get_temp_folder(), 'mainslide%03d.png'), self.file_path],
+                                       '-o', str(temp_dir_path / 'mainslide%03d.png'), self.file_path],
                                       startupinfo=self.startupinfo)
             elif self.controller.mutoolbin:
                 log.debug('loading presentation using mutool')
                 runlog = check_output([self.controller.mutoolbin, 'draw', '-w', str(size.width()), '-h',
                                        str(size.height()),
-                                       '-o', os.path.join(self.get_temp_folder(), 'mainslide%03d.png'), self.file_path],
+                                       '-o', str(temp_dir_path / 'mainslide%03d.png'), self.file_path],
                                       startupinfo=self.startupinfo)
             elif self.controller.gsbin:
                 log.debug('loading presentation using gs')
                 resolution = self.gs_get_resolution(size)
                 runlog = check_output([self.controller.gsbin, '-dSAFER', '-dNOPAUSE', '-dBATCH', '-sDEVICE=png16m',
                                        '-r' + str(resolution), '-dTextAlphaBits=4', '-dGraphicsAlphaBits=4',
-                                       '-sOutputFile=' + os.path.join(self.get_temp_folder(), 'mainslide%03d.png'),
+                                       '-sOutputFile=' + str(temp_dir_path / 'mainslide%03d.png'),
                                        self.file_path], startupinfo=self.startupinfo)
-            created_files = sorted(os.listdir(self.get_temp_folder()))
-            for fn in created_files:
-                if os.path.isfile(os.path.join(self.get_temp_folder(), fn)):
-                    self.image_files.append(os.path.join(self.get_temp_folder(), fn))
-        except Exception as e:
-            log.debug(e)
-            log.debug(runlog)
+            created_files = sorted(temp_dir_path.glob('*'))
+            for image_path in created_files:
+                if image_path.is_file():
+                    self.image_files.append(str(image_path))
+        except Exception:
+            log.exception(runlog)
             return False
         self.num_pages = len(self.image_files)
         # Create thumbnails

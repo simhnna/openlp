@@ -29,6 +29,7 @@ from PyQt5 import QtCore
 from openlp.core.common import Registry, AppLocation, Settings, check_directory_exists, md5_hash
 from openlp.core.common.path import Path
 from openlp.core.lib import create_thumb, validate_thumb
+from openlp.core.lib.shutil import rmtree
 
 log = logging.getLogger(__name__)
 
@@ -99,7 +100,7 @@ class PresentationDocument(object):
         """
         self.slide_number = 0
         self.file_path = name
-        check_directory_exists(Path(self.get_thumbnail_folder()))
+        check_directory_exists(self.get_thumbnail_folder())
 
     def load_presentation(self):
         """
@@ -116,10 +117,12 @@ class PresentationDocument(object):
         a file, e.g. thumbnails
         """
         try:
-            if os.path.exists(self.get_thumbnail_folder()):
-                shutil.rmtree(self.get_thumbnail_folder())
-            if os.path.exists(self.get_temp_folder()):
-                shutil.rmtree(self.get_temp_folder())
+            thumbnail_folder_path = self.get_thumbnail_folder()
+            temp_folder_path = self.get_temp_folder()
+            if thumbnail_folder_path.exists():
+                rmtree(thumbnail_folder_path)
+            if temp_folder_path.exists():
+                rmtree(temp_folder_path)
         except OSError:
             log.exception('Failed to delete presentation controller files')
 
@@ -132,24 +135,30 @@ class PresentationDocument(object):
     def get_thumbnail_folder(self):
         """
         The location where thumbnail images will be stored
+
+        :return: The path to the thumbnail
+        :rtype: openlp.core.common.path.Path
         """
         # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
             folder = md5_hash(self.file_path.encode('utf-8'))
         else:
             folder = self.get_file_name()
-        return os.path.join(self.controller.thumbnail_folder, folder)
+        return Path(self.controller.thumbnail_folder, folder)
 
     def get_temp_folder(self):
         """
         The location where thumbnail images will be stored
+
+        :return: The path to the temporary file folder
+        :rtype: openlp.core.common.path.Path
         """
         # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
             folder = md5_hash(self.file_path.encode('utf-8'))
         else:
-            folder = folder = self.get_file_name()
-        return os.path.join(self.controller.temp_folder, folder)
+            folder = self.get_file_name()
+        return Path(self.controller.temp_folder, folder)
 
     def check_thumbnails(self):
         """
@@ -251,15 +260,17 @@ class PresentationDocument(object):
             thumb_path = self.get_thumbnail_path(idx, False)
             create_thumb(file, thumb_path, False, QtCore.QSize(-1, 360))
 
-    def get_thumbnail_path(self, slide_no, check_exists):
+    def get_thumbnail_path(self, slide_no, check_exists=True):
         """
         Returns an image path containing a preview for the requested slide
 
-        :param slide_no: The slide an image is required for, starting at 1
-        :param check_exists:
+        :param int slide_no: The slide an image is required for, starting at 1
+        :param bool check_exists: Check if the generated path exists
+        :return: The path, or None if the :param:`check_exists` is True and the file does not exist
+        :rtype: openlp.core.common.path.Path, None
         """
-        path = os.path.join(self.get_thumbnail_folder(), self.controller.thumbnail_prefix + str(slide_no) + '.png')
-        if os.path.isfile(path) or not check_exists:
+        path = self.get_thumbnail_folder() / (self.controller.thumbnail_prefix + str(slide_no) + '.png')
+        if path.is_file() or not check_exists:
             return path
         else:
             return None
@@ -304,7 +315,7 @@ class PresentationDocument(object):
         """
         titles = []
         notes = []
-        titles_file = os.path.join(self.get_thumbnail_folder(), 'titles.txt')
+        titles_file = str(self.get_thumbnail_folder() / 'titles.txt')
         if os.path.exists(titles_file):
             try:
                 with open(titles_file, encoding='utf-8') as fi:
@@ -313,7 +324,7 @@ class PresentationDocument(object):
                 log.exception('Failed to open/read existing titles file')
                 titles = []
         for slide_no, title in enumerate(titles, 1):
-            notes_file = os.path.join(self.get_thumbnail_folder(), 'slideNotes{number:d}.txt'.format(number=slide_no))
+            notes_file = str(self.get_thumbnail_folder() / 'slideNotes{number:d}.txt'.format(number=slide_no))
             note = ''
             if os.path.exists(notes_file):
                 try:
@@ -331,14 +342,13 @@ class PresentationDocument(object):
         and notes to the slideNote%.txt
         """
         if titles:
-            titles_file = os.path.join(self.get_thumbnail_folder(), 'titles.txt')
-            with open(titles_file, mode='wt', encoding='utf-8') as fo:
+            titles_path = self.get_thumbnail_folder() / 'titles.txt'
+            with titles_path.open(mode='wt', encoding='utf-8') as fo:
                 fo.writelines(titles)
         if notes:
             for slide_no, note in enumerate(notes, 1):
-                notes_file = os.path.join(self.get_thumbnail_folder(),
-                                          'slideNotes{number:d}.txt'.format(number=slide_no))
-                with open(notes_file, mode='wt', encoding='utf-8') as fn:
+                notes_path = self.get_thumbnail_folder() / 'slideNotes{number:d}.txt'.format(number=slide_no)
+                with notes_path.open(mode='wt', encoding='utf-8') as fn:
                     fn.write(note)
 
 

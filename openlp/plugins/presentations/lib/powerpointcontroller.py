@@ -177,7 +177,7 @@ class PowerpointDocument(PresentationDocument):
             if not self.presentation.Slides(num + 1).SlideShowTransition.Hidden:
                 self.index_map[key] = num + 1
                 self.presentation.Slides(num + 1).Export(
-                    os.path.join(self.get_thumbnail_folder(), 'slide{key:d}.png'.format(key=key)), 'png', 320, 240)
+                    str(self.get_thumbnail_folder() / 'slide{key:d}.png'.format(key=key)), 'png', 320, 240)
                 key += 1
         self.slide_count = key - 1
 

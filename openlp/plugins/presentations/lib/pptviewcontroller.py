@@ -121,17 +121,17 @@ class PptviewDocument(PresentationDocument):
         the background PptView task started earlier.
         """
         log.debug('LoadPresentation')
-        temp_folder = self.get_temp_folder()
+        temp_dir_path = self.get_temp_folder()
         size = ScreenList().current['size']
         rect = RECT(size.x(), size.y(), size.right(), size.bottom())
         self.file_path = os.path.normpath(self.file_path)
-        preview_path = os.path.join(temp_folder, 'slide')
+        preview_path = temp_dir_path / 'slide'
         # Ensure that the paths are null terminated
         byte_file_path = self.file_path.encode('utf-16-le') + b'\0'
-        preview_path = preview_path.encode('utf-16-le') + b'\0'
-        if not os.path.isdir(temp_folder):
-            os.makedirs(temp_folder)
-        self.ppt_id = self.controller.process.OpenPPT(byte_file_path, None, rect, preview_path)
+        preview_file_name = str(preview_path).encode('utf-16-le') + b'\0'
+        if not temp_dir_path:
+            temp_dir_path.mkdir(parents=True)
+        self.ppt_id = self.controller.process.OpenPPT(byte_file_path, None, rect, preview_file_name)
         if self.ppt_id >= 0:
             self.create_thumbnails()
             self.stop_presentation()
