@@ -47,9 +47,9 @@ def run_thread(parent, worker, prefix='', auto_start=True):
     # Move the worker into the thread's context
     worker.moveToThread(thread)
     # Connect slots and signals
-    parent.version_thread.started.connect(parent.version_worker.start)
-    parent.version_worker.quit.connect(parent.version_thread.quit)
-    parent.version_worker.quit.connect(parent.version_worker.deleteLater)
-    parent.version_thread.finished.connect(parent.version_thread.deleteLater)
+    thread.started.connect(worker.start)
+    worker.quit.connect(thread.quit)
+    worker.quit.connect(worker.deleteLater)
+    thread.finished.connect(thread.deleteLater)
     if auto_start:
-        parent.version_thread.start()
+        thread.start()
