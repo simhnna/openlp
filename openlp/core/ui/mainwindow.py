@@ -40,7 +40,6 @@ from openlp.core.api.http import server
 from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, translate, is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
-from openlp.core.common.versionchecker import get_application_version
 from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
 from openlp.core.lib.ui import create_action
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
@@ -51,6 +50,7 @@ from openlp.core.ui.printserviceform import PrintServiceForm
 from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+from openlp.core.version import get_version
 
 
 log = logging.getLogger(__name__)
@@ -487,7 +487,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
     """
     The main window.
     """
-    openlp_version_check = QtCore.pyqtSignal(QtCore.QVariant)
     log.info('MainWindow loaded')
 
     def __init__(self):
@@ -561,7 +560,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         self.application.set_busy_cursor()
         # Simple message boxes
         Registry().register_function('theme_update_global', self.default_theme_changed)
-        self.openlp_version_check.connect(self.version_notice)
         Registry().register_function('config_screen_changed', self.screen_changed)
         Registry().register_function('bootstrap_post_set_up', self.bootstrap_post_set_up)
         # Reset the cursor
@@ -587,6 +585,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             if saved_plugin_id != -1:
                 self.media_tool_box.setCurrentIndex(saved_plugin_id)
 
+    def on_new_version_number(self, version_number):
+        """
+        Called when the version check thread completes and we need to check the version number
+
+        :param str version_number: The version number downloaded from the OpenLP server.
+        """
+
     def on_search_shortcut_triggered(self):
         """
         Called when the search shortcut has been pressed.
@@ -606,7 +611,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if widget:
             widget.on_focus()
 
-    def version_notice(self, version):
+    def on_new_version(self, version):
         """
         Notifies the user that a newer version of OpenLP is available.
         Triggered by delay thread and cannot display popup.
@@ -616,7 +621,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         log.debug('version_notice')
         version_text = translate('OpenLP.MainWindow', 'Version {new} of OpenLP is now available for download (you are '
                                  'currently running version {current}). \n\nYou can download the latest version from '
-                                 'http://openlp.org/.').format(new=version, current=get_application_version()[u'full'])
+                                 'http://openlp.org/.').format(new=version, current=get_version()[u'full'])
         QtWidgets.QMessageBox.question(self, translate('OpenLP.MainWindow', 'OpenLP Version Updated'), version_text)
 
     def show(self):
@@ -973,7 +978,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # Add a header section.
         # This is to insure it's our conf file for import.
         now = datetime.now()
-        application_version = get_application_version()
+        application_version = get_version()
         # Write INI format using Qsettings.
         # Write our header.
         export_settings.beginGroup(self.header_section)

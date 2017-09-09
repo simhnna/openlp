@@ -26,21 +26,19 @@ The :mod:`core` module provides all core application functions
 All the core functions of the OpenLP application including the GUI, settings,
 logging and a plugin framework are contained within the openlp.core module.
 """
-
 import argparse
 import logging
 import os
 import shutil
 import sys
 import time
-from pathlib import Path
 from traceback import format_exception
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
-from openlp.core.common.versionchecker import VersionThread, get_application_version
+from openlp.core.version import check_for_update, get_version
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
 from openlp.core.ui import SplashScreen
@@ -154,8 +152,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         self.processEvents()
         if not has_run_wizard:
             self.main_window.first_time()
-        version = VersionThread(self.main_window)
-        version.start()
+        if Settings().value('core/update check'):
+            check_for_update(self.main_window)
         self.main_window.is_display_blank()
         self.main_window.app_startup()
         return self.exec()
@@ -183,22 +181,18 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         data_folder_path = str(AppLocation.get_data_path())
         if not os.path.exists(data_folder_path):
             log.critical('Database was not found in: ' + data_folder_path)
-            status = QtWidgets.QMessageBox.critical(None, translate('OpenLP', 'Data Directory Error'),
-                                                    translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}'
-                                                                        '\n\nThe location of the data folder was '
-                                                                        'previously changed from the OpenLP\'s '
-                                                                        'default location. If the data was stored on '
-                                                                        'removable device, that device needs to be '
-                                                                        'made available.\n\nYou may reset the data '
-                                                                        'location back to the default location, '
-                                                                        'or you can try to make the current location '
-                                                                        'available.\n\nDo you want to reset to the '
-                                                                        'default data location? If not, OpenLP will be '
-                                                                        'closed so you can try to fix the the problem.')
-                                                    .format(path=data_folder_path),
-                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                          QtWidgets.QMessageBox.No),
-                                                    QtWidgets.QMessageBox.No)
+            status = QtWidgets.QMessageBox.critical(
+                None, translate('OpenLP', 'Data Directory Error'),
+                translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}\n\nThe location of the data '
+                          'folder was previously changed from the OpenLP\'s default location. If the data was '
+                          'stored on removable device, that device needs to be made available.\n\nYou may reset '
+                          'the data location back to the default location, or you can try to make the current '
+                          'location available.\n\nDo you want to reset to the default data location? If not, '
+                          'OpenLP will be closed so you can try to fix the the problem.').format(
+                              path=data_folder_path),
+                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
+                QtWidgets.QMessageBox.No
+            )
             if status == QtWidgets.QMessageBox.No:
                 # If answer was "No", return "True", it will shutdown OpenLP in def main
                 log.info('User requested termination')
@@ -239,7 +233,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         :param can_show_splash: Should OpenLP show the splash screen
         """
         data_version = Settings().value('core/application version')
-        openlp_version = get_application_version()['version']
+        openlp_version = get_version()['version']
         # New installation, no need to create backup
         if not has_run_wizard:
             Settings().setValue('core/application version', openlp_version)
@@ -415,7 +409,7 @@ def main(args=None):
     Registry.create()
     Registry().register('application', application)
     Registry().set_flag('no_web_server', args.no_web_server)
-    application.setApplicationVersion(get_application_version()['version'])
+    application.setApplicationVersion(get_version()['version'])
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     if application.is_already_running():
         sys.exit()

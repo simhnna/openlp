@@ -20,24 +20,21 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-The :mod:`openlp.core.common` module downloads the version details for OpenLP.
+The :mod:`openlp.core.version` module downloads the version details for OpenLP.
 """
 import logging
 import os
 import platform
 import sys
-import time
-import urllib.error
-import urllib.parse
-import urllib.request
 from datetime import datetime
 from distutils.version import LooseVersion
 from subprocess import Popen, PIPE
 
+import requests
 from PyQt5 import QtCore
 
-from openlp.core.common import AppLocation, Registry, Settings
-from openlp.core.common.httputils import ping
+from openlp.core.common import AppLocation, Settings
+from openlp.core.threading import run_thread
 
 log = logging.getLogger(__name__)
 
@@ -46,42 +43,87 @@ CONNECTION_TIMEOUT = 30
 CONNECTION_RETRIES = 2
 
 
-class VersionThread(QtCore.QThread):
+class VersionWorker(QtCore.QObject):
     """
-    A special Qt thread class to fetch the version of OpenLP from the website.
-    This is threaded so that it doesn't affect the loading time of OpenLP.
+    A worker class to fetch the version of OpenLP from the website. This is run from within a thread so that it
+    doesn't affect the loading time of OpenLP.
     """
-    def __init__(self, main_window):
-        """
-        Constructor for the thread class.
+    new_version = QtCore.pyqtSignal(dict)
+    no_internet = QtCore.pyqtSignal()
+    quit = QtCore.pyqtSignal()
 
-        :param main_window: The main window Object.
+    def __init__(self, last_check_date):
         """
-        log.debug("VersionThread - Initialise")
-        super(VersionThread, self).__init__(None)
-        self.main_window = main_window
+        Constructor for the version check worker.
 
-    def run(self):
+        :param string last_check_date: The last day we checked for a new version of OpenLP
         """
-        Run the thread.
+        log.debug('VersionWorker - Initialise')
+        super(VersionWorker, self).__init__(None)
+        self.last_check_date = last_check_date
+
+    def start(self):
         """
-        self.sleep(1)
-        log.debug('Version thread - run')
-        found = ping("openlp.io")
-        Registry().set_flag('internet_present', found)
-        update_check = Settings().value('core/update check')
-        if found:
-            Registry().execute('get_website_version')
-            if update_check:
-                app_version = get_application_version()
-                version = check_latest_version(app_version)
-                log.debug("Versions {version1} and {version2} ".format(version1=LooseVersion(str(version)),
-                                                                       version2=LooseVersion(str(app_version['full']))))
-                if LooseVersion(str(version)) > LooseVersion(str(app_version['full'])):
-                    self.main_window.openlp_version_check.emit('{version}'.format(version=version))
+        Check the latest version of OpenLP against the version file on the OpenLP site.
+
+        **Rules around versions and version files:**
+
+        * If a version number has a build (i.e. -bzr1234), then it is a nightly.
+        * If a version number's minor version is an odd number, it is a development release.
+        * If a version number's minor version is an even number, it is a stable release.
+        """
+        log.debug('VersionWorker - Start')
+        # I'm not entirely sure why this was here, I'm commenting it out until I hit the same scenario
+        # time.sleep(1)
+        current_version = get_version()
+        download_url = 'http://www.openlp.org/files/version.txt'
+        if current_version['build']:
+            download_url = 'http://www.openlp.org/files/nightly_version.txt'
+        elif int(current_version['version'].split('.')[1]) % 2 != 0:
+            download_url = 'http://www.openlp.org/files/dev_version.txt'
+        headers = {
+            'User-Agent', 'OpenLP/{version} {system}/{release}; '.format(version=current_version['full'],
+                                                                         system=platform.system(),
+                                                                         release=platform.release())
+        }
+        remote_version = None
+        retries = 0
+        while retries < 3:
+            try:
+                response = requests.get(download_url, headers=headers)
+                remote_version = response.text
+                log.debug('New version found: %s', remote_version)
+                break
+            except requests.exceptions.ConnectionError:
+                log.exception('Unable to connect to OpenLP server to download version file')
+                self.no_internet.emit()
+                retries += 1
+            except requests.exceptions.RequestException:
+                log.exception('Error occurred while connecting to OpenLP server to download version file')
+                retries += 1
+        if remote_version and LooseVersion(remote_version) > LooseVersion(current_version['full']):
+            self.new_version.emit(remote_version)
+        self.quit.emit()
 
 
-def get_application_version():
+def check_for_update(parent):
+    """
+    Run a thread to download and check the version of OpenLP
+
+    :param MainWindow parent: The parent object for the thread. Usually the OpenLP main window.
+    """
+    last_check_date = Settings().value('core/last version test')
+    if datetime.date().strftime('%Y-%m-%d') <= last_check_date:
+        log.debug('Version check skipped, last checked today')
+        return
+    worker = VersionWorker(last_check_date)
+    worker.new_version.connect(parent.on_new_version)
+    # TODO: Use this to figure out if there's an Internet connection?
+    # worker.no_internet.connect(parent.on_no_internet)
+    run_thread(parent, worker, 'version')
+
+
+def get_version():
     """
     Returns the application version of the running instance of OpenLP::
 
@@ -150,55 +192,3 @@ def get_application_version():
     else:
         log.info('Openlp version {version}'.format(version=APPLICATION_VERSION['version']))
     return APPLICATION_VERSION
-
-
-def check_latest_version(current_version):
-    """
-    Check the latest version of OpenLP against the version file on the OpenLP
-    site.
-
-    **Rules around versions and version files:**
-
-    * If a version number has a build (i.e. -bzr1234), then it is a nightly.
-    * If a version number's minor version is an odd number, it is a development release.
-    * If a version number's minor version is an even number, it is a stable release.
-
-    :param current_version: The current version of OpenLP.
-    """
-    version_string = current_version['full']
-    # set to prod in the distribution config file.
-    settings = Settings()
-    settings.beginGroup('core')
-    last_test = settings.value('last version test')
-    this_test = str(datetime.now().date())
-    settings.setValue('last version test', this_test)
-    settings.endGroup()
-    if last_test != this_test:
-        if current_version['build']:
-            req = urllib.request.Request('http://www.openlp.org/files/nightly_version.txt')
-        else:
-            version_parts = current_version['version'].split('.')
-            if int(version_parts[1]) % 2 != 0:
-                req = urllib.request.Request('http://www.openlp.org/files/dev_version.txt')
-            else:
-                req = urllib.request.Request('http://www.openlp.org/files/version.txt')
-        req.add_header('User-Agent', 'OpenLP/{version} {system}/{release}; '.format(version=current_version['full'],
-                                                                                    system=platform.system(),
-                                                                                    release=platform.release()))
-        remote_version = None
-        retries = 0
-        while True:
-            try:
-                remote_version = str(urllib.request.urlopen(req, None,
-                                                            timeout=CONNECTION_TIMEOUT).read().decode()).strip()
-            except (urllib.error.URLError, ConnectionError):
-                if retries > CONNECTION_RETRIES:
-                    log.exception('Failed to download the latest OpenLP version file')
-                else:
-                    retries += 1
-                    time.sleep(0.1)
-                    continue
-            break
-        if remote_version:
-            version_string = remote_version
-    return version_string

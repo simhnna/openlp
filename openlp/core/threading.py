@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
@@ -21,28 +20,36 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-The entrypoint for OpenLP
+The :mod:`openlp.core.threading` module contains some common threading code
 """
-import faulthandler
-import multiprocessing
-import sys
+from PyQt5 import QtCore
 
-from openlp.core.common import is_win, is_macosx
-from openlp.core import main
 
-faulthandler.enable()
-
-if __name__ == '__main__':
+def run_thread(parent, worker, prefix='', auto_start=True):
     """
-    Instantiate and run the application.
+    Create a thread and assign a worker to it. This removes a lot of boilerplate code from the codebase.
+
+    :param object parent: The parent object so that the thread and worker are not orphaned.
+    :param QObject worker: A QObject-based worker object which does the actual work.
+    :param str prefix: A prefix to be applied to the attribute names.
+    :param bool auto_start: Automatically start the thread. Defaults to True.
     """
-    # Add support for using multiprocessing from frozen Windows executable (built using PyInstaller),
-    # see https://docs.python.org/3/library/multiprocessing.html#multiprocessing.freeze_support
-    if is_win():
-        multiprocessing.freeze_support()
-    # Mac OS X passes arguments like '-psn_XXXX' to the application. This argument is actually a process serial number.
-    # However, this causes a conflict with other OpenLP arguments. Since we do not use this argument we can delete it
-    # to avoid any potential conflicts.
-    if is_macosx():
-        sys.argv = [x for x in sys.argv if not x.startswith('-psn')]
-    main()
+    # Set up attribute names
+    thread_name = 'thread'
+    worker_name = 'worker'
+    if prefix:
+        thread_name = '_'.join([prefix, thread_name])
+        worker_name = '_'.join([prefix, worker_name])
+    # Create the thread and add the thread and the worker to the parent
+    thread = QtCore.QThread()
+    setattr(parent, thread_name, thread)
+    setattr(parent, worker_name, worker)
+    # Move the worker into the thread's context
+    worker.moveToThread(thread)
+    # Connect slots and signals
+    parent.version_thread.started.connect(parent.version_worker.start)
+    parent.version_worker.quit.connect(parent.version_thread.quit)
+    parent.version_worker.quit.connect(parent.version_worker.deleteLater)
+    parent.version_thread.finished.connect(parent.version_thread.deleteLater)
+    if auto_start:
+        parent.version_thread.start()
