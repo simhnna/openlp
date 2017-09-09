@@ -22,13 +22,12 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
-from openlp.core import common
 from openlp.core.common import check_directory_exists, clean_button_text, de_hump, extension_loader, is_macosx, \
     is_linux, is_win, path_to_module, trace_error_handler, translate
+from openlp.core.common.path import Path
 
 
 class TestCommonFunctions(TestCase):

@@ -297,7 +297,9 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
                                                triggers=controller.send_to_plugins)
         controller.position_label = QtWidgets.QLabel()
         controller.position_label.setText(' 00:00 / 00:00')
+        controller.position_label.setAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
         controller.position_label.setToolTip(translate('OpenLP.SlideController', 'Video timer.'))
+        controller.position_label.setMinimumSize(90, 0)
         controller.position_label.setObjectName('position_label')
         controller.mediabar.add_toolbar_widget(controller.position_label)
         # Build the seek_slider.
@@ -433,7 +435,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         log.debug('video mediatype: ' + str(controller.media_info.media_type))
         # dont care about actual theme, set a black background
         if controller.is_live and not controller.media_info.is_background:
-            display.frame.evaluateJavaScript('show_video( "setBackBoard", null, null, null,"visible");')
+            display.frame.evaluateJavaScript('show_video("setBackBoard", null, null,"visible");')
         # now start playing - Preview is autoplay!
         autoplay = False
         # Preview requested
@@ -766,6 +768,11 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
             self.current_media_players[controller.controller_type].stop(display)
             self.current_media_players[controller.controller_type].set_visible(display, False)
             controller.seek_slider.setSliderPosition(0)
+            total_seconds = controller.media_info.length // 1000
+            total_minutes = total_seconds // 60
+            total_seconds %= 60
+            controller.position_label.setText(' %02d:%02d / %02d:%02d' %
+                                              (0, 0, total_minutes, total_seconds))
             controller.mediabar.actions['playbackPlay'].setVisible(True)
             controller.mediabar.actions['playbackStop'].setDisabled(True)
             controller.mediabar.actions['playbackPause'].setVisible(False)
@@ -828,7 +835,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
             display.override = {}
             self.current_media_players[controller.controller_type].reset(display)
             self.current_media_players[controller.controller_type].set_visible(display, False)
-            display.frame.evaluateJavaScript('show_video( "setBackBoard", null, null, null,"hidden");')
+            display.frame.evaluateJavaScript('show_video("setBackBoard", null, null, "hidden");')
             del self.current_media_players[controller.controller_type]
 
     def media_hide(self, msg):
@@ -843,7 +850,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         display = self._define_display(self.live_controller)
         if self.live_controller.controller_type in self.current_media_players and \
                 self.current_media_players[self.live_controller.controller_type].get_live_state() == MediaState.Playing:
-            self.current_media_players[self.live_controller.controller_type].pause(display)
+            self.media_pause(display.controller)
             self.current_media_players[self.live_controller.controller_type].set_visible(display, False)
 
     def media_blank(self, msg):
@@ -861,7 +868,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         display = self._define_display(self.live_controller)
         if self.live_controller.controller_type in self.current_media_players and \
                 self.current_media_players[self.live_controller.controller_type].get_live_state() == MediaState.Playing:
-            self.current_media_players[self.live_controller.controller_type].pause(display)
+            self.media_pause(display.controller)
             self.current_media_players[self.live_controller.controller_type].set_visible(display, False)
 
     def media_unblank(self, msg):
@@ -879,7 +886,7 @@ class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
         if self.live_controller.controller_type in self.current_media_players and \
                 self.current_media_players[self.live_controller.controller_type].get_live_state() != \
                 MediaState.Playing:
-            if self.current_media_players[self.live_controller.controller_type].play(display):
+            if self.media_play(display.controller):
                 self.current_media_players[self.live_controller.controller_type].set_visible(display, True)
                 # Start Timer for ui updates
                 if not self.live_timer.isActive():

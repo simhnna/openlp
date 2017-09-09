@@ -27,11 +27,11 @@ import os
 import re
 import base64
 import math
-from pathlib import Path
 
+from openlp.core.common import Settings, is_win, is_macosx, get_file_encoding
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
-from openlp.core.common import Settings, is_win, is_macosx, get_file_encoding
 
 log = logging.getLogger(__name__)
 

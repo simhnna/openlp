@@ -32,6 +32,7 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtWidgets
 
 from openlp.core.common import Registry, Settings
+from openlp.core.common.path import Path
 from openlp.core.lib.pluginmanager import PluginManager
 
 from tests.helpers.testmixin import TestMixin
@@ -48,7 +49,7 @@ class TestPluginManager(TestCase, TestMixin):
         """
         self.setup_application()
         self.build_settings()
-        self.temp_dir = mkdtemp('openlp')
+        self.temp_dir = Path(mkdtemp('openlp'))
         Settings().setValue('advanced/data path', self.temp_dir)
         Registry.create()
         Registry().register('service_list', MagicMock())
@@ -62,7 +63,7 @@ class TestPluginManager(TestCase, TestMixin):
         # On windows we need to manually garbage collect to close sqlalchemy files
         # to avoid errors when temporary files are deleted.
         gc.collect()
-        shutil.rmtree(self.temp_dir)
+        shutil.rmtree(str(self.temp_dir))
 
     @patch('openlp.plugins.songusage.lib.db.init_schema')
     @patch('openlp.plugins.songs.lib.db.init_schema')

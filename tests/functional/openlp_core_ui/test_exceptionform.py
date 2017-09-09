@@ -29,6 +29,7 @@ from unittest import TestCase
 from unittest.mock import mock_open, patch
 
 from openlp.core.common import Registry
+from openlp.core.common.path import Path
 from openlp.core.ui import exceptionform
 
 from tests.helpers.testmixin import TestMixin
@@ -154,7 +155,7 @@ class TestExceptionForm(TestMixin, TestCase):
         # THEN: Verify strings were formatted properly
         mocked_add_query_item.assert_called_with('body', MAIL_ITEM_TEXT)
 
-    @patch("openlp.core.ui.exceptionform.QtWidgets.QFileDialog.getSaveFileName")
+    @patch("openlp.core.ui.exceptionform.FileDialog.getSaveFileName")
     @patch("openlp.core.ui.exceptionform.Qt")
     def test_on_save_report_button_clicked(self,
                                            mocked_qt,
@@ -181,7 +182,7 @@ class TestExceptionForm(TestMixin, TestCase):
         mocked_qt.PYQT_VERSION_STR = 'PyQt5 Test'
         mocked_is_linux.return_value = False
         mocked_application_version.return_value = 'Trunk Test'
-        mocked_save_filename.return_value = ['testfile.txt', ]
+        mocked_save_filename.return_value = (Path('testfile.txt'), 'filter')
 
         test_form = exceptionform.ExceptionForm()
         test_form.file_attachment = None

@@ -28,6 +28,7 @@ from unittest.mock import ANY, MagicMock, patch
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry
+from openlp.core.common.path import Path
 from openlp.plugins.images.lib.db import ImageFilenames, ImageGroups
 from openlp.plugins.images.lib.mediaitem import ImageMediaItem
 
@@ -65,7 +66,7 @@ class TestImageMediaItem(TestCase):
         # THEN: load_list should have been called with the file list and None,
         #       the directory should have been saved to the settings
         mocked_load_list.assert_called_once_with(file_list, None)
-        mocked_settings().setValue.assert_called_once_with(ANY, '/path1')
+        mocked_settings().setValue.assert_called_once_with(ANY, Path('/', 'path1'))
 
     @patch('openlp.plugins.images.lib.mediaitem.ImageMediaItem.load_list')
     @patch('openlp.plugins.images.lib.mediaitem.Settings')
@@ -82,7 +83,7 @@ class TestImageMediaItem(TestCase):
         # THEN: load_list should have been called with the file list and the group name,
         #       the directory should have been saved to the settings
         mocked_load_list.assert_called_once_with(file_list, 'group')
-        mocked_settings().setValue.assert_called_once_with(ANY, '/path1')
+        mocked_settings().setValue.assert_called_once_with(ANY, Path('/', 'path1'))
 
     @patch('openlp.plugins.images.lib.mediaitem.ImageMediaItem.load_full_list')
     def test_save_new_images_list_empty_list(self, mocked_load_full_list):

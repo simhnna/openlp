@@ -402,7 +402,7 @@ class TestSystemPlayer(TestCase):
         """
         # GIVEN: A SystemPlayer instance
         player = SystemPlayer(self)
-        player.state = MediaState.Playing
+        player.state = [MediaState.Playing, MediaState.Playing]
         mocked_display = MagicMock()
         mocked_display.media_player.state.return_value = QtMultimedia.QMediaPlayer.PausedState
         mocked_display.controller.media_info.end_time = 1
@@ -415,11 +415,11 @@ class TestSystemPlayer(TestCase):
             player.update_ui(mocked_display)
 
         # THEN: The UI is updated
-        expected_stop_calls = [call(mocked_display), call(mocked_display)]
+        expected_stop_calls = [call(mocked_display)]
         expected_position_calls = [call(), call()]
         expected_block_signals_calls = [call(True), call(False)]
         mocked_display.media_player.state.assert_called_once_with()
-        self.assertEqual(2, mocked_stop.call_count)
+        self.assertEqual(1, mocked_stop.call_count)
         self.assertEqual(expected_stop_calls, mocked_stop.call_args_list)
         self.assertEqual(2, mocked_display.media_player.position.call_count)
         self.assertEqual(expected_position_calls, mocked_display.media_player.position.call_args_list)
@@ -442,11 +442,15 @@ class TestSystemPlayer(TestCase):
         # THEN: The css should be empty
         self.assertEqual('', result)
 
-    def test_get_info(self):
+    @patch('openlp.core.ui.media.systemplayer.QtMultimedia.QMediaPlayer')
+    def test_get_info(self, MockQMediaPlayer):
         """
         Test the get_info() method of the SystemPlayer
         """
         # GIVEN: A SystemPlayer instance
+        mocked_media_player = MagicMock()
+        mocked_media_player.supportedMimeTypes.return_value = []
+        MockQMediaPlayer.return_value = mocked_media_player
         player = SystemPlayer(self)
 
         # WHEN: get_info() is called

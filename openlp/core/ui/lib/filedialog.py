@@ -20,11 +20,9 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """ Patch the QFileDialog so it accepts and returns Path objects"""
-from pathlib import Path
-
 from PyQt5 import QtWidgets
 
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib import replace_params
 
 
@@ -36,7 +34,7 @@ class FileDialog(QtWidgets.QFileDialog):
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
-        :type directory: pathlib.Path
+        :type directory: openlp.core.common.path.Path
         :type options: QtWidgets.QFileDialog.Options
         :rtype: tuple[Path, str]
         """
@@ -55,7 +53,7 @@ class FileDialog(QtWidgets.QFileDialog):
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
-        :type directory: pathlib.Path
+        :type directory: openlp.core.common.path.Path
         :type filter: str
         :type initialFilter: str
         :type options: QtWidgets.QFileDialog.Options
@@ -76,7 +74,7 @@ class FileDialog(QtWidgets.QFileDialog):
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
-        :type directory: pathlib.Path
+        :type directory: openlp.core.common.path.Path
         :type filter: str
         :type initialFilter: str
         :type options: QtWidgets.QFileDialog.Options
@@ -98,7 +96,7 @@ class FileDialog(QtWidgets.QFileDialog):
 
         :type parent: QtWidgets.QWidget or None
         :type caption: str
-        :type directory: pathlib.Path
+        :type directory: openlp.core.common.path.Path
         :type filter: str
         :type initialFilter: str
         :type options: QtWidgets.QFileDialog.Options

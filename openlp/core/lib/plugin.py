@@ -150,7 +150,7 @@ class Plugin(QtCore.QObject, RegistryProperties):
         self.status = PluginStatus.Inactive
         # Add the default status to the default settings.
         default_settings[name + '/status'] = PluginStatus.Inactive
-        default_settings[name + '/last directory'] = ''
+        default_settings[name + '/last directory'] = None
         # Append a setting for files in the mediamanager (note not all plugins
         # which have a mediamanager need this).
         if media_item_class is not None:

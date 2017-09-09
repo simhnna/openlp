@@ -22,12 +22,12 @@
 
 import logging
 import os
-from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, AppLocation, Settings, UiStrings, check_directory_exists, translate, \
     delete_file, get_images_filter
+from openlp.core.common.path import Path
 from openlp.core.lib import ItemCapabilities, MediaManagerItem, ServiceItemContext, StringContent, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box
@@ -390,7 +390,7 @@ class ImageMediaItem(MediaManagerItem):
         self.application.set_normal_cursor()
         self.load_list(files, target_group)
         last_dir = os.path.split(files[0])[0]
-        Settings().setValue(self.settings_section + '/last directory', last_dir)
+        Settings().setValue(self.settings_section + '/last directory', Path(last_dir))
 
     def load_list(self, images, target_group=None, initial_load=False):
         """

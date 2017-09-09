@@ -24,12 +24,12 @@ Package to test the openlp.core.lib package.
 """
 import os
 from datetime import datetime, timedelta
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtGui
 
+from openlp.core.common.path import Path
 from openlp.core.lib import FormattingTags, build_icon, check_item_selected, clean_tags, compare_chord_lyric, \
     create_separated_list, create_thumb, expand_chords, expand_chords_for_printing, expand_tags, find_formatting_tags, \
     get_text_file_string, image_to_byte, replace_params, resize_image, str_to_bool, validate_thumb

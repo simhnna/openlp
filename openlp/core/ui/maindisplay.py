@@ -37,6 +37,7 @@ from PyQt5 import QtCore, QtWidgets, QtWebKit, QtWebKitWidgets, QtGui, QtMultime
 
 from openlp.core.common import AppLocation, Registry, RegistryProperties, OpenLPMixin, Settings, translate,\
     is_macosx, is_win
+from openlp.core.common.path import path_to_str
 from openlp.core.lib import ServiceItem, ImageSource, ScreenList, build_html, expand_tags, image_to_byte
 from openlp.core.lib.theme import BackgroundType
 from openlp.core.ui import HideMode, AlertLocation, DisplayControllerType
@@ -157,7 +158,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
         # platforms. For OpenLP 2.0 keep it only for OS X to not cause any
         # regressions on other platforms.
         if is_macosx():
-            window_flags = QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window
+            window_flags = QtCore.Qt.FramelessWindowHint | QtCore.Qt.Window | QtCore.Qt.NoDropShadowWindowHint
         self.setWindowFlags(window_flags)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.set_transparency(False)
@@ -259,7 +260,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
             background_color.setNamedColor(Settings().value('core/logo background color'))
             if not background_color.isValid():
                 background_color = QtCore.Qt.white
-            image_file = Settings().value('core/logo file')
+            image_file = path_to_str(Settings().value('core/logo file'))
             splash_image = QtGui.QImage(image_file)
             self.initial_fame = QtGui.QImage(
                 self.screen['size'].width(),

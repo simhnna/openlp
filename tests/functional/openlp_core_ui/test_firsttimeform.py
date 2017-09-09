@@ -25,11 +25,11 @@ Package to test the openlp.core.ui.firsttimeform package.
 import os
 import tempfile
 import urllib
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common import Registry
+from openlp.core.common.path import Path
 from openlp.core.ui.firsttimeform import FirstTimeForm
 
 from tests.helpers.testmixin import TestMixin

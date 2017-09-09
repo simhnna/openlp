@@ -23,10 +23,9 @@
 Package to test the openlp.core.lib.path package.
 """
 import os
-from pathlib import Path
 from unittest import TestCase
 
-from openlp.core.lib.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 
 
 class TestPath(TestCase):

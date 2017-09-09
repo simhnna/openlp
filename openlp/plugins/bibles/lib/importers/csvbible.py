@@ -51,9 +51,9 @@ All CSV files are expected to use a comma (',') as the delimiter and double quot
 """
 import csv
 from collections import namedtuple
-from pathlib import Path
 
 from openlp.core.common import get_file_encoding, translate
+from openlp.core.common.path import Path
 from openlp.core.lib.exceptions import ValidationError
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 

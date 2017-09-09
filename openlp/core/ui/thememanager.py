@@ -25,14 +25,13 @@ The Theme Manager manages adding, deleteing and modifying of themes.
 import os
 import zipfile
 import shutil
-from pathlib import Path
 
 from xml.etree.ElementTree import ElementTree, XML
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, OpenLPMixin, RegistryMixin, \
     UiStrings, check_directory_exists, translate, is_win, get_filesystem_encoding, delete_file
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib import ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType
@@ -379,16 +378,16 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             critical_error_message_box(message=translate('OpenLP.ThemeManager', 'You have not selected a theme.'))
             return
         theme = item.data(QtCore.Qt.UserRole)
-        path, filter_used = \
-            QtWidgets.QFileDialog.getSaveFileName(self.main_window,
-                                                  translate('OpenLP.ThemeManager', 'Save Theme - ({name})').
-                                                  format(name=theme),
-                                                  Settings().value(self.settings_section + '/last directory export'),
-                                                  translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
+        export_path, filter_used = \
+            FileDialog.getSaveFileName(self.main_window,
+                                       translate('OpenLP.ThemeManager', 'Save Theme - ({name})').
+                                       format(name=theme),
+                                       Settings().value(self.settings_section + '/last directory export'),
+                                       translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
         self.application.set_busy_cursor()
-        if path:
-            Settings().setValue(self.settings_section + '/last directory export', path)
-            if self._export_theme(path, theme):
+        if export_path:
+            Settings().setValue(self.settings_section + '/last directory export', export_path.parent)
+            if self._export_theme(str(export_path), theme):
                 QtWidgets.QMessageBox.information(self,
                                                   translate('OpenLP.ThemeManager', 'Theme Exported'),
                                                   translate('OpenLP.ThemeManager',
@@ -429,16 +428,15 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         file_paths, selected_filter = FileDialog.getOpenFileNames(
             self,
             translate('OpenLP.ThemeManager', 'Select Theme Import File'),
-            str_to_path(Settings().value(self.settings_section + '/last directory import')),
+            Settings().value(self.settings_section + '/last directory import'),
             translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
         self.log_info('New Themes {file_paths}'.format(file_paths=file_paths))
         if not file_paths:
             return
         self.application.set_busy_cursor()
         for file_path in file_paths:
-            file_name = path_to_str(file_path)
-            Settings().setValue(self.settings_section + '/last directory import', str(file_name))
-            self.unzip_theme(file_name, self.path)
+            self.unzip_theme(path_to_str(file_path), self.path)
+        Settings().setValue(self.settings_section + '/last directory import', file_path)
         self.load_themes()
         self.application.set_normal_cursor()
 

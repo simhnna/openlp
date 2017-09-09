@@ -1,10 +1,10 @@
 import os
 from unittest import TestCase
 from unittest.mock import patch
-from pathlib import Path
 
 from PyQt5 import QtWidgets
 
+from openlp.core.common.path import Path
 from openlp.core.ui.lib.filedialog import FileDialog
 
 
