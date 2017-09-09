@@ -41,6 +41,7 @@ __default_settings__ = {
     'images/db hostname': '',
     'images/db database': '',
     'images/background color': '#000000',
+    'images/last directory': None
 }
 
 
