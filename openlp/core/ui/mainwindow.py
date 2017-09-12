@@ -586,13 +586,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             if saved_plugin_id != -1:
                 self.media_tool_box.setCurrentIndex(saved_plugin_id)
 
-    def on_new_version_number(self, version_number):
-        """
-        Called when the version check thread completes and we need to check the version number
-
-        :param str version_number: The version number downloaded from the OpenLP server.
-        """
-
     def on_search_shortcut_triggered(self):
         """
         Called when the search shortcut has been pressed.
