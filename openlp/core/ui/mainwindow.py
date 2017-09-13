@@ -496,6 +496,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         """
         super(MainWindow, self).__init__()
         Registry().register('main_window', self)
+        self.version_thread = None
+        self.version_worker = None
         self.clipboard = self.application.clipboard()
         self.arguments = ''.join(self.application.args)
         # Set up settings sections for the main application (not for use by plugins).
@@ -1009,6 +1011,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if not self.application.is_event_loop_active:
             event.ignore()
             return
+        # Sometimes the version thread hasn't finished, let's wait for it
+        try:
+            if self.version_thread and self.version_thread.isRunning():
+                wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
+                wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
+                wait_dialog.setAutoClose(False)
+                self.version_thread.wait()
+                wait_dialog.close()
+        except RuntimeError:
+            # Ignore the RuntimeError that is thrown when Qt has already deleted the C++ thread object
+            pass
         # If we just did a settings import, close without saving changes.
         if self.settings_imported:
             self.clean_up(False)

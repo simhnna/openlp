@@ -26,7 +26,8 @@ import logging
 import os
 import platform
 import sys
-from datetime import datetime
+import time
+from datetime import date
 from distutils.version import LooseVersion
 from subprocess import Popen, PIPE
 
@@ -52,7 +53,7 @@ class VersionWorker(QtCore.QObject):
     no_internet = QtCore.pyqtSignal()
     quit = QtCore.pyqtSignal()
 
-    def __init__(self, last_check_date):
+    def __init__(self, last_check_date, current_version):
         """
         Constructor for the version check worker.
 
@@ -61,6 +62,7 @@ class VersionWorker(QtCore.QObject):
         log.debug('VersionWorker - Initialise')
         super(VersionWorker, self).__init__(None)
         self.last_check_date = last_check_date
+        self.current_version = current_version
 
     def start(self):
         """
@@ -74,15 +76,14 @@ class VersionWorker(QtCore.QObject):
         """
         log.debug('VersionWorker - Start')
         # I'm not entirely sure why this was here, I'm commenting it out until I hit the same scenario
-        # time.sleep(1)
-        current_version = get_version()
+        time.sleep(1)
         download_url = 'http://www.openlp.org/files/version.txt'
-        if current_version['build']:
+        if self.current_version['build']:
             download_url = 'http://www.openlp.org/files/nightly_version.txt'
-        elif int(current_version['version'].split('.')[1]) % 2 != 0:
+        elif int(self.current_version['version'].split('.')[1]) % 2 != 0:
             download_url = 'http://www.openlp.org/files/dev_version.txt'
         headers = {
-            'User-Agent', 'OpenLP/{version} {system}/{release}; '.format(version=current_version['full'],
+            'User-Agent': 'OpenLP/{version} {system}/{release}; '.format(version=self.current_version['full'],
                                                                          system=platform.system(),
                                                                          release=platform.release())
         }
@@ -94,16 +95,21 @@ class VersionWorker(QtCore.QObject):
                 remote_version = response.text
                 log.debug('New version found: %s', remote_version)
                 break
-            except requests.exceptions.ConnectionError:
+            except IOError:
                 log.exception('Unable to connect to OpenLP server to download version file')
-                self.no_internet.emit()
                 retries += 1
-            except requests.exceptions.RequestException:
-                log.exception('Error occurred while connecting to OpenLP server to download version file')
-                retries += 1
-        if remote_version and LooseVersion(remote_version) > LooseVersion(current_version['full']):
+        else:
+            self.no_internet.emit()
+        if remote_version and LooseVersion(remote_version) > LooseVersion(self.current_version['full']):
             self.new_version.emit(remote_version)
         self.quit.emit()
+
+
+def update_check_date():
+    """
+    Save when we last checked for an update
+    """
+    Settings().setValue('core/last version test', date.today().strftime('%Y-%m-%d'))
 
 
 def check_for_update(parent):
@@ -113,11 +119,12 @@ def check_for_update(parent):
     :param MainWindow parent: The parent object for the thread. Usually the OpenLP main window.
     """
     last_check_date = Settings().value('core/last version test')
-    if datetime.date().strftime('%Y-%m-%d') <= last_check_date:
+    if date.today().strftime('%Y-%m-%d') <= last_check_date:
         log.debug('Version check skipped, last checked today')
         return
-    worker = VersionWorker(last_check_date)
+    worker = VersionWorker(last_check_date, get_version())
     worker.new_version.connect(parent.on_new_version)
+    worker.quit.connect(update_check_date)
     # TODO: Use this to figure out if there's an Internet connection?
     # worker.no_internet.connect(parent.on_no_internet)
     run_thread(parent, worker, 'version')
@@ -132,6 +139,7 @@ def get_version():
     global APPLICATION_VERSION
     if APPLICATION_VERSION:
         return APPLICATION_VERSION
+    print(sys.argv)
     if '--dev-version' in sys.argv or '-d' in sys.argv:
         # NOTE: The following code is a duplicate of the code in setup.py. Any fix applied here should also be applied
         # there.
