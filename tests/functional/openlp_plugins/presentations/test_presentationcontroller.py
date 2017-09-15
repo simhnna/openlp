@@ -244,20 +244,3 @@ class TestPresentationDocument(TestCase):
 
         # THEN: load_presentation should return false
         self.assertFalse(result, "PresentationDocument.load_presentation should return false.")
-
-    def test_get_file_name(self):
-        """
-        Test the PresentationDocument.get_file_name method.
-        """
-
-        # GIVEN: A mocked os.path.split which returns a list, an instance of PresentationDocument and
-        #       arbitary file_path.
-        self.mock_os.path.split.return_value = ['directory', 'file.ext']
-        instance = PresentationDocument(self.mock_controller, 'Name')
-        instance.file_path = 'filepath'
-
-        # WHEN: Calling get_file_name
-        result = instance.get_file_name()
-
-        # THEN: get_file_name should return 'file.ext'
-        self.assertEqual(result, 'file.ext')

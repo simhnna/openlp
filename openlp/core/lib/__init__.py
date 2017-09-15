@@ -29,9 +29,10 @@ import os
 import re
 import math
 
-from PyQt5 import QtCore, QtGui, Qt, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import translate
+from openlp.core.common.path import Path
 
 log = logging.getLogger(__name__ + '.__init__')
 
@@ -125,10 +126,11 @@ def build_icon(icon):
     Build a QIcon instance from an existing QIcon, a resource location, or a physical file location. If the icon is a
     QIcon instance, that icon is simply returned. If not, it builds a QIcon instance from the resource or file name.
 
-    :param icon:
-        The icon to build. This can be a QIcon, a resource string in the form ``:/resource/file.png``, or a file
-        location like ``/path/to/file.png``. However, the **recommended** way is to specify a resource string.
+    :param QtGui.QIcon | Path | QtGui.QIcon | str icon:
+        The icon to build. This can be a QIcon, a resource string in the form ``:/resource/file.png``, or a file path
+        location like ``Path(/path/to/file.png)``. However, the **recommended** way is to specify a resource string.
     :return: The build icon.
+    :rtype: QtGui.QIcon
     """
     if isinstance(icon, QtGui.QIcon):
         return icon
@@ -136,6 +138,8 @@ def build_icon(icon):
     button_icon = QtGui.QIcon()
     if isinstance(icon, str):
         pix_map = QtGui.QPixmap(icon)
+    elif isinstance(icon, Path):
+        pix_map = QtGui.QPixmap(str(icon))
     elif isinstance(icon, QtGui.QImage):
         pix_map = QtGui.QPixmap.fromImage(icon)
     if pix_map:
@@ -221,10 +225,12 @@ def validate_thumb(file_path, thumb_path):
     :param thumb_path: The path to the thumb.
     :return: True, False if the image has changed since the thumb was created.
     """
-    if not os.path.exists(thumb_path):
+    file_path = Path(file_path)
+    thumb_path = Path(thumb_path)
+    if not thumb_path.exists():
         return False
-    image_date = os.stat(file_path).st_mtime
-    thumb_date = os.stat(thumb_path).st_mtime
+    image_date = file_path.stat().st_mtime
+    thumb_date = thumb_path.stat().st_mtime
     return image_date <= thumb_date
 
 

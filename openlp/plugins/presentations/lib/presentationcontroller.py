@@ -19,10 +19,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import logging
-import os
-import shutil
 
 from PyQt5 import QtCore
 
@@ -87,19 +84,26 @@ class PresentationDocument(object):
         Returns a path to an image containing a preview for the requested slide
 
     """
-    def __init__(self, controller, name):
+    def __init__(self, controller, document_path):
         """
         Constructor for the PresentationController class
+
+        :param controller:
+        :param openlp.core.common.path.Path document_path: Path to the document to load.
+        :rtype: None
         """
         self.controller = controller
-        self._setup(name)
+        self._setup(document_path)
 
-    def _setup(self, name):
+    def _setup(self, document_path):
         """
         Run some initial setup. This method is separate from __init__ in order to mock it out in tests.
+
+        :param openlp.core.common.path.Path document_path: Path to the document to load.
+        :rtype: None
         """
         self.slide_number = 0
-        self.file_path = name
+        self.file_path = document_path
         check_directory_exists(self.get_thumbnail_folder())
 
     def load_presentation(self):
@@ -126,12 +130,6 @@ class PresentationDocument(object):
         except OSError:
             log.exception('Failed to delete presentation controller files')
 
-    def get_file_name(self):
-        """
-        Return just the filename of the presentation, without the directory
-        """
-        return os.path.split(self.file_path)[1]
-
     def get_thumbnail_folder(self):
         """
         The location where thumbnail images will be stored
@@ -141,9 +139,9 @@ class PresentationDocument(object):
         """
         # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
-            folder = md5_hash(self.file_path.encode('utf-8'))
+            folder = md5_hash(bytes(self.file_path))
         else:
-            folder = self.get_file_name()
+            folder = self.file_path.name
         return Path(self.controller.thumbnail_folder, folder)
 
     def get_temp_folder(self):
@@ -155,19 +153,22 @@ class PresentationDocument(object):
         """
         # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
-            folder = md5_hash(self.file_path.encode('utf-8'))
+            folder = md5_hash(bytes(self.file_path))
         else:
-            folder = self.get_file_name()
+            folder = self.file_path.name
         return Path(self.controller.temp_folder, folder)
 
     def check_thumbnails(self):
         """
-        Returns ``True`` if the thumbnail images exist and are more recent than the powerpoint file.
+        Check that the last thumbnail image exists and is valid and are more recent than the powerpoint file.
+
+        :return: If the thumbnail is valid
+        :rtype: bool
         """
-        last_image = self.get_thumbnail_path(self.get_slide_count(), True)
-        if not (last_image and os.path.isfile(last_image)):
+        last_image_path = self.get_thumbnail_path(self.get_slide_count(), True)
+        if not (last_image_path and last_image_path.is_file()):
             return False
-        return validate_thumb(self.file_path, last_image)
+        return validate_thumb(self.file_path, last_image_path)
 
     def close_presentation(self):
         """
@@ -250,24 +251,28 @@ class PresentationDocument(object):
         """
         pass
 
-    def convert_thumbnail(self, file, idx):
+    def convert_thumbnail(self, image_path, index):
         """
         Convert the slide image the application made to a scaled 360px height .png image.
+
+        :param openlp.core.common.path.Path image_path: Path to the image to create a thumb nail of
+        :param int index: The index of the slide to create the thumbnail for.
+        :rtype: None
         """
         if self.check_thumbnails():
             return
-        if os.path.isfile(file):
-            thumb_path = self.get_thumbnail_path(idx, False)
-            create_thumb(file, thumb_path, False, QtCore.QSize(-1, 360))
+        if image_path.is_file():
+            thumb_path = self.get_thumbnail_path(index, False)
+            create_thumb(str(image_path), str(thumb_path), False, QtCore.QSize(-1, 360))
 
-    def get_thumbnail_path(self, slide_no, check_exists=True):
+    def get_thumbnail_path(self, slide_no, check_exists=False):
         """
         Returns an image path containing a preview for the requested slide
 
         :param int slide_no: The slide an image is required for, starting at 1
         :param bool check_exists: Check if the generated path exists
         :return: The path, or None if the :param:`check_exists` is True and the file does not exist
-        :rtype: openlp.core.common.path.Path, None
+        :rtype: openlp.core.common.path.Path | None
         """
         path = self.get_thumbnail_folder() / (self.controller.thumbnail_prefix + str(slide_no) + '.png')
         if path.is_file() or not check_exists:
@@ -313,43 +318,38 @@ class PresentationDocument(object):
         Reads the titles from the titles file and
         the notes files and returns the content in two lists
         """
-        titles = []
         notes = []
-        titles_file = str(self.get_thumbnail_folder() / 'titles.txt')
-        if os.path.exists(titles_file):
-            try:
-                with open(titles_file, encoding='utf-8') as fi:
-                    titles = fi.read().splitlines()
-            except:
-                log.exception('Failed to open/read existing titles file')
-                titles = []
+        titles_path = self.get_thumbnail_folder() / 'titles.txt'
+        try:
+            titles = titles_path.read_text().splitlines()
+        except:
+            log.exception('Failed to open/read existing titles file')
+            titles = []
         for slide_no, title in enumerate(titles, 1):
-            notes_file = str(self.get_thumbnail_folder() / 'slideNotes{number:d}.txt'.format(number=slide_no))
-            note = ''
-            if os.path.exists(notes_file):
-                try:
-                    with open(notes_file, encoding='utf-8') as fn:
-                        note = fn.read()
-                except:
-                    log.exception('Failed to open/read notes file')
-                    note = ''
+            notes_path = self.get_thumbnail_folder() / 'slideNotes{number:d}.txt'.format(number=slide_no)
+            try:
+                note = notes_path.read_text()
+            except:
+                log.exception('Failed to open/read notes file')
+                note = ''
             notes.append(note)
         return titles, notes
 
     def save_titles_and_notes(self, titles, notes):
         """
-        Performs the actual persisting of titles to the titles.txt
-        and notes to the slideNote%.txt
+        Performs the actual persisting of titles to the titles.txt and notes to the slideNote%.txt
+
+        :param list[str] titles: The titles to save
+        :param list[str] notes: The notes to save
+        :rtype: None
         """
         if titles:
             titles_path = self.get_thumbnail_folder() / 'titles.txt'
-            with titles_path.open(mode='wt', encoding='utf-8') as fo:
-                fo.writelines(titles)
+            titles_path.write_text('\n'.join(titles))
         if notes:
             for slide_no, note in enumerate(notes, 1):
                 notes_path = self.get_thumbnail_folder() / 'slideNotes{number:d}.txt'.format(number=slide_no)
-                with notes_path.open(mode='wt', encoding='utf-8') as fn:
-                    fn.write(note)
+                notes_path.write_text(note)
 
 
 class PresentationController(object):
@@ -426,12 +426,11 @@ class PresentationController(object):
         self.document_class = document_class
         self.settings_section = self.plugin.settings_section
         self.available = None
-        self.temp_folder = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), name)
-        self.thumbnail_folder = os.path.join(
-            str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
+        self.temp_folder = AppLocation.get_section_data_path(self.settings_section) / name
+        self.thumbnail_folder = AppLocation.get_section_data_path(self.settings_section) / 'thumbnails'
         self.thumbnail_prefix = 'slide'
-        check_directory_exists(Path(self.thumbnail_folder))
-        check_directory_exists(Path(self.temp_folder))
+        check_directory_exists(self.thumbnail_folder)
+        check_directory_exists(self.temp_folder)
 
     def enabled(self):
         """
@@ -466,11 +465,15 @@ class PresentationController(object):
         log.debug('Kill')
         self.close_presentation()
 
-    def add_document(self, name):
+    def add_document(self, document_path):
         """
         Called when a new presentation document is opened.
+
+        :param openlp.core.common.path.Path document_path: Path to the document to load
+        :return: The document
+        :rtype: PresentationDocument
         """
-        document = self.document_class(self, name)
+        document = self.document_class(self, document_path)
         self.docs.append(document)
         return document
 

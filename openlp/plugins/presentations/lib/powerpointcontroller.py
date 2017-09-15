@@ -120,15 +120,16 @@ class PowerpointDocument(PresentationDocument):
     Class which holds information and controls a single presentation.
     """
 
-    def __init__(self, controller, presentation):
+    def __init__(self, controller, document_path):
         """
         Constructor, store information about the file and initialise.
 
         :param controller:
-        :param presentation:
+        :param openlp.core.common.path.Path document_path: Path to the document to load
+        :rtype: None
         """
         log.debug('Init Presentation Powerpoint')
-        super(PowerpointDocument, self).__init__(controller, presentation)
+        super().__init__(controller, document_path)
         self.presentation = None
         self.index_map = {}
         self.slide_count = 0
@@ -145,7 +146,7 @@ class PowerpointDocument(PresentationDocument):
         try:
             if not self.controller.process:
                 self.controller.start_process()
-            self.controller.process.Presentations.Open(os.path.normpath(self.file_path), False, False, False)
+            self.controller.process.Presentations.Open(str(self.file_path), False, False, False)
             self.presentation = self.controller.process.Presentations(self.controller.process.Presentations.Count)
             self.create_thumbnails()
             self.create_titles_and_notes()
@@ -363,9 +364,8 @@ class PowerpointDocument(PresentationDocument):
                                                                           width=size.width(),
                                                                           horizontal=(right - left)))
         log.debug('window title: {title}'.format(title=window_title))
-        filename_root, filename_ext = os.path.splitext(os.path.basename(self.file_path))
         if size.y() == top and size.height() == (bottom - top) and size.x() == left and \
-                size.width() == (right - left) and filename_root in window_title:
+                size.width() == (right - left) and self.file_path.stem in window_title:
             log.debug('Found a match and will save the handle')
             self.presentation_hwnd = hwnd
             # Stop powerpoint from flashing in the taskbar

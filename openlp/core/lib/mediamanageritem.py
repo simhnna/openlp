@@ -359,10 +359,8 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         :param files: The files to be loaded.
         :param target_group: The QTreeWidgetItem of the group that will be the parent of the added files
         """
-        names = []
         full_list = []
         for count in range(self.list_view.count()):
-            names.append(self.list_view.item(count).text())
             full_list.append(self.list_view.item(count).data(QtCore.Qt.UserRole))
         duplicates_found = False
         files_added = False
