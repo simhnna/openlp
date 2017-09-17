@@ -197,7 +197,7 @@ class PresentationMediaItem(MediaManagerItem):
                     if not (preview_path and preview_path.exists()):
                         icon = build_icon(':/general/general_delete.png')
                     else:
-                        if validate_thumb(preview_path, thumbnail_path):
+                        if validate_thumb(Path(preview_path), Path(thumbnail_path)):
                             icon = build_icon(thumbnail_path)
                         else:
                             icon = create_thumb(str(preview_path), str(thumbnail_path))

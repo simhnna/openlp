@@ -483,7 +483,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     name = text_name
                 thumb = os.path.join(self.thumb_path, '{name}.png'.format(name=text_name))
                 item_name = QtWidgets.QListWidgetItem(name)
-                if validate_thumb(theme, thumb):
+                if validate_thumb(Path(theme), Path(thumb)):
                     icon = build_icon(thumb)
                 else:
                     icon = create_thumb(theme, thumb)

@@ -261,7 +261,8 @@ class PdfDocument(PresentationDocument):
             # The %03d in the file name is handled by each binary
             if self.controller.mudrawbin:
                 log.debug('loading presentation using mudraw')
-                runlog = check_output([str(self.controller.mudrawbin), '-w', str(size.width()), '-h', str(size.height()),
+                runlog = check_output([str(self.controller.mudrawbin), '-w', str(size.width()),
+                                       '-h', str(size.height()),
                                        '-o', str(temp_dir_path / 'mainslide%03d.png'), str(self.file_path)],
                                       startupinfo=self.startupinfo)
             elif self.controller.mutoolbin:

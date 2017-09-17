@@ -168,7 +168,7 @@ class PresentationDocument(object):
         last_image_path = self.get_thumbnail_path(self.get_slide_count(), True)
         if not (last_image_path and last_image_path.is_file()):
             return False
-        return validate_thumb(self.file_path, last_image_path)
+        return validate_thumb(Path(self.file_path), Path(last_image_path))
 
     def close_presentation(self):
         """

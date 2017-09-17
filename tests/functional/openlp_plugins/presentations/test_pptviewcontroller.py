@@ -22,7 +22,6 @@
 """
 This module contains tests for the pptviewcontroller module of the Presentations plugin.
 """
-import os
 import shutil
 from tempfile import mkdtemp
 from unittest import TestCase
@@ -30,6 +29,7 @@ from unittest.mock import MagicMock, patch
 
 from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from openlp.core.common import is_win
+from openlp.core.common.path import Path
 
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH
@@ -184,7 +184,7 @@ class TestPptviewDocument(TestCase):
         """
         # GIVEN: mocked PresentationController.save_titles_and_notes and a pptx file
         doc = PptviewDocument(self.mock_controller, self.mock_presentation)
-        doc.file_path = os.path.join(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
+        doc.file_path = Path(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
         doc.save_titles_and_notes = MagicMock()
 
         # WHEN reading the titles and notes
@@ -201,13 +201,13 @@ class TestPptviewDocument(TestCase):
         """
         # GIVEN: mocked PresentationController.save_titles_and_notes and an nonexistent file
         with patch('builtins.open') as mocked_open, \
-                patch('openlp.plugins.presentations.lib.pptviewcontroller.os.path.exists') as mocked_exists, \
+                patch.object(Path, 'exists') as mocked_path_exists, \
                 patch('openlp.plugins.presentations.lib.presentationcontroller.check_directory_exists') as \
                 mocked_dir_exists:
-            mocked_exists.return_value = False
+            mocked_path_exists.return_value = False
             mocked_dir_exists.return_value = False
             doc = PptviewDocument(self.mock_controller, self.mock_presentation)
-            doc.file_path = 'Idontexist.pptx'
+            doc.file_path = Path('Idontexist.pptx')
             doc.save_titles_and_notes = MagicMock()
 
             # WHEN: Reading the titles and notes
@@ -215,7 +215,7 @@ class TestPptviewDocument(TestCase):
 
             # THEN: File existens should have been checked, and not have been opened.
             doc.save_titles_and_notes.assert_called_once_with(None, None)
-            mocked_exists.assert_any_call('Idontexist.pptx')
+            mocked_path_exists.assert_called_with()
             self.assertEqual(mocked_open.call_count, 0, 'There should be no calls to open a file.')
 
     def test_create_titles_and_notes_invalid_file(self):
@@ -228,7 +228,7 @@ class TestPptviewDocument(TestCase):
             mocked_is_zf.return_value = False
             mocked_open.filesize = 10
             doc = PptviewDocument(self.mock_controller, self.mock_presentation)
-            doc.file_path = os.path.join(TEST_RESOURCES_PATH, 'presentations', 'test.ppt')
+            doc.file_path = Path(TEST_RESOURCES_PATH, 'presentations', 'test.ppt')
             doc.save_titles_and_notes = MagicMock()
 
             # WHEN: reading the titles and notes

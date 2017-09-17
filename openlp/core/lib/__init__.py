@@ -29,7 +29,7 @@ import os
 import re
 import math
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 
 from openlp.core.common import translate
 from openlp.core.common.path import Path
@@ -221,12 +221,11 @@ def validate_thumb(file_path, thumb_path):
     Validates whether an file's thumb still exists and if is up to date. **Note**, you must **not** call this function,
     before checking the existence of the file.
 
-    :param file_path: The path to the file. The file **must** exist!
-    :param thumb_path: The path to the thumb.
-    :return: True, False if the image has changed since the thumb was created.
+    :param openlp.core.common.path.Path file_path: The path to the file. The file **must** exist!
+    :param openlp.core.common.path.Path thumb_path: The path to the thumb.
+    :return: Has the image changed since the thumb was created?
+    :rtype: bool
     """
-    file_path = Path(file_path)
-    thumb_path = Path(thumb_path)
     if not thumb_path.exists():
         return False
     image_date = file_path.stat().st_mtime

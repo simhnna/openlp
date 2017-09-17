@@ -595,61 +595,46 @@ class TestLib(TestCase):
         Test the validate_thumb() function when the thumbnail does not exist
         """
         # GIVEN: A mocked out os module, with path.exists returning False, and fake paths to a file and a thumb
-        with patch('openlp.core.lib.os') as mocked_os:
-            file_path = 'path/to/file'
-            thumb_path = 'path/to/thumb'
-            mocked_os.path.exists.return_value = False
+        with patch.object(Path, 'exists', return_value=False) as mocked_path_exists:
+            file_path = Path('path', 'to', 'file')
+            thumb_path = Path('path', 'to', 'thumb')
 
             # WHEN: we run the validate_thumb() function
             result = validate_thumb(file_path, thumb_path)
 
             # THEN: we should have called a few functions, and the result should be False
-            mocked_os.path.exists.assert_called_with(thumb_path)
-            assert result is False, 'The result should be False'
+            thumb_path.exists.assert_called_once_with()
+            self.assertFalse(result, 'The result should be False')
 
     def test_validate_thumb_file_exists_and_newer(self):
         """
         Test the validate_thumb() function when the thumbnail exists and has a newer timestamp than the file
         """
-        # GIVEN: A mocked out os module, functions rigged to work for us, and fake paths to a file and a thumb
-        with patch('openlp.core.lib.os') as mocked_os:
-            file_path = 'path/to/file'
-            thumb_path = 'path/to/thumb'
-            file_mocked_stat = MagicMock()
-            file_mocked_stat.st_mtime = datetime.now()
-            thumb_mocked_stat = MagicMock()
-            thumb_mocked_stat.st_mtime = datetime.now() + timedelta(seconds=10)
-            mocked_os.path.exists.return_value = True
-            mocked_os.stat.side_effect = [file_mocked_stat, thumb_mocked_stat]
+        with patch.object(Path, 'exists'), patch.object(Path, 'stat'):
+            # GIVEN: Mocked file_path and thumb_path which return different values fo the modified times
+            file_path = MagicMock(**{'stat.return_value': MagicMock(st_mtime=10)})
+            thumb_path = MagicMock(**{'exists.return_value': True, 'stat.return_value': MagicMock(st_mtime=11)})
 
             # WHEN: we run the validate_thumb() function
+            result = validate_thumb(file_path, thumb_path)
 
-            # THEN: we should have called a few functions, and the result should be True
-            # mocked_os.path.exists.assert_called_with(thumb_path)
+            # THEN: `validate_thumb` should return True
+            self.assertTrue(result)
 
     def test_validate_thumb_file_exists_and_older(self):
         """
         Test the validate_thumb() function when the thumbnail exists but is older than the file
         """
-        # GIVEN: A mocked out os module, functions rigged to work for us, and fake paths to a file and a thumb
-        with patch('openlp.core.lib.os') as mocked_os:
-            file_path = 'path/to/file'
-            thumb_path = 'path/to/thumb'
-            file_mocked_stat = MagicMock()
-            file_mocked_stat.st_mtime = datetime.now()
-            thumb_mocked_stat = MagicMock()
-            thumb_mocked_stat.st_mtime = datetime.now() - timedelta(seconds=10)
-            mocked_os.path.exists.return_value = True
-            mocked_os.stat.side_effect = lambda fname: file_mocked_stat if fname == file_path else thumb_mocked_stat
+        # GIVEN: Mocked file_path and thumb_path which return different values fo the modified times
+        file_path = MagicMock(**{'stat.return_value': MagicMock(st_mtime=10)})
+        thumb_path = MagicMock(**{'exists.return_value': True, 'stat.return_value': MagicMock(st_mtime=9)})
 
-            # WHEN: we run the validate_thumb() function
-            result = validate_thumb(file_path, thumb_path)
+        # WHEN: we run the validate_thumb() function
+        result = validate_thumb(file_path, thumb_path)
 
-            # THEN: we should have called a few functions, and the result should be False
-            mocked_os.path.exists.assert_called_with(thumb_path)
-            mocked_os.stat.assert_any_call(file_path)
-            mocked_os.stat.assert_any_call(thumb_path)
-            assert result is False, 'The result should be False'
+        # THEN: `validate_thumb` should return False
+        thumb_path.stat.assert_called_once_with()
+        self.assertFalse(result, 'The result should be False')
 
     def test_replace_params_no_params(self):
         """
