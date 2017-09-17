@@ -262,7 +262,10 @@ class Settings(QtCore.QSettings):
         ('core/recent files', 'core/recent files', [(file_names_conv, None)]),
         ('media/media files', 'media/media files', [(file_names_conv, None)]),
         ('presentations/presentations files', 'presentations/presentations files', [(file_names_conv, None)]),
-        ('core/logo file', 'core/logo file', [(str_to_path, None)])
+        ('core/logo file', 'core/logo file', [(str_to_path, None)]),
+        ('presentations/last directory', 'presentations/last directory', [(str_to_path, None)]),
+        ('images/last directory', 'images/last directory', [(str_to_path, None)]),
+        ('media/last directory', 'media/last directory', [(str_to_path, None)])
     ]
 
     @staticmethod
