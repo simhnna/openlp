@@ -138,8 +138,11 @@ class Registry(object):
                     if result:
                         results.append(result)
                 except TypeError:
+                    # Who has called me can help in debugging
+                    trace_error_handler(log)
                     log.exception('Exception for function {function}'.format(function=function))
         else:
+            trace_error_handler(log)
             log.exception('Event {event} called but not registered'.format(event=event))
         return results
 
