@@ -39,7 +39,7 @@ class TestPresentationController(TestCase):
     def setUp(self):
         self.get_thumbnail_folder_patcher = \
             patch('openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument.get_thumbnail_folder',
-            return_value=Path())
+                  return_value=Path())
         self.get_thumbnail_folder_patcher.start()
         mocked_plugin = MagicMock()
         mocked_plugin.settings_section = 'presentations'

@@ -13,7 +13,7 @@ class TestShutil(TestCase):
 
     def test_copy(self):
         """
-        Test :func:`copy`        
+        Test :func:`copy`
         """
         # GIVEN: A mocked `shutil.copy` which returns a test path as a string
         with patch('openlp.core.lib.shutil.shutil.copy', return_value=os.path.join('destination', 'test', 'path')) \
@@ -43,7 +43,7 @@ class TestShutil(TestCase):
 
     def test_copyfile(self):
         """
-        Test :func:`copyfile`        
+        Test :func:`copyfile`
         """
         # GIVEN: A mocked :func:`shutil.copyfile` which returns a test path as a string
         with patch('openlp.core.lib.shutil.shutil.copyfile',
@@ -75,7 +75,7 @@ class TestShutil(TestCase):
 
     def test_copytree(self):
         """
-        Test :func:`copytree`        
+        Test :func:`copytree`
         """
         # GIVEN: A mocked :func:`shutil.copytree` which returns a test path as a string
         with patch('openlp.core.lib.shutil.shutil.copytree',
@@ -112,7 +112,7 @@ class TestShutil(TestCase):
 
     def test_rmtree(self):
         """
-        Test :func:`rmtree`        
+        Test :func:`rmtree`
         """
         # GIVEN: A mocked :func:`shutil.rmtree`
         with patch('openlp.core.lib.shutil.shutil.rmtree', return_value=None) as mocked_shutil_rmtree:
