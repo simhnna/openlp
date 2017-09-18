@@ -95,19 +95,17 @@ def rmtree(*args, **kwargs):
     args, kwargs = replace_params(args, kwargs, ((0, 'path', path_to_str),))
 
     return shutil.rmtree(*args, **kwargs)
-# TODO: Test and tidy
+
+
 def which(*args, **kwargs):
     """
-    Wraps :func:shutil.rmtree` so that we can accept Path objects.
+    Wraps :func:shutil.which` so that it return a Path objects.
 
-    :param openlp.core.common.path.Path path: Takes a Path object which is then converted to a str object
-    :return: Passes the return from :func:`shutil.rmtree` back
-    :rtype: None
+    :rtype: openlp.core.common.Path
 
     See the following link for more information on the other parameters:
-        https://docs.python.org/3/library/shutil.html#shutil.rmtree
+        https://docs.python.org/3/library/shutil.html#shutil.which
     """
-
     file_name = shutil.which(*args, **kwargs)
     if file_name:
         return str_to_path(file_name)

@@ -223,10 +223,9 @@ class ImpressDocument(PresentationDocument):
             if desktop is None:
                 self.controller.start_process()
                 desktop = self.controller.get_com_desktop()
-            url = self.file_path.as_uri()
         else:
             desktop = self.controller.get_uno_desktop()
-            url = uno.systemPathToFileUrl(str(self.file_path))
+        url = self.file_path.as_uri()
         if desktop is None:
             return False
         self.desktop = desktop
@@ -253,10 +252,7 @@ class ImpressDocument(PresentationDocument):
         if self.check_thumbnails():
             return
         temp_folder_path = self.get_temp_folder()
-        if is_win():
-            thumb_dir_url = temp_folder_path.as_uri()
-        else:
-            thumb_dir_url = uno.systemPathToFileUrl(str(temp_folder_path))
+        thumb_dir_url = temp_folder_path.as_uri()
         properties = []
         properties.append(self.create_property('FilterName', 'impress_png_Export'))
         properties = tuple(properties)

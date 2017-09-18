@@ -376,7 +376,10 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         self._file_name = path_to_str(file_path)
         self.main_window.set_service_modified(self.is_modified(), self.short_file_name())
         Settings().setValue('servicemanager/last file', file_path)
-        self._save_lite = file_path.suffix() == '.oszl'
+        if file_path and file_path.suffix() == '.oszl':
+            self._save_lite = True
+        else:
+            self._save_lite = False
 
     def file_name(self):
         """
