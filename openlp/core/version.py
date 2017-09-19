@@ -139,7 +139,6 @@ def get_version():
     global APPLICATION_VERSION
     if APPLICATION_VERSION:
         return APPLICATION_VERSION
-    print(sys.argv)
     if '--dev-version' in sys.argv or '-d' in sys.argv:
         # NOTE: The following code is a duplicate of the code in setup.py. Any fix applied here should also be applied
         # there.

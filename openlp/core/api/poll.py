@@ -52,7 +52,7 @@ class Poller(RegistryProperties):
             'isSecure': Settings().value('api/authentication enabled'),
             'isAuthorised': False,
             'chordNotation': Settings().value('songs/chord notation'),
-            'isStagedActive': self.is_stage_active(),
+            'isStageActive': self.is_stage_active(),
             'isLiveActive': self.is_live_active(),
             'isChordsActive': self.is_chords_active()
         }

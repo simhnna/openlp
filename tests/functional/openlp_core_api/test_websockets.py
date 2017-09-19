@@ -70,7 +70,7 @@ class TestWSServer(TestCase, TestMixin):
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        server = WebSocketServer()
+        WebSocketServer()
 
         # THEN: the api environment should have been created
         self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
@@ -93,7 +93,7 @@ class TestWSServer(TestCase, TestMixin):
         """
         Test the poll function returns the correct JSON
         """
-        # WHEN: the system is configured with a set of data
+        # GIVEN: the system is configured with a set of data
         mocked_service_manager = MagicMock()
         mocked_service_manager.service_id = 21
         mocked_live_controller = MagicMock()
@@ -105,8 +105,15 @@ class TestWSServer(TestCase, TestMixin):
         mocked_live_controller.desktop_screen.isChecked.return_value = False
         Registry().register('live_controller', mocked_live_controller)
         Registry().register('service_manager', mocked_service_manager)
+        # WHEN: The poller polls
+        with patch.object(self.poll, 'is_stage_active') as mocked_is_stage_active, \
+                patch.object(self.poll, 'is_live_active') as mocked_is_live_active, \
+                patch.object(self.poll, 'is_chords_active') as mocked_is_chords_active:
+            mocked_is_stage_active.return_value = True
+            mocked_is_live_active.return_value = True
+            mocked_is_chords_active.return_value = True
+            poll_json = self.poll.poll()
         # THEN: the live json should be generated and match expected results
-        poll_json = self.poll.poll()
         self.assertTrue(poll_json['results']['blank'], 'The blank return value should be True')
         self.assertFalse(poll_json['results']['theme'], 'The theme return value should be False')
         self.assertFalse(poll_json['results']['display'], 'The display return value should be False')

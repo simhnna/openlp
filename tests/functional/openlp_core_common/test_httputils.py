@@ -28,7 +28,7 @@ import socket
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file, ping
+from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file
 
 from tests.helpers.testmixin import TestMixin
 
@@ -253,7 +253,7 @@ class TestHttpUtils(TestCase, TestMixin):
             fake_url = 'this://is.a.fake/url'
 
             # WHEN: The get_url_file_size() method is called
-            size = get_url_file_size(fake_url)
+            get_url_file_size(fake_url)
 
             # THEN: The correct methods are called with the correct arguments and a web page is returned
             mock_urlopen.assert_called_with(fake_url, timeout=30)
@@ -272,29 +272,3 @@ class TestHttpUtils(TestCase, TestMixin):
         # THEN: socket.timeout should have been caught
         # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
         self.assertFalse(os.path.exists(self.tempfile), 'FTW url_get_file should have caught socket.timeout')
-
-    def test_ping_valid(self):
-        """
-        Test ping for OpenLP
-        """
-        # GIVEN: a valid url to test
-        url = "openlp.io"
-
-        # WHEN: Attempt to check the url exists
-        url_found = ping(url)
-
-        # THEN: It should be found
-        self.assertTrue(url_found, 'OpenLP.io is not found')
-
-    def test_ping_invalid(self):
-        """
-        Test ping for OpenLP
-        """
-        # GIVEN: a valid url to test
-        url = "trb143.io"
-
-        # WHEN: Attempt to check the url exists
-        url_found = ping(url)
-
-        # THEN: It should be found
-        self.assertFalse(url_found, 'TRB143.io is found')

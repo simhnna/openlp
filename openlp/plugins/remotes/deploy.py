@@ -49,10 +49,10 @@ def download_sha256():
     user_agent = 'OpenLP/' + Registry().get('application').applicationVersion()
     try:
         web_config = get_web_page('{host}{name}'.format(host='https://get.openlp.org/webclient/', name='download.cfg'),
-                                  header=('User-Agent', user_agent))
+                                  headers={'User-Agent': user_agent})
     except (urllib.error.URLError, ConnectionError) as err:
         return False
-    file_bits = web_config.read().decode('utf-8').split()
+    file_bits = web_config.split()
     return file_bits[0], file_bits[2]
 
 
