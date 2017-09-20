@@ -24,9 +24,8 @@ import logging
 from PyQt5 import QtCore
 
 from openlp.core.common import Registry, AppLocation, Settings, check_directory_exists, md5_hash
-from openlp.core.common.path import Path
+from openlp.core.common.path import Path, rmtree
 from openlp.core.lib import create_thumb, validate_thumb
-from openlp.core.lib.shutil import rmtree
 
 log = logging.getLogger(__name__)
 

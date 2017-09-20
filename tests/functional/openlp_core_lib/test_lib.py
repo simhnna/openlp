@@ -32,7 +32,7 @@ from PyQt5 import QtCore, QtGui
 from openlp.core.common.path import Path
 from openlp.core.lib import FormattingTags, build_icon, check_item_selected, clean_tags, compare_chord_lyric, \
     create_separated_list, create_thumb, expand_chords, expand_chords_for_printing, expand_tags, find_formatting_tags, \
-    get_text_file_string, image_to_byte, replace_params, resize_image, str_to_bool, validate_thumb
+    get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
 
@@ -635,38 +635,6 @@ class TestLib(TestCase):
         # THEN: `validate_thumb` should return False
         thumb_path.stat.assert_called_once_with()
         self.assertFalse(result, 'The result should be False')
-
-    def test_replace_params_no_params(self):
-        """
-        Test replace_params when called with and empty tuple instead of parameters to replace
-        """
-        # GIVEN: Some test data
-        test_args = (1, 2)
-        test_kwargs = {'arg3': 3, 'arg4': 4}
-        test_params = tuple()
-
-        # WHEN: Calling replace_params
-        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
-
-        # THEN: The positional and keyword args should not have changed
-        self.assertEqual(test_args, result_args)
-        self.assertEqual(test_kwargs, result_kwargs)
-
-    def test_replace_params_params(self):
-        """
-        Test replace_params when given a positional and a keyword argument to change
-        """
-        # GIVEN: Some test data
-        test_args = (1, 2)
-        test_kwargs = {'arg3': 3, 'arg4': 4}
-        test_params = ((1, 'arg2', str), (2, 'arg3', str))
-
-        # WHEN: Calling replace_params
-        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
-
-        # THEN: The positional and keyword args should have have changed
-        self.assertEqual(result_args, (1, '2'))
-        self.assertEqual(result_kwargs, {'arg3': '3', 'arg4': 4})
 
     def test_resize_thumb(self):
         """

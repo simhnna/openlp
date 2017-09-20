@@ -27,9 +27,8 @@ from subprocess import check_output, CalledProcessError
 
 from openlp.core.common import AppLocation, check_binary_exists
 from openlp.core.common import Settings, is_win
-from openlp.core.common.path import Path, path_to_str
+from openlp.core.common.path import which
 from openlp.core.lib import ScreenList
-from openlp.core.lib.shutil import which
 from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
 if is_win():

@@ -38,10 +38,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
-from openlp.core.common.path import Path
+from openlp.core.common.path import Path, copytree
 from openlp.core.common.versionchecker import VersionThread, get_application_version
 from openlp.core.lib import ScreenList
-from openlp.core.lib.shutil import copytree
 from openlp.core.resources import qInitResources
 from openlp.core.ui import SplashScreen
 from openlp.core.ui.exceptionform import ExceptionForm
