@@ -86,14 +86,13 @@ def get_web_page(url, headers=None, update_openlp=False, proxies=None):
     """
     if not url:
         return None
-    if headers and 'user-agent' not in [key.lower() for key in headers.keys()]:
+    if not headers:
+        headers = {}
+    if 'user-agent' not in [key.lower() for key in headers.keys()]:
         headers['User-Agent'] = get_user_agent()
     log.debug('Downloading URL = %s' % url)
     retries = 0
     while retries < CONNECTION_RETRIES:
-        # Put this at the bottom
-        # retries += 1
-        # time.sleep(0.1)
         try:
             response = requests.get(url, headers=headers, proxies=proxies, timeout=float(CONNECTION_TIMEOUT))
             log.debug('Downloaded page {url}'.format(url=response.url))
@@ -102,8 +101,9 @@ def get_web_page(url, headers=None, update_openlp=False, proxies=None):
             # For now, catch IOError. All requests errors inherit from IOError
             log.exception('Unable to connect to {url}'.format(url=url))
             response = None
-            if retries > CONNECTION_RETRIES:
+            if retries >= CONNECTION_RETRIES:
                 raise ConnectionError('Unable to connect to {url}, see log for details'.format(url=url))
+            retries += 1
         except:
             # Don't know what's happening, so reraise the original
             log.exception('Unknown error when trying to connect to {url}'.format(url=url))
