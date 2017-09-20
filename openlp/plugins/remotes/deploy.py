@@ -19,10 +19,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
+"""
+Download and "install" the remote web client
+"""
 import os
-import zipfile
-import urllib.error
+from zipfile import ZipFile
 
 from openlp.core.common import AppLocation, Registry
 from openlp.core.common.httputils import url_get_file, get_web_page, get_url_file_size
@@ -38,7 +39,7 @@ def deploy_zipfile(app_root, zip_name):
     :return: None
     """
     zip_file = os.path.join(app_root, zip_name)
-    web_zip = zipfile.ZipFile(zip_file)
+    web_zip = ZipFile(zip_file)
     web_zip.extractall(app_root)
 
 
@@ -48,9 +49,8 @@ def download_sha256():
     """
     user_agent = 'OpenLP/' + Registry().get('application').applicationVersion()
     try:
-        web_config = get_web_page('{host}{name}'.format(host='https://get.openlp.org/webclient/', name='download.cfg'),
-                                  headers={'User-Agent': user_agent})
-    except (urllib.error.URLError, ConnectionError) as err:
+        web_config = get_web_page('https://get.openlp.org/webclient/download.cfg', headers={'User-Agent': user_agent})
+    except ConnectionError:
         return False
     file_bits = web_config.split()
     return file_bits[0], file_bits[2]

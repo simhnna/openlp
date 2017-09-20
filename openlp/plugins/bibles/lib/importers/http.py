@@ -289,11 +289,6 @@ class BGExtract(RegistryProperties):
         if not page_source:
             send_error_message('download')
             return None
-        # TODO: Is this even necessary anymore?
-        # try:
-            # page_source = str(page_source, 'utf8')
-        # except UnicodeDecodeError:
-            # page_source = str(page_source, 'cp1251')
         try:
             soup = BeautifulSoup(page_source, 'lxml')
         except Exception:
