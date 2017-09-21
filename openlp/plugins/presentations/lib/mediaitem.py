@@ -331,7 +331,7 @@ class PresentationMediaItem(MediaManagerItem):
                 file_path = str_to_path(bitem.data(QtCore.Qt.UserRole))
                 path, file_name = file_path.parent, file_path.name
                 service_item.title = file_name
-                if file_path.exists:
+                if file_path.exists():
                     if self.display_type_combo_box.itemData(self.display_type_combo_box.currentIndex()) == 'automatic':
                         service_item.processor = self.find_controller_by_type(file_path)
                         if not service_item.processor:
