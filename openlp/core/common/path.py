@@ -214,4 +214,3 @@ class Path(PathVariant):
             with suppress(ValueError):
                 path = path.relative_to(base_path)
         return {'__Path__': path.parts}
-
