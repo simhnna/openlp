@@ -38,8 +38,7 @@ from openlp.core.lib.projector.constants import ERROR_MSG, ERROR_STRING, E_AUTHE
     E_NETWORK, E_NOT_CONNECTED, E_UNKNOWN_SOCKET_ERROR, STATUS_STRING, S_CONNECTED, S_CONNECTING, S_COOLDOWN, \
     S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
 from openlp.core.lib.projector.db import ProjectorDB
-from openlp.core.lib.projector.pjlink import PJLink
-from openlp.core.lib.projector.pjlink2 import PJLinkUDP
+from openlp.core.lib.projector.pjlink import PJLink, PJLinkUDP
 from openlp.core.ui.projector.editform import ProjectorEditForm
 from openlp.core.ui.projector.sourceselectform import SourceSelectTabs, SourceSelectSingle
 
@@ -700,16 +699,9 @@ class ProjectorManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, UiProjecto
         :returns: PJLink() instance
         """
         log.debug('_add_projector()')
-        return PJLink(dbid=projector.id,
-                      ip=projector.ip,
-                      port=int(projector.port),
-                      name=projector.name,
-                      location=projector.location,
-                      notes=projector.notes,
-                      pin=None if projector.pin == '' else projector.pin,
+        return PJLink(projector=projector,
                       poll_time=self.poll_time,
-                      socket_timeout=self.socket_timeout
-                      )
+                      socket_timeout=self.socket_timeout)
 
     def add_projector(self, projector, start=False):
         """
