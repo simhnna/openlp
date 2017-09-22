@@ -26,15 +26,17 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import openlp.core.lib.projector.pjlink
+from openlp.core.lib.projector.db import Projector
 from openlp.core.lib.projector.pjlink import PJLink
 from openlp.core.lib.projector.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
     PJLINK_POWR_STATUS, \
     E_ERROR, E_NOT_CONNECTED, E_SOCKET_ADDRESS_NOT_AVAILABLE, E_UNKNOWN_SOCKET_ERROR, E_WARN, \
     S_CONNECTED, S_OFF, S_ON, S_NOT_CONNECTED, S_CONNECTING, S_STANDBY
 
-from tests.resources.projector.data import TEST_PIN
+from tests.resources.projector.data import TEST_PIN, TEST1_DATA
 
-pjlink_test = PJLink(name='test', ip='127.0.0.1', pin=TEST_PIN, no_poll=True)
+pjlink_test = PJLink(Projector(**TEST1_DATA), pin=TEST_PIN, no_poll=True)
+pjlink_test.ip = '127.0.0.1'
 
 # Create a list of ERST positional data so we don't have to redo the same buildup multiple times
 PJLINK_ERST_POSITIONS = []

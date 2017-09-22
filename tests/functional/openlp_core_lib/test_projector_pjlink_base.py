@@ -25,12 +25,13 @@ Package to test the openlp.core.lib.projector.pjlink base package.
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
 
+from openlp.core.lib.projector.db import Projector
 from openlp.core.lib.projector.pjlink import PJLink
 from openlp.core.lib.projector.constants import E_PARAMETER, ERROR_STRING, S_ON, S_CONNECTED
 
-from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_CONNECT_AUTHENTICATE, TEST_HASH
+from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_CONNECT_AUTHENTICATE, TEST_HASH, TEST1_DATA
 
-pjlink_test = PJLink(name='test', ip='127.0.0.1', pin=TEST_PIN, no_poll=True)
+pjlink_test = PJLink(Projector(**TEST1_DATA), no_poll=True)
 
 
 class TestPJLinkBase(TestCase):

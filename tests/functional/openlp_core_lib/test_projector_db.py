@@ -111,7 +111,7 @@ class TestProjectorDBUpdate(TestCase):
         """
         Test that we can upgrade an old song db to the current schema
         """
-        # GIVEN: An old song db
+        # GIVEN: An old prjector db
         old_db = os.path.join(TEST_RESOURCES_PATH, "projector", TEST_DB_PJLINK1)
         tmp_db = os.path.join(self.tmp_folder, TEST_DB)
         shutil.copyfile(old_db, tmp_db)
