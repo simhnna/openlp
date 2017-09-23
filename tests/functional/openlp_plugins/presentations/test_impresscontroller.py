@@ -24,13 +24,12 @@ Functional tests to test the Impress class and related methods.
 """
 from unittest import TestCase
 from unittest.mock import MagicMock
-import os
 import shutil
 from tempfile import mkdtemp
 
 from openlp.core.common import Settings
-from openlp.plugins.presentations.lib.impresscontroller import \
-    ImpressController, ImpressDocument, TextType
+from openlp.core.common.path import Path
+from openlp.plugins.presentations.lib.impresscontroller import ImpressController, ImpressDocument, TextType
 from openlp.plugins.presentations.presentationplugin import __default_settings__
 
 from tests.utils.constants import TEST_RESOURCES_PATH
@@ -82,7 +81,7 @@ class TestImpressDocument(TestCase):
         mocked_plugin = MagicMock()
         mocked_plugin.settings_section = 'presentations'
         Settings().extend_default_settings(__default_settings__)
-        self.file_name = os.path.join(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
+        self.file_name = Path(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
         self.ppc = ImpressController(mocked_plugin)
         self.doc = ImpressDocument(self.ppc, self.file_name)
 

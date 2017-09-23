@@ -360,7 +360,7 @@ class ImageMediaItem(MediaManagerItem):
             if not os.path.exists(image_file.filename):
                 icon = build_icon(':/general/general_delete.png')
             else:
-                if validate_thumb(image_file.filename, thumb):
+                if validate_thumb(Path(image_file.filename), Path(thumb)):
                     icon = build_icon(thumb)
                 else:
                     icon = create_thumb(image_file.filename, thumb)

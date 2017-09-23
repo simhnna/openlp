@@ -32,7 +32,7 @@ from PyQt5 import QtCore, QtGui
 from openlp.core.common.path import Path
 from openlp.core.lib import FormattingTags, build_icon, check_item_selected, clean_tags, compare_chord_lyric, \
     create_separated_list, create_thumb, expand_chords, expand_chords_for_printing, expand_tags, find_formatting_tags, \
-    get_text_file_string, image_to_byte, replace_params, resize_image, str_to_bool, validate_thumb
+    get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
 
@@ -595,93 +595,46 @@ class TestLib(TestCase):
         Test the validate_thumb() function when the thumbnail does not exist
         """
         # GIVEN: A mocked out os module, with path.exists returning False, and fake paths to a file and a thumb
-        with patch('openlp.core.lib.os') as mocked_os:
-            file_path = 'path/to/file'
-            thumb_path = 'path/to/thumb'
-            mocked_os.path.exists.return_value = False
+        with patch.object(Path, 'exists', return_value=False) as mocked_path_exists:
+            file_path = Path('path', 'to', 'file')
+            thumb_path = Path('path', 'to', 'thumb')
 
             # WHEN: we run the validate_thumb() function
             result = validate_thumb(file_path, thumb_path)
 
             # THEN: we should have called a few functions, and the result should be False
-            mocked_os.path.exists.assert_called_with(thumb_path)
-            assert result is False, 'The result should be False'
+            thumb_path.exists.assert_called_once_with()
+            self.assertFalse(result, 'The result should be False')
 
     def test_validate_thumb_file_exists_and_newer(self):
         """
         Test the validate_thumb() function when the thumbnail exists and has a newer timestamp than the file
         """
-        # GIVEN: A mocked out os module, functions rigged to work for us, and fake paths to a file and a thumb
-        with patch('openlp.core.lib.os') as mocked_os:
-            file_path = 'path/to/file'
-            thumb_path = 'path/to/thumb'
-            file_mocked_stat = MagicMock()
-            file_mocked_stat.st_mtime = datetime.now()
-            thumb_mocked_stat = MagicMock()
-            thumb_mocked_stat.st_mtime = datetime.now() + timedelta(seconds=10)
-            mocked_os.path.exists.return_value = True
-            mocked_os.stat.side_effect = [file_mocked_stat, thumb_mocked_stat]
+        with patch.object(Path, 'exists'), patch.object(Path, 'stat'):
+            # GIVEN: Mocked file_path and thumb_path which return different values fo the modified times
+            file_path = MagicMock(**{'stat.return_value': MagicMock(st_mtime=10)})
+            thumb_path = MagicMock(**{'exists.return_value': True, 'stat.return_value': MagicMock(st_mtime=11)})
 
             # WHEN: we run the validate_thumb() function
+            result = validate_thumb(file_path, thumb_path)
 
-            # THEN: we should have called a few functions, and the result should be True
-            # mocked_os.path.exists.assert_called_with(thumb_path)
+            # THEN: `validate_thumb` should return True
+            self.assertTrue(result)
 
     def test_validate_thumb_file_exists_and_older(self):
         """
         Test the validate_thumb() function when the thumbnail exists but is older than the file
         """
-        # GIVEN: A mocked out os module, functions rigged to work for us, and fake paths to a file and a thumb
-        with patch('openlp.core.lib.os') as mocked_os:
-            file_path = 'path/to/file'
-            thumb_path = 'path/to/thumb'
-            file_mocked_stat = MagicMock()
-            file_mocked_stat.st_mtime = datetime.now()
-            thumb_mocked_stat = MagicMock()
-            thumb_mocked_stat.st_mtime = datetime.now() - timedelta(seconds=10)
-            mocked_os.path.exists.return_value = True
-            mocked_os.stat.side_effect = lambda fname: file_mocked_stat if fname == file_path else thumb_mocked_stat
+        # GIVEN: Mocked file_path and thumb_path which return different values fo the modified times
+        file_path = MagicMock(**{'stat.return_value': MagicMock(st_mtime=10)})
+        thumb_path = MagicMock(**{'exists.return_value': True, 'stat.return_value': MagicMock(st_mtime=9)})
 
-            # WHEN: we run the validate_thumb() function
-            result = validate_thumb(file_path, thumb_path)
+        # WHEN: we run the validate_thumb() function
+        result = validate_thumb(file_path, thumb_path)
 
-            # THEN: we should have called a few functions, and the result should be False
-            mocked_os.path.exists.assert_called_with(thumb_path)
-            mocked_os.stat.assert_any_call(file_path)
-            mocked_os.stat.assert_any_call(thumb_path)
-            assert result is False, 'The result should be False'
-
-    def test_replace_params_no_params(self):
-        """
-        Test replace_params when called with and empty tuple instead of parameters to replace
-        """
-        # GIVEN: Some test data
-        test_args = (1, 2)
-        test_kwargs = {'arg3': 3, 'arg4': 4}
-        test_params = tuple()
-
-        # WHEN: Calling replace_params
-        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
-
-        # THEN: The positional and keyword args should not have changed
-        self.assertEqual(test_args, result_args)
-        self.assertEqual(test_kwargs, result_kwargs)
-
-    def test_replace_params_params(self):
-        """
-        Test replace_params when given a positional and a keyword argument to change
-        """
-        # GIVEN: Some test data
-        test_args = (1, 2)
-        test_kwargs = {'arg3': 3, 'arg4': 4}
-        test_params = ((1, 'arg2', str), (2, 'arg3', str))
-
-        # WHEN: Calling replace_params
-        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
-
-        # THEN: The positional and keyword args should have have changed
-        self.assertEqual(result_args, (1, '2'))
-        self.assertEqual(result_kwargs, {'arg3': '3', 'arg4': 4})
+        # THEN: `validate_thumb` should return False
+        thumb_path.stat.assert_called_once_with()
+        self.assertFalse(result, 'The result should be False')
 
     def test_resize_thumb(self):
         """

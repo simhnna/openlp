@@ -563,7 +563,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 filename, sha256 = item.data(QtCore.Qt.UserRole)
                 self._increment_progress_bar(self.downloading.format(name=filename), 0)
                 self.previous_size = 0
-                destination = os.path.join(songs_destination, str(filename))
+                destination = Path(songs_destination, str(filename))
                 if not url_get_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
                                     destination, sha256):
                     missed_files.append('Song: {name}'.format(name=filename))
@@ -576,7 +576,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
                 if not url_get_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
-                                    os.path.join(bibles_destination, bible),
+                                    Path(bibles_destination, bible),
                                     sha256):
                     missed_files.append('Bible: {name}'.format(name=bible))
             bibles_iterator += 1
@@ -588,7 +588,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=theme), 0)
                 self.previous_size = 0
                 if not url_get_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
-                                    os.path.join(themes_destination, theme),
+                                    Path(themes_destination, theme),
                                     sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
         if missed_files:

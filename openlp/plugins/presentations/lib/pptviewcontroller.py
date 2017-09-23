@@ -85,9 +85,9 @@ class PptviewController(PresentationController):
             if self.process:
                 return
             log.debug('start PPTView')
-            dll_path = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)),
-                                    'plugins', 'presentations', 'lib', 'pptviewlib', 'pptviewlib.dll')
-            self.process = cdll.LoadLibrary(dll_path)
+            dll_path = AppLocation.get_directory(AppLocation.AppDir) \
+                / 'plugins' / 'presentations' / 'lib' / 'pptviewlib' / 'pptviewlib.dll'
+            self.process = cdll.LoadLibrary(str(dll_path))
             if log.isEnabledFor(logging.DEBUG):
                 self.process.SetDebug(1)
 
@@ -104,12 +104,15 @@ class PptviewDocument(PresentationDocument):
     """
     Class which holds information and controls a single presentation.
     """
-    def __init__(self, controller, presentation):
+    def __init__(self, controller, document_path):
         """
         Constructor, store information about the file and initialise.
+
+        :param openlp.core.common.path.Path document_path: File path to the document to load
+        :rtype: None
         """
         log.debug('Init Presentation PowerPoint')
-        super(PptviewDocument, self).__init__(controller, presentation)
+        super().__init__(controller, document_path)
         self.presentation = None
         self.ppt_id = None
         self.blanked = False
@@ -121,17 +124,16 @@ class PptviewDocument(PresentationDocument):
         the background PptView task started earlier.
         """
         log.debug('LoadPresentation')
-        temp_folder = self.get_temp_folder()
+        temp_path = self.get_temp_folder()
         size = ScreenList().current['size']
         rect = RECT(size.x(), size.y(), size.right(), size.bottom())
-        self.file_path = os.path.normpath(self.file_path)
-        preview_path = os.path.join(temp_folder, 'slide')
+        preview_path = temp_path / 'slide'
         # Ensure that the paths are null terminated
-        byte_file_path = self.file_path.encode('utf-16-le') + b'\0'
-        preview_path = preview_path.encode('utf-16-le') + b'\0'
-        if not os.path.isdir(temp_folder):
-            os.makedirs(temp_folder)
-        self.ppt_id = self.controller.process.OpenPPT(byte_file_path, None, rect, preview_path)
+        file_path_utf16 = str(self.file_path).encode('utf-16-le') + b'\0'
+        preview_path_utf16 = str(preview_path).encode('utf-16-le') + b'\0'
+        if not temp_path.is_dir():
+            temp_path.mkdir(parents=True)
+        self.ppt_id = self.controller.process.OpenPPT(file_path_utf16, None, rect, preview_path_utf16)
         if self.ppt_id >= 0:
             self.create_thumbnails()
             self.stop_presentation()
@@ -148,7 +150,7 @@ class PptviewDocument(PresentationDocument):
             return
         log.debug('create_thumbnails proceeding')
         for idx in range(self.get_slide_count()):
-            path = '{folder}\\slide{index}.bmp'.format(folder=self.get_temp_folder(), index=str(idx + 1))
+            path = self.get_temp_folder() / 'slide{index:d}.bmp'.format(index=idx + 1)
             self.convert_thumbnail(path, idx + 1)
 
     def create_titles_and_notes(self):
@@ -161,13 +163,12 @@ class PptviewDocument(PresentationDocument):
         """
         titles = None
         notes = None
-        filename = os.path.normpath(self.file_path)
         # let's make sure we have a valid zipped presentation
-        if os.path.exists(filename) and zipfile.is_zipfile(filename):
+        if self.file_path.exists() and zipfile.is_zipfile(str(self.file_path)):
             namespaces = {"p": "http://schemas.openxmlformats.org/presentationml/2006/main",
                           "a": "http://schemas.openxmlformats.org/drawingml/2006/main"}
             # open the file
-            with zipfile.ZipFile(filename) as zip_file:
+            with zipfile.ZipFile(str(self.file_path)) as zip_file:
                 # find the presentation.xml to get the slide count
                 with zip_file.open('ppt/presentation.xml') as pres:
                     tree = ElementTree.parse(pres)

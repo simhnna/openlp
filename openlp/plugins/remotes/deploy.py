@@ -64,6 +64,6 @@ def download_and_check(callback=None):
     file_size = get_url_file_size('https://get.openlp.org/webclient/site.zip')
     callback.setRange(0, file_size)
     if url_get_file(callback, '{host}{name}'.format(host='https://get.openlp.org/webclient/', name='site.zip'),
-                    os.path.join(str(AppLocation.get_section_data_path('remotes')), 'site.zip'),
+                    AppLocation.get_section_data_path('remotes') / 'site.zip',
                     sha256=sha256):
         deploy_zipfile(str(AppLocation.get_section_data_path('remotes')), 'site.zip')

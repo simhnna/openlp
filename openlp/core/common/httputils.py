@@ -211,7 +211,7 @@ def url_get_file(callback, url, f_path, sha256=None):
 
     :param callback: the class which needs to be updated
     :param url: URL to download
-    :param f_path: Destination file
+    :param openlp.core.common.path.Path f_path: Destination file
     :param sha256: The check sum value to be checked against the download value
     """
     block_count = 0
@@ -220,29 +220,23 @@ def url_get_file(callback, url, f_path, sha256=None):
     log.debug("url_get_file: " + url)
     while True:
         try:
-            filename = open(f_path, "wb")
-            url_file = urllib.request.urlopen(url, timeout=CONNECTION_TIMEOUT)
             if sha256:
                 hasher = hashlib.sha256()
-            # Download until finished or canceled.
-            while not callback.was_cancelled:
-                data = url_file.read(block_size)
-                if not data:
-                    break
-                filename.write(data)
-                if sha256:
-                    hasher.update(data)
-                block_count += 1
-                callback._download_progress(block_count, block_size)
-            filename.close()
-            if sha256 and hasher.hexdigest() != sha256:
-                log.error('sha256 sums did not match for file: {file}'.format(file=f_path))
-                os.remove(f_path)
-                return False
-        except (urllib.error.URLError, socket.timeout) as err:
+            with f_path.open('wb') as file:
+                url_file = urllib.request.urlopen(url, timeout=CONNECTION_TIMEOUT)
+                # Download until finished or canceled.
+                while not callback.was_cancelled:
+                    data = url_file.read(block_size)
+                    if not data:
+                        break
+                    file.write(data)
+                    if sha256:
+                        hasher.update(data)
+                    block_count += 1
+                    callback._download_progress(block_count, block_size)
+        except (urllib.error.URLError, socket.timeout):
             trace_error_handler(log)
-            filename.close()
-            os.remove(f_path)
+            f_path.unlink()
             if retries > CONNECTION_RETRIES:
                 return False
             else:
@@ -251,8 +245,12 @@ def url_get_file(callback, url, f_path, sha256=None):
                 continue
         break
     # Delete file if cancelled, it may be a partial file.
+    if sha256 and hasher.hexdigest() != sha256:
+        log.error('sha256 sums did not match for file: {file}'.format(file=f_path))
+        f_path.unlink()
+        return False
     if callback.was_cancelled:
-        os.remove(f_path)
+        f_path.unlink()
     return True
 
 

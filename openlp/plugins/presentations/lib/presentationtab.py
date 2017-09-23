@@ -38,7 +38,6 @@ class PresentationTab(SettingsTab):
         """
         Constructor
         """
-        self.parent = parent
         self.controllers = controllers
         super(PresentationTab, self).__init__(parent, title, visible_title, icon_path)
         self.activated = False
@@ -194,7 +193,7 @@ class PresentationTab(SettingsTab):
         pdf_program_path = self.program_path_edit.path
         enable_pdf_program = self.pdf_program_check_box.checkState()
         # If the given program is blank disable using the program
-        if not pdf_program_path:
+        if pdf_program_path is None:
             enable_pdf_program = 0
         if pdf_program_path != Settings().value(self.settings_section + '/pdf_program'):
             Settings().setValue(self.settings_section + '/pdf_program', pdf_program_path)
@@ -220,9 +219,11 @@ class PresentationTab(SettingsTab):
 
     def on_program_path_edit_path_changed(self, new_path):
         """
-        Select the mudraw or ghostscript binary that should be used.
+        Handle the `pathEditChanged` signal from program_path_edit
+
+        :param openlp.core.common.path.Path new_path: File path to the new program
+        :rtype: None
         """
-        new_path = path_to_str(new_path)
         if new_path:
             if not PdfController.process_check_binary(new_path):
                 critical_error_message_box(UiStrings().Error,

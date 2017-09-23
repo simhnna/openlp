@@ -29,6 +29,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file, ping
+from openlp.core.common.path import Path
 
 from tests.helpers.testmixin import TestMixin
 
@@ -267,7 +268,7 @@ class TestHttpUtils(TestCase, TestMixin):
         mocked_urlopen.side_effect = socket.timeout()
 
         # WHEN: Attempt to retrieve a file
-        url_get_file(MagicMock(), url='http://localhost/test', f_path=self.tempfile)
+        url_get_file(MagicMock(), url='http://localhost/test', f_path=Path(self.tempfile))
 
         # THEN: socket.timeout should have been caught
         # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files

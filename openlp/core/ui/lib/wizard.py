@@ -310,7 +310,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         """
         folder_path = FileDialog.getExistingDirectory(
             self, title, Settings().value(self.plugin.settings_section + '/' + setting_name),
-            QtWidgets.QFileDialog.ShowDirsOnly)
+            FileDialog.ShowDirsOnly)
         if folder_path:
             editbox.setText(str(folder_path))
             Settings().setValue(self.plugin.settings_section + '/' + setting_name, folder_path)
