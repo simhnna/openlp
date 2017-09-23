@@ -72,6 +72,28 @@ PJLINK_HEADER = '{prefix}{{linkclass}}'.format(prefix=PJLINK_PREFIX)
 PJLINK_SUFFIX = CR
 
 
+class PJLinkUDP(QtNetwork.QUdpSocket):
+    """
+    Socket service for PJLink UDP socket.
+    """
+    # New commands available in PJLink Class 2
+    pjlink_udp_commands = [
+        'ACKN',  # Class 2  (cmd is SRCH)
+        'ERST',  # Class 1/2
+        'INPT',  # Class 1/2
+        'LKUP',  # Class 2  (reply only - no cmd)
+        'POWR',  # Class 1/2
+        'SRCH'   # Class 2  (reply is ACKN)
+    ]
+
+    def __init__(self, port=PJLINK_PORT):
+        """
+        Initialize socket
+        """
+
+        self.port = port
+
+
 class PJLinkCommands(object):
     """
     Process replies from PJLink projector.
@@ -488,7 +510,7 @@ class PJLinkCommands(object):
 
 class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
     """
-    Socket service for connecting to a PJLink-capable projector.
+    Socket service for PJLink TCP socket.
     """
     # Signals sent by this module
     changeStatus = QtCore.pyqtSignal(str, int, str)
@@ -499,43 +521,29 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
     projectorReceivedData = QtCore.pyqtSignal()  # Notify when received data finished processing
     projectorUpdateIcons = QtCore.pyqtSignal()  # Update the status icons on toolbar
 
-    # New commands available in PJLink Class 2
-    pjlink_udp_commands = [
-        'ACKN',  # Class 2
-        'ERST',  # Class 1 or 2
-        'INPT',  # Class 1 or 2
-        'LKUP',  # Class 2
-        'POWR',  # Class 1 or 2
-        'SRCH'   # Class 2
-    ]
-
-    def __init__(self, port=PJLINK_PORT, *args, **kwargs):
+    def __init__(self, projector, *args, **kwargs):
         """
         Setup for instance.
         Options should be in kwargs except for port which does have a default.
 
-        :param name: Display name
-        :param ip: IP address to connect to
-        :param port: Port to use. Default to PJLINK_PORT
-        :param pin: Access pin (if needed)
+        :param projector: Database record of projector
 
         Optional parameters
-        :param dbid: Database ID number
-        :param location: Location where projector is physically located
-        :param notes: Extra notes about the projector
         :param poll_time: Time (in seconds) to poll connected projector
         :param socket_timeout: Time (in seconds) to abort the connection if no response
         """
-        log.debug('PJlink(args={args} kwargs={kwargs})'.format(args=args, kwargs=kwargs))
+        log.debug('PJlink(projector={projector}, args={args} kwargs={kwargs})'.format(projector=projector,
+                                                                                      args=args,
+                                                                                      kwargs=kwargs))
         super().__init__()
-        self.dbid = kwargs.get('dbid')
-        self.ip = kwargs.get('ip')
-        self.location = kwargs.get('location')
-        self.mac_adx = kwargs.get('mac_adx')
-        self.name = kwargs.get('name')
-        self.notes = kwargs.get('notes')
-        self.pin = kwargs.get('pin')
-        self.port = port
+        self.entry = projector
+        self.ip = self.entry.ip
+        self.location = self.entry.location
+        self.mac_adx = self.entry.mac_adx
+        self.name = self.entry.name
+        self.notes = self.entry.notes
+        self.pin = self.entry.pin
+        self.port = self.entry.port
         self.db_update = False  # Use to check if db needs to be updated prior to exiting
         # Poll time 20 seconds unless called with something else
         self.poll_time = 20000 if 'poll_time' not in kwargs else kwargs['poll_time'] * 1000
@@ -751,7 +759,7 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
             self.change_status(E_AUTHENTICATION)
             log.debug('({ip}) emitting projectorAuthentication() signal'.format(ip=self.ip))
             return
-        elif data_check[1] == '0' and self.pin is not None:
+        elif (data_check[1] == '0') and (self.pin):
             # Pin set and no authentication needed
             log.warning('({ip}) Regular connection but PIN set'.format(ip=self.name))
             self.disconnect_from_host()
@@ -761,7 +769,7 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
             return
         elif data_check[1] == '1':
             # Authenticated login with salt
-            if self.pin is None:
+            if not self.pin:
                 log.warning('({ip}) Authenticated connection but no pin set'.format(ip=self.ip))
                 self.disconnect_from_host()
                 self.change_status(E_AUTHENTICATION)
@@ -776,7 +784,7 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
         else:
             data_hash = None
         # We're connected at this point, so go ahead and setup regular I/O
-        self.readyRead.connect(self.get_data)
+        self.readyRead.connect(self.get_socket)
         self.projectorReceivedData.connect(self._send_command)
         # Initial data we should know about
         self.send_command(cmd='CLSS', salt=data_hash)
@@ -800,27 +808,51 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
                                                                                    count=trash_count))
         return
 
+    @QtCore.pyqtSlot(str, str)
+    def get_buffer(self, data, ip):
+        """
+        Get data from somewhere other than TCP socket
+
+        :param data:  Data to process. buffer must be formatted as a proper PJLink packet.
+        :param ip:      Destination IP for buffer.
+        """
+        log.debug("({ip}) get_buffer(data='{buff}' ip='{ip_in}'".format(ip=self.ip, buff=data, ip_in=ip))
+        if ip is None:
+            log.debug("({ip}) get_buffer() Don't know who data is for - exiting".format(ip=self.ip))
+            return
+        return self.get_data(buff=data, ip=ip)
+
     @QtCore.pyqtSlot()
-    def get_data(self):
+    def get_socket(self):
         """
-        Socket interface to retrieve data.
+        Get data from TCP socket.
         """
-        log.debug('({ip}) get_data(): Reading data'.format(ip=self.ip))
+        log.debug('({ip}) get_socket(): Reading data'.format(ip=self.ip))
         if self.state() != self.ConnectedState:
-            log.debug('({ip}) get_data(): Not connected - returning'.format(ip=self.ip))
+            log.debug('({ip}) get_socket(): Not connected - returning'.format(ip=self.ip))
             self.send_busy = False
             return
         # Although we have a packet length limit, go ahead and use a larger buffer
         read = self.readLine(1024)
-        log.debug("({ip}) get_data(): '{buff}'".format(ip=self.ip, buff=read))
+        log.debug("({ip}) get_socket(): '{buff}'".format(ip=self.ip, buff=read))
         if read == -1:
             # No data available
-            log.debug('({ip}) get_data(): No data available (-1)'.format(ip=self.ip))
+            log.debug('({ip}) get_socket(): No data available (-1)'.format(ip=self.ip))
             return self.receive_data_signal()
         self.socket_timer.stop()
         self.projectorNetwork.emit(S_NETWORK_RECEIVED)
+        return self.get_data(buff=read, ip=self.ip)
+
+    def get_data(self, buff, ip):
+        """
+        Process received data
+
+        :param buff:    Data to process.
+        :param ip:      (optional) Destination IP.
+        """
+        log.debug("({ip}) get_data(ip='{ip_in}' buffer='{buff}'".format(ip=self.ip, ip_in=ip, buff=buff))
         # NOTE: Class2 has changed to some values being UTF-8
-        data_in = decode(read, 'utf-8')
+        data_in = decode(buff, 'utf-8')
         data = data_in.strip()
         if (len(data) < 7) or (not data.startswith(PJLINK_PREFIX)):
             return self._trash_buffer(msg='get_data(): Invalid packet - length or prefix')
@@ -990,7 +1022,7 @@ class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
             self.reset_information()
         self.disconnectFromHost()
         try:
-            self.readyRead.disconnect(self.get_data)
+            self.readyRead.disconnect(self.get_socket)
         except TypeError:
             pass
         if abort:

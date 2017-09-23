@@ -27,6 +27,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 import openlp.core.lib.projector.pjlink
+from openlp.core.lib.projector.db import Projector
 from openlp.core.lib.projector.pjlink import PJLink
 from openlp.core.lib.projector.constants import PJLINK_ERRORS, \
     E_AUTHENTICATION, E_PARAMETER, E_PROJECTOR, E_UNAVAILABLE, E_UNDEFINED
@@ -35,9 +36,10 @@ from openlp.core.lib.projector.constants import PJLINK_ERRORS, \
 from openlp.core.lib.projector.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
     PJLINK_POWR_STATUS, PJLINK_VALID_CMD, E_WARN, E_ERROR, S_OFF, S_STANDBY, S_ON
 '''
-from tests.resources.projector.data import TEST_PIN
+from tests.resources.projector.data import TEST_PIN, TEST1_DATA
 
-pjlink_test = PJLink(name='test', ip='127.0.0.1', pin=TEST_PIN, no_poll=True)
+pjlink_test = PJLink(Projector(**TEST1_DATA), pin=TEST_PIN, no_poll=True)
+pjlink_test.ip = '127.0.0.1'
 
 
 class TestPJLinkRouting(TestCase):

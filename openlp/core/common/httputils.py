@@ -113,7 +113,6 @@ def get_web_page(url, headers=None, update_openlp=False, proxies=None):
     if not response or not response.text:
         log.error('{url} could not be downloaded'.format(url=url))
         return None
-    log.debug(response.text)
     return response.text
 
 
@@ -182,7 +181,6 @@ def url_get_file(callback, url, file_path, sha256=None):
                 retries += 1
                 time.sleep(0.1)
                 continue
-    # Delete file if cancelled, it may be a partial file.
     if callback.was_cancelled:
         os.remove(file_path)
     return True

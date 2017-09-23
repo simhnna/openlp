@@ -29,7 +29,6 @@ import sys
 from openlp.core.common import Settings, is_win, is_macosx
 from openlp.core.common.path import Path
 
-
 if not is_win() and not is_macosx():
     try:
         from xdg import BaseDirectory

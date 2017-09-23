@@ -28,8 +28,6 @@ logging and a plugin framework are contained within the openlp.core module.
 """
 import argparse
 import logging
-import os
-import shutil
 import sys
 import time
 from datetime import datetime
@@ -39,7 +37,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
-from openlp.core.common.path import Path
+from openlp.core.common.path import Path, copytree
 from openlp.core.version import check_for_update, get_version
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
@@ -180,21 +178,20 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         """
         Check if the data folder path exists.
         """
-        data_folder_path = str(AppLocation.get_data_path())
-        if not os.path.exists(data_folder_path):
-            log.critical('Database was not found in: ' + data_folder_path)
+        data_folder_path = AppLocation.get_data_path()
+        if not data_folder_path.exists():
+            log.critical('Database was not found in: %s', data_folder_path)
             status = QtWidgets.QMessageBox.critical(
                 None, translate('OpenLP', 'Data Directory Error'),
-                translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}\n\nThe location of the data '
-                          'folder was previously changed from the OpenLP\'s default location. If the data was '
-                          'stored on removable device, that device needs to be made available.\n\nYou may reset '
-                          'the data location back to the default location, or you can try to make the current '
-                          'location available.\n\nDo you want to reset to the default data location? If not, '
-                          'OpenLP will be closed so you can try to fix the the problem.').format(
-                              path=data_folder_path),
+                translate('OpenLP', 'OpenLP data folder was not found in:\n\n{path}\n\nThe location of the data folder '
+                                    'was previously changed from the OpenLP\'s default location. If the data was '
+                                    'stored on removable device, that device needs to be made available.\n\nYou may '
+                                    'reset the data location back to the default location, or you can try to make the '
+                                    'current location available.\n\nDo you want to reset to the default data location? '
+                                    'If not, OpenLP will be closed so you can try to fix the the problem.')
+                .format(path=data_folder_path),
                 QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No),
-                QtWidgets.QMessageBox.No
-            )
+                QtWidgets.QMessageBox.No)
             if status == QtWidgets.QMessageBox.No:
                 # If answer was "No", return "True", it will shutdown OpenLP in def main
                 log.info('User requested termination')
@@ -248,11 +245,11 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                                                                   'a backup of the old data folder?'),
                                               defaultButton=QtWidgets.QMessageBox.Yes) == QtWidgets.QMessageBox.Yes:
                 # Create copy of data folder
-                data_folder_path = str(AppLocation.get_data_path())
+                data_folder_path = AppLocation.get_data_path()
                 timestamp = time.strftime("%Y%m%d-%H%M%S")
-                data_folder_backup_path = data_folder_path + '-' + timestamp
+                data_folder_backup_path = data_folder_path.with_name(data_folder_path.name + '-' + timestamp)
                 try:
-                    shutil.copytree(data_folder_path, data_folder_backup_path)
+                    copytree(data_folder_path, data_folder_backup_path)
                 except OSError:
                     QtWidgets.QMessageBox.warning(None, translate('OpenLP', 'Backup'),
                                                   translate('OpenLP', 'Backup of the data folder failed!'))
