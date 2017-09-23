@@ -38,6 +38,7 @@ class TestBibleHTTP(TestCase):
         Registry.create()
         Registry().register('service_list', MagicMock())
         Registry().register('application', MagicMock())
+        Registry().register('main_window', MagicMock())
 
     def test_bible_gateway_extract_books(self):
         """
