@@ -28,9 +28,10 @@ import multiprocessing
 import sys
 
 from openlp.core.common import is_win, is_macosx
+from openlp.core.common.applocation import AppLocation
 from openlp.core import main
 
-faulthandler.enable()
+faulthandler.enable(open(str(AppLocation.get_directory(AppLocation.CacheDir) / 'error.log'), 'wb'))
 
 if __name__ == '__main__':
     """

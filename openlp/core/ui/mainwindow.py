@@ -1017,7 +1017,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
                 wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
                 wait_dialog.setAutoClose(False)
-                self.version_thread.wait()
+                wait_dialog.show()
+                retry = 0
+                while self.version_thread.isRunning() and retry < 10:
+                    self.application.processEvents()
+                    self.version_thread.wait(500)
+                if self.version_thread.isRunning():
+                    self.version_thread.terminate()
                 wait_dialog.close()
         except RuntimeError:
             # Ignore the RuntimeError that is thrown when Qt has already deleted the C++ thread object
