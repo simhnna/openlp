@@ -1017,11 +1017,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
                 wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
                 wait_dialog.setAutoClose(False)
+                wait_dialog.setCancelButton(None)
                 wait_dialog.show()
                 retry = 0
-                while self.version_thread.isRunning() and retry < 10:
+                while self.version_thread.isRunning() and retry < 50:
                     self.application.processEvents()
-                    self.version_thread.wait(500)
+                    self.version_thread.wait(100)
+                    retry += 1
                 if self.version_thread.isRunning():
                     self.version_thread.terminate()
                 wait_dialog.close()
