@@ -214,10 +214,11 @@ class PathType(types.TypeDecorator):
         """
         Some times it make sense to compare a PathType with a string. In the case a string is used coerce the the
         PathType to a UnicodeText type.
-        
-        :param op: The operation being carried out. Not used, as we only care about the type that is being used with the 
-                   operation.
-        :param openlp.core.common.path.Path | str value: The value being used for the comparison. Most likely a Path Object or str.
+
+        :param op: The operation being carried out. Not used, as we only care about the type that is being used with the
+            operation.
+        :param openlp.core.common.path.Path | str value: The value being used for the comparison. Most likely a Path
+            Object or str.
         :return: The coerced value stored in the db
         :rtype: PathType or UnicodeText
         """
@@ -343,8 +344,8 @@ class Manager(object):
 
         :param plugin_name:  The name to setup paths and settings section names
         :param init_schema: The init_schema function for this database
-        :param openlp.core.common.path.Path db_file_path: The file name to use for this database. Defaults to None resulting in the plugin_name
-        being used.
+        :param openlp.core.common.path.Path db_file_path: The file name to use for this database. Defaults to None
+            resulting in the plugin_name being used.
         :param upgrade_mod: The upgrade_schema function for this database
         """
         self.is_dirty = False

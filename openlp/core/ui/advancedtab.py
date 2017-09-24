@@ -494,7 +494,7 @@ class AdvancedTab(SettingsTab):
     def on_data_directory_path_edit_path_changed(self, new_path):
         """
         Handle the `editPathChanged` signal of the data_directory_path_edit
-        
+
         :param openlp.core.common.path.Path new_path: The new path
         :rtype: None
         """
@@ -528,7 +528,7 @@ class AdvancedTab(SettingsTab):
     def check_data_overwrite(self, data_path):
         """
         Check if there's already data in the target directory.
-        
+
         :param openlp.core.common.path.Path data_path: The target directory to check
         """
         if (data_path / 'songs').exists():
