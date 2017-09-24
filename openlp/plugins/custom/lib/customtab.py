@@ -34,9 +34,6 @@ class CustomTab(SettingsTab):
     """
     CustomTab is the Custom settings tab in the settings dialog.
     """
-    def __init__(self, parent, title, visible_title, icon_path):
-        super(CustomTab, self).__init__(parent, title, visible_title, icon_path)
-
     def setupUi(self):
         self.setObjectName('CustomTab')
         super(CustomTab, self).setupUi()
