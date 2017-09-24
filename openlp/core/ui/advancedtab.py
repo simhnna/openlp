@@ -511,7 +511,7 @@ class AdvancedTab(SettingsTab):
         # Check if data already exists here.
         self.check_data_overwrite(new_path)
         # Save the new location.
-        self.main_window.set_new_data_path(path_to_str(new_data_path))
+        self.main_window.new_data_path = new_path
         self.data_directory_cancel_button.show()
 
     def on_data_directory_copy_check_box_toggled(self):
@@ -562,7 +562,7 @@ class AdvancedTab(SettingsTab):
         """
         self.data_directory_path_edit.path = AppLocation.get_data_path()
         self.data_directory_copy_check_box.setChecked(False)
-        self.main_window.set_new_data_path(None)
+        self.main_window.new_data_path = None
         self.main_window.set_copy_data(False)
         self.data_directory_copy_check_box.hide()
         self.data_directory_cancel_button.hide()
