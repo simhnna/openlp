@@ -22,13 +22,15 @@
 """
     Package to test the openlp.plugin.bible.lib.https package.
 """
-from unittest import TestCase, skip
+import os
+from unittest import TestCase, skipIf
 from unittest.mock import MagicMock
 
 from openlp.core.common import Registry
 from openlp.plugins.bibles.lib.importers.http import BGExtract, CWExtract, BSExtract
 
 
+@skipIf(os.environ.get('JENKINS_URL'), 'Skip Bible HTTP tests to prevent Jenkins from being blacklisted')
 class TestBibleHTTP(TestCase):
 
     def setUp(self):
