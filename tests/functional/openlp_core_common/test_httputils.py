@@ -228,8 +228,7 @@ class TestHttpUtils(TestCase, TestMixin):
         assert file_size == 100
 
     @patch('openlp.core.common.httputils.requests')
-    @patch('openlp.core.common.httputils.os.remove')
-    def test_socket_timeout(self, mocked_remove, mocked_requests):
+    def test_socket_timeout(self, mocked_requests):
         """
         Test socket timeout gets caught
         """
@@ -237,9 +236,8 @@ class TestHttpUtils(TestCase, TestMixin):
         mocked_requests.get.side_effect = IOError
 
         # WHEN: Attempt to retrieve a file
-        url_get_file(MagicMock(), url='http://localhost/test', file_path=self.tempfile)
+        url_get_file(MagicMock(), url='http://localhost/test', file_path=Path(self.tempfile))
 
         # THEN: socket.timeout should have been caught
         # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
-        mocked_remove.assert_called_with(self.tempfile)
-        assert mocked_remove.call_count == 3, 'os.remove() should have been called 3 times'
+        assert not os.path.exists(self.tempfile), 'tempfile should have been deleted'

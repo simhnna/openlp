@@ -142,7 +142,7 @@ def url_get_file(callback, url, file_path, sha256=None):
 
     :param callback: the class which needs to be updated
     :param url: URL to download
-    :param f_path: Destination file
+    :param file_path: Destination file
     :param sha256: The check sum value to be checked against the download value
     """
     block_count = 0
@@ -151,7 +151,7 @@ def url_get_file(callback, url, file_path, sha256=None):
     log.debug('url_get_file: %s', url)
     while retries < CONNECTION_RETRIES:
         try:
-            with open(file_path, 'wb') as saved_file:
+            with file_path.open('wb') as saved_file:
                 response = requests.get(url, timeout=float(CONNECTION_TIMEOUT), stream=True)
                 if sha256:
                     hasher = hashlib.sha256()
@@ -168,20 +168,22 @@ def url_get_file(callback, url, file_path, sha256=None):
             if sha256 and hasher.hexdigest() != sha256:
                 log.error('sha256 sums did not match for file %s, got %s, expected %s', file_path, hasher.hexdigest(),
                           sha256)
-                os.remove(file_path)
+                if file_path.exists():
+                    file_path.unlink()
                 return False
             break
         except IOError:
             trace_error_handler(log)
-            os.remove(file_path)
             if retries > CONNECTION_RETRIES:
+                if file_path.exists():
+                    file_path.unlink()
                 return False
             else:
                 retries += 1
                 time.sleep(0.1)
                 continue
-    if callback.was_cancelled:
-        os.remove(file_path)
+    if callback.was_cancelled and file_path.exists():
+        file_path.unlink()
     return True
 
 
