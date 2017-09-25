@@ -31,11 +31,11 @@ class FileDialog(QtWidgets.QFileDialog):
         """
         Wraps `getExistingDirectory` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None
+        :type parent: QtWidgets.QWidget | None
         :type caption: str
         :type directory: openlp.core.common.path.Path
         :type options: QtWidgets.QFileDialog.Options
-        :rtype: tuple[Path, str]
+        :rtype: tuple[openlp.core.common.path.Path, str]
         """
         args, kwargs = replace_params(args, kwargs, ((2, 'directory', path_to_str),))
 
@@ -50,13 +50,13 @@ class FileDialog(QtWidgets.QFileDialog):
         """
         Wraps `getOpenFileName` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None
+        :type parent: QtWidgets.QWidget | None
         :type caption: str
         :type directory: openlp.core.common.path.Path
         :type filter: str
         :type initialFilter: str
         :type options: QtWidgets.QFileDialog.Options
-        :rtype: tuple[Path, str]
+        :rtype: tuple[openlp.core.common.path.Path, str]
         """
         args, kwargs = replace_params(args, kwargs, ((2, 'directory', path_to_str),))
 
@@ -71,13 +71,13 @@ class FileDialog(QtWidgets.QFileDialog):
         """
         Wraps `getOpenFileNames` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None
+        :type parent: QtWidgets.QWidget | None
         :type caption: str
         :type directory: openlp.core.common.path.Path
         :type filter: str
         :type initialFilter: str
         :type options: QtWidgets.QFileDialog.Options
-        :rtype: tuple[list[Path], str]
+        :rtype: tuple[list[openlp.core.common.path.Path], str]
         """
         args, kwargs = replace_params(args, kwargs, ((2, 'directory', path_to_str),))
 
@@ -93,13 +93,13 @@ class FileDialog(QtWidgets.QFileDialog):
         """
         Wraps `getSaveFileName` so that it can be called with, and return Path objects
 
-        :type parent: QtWidgets.QWidget or None
+        :type parent: QtWidgets.QWidget | None
         :type caption: str
         :type directory: openlp.core.common.path.Path
         :type filter: str
         :type initialFilter: str
         :type options: QtWidgets.QFileDialog.Options
-        :rtype: tuple[Path or None, str]
+        :rtype: tuple[openlp.core.common.path.Path | None, str]
         """
         args, kwargs = replace_params(args, kwargs, ((2, 'directory', path_to_str),))
 
