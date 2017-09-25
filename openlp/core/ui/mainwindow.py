@@ -1351,12 +1351,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             if self.application:
                 self.application.process_events()
 
-    def set_new_data_path(self, new_data_path):
-        """
-        Set the new data path
-        """
-        self.new_data_path = new_data_path
-
     def set_copy_data(self, copy_data):
         """
         Set the flag to copy the data
@@ -1368,7 +1362,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Change the data directory.
         """
         log.info('Changing data path to {newpath}'.format(newpath=self.new_data_path))
-        old_data_path = str(AppLocation.get_data_path())
+        old_data_path = AppLocation.get_data_path()
         # Copy OpenLP data to new location if requested.
         self.application.set_busy_cursor()
         if self.copy_data:
@@ -1377,7 +1371,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 self.show_status_message(
                     translate('OpenLP.MainWindow', 'Copying OpenLP data to new data directory location - {path} '
                               '- Please wait for copy to finish').format(path=self.new_data_path))
-                dir_util.copy_tree(old_data_path, self.new_data_path)
+                dir_util.copy_tree(str(old_data_path), str(self.new_data_path))
                 log.info('Copy successful')
             except (IOError, os.error, DistutilsFileError) as why:
                 self.application.set_normal_cursor()
@@ -1392,9 +1386,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             log.info('No data copy requested')
         # Change the location of data directory in config file.
         settings = QtCore.QSettings()
-        settings.setValue('advanced/data path', Path(self.new_data_path))
+        settings.setValue('advanced/data path', self.new_data_path)
         # Check if the new data path is our default.
-        if self.new_data_path == str(AppLocation.get_directory(AppLocation.DataDir)):
+        if self.new_data_path == AppLocation.get_directory(AppLocation.DataDir):
             settings.remove('advanced/data path')
         self.application.set_normal_cursor()
 

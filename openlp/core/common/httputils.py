@@ -24,7 +24,6 @@ The :mod:`openlp.core.utils` module provides the utility libraries for OpenLP.
 """
 import hashlib
 import logging
-import os
 import sys
 import time
 from random import randint
