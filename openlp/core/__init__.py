@@ -26,7 +26,6 @@ The :mod:`core` module provides all core application functions
 All the core functions of the OpenLP application including the GUI, settings,
 logging and a plugin framework are contained within the openlp.core module.
 """
-
 import argparse
 import logging
 import sys
@@ -39,7 +38,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, is_macosx, is_win, translate
 from openlp.core.common.path import Path, copytree
-from openlp.core.common.versionchecker import VersionThread, get_application_version
+from openlp.core.version import check_for_update, get_version
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
 from openlp.core.ui import SplashScreen
@@ -153,8 +152,8 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         self.processEvents()
         if not has_run_wizard:
             self.main_window.first_time()
-        version = VersionThread(self.main_window)
-        version.start()
+        if Settings().value('core/update check'):
+            check_for_update(self.main_window)
         self.main_window.is_display_blank()
         self.main_window.app_startup()
         return self.exec()
@@ -233,7 +232,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
         :param can_show_splash: Should OpenLP show the splash screen
         """
         data_version = Settings().value('core/application version')
-        openlp_version = get_application_version()['version']
+        openlp_version = get_version()['version']
         # New installation, no need to create backup
         if not has_run_wizard:
             Settings().setValue('core/application version', openlp_version)
@@ -408,7 +407,7 @@ def main(args=None):
     Registry.create()
     Registry().register('application', application)
     Registry().set_flag('no_web_server', args.no_web_server)
-    application.setApplicationVersion(get_application_version()['version'])
+    application.setApplicationVersion(get_version()['version'])
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     if application.is_already_running():
         sys.exit()

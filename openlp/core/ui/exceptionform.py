@@ -71,7 +71,7 @@ except ImportError:
     VLC_VERSION = '-'
 
 from openlp.core.common import RegistryProperties, Settings, UiStrings, is_linux, translate
-from openlp.core.common.versionchecker import get_application_version
+from openlp.core.version import get_version
 from openlp.core.ui.lib.filedialog import FileDialog
 
 from .exceptiondialog import Ui_ExceptionDialog
@@ -110,7 +110,7 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
         """
         Create an exception report.
         """
-        openlp_version = get_application_version()
+        openlp_version = get_version()
         description = self.description_text_edit.toPlainText()
         traceback = self.exception_text_edit.toPlainText()
         system = translate('OpenLP.ExceptionForm', 'Platform: {platform}\n').format(platform=platform.platform())

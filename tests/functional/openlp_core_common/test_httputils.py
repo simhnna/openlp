@@ -24,11 +24,10 @@ Functional tests to test the AppLocation class and related methods.
 """
 import os
 import tempfile
-import socket
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file, ping
+from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file
 from openlp.core.common.path import Path
 
 from tests.helpers.testmixin import TestMixin
@@ -68,7 +67,7 @@ class TestHttpUtils(TestCase, TestMixin):
         """
         with patch('openlp.core.common.httputils.sys') as mocked_sys:
 
-            # GIVEN: The system is Linux
+            # GIVEN: The system is Windows
             mocked_sys.platform = 'win32'
 
             # WHEN: We call get_user_agent()
@@ -83,7 +82,7 @@ class TestHttpUtils(TestCase, TestMixin):
         """
         with patch('openlp.core.common.httputils.sys') as mocked_sys:
 
-            # GIVEN: The system is Linux
+            # GIVEN: The system is macOS
             mocked_sys.platform = 'darwin'
 
             # WHEN: We call get_user_agent()
@@ -98,7 +97,7 @@ class TestHttpUtils(TestCase, TestMixin):
         """
         with patch('openlp.core.common.httputils.sys') as mocked_sys:
 
-            # GIVEN: The system is Linux
+            # GIVEN: The system is something else
             mocked_sys.platform = 'freebsd'
 
             # WHEN: We call get_user_agent()
@@ -120,182 +119,125 @@ class TestHttpUtils(TestCase, TestMixin):
         # THEN: None should be returned
         self.assertIsNone(result, 'The return value of get_web_page should be None')
 
-    def test_get_web_page(self):
+    @patch('openlp.core.common.httputils.requests')
+    @patch('openlp.core.common.httputils.get_user_agent')
+    @patch('openlp.core.common.httputils.Registry')
+    def test_get_web_page(self, MockRegistry, mocked_get_user_agent, mocked_requests):
         """
         Test that the get_web_page method works correctly
         """
-        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent, \
-                patch('openlp.core.common.Registry') as MockRegistry:
-            # GIVEN: Mocked out objects and a fake URL
-            mocked_request_object = MagicMock()
-            MockRequest.return_value = mocked_request_object
-            mocked_page_object = MagicMock()
-            mock_urlopen.return_value = mocked_page_object
-            mock_get_user_agent.return_value = 'user_agent'
-            fake_url = 'this://is.a.fake/url'
+        # GIVEN: Mocked out objects and a fake URL
+        mocked_requests.get.return_value = MagicMock(text='text')
+        mocked_get_user_agent.return_value = 'user_agent'
+        fake_url = 'this://is.a.fake/url'
 
-            # WHEN: The get_web_page() method is called
-            returned_page = get_web_page(fake_url)
+        # WHEN: The get_web_page() method is called
+        returned_page = get_web_page(fake_url)
 
-            # THEN: The correct methods are called with the correct arguments and a web page is returned
-            MockRequest.assert_called_with(fake_url)
-            mocked_request_object.add_header.assert_called_with('User-Agent', 'user_agent')
-            self.assertEqual(1, mocked_request_object.add_header.call_count,
-                             'There should only be 1 call to add_header')
-            mock_get_user_agent.assert_called_with()
-            mock_urlopen.assert_called_with(mocked_request_object, timeout=30)
-            mocked_page_object.geturl.assert_called_with()
-            self.assertEqual(0, MockRegistry.call_count, 'The Registry() object should have never been called')
-            self.assertEqual(mocked_page_object, returned_page, 'The returned page should be the mock object')
+        # THEN: The correct methods are called with the correct arguments and a web page is returned
+        mocked_requests.get.assert_called_once_with(fake_url, headers={'User-Agent': 'user_agent'},
+                                                    proxies=None, timeout=30.0)
+        mocked_get_user_agent.assert_called_once_with()
+        assert MockRegistry.call_count == 0, 'The Registry() object should have never been called'
+        assert returned_page == 'text', 'The returned page should be the mock object'
 
-    def test_get_web_page_with_header(self):
+    @patch('openlp.core.common.httputils.requests')
+    @patch('openlp.core.common.httputils.get_user_agent')
+    def test_get_web_page_with_header(self, mocked_get_user_agent, mocked_requests):
         """
         Test that adding a header to the call to get_web_page() adds the header to the request
         """
-        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent:
-            # GIVEN: Mocked out objects, a fake URL and a fake header
-            mocked_request_object = MagicMock()
-            MockRequest.return_value = mocked_request_object
-            mocked_page_object = MagicMock()
-            mock_urlopen.return_value = mocked_page_object
-            mock_get_user_agent.return_value = 'user_agent'
-            fake_url = 'this://is.a.fake/url'
-            fake_header = ('Fake-Header', 'fake value')
+        # GIVEN: Mocked out objects, a fake URL and a fake header
+        mocked_requests.get.return_value = MagicMock(text='text')
+        mocked_get_user_agent.return_value = 'user_agent'
+        fake_url = 'this://is.a.fake/url'
+        fake_headers = {'Fake-Header': 'fake value'}
 
-            # WHEN: The get_web_page() method is called
-            returned_page = get_web_page(fake_url, header=fake_header)
+        # WHEN: The get_web_page() method is called
+        returned_page = get_web_page(fake_url, headers=fake_headers)
 
-            # THEN: The correct methods are called with the correct arguments and a web page is returned
-            MockRequest.assert_called_with(fake_url)
-            mocked_request_object.add_header.assert_called_with(fake_header[0], fake_header[1])
-            self.assertEqual(2, mocked_request_object.add_header.call_count,
-                             'There should only be 2 calls to add_header')
-            mock_get_user_agent.assert_called_with()
-            mock_urlopen.assert_called_with(mocked_request_object, timeout=30)
-            mocked_page_object.geturl.assert_called_with()
-            self.assertEqual(mocked_page_object, returned_page, 'The returned page should be the mock object')
+        # THEN: The correct methods are called with the correct arguments and a web page is returned
+        expected_headers = dict(fake_headers)
+        expected_headers.update({'User-Agent': 'user_agent'})
+        mocked_requests.get.assert_called_once_with(fake_url, headers=expected_headers,
+                                                    proxies=None, timeout=30.0)
+        mocked_get_user_agent.assert_called_with()
+        assert returned_page == 'text', 'The returned page should be the mock object'
 
-    def test_get_web_page_with_user_agent_in_headers(self):
+    @patch('openlp.core.common.httputils.requests')
+    @patch('openlp.core.common.httputils.get_user_agent')
+    def test_get_web_page_with_user_agent_in_headers(self, mocked_get_user_agent, mocked_requests):
         """
         Test that adding a user agent in the header when calling get_web_page() adds that user agent to the request
         """
-        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent:
-            # GIVEN: Mocked out objects, a fake URL and a fake header
-            mocked_request_object = MagicMock()
-            MockRequest.return_value = mocked_request_object
-            mocked_page_object = MagicMock()
-            mock_urlopen.return_value = mocked_page_object
-            fake_url = 'this://is.a.fake/url'
-            user_agent_header = ('User-Agent', 'OpenLP/2.2.0')
+        # GIVEN: Mocked out objects, a fake URL and a fake header
+        mocked_requests.get.return_value = MagicMock(text='text')
+        fake_url = 'this://is.a.fake/url'
+        user_agent_headers = {'User-Agent': 'OpenLP/2.2.0'}
 
-            # WHEN: The get_web_page() method is called
-            returned_page = get_web_page(fake_url, header=user_agent_header)
+        # WHEN: The get_web_page() method is called
+        returned_page = get_web_page(fake_url, headers=user_agent_headers)
 
-            # THEN: The correct methods are called with the correct arguments and a web page is returned
-            MockRequest.assert_called_with(fake_url)
-            mocked_request_object.add_header.assert_called_with(user_agent_header[0], user_agent_header[1])
-            self.assertEqual(1, mocked_request_object.add_header.call_count,
-                             'There should only be 1 call to add_header')
-            self.assertEqual(0, mock_get_user_agent.call_count, 'get_user_agent should not have been called')
-            mock_urlopen.assert_called_with(mocked_request_object, timeout=30)
-            mocked_page_object.geturl.assert_called_with()
-            self.assertEqual(mocked_page_object, returned_page, 'The returned page should be the mock object')
+        # THEN: The correct methods are called with the correct arguments and a web page is returned
+        mocked_requests.get.assert_called_once_with(fake_url, headers=user_agent_headers,
+                                                    proxies=None, timeout=30.0)
+        assert mocked_get_user_agent.call_count == 0, 'get_user_agent() should not have been called'
+        assert returned_page == 'text', 'The returned page should be "test"'
 
-    def test_get_web_page_update_openlp(self):
+    @patch('openlp.core.common.httputils.requests')
+    @patch('openlp.core.common.httputils.get_user_agent')
+    @patch('openlp.core.common.httputils.Registry')
+    def test_get_web_page_update_openlp(self, MockRegistry, mocked_get_user_agent, mocked_requests):
         """
         Test that passing "update_openlp" as true to get_web_page calls Registry().get('app').process_events()
         """
-        with patch('openlp.core.common.httputils.urllib.request.Request') as MockRequest, \
-                patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent, \
-                patch('openlp.core.common.httputils.Registry') as MockRegistry:
-            # GIVEN: Mocked out objects, a fake URL
-            mocked_request_object = MagicMock()
-            MockRequest.return_value = mocked_request_object
-            mocked_page_object = MagicMock()
-            mock_urlopen.return_value = mocked_page_object
-            mock_get_user_agent.return_value = 'user_agent'
-            mocked_registry_object = MagicMock()
-            mocked_application_object = MagicMock()
-            mocked_registry_object.get.return_value = mocked_application_object
-            MockRegistry.return_value = mocked_registry_object
-            fake_url = 'this://is.a.fake/url'
+        # GIVEN: Mocked out objects, a fake URL
+        mocked_requests.get.return_value = MagicMock(text='text')
+        mocked_get_user_agent.return_value = 'user_agent'
+        mocked_registry_object = MagicMock()
+        mocked_application_object = MagicMock()
+        mocked_registry_object.get.return_value = mocked_application_object
+        MockRegistry.return_value = mocked_registry_object
+        fake_url = 'this://is.a.fake/url'
 
-            # WHEN: The get_web_page() method is called
-            returned_page = get_web_page(fake_url, update_openlp=True)
+        # WHEN: The get_web_page() method is called
+        returned_page = get_web_page(fake_url, update_openlp=True)
 
-            # THEN: The correct methods are called with the correct arguments and a web page is returned
-            MockRequest.assert_called_with(fake_url)
-            mocked_request_object.add_header.assert_called_with('User-Agent', 'user_agent')
-            self.assertEqual(1, mocked_request_object.add_header.call_count,
-                             'There should only be 1 call to add_header')
-            mock_urlopen.assert_called_with(mocked_request_object, timeout=30)
-            mocked_page_object.geturl.assert_called_with()
-            mocked_registry_object.get.assert_called_with('application')
-            mocked_application_object.process_events.assert_called_with()
-            self.assertEqual(mocked_page_object, returned_page, 'The returned page should be the mock object')
+        # THEN: The correct methods are called with the correct arguments and a web page is returned
+        mocked_requests.get.assert_called_once_with(fake_url, headers={'User-Agent': 'user_agent'},
+                                                    proxies=None, timeout=30.0)
+        mocked_get_user_agent.assert_called_once_with()
+        mocked_registry_object.get.assert_called_with('application')
+        mocked_application_object.process_events.assert_called_with()
+        assert returned_page == 'text', 'The returned page should be the mock object'
 
-    def test_get_url_file_size(self):
+    @patch('openlp.core.common.httputils.requests')
+    def test_get_url_file_size(self, mocked_requests):
         """
-        Test that passing "update_openlp" as true to get_web_page calls Registry().get('app').process_events()
+        Test that calling "get_url_file_size" works correctly
         """
-        with patch('openlp.core.common.httputils.urllib.request.urlopen') as mock_urlopen, \
-                patch('openlp.core.common.httputils.get_user_agent') as mock_get_user_agent:
-            # GIVEN: Mocked out objects, a fake URL
-            mocked_page_object = MagicMock()
-            mock_urlopen.return_value = mocked_page_object
-            mock_get_user_agent.return_value = 'user_agent'
-            fake_url = 'this://is.a.fake/url'
+        # GIVEN: Mocked out objects, a fake URL
+        mocked_requests.head.return_value = MagicMock(headers={'Content-Length': 100})
+        fake_url = 'this://is.a.fake/url'
 
-            # WHEN: The get_url_file_size() method is called
-            size = get_url_file_size(fake_url)
+        # WHEN: The get_url_file_size() method is called
+        file_size = get_url_file_size(fake_url)
 
-            # THEN: The correct methods are called with the correct arguments and a web page is returned
-            mock_urlopen.assert_called_with(fake_url, timeout=30)
+        # THEN: The correct methods are called with the correct arguments and a web page is returned
+        mocked_requests.head.assert_called_once_with(fake_url, allow_redirects=True, timeout=30.0)
+        assert file_size == 100
 
-    @patch('openlp.core.ui.firsttimeform.urllib.request.urlopen')
-    def test_socket_timeout(self, mocked_urlopen):
+    @patch('openlp.core.common.httputils.requests')
+    def test_socket_timeout(self, mocked_requests):
         """
         Test socket timeout gets caught
         """
         # GIVEN: Mocked urlopen to fake a network disconnect in the middle of a download
-        mocked_urlopen.side_effect = socket.timeout()
+        mocked_requests.get.side_effect = IOError
 
         # WHEN: Attempt to retrieve a file
-        url_get_file(MagicMock(), url='http://localhost/test', f_path=Path(self.tempfile))
+        url_get_file(MagicMock(), url='http://localhost/test', file_path=Path(self.tempfile))
 
         # THEN: socket.timeout should have been caught
         # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
-        self.assertFalse(os.path.exists(self.tempfile), 'FTW url_get_file should have caught socket.timeout')
-
-    def test_ping_valid(self):
-        """
-        Test ping for OpenLP
-        """
-        # GIVEN: a valid url to test
-        url = "openlp.io"
-
-        # WHEN: Attempt to check the url exists
-        url_found = ping(url)
-
-        # THEN: It should be found
-        self.assertTrue(url_found, 'OpenLP.io is not found')
-
-    def test_ping_invalid(self):
-        """
-        Test ping for OpenLP
-        """
-        # GIVEN: a valid url to test
-        url = "trb143.io"
-
-        # WHEN: Attempt to check the url exists
-        url_found = ping(url)
-
-        # THEN: It should be found
-        self.assertFalse(url_found, 'TRB143.io is found')
+        assert not os.path.exists(self.tempfile), 'tempfile should have been deleted'
