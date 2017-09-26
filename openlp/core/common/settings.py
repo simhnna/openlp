@@ -177,6 +177,7 @@ class Settings(QtCore.QSettings):
         'images/background color': '#000000',
         'media/players': 'system,webkit',
         'media/override player': QtCore.Qt.Unchecked,
+        'remotes/download version': '0000_00_00',
         'players/background color': '#000000',
         'servicemanager/last directory': None,
         'servicemanager/last file': None,
