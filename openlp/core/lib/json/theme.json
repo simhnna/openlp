@@ -4,7 +4,7 @@
         "color": "#000000",
         "direction": "vertical",
         "end_color": "#000000",
-        "filename": "",
+        "filename": null,
         "start_color": "#000000",
         "type": "solid"
     },

@@ -22,11 +22,10 @@
 """
 Package to test the openlp.core.ui.exeptionform package.
 """
-
 import os
 import tempfile
 from unittest import TestCase
-from unittest.mock import mock_open, patch
+from unittest.mock import call, patch
 
 from openlp.core.common import Registry
 from openlp.core.common.path import Path
@@ -142,15 +141,15 @@ class TestExceptionForm(TestMixin, TestCase):
         test_form = exceptionform.ExceptionForm()
         test_form.file_attachment = None
 
-        with patch.object(test_form, '_pyuno_import') as mock_pyuno:
-            with patch.object(test_form.exception_text_edit, 'toPlainText') as mock_traceback:
-                with patch.object(test_form.description_text_edit, 'toPlainText') as mock_description:
-                    mock_pyuno.return_value = 'UNO Bridge Test'
-                    mock_traceback.return_value = 'openlp: Traceback Test'
-                    mock_description.return_value = 'Description Test'
+        with patch.object(test_form, '_pyuno_import') as mock_pyuno, \
+                patch.object(test_form.exception_text_edit, 'toPlainText') as mock_traceback, \
+                patch.object(test_form.description_text_edit, 'toPlainText') as mock_description:
+            mock_pyuno.return_value = 'UNO Bridge Test'
+            mock_traceback.return_value = 'openlp: Traceback Test'
+            mock_description.return_value = 'Description Test'
 
-                    # WHEN: on_save_report_button_clicked called
-                    test_form.on_send_report_button_clicked()
+            # WHEN: on_save_report_button_clicked called
+            test_form.on_send_report_button_clicked()
 
         # THEN: Verify strings were formatted properly
         mocked_add_query_item.assert_called_with('body', MAIL_ITEM_TEXT)
@@ -182,25 +181,24 @@ class TestExceptionForm(TestMixin, TestCase):
         mocked_qt.PYQT_VERSION_STR = 'PyQt5 Test'
         mocked_is_linux.return_value = False
         mocked_application_version.return_value = 'Trunk Test'
-        mocked_save_filename.return_value = (Path('testfile.txt'), 'filter')
 
-        test_form = exceptionform.ExceptionForm()
-        test_form.file_attachment = None
+        with patch.object(Path, 'open') as mocked_path_open:
+            x = Path('testfile.txt')
+            mocked_save_filename.return_value = x, 'ext'
 
-        with patch.object(test_form, '_pyuno_import') as mock_pyuno:
-            with patch.object(test_form.exception_text_edit, 'toPlainText') as mock_traceback:
-                with patch.object(test_form.description_text_edit, 'toPlainText') as mock_description:
-                    with patch("openlp.core.ui.exceptionform.open", mock_open(), create=True) as mocked_open:
-                        mock_pyuno.return_value = 'UNO Bridge Test'
-                        mock_traceback.return_value = 'openlp: Traceback Test'
-                        mock_description.return_value = 'Description Test'
+            test_form = exceptionform.ExceptionForm()
+            test_form.file_attachment = None
 
-                        # WHEN: on_save_report_button_clicked called
-                        test_form.on_save_report_button_clicked()
+            with patch.object(test_form, '_pyuno_import') as mock_pyuno, \
+                    patch.object(test_form.exception_text_edit, 'toPlainText') as mock_traceback, \
+                    patch.object(test_form.description_text_edit, 'toPlainText') as mock_description:
+                mock_pyuno.return_value = 'UNO Bridge Test'
+                mock_traceback.return_value = 'openlp: Traceback Test'
+                mock_description.return_value = 'Description Test'
+
+                # WHEN: on_save_report_button_clicked called
+                test_form.on_save_report_button_clicked()
 
         # THEN: Verify proper calls to save file
         # self.maxDiff = None
-        check_text = "call().write({text})".format(text=MAIL_ITEM_TEXT.__repr__())
-        write_text = "{text}".format(text=mocked_open.mock_calls[1])
-        mocked_open.assert_called_with('testfile.txt', 'w')
-        self.assertEquals(check_text, write_text, "Saved information should match test text")
+        mocked_path_open.assert_has_calls([call().__enter__().write(MAIL_ITEM_TEXT)])
