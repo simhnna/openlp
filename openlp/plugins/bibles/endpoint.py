@@ -62,7 +62,7 @@ def bibles_service(request):
 
     :param request: The http request object.
     """
-    service(request, 'bibles', log)
+    return service(request, 'bibles', log)
 
 
 @api_bibles_endpoint.route('bibles/search')
@@ -95,6 +95,6 @@ def bibles_service_api(request):
     :param request: The http request object.
     """
     try:
-        search(request, 'bibles', log)
+        return search(request, 'bibles', log)
     except NotFound:
         return {'results': {'items': []}}

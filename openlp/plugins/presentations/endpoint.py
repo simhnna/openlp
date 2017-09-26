@@ -76,7 +76,7 @@ def presentations_service(request):
 
     :param request: The http request object.
     """
-    service(request, 'presentations', log)
+    return service(request, 'presentations', log)
 
 
 @api_presentations_endpoint.route('presentations/search')
@@ -109,6 +109,6 @@ def presentations_service_api(request):
     :param request: The http request object.
     """
     try:
-        search(request, 'presentations', log)
+        return search(request, 'presentations', log)
     except NotFound:
         return {'results': {'items': []}}

@@ -75,7 +75,7 @@ def images_service(request):
 
     :param request: The http request object.
     """
-    service(request, 'images', log)
+    return service(request, 'images', log)
 
 
 @api_images_endpoint.route('images/search')
@@ -108,6 +108,6 @@ def images_service_api(request):
     :param request: The http request object.
     """
     try:
-        search(request, 'images', log)
+        return search(request, 'images', log)
     except NotFound:
         return {'results': {'items': []}}
