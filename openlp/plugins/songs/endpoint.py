@@ -95,6 +95,6 @@ def songs_service_api(request):
     :param request: The http request object.
     """
     try:
-        return search(request, 'songs', log)
+        return service(request, 'songs', log)
     except NotFound:
         return {'results': {'items': []}}

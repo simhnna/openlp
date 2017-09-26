@@ -37,6 +37,8 @@ from openlp.core.api.poll import Poller
 from openlp.core.api.endpoint.controller import controller_endpoint, api_controller_endpoint
 from openlp.core.api.endpoint.core import chords_endpoint, stage_endpoint, blank_endpoint, main_endpoint
 from openlp.core.api.endpoint.service import service_endpoint, api_service_endpoint
+from openlp.core.api.endpoint.remote import remote_endpoint
+
 
 log = logging.getLogger(__name__)
 
@@ -95,3 +97,4 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         register_endpoint(main_endpoint)
         register_endpoint(service_endpoint)
         register_endpoint(api_service_endpoint)
+        register_endpoint(remote_endpoint)
