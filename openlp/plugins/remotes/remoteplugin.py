@@ -20,16 +20,15 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-import logging
-import os
 import time
-
 from PyQt5 import QtCore, QtWidgets
 
+import logging
+
+from openlp.core.api.endpoint.remote import remote_endpoint
 from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, Registry, Settings, OpenLPMixin, UiStrings, check_directory_exists
 from openlp.core.lib import Plugin, StringContent, translate, build_icon
-from openlp.plugins.remotes.endpoint import remote_endpoint
 from openlp.plugins.remotes.deploy import download_and_check, download_sha256
 
 log = logging.getLogger(__name__)
