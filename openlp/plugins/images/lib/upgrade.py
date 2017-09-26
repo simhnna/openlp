@@ -48,7 +48,6 @@ def upgrade_2(session, metadata):
     """
     Version 2 upgrade - Move file path from old db to JSON encoded path to new db. Added during 2.5 dev
     """
-    # TODO: Update tests
     log.debug('Starting upgrade_2 for file_path to JSON')
     old_table = Table('image_filenames', metadata, autoload=True)
     if 'file_path' not in [col.name for col in old_table.c.values()]:
