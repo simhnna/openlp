@@ -34,7 +34,7 @@ from openlp.core.ui.firsttimeform import FirstTimeForm
 
 from tests.helpers.testmixin import TestMixin
 
-FAKE_CONFIG = b"""
+FAKE_CONFIG = """
 [general]
 base url = http://example.com/frw/
 [songs]
@@ -45,7 +45,7 @@ directory = bibles
 directory = themes
 """
 
-FAKE_BROKEN_CONFIG = b"""
+FAKE_BROKEN_CONFIG = """
 [general]
 base url = http://example.com/frw/
 [songs]
@@ -54,7 +54,7 @@ directory = songs
 directory = bibles
 """
 
-FAKE_INVALID_CONFIG = b"""
+FAKE_INVALID_CONFIG = """
 <html>
 <head><title>This is not a config file</title></head>
 <body>Some text</body>
@@ -112,7 +112,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
                 patch('openlp.core.ui.firsttimeform.Settings') as MockedSettings, \
                 patch('openlp.core.ui.firsttimeform.gettempdir') as mocked_gettempdir, \
                 patch('openlp.core.ui.firsttimeform.check_directory_exists') as mocked_check_directory_exists, \
-                patch.object(frw.application, 'set_normal_cursor') as mocked_set_normal_cursor:
+                patch.object(frw.application, 'set_normal_cursor'):
             mocked_settings = MagicMock()
             mocked_settings.value.return_value = True
             MockedSettings.return_value = mocked_settings
@@ -192,7 +192,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
         with patch('openlp.core.ui.firsttimeform.get_web_page') as mocked_get_web_page:
             first_time_form = FirstTimeForm(None)
             first_time_form.initialize(MagicMock())
-            mocked_get_web_page.return_value.read.return_value = FAKE_BROKEN_CONFIG
+            mocked_get_web_page.return_value = FAKE_BROKEN_CONFIG
 
             # WHEN: The First Time Wizard is downloads the config file
             first_time_form._download_index()
@@ -208,7 +208,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
         with patch('openlp.core.ui.firsttimeform.get_web_page') as mocked_get_web_page:
             first_time_form = FirstTimeForm(None)
             first_time_form.initialize(MagicMock())
-            mocked_get_web_page.return_value.read.return_value = FAKE_INVALID_CONFIG
+            mocked_get_web_page.return_value = FAKE_INVALID_CONFIG
 
             # WHEN: The First Time Wizard is downloads the config file
             first_time_form._download_index()
@@ -225,14 +225,13 @@ class TestFirstTimeForm(TestCase, TestMixin):
         # GIVEN: Initial setup and mocks
         first_time_form = FirstTimeForm(None)
         first_time_form.initialize(MagicMock())
-        mocked_get_web_page.side_effect = urllib.error.HTTPError(url='http//localhost',
-                                                                 code=407,
-                                                                 msg='Network proxy error',
-                                                                 hdrs=None,
-                                                                 fp=None)
+        mocked_get_web_page.side_effect = ConnectionError('')
+        mocked_message_box.Ok = 'OK'
+
         # WHEN: the First Time Wizard calls to get the initial configuration
         first_time_form._download_index()
 
         # THEN: the critical_error_message_box should have been called
-        self.assertEquals(mocked_message_box.mock_calls[1][1][0], 'Network Error 407',
-                          'first_time_form should have caught Network Error')
+        mocked_message_box.critical.assert_called_once_with(
+            first_time_form, 'Network Error', 'There was a network error attempting to connect to retrieve '
+            'initial configuration information', 'OK')

@@ -24,6 +24,7 @@ Package to test the openlp.core.ui.exeptionform package.
 """
 import os
 import tempfile
+
 from unittest import TestCase
 from unittest.mock import call, patch
 
@@ -52,7 +53,7 @@ MAIL_ITEM_TEXT = ('**OpenLP Bug Report**\nVersion: Trunk Test\n\n--- Details of 
 
 @patch("openlp.core.ui.exceptionform.Qt.qVersion")
 @patch("openlp.core.ui.exceptionform.QtGui.QDesktopServices.openUrl")
-@patch("openlp.core.ui.exceptionform.get_application_version")
+@patch("openlp.core.ui.exceptionform.get_version")
 @patch("openlp.core.ui.exceptionform.sqlalchemy")
 @patch("openlp.core.ui.exceptionform.bs4")
 @patch("openlp.core.ui.exceptionform.etree")
@@ -63,18 +64,10 @@ class TestExceptionForm(TestMixin, TestCase):
     """
     Test functionality of exception form functions
     """
-    def __method_template_for_class_patches(self,
-                                            __PLACEHOLDER_FOR_LOCAL_METHOD_PATCH_DECORATORS_GO_HERE__,
-                                            mocked_python_version,
-                                            mocked_platform,
-                                            mocked_is_linux,
-                                            mocked_etree,
-                                            mocked_bs4,
-                                            mocked_sqlalchemy,
-                                            mocked_application_version,
-                                            mocked_openlurl,
-                                            mocked_qversion,
-                                            ):
+    def __method_template_for_class_patches(self, __PLACEHOLDER_FOR_LOCAL_METHOD_PATCH_DECORATORS_GO_HERE__,
+                                            mocked_python_version, mocked_platform, mocked_is_linux,
+                                            mocked_etree, mocked_bs4, mocked_sqlalchemy, mocked_get_version,
+                                            mocked_openlurl, mocked_qversion):
         """
         Template so you don't have to remember the layout of class mock options for methods
         """
@@ -85,7 +78,7 @@ class TestExceptionForm(TestMixin, TestCase):
         mocked_platform.return_value = 'Nose Test'
         mocked_qversion.return_value = 'Qt5 test'
         mocked_is_linux.return_value = False
-        mocked_application_version.return_value = 'Trunk Test'
+        mocked_get_version.return_value = 'Trunk Test'
 
     def setUp(self):
         self.setup_application()
@@ -106,22 +99,10 @@ class TestExceptionForm(TestMixin, TestCase):
     @patch("openlp.core.ui.exceptionform.QtCore.QUrl")
     @patch("openlp.core.ui.exceptionform.QtCore.QUrlQuery.addQueryItem")
     @patch("openlp.core.ui.exceptionform.Qt")
-    def test_on_send_report_button_clicked(self,
-                                           mocked_qt,
-                                           mocked_add_query_item,
-                                           mocked_qurl,
-                                           mocked_file_dialog,
-                                           mocked_ui_exception_dialog,
-                                           mocked_python_version,
-                                           mocked_platform,
-                                           mocked_is_linux,
-                                           mocked_etree,
-                                           mocked_bs4,
-                                           mocked_sqlalchemy,
-                                           mocked_application_version,
-                                           mocked_openlurl,
-                                           mocked_qversion,
-                                           ):
+    def test_on_send_report_button_clicked(self, mocked_qt, mocked_add_query_item, mocked_qurl, mocked_file_dialog,
+                                           mocked_ui_exception_dialog, mocked_python_version, mocked_platform,
+                                           mocked_is_linux, mocked_etree, mocked_bs4, mocked_sqlalchemy,
+                                           mocked_get_version, mocked_openlurl, mocked_qversion):
         """
         Test send report  creates the proper system information text
         """
@@ -133,10 +114,10 @@ class TestExceptionForm(TestMixin, TestCase):
         mocked_platform.return_value = 'Nose Test'
         mocked_qversion.return_value = 'Qt5 test'
         mocked_is_linux.return_value = False
-        mocked_application_version.return_value = 'Trunk Test'
+        mocked_get_version.return_value = 'Trunk Test'
         mocked_qt.PYQT_VERSION_STR = 'PyQt5 Test'
         mocked_is_linux.return_value = False
-        mocked_application_version.return_value = 'Trunk Test'
+        mocked_get_version.return_value = 'Trunk Test'
 
         test_form = exceptionform.ExceptionForm()
         test_form.file_attachment = None
@@ -156,19 +137,10 @@ class TestExceptionForm(TestMixin, TestCase):
 
     @patch("openlp.core.ui.exceptionform.FileDialog.getSaveFileName")
     @patch("openlp.core.ui.exceptionform.Qt")
-    def test_on_save_report_button_clicked(self,
-                                           mocked_qt,
-                                           mocked_save_filename,
-                                           mocked_python_version,
-                                           mocked_platform,
-                                           mocked_is_linux,
-                                           mocked_etree,
-                                           mocked_bs4,
-                                           mocked_sqlalchemy,
-                                           mocked_application_version,
-                                           mocked_openlurl,
-                                           mocked_qversion,
-                                           ):
+    def test_on_save_report_button_clicked(self, mocked_qt, mocked_save_filename, mocked_python_version,
+                                           mocked_platform, mocked_is_linux, mocked_etree, mocked_bs4,
+                                           mocked_sqlalchemy, mocked_get_version, mocked_openlurl,
+                                           mocked_qversion):
         """
         Test save report saves the correct information to a file
         """
@@ -180,11 +152,11 @@ class TestExceptionForm(TestMixin, TestCase):
         mocked_qversion.return_value = 'Qt5 test'
         mocked_qt.PYQT_VERSION_STR = 'PyQt5 Test'
         mocked_is_linux.return_value = False
-        mocked_application_version.return_value = 'Trunk Test'
+        mocked_get_version.return_value = 'Trunk Test'
 
         with patch.object(Path, 'open') as mocked_path_open:
-            x = Path('testfile.txt')
-            mocked_save_filename.return_value = x, 'ext'
+            test_path = Path('testfile.txt')
+            mocked_save_filename.return_value = test_path, 'ext'
 
             test_form = exceptionform.ExceptionForm()
             test_form.file_attachment = None

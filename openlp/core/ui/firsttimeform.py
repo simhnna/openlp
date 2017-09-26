@@ -181,22 +181,16 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self.application.process_events()
         try:
             web_config = get_web_page('{host}{name}'.format(host=self.web, name='download.cfg'),
-                                      header=('User-Agent', user_agent))
-        except (urllib.error.URLError, ConnectionError) as err:
-            msg = QtWidgets.QMessageBox()
-            title = translate('OpenLP.FirstTimeWizard', 'Network Error')
-            msg.setText('{title} {error}'.format(title=title,
-                                                 error=err.code if hasattr(err, 'code') else ''))
-            msg.setInformativeText(translate('OpenLP.FirstTimeWizard',
-                                             'There was a network error attempting to '
-                                             'connect to retrieve initial configuration information'))
-            msg.setStandardButtons(msg.Ok)
-            ans = msg.exec()
+                                      headers={'User-Agent': user_agent})
+        except ConnectionError:
+            QtWidgets.QMessageBox.critical(self, translate('OpenLP.FirstTimeWizard', 'Network Error'),
+                                           translate('OpenLP.FirstTimeWizard', 'There was a network error attempting '
+                                                     'to connect to retrieve initial configuration information'),
+                                           QtWidgets.QMessageBox.Ok)
             web_config = False
         if web_config:
-            files = web_config.read()
             try:
-                self.config.read_string(files.decode())
+                self.config.read_string(web_config)
                 self.web = self.config.get('general', 'base url')
                 self.songs_url = self.web + self.config.get('songs', 'directory') + '/'
                 self.bibles_url = self.web + self.config.get('bibles', 'directory') + '/'

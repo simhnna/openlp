@@ -22,9 +22,6 @@
 """
 Package to test the openlp.core.utils.__init__ package.
 """
-import urllib.request
-import urllib.error
-import urllib.parse
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -37,20 +34,21 @@ class TestFirstTimeWizard(TestMixin, TestCase):
     """
     Test First Time Wizard import functions
     """
-    def test_webpage_connection_retry(self):
+    @patch('openlp.core.common.httputils.requests')
+    def test_webpage_connection_retry(self, mocked_requests):
         """
         Test get_web_page will attempt CONNECTION_RETRIES+1 connections - bug 1409031
         """
         # GIVEN: Initial settings and mocks
-        with patch.object(urllib.request, 'urlopen') as mocked_urlopen:
-            mocked_urlopen.side_effect = ConnectionError
+        mocked_requests.get.side_effect = IOError('Unable to connect')
 
-            # WHEN: A webpage is requested
-            try:
-                get_web_page(url='http://localhost')
-            except:
-                pass
+        # WHEN: A webpage is requested
+        try:
+            get_web_page('http://localhost')
+        except Exception as e:
+            assert isinstance(e, ConnectionError)
 
-            # THEN: urlopen should have been called CONNECTION_RETRIES + 1 count
-            self.assertEquals(mocked_urlopen.call_count, CONNECTION_RETRIES + 1,
-                              'get_web_page() should have tried {} times'.format(CONNECTION_RETRIES))
+        # THEN: urlopen should have been called CONNECTION_RETRIES + 1 count
+        assert mocked_requests.get.call_count == CONNECTION_RETRIES, \
+            'get should have been called {} times, but was only called {} times'.format(
+                CONNECTION_RETRIES, mocked_requests.get.call_count)

@@ -62,7 +62,7 @@ class TestImageDBUpgrade(TestCase, TestMixin):
 
     def test_image_filenames_table(self):
         """
-        Test that the ImageFilenames table is correctly upgraded to the latest version 
+        Test that the ImageFilenames table is correctly upgraded to the latest version
         """
         # GIVEN: An unversioned image database
         temp_db_name = os.path.join(self.tmp_folder, 'image-v0.sqlite')

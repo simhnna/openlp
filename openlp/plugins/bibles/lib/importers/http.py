@@ -93,7 +93,7 @@ class BGExtract(RegistryProperties):
     NAME = 'BibleGateway'
 
     def __init__(self, proxy_url=None):
-        log.debug('BGExtract.init("{url}")'.format(url=proxy_url))
+        log.debug('BGExtract.init(proxy_url="{url}")'.format(url=proxy_url))
         self.proxy_url = proxy_url
         socket.setdefaulttimeout(30)
 
@@ -285,15 +285,10 @@ class BGExtract(RegistryProperties):
         log.debug('BGExtract.get_books_from_http("{version}")'.format(version=version))
         url_params = urllib.parse.urlencode({'action': 'getVersionInfo', 'vid': '{version}'.format(version=version)})
         reference_url = 'http://www.biblegateway.com/versions/?{url}#books'.format(url=url_params)
-        page = get_web_page(reference_url)
-        if not page:
+        page_source = get_web_page(reference_url)
+        if not page_source:
             send_error_message('download')
             return None
-        page_source = page.read()
-        try:
-            page_source = str(page_source, 'utf8')
-        except UnicodeDecodeError:
-            page_source = str(page_source, 'cp1251')
         try:
             soup = BeautifulSoup(page_source, 'lxml')
         except Exception:
@@ -759,7 +754,7 @@ class HTTPBible(BibleImport, RegistryProperties):
         return BiblesResourcesDB.get_verse_count(book_id, chapter)
 
 
-def get_soup_for_bible_ref(reference_url, header=None, pre_parse_regex=None, pre_parse_substitute=None):
+def get_soup_for_bible_ref(reference_url, headers=None, pre_parse_regex=None, pre_parse_substitute=None):
     """
     Gets a webpage and returns a parsed and optionally cleaned soup or None.
 
@@ -772,15 +767,15 @@ def get_soup_for_bible_ref(reference_url, header=None, pre_parse_regex=None, pre
     if not reference_url:
         return None
     try:
-        page = get_web_page(reference_url, header, True)
+        page_source = get_web_page(reference_url, headers, update_openlp=True)
     except Exception as e:
-        page = None
-    if not page:
+        log.exception('Unable to download Bible %s, unknown exception occurred', reference_url)
+        page_source = None
+    if not page_source:
         send_error_message('download')
         return None
-    page_source = page.read()
     if pre_parse_regex and pre_parse_substitute is not None:
-        page_source = re.sub(pre_parse_regex, pre_parse_substitute, page_source.decode())
+        page_source = re.sub(pre_parse_regex, pre_parse_substitute, page_source)
     soup = None
     try:
         soup = BeautifulSoup(page_source, 'lxml')

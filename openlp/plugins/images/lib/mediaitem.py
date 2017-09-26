@@ -48,7 +48,7 @@ class ImageMediaItem(MediaManagerItem):
     log.info('Image Media Item loaded')
 
     def __init__(self, parent, plugin):
-        self.icon_resource = 'images/image'
+        self.icon_path = 'images/image'
         self.manager = None
         self.choose_group_form = None
         self.add_group_form = None
