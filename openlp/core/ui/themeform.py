@@ -451,7 +451,7 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
     def on_image_path_edit_path_changed(self, new_path):
         """
         Handle the `pathEditChanged` signal from image_path_edit
-        
+
         :param openlp.core.common.path.Path new_path: Path to the new image
         :rtype: None
         """
@@ -461,7 +461,7 @@ class ThemeForm(QtWidgets.QWizard, Ui_ThemeWizard, RegistryProperties):
     def on_video_path_edit_path_changed(self, new_path):
         """
         Handle the `pathEditChanged` signal from video_path_edit
-        
+
         :param openlp.core.common.path.Path new_path: Path to the new video
         :rtype: None
         """

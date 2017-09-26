@@ -392,11 +392,11 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         theme_name = item.data(QtCore.Qt.UserRole)
         export_path, filter_used = \
             FileDialog.getSaveFileName(self.main_window,
-                                         translate('OpenLP.ThemeManager',
-                                                   'Save Theme - ({name})').format(name=theme_name),
-                                         Settings().value(self.settings_section + '/last directory export'),
-                                         translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'),
-                                         translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
+                                       translate('OpenLP.ThemeManager',
+                                                 'Save Theme - ({name})').format(name=theme_name),
+                                       Settings().value(self.settings_section + '/last directory export'),
+                                       translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'),
+                                       translate('OpenLP.ThemeManager', 'OpenLP Themes (*.otz)'))
         self.application.set_busy_cursor()
         if export_path:
             Settings().setValue(self.settings_section + '/last directory export', export_path.parent)
@@ -637,7 +637,6 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         """
         Called by theme maintenance Dialog to save the theme and to trigger the reload of the theme list
 
-        
         :param Theme theme: The theme data object.
         :param openlp.core.common.path.Path image_source_path: Where the theme image is currently located.
         :param openlp.core.common.path.Path image_destination_path: Where the Theme Image is to be saved to
