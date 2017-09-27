@@ -66,6 +66,7 @@ class HttpWorker(QtCore.QObject):
         """
         address = Settings().value('api/ip address')
         port = Settings().value('api/port')
+        Registry().execute('get_website_version')
         serve(application, host=address, port=port)
 
     def stop(self):
