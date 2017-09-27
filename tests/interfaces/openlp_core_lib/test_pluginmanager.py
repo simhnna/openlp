@@ -94,4 +94,3 @@ class TestPluginManager(TestCase, TestMixin):
         self.assertIn('custom', plugin_names, 'There should be a "custom" plugin')
         self.assertIn('songusage', plugin_names, 'There should be a "songusage" plugin')
         self.assertIn('alerts', plugin_names, 'There should be a "alerts" plugin')
-        self.assertIn('remotes', plugin_names, 'There should be a "remotes" plugin')
