@@ -289,7 +289,8 @@ class AdvancedTab(SettingsTab):
                                                             'Auto-scroll the next slide to bottom'))
         self.enable_auto_close_check_box.setText(translate('OpenLP.AdvancedTab',
                                                            'Enable application exit confirmation'))
-        self.use_dark_style_checkbox.setText(translate('OpenLP.AdvancedTab', 'Use dark style (needs restart)'))
+        if HAS_DARK_STYLE:
+            self.use_dark_style_checkbox.setText(translate('OpenLP.AdvancedTab', 'Use dark style (needs restart)'))
         self.service_name_group_box.setTitle(translate('OpenLP.AdvancedTab', 'Default Service Name'))
         self.service_name_check_box.setText(translate('OpenLP.AdvancedTab', 'Enable default service name'))
         self.service_name_time_label.setText(translate('OpenLP.AdvancedTab', 'Date and Time:'))
