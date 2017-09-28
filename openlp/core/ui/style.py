@@ -84,7 +84,7 @@ def can_show_icon():
     .. note::
         This method uses internal imports to prevent circular imports.
     """
-    return not is_macosx() or Settings.value('advanced/use_dark_style')
+    return not is_macosx() or Settings().value('advanced/use_dark_style')
 
 
 def get_application_stylesheet():
