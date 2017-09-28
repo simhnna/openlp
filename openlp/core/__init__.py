@@ -45,10 +45,12 @@ from openlp.core.common.versionchecker import VersionThread, get_application_ver
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
 from openlp.core.ui import SplashScreen
+from openlp.core.ui.dark import HAS_DARK_STYLE, DARK_STYLESHEET
 from openlp.core.ui.exceptionform import ExceptionForm
 from openlp.core.ui.firsttimeform import FirstTimeForm
 from openlp.core.ui.firsttimelanguageform import FirstTimeLanguageForm
 from openlp.core.ui.mainwindow import MainWindow
+
 
 __all__ = ['OpenLP', 'main']
 
@@ -122,13 +124,16 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                 sys.exit()
         # Correct stylesheet bugs
         application_stylesheet = ''
-        if not Settings().value('advanced/alternate rows'):
-            base_color = self.palette().color(QtGui.QPalette.Active, QtGui.QPalette.Base)
-            alternate_rows_repair_stylesheet = \
-                'QTableWidget, QListWidget, QTreeWidget {alternate-background-color: ' + base_color.name() + ';}\n'
-            application_stylesheet += alternate_rows_repair_stylesheet
-        if is_win():
-            application_stylesheet += WIN_REPAIR_STYLESHEET
+        if HAS_DARK_STYLE:
+            application_stylesheet = DARK_STYLESHEET
+        else:
+            if not Settings().value('advanced/alternate rows'):
+                base_color = self.palette().color(QtGui.QPalette.Active, QtGui.QPalette.Base)
+                alternate_rows_repair_stylesheet = \
+                    'QTableWidget, QListWidget, QTreeWidget {alternate-background-color: ' + base_color.name() + ';}\n'
+                application_stylesheet += alternate_rows_repair_stylesheet
+            if is_win():
+                application_stylesheet += WIN_REPAIR_STYLESHEET
         if application_stylesheet:
             self.setStyleSheet(application_stylesheet)
         can_show_splash = Settings().value('core/show splash')

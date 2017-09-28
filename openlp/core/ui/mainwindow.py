@@ -45,6 +45,7 @@ from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus,
 from openlp.core.lib.ui import create_action
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
+from openlp.core.ui.dark import HAS_DARK_STYLE
 from openlp.core.ui.firsttimeform import FirstTimeForm
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.printserviceform import PrintServiceForm
@@ -155,7 +156,8 @@ class Ui_MainWindow(object):
         # Create the MediaManager
         self.media_manager_dock = OpenLPDockWidget(main_window, 'media_manager_dock',
                                                    ':/system/system_mediamanager.png')
-        self.media_manager_dock.setStyleSheet(MEDIA_MANAGER_STYLE)
+        if not HAS_DARK_STYLE:
+            self.media_manager_dock.setStyleSheet(MEDIA_MANAGER_STYLE)
         # Create the media toolbox
         self.media_tool_box = QtWidgets.QToolBox(self.media_manager_dock)
         self.media_tool_box.setObjectName('media_tool_box')
