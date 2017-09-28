@@ -136,6 +136,7 @@ class Settings(QtCore.QSettings):
         'advanced/single click service preview': False,
         'advanced/x11 bypass wm': X11_BYPASS_DEFAULT,
         'advanced/search as type': True,
+        'advanced/use_dark_style': False,
         'api/twelve hour': True,
         'api/port': 4316,
         'api/websocket port': 4317,
