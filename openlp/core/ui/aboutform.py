@@ -26,7 +26,7 @@ import webbrowser
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common.versionchecker import get_application_version
+from openlp.core.version import get_version
 from openlp.core.lib import translate
 from .aboutdialog import UiAboutDialog
 
@@ -49,7 +49,7 @@ class AboutForm(QtWidgets.QDialog, UiAboutDialog):
         Set up the dialog. This method is mocked out in tests.
         """
         self.setup_ui(self)
-        application_version = get_application_version()
+        application_version = get_version()
         about_text = self.about_text_edit.toPlainText()
         about_text = about_text.replace('<version>', application_version['version'])
         if application_version['build']:

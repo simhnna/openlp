@@ -26,6 +26,7 @@ from string import Template
 from PyQt5 import QtGui, QtCore, QtWebKitWidgets
 
 from openlp.core.common import Registry, RegistryProperties, OpenLPMixin, RegistryMixin, Settings
+from openlp.core.common.path import path_to_str
 from openlp.core.lib import FormattingTags, ImageSource, ItemCapabilities, ScreenList, ServiceItem, expand_tags, \
     build_lyrics_format_css, build_lyrics_outline_css, build_chords_css
 from openlp.core.common import ThemeLevel
@@ -118,7 +119,7 @@ class Renderer(OpenLPMixin, RegistryMixin, RegistryProperties):
             theme_data, main_rect, footer_rect = self._theme_dimensions[theme_name]
         # if No file do not update cache
         if theme_data.background_filename:
-            self.image_manager.add_image(theme_data.background_filename,
+            self.image_manager.add_image(path_to_str(theme_data.background_filename),
                                          ImageSource.Theme, QtGui.QColor(theme_data.background_border_color))
 
     def pre_render(self, override_theme_data=None):
@@ -207,8 +208,8 @@ class Renderer(OpenLPMixin, RegistryMixin, RegistryProperties):
         service_item.raw_footer = FOOTER
         # if No file do not update cache
         if theme_data.background_filename:
-            self.image_manager.add_image(
-                theme_data.background_filename, ImageSource.Theme, QtGui.QColor(theme_data.background_border_color))
+            self.image_manager.add_image(path_to_str(theme_data.background_filename),
+                                         ImageSource.Theme, QtGui.QColor(theme_data.background_border_color))
         theme_data, main, footer = self.pre_render(theme_data)
         service_item.theme_data = theme_data
         service_item.main = main

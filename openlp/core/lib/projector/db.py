@@ -341,9 +341,9 @@ class ProjectorDB(Manager):
         """
         old_projector = self.get_object_filtered(Projector, Projector.ip == projector.ip)
         if old_projector is not None:
-            log.warning('add_new() skipping entry ip="{ip}" (Already saved)'.format(ip=old_projector.ip))
+            log.warning('add_projector() skipping entry ip="{ip}" (Already saved)'.format(ip=old_projector.ip))
             return False
-        log.debug('add_new() saving new entry')
+        log.debug('add_projector() saving new entry')
         log.debug('ip="{ip}", name="{name}", location="{location}"'.format(ip=projector.ip,
                                                                            name=projector.name,
                                                                            location=projector.location))

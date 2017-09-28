@@ -22,9 +22,8 @@
 """
 The :mod:`advancedtab` provides an advanced settings facility.
 """
-from datetime import datetime, timedelta
 import logging
-import os
+from datetime import datetime, timedelta
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -492,24 +491,27 @@ class AdvancedTab(SettingsTab):
         self.service_name_edit.setText(UiStrings().DefaultServiceName)
         self.service_name_edit.setFocus()
 
-    def on_data_directory_path_edit_path_changed(self, new_data_path):
+    def on_data_directory_path_edit_path_changed(self, new_path):
         """
-        Browse for a new data directory location.
+        Handle the `editPathChanged` signal of the data_directory_path_edit
+
+        :param openlp.core.common.path.Path new_path: The new path
+        :rtype: None
         """
         # Make sure they want to change the data.
         answer = QtWidgets.QMessageBox.question(self, translate('OpenLP.AdvancedTab', 'Confirm Data Directory Change'),
                                                 translate('OpenLP.AdvancedTab', 'Are you sure you want to change the '
                                                           'location of the OpenLP data directory to:\n\n{path}'
                                                           '\n\nThe data directory will be changed when OpenLP is '
-                                                          'closed.').format(path=new_data_path),
+                                                          'closed.').format(path=new_path),
                                                 defaultButton=QtWidgets.QMessageBox.No)
         if answer != QtWidgets.QMessageBox.Yes:
             self.data_directory_path_edit.path = AppLocation.get_data_path()
             return
         # Check if data already exists here.
-        self.check_data_overwrite(path_to_str(new_data_path))
+        self.check_data_overwrite(new_path)
         # Save the new location.
-        self.main_window.set_new_data_path(path_to_str(new_data_path))
+        self.main_window.new_data_path = new_path
         self.data_directory_cancel_button.show()
 
     def on_data_directory_copy_check_box_toggled(self):
@@ -526,9 +528,10 @@ class AdvancedTab(SettingsTab):
     def check_data_overwrite(self, data_path):
         """
         Check if there's already data in the target directory.
+
+        :param openlp.core.common.path.Path data_path: The target directory to check
         """
-        test_path = os.path.join(data_path, 'songs')
-        if os.path.exists(test_path):
+        if (data_path / 'songs').exists():
             self.data_exists = True
             # Check is they want to replace existing data.
             answer = QtWidgets.QMessageBox.warning(self,
@@ -537,7 +540,7 @@ class AdvancedTab(SettingsTab):
                                                              'WARNING: \n\nThe location you have selected \n\n{path}'
                                                              '\n\nappears to contain OpenLP data files. Do you wish to '
                                                              'replace these files with the current data '
-                                                             'files?').format(path=os.path.abspath(data_path,)),
+                                                             'files?'.format(path=data_path)),
                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
                                                                                          QtWidgets.QMessageBox.No),
                                                    QtWidgets.QMessageBox.No)
@@ -559,7 +562,7 @@ class AdvancedTab(SettingsTab):
         """
         self.data_directory_path_edit.path = AppLocation.get_data_path()
         self.data_directory_copy_check_box.setChecked(False)
-        self.main_window.set_new_data_path(None)
+        self.main_window.new_data_path = None
         self.main_window.set_copy_data(False)
         self.data_directory_copy_check_box.hide()
         self.data_directory_cancel_button.hide()

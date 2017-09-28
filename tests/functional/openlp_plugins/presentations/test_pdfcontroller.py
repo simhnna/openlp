@@ -32,6 +32,7 @@ from PyQt5 import QtCore, QtGui
 
 from openlp.plugins.presentations.lib.pdfcontroller import PdfController, PdfDocument
 from openlp.core.common import Settings
+from openlp.core.common.path import Path
 from openlp.core.lib import ScreenList
 
 from tests.utils.constants import TEST_RESOURCES_PATH
@@ -66,8 +67,8 @@ class TestPdfController(TestCase, TestMixin):
         self.desktop.screenGeometry.return_value = SCREEN['size']
         self.screens = ScreenList.create(self.desktop)
         Settings().extend_default_settings(__default_settings__)
-        self.temp_folder = mkdtemp()
-        self.thumbnail_folder = mkdtemp()
+        self.temp_folder = Path(mkdtemp())
+        self.thumbnail_folder = Path(mkdtemp())
         self.mock_plugin = MagicMock()
         self.mock_plugin.settings_section = self.temp_folder
 
@@ -77,8 +78,8 @@ class TestPdfController(TestCase, TestMixin):
         """
         del self.screens
         self.destroy_settings()
-        shutil.rmtree(self.thumbnail_folder)
-        shutil.rmtree(self.temp_folder)
+        shutil.rmtree(str(self.thumbnail_folder))
+        shutil.rmtree(str(self.temp_folder))
 
     def test_constructor(self):
         """
@@ -98,7 +99,7 @@ class TestPdfController(TestCase, TestMixin):
         Test loading of a Pdf using the PdfController
         """
         # GIVEN: A Pdf-file
-        test_file = os.path.join(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
+        test_file = Path(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
 
         # WHEN: The Pdf is loaded
         controller = PdfController(plugin=self.mock_plugin)
@@ -118,7 +119,7 @@ class TestPdfController(TestCase, TestMixin):
         Test loading of a Pdf and check size of generate pictures
         """
         # GIVEN: A Pdf-file
-        test_file = os.path.join(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
+        test_file = Path(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
 
         # WHEN: The Pdf is loaded
         controller = PdfController(plugin=self.mock_plugin)
@@ -131,7 +132,7 @@ class TestPdfController(TestCase, TestMixin):
 
         # THEN: The load should succeed and pictures should be created and have been scales to fit the screen
         self.assertTrue(loaded, 'The loading of the PDF should succeed.')
-        image = QtGui.QImage(os.path.join(self.temp_folder, 'pdf_test1.pdf', 'mainslide001.png'))
+        image = QtGui.QImage(os.path.join(str(self.temp_folder), 'pdf_test1.pdf', 'mainslide001.png'))
         # Based on the converter used the resolution will differ a bit
         if controller.gsbin:
             self.assertEqual(760, image.height(), 'The height should be 760')

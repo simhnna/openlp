@@ -12,7 +12,7 @@ environment:
 
 install:
   # Install dependencies from pypi
-  - "%PYTHON%\\python.exe -m pip install sqlalchemy alembic chardet beautifulsoup4 Mako nose mock pyodbc==4.0.8 psycopg2 pypiwin32 pyenchant websockets asyncio waitress six webob"
+  - "%PYTHON%\\python.exe -m pip install sqlalchemy alembic chardet beautifulsoup4 Mako nose mock pyodbc==4.0.8 psycopg2 pypiwin32 pyenchant websockets asyncio waitress six webob requests"
   # Install mysql dependency
   - "%PYTHON%\\python.exe -m pip install http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.0.4.zip#md5=3df394d89300db95163f17c843ef49df"
   # Download and install lxml and pyicu (originally from http://www.lfd.uci.edu/~gohlke/pythonlibs/)

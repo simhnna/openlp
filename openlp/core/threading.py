@@ -20,45 +20,36 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.common.versionchecker package.
+The :mod:`openlp.core.threading` module contains some common threading code
 """
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
-
-from openlp.core.common.settings import Settings
-from openlp.core.common.versionchecker import VersionThread
-
-from tests.helpers.testmixin import TestMixin
+from PyQt5 import QtCore
 
 
-class TestVersionchecker(TestMixin, TestCase):
+def run_thread(parent, worker, prefix='', auto_start=True):
+    """
+    Create a thread and assign a worker to it. This removes a lot of boilerplate code from the codebase.
 
-    def setUp(self):
-        """
-        Create an instance and a few example actions.
-        """
-        self.build_settings()
-
-    def tearDown(self):
-        """
-        Clean up
-        """
-        self.destroy_settings()
-
-    def test_version_thread_triggered(self):
-        """
-        Test the version thread call does not trigger UI
-        :return:
-        """
-        # GIVEN: a equal version setup and the data is not today.
-        mocked_main_window = MagicMock()
-        Settings().setValue('core/last version test', '1950-04-01')
-        # WHEN: We check to see if the version is different .
-        with patch('PyQt5.QtCore.QThread'),\
-                patch('openlp.core.common.versionchecker.get_application_version') as mocked_get_application_version:
-            mocked_get_application_version.return_value = {'version': '1.0.0', 'build': '', 'full': '2.0.4'}
-            version_thread = VersionThread(mocked_main_window)
-            version_thread.run()
-        # THEN: If the version has changed the main window is notified
-        self.assertTrue(mocked_main_window.openlp_version_check.emit.called,
-                        'The main windows should have been notified')
+    :param object parent: The parent object so that the thread and worker are not orphaned.
+    :param QObject worker: A QObject-based worker object which does the actual work.
+    :param str prefix: A prefix to be applied to the attribute names.
+    :param bool auto_start: Automatically start the thread. Defaults to True.
+    """
+    # Set up attribute names
+    thread_name = 'thread'
+    worker_name = 'worker'
+    if prefix:
+        thread_name = '_'.join([prefix, thread_name])
+        worker_name = '_'.join([prefix, worker_name])
+    # Create the thread and add the thread and the worker to the parent
+    thread = QtCore.QThread()
+    setattr(parent, thread_name, thread)
+    setattr(parent, worker_name, worker)
+    # Move the worker into the thread's context
+    worker.moveToThread(thread)
+    # Connect slots and signals
+    thread.started.connect(worker.start)
+    worker.quit.connect(thread.quit)
+    worker.quit.connect(worker.deleteLater)
+    thread.finished.connect(thread.deleteLater)
+    if auto_start:
+        thread.start()

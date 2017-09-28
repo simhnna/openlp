@@ -19,16 +19,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-import logging
 import copy
-import os
+import logging
 
 from PyQt5 import QtCore
 
 from openlp.core.common import Registry, Settings
-from openlp.core.ui import HideMode
+from openlp.core.common.path import Path
 from openlp.core.lib import ServiceItemContext
+from openlp.core.ui import HideMode
 from openlp.plugins.presentations.lib.pdfcontroller import PDF_CONTROLLER_FILETYPES
 
 log = logging.getLogger(__name__)
@@ -325,21 +324,25 @@ class MessageListener(object):
         is_live = message[1]
         item = message[0]
         hide_mode = message[2]
-        file = item.get_frame_path()
+        file_path = Path(item.get_frame_path())
         self.handler = item.processor
         # When starting presentation from the servicemanager we convert
         # PDF/XPS/OXPS-serviceitems into image-serviceitems. When started from the mediamanager
         # the conversion has already been done at this point.
-        file_type = os.path.splitext(file.lower())[1][1:]
+        file_type = file_path.suffix.lower()[1:]
         if file_type in PDF_CONTROLLER_FILETYPES:
-            log.debug('Converting from pdf/xps/oxps to images for serviceitem with file {name}'.format(name=file))
+            log.debug('Converting from pdf/xps/oxps to images for serviceitem with file {name}'.format(name=file_path))
             # Create a copy of the original item, and then clear the original item so it can be filled with images
             item_cpy = copy.copy(item)
             item.__init__(None)
             if is_live:
-                self.media_item.generate_slide_data(item, item_cpy, False, False, ServiceItemContext.Live, file)
+                # TODO: To Path object
+                self.media_item.generate_slide_data(item, item_cpy, False, False, ServiceItemContext.Live,
+                                                    str(file_path))
             else:
-                self.media_item.generate_slide_data(item, item_cpy, False, False, ServiceItemContext.Preview, file)
+                # TODO: To Path object
+                self.media_item.generate_slide_data(item, item_cpy, False, False, ServiceItemContext.Preview,
+                                                    str(file_path))
             # Some of the original serviceitem attributes is needed in the new serviceitem
             item.footer = item_cpy.footer
             item.from_service = item_cpy.from_service
@@ -352,13 +355,13 @@ class MessageListener(object):
             self.handler = None
         else:
             if self.handler == self.media_item.automatic:
-                self.handler = self.media_item.find_controller_by_type(file)
+                self.handler = self.media_item.find_controller_by_type(file_path)
                 if not self.handler:
                     return
             else:
-                # the saved handler is not present so need to use one based on file suffix.
+                # the saved handler is not present so need to use one based on file_path suffix.
                 if not self.controllers[self.handler].available:
-                    self.handler = self.media_item.find_controller_by_type(file)
+                    self.handler = self.media_item.find_controller_by_type(file_path)
                     if not self.handler:
                         return
         if is_live:
@@ -370,7 +373,7 @@ class MessageListener(object):
         if self.handler is None:
             self.controller = controller
         else:
-            controller.add_handler(self.controllers[self.handler], file, hide_mode, message[3])
+            controller.add_handler(self.controllers[self.handler], file_path, hide_mode, message[3])
             self.timer.start()
 
     def slide(self, message):

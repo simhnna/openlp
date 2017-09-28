@@ -39,8 +39,7 @@ from openlp.core.api.http import server
 from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, UiStrings, \
     check_directory_exists, translate, is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
-from openlp.core.common.path import Path, path_to_str, str_to_path
-from openlp.core.common.versionchecker import get_application_version
+from openlp.core.common.path import Path, copyfile, path_to_str, str_to_path
 from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
 from openlp.core.lib.ui import create_action
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
@@ -53,6 +52,7 @@ from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+from openlp.core.version import get_version
 
 
 log = logging.getLogger(__name__)
@@ -490,7 +490,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
     """
     The main window.
     """
-    openlp_version_check = QtCore.pyqtSignal(QtCore.QVariant)
     log.info('MainWindow loaded')
 
     def __init__(self):
@@ -499,6 +498,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         """
         super(MainWindow, self).__init__()
         Registry().register('main_window', self)
+        self.version_thread = None
+        self.version_worker = None
         self.clipboard = self.application.clipboard()
         self.arguments = ''.join(self.application.args)
         # Set up settings sections for the main application (not for use by plugins).
@@ -564,7 +565,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         self.application.set_busy_cursor()
         # Simple message boxes
         Registry().register_function('theme_update_global', self.default_theme_changed)
-        self.openlp_version_check.connect(self.version_notice)
         Registry().register_function('config_screen_changed', self.screen_changed)
         Registry().register_function('bootstrap_post_set_up', self.bootstrap_post_set_up)
         # Reset the cursor
@@ -609,7 +609,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if widget:
             widget.on_focus()
 
-    def version_notice(self, version):
+    def on_new_version(self, version):
         """
         Notifies the user that a newer version of OpenLP is available.
         Triggered by delay thread and cannot display popup.
@@ -619,7 +619,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         log.debug('version_notice')
         version_text = translate('OpenLP.MainWindow', 'Version {new} of OpenLP is now available for download (you are '
                                  'currently running version {current}). \n\nYou can download the latest version from '
-                                 'http://openlp.org/.').format(new=version, current=get_application_version()[u'full'])
+                                 'http://openlp.org/.').format(new=version, current=get_version()[u'full'])
         QtWidgets.QMessageBox.question(self, translate('OpenLP.MainWindow', 'OpenLP Version Updated'), version_text)
 
     def show(self):
@@ -850,12 +850,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                                                 QtWidgets.QMessageBox.No)
         if answer == QtWidgets.QMessageBox.No:
             return
-        import_file_name, filter_used = QtWidgets.QFileDialog.getOpenFileName(
+        import_file_path, filter_used = FileDialog.getOpenFileName(
             self,
             translate('OpenLP.MainWindow', 'Import settings'),
-            '',
+            None,
             translate('OpenLP.MainWindow', 'OpenLP Settings (*.conf)'))
-        if not import_file_name:
+        if import_file_path is None:
             return
         setting_sections = []
         # Add main sections.
@@ -873,12 +873,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # Add plugin sections.
         setting_sections.extend([plugin.name for plugin in self.plugin_manager.plugins])
         # Copy the settings file to the tmp dir, because we do not want to change the original one.
-        temp_directory = os.path.join(str(gettempdir()), 'openlp')
-        check_directory_exists(Path(temp_directory))
-        temp_config = os.path.join(temp_directory, os.path.basename(import_file_name))
-        shutil.copyfile(import_file_name, temp_config)
+        temp_dir_path = Path(gettempdir(), 'openlp')
+        check_directory_exists(temp_dir_path)
+        temp_config_path = temp_dir_path / import_file_path.name
+        copyfile(import_file_path, temp_config_path)
         settings = Settings()
-        import_settings = Settings(temp_config, Settings.IniFormat)
+        import_settings = Settings(str(temp_config_path), Settings.IniFormat)
 
         log.info('hook upgrade_plugin_settings')
         self.plugin_manager.hook_upgrade_plugin_settings(import_settings)
@@ -922,7 +922,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 settings.setValue('{key}'.format(key=section_key), value)
         now = datetime.now()
         settings.beginGroup(self.header_section)
-        settings.setValue('file_imported', import_file_name)
+        settings.setValue('file_imported', import_file_path)
         settings.setValue('file_date_imported', now.strftime("%Y-%m-%d %H:%M"))
         settings.endGroup()
         settings.sync()
@@ -1013,6 +1013,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if not self.application.is_event_loop_active:
             event.ignore()
             return
+        # Sometimes the version thread hasn't finished, let's wait for it
+        try:
+            if self.version_thread and self.version_thread.isRunning():
+                wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
+                wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
+                wait_dialog.setAutoClose(False)
+                wait_dialog.setCancelButton(None)
+                wait_dialog.show()
+                retry = 0
+                while self.version_thread.isRunning() and retry < 50:
+                    self.application.processEvents()
+                    self.version_thread.wait(100)
+                    retry += 1
+                if self.version_thread.isRunning():
+                    self.version_thread.terminate()
+                wait_dialog.close()
+        except RuntimeError:
+            # Ignore the RuntimeError that is thrown when Qt has already deleted the C++ thread object
+            pass
         # If we just did a settings import, close without saving changes.
         if self.settings_imported:
             self.clean_up(False)
@@ -1334,12 +1353,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             if self.application:
                 self.application.process_events()
 
-    def set_new_data_path(self, new_data_path):
-        """
-        Set the new data path
-        """
-        self.new_data_path = new_data_path
-
     def set_copy_data(self, copy_data):
         """
         Set the flag to copy the data
@@ -1351,7 +1364,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Change the data directory.
         """
         log.info('Changing data path to {newpath}'.format(newpath=self.new_data_path))
-        old_data_path = str(AppLocation.get_data_path())
+        old_data_path = AppLocation.get_data_path()
         # Copy OpenLP data to new location if requested.
         self.application.set_busy_cursor()
         if self.copy_data:
@@ -1360,7 +1373,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 self.show_status_message(
                     translate('OpenLP.MainWindow', 'Copying OpenLP data to new data directory location - {path} '
                               '- Please wait for copy to finish').format(path=self.new_data_path))
-                dir_util.copy_tree(old_data_path, self.new_data_path)
+                dir_util.copy_tree(str(old_data_path), str(self.new_data_path))
                 log.info('Copy successful')
             except (IOError, os.error, DistutilsFileError) as why:
                 self.application.set_normal_cursor()
@@ -1375,9 +1388,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             log.info('No data copy requested')
         # Change the location of data directory in config file.
         settings = QtCore.QSettings()
-        settings.setValue('advanced/data path', Path(self.new_data_path))
+        settings.setValue('advanced/data path', self.new_data_path)
         # Check if the new data path is our default.
-        if self.new_data_path == str(AppLocation.get_directory(AppLocation.DataDir)):
+        if self.new_data_path == AppLocation.get_directory(AppLocation.DataDir):
             settings.remove('advanced/data path')
         self.application.set_normal_cursor()
 

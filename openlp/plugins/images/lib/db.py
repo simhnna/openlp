@@ -22,11 +22,10 @@
 """
 The :mod:`db` module provides the database and schema that is the backend for the Images plugin.
 """
-
 from sqlalchemy import Column, ForeignKey, Table, types
 from sqlalchemy.orm import mapper
 
-from openlp.core.lib.db import BaseModel, init_db
+from openlp.core.lib.db import BaseModel, PathType, init_db
 
 
 class ImageGroups(BaseModel):
@@ -65,7 +64,7 @@ def init_schema(url):
 
             * id
             * group_id
-            * filename
+            * file_path
     """
     session, metadata = init_db(url)
 
@@ -80,7 +79,7 @@ def init_schema(url):
     image_filenames_table = Table('image_filenames', metadata,
                                   Column('id', types.Integer(), primary_key=True),
                                   Column('group_id', types.Integer(), ForeignKey('image_groups.id'), default=None),
-                                  Column('filename', types.Unicode(255), nullable=False)
+                                  Column('file_path', PathType(), nullable=False)
                                   )
 
     mapper(ImageGroups, image_groups_table)
