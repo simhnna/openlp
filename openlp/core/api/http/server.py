@@ -89,7 +89,7 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         self.thread.start()
         Registry().register_function('download_website', self.first_time)
         Registry().register_function('get_website_version', self.website_version)
-        Registry().set_flag('website_version', '0001_01_01')
+        Registry().set_flag('website_version', '0.0')
 
     def bootstrap_post_set_up(self):
         """
@@ -126,7 +126,7 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         Import web site code if active
         """
         self.application.process_events()
-        progress = Progress(self)
+        progress = DownloadProgressDialog(self)
         progress.forceShow()
         self.application.process_events()
         time.sleep(1)
@@ -147,12 +147,12 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         Registry().set_flag('website_version', self.version)
 
 
-class Progress(QtWidgets.QProgressDialog):
+class DownloadProgressDialog(QtWidgets.QProgressDialog):
     """
     Local class to handle download display based and supporting httputils:get_web_page
     """
     def __init__(self, parent):
-        super(Progress, self).__init__(parent.main_window)
+        super(DownloadProgressDialog, self).__init__(parent.main_window)
         self.parent = parent
         self.setWindowModality(QtCore.Qt.WindowModal)
         self.setWindowTitle(translate('RemotePlugin', 'Importing Website'))
