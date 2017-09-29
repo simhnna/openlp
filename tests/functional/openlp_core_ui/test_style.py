@@ -24,13 +24,14 @@ Package to test the :mod:`~openlp.core.ui.style` module.
 """
 from unittest.mock import MagicMock, patch
 
+import openlp.core.ui.style
 from openlp.core.ui.style import MEDIA_MANAGER_STYLE, WIN_REPAIR_STYLESHEET, get_application_stylesheet, \
     get_library_stylesheet
 
 
 @patch('openlp.core.ui.style.HAS_DARK_STYLE', True)
 @patch('openlp.core.ui.style.Settings')
-@patch('openlp.core.ui.style.qdarkstyle')
+@patch.object(openlp.core.ui.style, 'qdarkstyle')
 def test_get_application_stylesheet_dark(mocked_qdarkstyle, MockSettings):
     """Test that the dark stylesheet is returned when available and enabled"""
     # GIVEN: We're on Windows and no dark style is set
@@ -38,7 +39,7 @@ def test_get_application_stylesheet_dark(mocked_qdarkstyle, MockSettings):
     mocked_settings.value.return_value = True
     MockSettings.return_value = mocked_settings
     mocked_qdarkstyle.load_stylesheet_pyqt5.return_value = 'dark_style'
-    
+
     # WHEN: can_show_icon() is called
     result = get_application_stylesheet()
 
@@ -56,7 +57,7 @@ def test_get_application_stylesheet_not_alternate_rows(MockRegistry, MockSetting
     mocked_is_win.return_value = False
     MockSettings.return_value.value.return_value = False
     MockRegistry.return_value.get.return_value.palette.return_value.color.return_value.name.return_value = 'color'
-    
+
     # WHEN: can_show_icon() is called
     result = get_application_stylesheet()
 
@@ -73,7 +74,7 @@ def test_get_application_stylesheet_win_repair(MockSettings, mocked_is_win):
     # GIVEN: We're on Windows and no dark style is set
     mocked_is_win.return_value = True
     MockSettings.return_value.value.return_value = True
-    
+
     # WHEN: can_show_icon() is called
     result = get_application_stylesheet()
 
