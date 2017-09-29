@@ -211,8 +211,8 @@ class ThemesTab(SettingsTab):
         """
         Utility method to update the global theme preview image.
         """
-        image = self.theme_manager.get_preview_image(self.global_theme)
-        preview = QtGui.QPixmap(str(image))
+        image_path = self.theme_manager.theme_path / '{file_name}.png'.format(file_name=self.global_theme)
+        preview = QtGui.QPixmap(str(image_path))
         if not preview.isNull():
             preview = preview.scaled(300, 255, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
         self.default_list_view.setPixmap(preview)

@@ -50,7 +50,7 @@ __default_settings__ = {
     'songusage/active': False,
     'songusage/to date': QtCore.QDate(YEAR, 8, 31),
     'songusage/from date': QtCore.QDate(YEAR - 1, 9, 1),
-    'songusage/last directory export': ''
+    'songusage/last directory export': None
 }
 
 

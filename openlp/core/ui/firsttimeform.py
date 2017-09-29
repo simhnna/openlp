@@ -30,13 +30,13 @@ import urllib.request
 import urllib.parse
 import urllib.error
 from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
-from pathlib import Path
 from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, \
     translate, clean_button_text, trace_error_handler
+from openlp.core.common.path import Path
 from openlp.core.lib import PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.common.httputils import get_web_page, get_url_file_size, url_get_file, CONNECTION_TIMEOUT
@@ -181,22 +181,16 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self.application.process_events()
         try:
             web_config = get_web_page('{host}{name}'.format(host=self.web, name='download.cfg'),
-                                      header=('User-Agent', user_agent))
-        except (urllib.error.URLError, ConnectionError) as err:
-            msg = QtWidgets.QMessageBox()
-            title = translate('OpenLP.FirstTimeWizard', 'Network Error')
-            msg.setText('{title} {error}'.format(title=title,
-                                                 error=err.code if hasattr(err, 'code') else ''))
-            msg.setInformativeText(translate('OpenLP.FirstTimeWizard',
-                                             'There was a network error attempting to '
-                                             'connect to retrieve initial configuration information'))
-            msg.setStandardButtons(msg.Ok)
-            ans = msg.exec()
+                                      headers={'User-Agent': user_agent})
+        except ConnectionError:
+            QtWidgets.QMessageBox.critical(self, translate('OpenLP.FirstTimeWizard', 'Network Error'),
+                                           translate('OpenLP.FirstTimeWizard', 'There was a network error attempting '
+                                                     'to connect to retrieve initial configuration information'),
+                                           QtWidgets.QMessageBox.Ok)
             web_config = False
         if web_config:
-            files = web_config.read()
             try:
-                self.config.read_string(files.decode())
+                self.config.read_string(web_config)
                 self.web = self.config.get('general', 'base url')
                 self.songs_url = self.web + self.config.get('songs', 'directory') + '/'
                 self.bibles_url = self.web + self.config.get('bibles', 'directory') + '/'
@@ -563,7 +557,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 filename, sha256 = item.data(QtCore.Qt.UserRole)
                 self._increment_progress_bar(self.downloading.format(name=filename), 0)
                 self.previous_size = 0
-                destination = os.path.join(songs_destination, str(filename))
+                destination = Path(songs_destination, str(filename))
                 if not url_get_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
                                     destination, sha256):
                     missed_files.append('Song: {name}'.format(name=filename))
@@ -576,7 +570,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
                 if not url_get_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
-                                    os.path.join(bibles_destination, bible),
+                                    Path(bibles_destination, bible),
                                     sha256):
                     missed_files.append('Bible: {name}'.format(name=bible))
             bibles_iterator += 1
@@ -588,7 +582,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=theme), 0)
                 self.previous_size = 0
                 if not url_get_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
-                                    os.path.join(themes_destination, theme),
+                                    Path(themes_destination, theme),
                                     sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
         if missed_files:

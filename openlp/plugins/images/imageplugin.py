@@ -29,7 +29,7 @@ from openlp.core.common import Settings, translate
 from openlp.core.lib import Plugin, StringContent, ImageSource, build_icon
 from openlp.core.lib.db import Manager
 from openlp.plugins.images.endpoint import api_images_endpoint, images_endpoint
-from openlp.plugins.images.lib import ImageMediaItem, ImageTab
+from openlp.plugins.images.lib import ImageMediaItem, ImageTab, upgrade
 from openlp.plugins.images.lib.db import init_schema
 
 log = logging.getLogger(__name__)
@@ -41,6 +41,7 @@ __default_settings__ = {
     'images/db hostname': '',
     'images/db database': '',
     'images/background color': '#000000',
+    'images/last directory': None
 }
 
 
@@ -49,7 +50,7 @@ class ImagePlugin(Plugin):
 
     def __init__(self):
         super(ImagePlugin, self).__init__('images', __default_settings__, ImageMediaItem, ImageTab)
-        self.manager = Manager('images', init_schema)
+        self.manager = Manager('images', init_schema, upgrade_mod=upgrade)
         self.weight = -7
         self.icon_path = ':/plugins/plugin_images.png'
         self.icon = build_icon(self.icon_path)
@@ -70,14 +71,6 @@ class ImagePlugin(Plugin):
                                'selected image as a background instead of the background '
                                'provided by the theme.')
         return about_text
-
-    def upgrade_settings(self, settings):
-        """
-        Upgrade the settings of this plugin.
-
-        :param settings: The Settings object containing the old settings.
-        """
-        pass
 
     def set_plugin_text_strings(self):
         """

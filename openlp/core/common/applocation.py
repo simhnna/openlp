@@ -25,10 +25,9 @@ The :mod:`openlp.core.common.applocation` module provides an utility for OpenLP 
 import logging
 import os
 import sys
-from pathlib import Path
 
 from openlp.core.common import Settings, is_win, is_macosx
-
+from openlp.core.common.path import Path
 
 if not is_win() and not is_macosx():
     try:
@@ -64,10 +63,8 @@ class AppLocation(object):
         Return the appropriate directory according to the directory type.
 
         :param dir_type: The directory type you want, for instance the data directory. Default *AppLocation.AppDir*
-        :type dir_type: AppLocation Enum
-
         :return: The requested path
-        :rtype: pathlib.Path
+        :rtype: openlp.core.common.path.Path
         """
         if dir_type == AppLocation.AppDir or dir_type == AppLocation.VersionDir:
             return get_frozen_path(FROZEN_APP_PATH, APP_PATH)
@@ -84,11 +81,11 @@ class AppLocation(object):
         Return the path OpenLP stores all its data under.
 
         :return: The data path to use.
-        :rtype: pathlib.Path
+        :rtype: openlp.core.common.path.Path
         """
         # Check if we have a different data location.
         if Settings().contains('advanced/data path'):
-            path = Path(Settings().value('advanced/data path'))
+            path = Settings().value('advanced/data path')
         else:
             path = AppLocation.get_directory(AppLocation.DataDir)
             check_directory_exists(path)
@@ -104,7 +101,7 @@ class AppLocation(object):
         :param str extension: Defaults to ''. The extension to search for. For example::
             '.png'
         :return: List of files found.
-        :rtype: list[pathlib.Path]
+        :rtype: list[openlp.core.common.path.Path]
         """
         path = AppLocation.get_data_path()
         if section:
@@ -120,9 +117,8 @@ class AppLocation(object):
         """
         Return the path a particular module stores its data under.
 
-        :type section: str
-
-        :rtype: pathlib.Path
+        :param str section:
+        :rtype: openlp.core.common.path.Path
         """
         path = AppLocation.get_data_path() / section
         check_directory_exists(path)
@@ -135,7 +131,7 @@ def _get_os_dir_path(dir_type):
 
     :param dir_type: AppLocation Enum of the requested path type
     :return: The requested path
-    :rtype: pathlib.Path
+    :rtype: openlp.core.common.path.Path
     """
     # If running from source, return the language directory from the source directory
     if dir_type == AppLocation.LanguageDir:

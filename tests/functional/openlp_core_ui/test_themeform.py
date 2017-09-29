@@ -22,10 +22,10 @@
 """
 Package to test the openlp.core.ui.themeform package.
 """
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from openlp.core.common.path import Path
 from openlp.core.ui import ThemeForm
 
 
@@ -49,5 +49,5 @@ class TestThemeManager(TestCase):
             self.instance.on_image_path_edit_path_changed(Path('/', 'new', 'pat.h'))
 
             # THEN: The theme background file should be set and `set_background_page_values` should have been called
-            self.assertEqual(self.instance.theme.background_filename, '/new/pat.h')
+            self.assertEqual(self.instance.theme.background_filename, Path('/', 'new', 'pat.h'))
             mocked_set_background_page_values.assert_called_once_with()

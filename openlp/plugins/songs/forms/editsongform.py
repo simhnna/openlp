@@ -28,12 +28,11 @@ import logging
 import re
 import os
 import shutil
-from pathlib import Path
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, UiStrings, check_directory_exists, translate
-from openlp.core.common.path import path_to_str
+from openlp.core.common.path import Path, path_to_str
 from openlp.core.lib import PluginStatus, MediaType, create_separated_list
 from openlp.core.lib.ui import set_case_insensitive_completer, critical_error_message_box, find_and_set_in_combo_box
 from openlp.core.ui.lib.filedialog import FileDialog

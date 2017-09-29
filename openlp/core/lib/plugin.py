@@ -27,7 +27,7 @@ import logging
 from PyQt5 import QtCore
 
 from openlp.core.common import Registry, RegistryProperties, Settings, UiStrings
-from openlp.core.common.versionchecker import get_application_version
+from openlp.core.version import get_version
 
 log = logging.getLogger(__name__)
 
@@ -139,7 +139,7 @@ class Plugin(QtCore.QObject, RegistryProperties):
         if version:
             self.version = version
         else:
-            self.version = get_application_version()['version']
+            self.version = get_version()['version']
         self.settings_section = self.name
         self.icon = None
         self.media_item_class = media_item_class
@@ -150,7 +150,7 @@ class Plugin(QtCore.QObject, RegistryProperties):
         self.status = PluginStatus.Inactive
         # Add the default status to the default settings.
         default_settings[name + '/status'] = PluginStatus.Inactive
-        default_settings[name + '/last directory'] = ''
+        default_settings[name + '/last directory'] = None
         # Append a setting for files in the mediamanager (note not all plugins
         # which have a mediamanager need this).
         if media_item_class is not None:

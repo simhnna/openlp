@@ -32,6 +32,7 @@ import math
 from PyQt5 import QtCore, QtGui, Qt, QtWidgets
 
 from openlp.core.common import translate
+from openlp.core.common.path import Path
 
 log = logging.getLogger(__name__ + '.__init__')
 
@@ -89,7 +90,7 @@ def get_text_file_string(text_file_path):
     returns False. If there is an error loading the file or the content can't be decoded then the function will return
     None.
 
-    :param pathlib.Path text_file_path: The path to the file.
+    :param openlp.core.common.path.Path text_file_path: The path to the file.
     :return: The contents of the file, False if the file does not exist, or None if there is an Error reading or
     decoding the file.
     :rtype: str | False | None
@@ -125,10 +126,11 @@ def build_icon(icon):
     Build a QIcon instance from an existing QIcon, a resource location, or a physical file location. If the icon is a
     QIcon instance, that icon is simply returned. If not, it builds a QIcon instance from the resource or file name.
 
-    :param icon:
-        The icon to build. This can be a QIcon, a resource string in the form ``:/resource/file.png``, or a file
-        location like ``/path/to/file.png``. However, the **recommended** way is to specify a resource string.
+    :param QtGui.QIcon | Path | QtGui.QIcon | str icon:
+        The icon to build. This can be a QIcon, a resource string in the form ``:/resource/file.png``, or a file path
+        location like ``Path(/path/to/file.png)``. However, the **recommended** way is to specify a resource string.
     :return: The build icon.
+    :rtype: QtGui.QIcon
     """
     if isinstance(icon, QtGui.QIcon):
         return icon
@@ -136,6 +138,8 @@ def build_icon(icon):
     button_icon = QtGui.QIcon()
     if isinstance(icon, str):
         pix_map = QtGui.QPixmap(icon)
+    elif isinstance(icon, Path):
+        pix_map = QtGui.QPixmap(str(icon))
     elif isinstance(icon, QtGui.QImage):
         pix_map = QtGui.QPixmap.fromImage(icon)
     if pix_map:
@@ -217,14 +221,15 @@ def validate_thumb(file_path, thumb_path):
     Validates whether an file's thumb still exists and if is up to date. **Note**, you must **not** call this function,
     before checking the existence of the file.
 
-    :param file_path: The path to the file. The file **must** exist!
-    :param thumb_path: The path to the thumb.
-    :return: True, False if the image has changed since the thumb was created.
+    :param openlp.core.common.path.Path file_path: The path to the file. The file **must** exist!
+    :param openlp.core.common.path.Path thumb_path: The path to the thumb.
+    :return: Has the image changed since the thumb was created?
+    :rtype: bool
     """
-    if not os.path.exists(thumb_path):
+    if not thumb_path.exists():
         return False
-    image_date = os.stat(file_path).st_mtime
-    thumb_date = os.stat(thumb_path).st_mtime
+    image_date = file_path.stat().st_mtime
+    thumb_date = thumb_path.stat().st_mtime
     return image_date <= thumb_date
 
 
@@ -604,41 +609,6 @@ def create_separated_list(string_list):
     else:
         list_to_string = ''
     return list_to_string
-
-
-def replace_params(args, kwargs, params):
-    """
-    Apply a transformation function to the specified args or kwargs
-
-    :param args: Positional arguments
-    :type args: (,)
-
-    :param kwargs: Key Word arguments
-    :type kwargs: dict
-
-    :param params: A tuple of tuples with the position and the key word to replace.
-    :type params: ((int, str, path_to_str),)
-
-    :return: The modified positional and keyword arguments
-    :rtype: (tuple, dict)
-
-
-    Usage:
-        Take a method with the following signature, and assume we which to apply the str function to arg2:
-            def method(arg1=None, arg2=None, arg3=None)
-
-        As arg2 can be specified postitionally as the second argument (1 with a zero index) or as a keyword, the we
-        would call this function as follows:
-
-        replace_params(args, kwargs, ((1, 'arg2', str),))
-    """
-    args = list(args)
-    for position, key_word, transform in params:
-        if len(args) > position:
-            args[position] = transform(args[position])
-        elif key_word in kwargs:
-            kwargs[key_word] = transform(kwargs[key_word])
-    return tuple(args), kwargs
 
 
 from .exceptions import ValidationError

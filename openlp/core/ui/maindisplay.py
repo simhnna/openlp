@@ -37,6 +37,7 @@ from PyQt5 import QtCore, QtWidgets, QtWebKit, QtWebKitWidgets, QtGui, QtMultime
 
 from openlp.core.common import AppLocation, Registry, RegistryProperties, OpenLPMixin, Settings, translate,\
     is_macosx, is_win
+from openlp.core.common.path import path_to_str
 from openlp.core.lib import ServiceItem, ImageSource, ScreenList, build_html, expand_tags, image_to_byte
 from openlp.core.lib.theme import BackgroundType
 from openlp.core.ui import HideMode, AlertLocation, DisplayControllerType
@@ -259,7 +260,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
             background_color.setNamedColor(Settings().value('core/logo background color'))
             if not background_color.isValid():
                 background_color = QtCore.Qt.white
-            image_file = Settings().value('core/logo file')
+            image_file = path_to_str(Settings().value('core/logo file'))
             splash_image = QtGui.QImage(image_file)
             self.initial_fame = QtGui.QImage(
                 self.screen['size'].width(),
@@ -345,7 +346,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
         if not hasattr(self, 'service_item'):
             return False
         self.override['image'] = path
-        self.override['theme'] = self.service_item.theme_data.background_filename
+        self.override['theme'] = path_to_str(self.service_item.theme_data.background_filename)
         self.image(path)
         # Update the preview frame.
         if self.is_live:
@@ -453,7 +454,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
                 Registry().execute('video_background_replaced')
                 self.override = {}
             # We have a different theme.
-            elif self.override['theme'] != service_item.theme_data.background_filename:
+            elif self.override['theme'] != path_to_str(service_item.theme_data.background_filename):
                 Registry().execute('live_theme_changed')
                 self.override = {}
             else:
@@ -465,7 +466,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
         if self.service_item.theme_data.background_type == 'image':
             if self.service_item.theme_data.background_filename:
                 self.service_item.bg_image_bytes = self.image_manager.get_image_bytes(
-                    self.service_item.theme_data.background_filename, ImageSource.Theme)
+                    path_to_str(self.service_item.theme_data.background_filename), ImageSource.Theme)
             if image_path:
                 image_bytes = self.image_manager.get_image_bytes(image_path, ImageSource.ImagePlugin)
         created_html = build_html(self.service_item, self.screen, self.is_live, background, image_bytes,
@@ -487,7 +488,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
                 path = os.path.join(str(AppLocation.get_section_data_path('themes')),
                                     self.service_item.theme_data.theme_name)
                 service_item.add_from_command(path,
-                                              self.service_item.theme_data.background_filename,
+                                              path_to_str(self.service_item.theme_data.background_filename),
                                               ':/media/slidecontroller_multimedia.png')
                 self.media_controller.video(DisplayControllerType.Live, service_item, video_behind_text=True)
         self._hide_mouse()

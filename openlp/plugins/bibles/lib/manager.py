@@ -21,10 +21,9 @@
 ###############################################################################
 
 import logging
-import os
-from pathlib import Path
 
 from openlp.core.common import AppLocation, OpenLPMixin, RegistryProperties, Settings, translate, delete_file, UiStrings
+from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib import LanguageSelection, parse_reference
 from openlp.plugins.bibles.lib.db import BibleDB, BibleMeta
 from .importers.csvbible import CSVBible
@@ -306,13 +305,10 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         """
         Does a verse search for the given bible and text.
 
-        :param bible: The bible to search
-        :type bible: str
-        :param text: The text to search for
-        :type text: str
-
+        :param str bible: The bible to search
+        :param str text: The text to search for
         :return: The search results if valid, or None if the search is invalid.
-        :rtype: None, list
+        :rtype: None | list
         """
         log.debug('BibleManager.verse_search("{bible}", "{text}")'.format(bible=bible, text=text))
         if not text:

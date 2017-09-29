@@ -23,10 +23,10 @@
 This module contains tests for the openlp.core.ui.lib.pathedit module
 """
 import os
-from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, patch
 
+from openlp.core.common.path import Path
 from openlp.core.ui.lib import PathEdit, PathType
 from openlp.core.ui.lib.filedialog import FileDialog
 

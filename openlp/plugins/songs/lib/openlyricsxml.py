@@ -62,7 +62,7 @@ import re
 from lxml import etree, objectify
 
 from openlp.core.common import translate, Settings
-from openlp.core.common.versionchecker import get_application_version
+from openlp.core.version import get_version
 from openlp.core.lib import FormattingTags
 from openlp.plugins.songs.lib import VerseType, clean_song
 from openlp.plugins.songs.lib.db import Author, AuthorType, Book, Song, Topic
@@ -234,7 +234,7 @@ class OpenLyrics(object):
         # Append the necessary meta data to the song.
         song_xml.set('xmlns', NAMESPACE)
         song_xml.set('version', OpenLyrics.IMPLEMENTED_VERSION)
-        application_name = 'OpenLP ' + get_application_version()['version']
+        application_name = 'OpenLP ' + get_version()['version']
         song_xml.set('createdIn', application_name)
         song_xml.set('modifiedIn', application_name)
         # "Convert" 2012-08-27 11:49:15 to 2012-08-27T11:49:15.

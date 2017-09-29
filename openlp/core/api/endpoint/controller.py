@@ -79,8 +79,7 @@ def controller_text(request):
                     item['title'] = str(frame['display_title'])
                 if current_item.is_capable(ItemCapabilities.HasNotes):
                     item['slide_notes'] = str(frame['notes'])
-                if current_item.is_capable(ItemCapabilities.HasThumbnails) and \
-                        Settings().value('api/thumbnails'):
+                if current_item.is_capable(ItemCapabilities.HasThumbnails) and Settings().value('api/thumbnails'):
                     # If the file is under our app directory tree send the portion after the match
                     data_path = str(AppLocation.get_data_path())
                     if frame['image'][0:len(data_path)] == data_path:

@@ -24,11 +24,11 @@ Package to test the openlp.core.__init__ package.
 """
 import os
 from unittest import TestCase
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core import OpenLP, parse_options
+from openlp.core import OpenLP
 from openlp.core.common import Settings
 
 from tests.helpers.testmixin import TestMixin
@@ -96,9 +96,9 @@ class TestInit(TestCase, TestMixin):
             'build': 'bzr000'
         }
         Settings().setValue('core/application version', '2.2.0')
-        with patch('openlp.core.get_application_version') as mocked_get_application_version,\
+        with patch('openlp.core.get_version') as mocked_get_version,\
                 patch('openlp.core.QtWidgets.QMessageBox.question') as mocked_question:
-            mocked_get_application_version.return_value = MOCKED_VERSION
+            mocked_get_version.return_value = MOCKED_VERSION
             mocked_question.return_value = QtWidgets.QMessageBox.No
 
             # WHEN: We check if a backup should be created
@@ -122,9 +122,9 @@ class TestInit(TestCase, TestMixin):
         Settings().setValue('core/application version', '2.0.5')
         self.openlp.splash = MagicMock()
         self.openlp.splash.isVisible.return_value = True
-        with patch('openlp.core.get_application_version') as mocked_get_application_version,\
+        with patch('openlp.core.get_version') as mocked_get_version, \
                 patch('openlp.core.QtWidgets.QMessageBox.question') as mocked_question:
-            mocked_get_application_version.return_value = MOCKED_VERSION
+            mocked_get_version.return_value = MOCKED_VERSION
             mocked_question.return_value = QtWidgets.QMessageBox.No
 
             # WHEN: We check if a backup should be created

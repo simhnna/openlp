@@ -26,12 +26,11 @@ The Media plugin
 import logging
 import os
 import re
-from pathlib import Path
-
 from PyQt5 import QtCore
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.common import AppLocation, translate, check_binary_exists
+from openlp.core.common.path import Path
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.media.endpoint import api_media_endpoint, media_endpoint
 from openlp.plugins.media.lib import MediaMediaItem, MediaTab
@@ -43,7 +42,8 @@ log = logging.getLogger(__name__)
 # Some settings starting with "media" are in core, because they are needed for core functionality.
 __default_settings__ = {
     'media/media auto start': QtCore.Qt.Unchecked,
-    'media/media files': []
+    'media/media files': [],
+    'media/last directory': None
 }
 
 
