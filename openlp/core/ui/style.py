@@ -77,16 +77,6 @@ QProgressBar{
 """
 
 
-def can_show_icon():
-    """
-    A global method to determine if an icon can be shown on a widget
-
-    .. note::
-        This method uses internal imports to prevent circular imports.
-    """
-    return not is_macosx() or Settings().value('advanced/use_dark_style')
-
-
 def get_application_stylesheet():
     """
     Return the correct application stylesheet based on the current style and operating system
