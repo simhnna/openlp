@@ -46,33 +46,13 @@ from openlp.core.ui.exceptionform import ExceptionForm
 from openlp.core.ui.firsttimeform import FirstTimeForm
 from openlp.core.ui.firsttimelanguageform import FirstTimeLanguageForm
 from openlp.core.ui.mainwindow import MainWindow
+from openlp.core.ui.style import get_application_stylesheet
+
 
 __all__ = ['OpenLP', 'main']
 
 
 log = logging.getLogger()
-
-WIN_REPAIR_STYLESHEET = """
-QMainWindow::separator
-{
-  border: none;
-}
-
-QDockWidget::title
-{
-  border: 1px solid palette(dark);
-  padding-left: 5px;
-  padding-top: 2px;
-  margin: 1px 0;
-}
-
-QToolBar
-{
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-"""
 
 
 class OpenLP(OpenLPMixin, QtWidgets.QApplication):
@@ -118,14 +98,7 @@ class OpenLP(OpenLPMixin, QtWidgets.QApplication):
                 QtCore.QCoreApplication.exit()
                 sys.exit()
         # Correct stylesheet bugs
-        application_stylesheet = ''
-        if not Settings().value('advanced/alternate rows'):
-            base_color = self.palette().color(QtGui.QPalette.Active, QtGui.QPalette.Base)
-            alternate_rows_repair_stylesheet = \
-                'QTableWidget, QListWidget, QTreeWidget {alternate-background-color: ' + base_color.name() + ';}\n'
-            application_stylesheet += alternate_rows_repair_stylesheet
-        if is_win():
-            application_stylesheet += WIN_REPAIR_STYLESHEET
+        application_stylesheet = get_application_stylesheet()
         if application_stylesheet:
             self.setStyleSheet(application_stylesheet)
         can_show_splash = Settings().value('core/show splash')
