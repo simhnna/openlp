@@ -281,7 +281,7 @@ class OpenLyrics(object):
         tags_element = None
         match = re.search('\{/?\w+\}', song.lyrics, re.UNICODE)
         if match:
-            # Named 'format_' - 'format' is built-in fuction in Python.
+            # Named 'format_' - 'format' is built-in function in Python.
             format_ = etree.SubElement(song_xml, 'format')
             tags_element = etree.SubElement(format_, 'tags')
             tags_element.set('application', 'OpenLP')
