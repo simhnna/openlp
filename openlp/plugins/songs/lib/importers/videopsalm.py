@@ -87,10 +87,7 @@ class VideoPsalmImport(SongImport):
             songs = songbook['Songs']
             self.import_wizard.progress_bar.setMaximum(len(songs))
             songbook_name = songbook['Text']
-            # TODO: This probably never worked!
-            # Originally: media_folder = os.path.normpath(os.path.join(os.path.dirname(song_file.name), '..', 'Audio'))
-            # song_file.name returned just the file name, so it had no directory to operate on.
-            media_folder = Path('..', 'Audio')
+            media_path = Path('..', 'Audio')
             for song in songs:
                 self.song_book_name = songbook_name
                 if 'Text' in song:
@@ -115,7 +112,7 @@ class VideoPsalmImport(SongImport):
                 if 'Theme' in song:
                     self.topics = song['Theme'].splitlines()
                 if 'AudioFile' in song:
-                    self.add_media_file(str(media_folder / song['AudioFile']))
+                    self.add_media_file(media_path / song['AudioFile'])
                 if 'Memo1' in song:
                     self.add_comment(song['Memo1'])
                 if 'Memo2' in song:

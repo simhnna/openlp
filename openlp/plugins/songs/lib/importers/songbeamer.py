@@ -29,6 +29,7 @@ import base64
 import math
 
 from openlp.core.common import Settings, is_win, is_macosx, get_file_encoding
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 
@@ -412,14 +413,15 @@ class SongBeamerImport(SongImport):
         """
         # The path is relative to SongBeamers Song folder
         if is_win():
-            user_doc_folder = os.path.expandvars('$DOCUMENTS')
+            user_doc_path = Path(os.path.expandvars('$DOCUMENTS'))
         elif is_macosx():
-            user_doc_folder = os.path.join(os.path.expanduser('~'), 'Documents')
+            user_doc_path = Path.home() / 'Documents'
         else:
             # SongBeamer only runs on mac and win...
             return
-        audio_file_path = os.path.normpath(os.path.join(user_doc_folder, 'SongBeamer', 'Songs', audio_file_path))
-        if os.path.isfile(audio_file_path):
+        audio_file_path = user_doc_path / 'SongBeamer' / 'Songs' / audio_file_path
+        if audio_file_path.is_file():
             self.add_media_file(audio_file_path)
         else:
-            log.debug('Could not import mediafile "%s" since it does not exists!' % audio_file_path)
+            log.debug('Could not import mediafile "{audio_file_path}" since it does not exists!'
+                      .format(audio_file_path=audio_file_path))

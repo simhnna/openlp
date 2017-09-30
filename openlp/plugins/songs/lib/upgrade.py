@@ -172,7 +172,6 @@ def upgrade_7(session, metadata):
     """
     Version 7 upgrade - Move file path from old db to JSON encoded path to new db. Upgrade added in 2.5 dev
     """
-    # TODO: Test
     log.debug('Starting upgrade_7 for file_path to JSON')
     old_table = Table('media_files', metadata, autoload=True)
     if 'file_path' not in [col.name for col in old_table.c.values()]:

@@ -270,12 +270,10 @@ class SongImport(QtCore.QObject):
             return
         self.authors.append((author, type))
 
-    def add_media_file(self, filename, weight=0):
+    def add_media_file(self, file_path, weight=0):
         """
         Add a media file to the list
         """
-        # TODO: File path
-        file_path = Path(filename)
         if file_path in [x[0] for x in self.media_files]:
             return
         self.media_files.append((file_path, weight))
