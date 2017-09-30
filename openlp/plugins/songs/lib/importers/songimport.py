@@ -22,13 +22,11 @@
 
 import logging
 import re
-import shutil
-import os
 
 from PyQt5 import QtCore
 
 from openlp.core.common import Registry, AppLocation, check_directory_exists, translate
-from openlp.core.common.path import Path
+from openlp.core.common.path import copyfile
 from openlp.core.ui.lib.wizard import WizardStrings
 from openlp.plugins.songs.lib import clean_song, VerseType
 from openlp.plugins.songs.lib.db import Song, Author, Topic, Book, MediaFile

@@ -152,7 +152,7 @@ class OpenOfficeImport(SongImport):
                     self.document.supportsService("com.sun.star.text.TextDocument"):
                 self.close_ooo_file()
             else:
-                self.import_wizard.increment_progress_bar('Processing file {file_path}'.format(file_path), 0)
+                self.import_wizard.increment_progress_bar('Processing file {file_path}'.format(file_path=file_path), 0)
         except AttributeError:
             log.exception("open_ooo_file failed: {url}".format(url=url))
         return
