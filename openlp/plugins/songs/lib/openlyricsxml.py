@@ -71,6 +71,7 @@ log = logging.getLogger(__name__)
 
 NAMESPACE = 'http://openlyrics.info/namespace/2009/song'
 NSMAP = '{{' + NAMESPACE + '}}{tag}'
+NEWPAGETAG = '<p style="page-break-after: always;"/>'
 
 
 class SongXML(object):
@@ -472,6 +473,7 @@ class OpenLyrics(object):
             text = text.replace('{{/{tag}}}'.format(tag=tag), '</tag>')
         # Replace \n with <br/>.
         text = text.replace('\n', '<br/>')
+        text = text.replace('[--}{--]', NEWPAGETAG)
         element = etree.XML('<lines>{text}</lines>'.format(text=text))
         verse_element.append(element)
         return element
@@ -633,6 +635,9 @@ class OpenLyrics(object):
             text += '\n'
             if element.tail:
                 text += element.tail
+            return text
+        elif newlines and element.tag == NSMAP.format(tag='p') and 'page-break-after' in str(element.attrib):
+            text += '[--}{--]'
             return text
         # Start formatting tag.
         if element.tag == NSMAP.format(tag='tag'):
