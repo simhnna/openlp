@@ -62,7 +62,7 @@ def songs_service(request):
 
     :param request: The http request object.
     """
-    service(request, 'songs', log)
+    return service(request, 'songs', log)
 
 
 @api_songs_endpoint.route('songs/search')
@@ -95,6 +95,6 @@ def songs_service_api(request):
     :param request: The http request object.
     """
     try:
-        search(request, 'songs', log)
+        return service(request, 'songs', log)
     except NotFound:
         return {'results': {'items': []}}

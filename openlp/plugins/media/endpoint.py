@@ -62,7 +62,7 @@ def media_service(request):
 
     :param request: The http request object.
     """
-    service(request, 'media', log)
+    return service(request, 'media', log)
 
 
 @api_media_endpoint.route('media/search')
@@ -95,6 +95,6 @@ def media_service_api(request):
     :param request: The http request object.
     """
     try:
-        search(request, 'media', log)
+        return search(request, 'media', log)
     except NotFound:
         return {'results': {'items': []}}

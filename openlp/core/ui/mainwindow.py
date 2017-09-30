@@ -51,30 +51,11 @@ from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+from openlp.core.ui.style import PROGRESSBAR_STYLE, get_library_stylesheet
 from openlp.core.version import get_version
 
 
 log = logging.getLogger(__name__)
-
-MEDIA_MANAGER_STYLE = """
-::tab#media_tool_box {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-        stop: 0 palette(button), stop: 1.0 palette(mid));
-    border: 0;
-    border-radius: 2px;
-    margin-top: 0;
-    margin-bottom: 0;
-    text-align: left;
-}
-/* This is here to make the tabs on KDE with the Breeze theme work */
-::tab:selected {}
-"""
-
-PROGRESSBAR_STYLE = """
-QProgressBar{
-    height: 10px;
-}
-"""
 
 
 class Ui_MainWindow(object):
@@ -155,7 +136,7 @@ class Ui_MainWindow(object):
         # Create the MediaManager
         self.media_manager_dock = OpenLPDockWidget(main_window, 'media_manager_dock',
                                                    ':/system/system_mediamanager.png')
-        self.media_manager_dock.setStyleSheet(MEDIA_MANAGER_STYLE)
+        self.media_manager_dock.setStyleSheet(get_library_stylesheet())
         # Create the media toolbox
         self.media_tool_box = QtWidgets.QToolBox(self.media_manager_dock)
         self.media_tool_box.setObjectName('media_tool_box')

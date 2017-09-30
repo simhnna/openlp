@@ -22,14 +22,12 @@
 
 import os
 import shutil
-
 from tempfile import mkdtemp
 from unittest import TestCase
 
-from openlp.plugins.remotes.deploy import deploy_zipfile
+from openlp.core.api.deploy import deploy_zipfile
 
-
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
+TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
 
 
 class TestRemoteDeploy(TestCase):
@@ -54,6 +52,7 @@ class TestRemoteDeploy(TestCase):
         Remote Deploy tests - test the dummy zip file is processed correctly
         """
         # GIVEN: A new downloaded zip file
+        aa = TEST_PATH
         zip_file = os.path.join(TEST_PATH, 'remotes', 'site.zip')
         app_root = os.path.join(self.app_root, 'site.zip')
         shutil.copyfile(zip_file, app_root)

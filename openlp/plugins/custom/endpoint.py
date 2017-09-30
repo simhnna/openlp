@@ -62,7 +62,7 @@ def custom_service(request):
 
     :param request: The http request object.
     """
-    service(request, 'custom', log)
+    return service(request, 'custom', log)
 
 
 @api_custom_endpoint.route('custom/search')
@@ -95,6 +95,6 @@ def custom_service_api(request):
     :param request: The http request object.
     """
     try:
-        search(request, 'custom', log)
+        return search(request, 'custom', log)
     except NotFound:
         return {'results': {'items': []}}
