@@ -80,8 +80,8 @@ class CCLIFileImport(SongImport):
                     if not self.do_import_txt_file(lines):
                         self.log_error(file_path)
                 else:
-                    self.log_error(file_path, translate('SongsPlugin.CCLIFileImport', 'The file does not have a valid '
-                                                                                     'extension.'))
+                    self.log_error(file_path, translate('SongsPlugin.CCLIFileImport',
+                                                        'The file does not have a valid extension.'))
                     log.info('Extension {name} is not valid'.format(name=file_path))
             if self.stop_import_flag:
                 return

@@ -304,7 +304,6 @@ class TestEasyWorshipSongImport(TestCase):
             mocked_manager = MagicMock()
             importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
             with patch.object(importer, 'log_error') as mocked_log_error:
-                #importer.log_error = MagicMock()
 
                 # WHEN: do_import is supplied with an import source (Songs.MB missing)
                 importer.import_source = 'Songs.DB'
@@ -368,7 +367,7 @@ class TestEasyWorshipSongImport(TestCase):
         # GIVEN: A mocked out SongImport class, a mocked out "manager"
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'), \
             patch('openlp.plugins.songs.lib.importers.easyworship.Path.is_file', return_value=True), \
-            patch('openlp.plugins.songs.lib.importers.easyworship.Path.stat', **{'return_value.st_size':0x800}), \
+            patch('openlp.plugins.songs.lib.importers.easyworship.Path.stat', **{'return_value.st_size': 0x800}), \
             patch('openlp.plugins.songs.lib.importers.easyworship.Path.open'), \
             patch('builtins.open'), patch('openlp.plugins.songs.lib.importers.easyworship.struct') as mocked_struct, \
             patch('openlp.plugins.songs.lib.importers.easyworship.retrieve_windows_encoding') as \

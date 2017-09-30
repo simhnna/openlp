@@ -99,7 +99,8 @@ class DreamBeamImport(SongImport):
                 if song_xml.tag != 'DreamSong':
                     self.log_error(
                         file_path,
-                        translate('SongsPlugin.DreamBeamImport', 'Invalid DreamBeam song file_path. Missing DreamSong tag.'))
+                        translate('SongsPlugin.DreamBeamImport',
+                                  'Invalid DreamBeam song file_path. Missing DreamSong tag.'))
                     continue
                 if hasattr(song_xml, 'Version'):
                     self.version = float(song_xml.Version.text)

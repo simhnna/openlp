@@ -130,4 +130,5 @@ class VideoPsalmImport(SongImport):
                 if not self.finish():
                     self.log_error('Could not import {title}'.format(title=self.title))
         except Exception as e:
-            self.log_error(self.import_source.name, translate('SongsPlugin.VideoPsalmImport', 'Error: {error}').format(error=e))
+            self.log_error(self.import_source.name,
+                           translate('SongsPlugin.VideoPsalmImport', 'Error: {error}').format(error=e))
