@@ -26,8 +26,9 @@ ProPresenter song files into the current installation database.
 
 import os
 
+from openlp.core.common.path import Path
+
 from tests.helpers.songfileimport import SongImportTestHelper
-from openlp.core.common import Registry
 
 TEST_PATH = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'powerpraisesongs'))
@@ -44,7 +45,7 @@ class TestPowerPraiseFileImport(SongImportTestHelper):
         """
         Test that loading a PowerPraise file works correctly
         """
-        self.file_import([os.path.join(TEST_PATH, 'Naher, mein Gott zu Dir.ppl')],
+        self.file_import([Path(TEST_PATH, 'Naher, mein Gott zu Dir.ppl')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Naher, mein Gott zu Dir.json')))
-        self.file_import([os.path.join(TEST_PATH, 'You are so faithful.ppl')],
+        self.file_import([Path(TEST_PATH, 'You are so faithful.ppl')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'You are so faithful.json')))

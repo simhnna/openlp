@@ -47,7 +47,7 @@ class EasySlidesImport(SongImport):
     def do_import(self):
         log.info('Importing EasySlides XML file {source}'.format(source=self.import_source))
         parser = etree.XMLParser(remove_blank_text=True, recover=True)
-        parsed_file = etree.parse(self.import_source, parser)
+        parsed_file = etree.parse(str(self.import_source), parser)
         xml = etree.tostring(parsed_file).decode()
         song_xml = objectify.fromstring(xml)
         self.import_wizard.progress_bar.setMaximum(len(song_xml.Item))

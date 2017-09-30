@@ -231,16 +231,15 @@ class OPSProImport(SongImport):
         xor_pattern_2k = (0xa1, 0xec, 0x7a, 0x9c, 0xe1, 0x28, 0x34, 0x8a, 0x73, 0x7b, 0xd2, 0xdf, 0x50)
         # Access97 XOR of the source
         xor_pattern_97 = (0x86, 0xfb, 0xec, 0x37, 0x5d, 0x44, 0x9c, 0xfa, 0xc6, 0x5e, 0x28, 0xe6, 0x13)
-        mdb = open(self.import_source, 'rb')
-        mdb.seek(0x14)
-        version = struct.unpack('B', mdb.read(1))[0]
-        # Get encrypted logo
-        mdb.seek(0x62)
-        EncrypFlag = struct.unpack('B', mdb.read(1))[0]
-        # Get encrypted password
-        mdb.seek(0x42)
-        encrypted_password = mdb.read(26)
-        mdb.close()
+        with self.import_source.open('rb') as mdb_file:
+            mdb_file.seek(0x14)
+            version = struct.unpack('B', mdb_file.read(1))[0]
+            # Get encrypted logo
+            mdb_file.seek(0x62)
+            EncrypFlag = struct.unpack('B', mdb_file.read(1))[0]
+            # Get encrypted password
+            mdb_file.seek(0x42)
+            encrypted_password = mdb_file.read(26)
         # "Decrypt" the password based on the version
         decrypted_password = ''
         if version < 0x01:

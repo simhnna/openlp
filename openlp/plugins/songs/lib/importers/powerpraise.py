@@ -23,8 +23,6 @@
 The :mod:`powerpraiseimport` module provides the functionality for importing
 Powerpraise song files into the current database.
 """
-
-import os
 from lxml import objectify
 
 from openlp.core.ui.lib.wizard import WizardStrings
@@ -41,10 +39,10 @@ class PowerPraiseImport(SongImport):
         for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            self.import_wizard.increment_progress_bar(
-                WizardStrings.ImportingType.format(source=os.path.basename(file_path)))
-            root = objectify.parse(open(file_path, 'rb')).getroot()
-            self.process_song(root)
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=file_path.name))
+            with file_path.open('rb') as xml_file:
+                root = objectify.parse(xml_file).getroot()
+                self.process_song(root)
 
     def process_song(self, root):
         self.set_defaults()

@@ -51,7 +51,7 @@ class TestMediaShoutImport(TestCase):
         """
         # GIVEN: A MediaShoutImport class
         # WHEN: It is created
-        importer = MediaShoutImport(MagicMock(), filename='mediashout.db')
+        importer = MediaShoutImport(MagicMock(), file_path='mediashout.db')
 
         # THEN: It should not be None
         self.assertIsNotNone(importer)
@@ -62,7 +62,7 @@ class TestMediaShoutImport(TestCase):
         Test that do_import exits early when unable to connect to the database
         """
         # GIVEN: A MediaShoutImport instance
-        importer = MediaShoutImport(MagicMock(), filename='mediashout.db')
+        importer = MediaShoutImport(MagicMock(), file_path='mediashout.db')
         mocked_pyodbc.connect.side_effect = Exception('Unable to connect')
 
         # WHEN: do_import is called
@@ -89,7 +89,7 @@ class TestMediaShoutImport(TestCase):
         group = GroupRecord('Hymns')
 
         # GIVEN: A MediaShoutImport instance and a bunch of stuff mocked out
-        importer = MediaShoutImport(MagicMock(), filename='mediashout.db')
+        importer = MediaShoutImport(MagicMock(), file_path='mediashout.db')
         mocked_cursor = MagicMock()
         mocked_cursor.fetchall.side_effect = [[song], [verse], [play_order], [theme], [group]]
         mocked_cursor.tables.fetchone.return_value = True
@@ -124,7 +124,7 @@ class TestMediaShoutImport(TestCase):
         song = SongRecord(1, 'Amazing Grace', 'William Wilberforce', 'Public Domain', 1, '654321', '')
 
         # GIVEN: A MediaShoutImport instance and a bunch of stuff mocked out
-        importer = MediaShoutImport(MagicMock(), filename='mediashout.db')
+        importer = MediaShoutImport(MagicMock(), file_path='mediashout.db')
         mocked_cursor = MagicMock()
         mocked_cursor.fetchall.return_value = [song]
         mocked_connection = MagicMock()
@@ -158,7 +158,7 @@ class TestMediaShoutImport(TestCase):
         play_order = PlayOrderRecord(0, 1, 1)
         theme = ThemeRecord('Grace')
         group = GroupRecord('Hymns')
-        importer = MediaShoutImport(MagicMock(), filename='mediashout.db')
+        importer = MediaShoutImport(MagicMock(), file_path='mediashout.db')
 
         # WHEN: A song is processed
         with patch.object(importer, 'set_defaults') as mocked_set_defaults, \
@@ -200,7 +200,7 @@ class TestMediaShoutImport(TestCase):
         play_order = PlayOrderRecord(0, 1, 1)
         theme = ThemeRecord('Grace')
         group = GroupRecord('Hymns')
-        importer = MediaShoutImport(MagicMock(), filename='mediashout.db')
+        importer = MediaShoutImport(MagicMock(), file_path='mediashout.db')
 
         # WHEN: A song is processed
         with patch.object(importer, 'set_defaults') as mocked_set_defaults, \

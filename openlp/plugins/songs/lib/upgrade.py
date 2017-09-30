@@ -23,16 +23,20 @@
 The :mod:`upgrade` module provides a way for the database and schema that is the
 backend for the Songs plugin
 """
+import json
 import logging
 
 from sqlalchemy import Table, Column, ForeignKey, types
 from sqlalchemy.sql.expression import func, false, null, text
 
+from openlp.core.common import AppLocation
 from openlp.core.common.db import drop_columns
-from openlp.core.lib.db import get_upgrade_op
+from openlp.core.common.json import OpenLPJsonEncoder
+from openlp.core.common.path import Path
+from openlp.core.lib.db import PathType, get_upgrade_op
 
 log = logging.getLogger(__name__)
-__version__ = 6
+__version__ = 7
 
 
 # TODO: When removing an upgrade path the ftw-data needs updating to the minimum supported version
@@ -162,3 +166,29 @@ def upgrade_6(session, metadata):
             op.drop_column('songs', 'song_number')
     # Finally, clean up our mess in people's databases
     op.execute('DELETE FROM songs_songbooks WHERE songbook_id = 0')
+
+
+def upgrade_7(session, metadata):
+    """
+    Version 7 upgrade - Move file path from old db to JSON encoded path to new db. Upgrade added in 2.5 dev
+    """
+    # TODO: Test
+    log.debug('Starting upgrade_7 for file_path to JSON')
+    old_table = Table('media_files', metadata, autoload=True)
+    if 'file_path' not in [col.name for col in old_table.c.values()]:
+        op = get_upgrade_op(session)
+        op.add_column('media_files', Column('file_path', PathType()))
+        conn = op.get_bind()
+        results = conn.execute('SELECT * FROM media_files')
+        data_path = AppLocation.get_data_path()
+        for row in results.fetchall():
+            file_path_json = json.dumps(Path(row.file_name), cls=OpenLPJsonEncoder, base_path=data_path)
+            sql = 'UPDATE media_files SET file_path = \'{file_path_json}\' WHERE id = {id}'.format(
+                file_path_json=file_path_json, id=row.id)
+            conn.execute(sql)
+        # Drop old columns
+        if metadata.bind.url.get_dialect().name == 'sqlite':
+            drop_columns(op, 'media_files', ['file_name', ])
+        else:
+            op.drop_constraint('media_files', 'foreignkey')
+            op.drop_column('media_files', 'filenames')

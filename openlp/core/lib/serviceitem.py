@@ -426,10 +426,10 @@ class ServiceItem(RegistryProperties):
             self.background_audio = []
             for filename in header['background_audio']:
                 # Give them real file paths.
-                filepath = filename
+                filepath = str(filename)
                 if path:
                     # Windows can handle both forward and backward slashes, so we use ntpath to get the basename
-                    filepath = os.path.join(path, ntpath.basename(filename))
+                    filepath = os.path.join(path, ntpath.basename(str(filename)))
                 self.background_audio.append(filepath)
         self.theme_overwritten = header.get('theme_overwritten', False)
         if self.service_item_type == ServiceItemType.Text:

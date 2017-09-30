@@ -25,6 +25,7 @@ Worship songs into the OpenLP database.
 """
 import os
 import logging
+from openlp.core.common.path import Path
 
 from openlp.core.common import translate
 from openlp.plugins.songs.lib.importers.songimport import SongImport
@@ -100,62 +101,60 @@ class WordsOfWorshipImport(SongImport):
         """
         if isinstance(self.import_source, list):
             self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-            for source in self.import_source:
+            for file_path in self.import_source:
                 if self.stop_import_flag:
                     return
                 self.set_defaults()
-                song_data = open(source, 'rb')
-                if song_data.read(19).decode() != 'WoW File\nSong Words':
-                    self.log_error(source,
-                                   translate('SongsPlugin.WordsofWorshipSongImport',
-                                             'Invalid Words of Worship song file. Missing "{text}" '
-                                             'header.').format(text='WoW File\\nSong Words'))
-                    continue
-                # Seek to byte which stores number of blocks in the song
-                song_data.seek(56)
-                no_of_blocks = ord(song_data.read(1))
-                song_data.seek(66)
-                if song_data.read(16).decode() != 'CSongDoc::CBlock':
-                    self.log_error(source,
-                                   translate('SongsPlugin.WordsofWorshipSongImport',
-                                             'Invalid Words of Worship song file. Missing "{text}" '
-                                             'string.').format(text='CSongDoc::CBlock'))
-                    continue
-                # Seek to the beginning of the first block
-                song_data.seek(82)
-                for block in range(no_of_blocks):
-                    skip_char_at_end = True
-                    self.lines_to_read = ord(song_data.read(4)[:1])
-                    block_text = ''
-                    while self.lines_to_read:
-                        self.line_text = str(song_data.read(ord(song_data.read(1))), 'cp1252')
-                        if skip_char_at_end:
-                            skip_char = ord(song_data.read(1))
-                            # Check if we really should skip a char. In some wsg files we shouldn't
-                            if skip_char != 0:
-                                song_data.seek(-1, os.SEEK_CUR)
-                                skip_char_at_end = False
-                        if block_text:
-                            block_text += '\n'
-                        block_text += self.line_text
-                        self.lines_to_read -= 1
-                    block_type = BLOCK_TYPES[ord(song_data.read(4)[:1])]
-                    # Blocks are separated by 2 bytes, skip them, but not if
-                    # this is the last block!
-                    if block + 1 < no_of_blocks:
-                        song_data.seek(2, os.SEEK_CUR)
-                    self.add_verse(block_text, block_type)
-                # Now to extract the author
-                author_length = ord(song_data.read(1))
-                if author_length:
-                    self.parse_author(str(song_data.read(author_length), 'cp1252'))
-                # Finally the copyright
-                copyright_length = ord(song_data.read(1))
-                if copyright_length:
-                    self.add_copyright(str(song_data.read(copyright_length), 'cp1252'))
-                file_name = os.path.split(source)[1]
-                # Get the song title
-                self.title = file_name.rpartition('.')[0]
-                song_data.close()
-                if not self.finish():
-                    self.log_error(source)
+                with file_path.open('rb') as song_data:
+                    if song_data.read(19).decode() != 'WoW File\nSong Words':
+                        self.log_error(file_path,
+                                       translate('SongsPlugin.WordsofWorshipSongImport',
+                                                 'Invalid Words of Worship song file. Missing "{text}" '
+                                                 'header.').format(text='WoW File\\nSong Words'))
+                        continue
+                    # Seek to byte which stores number of blocks in the song
+                    song_data.seek(56)
+                    no_of_blocks = ord(song_data.read(1))
+                    song_data.seek(66)
+                    if song_data.read(16).decode() != 'CSongDoc::CBlock':
+                        self.log_error(file_path,
+                                       translate('SongsPlugin.WordsofWorshipSongImport',
+                                                 'Invalid Words of Worship song file. Missing "{text}" '
+                                                 'string.').format(text='CSongDoc::CBlock'))
+                        continue
+                    # Seek to the beginning of the first block
+                    song_data.seek(82)
+                    for block in range(no_of_blocks):
+                        skip_char_at_end = True
+                        self.lines_to_read = ord(song_data.read(4)[:1])
+                        block_text = ''
+                        while self.lines_to_read:
+                            self.line_text = str(song_data.read(ord(song_data.read(1))), 'cp1252')
+                            if skip_char_at_end:
+                                skip_char = ord(song_data.read(1))
+                                # Check if we really should skip a char. In some wsg files we shouldn't
+                                if skip_char != 0:
+                                    song_data.seek(-1, os.SEEK_CUR)
+                                    skip_char_at_end = False
+                            if block_text:
+                                block_text += '\n'
+                            block_text += self.line_text
+                            self.lines_to_read -= 1
+                        block_type = BLOCK_TYPES[ord(song_data.read(4)[:1])]
+                        # Blocks are separated by 2 bytes, skip them, but not if
+                        # this is the last block!
+                        if block + 1 < no_of_blocks:
+                            song_data.seek(2, os.SEEK_CUR)
+                        self.add_verse(block_text, block_type)
+                    # Now to extract the author
+                    author_length = ord(song_data.read(1))
+                    if author_length:
+                        self.parse_author(str(song_data.read(author_length), 'cp1252'))
+                    # Finally the copyright
+                    copyright_length = ord(song_data.read(1))
+                    if copyright_length:
+                        self.add_copyright(str(song_data.read(copyright_length), 'cp1252'))
+                    # Get the song title
+                    self.title = file_path.stem
+                    if not self.finish():
+                        self.log_error(file_path)

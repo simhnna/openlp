@@ -22,14 +22,14 @@
 """
 This module contains tests for the OpenLyrics song importer.
 """
-import os
 import shutil
 from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.plugins.songs.lib.openlyricsexport import OpenLyricsExport
 from openlp.core.common import Registry
+from openlp.core.common.path import Path, rmtree
+from openlp.plugins.songs.lib.openlyricsexport import OpenLyricsExport
 
 from tests.helpers.testmixin import TestMixin
 
@@ -43,13 +43,13 @@ class TestOpenLyricsExport(TestCase, TestMixin):
         Create the registry
         """
         Registry.create()
-        self.temp_folder = mkdtemp()
+        self.temp_folder = Path(mkdtemp())
 
     def tearDown(self):
         """
         Cleanup
         """
-        shutil.rmtree(self.temp_folder)
+        rmtree(self.temp_folder)
 
     def test_export_same_filename(self):
         """
@@ -73,7 +73,9 @@ class TestOpenLyricsExport(TestCase, TestMixin):
             ol_export.do_export()
 
             # THEN: The exporter should have created 2 files
-            self.assertTrue(os.path.exists(os.path.join(self.temp_folder,
-                                                        '%s (%s).xml' % (song.title, author.display_name))))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_folder,
-                                                        '%s (%s)-1.xml' % (song.title, author.display_name))))
+            self.assertTrue((self.temp_folder /
+                             '{title} ({display_name}).xml'.format(
+                                 title=song.title, display_name=author.display_name)).exists())
+            self.assertTrue((self.temp_folder /
+                             '{title} ({display_name})-1.xml'.format(
+                                 title=song.title, display_name=author.display_name)).exists())

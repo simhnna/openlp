@@ -19,11 +19,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-import logging
-import os
 import chardet
 import codecs
+import logging
 
 from openlp.core.lib import translate
 from openlp.plugins.songs.lib import VerseType
@@ -48,7 +46,7 @@ class CCLIFileImport(SongImport):
         :param manager: The song manager for the running OpenLP installation.
         :param kwargs:  The files to be imported.
         """
-        super(CCLIFileImport, self).__init__(manager, **kwargs)
+        super().__init__(manager, **kwargs)
 
     def do_import(self):
         """
@@ -56,37 +54,35 @@ class CCLIFileImport(SongImport):
         """
         log.debug('Starting CCLI File Import')
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-        for filename in self.import_source:
-            filename = str(filename)
-            log.debug('Importing CCLI File: {name}'.format(name=filename))
-            if os.path.isfile(filename):
-                detect_file = open(filename, 'rb')
-                detect_content = detect_file.read(2048)
-                try:
-                    str(detect_content, 'utf-8')
-                    details = {'confidence': 1, 'encoding': 'utf-8'}
-                except UnicodeDecodeError:
-                    details = chardet.detect(detect_content)
-                detect_file.close()
-                infile = codecs.open(filename, 'r', details['encoding'])
-                if not infile.read(1) == '\ufeff':
+        for file_path in self.import_source:
+            log.debug('Importing CCLI File: {name}'.format(name=file_path))
+            if file_path.is_file():
+                with file_path.open('rb') as detect_file:
+                    detect_content = detect_file.read(2048)
+                    try:
+                        str(detect_content, 'utf-8')
+                        details = {'confidence': 1, 'encoding': 'utf-8'}
+                    except UnicodeDecodeError:
+                        details = chardet.detect(detect_content)
+                in_file = codecs.open(str(file_path), 'r', details['encoding'])
+                if not in_file.read(1) == '\ufeff':
                     # not UTF or no BOM was found
-                    infile.seek(0)
-                lines = infile.readlines()
-                infile.close()
-                ext = os.path.splitext(filename)[1]
-                if ext.lower() == '.usr' or ext.lower() == '.bin':
-                    log.info('SongSelect USR format file found: {name}'.format(name=filename))
+                    in_file.seek(0)
+                lines = in_file.readlines()
+                in_file.close()
+                ext = file_path.suffix.lower()
+                if ext == '.usr' or ext == '.bin':
+                    log.info('SongSelect USR format file found: {name}'.format(name=file_path))
                     if not self.do_import_usr_file(lines):
-                        self.log_error(filename)
-                elif ext.lower() == '.txt':
-                    log.info('SongSelect TEXT format file found: {name}'.format(name=filename))
+                        self.log_error(file_path)
+                elif ext == '.txt':
+                    log.info('SongSelect TEXT format file found: {name}'.format(name=file_path))
                     if not self.do_import_txt_file(lines):
-                        self.log_error(filename)
+                        self.log_error(file_path)
                 else:
-                    self.log_error(filename, translate('SongsPlugin.CCLIFileImport', 'The file does not have a valid '
+                    self.log_error(file_path, translate('SongsPlugin.CCLIFileImport', 'The file does not have a valid '
                                                                                      'extension.'))
-                    log.info('Extension {name} is not valid'.format(name=filename))
+                    log.info('Extension {name} is not valid'.format(name=file_path))
             if self.stop_import_flag:
                 return
 

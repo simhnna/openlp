@@ -21,8 +21,9 @@
 """
 This module contains tests for the EasySlides song importer.
 """
-
 import os
+
+from openlp.core.common.path import Path
 
 from tests.helpers.songfileimport import SongImportTestHelper
 
@@ -41,7 +42,7 @@ class TestEasySlidesFileImport(SongImportTestHelper):
         """
         Test that loading an EasySlides file works correctly on various files
         """
-        self.file_import(os.path.join(TEST_PATH, 'amazing-grace.xml'),
+        self.file_import(Path(TEST_PATH, 'amazing-grace.xml'),
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import(os.path.join(TEST_PATH, 'Export_2017-01-12_BB.xml'),
+        self.file_import(Path(TEST_PATH, 'Export_2017-01-12_BB.xml'),
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Export_2017-01-12_BB.json')))

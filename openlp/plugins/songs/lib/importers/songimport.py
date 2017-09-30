@@ -62,14 +62,14 @@ class SongImport(QtCore.QObject):
         """
         self.manager = manager
         QtCore.QObject.__init__(self)
-        if 'filename' in kwargs:
-            self.import_source = kwargs['filename']
-        elif 'filenames' in kwargs:
-            self.import_source = kwargs['filenames']
-        elif 'folder' in kwargs:
-            self.import_source = kwargs['folder']
+        if 'file_path' in kwargs:
+            self.import_source = kwargs['file_path']
+        elif 'file_paths' in kwargs:
+            self.import_source = kwargs['file_paths']
+        elif 'folder_path' in kwargs:
+            self.import_source = kwargs['folder_path']
         else:
-            raise KeyError('Keyword arguments "filename[s]" or "folder" not supplied.')
+            raise KeyError('Keyword arguments "file_path[s]" or "folder_path" not supplied.')
         log.debug(self.import_source)
         self.import_wizard = None
         self.song = None
@@ -274,9 +274,11 @@ class SongImport(QtCore.QObject):
         """
         Add a media file to the list
         """
-        if filename in [x[0] for x in self.media_files]:
+        # TODO: File path
+        file_path = Path(filename)
+        if file_path in [x[0] for x in self.media_files]:
             return
-        self.media_files.append((filename, weight))
+        self.media_files.append((file_path, weight))
 
     def add_verse(self, verse_text, verse_def='v', lang=None):
         """
@@ -403,29 +405,30 @@ class SongImport(QtCore.QObject):
         self.manager.save_object(song)
         # Now loop through the media files, copy them to the correct location,
         # and save the song again.
-        for filename, weight in self.media_files:
-            media_file = self.manager.get_object_filtered(MediaFile, MediaFile.file_name == filename)
+        for file_path, weight in self.media_files:
+            media_file = self.manager.get_object_filtered(MediaFile, MediaFile.file_path == file_path)
             if not media_file:
-                if os.path.dirname(filename):
-                    filename = self.copy_media_file(song.id, filename)
-                song.media_files.append(MediaFile.populate(file_name=filename, weight=weight))
+                if file_path.parent:
+                    file_path = self.copy_media_file(song.id, file_path)
+                song.media_files.append(MediaFile.populate(file_path=file_path, weight=weight))
         self.manager.save_object(song)
         self.set_defaults()
         return True
 
-    def copy_media_file(self, song_id, filename):
+    def copy_media_file(self, song_id, file_path):
         """
         This method copies the media file to the correct location and returns
         the new file location.
 
         :param song_id:
-        :param filename: The file to copy.
+        :param openlp.core.common.path.Path file_path: The file to copy.
+        :return: The new location of the file
+        :rtype: openlp.core.common.path.Path
         """
         if not hasattr(self, 'save_path'):
-            self.save_path = os.path.join(str(AppLocation.get_section_data_path(self.import_wizard.plugin.name)),
-                                          'audio', str(song_id))
-        check_directory_exists(Path(self.save_path))
-        if not filename.startswith(self.save_path):
-            old_file, filename = filename, os.path.join(self.save_path, os.path.split(filename)[1])
-            shutil.copyfile(old_file, filename)
-        return filename
+            self.save_path = AppLocation.get_section_data_path(self.import_wizard.plugin.name) / 'audio' / str(song_id)
+        check_directory_exists(self.save_path)
+        if self.save_path not in file_path.parents:
+            old_path, file_path = file_path, self.save_path / file_path.name
+            copyfile(old_path, file_path)
+        return file_path

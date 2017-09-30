@@ -31,6 +31,7 @@ from urllib.error import URLError
 from PyQt5 import QtWidgets
 
 from openlp.core import Registry
+from openlp.core.common.path import Path
 from openlp.plugins.songs.forms.songselectform import SongSelectForm, SearchWorker
 from openlp.plugins.songs.lib import Song
 from openlp.plugins.songs.lib.songselect import SongSelectImport, LOGIN_PAGE, LOGOUT_URL, BASE_URL
@@ -810,15 +811,15 @@ class TestSongSelectFileImport(SongImportTestHelper):
     def __init__(self, *args, **kwargs):
         self.importer_class_name = 'CCLIFileImport'
         self.importer_module_name = 'cclifile'
-        super(TestSongSelectFileImport, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def test_song_import(self):
         """
         Test that loading an OpenSong file works correctly on various files
         """
-        self.file_import([os.path.join(TEST_PATH, 'TestSong.bin')],
+        self.file_import([Path(TEST_PATH, 'TestSong.bin')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'TestSong-bin.json')))
-        self.file_import([os.path.join(TEST_PATH, 'TestSong.txt')],
+        self.file_import([Path(TEST_PATH, 'TestSong.txt')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'TestSong-txt.json')))
 
 

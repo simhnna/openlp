@@ -82,10 +82,8 @@ The XML of `Foilpresenter <http://foilpresenter.de/>`_  songs is of the format::
     </kategorien>
     </foilpresenterfolie>
 """
-
 import logging
 import re
-import os
 
 from lxml import etree, objectify
 
@@ -121,10 +119,9 @@ class FoilPresenterImport(SongImport):
         for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            self.import_wizard.increment_progress_bar(
-                WizardStrings.ImportingType.format(source=os.path.basename(file_path)))
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=file_path.name))
             try:
-                parsed_file = etree.parse(file_path, parser)
+                parsed_file = etree.parse(str(file_path), parser)
                 xml = etree.tostring(parsed_file).decode()
                 self.foil_presenter.xml_to_song(xml)
             except etree.XMLSyntaxError:

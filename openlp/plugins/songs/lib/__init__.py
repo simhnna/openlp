@@ -534,13 +534,13 @@ def delete_song(song_id, song_plugin):
     media_files = song_plugin.manager.get_all_objects(MediaFile, MediaFile.song_id == song_id)
     for media_file in media_files:
         try:
-            os.remove(media_file.file_name)
+            media_file.file_path.unlink()
         except OSError:
-            log.exception('Could not remove file: {name}'.format(name=media_file.file_name))
+            log.exception('Could not remove file: {name}'.format(name=media_file.file_path))
     try:
-        save_path = os.path.join(str(AppLocation.get_section_data_path(song_plugin.name)), 'audio', str(song_id))
-        if os.path.exists(save_path):
-            os.rmdir(save_path)
+        save_path = AppLocation.get_section_data_path(song_plugin.name) / 'audio' / str(song_id)
+        if save_path.exists():
+            save_path.rmdir()
     except OSError:
         log.exception('Could not remove directory: {path}'.format(path=save_path))
     song_plugin.manager.delete_object(Song, song_id)

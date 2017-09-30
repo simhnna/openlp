@@ -76,7 +76,7 @@ class ZionWorxImport(SongImport):
         Receive a CSV file (from a ZionWorx database dump) to import.
         """
         # Encoding should always be ISO-8859-1
-        with open(self.import_source, 'rt', encoding='ISO-8859-1') as songs_file:
+        with self.import_source.open('rt', encoding='ISO-8859-1') as songs_file:
             field_names = ['SongNum', 'Title1', 'Title2', 'Lyrics', 'Writer', 'Copyright', 'Keywords',
                            'DefaultStyle']
             songs_reader = csv.DictReader(songs_file, field_names)

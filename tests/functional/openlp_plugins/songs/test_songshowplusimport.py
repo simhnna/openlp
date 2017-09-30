@@ -26,6 +26,7 @@ import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songshowplus import SongShowPlusImport
 
@@ -46,13 +47,13 @@ class TestSongShowPlusFileImport(SongImportTestHelper):
         """
         Test that loading a SongShow Plus file works correctly on various files
         """
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace.sbsong')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace.sbsong')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([os.path.join(TEST_PATH, 'Beautiful Garden Of Prayer.sbsong')],
+        self.file_import([Path(TEST_PATH, 'Beautiful Garden Of Prayer.sbsong')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Beautiful Garden Of Prayer.json')))
-        self.file_import([os.path.join(TEST_PATH, 'a mighty fortress is our god.sbsong')],
+        self.file_import([Path(TEST_PATH, 'a mighty fortress is our god.sbsong')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'a mighty fortress is our god.json')))
-        self.file_import([os.path.join(TEST_PATH, 'cleanse-me.sbsong')],
+        self.file_import([Path(TEST_PATH, 'cleanse-me.sbsong')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'cleanse-me.json')))
 
 
@@ -69,7 +70,7 @@ class TestSongShowPlusImport(TestCase):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = SongShowPlusImport(mocked_manager, filenames=[])
+            importer = SongShowPlusImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
             self.assertIsNotNone(importer, 'Import should not be none')
@@ -82,7 +83,7 @@ class TestSongShowPlusImport(TestCase):
         with patch('openlp.plugins.songs.lib.importers.songshowplus.SongImport'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = SongShowPlusImport(mocked_manager, filenames=[])
+            importer = SongShowPlusImport(mocked_manager, file_paths=[])
             importer.import_wizard = mocked_import_wizard
             importer.stop_import_flag = True
 
@@ -103,7 +104,7 @@ class TestSongShowPlusImport(TestCase):
         with patch('openlp.plugins.songs.lib.importers.songshowplus.SongImport'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = SongShowPlusImport(mocked_manager, filenames=[])
+            importer = SongShowPlusImport(mocked_manager, file_paths=[])
             importer.import_wizard = mocked_import_wizard
             importer.stop_import_flag = True
 
@@ -123,7 +124,7 @@ class TestSongShowPlusImport(TestCase):
         # GIVEN: A mocked out SongImport class, and a mocked out "manager"
         with patch('openlp.plugins.songs.lib.importers.songshowplus.SongImport'):
             mocked_manager = MagicMock()
-            importer = SongShowPlusImport(mocked_manager, filenames=[])
+            importer = SongShowPlusImport(mocked_manager, file_paths=[])
 
             # WHEN: Supplied with the following arguments replicating verses being added
             test_values = [
@@ -151,7 +152,7 @@ class TestSongShowPlusImport(TestCase):
         # GIVEN: A mocked out SongImport class, and a mocked out "manager"
         with patch('openlp.plugins.songs.lib.importers.songshowplus.SongImport'):
             mocked_manager = MagicMock()
-            importer = SongShowPlusImport(mocked_manager, filenames=[])
+            importer = SongShowPlusImport(mocked_manager, file_paths=[])
 
             # WHEN: Supplied with the following arguments replicating a verse order being added
             test_values = [

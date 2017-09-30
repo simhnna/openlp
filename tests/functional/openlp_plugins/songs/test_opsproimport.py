@@ -86,7 +86,7 @@ class TestOpsProSongImport(TestCase):
         mocked_manager = MagicMock()
 
         # WHEN: An importer object is created
-        importer = OPSProImport(mocked_manager, filenames=[])
+        importer = OPSProImport(mocked_manager, file_paths=[])
 
         # THEN: The importer object should not be None
         self.assertIsNotNone(importer, 'Import should not be none')
@@ -98,7 +98,7 @@ class TestOpsProSongImport(TestCase):
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a mocked song and lyrics entry
         mocked_manager = MagicMock()
-        importer = OPSProImport(mocked_manager, filenames=[])
+        importer = OPSProImport(mocked_manager, file_paths=[])
         importer.finish = MagicMock()
         song, lyrics = _build_data('you are so faithfull.txt', False)
 
@@ -118,7 +118,7 @@ class TestOpsProSongImport(TestCase):
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a mocked song and lyrics entry
         mocked_manager = MagicMock()
-        importer = OPSProImport(mocked_manager, filenames=[])
+        importer = OPSProImport(mocked_manager, file_paths=[])
         importer.finish = MagicMock()
         song, lyrics = _build_data('amazing grace.txt', False)
 
@@ -138,7 +138,7 @@ class TestOpsProSongImport(TestCase):
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a mocked song and lyrics entry
         mocked_manager = MagicMock()
-        importer = OPSProImport(mocked_manager, filenames=[])
+        importer = OPSProImport(mocked_manager, file_paths=[])
         importer.finish = MagicMock()
         song, lyrics = _build_data('amazing grace2.txt', True)
 
@@ -158,7 +158,7 @@ class TestOpsProSongImport(TestCase):
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a mocked song and lyrics entry
         mocked_manager = MagicMock()
-        importer = OPSProImport(mocked_manager, filenames=[])
+        importer = OPSProImport(mocked_manager, file_paths=[])
         importer.finish = MagicMock()
         song, lyrics = _build_data('amazing grace3.txt', True)
 

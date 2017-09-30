@@ -78,27 +78,28 @@ class DreamBeamImport(SongImport):
 
     def do_import(self):
         """
-        Receive a single file or a list of files to import.
+        Receive a single file_path or a list of files to import.
         """
         if isinstance(self.import_source, list):
             self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-            for file in self.import_source:
+            for file_path in self.import_source:
                 if self.stop_import_flag:
                     return
                 self.set_defaults()
                 parser = etree.XMLParser(remove_blank_text=True)
                 try:
-                    parsed_file = etree.parse(open(file, 'r'), parser)
+                    with file_path.open('r') as xml_file:
+                        parsed_file = etree.parse(xml_file, parser)
                 except etree.XMLSyntaxError:
-                    log.exception('XML syntax error in file {name}'.format(name=file))
-                    self.log_error(file, SongStrings.XMLSyntaxError)
+                    log.exception('XML syntax error in file_path {name}'.format(name=file_path))
+                    self.log_error(file_path, SongStrings.XMLSyntaxError)
                     continue
                 xml = etree.tostring(parsed_file).decode()
                 song_xml = objectify.fromstring(xml)
                 if song_xml.tag != 'DreamSong':
                     self.log_error(
-                        file,
-                        translate('SongsPlugin.DreamBeamImport', 'Invalid DreamBeam song file. Missing DreamSong tag.'))
+                        file_path,
+                        translate('SongsPlugin.DreamBeamImport', 'Invalid DreamBeam song file_path. Missing DreamSong tag.'))
                     continue
                 if hasattr(song_xml, 'Version'):
                     self.version = float(song_xml.Version.text)
@@ -144,4 +145,4 @@ class DreamBeamImport(SongImport):
                     else:
                         self.parse_author(author_copyright)
                 if not self.finish():
-                    self.log_error(file)
+                    self.log_error(file_path)

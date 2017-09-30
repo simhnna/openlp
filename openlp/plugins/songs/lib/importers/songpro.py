@@ -25,6 +25,7 @@ songs into the OpenLP database.
 """
 import re
 
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib import strip_rtf
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 
@@ -72,7 +73,8 @@ class SongProImport(SongImport):
         Receive a single file or a list of files to import.
         """
         self.encoding = None
-        with open(self.import_source, 'rt', errors='ignore') as songs_file:
+        self.import_source = Path(self.import_source)
+        with self.import_source.open('rt', errors='ignore') as songs_file:
             self.import_wizard.progress_bar.setMaximum(0)
             tag = ''
             text = ''

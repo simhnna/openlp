@@ -22,7 +22,8 @@
 This module contains tests for the LyriX song importer.
 """
 import os
-from unittest.mock import patch
+
+from openlp.core.common.path import Path
 
 from tests.helpers.songfileimport import SongImportTestHelper
 
@@ -41,9 +42,9 @@ class TestLyrixFileImport(SongImportTestHelper):
         """
         Test that loading an LyriX file works correctly on various files
         """
-        self.file_import([os.path.join(TEST_PATH, 'A06.TXT')],
+        self.file_import([Path(TEST_PATH, 'A06.TXT')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([os.path.join(TEST_PATH, 'A002.TXT')],
+        self.file_import([Path(TEST_PATH, 'A002.TXT')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace2.json')))
-        self.file_import([os.path.join(TEST_PATH, 'AO05.TXT')],
+        self.file_import([Path(TEST_PATH, 'AO05.TXT')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'in die regterhand.json')))

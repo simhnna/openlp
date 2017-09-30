@@ -19,7 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import logging
 import re
 
@@ -116,12 +115,11 @@ class OpenSongImport(SongImport):
         if not isinstance(self.import_source, list):
             return
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-        for filename in self.import_source:
+        for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            song_file = open(filename, 'rb')
-            self.do_import_file(song_file)
-            song_file.close()
+            with file_path.open('rb') as song_file:
+                self.do_import_file(song_file)
 
     def do_import_file(self, file):
         """
