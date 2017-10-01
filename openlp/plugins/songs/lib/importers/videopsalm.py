@@ -22,13 +22,12 @@
 """
 The :mod:`lyrix` module provides the functionality for importing songs which are
 exproted from Lyrix."""
-
-import logging
 import json
-import os
+import logging
 import re
 
 from openlp.core.common import translate, Settings
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.db import AuthorType
 
@@ -50,11 +49,10 @@ class VideoPsalmImport(SongImport):
         """
         Process the VideoPsalm file - pass in a file-like object, not a file path.
         """
+        self.import_source = Path(self.import_source)
         self.set_defaults()
-        # Open SongBook file
-        song_file = open(self.import_source, 'rt', encoding='utf-8-sig')
         try:
-            file_content = song_file.read()
+            file_content = self.import_source.read_text(encoding='utf-8-sig')
             processed_content = ''
             inside_quotes = False
             # The VideoPsalm format is not valid json, it uses illegal line breaks and unquoted keys, this must be fixed
@@ -89,7 +87,7 @@ class VideoPsalmImport(SongImport):
             songs = songbook['Songs']
             self.import_wizard.progress_bar.setMaximum(len(songs))
             songbook_name = songbook['Text']
-            media_folder = os.path.normpath(os.path.join(os.path.dirname(song_file.name), '..', 'Audio'))
+            media_path = Path('..', 'Audio')
             for song in songs:
                 self.song_book_name = songbook_name
                 if 'Text' in song:
@@ -114,7 +112,7 @@ class VideoPsalmImport(SongImport):
                 if 'Theme' in song:
                     self.topics = song['Theme'].splitlines()
                 if 'AudioFile' in song:
-                    self.add_media_file(os.path.join(media_folder, song['AudioFile']))
+                    self.add_media_file(media_path / song['AudioFile'])
                 if 'Memo1' in song:
                     self.add_comment(song['Memo1'])
                 if 'Memo2' in song:
@@ -132,4 +130,5 @@ class VideoPsalmImport(SongImport):
                 if not self.finish():
                     self.log_error('Could not import {title}'.format(title=self.title))
         except Exception as e:
-            self.log_error(song_file.name, translate('SongsPlugin.VideoPsalmImport', 'Error: {error}').format(error=e))
+            self.log_error(self.import_source.name,
+                           translate('SongsPlugin.VideoPsalmImport', 'Error: {error}').format(error=e))

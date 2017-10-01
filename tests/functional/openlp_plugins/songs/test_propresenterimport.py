@@ -23,8 +23,9 @@
 The :mod:`propresenterimport` module provides the functionality for importing
 ProPresenter song files into the current installation database.
 """
-
 import os
+
+from openlp.core.common.path import Path
 
 from tests.helpers.songfileimport import SongImportTestHelper
 
@@ -43,19 +44,19 @@ class TestProPresenterFileImport(SongImportTestHelper):
         """
         Test that loading a ProPresenter 4 file works correctly
         """
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace.pro4')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace.pro4')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
 
     def test_pro5_song_import(self):
         """
         Test that loading a ProPresenter 5 file works correctly
         """
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace.pro5')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace.pro5')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
 
     def test_pro6_song_import(self):
         """
         Test that loading a ProPresenter 6 file works correctly
         """
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace.pro6')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace.pro6')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))

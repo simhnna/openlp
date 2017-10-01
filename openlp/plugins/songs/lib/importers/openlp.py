@@ -266,7 +266,7 @@ class OpenLPSongImport(SongImport):
             if has_media_files and song.media_files:
                 for media_file in song.media_files:
                     existing_media_file = self.manager.get_object_filtered(
-                        MediaFile, MediaFile.file_name == media_file.file_name)
+                        MediaFile, MediaFile.file_path == media_file.file_path)
                     if existing_media_file:
                         new_song.media_files.append(existing_media_file)
                     else:

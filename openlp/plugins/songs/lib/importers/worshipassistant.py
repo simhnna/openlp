@@ -28,7 +28,7 @@ import csv
 import logging
 import re
 
-from openlp.core.common import translate
+from openlp.core.common import get_file_encoding, translate
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 
@@ -81,19 +81,16 @@ class WorshipAssistantImport(SongImport):
         Receive a CSV file to import.
         """
         # Get encoding
-        detect_file = open(self.import_source, 'rb')
-        detect_content = detect_file.read()
-        details = chardet.detect(detect_content)
-        detect_file.close()
-        songs_file = open(self.import_source, 'r', encoding=details['encoding'])
-        songs_reader = csv.DictReader(songs_file, escapechar='\\')
-        try:
-            records = list(songs_reader)
-        except csv.Error as e:
-            self.log_error(translate('SongsPlugin.WorshipAssistantImport', 'Error reading CSV file.'),
-                           translate('SongsPlugin.WorshipAssistantImport',
-                                     'Line {number:d}: {error}').format(number=songs_reader.line_num, error=e))
-            return
+        encoding = get_file_encoding(self.import_source)['encoding']
+        with self.import_source.open('r', encoding=encoding) as songs_file:
+            songs_reader = csv.DictReader(songs_file, escapechar='\\')
+            try:
+                records = list(songs_reader)
+            except csv.Error as e:
+                self.log_error(translate('SongsPlugin.WorshipAssistantImport', 'Error reading CSV file.'),
+                               translate('SongsPlugin.WorshipAssistantImport',
+                                         'Line {number:d}: {error}').format(number=songs_reader.line_num, error=e))
+                return
         num_records = len(records)
         log.info('{count} records found in CSV file'.format(count=num_records))
         self.import_wizard.progress_bar.setMaximum(num_records)
@@ -185,4 +182,3 @@ class WorshipAssistantImport(SongImport):
                 self.log_error(translate('SongsPlugin.WorshipAssistantImport',
                                          'Record {count:d}').format(count=index) +
                                (': "' + self.title + '"' if self.title else ''))
-            songs_file.close()

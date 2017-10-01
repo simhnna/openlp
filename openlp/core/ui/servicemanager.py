@@ -561,7 +561,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 service_item = item['service_item'].get_service_repr(self._save_lite)
                 if service_item['header']['background_audio']:
                     for i, file_name in enumerate(service_item['header']['background_audio']):
-                        new_file = os.path.join('audio', item['service_item'].unique_identifier, file_name)
+                        new_file = os.path.join('audio', item['service_item'].unique_identifier, str(file_name))
                         audio_files.append((file_name, new_file))
                         service_item['header']['background_audio'][i] = new_file
                 # Add the service item to the service.
@@ -586,6 +586,8 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
             for write_from in write_list:
                 zip_file.write(write_from, write_from)
             for audio_from, audio_to in audio_files:
+                audio_from = str(audio_from)
+                audio_to = str(audio_to)
                 if audio_from.startswith('audio'):
                     # When items are saved, they get new unique_identifier. Let's copy the file to the new location.
                     # Unused files can be ignored, OpenLP automatically cleans up the service manager dir on exit.

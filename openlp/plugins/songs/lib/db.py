@@ -23,14 +23,15 @@
 The :mod:`db` module provides the database and schema that is the backend for
 the Songs plugin
 """
-
+from contextlib import suppress
 from sqlalchemy import Column, ForeignKey, Table, types
 from sqlalchemy.orm import mapper, relation, reconstructor
 from sqlalchemy.sql.expression import func, text
 
-from openlp.core.lib.db import BaseModel, init_db
+from openlp.core.common.applocation import AppLocation
 from openlp.core.common.languagemanager import get_natural_key
 from openlp.core.lib import translate
+from openlp.core.lib.db import BaseModel, PathType, init_db
 
 
 class Author(BaseModel):
@@ -238,7 +239,7 @@ def init_schema(url):
 
     **media_files Table**
         * id
-        * file_name
+        * _file_path
         * type
 
     **song_books Table**
@@ -305,7 +306,7 @@ def init_schema(url):
         'media_files', metadata,
         Column('id', types.Integer(), primary_key=True),
         Column('song_id', types.Integer(), ForeignKey('songs.id'), default=None),
-        Column('file_name', types.Unicode(255), nullable=False),
+        Column('file_path', PathType, nullable=False),
         Column('type', types.Unicode(64), nullable=False, default='audio'),
         Column('weight', types.Integer(), default=0)
     )

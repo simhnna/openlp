@@ -112,7 +112,7 @@ class SongBeamerImport(SongImport):
         if not isinstance(self.import_source, list):
             return
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-        for import_file in self.import_source:
+        for file_path in self.import_source:
             # TODO: check that it is a valid SongBeamer file
             if self.stop_import_flag:
                 return
@@ -120,20 +120,19 @@ class SongBeamerImport(SongImport):
             self.current_verse = ''
             self.current_verse_type = VerseType.tags[VerseType.Verse]
             self.chord_table = None
-            file_name = os.path.split(import_file)[1]
-            if os.path.isfile(import_file):
+            if file_path.is_file():
                 # Detect the encoding
-                self.input_file_encoding = get_file_encoding(Path(import_file))['encoding']
+                self.input_file_encoding = get_file_encoding(file_path)['encoding']
                 # The encoding should only be ANSI (cp1252), UTF-8, Unicode, Big-Endian-Unicode.
                 # So if it doesn't start with 'u' we default to cp1252. See:
                 # https://forum.songbeamer.com/viewtopic.php?p=419&sid=ca4814924e37c11e4438b7272a98b6f2
                 if not self.input_file_encoding.lower().startswith('u'):
                     self.input_file_encoding = 'cp1252'
-                infile = open(import_file, 'rt', encoding=self.input_file_encoding)
-                song_data = infile.readlines()
+                with file_path.open(encoding=self.input_file_encoding) as song_file:
+                    song_data = song_file.readlines()
             else:
                 continue
-            self.title = file_name.split('.sng')[0]
+            self.title = file_path.stem
             read_verses = False
             # The first verse separator doesn't count, but the others does, so line count starts at -1
             line_number = -1
@@ -185,7 +184,7 @@ class SongBeamerImport(SongImport):
                                 # inserted by songbeamer, but are manually added headings. So restart the loop, and
                                 # count tags as lines.
                                 self.set_defaults()
-                                self.title = file_name.split('.sng')[0]
+                                self.title = file_path.stem
                                 verse_tags_mode = VerseTagMode.ContainsNoTagsRestart
                                 read_verses = False
                                 # The first verseseparator doesn't count, but the others does, so linecount starts at -1
@@ -207,7 +206,7 @@ class SongBeamerImport(SongImport):
                 self.replace_html_tags()
                 self.add_verse(self.current_verse, self.current_verse_type)
             if not self.finish():
-                self.log_error(import_file)
+                self.log_error(file_path)
 
     def insert_chords(self, line_number, line):
         """
@@ -414,14 +413,15 @@ class SongBeamerImport(SongImport):
         """
         # The path is relative to SongBeamers Song folder
         if is_win():
-            user_doc_folder = os.path.expandvars('$DOCUMENTS')
+            user_doc_path = Path(os.path.expandvars('$DOCUMENTS'))
         elif is_macosx():
-            user_doc_folder = os.path.join(os.path.expanduser('~'), 'Documents')
+            user_doc_path = Path.home() / 'Documents'
         else:
             # SongBeamer only runs on mac and win...
             return
-        audio_file_path = os.path.normpath(os.path.join(user_doc_folder, 'SongBeamer', 'Songs', audio_file_path))
-        if os.path.isfile(audio_file_path):
+        audio_file_path = user_doc_path / 'SongBeamer' / 'Songs' / audio_file_path
+        if audio_file_path.is_file():
             self.add_media_file(audio_file_path)
         else:
-            log.debug('Could not import mediafile "%s" since it does not exists!' % audio_file_path)
+            log.debug('Could not import mediafile "{audio_file_path}" since it does not exists!'
+                      .format(audio_file_path=audio_file_path))

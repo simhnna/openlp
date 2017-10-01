@@ -129,36 +129,21 @@ class ApiTab(SettingsTab):
         self.master_version_value.setObjectName('master_version_value')
         self.update_site_layout.addRow(self.master_version_label, self.master_version_value)
         self.left_layout.addWidget(self.update_site_group_box)
-        self.android_app_group_box = QtWidgets.QGroupBox(self.right_column)
-        self.android_app_group_box.setObjectName('android_app_group_box')
-        self.right_layout.addWidget(self.android_app_group_box)
-        self.android_qr_layout = QtWidgets.QVBoxLayout(self.android_app_group_box)
-        self.android_qr_layout.setObjectName('android_qr_layout')
-        self.android_qr_code_label = QtWidgets.QLabel(self.android_app_group_box)
-        self.android_qr_code_label.setPixmap(QtGui.QPixmap(':/remotes/android_app_qr.png'))
-        self.android_qr_code_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.android_qr_code_label.setObjectName('android_qr_code_label')
-        self.android_qr_layout.addWidget(self.android_qr_code_label)
-        self.android_qr_description_label = QtWidgets.QLabel(self.android_app_group_box)
-        self.android_qr_description_label.setObjectName('android_qr_description_label')
-        self.android_qr_description_label.setOpenExternalLinks(True)
-        self.android_qr_description_label.setWordWrap(True)
-        self.android_qr_layout.addWidget(self.android_qr_description_label)
-        self.ios_app_group_box = QtWidgets.QGroupBox(self.right_column)
-        self.ios_app_group_box.setObjectName('ios_app_group_box')
-        self.right_layout.addWidget(self.ios_app_group_box)
-        self.ios_qr_layout = QtWidgets.QVBoxLayout(self.ios_app_group_box)
-        self.ios_qr_layout.setObjectName('ios_qr_layout')
-        self.ios_qr_code_label = QtWidgets.QLabel(self.ios_app_group_box)
-        self.ios_qr_code_label.setPixmap(QtGui.QPixmap(':/remotes/ios_app_qr.png'))
-        self.ios_qr_code_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.ios_qr_code_label.setObjectName('ios_qr_code_label')
-        self.ios_qr_layout.addWidget(self.ios_qr_code_label)
-        self.ios_qr_description_label = QtWidgets.QLabel(self.ios_app_group_box)
-        self.ios_qr_description_label.setObjectName('ios_qr_description_label')
-        self.ios_qr_description_label.setOpenExternalLinks(True)
-        self.ios_qr_description_label.setWordWrap(True)
-        self.ios_qr_layout.addWidget(self.ios_qr_description_label)
+        self.app_group_box = QtWidgets.QGroupBox(self.right_column)
+        self.app_group_box.setObjectName('app_group_box')
+        self.right_layout.addWidget(self.app_group_box)
+        self.app_qr_layout = QtWidgets.QVBoxLayout(self.app_group_box)
+        self.app_qr_layout.setObjectName('app_qr_layout')
+        self.app_qr_code_label = QtWidgets.QLabel(self.app_group_box)
+        self.app_qr_code_label.setPixmap(QtGui.QPixmap(':/remotes/app_qr.svg'))
+        self.app_qr_code_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.app_qr_code_label.setObjectName('app_qr_code_label')
+        self.app_qr_layout.addWidget(self.app_qr_code_label)
+        self.app_qr_description_label = QtWidgets.QLabel(self.app_group_box)
+        self.app_qr_description_label.setObjectName('app_qr_description_label')
+        self.app_qr_description_label.setOpenExternalLinks(True)
+        self.app_qr_description_label.setWordWrap(True)
+        self.app_qr_layout.addWidget(self.app_qr_description_label)
         self.left_layout.addStretch()
         self.right_layout.addStretch()
         self.twelve_hour_check_box.stateChanged.connect(self.on_twelve_hour_check_box_changed)
@@ -195,16 +180,11 @@ class ApiTab(SettingsTab):
         self.twelve_hour_check_box.setText(translate('RemotePlugin.RemoteTab', 'Display stage time in 12h format'))
         self.thumbnails_check_box.setText(translate('RemotePlugin.RemoteTab',
                                                     'Show thumbnails of non-text slides in remote and stage view.'))
-        self.android_app_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Android App'))
-        self.android_qr_description_label.setText(
+        self.app_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Remote App'))
+        self.app_qr_description_label.setText(
             translate('RemotePlugin.RemoteTab',
-                      'Scan the QR code or click <a href="{qr}">download</a> to install the Android app from Google '
-                      'Play.').format(qr='https://play.google.com/store/apps/details?id=org.openlp.android2'))
-        self.ios_app_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'iOS App'))
-        self.ios_qr_description_label.setText(
-            translate('RemotePlugin.RemoteTab',
-                      'Scan the QR code or click <a href="{qr}">download</a> to install the iOS app from the App '
-                      'Store.').format(qr='https://itunes.apple.com/app/id1096218725'))
+                      'Scan the QR code or click <a href="{qr}">download</a> to download an app for your mobile device'
+                      ).format(qr='https://openlp.org/#mobile-app-downloads'))
         self.user_login_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'User Authentication'))
         self.aa = UiStrings()
         self.update_site_group_box.setTitle(UiStrings().WebDownloadText)
@@ -222,6 +202,8 @@ class ApiTab(SettingsTab):
         self.remote_url.setText('<a href="{url}">{url}</a>'.format(url=http_url))
         http_url_temp = http_url + 'stage'
         self.stage_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
+        http_url_temp = http_url + 'chords'
+        self.chords_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
         http_url_temp = http_url + 'main'
         self.live_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
 

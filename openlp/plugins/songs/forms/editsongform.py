@@ -23,27 +23,25 @@
 The :mod:`~openlp.plugins.songs.forms.editsongform` module contains the form
 used to edit songs.
 """
-
 import logging
-import re
 import os
-import shutil
+import re
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, AppLocation, UiStrings, check_directory_exists, translate
-from openlp.core.common.path import Path, path_to_str
+from openlp.core.common.languagemanager import get_natural_key
+from openlp.core.common.path import copyfile
 from openlp.core.lib import PluginStatus, MediaType, create_separated_list
 from openlp.core.lib.ui import set_case_insensitive_completer, critical_error_message_box, find_and_set_in_combo_box
 from openlp.core.ui.lib.filedialog import FileDialog
-from openlp.core.common.languagemanager import get_natural_key
-from openlp.plugins.songs.lib import VerseType, clean_song
-from openlp.plugins.songs.lib.db import Book, Song, Author, AuthorType, Topic, MediaFile, SongBookEntry
-from openlp.plugins.songs.lib.ui import SongStrings
-from openlp.plugins.songs.lib.openlyricsxml import SongXML
 from openlp.plugins.songs.forms.editsongdialog import Ui_EditSongDialog
 from openlp.plugins.songs.forms.editverseform import EditVerseForm
 from openlp.plugins.songs.forms.mediafilesform import MediaFilesForm
+from openlp.plugins.songs.lib import VerseType, clean_song
+from openlp.plugins.songs.lib.db import Book, Song, Author, AuthorType, Topic, MediaFile, SongBookEntry
+from openlp.plugins.songs.lib.openlyricsxml import SongXML
+from openlp.plugins.songs.lib.ui import SongStrings
 
 log = logging.getLogger(__name__)
 
@@ -545,9 +543,9 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                                             songbook_entry.entry)
         self.audio_list_widget.clear()
         for media in self.song.media_files:
-            media_file = QtWidgets.QListWidgetItem(os.path.split(media.file_name)[1])
-            media_file.setData(QtCore.Qt.UserRole, media.file_name)
-            self.audio_list_widget.addItem(media_file)
+            item = QtWidgets.QListWidgetItem(media.file_path.name)
+            item.setData(QtCore.Qt.UserRole, media.file_path)
+            self.audio_list_widget.addItem(item)
         self.title_edit.setFocus()
         # Hide or show the preview button.
         self.preview_button.setVisible(preview)
@@ -927,12 +925,11 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         Loads file(s) from the filesystem.
         """
         filters = '{text} (*)'.format(text=UiStrings().AllFiles)
-        file_paths, selected_filter = FileDialog.getOpenFileNames(
-            self, translate('SongsPlugin.EditSongForm', 'Open File(s)'), Path(), filters)
+        file_paths, filter_used = FileDialog.getOpenFileNames(
+            parent=self, caption=translate('SongsPlugin.EditSongForm', 'Open File(s)'), filter=filters)
         for file_path in file_paths:
-            filename = path_to_str(file_path)
-            item = QtWidgets.QListWidgetItem(os.path.split(str(filename))[1])
-            item.setData(QtCore.Qt.UserRole, filename)
+            item = QtWidgets.QListWidgetItem(file_path.name)
+            item.setData(QtCore.Qt.UserRole, file_path)
             self.audio_list_widget.addItem(item)
 
     def on_audio_add_from_media_button_clicked(self):
@@ -940,9 +937,9 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         Loads file(s) from the media plugin.
         """
         if self.media_form.exec():
-            for filename in self.media_form.get_selected_files():
-                item = QtWidgets.QListWidgetItem(os.path.split(str(filename))[1])
-                item.setData(QtCore.Qt.UserRole, filename)
+            for file_path in self.media_form.get_selected_files():
+                item = QtWidgets.QListWidgetItem(file_path.name)
+                item.setData(QtCore.Qt.UserRole, file_path)
                 self.audio_list_widget.addItem(item)
 
     def on_audio_remove_button_clicked(self):
@@ -1066,34 +1063,33 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         # Save the song here because we need a valid id for the audio files.
         clean_song(self.manager, self.song)
         self.manager.save_object(self.song)
-        audio_files = [a.file_name for a in self.song.media_files]
-        log.debug(audio_files)
-        save_path = os.path.join(str(AppLocation.get_section_data_path(self.media_item.plugin.name)), 'audio',
-                                 str(self.song.id))
-        check_directory_exists(Path(save_path))
+        audio_paths = [a.file_path for a in self.song.media_files]
+        log.debug(audio_paths)
+        save_path = AppLocation.get_section_data_path(self.media_item.plugin.name) / 'audio' / str(self.song.id)
+        check_directory_exists(save_path)
         self.song.media_files = []
-        files = []
+        file_paths = []
         for row in range(self.audio_list_widget.count()):
             item = self.audio_list_widget.item(row)
-            filename = item.data(QtCore.Qt.UserRole)
-            if not filename.startswith(save_path):
-                old_file, filename = filename, os.path.join(save_path, os.path.split(filename)[1])
-                shutil.copyfile(old_file, filename)
-            files.append(filename)
+            file_path = item.data(QtCore.Qt.UserRole)
+            if save_path not in file_path.parents:
+                old_file_path, file_path = file_path, save_path / file_path.name
+                copyfile(old_file_path, file_path)
+            file_paths.append(file_path)
             media_file = MediaFile()
-            media_file.file_name = filename
+            media_file.file_path = file_path
             media_file.type = 'audio'
             media_file.weight = row
             self.song.media_files.append(media_file)
-        for audio in audio_files:
-            if audio not in files:
+        for audio_path in audio_paths:
+            if audio_path not in file_paths:
                 try:
-                    os.remove(audio)
+                    audio_path.unlink()
                 except:
-                    log.exception('Could not remove file: {audio}'.format(audio=audio))
-        if not files:
+                    log.exception('Could not remove file: {audio}'.format(audio=audio_path))
+        if not file_paths:
             try:
-                os.rmdir(save_path)
+                save_path.rmdir()
             except OSError:
                 log.exception('Could not remove directory: {path}'.format(path=save_path))
         clean_song(self.manager, self.song)

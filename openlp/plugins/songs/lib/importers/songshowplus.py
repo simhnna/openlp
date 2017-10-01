@@ -23,7 +23,6 @@
 The :mod:`songshowplus` module provides the functionality for importing SongShow Plus songs into the OpenLP
 database.
 """
-import os
 import logging
 import re
 import struct
@@ -93,97 +92,95 @@ class SongShowPlusImport(SongImport):
         if not isinstance(self.import_source, list):
             return
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-        for file in self.import_source:
+        for file_path in self.import_source:
             if self.stop_import_flag:
                 return
             self.ssp_verse_order_list = []
             self.other_count = 0
             self.other_list = {}
-            file_name = os.path.split(file)[1]
-            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=file_name), 0)
-            song_data = open(file, 'rb')
-            while True:
-                block_key, = struct.unpack("I", song_data.read(4))
-                log.debug('block_key: %d' % block_key)
-                # The file ends with 4 NULL's
-                if block_key == 0:
-                    break
-                next_block_starts, = struct.unpack("I", song_data.read(4))
-                next_block_starts += song_data.tell()
-                if block_key in (VERSE, CHORUS, BRIDGE):
-                    null, verse_no, = struct.unpack("BB", song_data.read(2))
-                elif block_key == CUSTOM_VERSE:
-                    null, verse_name_length, = struct.unpack("BB", song_data.read(2))
-                    verse_name = self.decode(song_data.read(verse_name_length))
-                length_descriptor_size, = struct.unpack("B", song_data.read(1))
-                log.debug('length_descriptor_size: %d' % length_descriptor_size)
-                # In the case of song_numbers the number is in the data from the
-                # current position to the next block starts
-                if block_key == SONG_NUMBER:
-                    sn_bytes = song_data.read(length_descriptor_size - 1)
-                    self.song_number = int.from_bytes(sn_bytes, byteorder='little')
-                    continue
-                # Detect if/how long the length descriptor is
-                if length_descriptor_size == 12 or length_descriptor_size == 20:
-                    length_descriptor, = struct.unpack("I", song_data.read(4))
-                elif length_descriptor_size == 2:
-                    length_descriptor = 1
-                elif length_descriptor_size == 9:
-                    length_descriptor = 0
-                else:
-                    length_descriptor, = struct.unpack("B", song_data.read(1))
-                log.debug('length_descriptor: %d' % length_descriptor)
-                data = song_data.read(length_descriptor)
-                log.debug(data)
-                if block_key == TITLE:
-                    self.title = self.decode(data)
-                elif block_key == AUTHOR:
-                    authors = self.decode(data).split(" / ")
-                    for author in authors:
-                        if author.find(",") != -1:
-                            author_parts = author.split(", ")
-                            author = author_parts[1] + " " + author_parts[0]
-                        self.parse_author(author)
-                elif block_key == COPYRIGHT:
-                    self.add_copyright(self.decode(data))
-                elif block_key == CCLI_NO:
-                    # Try to get the CCLI number even if the field contains additional text
-                    match = re.search(r'\d+', self.decode(data))
-                    if match:
-                        self.ccli_number = int(match.group())
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=file_path.name), 0)
+            with file_path.open('rb') as song_file:
+                while True:
+                    block_key, = struct.unpack("I", song_file.read(4))
+                    log.debug('block_key: %d' % block_key)
+                    # The file ends with 4 NULL's
+                    if block_key == 0:
+                        break
+                    next_block_starts, = struct.unpack("I", song_file.read(4))
+                    next_block_starts += song_file.tell()
+                    if block_key in (VERSE, CHORUS, BRIDGE):
+                        null, verse_no, = struct.unpack("BB", song_file.read(2))
+                    elif block_key == CUSTOM_VERSE:
+                        null, verse_name_length, = struct.unpack("BB", song_file.read(2))
+                        verse_name = self.decode(song_file.read(verse_name_length))
+                    length_descriptor_size, = struct.unpack("B", song_file.read(1))
+                    log.debug('length_descriptor_size: %d' % length_descriptor_size)
+                    # In the case of song_numbers the number is in the data from the
+                    # current position to the next block starts
+                    if block_key == SONG_NUMBER:
+                        sn_bytes = song_file.read(length_descriptor_size - 1)
+                        self.song_number = int.from_bytes(sn_bytes, byteorder='little')
+                        continue
+                    # Detect if/how long the length descriptor is
+                    if length_descriptor_size == 12 or length_descriptor_size == 20:
+                        length_descriptor, = struct.unpack("I", song_file.read(4))
+                    elif length_descriptor_size == 2:
+                        length_descriptor = 1
+                    elif length_descriptor_size == 9:
+                        length_descriptor = 0
                     else:
-                        log.warning("Can't parse CCLI Number from string: {text}".format(text=self.decode(data)))
-                elif block_key == VERSE:
-                    self.add_verse(self.decode(data), "{tag}{number}".format(tag=VerseType.tags[VerseType.Verse],
-                                                                             number=verse_no))
-                elif block_key == CHORUS:
-                    self.add_verse(self.decode(data), "{tag}{number}".format(tag=VerseType.tags[VerseType.Chorus],
-                                                                             number=verse_no))
-                elif block_key == BRIDGE:
-                    self.add_verse(self.decode(data), "{tag}{number}".format(tag=VerseType.tags[VerseType.Bridge],
-                                                                             number=verse_no))
-                elif block_key == TOPIC:
-                    self.topics.append(self.decode(data))
-                elif block_key == COMMENTS:
-                    self.comments = self.decode(data)
-                elif block_key == VERSE_ORDER:
-                    verse_tag = self.to_openlp_verse_tag(self.decode(data), True)
-                    if verse_tag:
-                        if not isinstance(verse_tag, str):
-                            verse_tag = self.decode(verse_tag)
-                        self.ssp_verse_order_list.append(verse_tag)
-                elif block_key == SONG_BOOK:
-                    self.song_book_name = self.decode(data)
-                elif block_key == CUSTOM_VERSE:
-                    verse_tag = self.to_openlp_verse_tag(verse_name)
-                    self.add_verse(self.decode(data), verse_tag)
-                else:
-                    log.debug("Unrecognised blockKey: {key}, data: {data}".format(key=block_key, data=data))
-                    song_data.seek(next_block_starts)
-            self.verse_order_list = self.ssp_verse_order_list
-            song_data.close()
-            if not self.finish():
-                self.log_error(file)
+                        length_descriptor, = struct.unpack("B", song_file.read(1))
+                    log.debug('length_descriptor: %d' % length_descriptor)
+                    data = song_file.read(length_descriptor)
+                    log.debug(data)
+                    if block_key == TITLE:
+                        self.title = self.decode(data)
+                    elif block_key == AUTHOR:
+                        authors = self.decode(data).split(" / ")
+                        for author in authors:
+                            if author.find(",") != -1:
+                                author_parts = author.split(", ")
+                                author = author_parts[1] + " " + author_parts[0]
+                            self.parse_author(author)
+                    elif block_key == COPYRIGHT:
+                        self.add_copyright(self.decode(data))
+                    elif block_key == CCLI_NO:
+                        # Try to get the CCLI number even if the field contains additional text
+                        match = re.search(r'\d+', self.decode(data))
+                        if match:
+                            self.ccli_number = int(match.group())
+                        else:
+                            log.warning("Can't parse CCLI Number from string: {text}".format(text=self.decode(data)))
+                    elif block_key == VERSE:
+                        self.add_verse(self.decode(data), "{tag}{number}".format(tag=VerseType.tags[VerseType.Verse],
+                                                                                 number=verse_no))
+                    elif block_key == CHORUS:
+                        self.add_verse(self.decode(data), "{tag}{number}".format(tag=VerseType.tags[VerseType.Chorus],
+                                                                                 number=verse_no))
+                    elif block_key == BRIDGE:
+                        self.add_verse(self.decode(data), "{tag}{number}".format(tag=VerseType.tags[VerseType.Bridge],
+                                                                                 number=verse_no))
+                    elif block_key == TOPIC:
+                        self.topics.append(self.decode(data))
+                    elif block_key == COMMENTS:
+                        self.comments = self.decode(data)
+                    elif block_key == VERSE_ORDER:
+                        verse_tag = self.to_openlp_verse_tag(self.decode(data), True)
+                        if verse_tag:
+                            if not isinstance(verse_tag, str):
+                                verse_tag = self.decode(verse_tag)
+                            self.ssp_verse_order_list.append(verse_tag)
+                    elif block_key == SONG_BOOK:
+                        self.song_book_name = self.decode(data)
+                    elif block_key == CUSTOM_VERSE:
+                        verse_tag = self.to_openlp_verse_tag(verse_name)
+                        self.add_verse(self.decode(data), verse_tag)
+                    else:
+                        log.debug("Unrecognised blockKey: {key}, data: {data}".format(key=block_key, data=data))
+                        song_file.seek(next_block_starts)
+                self.verse_order_list = self.ssp_verse_order_list
+                if not self.finish():
+                    self.log_error(file_path)
 
     def to_openlp_verse_tag(self, verse_name, ignore_unique=False):
         """

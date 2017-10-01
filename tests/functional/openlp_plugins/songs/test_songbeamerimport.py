@@ -26,8 +26,9 @@ import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.plugins.songs.lib.importers.songbeamer import SongBeamerImport, SongBeamerTypes
 from openlp.core.common import Registry
+from openlp.core.common.path import Path
+from openlp.plugins.songs.lib.importers.songbeamer import SongBeamerImport, SongBeamerTypes
 
 from tests.helpers.songfileimport import SongImportTestHelper
 
@@ -51,18 +52,18 @@ class TestSongBeamerFileImport(SongImportTestHelper):
         mocked_returned_settings = MagicMock()
         mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace.sng')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace.sng')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([os.path.join(TEST_PATH, 'Lobsinget dem Herrn.sng')],
+        self.file_import([Path(TEST_PATH, 'Lobsinget dem Herrn.sng')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Lobsinget dem Herrn.json')))
-        self.file_import([os.path.join(TEST_PATH, 'When I Call On You.sng')],
+        self.file_import([Path(TEST_PATH, 'When I Call On You.sng')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'When I Call On You.json')))
 
     def test_cp1252_encoded_file(self):
         """
         Test that a CP1252 encoded file get's decoded properly.
         """
-        self.file_import([os.path.join(TEST_PATH, 'cp1252song.sng')],
+        self.file_import([Path(TEST_PATH, 'cp1252song.sng')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'cp1252song.json')))
 
 
@@ -78,7 +79,7 @@ class TestSongBeamerImport(TestCase):
         self.song_import_patcher = patch('openlp.plugins.songs.lib.importers.songbeamer.SongImport')
         self.song_import_patcher.start()
         mocked_manager = MagicMock()
-        self.importer = SongBeamerImport(mocked_manager, filenames=[])
+        self.importer = SongBeamerImport(mocked_manager, file_paths=[])
 
     def tearDown(self):
         """
@@ -95,7 +96,7 @@ class TestSongBeamerImport(TestCase):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = SongBeamerImport(mocked_manager, filenames=[])
+            importer = SongBeamerImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
             self.assertIsNotNone(importer, 'Import should not be none')

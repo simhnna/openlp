@@ -24,12 +24,10 @@ The :mod:`openlyricsexport` module provides the functionality for exporting song
 format.
 """
 import logging
-import os
 
 from lxml import etree
 
 from openlp.core.common import RegistryProperties, check_directory_exists, translate, clean_filename
-from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
 
 log = logging.getLogger(__name__)
@@ -42,13 +40,16 @@ class OpenLyricsExport(RegistryProperties):
     def __init__(self, parent, songs, save_path):
         """
         Initialise the export.
+
+        :param openlp.core.common.path.Path save_path: The directory to save the exported songs in
+        :rtype: None
         """
         log.debug('initialise OpenLyricsExport')
         self.parent = parent
         self.manager = parent.plugin.manager
         self.songs = songs
         self.save_path = save_path
-        check_directory_exists(Path(self.save_path))
+        check_directory_exists(self.save_path)
 
     def do_export(self):
         """
@@ -69,15 +70,15 @@ class OpenLyricsExport(RegistryProperties):
                                                    author=', '.join([author.display_name for author in song.authors]))
             filename = clean_filename(filename)
             # Ensure the filename isn't too long for some filesystems
-            filename_with_ext = '{name}.xml'.format(name=filename[0:250 - len(self.save_path)])
+            path_length = len(str(self.save_path))
+            filename_with_ext = '{name}.xml'.format(name=filename[0:250 - path_length])
             # Make sure we're not overwriting an existing file
             conflicts = 0
-            while os.path.exists(os.path.join(self.save_path, filename_with_ext)):
+            while (self.save_path / filename_with_ext).exists():
                 conflicts += 1
-                filename_with_ext = '{name}-{extra}.xml'.format(name=filename[0:247 - len(self.save_path)],
-                                                                extra=conflicts)
+                filename_with_ext = '{name}-{extra}.xml'.format(name=filename[0:247 - path_length], extra=conflicts)
             # Pass a file object, because lxml does not cope with some special
             # characters in the path (see lp:757673 and lp:744337).
-            tree.write(open(os.path.join(self.save_path, filename_with_ext), 'wb'), encoding='utf-8',
-                       xml_declaration=True, pretty_print=True)
+            with (self.save_path / filename_with_ext).open('wb') as out_file:
+                tree.write(out_file, encoding='utf-8', xml_declaration=True, pretty_print=True)
         return True

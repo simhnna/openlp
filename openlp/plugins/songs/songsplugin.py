@@ -37,7 +37,6 @@ from openlp.core.common.actions import ActionList
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.core.lib.ui import create_action
-
 from openlp.plugins.songs import reporting
 from openlp.plugins.songs.endpoint import api_songs_endpoint, songs_endpoint
 from openlp.plugins.songs.forms.duplicatesongremovalform import DuplicateSongRemovalForm
@@ -49,7 +48,6 @@ from openlp.plugins.songs.lib.importers.openlp import OpenLPSongImport
 from openlp.plugins.songs.lib.mediaitem import SongMediaItem
 from openlp.plugins.songs.lib.mediaitem import SongSearch
 from openlp.plugins.songs.lib.songstab import SongsTab
-
 
 log = logging.getLogger(__name__)
 __default_settings__ = {
@@ -340,7 +338,7 @@ class SongsPlugin(Plugin):
         progress.forceShow()
         self.application.process_events()
         for db in song_dbs:
-            importer = OpenLPSongImport(self.manager, filename=db)
+            importer = OpenLPSongImport(self.manager, file_path=db)
             importer.do_import(progress)
             self.application.process_events()
         progress.setValue(song_count)

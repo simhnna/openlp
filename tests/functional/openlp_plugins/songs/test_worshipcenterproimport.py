@@ -55,7 +55,7 @@ if CAN_RUN_TESTS:
         _title_assignment_list = []
 
         def __init__(self, manager):
-            WorshipCenterProImport.__init__(self, manager, filenames=[])
+            WorshipCenterProImport.__init__(self, manager, file_paths=[])
 
         @property
         def title(self):
@@ -153,7 +153,7 @@ class TestWorshipCenterProSongImport(TestCase):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = WorshipCenterProImport(mocked_manager, filenames=[])
+            importer = WorshipCenterProImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
             self.assertIsNotNone(importer, 'Import should not be none')
@@ -170,7 +170,7 @@ class TestWorshipCenterProSongImport(TestCase):
             mocked_manager = MagicMock()
             mocked_log_error = MagicMock()
             mocked_translate.return_value = 'Translated Text'
-            importer = WorshipCenterProImport(mocked_manager, filenames=[])
+            importer = WorshipCenterProImport(mocked_manager, file_paths=[])
             importer.log_error = mocked_log_error
             importer.import_source = 'import_source'
             pyodbc_errors = [pyodbc.DatabaseError, pyodbc.IntegrityError, pyodbc.InternalError, pyodbc.OperationalError]

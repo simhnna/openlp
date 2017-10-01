@@ -41,12 +41,19 @@ class MediaFilesForm(QtWidgets.QDialog, Ui_MediaFilesDialog):
                                              QtCore.Qt.WindowCloseButtonHint)
         self.setupUi(self)
 
-    def populate_files(self, files):
+    def populate_files(self, file_paths):
+        """
+        :param list[openlp.core.common.path.Path] file_paths:
+        :return:
+        """
         self.file_list_widget.clear()
-        for file in files:
-            item = QtWidgets.QListWidgetItem(os.path.split(file)[1])
-            item.setData(QtCore.Qt.UserRole, file)
+        for file_path in file_paths:
+            item = QtWidgets.QListWidgetItem(file_path.name)
+            item.setData(QtCore.Qt.UserRole, file_path)
             self.file_list_widget.addItem(item)
 
     def get_selected_files(self):
+        """
+        :rtype: list[openlp.core.common.path.Path]
+        """
         return [item.data(QtCore.Qt.UserRole) for item in self.file_list_widget.selectedItems()]
