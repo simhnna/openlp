@@ -54,7 +54,7 @@ class TestOpenOfficeImport(TestCase, TestMixin):
         mocked_manager = MagicMock()
 
         # WHEN: An importer object is created
-        importer = OpenOfficeImport(mocked_manager, filenames=[])
+        importer = OpenOfficeImport(mocked_manager, file_paths=[])
 
         # THEN: The importer object should not be None
         self.assertIsNotNone(importer, 'Import should not be none')
@@ -66,7 +66,7 @@ class TestOpenOfficeImport(TestCase, TestMixin):
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a document that raises an exception
         mocked_manager = MagicMock()
-        importer = OpenOfficeImport(mocked_manager, filenames=[])
+        importer = OpenOfficeImport(mocked_manager, file_paths=[])
         importer.document = MagicMock()
         importer.document.close = MagicMock(side_effect=Exception())
 

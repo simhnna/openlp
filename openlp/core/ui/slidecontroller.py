@@ -868,7 +868,7 @@ class SlideController(DisplayController, RegistryProperties):
                     self.track_menu.clear()
                     for counter in range(len(self.service_item.background_audio)):
                         action = self.track_menu.addAction(
-                            os.path.basename(self.service_item.background_audio[counter]))
+                            os.path.basename(str(self.service_item.background_audio[counter])))
                         action.setData(counter)
                         action.triggered.connect(self.on_track_triggered)
                     self.display.audio_player.repeat = \

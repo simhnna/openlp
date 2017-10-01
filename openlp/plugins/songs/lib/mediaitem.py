@@ -22,25 +22,24 @@
 
 import logging
 import os
-import shutil
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_, or_
 
 from openlp.core.common import Registry, AppLocation, Settings, check_directory_exists, UiStrings, translate
-from openlp.core.common.path import Path
+from openlp.core.common.languagemanager import get_natural_key
+from openlp.core.common.path import copyfile
 from openlp.core.lib import MediaManagerItem, ItemCapabilities, PluginStatus, ServiceItemContext, \
     check_item_selected, create_separated_list
 from openlp.core.lib.ui import create_widget_action
-from openlp.core.common.languagemanager import get_natural_key
 from openlp.plugins.songs.forms.editsongform import EditSongForm
-from openlp.plugins.songs.forms.songmaintenanceform import SongMaintenanceForm
-from openlp.plugins.songs.forms.songimportform import SongImportForm
 from openlp.plugins.songs.forms.songexportform import SongExportForm
+from openlp.plugins.songs.forms.songimportform import SongImportForm
+from openlp.plugins.songs.forms.songmaintenanceform import SongMaintenanceForm
 from openlp.plugins.songs.lib import VerseType, clean_string, delete_song
 from openlp.plugins.songs.lib.db import Author, AuthorType, Song, Book, MediaFile, SongBookEntry, Topic
-from openlp.plugins.songs.lib.ui import SongStrings
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics, SongXML
+from openlp.plugins.songs.lib.ui import SongStrings
 
 log = logging.getLogger(__name__)
 
@@ -88,11 +87,11 @@ class SongMediaItem(MediaManagerItem):
     def _update_background_audio(self, song, item):
         song.media_files = []
         for i, bga in enumerate(item.background_audio):
-            dest_file = os.path.join(
-                str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(song.id), os.path.split(bga)[1])
-            check_directory_exists(Path(os.path.split(dest_file)[0]))
-            shutil.copyfile(os.path.join(str(AppLocation.get_section_data_path('servicemanager')), bga), dest_file)
-            song.media_files.append(MediaFile.populate(weight=i, file_name=dest_file))
+            dest_path =\
+                AppLocation.get_section_data_path(self.plugin.name) / 'audio' / str(song.id) / os.path.split(bga)[1]
+            check_directory_exists(dest_path.parent)
+            copyfile(AppLocation.get_section_data_path('servicemanager') / bga, dest_path)
+            song.media_files.append(MediaFile.populate(weight=i, file_path=dest_path))
         self.plugin.manager.save_object(song, True)
 
     def add_end_header_bar(self):
@@ -534,14 +533,13 @@ class SongMediaItem(MediaManagerItem):
                                                                       'copy', 'For song cloning'))
             # Copy audio files from the old to the new song
             if len(old_song.media_files) > 0:
-                save_path = os.path.join(
-                    str(AppLocation.get_section_data_path(self.plugin.name)), 'audio', str(new_song.id))
-                check_directory_exists(Path(save_path))
+                save_path = AppLocation.get_section_data_path(self.plugin.name) / 'audio' / str(new_song.id)
+                check_directory_exists(save_path)
                 for media_file in old_song.media_files:
-                    new_media_file_name = os.path.join(save_path, os.path.basename(media_file.file_name))
-                    shutil.copyfile(media_file.file_name, new_media_file_name)
+                    new_media_file_path = save_path / media_file.file_path.name
+                    copyfile(media_file.file_path, new_media_file_path)
                     new_media_file = MediaFile()
-                    new_media_file.file_name = new_media_file_name
+                    new_media_file.file_path = new_media_file_path
                     new_media_file.type = media_file.type
                     new_media_file.weight = media_file.weight
                     new_song.media_files.append(new_media_file)
@@ -613,7 +611,7 @@ class SongMediaItem(MediaManagerItem):
         # Add the audio file to the service item.
         if song.media_files:
             service_item.add_capability(ItemCapabilities.HasBackgroundAudio)
-            service_item.background_audio = [m.file_name for m in song.media_files]
+            service_item.background_audio = [m.file_path for m in song.media_files]
         return True
 
     def generate_footer(self, item, song):

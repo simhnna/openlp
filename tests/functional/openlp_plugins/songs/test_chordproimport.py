@@ -24,6 +24,8 @@ This module contains tests for the OpenSong song importer.
 """
 import os
 
+from openlp.core.common.path import Path
+
 from tests.helpers.songfileimport import SongImportTestHelper
 from unittest.mock import patch, MagicMock
 
@@ -48,5 +50,5 @@ class TestChordProFileImport(SongImportTestHelper):
         mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
         # Do the test import
-        self.file_import([os.path.join(TEST_PATH, 'swing-low.chordpro')],
+        self.file_import([Path(TEST_PATH, 'swing-low.chordpro')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'swing-low.json')))

@@ -22,8 +22,9 @@
 """
 This module contains tests for the Words of Worship song importer.
 """
-
 import os
+
+from openlp.core.common.path import Path
 
 from tests.helpers.songfileimport import SongImportTestHelper
 from openlp.plugins.songs.lib.importers.wordsofworship import WordsOfWorshipImport
@@ -43,10 +44,10 @@ class TestWordsOfWorshipFileImport(SongImportTestHelper):
         """
         Test that loading a Words of Worship file works correctly
         """
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace (6 Verses).wow-song')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace (6 Verses).wow-song')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace (6 Verses).json')))
-        self.file_import([os.path.join(TEST_PATH, 'When morning gilds the skies.wsg')],
+        self.file_import([Path(TEST_PATH, 'When morning gilds the skies.wsg')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'When morning gilds the skies.json')))
-        self.file_import([os.path.join(TEST_PATH, 'Holy Holy Holy Lord God Almighty.wow-song')],
+        self.file_import([Path(TEST_PATH, 'Holy Holy Holy Lord God Almighty.wow-song')],
                          self.load_external_result_data(os.path.join(TEST_PATH,
                                                                      'Holy Holy Holy Lord God Almighty.json')))

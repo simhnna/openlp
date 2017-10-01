@@ -97,7 +97,7 @@ class EasyWorshipSongImportLogger(EasyWorshipSongImport):
     _title_assignment_list = []
 
     def __init__(self, manager):
-        EasyWorshipSongImport.__init__(self, manager, filenames=[])
+        EasyWorshipSongImport.__init__(self, manager, file_paths=[])
 
     @property
     def title(self):
@@ -180,7 +180,7 @@ class TestEasyWorshipSongImport(TestCase):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
             self.assertIsNotNone(importer, 'Import should not be none')
@@ -192,7 +192,7 @@ class TestEasyWorshipSongImport(TestCase):
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a list of field descriptions.
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'):
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
             importer.field_descriptions = TEST_FIELD_DESCS
 
             # WHEN: Called with a field name that exists
@@ -210,7 +210,7 @@ class TestEasyWorshipSongImport(TestCase):
         # GIVEN: A mocked out SongImport class, a mocked out "manager" and a list of field descriptions
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'):
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
             importer.field_descriptions = TEST_FIELD_DESCS
 
             # WHEN: Called with a field name that does not exist
@@ -229,7 +229,7 @@ class TestEasyWorshipSongImport(TestCase):
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'), \
                 patch('openlp.plugins.songs.lib.importers.easyworship.struct') as mocked_struct:
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
 
             # WHEN: db_set_record_struct is called with a list of field descriptions
             return_value = importer.db_set_record_struct(TEST_FIELD_DESCS)
@@ -246,7 +246,7 @@ class TestEasyWorshipSongImport(TestCase):
         # GIVEN: A mocked out SongImport class, a mocked out "manager", an encoding and some test data and known results
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'):
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
             importer.encoding = TEST_DATA_ENCODING
             importer.fields = TEST_FIELDS
             importer.field_descriptions = TEST_FIELD_DESCS
@@ -270,7 +270,7 @@ class TestEasyWorshipSongImport(TestCase):
             with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'):
                 mocked_manager = MagicMock()
                 mocked_memo_file = MagicMock()
-                importer = EasyWorshipSongImport(mocked_manager, filenames=[])
+                importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
                 importer.memo_file = mocked_memo_file
                 importer.encoding = TEST_DATA_ENCODING
 
@@ -294,44 +294,25 @@ class TestEasyWorshipSongImport(TestCase):
                     else:
                         mocked_memo_file.seek.assert_any_call(call[0], call[1])
 
-    def test_do_import_source(self):
-        """
-        Test the :mod:`do_import` module opens the correct files
-        """
-        # GIVEN: A mocked out SongImport class, a mocked out "manager"
-        with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'), \
-                patch('openlp.plugins.songs.lib.importers.easyworship.os.path') as mocked_os_path:
-            mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
-            mocked_os_path.isfile.side_effect = [True, False]
-
-            # WHEN: Supplied with an import source
-            importer.import_source = 'Songs.DB'
-
-            # THEN: do_import should return None having called os.path.isfile
-            self.assertIsNone(importer.do_import(), 'do_import should return None')
-            mocked_os_path.isfile.assert_any_call('Songs.DB')
-            mocked_os_path.isfile.assert_any_call('Songs.MB')
-
     def test_do_import_source_invalid(self):
         """
         Test the :mod:`do_import` module produces an error when Songs.MB not found.
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager"
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'), \
-                patch('openlp.plugins.songs.lib.importers.easyworship.os.path') as mocked_os_path:
+                patch('openlp.plugins.songs.lib.importers.easyworship.Path.is_file', side_effect=[True, False]):
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
-            importer.log_error = MagicMock()
-            mocked_os_path.isfile.side_effect = [True, False]
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
+            with patch.object(importer, 'log_error') as mocked_log_error:
 
-            # WHEN: do_import is supplied with an import source (Songs.MB missing)
-            importer.import_source = 'Songs.DB'
-            importer.do_import()
+                # WHEN: do_import is supplied with an import source (Songs.MB missing)
+                importer.import_source = 'Songs.DB'
+                importer.do_import()
 
-            # THEN: do_import should have logged an error that the Songs.MB file could not be found.
-            importer.log_error.assert_any_call(importer.import_source, 'Could not find the "Songs.MB" file. It must be '
-                                                                       'in the same folder as the "Songs.DB" file.')
+                # THEN: do_import should have logged an error that the Songs.MB file could not be found.
+                mocked_log_error.assert_any_call(importer.import_source,
+                                                 'Could not find the "Songs.MB" file. It must be in the same folder as '
+                                                 'the "Songs.DB" file.')
 
     def test_do_import_database_validity(self):
         """
@@ -339,18 +320,19 @@ class TestEasyWorshipSongImport(TestCase):
         """
         # GIVEN: A mocked out SongImport class, os.path and a mocked out "manager"
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'), \
-                patch('openlp.plugins.songs.lib.importers.easyworship.os.path') as mocked_os_path:
+                patch('openlp.plugins.songs.lib.importers.easyworship.Path.is_file', return_value=True), \
+                patch('openlp.plugins.songs.lib.importers.easyworship.Path.stat') as mocked_stat:
+
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
-            mocked_os_path.isfile.return_value = True
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
             importer.import_source = 'Songs.DB'
 
             # WHEN: DB file size is less than 0x800
-            mocked_os_path.getsize.return_value = 0x7FF
+            mocked_stat.return_value.st_size = 0x7FF
 
-            # THEN: do_import should return None having called os.path.isfile
+            # THEN: do_import should return None having called Path.stat()
             self.assertIsNone(importer.do_import(), 'do_import should return None when db_size is less than 0x800')
-            mocked_os_path.getsize.assert_any_call('Songs.DB')
+            mocked_stat.assert_called_once_with()
 
     def test_do_import_memo_validty(self):
         """
@@ -358,13 +340,12 @@ class TestEasyWorshipSongImport(TestCase):
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager"
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'), \
-            patch('openlp.plugins.songs.lib.importers.easyworship.os.path') as mocked_os_path, \
-            patch('builtins.open') as mocked_open, \
+                patch('openlp.plugins.songs.lib.importers.easyworship.Path.is_file', return_value=True), \
+                patch('openlp.plugins.songs.lib.importers.easyworship.Path.stat', **{'return_value.st_size': 0x800}), \
+                patch('openlp.plugins.songs.lib.importers.easyworship.Path.open') as mocked_open, \
                 patch('openlp.plugins.songs.lib.importers.easyworship.struct') as mocked_struct:
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
-            mocked_os_path.isfile.return_value = True
-            mocked_os_path.getsize.return_value = 0x800
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
             importer.import_source = 'Songs.DB'
 
             # WHEN: Unpacking first 35 bytes of Memo file
@@ -385,14 +366,14 @@ class TestEasyWorshipSongImport(TestCase):
         """
         # GIVEN: A mocked out SongImport class, a mocked out "manager"
         with patch('openlp.plugins.songs.lib.importers.easyworship.SongImport'), \
-            patch('openlp.plugins.songs.lib.importers.easyworship.os.path') as mocked_os_path, \
+            patch('openlp.plugins.songs.lib.importers.easyworship.Path.is_file', return_value=True), \
+            patch('openlp.plugins.songs.lib.importers.easyworship.Path.stat', **{'return_value.st_size': 0x800}), \
+            patch('openlp.plugins.songs.lib.importers.easyworship.Path.open'), \
             patch('builtins.open'), patch('openlp.plugins.songs.lib.importers.easyworship.struct') as mocked_struct, \
-                patch('openlp.plugins.songs.lib.importers.easyworship.retrieve_windows_encoding') as \
+            patch('openlp.plugins.songs.lib.importers.easyworship.retrieve_windows_encoding') as \
                 mocked_retrieve_windows_encoding:
             mocked_manager = MagicMock()
-            importer = EasyWorshipSongImport(mocked_manager, filenames=[])
-            mocked_os_path.isfile.return_value = True
-            mocked_os_path.getsize.return_value = 0x800
+            importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
             importer.import_source = 'Songs.DB'
 
             # WHEN: Unpacking the code page

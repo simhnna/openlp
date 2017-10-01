@@ -23,9 +23,7 @@
 The :mod:`openlyrics` module provides the functionality for importing
 songs which are saved as OpenLyrics files.
 """
-
 import logging
-import os
 
 from lxml import etree
 
@@ -58,12 +56,11 @@ class OpenLyricsImport(SongImport):
         for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            self.import_wizard.increment_progress_bar(
-                WizardStrings.ImportingType.format(source=os.path.basename(file_path)))
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=file_path.name))
             try:
                 # Pass a file object, because lxml does not cope with some
                 # special characters in the path (see lp:757673 and lp:744337).
-                parsed_file = etree.parse(open(file_path, 'rb'), parser)
+                parsed_file = etree.parse(file_path.open('rb'), parser)
                 xml = etree.tostring(parsed_file).decode()
                 self.open_lyrics.xml_to_song(xml)
             except etree.XMLSyntaxError:

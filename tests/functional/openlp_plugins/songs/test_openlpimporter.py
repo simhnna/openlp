@@ -48,7 +48,7 @@ class TestOpenLPImport(TestCase):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = OpenLPSongImport(mocked_manager, filenames=[])
+            importer = OpenLPSongImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
             self.assertIsNotNone(importer, 'Import should not be none')
@@ -61,7 +61,7 @@ class TestOpenLPImport(TestCase):
         with patch('openlp.plugins.songs.lib.importers.openlp.SongImport'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OpenLPSongImport(mocked_manager, filenames=[])
+            importer = OpenLPSongImport(mocked_manager, file_paths=[])
             importer.import_wizard = mocked_import_wizard
             importer.stop_import_flag = True
 

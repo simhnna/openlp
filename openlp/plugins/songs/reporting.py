@@ -31,7 +31,6 @@ from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.plugins.songs.lib.db import Song
 
-
 log = logging.getLogger(__name__)
 
 
@@ -58,9 +57,9 @@ def report_song_list():
     report_file_path.with_suffix('.csv')
     Registry().get('application').set_busy_cursor()
     try:
-        with report_file_path.open('wt') as file_handle:
+        with report_file_path.open('wt') as export_file:
             fieldnames = ('Title', 'Alternative Title', 'Copyright', 'Author(s)', 'Song Book', 'Topic')
-            writer = csv.DictWriter(file_handle, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
+            writer = csv.DictWriter(export_file, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
             headers = dict((n, n) for n in fieldnames)
             writer.writerow(headers)
             song_list = plugin.manager.get_all_objects(Song)
