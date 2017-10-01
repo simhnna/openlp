@@ -19,46 +19,45 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-"""
-Package to test the openlp.core.common.versionchecker package.
-"""
+
+import os
+import shutil
+from tempfile import mkdtemp
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
 
-from openlp.core.common.settings import Settings
-from openlp.core.common.versionchecker import VersionThread
+from openlp.core.api.deploy import deploy_zipfile
 
-from tests.helpers.testmixin import TestMixin
+TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
 
 
-class TestVersionchecker(TestMixin, TestCase):
+class TestRemoteDeploy(TestCase):
+    """
+    Test the Remote plugin deploy functions
+    """
 
     def setUp(self):
         """
-        Create an instance and a few example actions.
+        Setup for tests
         """
-        self.build_settings()
+        self.app_root = mkdtemp()
 
     def tearDown(self):
         """
-        Clean up
+        Clean up after tests
         """
-        self.destroy_settings()
+        shutil.rmtree(self.app_root)
 
-    def test_version_thread_triggered(self):
+    def test_deploy_zipfile(self):
         """
-        Test the version thread call does not trigger UI
-        :return:
+        Remote Deploy tests - test the dummy zip file is processed correctly
         """
-        # GIVEN: a equal version setup and the data is not today.
-        mocked_main_window = MagicMock()
-        Settings().setValue('core/last version test', '1950-04-01')
-        # WHEN: We check to see if the version is different .
-        with patch('PyQt5.QtCore.QThread'),\
-                patch('openlp.core.common.versionchecker.get_application_version') as mocked_get_application_version:
-            mocked_get_application_version.return_value = {'version': '1.0.0', 'build': '', 'full': '2.0.4'}
-            version_thread = VersionThread(mocked_main_window)
-            version_thread.run()
-        # THEN: If the version has changed the main window is notified
-        self.assertTrue(mocked_main_window.openlp_version_check.emit.called,
-                        'The main windows should have been notified')
+        # GIVEN: A new downloaded zip file
+        aa = TEST_PATH
+        zip_file = os.path.join(TEST_PATH, 'remotes', 'site.zip')
+        app_root = os.path.join(self.app_root, 'site.zip')
+        shutil.copyfile(zip_file, app_root)
+        # WHEN: I process the zipfile
+        deploy_zipfile(self.app_root, 'site.zip')
+
+        # THEN test if www directory has been created
+        self.assertTrue(os.path.isdir(os.path.join(self.app_root, 'www')), 'We should have a www directory')

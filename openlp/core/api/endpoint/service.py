@@ -23,7 +23,7 @@ import logging
 import json
 
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.api.http import register_endpoint, requires_auth
+from openlp.core.api.http import requires_auth
 from openlp.core.common import Registry
 
 

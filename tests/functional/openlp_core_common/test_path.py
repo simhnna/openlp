@@ -24,8 +24,209 @@ Package to test the openlp.core.common.path package.
 """
 import os
 from unittest import TestCase
+from unittest.mock import ANY, MagicMock, patch
 
-from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.path import Path, copy, copyfile, copytree, path_to_str, replace_params, rmtree, str_to_path, \
+    which
+
+
+class TestShutil(TestCase):
+    """
+    Tests for the :mod:`openlp.core.common.path` module
+    """
+    def test_replace_params_no_params(self):
+        """
+        Test replace_params when called with and empty tuple instead of parameters to replace
+        """
+        # GIVEN: Some test data
+        test_args = (1, 2)
+        test_kwargs = {'arg3': 3, 'arg4': 4}
+        test_params = tuple()
+
+        # WHEN: Calling replace_params
+        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
+
+        # THEN: The positional and keyword args should not have changed
+        self.assertEqual(test_args, result_args)
+        self.assertEqual(test_kwargs, result_kwargs)
+
+    def test_replace_params_params(self):
+        """
+        Test replace_params when given a positional and a keyword argument to change
+        """
+        # GIVEN: Some test data
+        test_args = (1, 2)
+        test_kwargs = {'arg3': 3, 'arg4': 4}
+        test_params = ((1, 'arg2', str), (2, 'arg3', str))
+
+        # WHEN: Calling replace_params
+        result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
+
+        # THEN: The positional and keyword args should have have changed
+        self.assertEqual(result_args, (1, '2'))
+        self.assertEqual(result_kwargs, {'arg3': '3', 'arg4': 4})
+
+    def test_copy(self):
+        """
+        Test :func:`openlp.core.common.path.copy`
+        """
+        # GIVEN: A mocked `shutil.copy` which returns a test path as a string
+        with patch('openlp.core.common.path.shutil.copy', return_value=os.path.join('destination', 'test', 'path')) \
+                as mocked_shutil_copy:
+
+            # WHEN: Calling :func:`openlp.core.common.path.copy` with the src and dst parameters as Path object types
+            result = copy(Path('source', 'test', 'path'), Path('destination', 'test', 'path'))
+
+            # THEN: :func:`shutil.copy` should have been called with the str equivalents of the Path objects.
+            #       :func:`openlp.core.common.path.copy` should return the str type result of calling
+            #       :func:`shutil.copy` as a Path object.
+            mocked_shutil_copy.assert_called_once_with(os.path.join('source', 'test', 'path'),
+                                                       os.path.join('destination', 'test', 'path'))
+            self.assertEqual(result, Path('destination', 'test', 'path'))
+
+    def test_copy_follow_optional_params(self):
+        """
+        Test :func:`openlp.core.common.path.copy` when follow_symlinks is set to false
+        """
+        # GIVEN: A mocked `shutil.copy`
+        with patch('openlp.core.common.path.shutil.copy', return_value='') as mocked_shutil_copy:
+
+            # WHEN: Calling :func:`openlp.core.common.path.copy` with :param:`follow_symlinks` set to False
+            copy(Path('source', 'test', 'path'), Path('destination', 'test', 'path'), follow_symlinks=False)
+
+            # THEN: :func:`shutil.copy` should have been called with :param:`follow_symlinks` set to false
+            mocked_shutil_copy.assert_called_once_with(ANY, ANY, follow_symlinks=False)
+
+    def test_copyfile(self):
+        """
+        Test :func:`openlp.core.common.path.copyfile`
+        """
+        # GIVEN: A mocked :func:`shutil.copyfile` which returns a test path as a string
+        with patch('openlp.core.common.path.shutil.copyfile',
+                   return_value=os.path.join('destination', 'test', 'path')) as mocked_shutil_copyfile:
+
+            # WHEN: Calling :func:`openlp.core.common.path.copyfile` with the src and dst parameters as Path object
+            #       types
+            result = copyfile(Path('source', 'test', 'path'), Path('destination', 'test', 'path'))
+
+            # THEN: :func:`shutil.copyfile` should have been called with the str equivalents of the Path objects.
+            #       :func:`openlp.core.common.path.copyfile` should return the str type result of calling
+            #       :func:`shutil.copyfile` as a Path object.
+            mocked_shutil_copyfile.assert_called_once_with(os.path.join('source', 'test', 'path'),
+                                                           os.path.join('destination', 'test', 'path'))
+            self.assertEqual(result, Path('destination', 'test', 'path'))
+
+    def test_copyfile_optional_params(self):
+        """
+        Test :func:`openlp.core.common.path.copyfile` when follow_symlinks is set to false
+        """
+        # GIVEN: A mocked :func:`shutil.copyfile`
+        with patch('openlp.core.common.path.shutil.copyfile', return_value='') as mocked_shutil_copyfile:
+
+            # WHEN: Calling :func:`openlp.core.common.path.copyfile` with :param:`follow_symlinks` set to False
+            copyfile(Path('source', 'test', 'path'), Path('destination', 'test', 'path'), follow_symlinks=False)
+
+            # THEN: :func:`shutil.copyfile` should have been called with the optional parameters, with out any of the
+            #       values being modified
+            mocked_shutil_copyfile.assert_called_once_with(ANY, ANY, follow_symlinks=False)
+
+    def test_copytree(self):
+        """
+        Test :func:`openlp.core.common.path.copytree`
+        """
+        # GIVEN: A mocked :func:`shutil.copytree` which returns a test path as a string
+        with patch('openlp.core.common.path.shutil.copytree',
+                   return_value=os.path.join('destination', 'test', 'path')) as mocked_shutil_copytree:
+
+            # WHEN: Calling :func:`openlp.core.common.path.copytree` with the src and dst parameters as Path object
+            #       types
+            result = copytree(Path('source', 'test', 'path'), Path('destination', 'test', 'path'))
+
+            # THEN: :func:`shutil.copytree` should have been called with the str equivalents of the Path objects.
+            #       :func:`openlp.core.common.path.copytree` should return the str type result of calling
+            #       :func:`shutil.copytree` as a Path object.
+            mocked_shutil_copytree.assert_called_once_with(os.path.join('source', 'test', 'path'),
+                                                           os.path.join('destination', 'test', 'path'))
+            self.assertEqual(result, Path('destination', 'test', 'path'))
+
+    def test_copytree_optional_params(self):
+        """
+        Test :func:`openlp.core.common.path.copytree` when optional parameters are passed
+        """
+        # GIVEN: A mocked :func:`shutil.copytree`
+        with patch('openlp.core.common.path.shutil.copytree', return_value='') as mocked_shutil_copytree:
+            mocked_ignore = MagicMock()
+            mocked_copy_function = MagicMock()
+
+            # WHEN: Calling :func:`openlp.core.common.path.copytree` with the optional parameters set
+            copytree(Path('source', 'test', 'path'), Path('destination', 'test', 'path'), symlinks=True,
+                     ignore=mocked_ignore, copy_function=mocked_copy_function, ignore_dangling_symlinks=True)
+
+            # THEN: :func:`shutil.copytree` should have been called with the optional parameters, with out any of the
+            #       values being modified
+            mocked_shutil_copytree.assert_called_once_with(ANY, ANY, symlinks=True, ignore=mocked_ignore,
+                                                           copy_function=mocked_copy_function,
+                                                           ignore_dangling_symlinks=True)
+
+    def test_rmtree(self):
+        """
+        Test :func:`rmtree`
+        """
+        # GIVEN: A mocked :func:`shutil.rmtree`
+        with patch('openlp.core.common.path.shutil.rmtree', return_value=None) as mocked_shutil_rmtree:
+
+            # WHEN: Calling :func:`openlp.core.common.path.rmtree` with the path parameter as Path object type
+            result = rmtree(Path('test', 'path'))
+
+            # THEN: :func:`shutil.rmtree` should have been called with the str equivalents of the Path object.
+            mocked_shutil_rmtree.assert_called_once_with(os.path.join('test', 'path'))
+            self.assertIsNone(result)
+
+    def test_rmtree_optional_params(self):
+        """
+        Test :func:`openlp.core.common.path.rmtree` when optional parameters are passed
+        """
+        # GIVEN: A mocked :func:`shutil.rmtree`
+        with patch('openlp.core.common.path.shutil.rmtree', return_value='') as mocked_shutil_rmtree:
+            mocked_on_error = MagicMock()
+
+            # WHEN: Calling :func:`openlp.core.common.path.rmtree` with :param:`ignore_errors` set to True and
+            #       :param:`onerror` set to a mocked object
+            rmtree(Path('test', 'path'), ignore_errors=True, onerror=mocked_on_error)
+
+            # THEN: :func:`shutil.rmtree` should have been called with the optional parameters, with out any of the
+            #       values being modified
+            mocked_shutil_rmtree.assert_called_once_with(ANY, ignore_errors=True, onerror=mocked_on_error)
+
+    def test_which_no_command(self):
+        """
+        Test :func:`openlp.core.common.path.which` when the command is not found.
+        """
+        # GIVEN: A mocked :func:`shutil.which` when the command is not found.
+        with patch('openlp.core.common.path.shutil.which', return_value=None) as mocked_shutil_which:
+
+            # WHEN: Calling :func:`openlp.core.common.path.which` with a command that does not exist.
+            result = which('no_command')
+
+            # THEN: :func:`shutil.which` should have been called with the command, and :func:`which` should return None.
+            mocked_shutil_which.assert_called_once_with('no_command')
+            self.assertIsNone(result)
+
+    def test_which_command(self):
+        """
+        Test :func:`openlp.core.common.path.which` when a command has been found.
+        """
+        # GIVEN: A mocked :func:`shutil.which` when the command is found.
+        with patch('openlp.core.common.path.shutil.which',
+                   return_value=os.path.join('path', 'to', 'command')) as mocked_shutil_which:
+
+            # WHEN: Calling :func:`openlp.core.common.path.which` with a command that exists.
+            result = which('command')
+
+            # THEN: :func:`shutil.which` should have been called with the command, and :func:`which` should return a
+            #       Path object equivalent of the command path.
+            mocked_shutil_which.assert_called_once_with('command')
+            self.assertEqual(result, Path('path', 'to', 'command'))
 
 
 class TestPath(TestCase):

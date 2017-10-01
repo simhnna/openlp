@@ -26,7 +26,7 @@ This script is used to check dependencies of OpenLP. It checks availability
 of required python modules and their version. To verify availability of Python
 modules, simply run this script::
 
-    @:~$ ./check_dependencies.py
+    $ ./check_dependencies.py
 
 """
 import os
@@ -45,7 +45,7 @@ IS_MAC = sys.platform.startswith('dar')
 
 
 VERS = {
-    'Python': '3.0',
+    'Python': '3.4',
     'PyQt5': '5.0',
     'Qt5': '5.0',
     'sqlalchemy': '0.5',
@@ -97,7 +97,8 @@ MODULES = [
     'asyncio',
     'waitress',
     'six',
-    'webob'
+    'webob',
+    'requests'
 ]
 
 

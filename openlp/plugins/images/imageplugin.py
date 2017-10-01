@@ -29,7 +29,7 @@ from openlp.core.common import Settings, translate
 from openlp.core.lib import Plugin, StringContent, ImageSource, build_icon
 from openlp.core.lib.db import Manager
 from openlp.plugins.images.endpoint import api_images_endpoint, images_endpoint
-from openlp.plugins.images.lib import ImageMediaItem, ImageTab
+from openlp.plugins.images.lib import ImageMediaItem, ImageTab, upgrade
 from openlp.plugins.images.lib.db import init_schema
 
 log = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ class ImagePlugin(Plugin):
 
     def __init__(self):
         super(ImagePlugin, self).__init__('images', __default_settings__, ImageMediaItem, ImageTab)
-        self.manager = Manager('images', init_schema)
+        self.manager = Manager('images', init_schema, upgrade_mod=upgrade)
         self.weight = -7
         self.icon_path = ':/plugins/plugin_images.png'
         self.icon = build_icon(self.icon_path)

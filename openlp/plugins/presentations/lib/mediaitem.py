@@ -19,15 +19,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import logging
-import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import Registry, Settings, UiStrings, translate
 from openlp.core.common.languagemanager import get_locale_key
-from openlp.core.common.path import path_to_str
+from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext,\
     build_icon, check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import critical_error_message_box, create_horizontal_adjusting_combo_box
@@ -128,7 +126,7 @@ class PresentationMediaItem(MediaManagerItem):
         """
         self.list_view.setIconSize(QtCore.QSize(88, 50))
         file_paths = Settings().value(self.settings_section + '/presentations files')
-        self.load_list([path_to_str(file) for file in file_paths], initial_load=True)
+        self.load_list([path_to_str(path) for path in file_paths], initial_load=True)
         self.populate_display_types()
 
     def populate_display_types(self):
@@ -152,54 +150,57 @@ class PresentationMediaItem(MediaManagerItem):
         else:
             self.presentation_widget.hide()
 
-    def load_list(self, files, target_group=None, initial_load=False):
+    def load_list(self, file_paths, target_group=None, initial_load=False):
         """
         Add presentations into the media manager. This is called both on initial load of the plugin to populate with
         existing files, and when the user adds new files via the media manager.
+
+        :param list[openlp.core.common.path.Path] file_paths: List of file paths to add to the media manager.
         """
-        current_list = self.get_file_list()
-        titles = [file_path.name for file_path in current_list]
+        file_paths = [str_to_path(filename) for filename in file_paths]
+        current_paths = self.get_file_list()
+        titles = [file_path.name for file_path in current_paths]
         self.application.set_busy_cursor()
         if not initial_load:
-            self.main_window.display_progress_bar(len(files))
+            self.main_window.display_progress_bar(len(file_paths))
         # Sort the presentations by its filename considering language specific characters.
-        files.sort(key=lambda filename: get_locale_key(os.path.split(str(filename))[1]))
-        for file in files:
+        file_paths.sort(key=lambda file_path: get_locale_key(file_path.name))
+        for file_path in file_paths:
             if not initial_load:
                 self.main_window.increment_progress_bar()
-            if current_list.count(file) > 0:
+            if current_paths.count(file_path) > 0:
                 continue
-            filename = os.path.split(file)[1]
-            if not os.path.exists(file):
-                item_name = QtWidgets.QListWidgetItem(filename)
+            file_name = file_path.name
+            if not file_path.exists():
+                item_name = QtWidgets.QListWidgetItem(file_name)
                 item_name.setIcon(build_icon(ERROR_IMAGE))
-                item_name.setData(QtCore.Qt.UserRole, file)
-                item_name.setToolTip(file)
+                item_name.setData(QtCore.Qt.UserRole, path_to_str(file_path))
+                item_name.setToolTip(str(file_path))
                 self.list_view.addItem(item_name)
             else:
-                if titles.count(filename) > 0:
+                if titles.count(file_name) > 0:
                     if not initial_load:
                         critical_error_message_box(translate('PresentationPlugin.MediaItem', 'File Exists'),
                                                    translate('PresentationPlugin.MediaItem',
                                                              'A presentation with that filename already exists.'))
                     continue
-                controller_name = self.find_controller_by_type(filename)
+                controller_name = self.find_controller_by_type(file_path)
                 if controller_name:
                     controller = self.controllers[controller_name]
-                    doc = controller.add_document(file)
-                    thumb = os.path.join(doc.get_thumbnail_folder(), 'icon.png')
-                    preview = doc.get_thumbnail_path(1, True)
-                    if not preview and not initial_load:
+                    doc = controller.add_document(file_path)
+                    thumbnail_path = doc.get_thumbnail_folder() / 'icon.png'
+                    preview_path = doc.get_thumbnail_path(1, True)
+                    if not preview_path and not initial_load:
                         doc.load_presentation()
-                        preview = doc.get_thumbnail_path(1, True)
+                        preview_path = doc.get_thumbnail_path(1, True)
                     doc.close_presentation()
-                    if not (preview and os.path.exists(preview)):
+                    if not (preview_path and preview_path.exists()):
                         icon = build_icon(':/general/general_delete.png')
                     else:
-                        if validate_thumb(preview, thumb):
-                            icon = build_icon(thumb)
+                        if validate_thumb(Path(preview_path), Path(thumbnail_path)):
+                            icon = build_icon(thumbnail_path)
                         else:
-                            icon = create_thumb(preview, thumb)
+                            icon = create_thumb(str(preview_path), str(thumbnail_path))
                 else:
                     if initial_load:
                         icon = build_icon(':/general/general_delete.png')
@@ -208,10 +209,10 @@ class PresentationMediaItem(MediaManagerItem):
                                                    translate('PresentationPlugin.MediaItem',
                                                              'This type of presentation is not supported.'))
                         continue
-                item_name = QtWidgets.QListWidgetItem(filename)
-                item_name.setData(QtCore.Qt.UserRole, file)
+                item_name = QtWidgets.QListWidgetItem(file_name)
+                item_name.setData(QtCore.Qt.UserRole, path_to_str(file_path))
                 item_name.setIcon(icon)
-                item_name.setToolTip(file)
+                item_name.setToolTip(str(file_path))
                 self.list_view.addItem(item_name)
         if not initial_load:
             self.main_window.finished_progress_bar()
@@ -228,8 +229,8 @@ class PresentationMediaItem(MediaManagerItem):
             self.application.set_busy_cursor()
             self.main_window.display_progress_bar(len(row_list))
             for item in items:
-                filepath = str(item.data(QtCore.Qt.UserRole))
-                self.clean_up_thumbnails(filepath)
+                file_path = str_to_path(item.data(QtCore.Qt.UserRole))
+                self.clean_up_thumbnails(file_path)
                 self.main_window.increment_progress_bar()
             self.main_window.finished_progress_bar()
             for row in row_list:
@@ -237,30 +238,29 @@ class PresentationMediaItem(MediaManagerItem):
             Settings().setValue(self.settings_section + '/presentations files', self.get_file_list())
             self.application.set_normal_cursor()
 
-    def clean_up_thumbnails(self, filepath, clean_for_update=False):
+    def clean_up_thumbnails(self, file_path, clean_for_update=False):
         """
         Clean up the files created such as thumbnails
 
-        :param filepath: File path of the presention to clean up after
-        :param clean_for_update: Only clean thumbnails if update is needed
-        :return: None
+        :param openlp.core.common.path.Path file_path: File path of the presention to clean up after
+        :param bool clean_for_update: Only clean thumbnails if update is needed
+        :rtype: None
         """
         for cidx in self.controllers:
-            root, file_ext = os.path.splitext(filepath)
-            file_ext = file_ext[1:]
+            file_ext = file_path.suffix[1:]
             if file_ext in self.controllers[cidx].supports or file_ext in self.controllers[cidx].also_supports:
-                doc = self.controllers[cidx].add_document(filepath)
+                doc = self.controllers[cidx].add_document(file_path)
                 if clean_for_update:
                     thumb_path = doc.get_thumbnail_path(1, True)
-                    if not thumb_path or not os.path.exists(filepath) or os.path.getmtime(
-                            thumb_path) < os.path.getmtime(filepath):
+                    if not thumb_path or not file_path.exists() or \
+                            thumb_path.stat().st_mtime < file_path.stat().st_mtime:
                         doc.presentation_deleted()
                 else:
                     doc.presentation_deleted()
                 doc.close_presentation()
 
     def generate_slide_data(self, service_item, item=None, xml_version=False, remote=False,
-                            context=ServiceItemContext.Service, presentation_file=None):
+                            context=ServiceItemContext.Service, file_path=None):
         """
         Generate the slide data. Needs to be implemented by the plugin.
 
@@ -276,10 +276,9 @@ class PresentationMediaItem(MediaManagerItem):
             items = self.list_view.selectedItems()
             if len(items) > 1:
                 return False
-        filename = presentation_file
-        if filename is None:
-            filename = items[0].data(QtCore.Qt.UserRole)
-        file_type = os.path.splitext(filename.lower())[1][1:]
+        if file_path is None:
+            file_path = str_to_path(items[0].data(QtCore.Qt.UserRole))
+        file_type = file_path.suffix.lower()[1:]
         if not self.display_type_combo_box.currentText():
             return False
         service_item.add_capability(ItemCapabilities.CanEditTitle)
@@ -292,29 +291,28 @@ class PresentationMediaItem(MediaManagerItem):
             # force a nonexistent theme
             service_item.theme = -1
             for bitem in items:
-                filename = presentation_file
-                if filename is None:
-                    filename = bitem.data(QtCore.Qt.UserRole)
-                (path, name) = os.path.split(filename)
-                service_item.title = name
-                if os.path.exists(filename):
-                    processor = self.find_controller_by_type(filename)
+                if file_path is None:
+                    file_path = str_to_path(bitem.data(QtCore.Qt.UserRole))
+                path, file_name = file_path.parent, file_path.name
+                service_item.title = file_name
+                if file_path.exists():
+                    processor = self.find_controller_by_type(file_path)
                     if not processor:
                         return False
                     controller = self.controllers[processor]
                     service_item.processor = None
-                    doc = controller.add_document(filename)
-                    if doc.get_thumbnail_path(1, True) is None or not os.path.isfile(
-                            os.path.join(doc.get_temp_folder(), 'mainslide001.png')):
+                    doc = controller.add_document(file_path)
+                    if doc.get_thumbnail_path(1, True) is None or \
+                            not (doc.get_temp_folder() / 'mainslide001.png').is_file():
                         doc.load_presentation()
                     i = 1
-                    image = os.path.join(doc.get_temp_folder(), 'mainslide{number:0>3d}.png'.format(number=i))
-                    thumbnail = os.path.join(doc.get_thumbnail_folder(), 'slide%d.png' % i)
-                    while os.path.isfile(image):
-                        service_item.add_from_image(image, name, thumbnail=thumbnail)
+                    image_path = doc.get_temp_folder() / 'mainslide{number:0>3d}.png'.format(number=i)
+                    thumbnail_path = doc.get_thumbnail_folder() / 'slide{number:d}.png'.format(number=i)
+                    while image_path.is_file():
+                        service_item.add_from_image(str(image_path), file_name, thumbnail=str(thumbnail_path))
                         i += 1
-                        image = os.path.join(doc.get_temp_folder(), 'mainslide{number:0>3d}.png'.format(number=i))
-                        thumbnail = os.path.join(doc.get_thumbnail_folder(), 'slide{number:d}.png'.format(number=i))
+                        image_path = doc.get_temp_folder() / 'mainslide{number:0>3d}.png'.format(number=i)
+                        thumbnail_path = doc.get_thumbnail_folder() / 'slide{number:d}.png'.format(number=i)
                     service_item.add_capability(ItemCapabilities.HasThumbnails)
                     doc.close_presentation()
                     return True
@@ -324,34 +322,34 @@ class PresentationMediaItem(MediaManagerItem):
                         critical_error_message_box(translate('PresentationPlugin.MediaItem', 'Missing Presentation'),
                                                    translate('PresentationPlugin.MediaItem',
                                                              'The presentation {name} no longer exists.'
-                                                             ).format(name=filename))
+                                                             ).format(name=file_path))
                     return False
         else:
             service_item.processor = self.display_type_combo_box.currentText()
             service_item.add_capability(ItemCapabilities.ProvidesOwnDisplay)
             for bitem in items:
-                filename = bitem.data(QtCore.Qt.UserRole)
-                (path, name) = os.path.split(filename)
-                service_item.title = name
-                if os.path.exists(filename):
+                file_path = str_to_path(bitem.data(QtCore.Qt.UserRole))
+                path, file_name = file_path.parent, file_path.name
+                service_item.title = file_name
+                if file_path.exists():
                     if self.display_type_combo_box.itemData(self.display_type_combo_box.currentIndex()) == 'automatic':
-                        service_item.processor = self.find_controller_by_type(filename)
+                        service_item.processor = self.find_controller_by_type(file_path)
                         if not service_item.processor:
                             return False
                     controller = self.controllers[service_item.processor]
-                    doc = controller.add_document(filename)
+                    doc = controller.add_document(file_path)
                     if doc.get_thumbnail_path(1, True) is None:
                         doc.load_presentation()
                     i = 1
-                    img = doc.get_thumbnail_path(i, True)
-                    if img:
+                    thumbnail_path = doc.get_thumbnail_path(i, True)
+                    if thumbnail_path:
                         # Get titles and notes
                         titles, notes = doc.get_titles_and_notes()
                         service_item.add_capability(ItemCapabilities.HasDisplayTitle)
                         if notes.count('') != len(notes):
                             service_item.add_capability(ItemCapabilities.HasNotes)
                         service_item.add_capability(ItemCapabilities.HasThumbnails)
-                        while img:
+                        while thumbnail_path:
                             # Use title and note if available
                             title = ''
                             if titles and len(titles) >= i:
@@ -359,9 +357,9 @@ class PresentationMediaItem(MediaManagerItem):
                             note = ''
                             if notes and len(notes) >= i:
                                 note = notes[i - 1]
-                            service_item.add_from_command(path, name, img, title, note)
+                            service_item.add_from_command(str(path), file_name, str(thumbnail_path), title, note)
                             i += 1
-                            img = doc.get_thumbnail_path(i, True)
+                            thumbnail_path = doc.get_thumbnail_path(i, True)
                         doc.close_presentation()
                         return True
                     else:
@@ -371,7 +369,7 @@ class PresentationMediaItem(MediaManagerItem):
                                                                  'Missing Presentation'),
                                                        translate('PresentationPlugin.MediaItem',
                                                                  'The presentation {name} is incomplete, '
-                                                                 'please reload.').format(name=filename))
+                                                                 'please reload.').format(name=file_path))
                         return False
                 else:
                     # File is no longer present
@@ -379,18 +377,20 @@ class PresentationMediaItem(MediaManagerItem):
                         critical_error_message_box(translate('PresentationPlugin.MediaItem', 'Missing Presentation'),
                                                    translate('PresentationPlugin.MediaItem',
                                                              'The presentation {name} no longer exists.'
-                                                             ).format(name=filename))
+                                                             ).format(name=file_path))
                     return False
 
-    def find_controller_by_type(self, filename):
+    def find_controller_by_type(self, file_path):
         """
         Determine the default application controller to use for the selected file type. This is used if "Automatic" is
         set as the preferred controller. Find the first (alphabetic) enabled controller which "supports" the extension.
         If none found, then look for a controller which "also supports" it instead.
 
-        :param filename: The file name
+        :param openlp.core.common.path.Path file_path: The file path
+        :return: The default application controller for this file type, or None if not supported
+        :rtype: PresentationController
         """
-        file_type = os.path.splitext(filename)[1][1:]
+        file_type = file_path.suffix[1:]
         if not file_type:
             return None
         for controller in self.controllers:

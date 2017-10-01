@@ -71,7 +71,7 @@ except ImportError:
     VLC_VERSION = '-'
 
 from openlp.core.common import RegistryProperties, Settings, UiStrings, is_linux, translate
-from openlp.core.common.versionchecker import get_application_version
+from openlp.core.version import get_version
 from openlp.core.ui.lib.filedialog import FileDialog
 
 from .exceptiondialog import Ui_ExceptionDialog
@@ -110,7 +110,7 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
         """
         Create an exception report.
         """
-        openlp_version = get_application_version()
+        openlp_version = get_version()
         description = self.description_text_edit.toPlainText()
         traceback = self.exception_text_edit.toPlainText()
         system = translate('OpenLP.ExceptionForm', 'Platform: {platform}\n').format(platform=platform.platform())
@@ -149,21 +149,11 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
             opts = self._create_report()
             report_text = self.report_text.format(version=opts['version'], description=opts['description'],
                                                   traceback=opts['traceback'], libs=opts['libs'], system=opts['system'])
-            filename = str(file_path)
             try:
-                report_file = open(filename, 'w')
-                try:
+                with file_path.open('w') as report_file:
                     report_file.write(report_text)
-                except UnicodeError:
-                    report_file.close()
-                    report_file = open(filename, 'wb')
-                    report_file.write(report_text.encode('utf-8'))
-                finally:
-                    report_file.close()
             except IOError:
                 log.exception('Failed to write crash report')
-            finally:
-                report_file.close()
 
     def on_send_report_button_clicked(self):
         """
@@ -219,7 +209,7 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
                                        translate('ImagePlugin.ExceptionDialog', 'Select Attachment'),
                                        Settings().value(self.settings_section + '/last directory'),
                                        '{text} (*)'.format(text=UiStrings().AllFiles))
-        log.info('New file {file}'.format(file=file_path))
+        log.info('New files {file_path}'.format(file_path=file_path))
         if file_path:
             self.file_attachment = str(file_path)
 

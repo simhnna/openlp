@@ -70,7 +70,7 @@ class AlertForm(QtWidgets.QDialog, Ui_AlertDialog):
             item_name = QtWidgets.QListWidgetItem(alert.text)
             item_name.setData(QtCore.Qt.UserRole, alert.id)
             self.alert_list_widget.addItem(item_name)
-            if alert.text == str(self.alert_text_edit.text()):
+            if alert.text == self.alert_text_edit.text():
                 self.item_id = alert.id
                 self.alert_list_widget.setCurrentRow(self.alert_list_widget.row(item_name))
 

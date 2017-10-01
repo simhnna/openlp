@@ -19,46 +19,37 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-import os
-import shutil
-
-from tempfile import mkdtemp
-from unittest import TestCase
-
-from openlp.plugins.remotes.deploy import deploy_zipfile
+"""
+The :mod:`openlp.core.threading` module contains some common threading code
+"""
+from PyQt5 import QtCore
 
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
-
-
-class TestRemoteDeploy(TestCase):
+def run_thread(parent, worker, prefix='', auto_start=True):
     """
-    Test the Remote plugin deploy functions
+    Create a thread and assign a worker to it. This removes a lot of boilerplate code from the codebase.
+
+    :param object parent: The parent object so that the thread and worker are not orphaned.
+    :param QObject worker: A QObject-based worker object which does the actual work.
+    :param str prefix: A prefix to be applied to the attribute names.
+    :param bool auto_start: Automatically start the thread. Defaults to True.
     """
-
-    def setUp(self):
-        """
-        Setup for tests
-        """
-        self.app_root = mkdtemp()
-
-    def tearDown(self):
-        """
-        Clean up after tests
-        """
-        shutil.rmtree(self.app_root)
-
-    def test_deploy_zipfile(self):
-        """
-        Remote Deploy tests - test the dummy zip file is processed correctly
-        """
-        # GIVEN: A new downloaded zip file
-        zip_file = os.path.join(TEST_PATH, 'remotes', 'site.zip')
-        app_root = os.path.join(self.app_root, 'site.zip')
-        shutil.copyfile(zip_file, app_root)
-        # WHEN: I process the zipfile
-        deploy_zipfile(self.app_root, 'site.zip')
-
-        # THEN test if www directory has been created
-        self.assertTrue(os.path.isdir(os.path.join(self.app_root, 'www')), 'We should have a www directory')
+    # Set up attribute names
+    thread_name = 'thread'
+    worker_name = 'worker'
+    if prefix:
+        thread_name = '_'.join([prefix, thread_name])
+        worker_name = '_'.join([prefix, worker_name])
+    # Create the thread and add the thread and the worker to the parent
+    thread = QtCore.QThread()
+    setattr(parent, thread_name, thread)
+    setattr(parent, worker_name, worker)
+    # Move the worker into the thread's context
+    worker.moveToThread(thread)
+    # Connect slots and signals
+    thread.started.connect(worker.start)
+    worker.quit.connect(thread.quit)
+    worker.quit.connect(worker.deleteLater)
+    thread.finished.connect(thread.deleteLater)
+    if auto_start:
+        thread.start()

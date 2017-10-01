@@ -19,10 +19,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
+"""
+Download and "install" the remote web client
+"""
 import os
-import zipfile
-import urllib.error
+from zipfile import ZipFile
 
 from openlp.core.common import AppLocation, Registry
 from openlp.core.common.httputils import url_get_file, get_web_page, get_url_file_size
@@ -38,7 +39,7 @@ def deploy_zipfile(app_root, zip_name):
     :return: None
     """
     zip_file = os.path.join(app_root, zip_name)
-    web_zip = zipfile.ZipFile(zip_file)
+    web_zip = ZipFile(zip_file)
     web_zip.extractall(app_root)
 
 
@@ -48,11 +49,10 @@ def download_sha256():
     """
     user_agent = 'OpenLP/' + Registry().get('application').applicationVersion()
     try:
-        web_config = get_web_page('{host}{name}'.format(host='https://get.openlp.org/webclient/', name='download.cfg'),
-                                  header=('User-Agent', user_agent))
-    except (urllib.error.URLError, ConnectionError) as err:
+        web_config = get_web_page('https://get.openlp.org/webclient/download.cfg', headers={'User-Agent': user_agent})
+    except ConnectionError:
         return False
-    file_bits = web_config.read().decode('utf-8').split()
+    file_bits = web_config.split()
     return file_bits[0], file_bits[2]
 
 
@@ -63,7 +63,7 @@ def download_and_check(callback=None):
     sha256, version = download_sha256()
     file_size = get_url_file_size('https://get.openlp.org/webclient/site.zip')
     callback.setRange(0, file_size)
-    if url_get_file(callback, '{host}{name}'.format(host='https://get.openlp.org/webclient/', name='site.zip'),
-                    os.path.join(str(AppLocation.get_section_data_path('remotes')), 'site.zip'),
+    if url_get_file(callback, 'https://get.openlp.org/webclient/site.zip',
+                    AppLocation.get_section_data_path('remotes') / 'site.zip',
                     sha256=sha256):
         deploy_zipfile(str(AppLocation.get_section_data_path('remotes')), 'site.zip')

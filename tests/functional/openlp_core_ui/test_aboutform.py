@@ -47,13 +47,13 @@ class TestFirstTimeForm(TestCase, TestMixin):
         # THEN: A web browser is opened
         mocked_webbrowser.open_new.assert_called_with('http://openlp.org/en/contribute')
 
-    @patch('openlp.core.ui.aboutform.get_application_version')
-    def test_about_form_build_number(self, mocked_get_application_version):
+    @patch('openlp.core.ui.aboutform.get_version')
+    def test_about_form_build_number(self, mocked_get_version):
         """
         Test that the build number is added to the about form
         """
-        # GIVEN: A mocked out get_application_version function
-        mocked_get_application_version.return_value = {'version': '3.1.5', 'build': '3000'}
+        # GIVEN: A mocked out get_version function
+        mocked_get_version.return_value = {'version': '3.1.5', 'build': '3000'}
 
         # WHEN: The about form is created
         about_form = AboutForm(None)

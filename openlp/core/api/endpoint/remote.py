@@ -21,18 +21,13 @@
 ###############################################################################
 import logging
 
-import os
-
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.endpoint.core import TRANSLATED_STRINGS
-from openlp.core.common import AppLocation
 
-
-static_dir = os.path.join(str(AppLocation.get_section_data_path('remotes')))
 
 log = logging.getLogger(__name__)
 
-remote_endpoint = Endpoint('remote', template_dir=static_dir, static_dir=static_dir)
+remote_endpoint = Endpoint('remote', template_dir='remotes', static_dir='remotes')
 
 
 @remote_endpoint.route('{view}')

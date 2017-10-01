@@ -202,6 +202,8 @@ class ApiTab(SettingsTab):
         self.remote_url.setText('<a href="{url}">{url}</a>'.format(url=http_url))
         http_url_temp = http_url + 'stage'
         self.stage_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
+        http_url_temp = http_url + 'chords'
+        self.chords_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
         http_url_temp = http_url + 'main'
         self.live_url.setText('<a href="{url}">{url}</a>'.format(url=http_url_temp))
 

@@ -22,9 +22,8 @@
 """
 The :mod:`advancedtab` provides an advanced settings facility.
 """
-from datetime import datetime, timedelta
 import logging
-import os
+from datetime import datetime, timedelta
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -33,6 +32,7 @@ from openlp.core.common.languagemanager import format_time
 from openlp.core.common.path import path_to_str
 from openlp.core.lib import SettingsTab, build_icon
 from openlp.core.ui.lib import PathEdit, PathType
+from openlp.core.ui.style import HAS_DARK_STYLE
 
 log = logging.getLogger(__name__)
 
@@ -110,8 +110,80 @@ class AdvancedTab(SettingsTab):
         self.enable_auto_close_check_box.setObjectName('enable_auto_close_check_box')
         self.ui_layout.addRow(self.enable_auto_close_check_box)
         self.left_layout.addWidget(self.ui_group_box)
+        if HAS_DARK_STYLE:
+            self.use_dark_style_checkbox = QtWidgets.QCheckBox(self.ui_group_box)
+            self.use_dark_style_checkbox.setObjectName('use_dark_style_checkbox')
+            self.ui_layout.addRow(self.use_dark_style_checkbox)
+        # Data Directory
+        self.data_directory_group_box = QtWidgets.QGroupBox(self.left_column)
+        self.data_directory_group_box.setObjectName('data_directory_group_box')
+        self.data_directory_layout = QtWidgets.QFormLayout(self.data_directory_group_box)
+        self.data_directory_layout.setObjectName('data_directory_layout')
+        self.data_directory_new_label = QtWidgets.QLabel(self.data_directory_group_box)
+        self.data_directory_new_label.setObjectName('data_directory_current_label')
+        self.data_directory_path_edit = PathEdit(self.data_directory_group_box, path_type=PathType.Directories,
+                                                 default_path=AppLocation.get_directory(AppLocation.DataDir))
+        self.data_directory_layout.addRow(self.data_directory_new_label, self.data_directory_path_edit)
+        self.new_data_directory_has_files_label = QtWidgets.QLabel(self.data_directory_group_box)
+        self.new_data_directory_has_files_label.setObjectName('new_data_directory_has_files_label')
+        self.new_data_directory_has_files_label.setWordWrap(True)
+        self.data_directory_cancel_button = QtWidgets.QToolButton(self.data_directory_group_box)
+        self.data_directory_cancel_button.setObjectName('data_directory_cancel_button')
+        self.data_directory_cancel_button.setIcon(build_icon(':/general/general_delete.png'))
+        self.data_directory_copy_check_layout = QtWidgets.QHBoxLayout()
+        self.data_directory_copy_check_layout.setObjectName('data_directory_copy_check_layout')
+        self.data_directory_copy_check_box = QtWidgets.QCheckBox(self.data_directory_group_box)
+        self.data_directory_copy_check_box.setObjectName('data_directory_copy_check_box')
+        self.data_directory_copy_check_layout.addWidget(self.data_directory_copy_check_box)
+        self.data_directory_copy_check_layout.addStretch()
+        self.data_directory_copy_check_layout.addWidget(self.data_directory_cancel_button)
+        self.data_directory_layout.addRow(self.data_directory_copy_check_layout)
+        self.data_directory_layout.addRow(self.new_data_directory_has_files_label)
+        self.left_layout.addWidget(self.data_directory_group_box)
+        # Hide mouse
+        self.hide_mouse_group_box = QtWidgets.QGroupBox(self.right_column)
+        self.hide_mouse_group_box.setObjectName('hide_mouse_group_box')
+        self.hide_mouse_layout = QtWidgets.QVBoxLayout(self.hide_mouse_group_box)
+        self.hide_mouse_layout.setObjectName('hide_mouse_layout')
+        self.hide_mouse_check_box = QtWidgets.QCheckBox(self.hide_mouse_group_box)
+        self.hide_mouse_check_box.setObjectName('hide_mouse_check_box')
+        self.hide_mouse_layout.addWidget(self.hide_mouse_check_box)
+        self.right_layout.addWidget(self.hide_mouse_group_box)
+        # Service Item Slide Limits
+        self.slide_group_box = QtWidgets.QGroupBox(self.right_column)
+        self.slide_group_box.setObjectName('slide_group_box')
+        self.slide_layout = QtWidgets.QVBoxLayout(self.slide_group_box)
+        self.slide_layout.setObjectName('slide_layout')
+        self.slide_label = QtWidgets.QLabel(self.slide_group_box)
+        self.slide_label.setWordWrap(True)
+        self.slide_layout.addWidget(self.slide_label)
+        self.end_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
+        self.end_slide_radio_button.setObjectName('end_slide_radio_button')
+        self.slide_layout.addWidget(self.end_slide_radio_button)
+        self.wrap_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
+        self.wrap_slide_radio_button.setObjectName('wrap_slide_radio_button')
+        self.slide_layout.addWidget(self.wrap_slide_radio_button)
+        self.next_item_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
+        self.next_item_radio_button.setObjectName('next_item_radio_button')
+        self.slide_layout.addWidget(self.next_item_radio_button)
+        self.right_layout.addWidget(self.slide_group_box)
+        # Display Workarounds
+        self.display_workaround_group_box = QtWidgets.QGroupBox(self.right_column)
+        self.display_workaround_group_box.setObjectName('display_workaround_group_box')
+        self.display_workaround_layout = QtWidgets.QVBoxLayout(self.display_workaround_group_box)
+        self.display_workaround_layout.setObjectName('display_workaround_layout')
+        self.ignore_aspect_ratio_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
+        self.ignore_aspect_ratio_check_box.setObjectName('ignore_aspect_ratio_check_box')
+        self.display_workaround_layout.addWidget(self.ignore_aspect_ratio_check_box)
+        self.x11_bypass_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
+        self.x11_bypass_check_box.setObjectName('x11_bypass_check_box')
+        self.display_workaround_layout.addWidget(self.x11_bypass_check_box)
+        self.alternate_rows_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
+        self.alternate_rows_check_box.setObjectName('alternate_rows_check_box')
+        self.display_workaround_layout.addWidget(self.alternate_rows_check_box)
+        self.right_layout.addWidget(self.display_workaround_group_box)
         # Default service name
-        self.service_name_group_box = QtWidgets.QGroupBox(self.left_column)
+        self.service_name_group_box = QtWidgets.QGroupBox(self.right_column)
         self.service_name_group_box.setObjectName('service_name_group_box')
         self.service_name_layout = QtWidgets.QFormLayout(self.service_name_group_box)
         self.service_name_check_box = QtWidgets.QCheckBox(self.service_name_group_box)
@@ -148,77 +220,11 @@ class AdvancedTab(SettingsTab):
         self.service_name_example = QtWidgets.QLabel(self.service_name_group_box)
         self.service_name_example.setObjectName('service_name_example')
         self.service_name_layout.addRow(self.service_name_example_label, self.service_name_example)
-        self.left_layout.addWidget(self.service_name_group_box)
-        # Data Directory
-        self.data_directory_group_box = QtWidgets.QGroupBox(self.left_column)
-        self.data_directory_group_box.setObjectName('data_directory_group_box')
-        self.data_directory_layout = QtWidgets.QFormLayout(self.data_directory_group_box)
-        self.data_directory_layout.setObjectName('data_directory_layout')
-        self.data_directory_new_label = QtWidgets.QLabel(self.data_directory_group_box)
-        self.data_directory_new_label.setObjectName('data_directory_current_label')
-        self.data_directory_path_edit = PathEdit(self.data_directory_group_box, path_type=PathType.Directories,
-                                                 default_path=AppLocation.get_directory(AppLocation.DataDir))
-        self.data_directory_layout.addRow(self.data_directory_new_label, self.data_directory_path_edit)
-        self.new_data_directory_has_files_label = QtWidgets.QLabel(self.data_directory_group_box)
-        self.new_data_directory_has_files_label.setObjectName('new_data_directory_has_files_label')
-        self.new_data_directory_has_files_label.setWordWrap(True)
-        self.data_directory_cancel_button = QtWidgets.QToolButton(self.data_directory_group_box)
-        self.data_directory_cancel_button.setObjectName('data_directory_cancel_button')
-        self.data_directory_cancel_button.setIcon(build_icon(':/general/general_delete.png'))
-        self.data_directory_copy_check_layout = QtWidgets.QHBoxLayout()
-        self.data_directory_copy_check_layout.setObjectName('data_directory_copy_check_layout')
-        self.data_directory_copy_check_box = QtWidgets.QCheckBox(self.data_directory_group_box)
-        self.data_directory_copy_check_box.setObjectName('data_directory_copy_check_box')
-        self.data_directory_copy_check_layout.addWidget(self.data_directory_copy_check_box)
-        self.data_directory_copy_check_layout.addStretch()
-        self.data_directory_copy_check_layout.addWidget(self.data_directory_cancel_button)
-        self.data_directory_layout.addRow(self.data_directory_copy_check_layout)
-        self.data_directory_layout.addRow(self.new_data_directory_has_files_label)
-        self.left_layout.addWidget(self.data_directory_group_box)
+        self.right_layout.addWidget(self.service_name_group_box)
+        # After the last item on each side, add some spacing
         self.left_layout.addStretch()
-        # Hide mouse
-        self.hide_mouse_group_box = QtWidgets.QGroupBox(self.right_column)
-        self.hide_mouse_group_box.setObjectName('hide_mouse_group_box')
-        self.hide_mouse_layout = QtWidgets.QVBoxLayout(self.hide_mouse_group_box)
-        self.hide_mouse_layout.setObjectName('hide_mouse_layout')
-        self.hide_mouse_check_box = QtWidgets.QCheckBox(self.hide_mouse_group_box)
-        self.hide_mouse_check_box.setObjectName('hide_mouse_check_box')
-        self.hide_mouse_layout.addWidget(self.hide_mouse_check_box)
-        self.right_layout.addWidget(self.hide_mouse_group_box)
-        # Service Item Slide Limits
-        self.slide_group_box = QtWidgets.QGroupBox(self.right_column)
-        self.slide_group_box.setObjectName('slide_group_box')
-        self.slide_layout = QtWidgets.QVBoxLayout(self.slide_group_box)
-        self.slide_layout.setObjectName('slide_layout')
-        self.slide_label = QtWidgets.QLabel(self.slide_group_box)
-        self.slide_label.setWordWrap(True)
-        self.slide_layout.addWidget(self.slide_label)
-        self.end_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
-        self.end_slide_radio_button.setObjectName('end_slide_radio_button')
-        self.slide_layout.addWidget(self.end_slide_radio_button)
-        self.wrap_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
-        self.wrap_slide_radio_button.setObjectName('wrap_slide_radio_button')
-        self.slide_layout.addWidget(self.wrap_slide_radio_button)
-        self.next_item_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
-        self.next_item_radio_button.setObjectName('next_item_radio_button')
-        self.slide_layout.addWidget(self.next_item_radio_button)
-        self.right_layout.addWidget(self.slide_group_box)
-        # Display Workarounds
-        self.display_workaround_group_box = QtWidgets.QGroupBox(self.left_column)
-        self.display_workaround_group_box.setObjectName('display_workaround_group_box')
-        self.display_workaround_layout = QtWidgets.QVBoxLayout(self.display_workaround_group_box)
-        self.display_workaround_layout.setObjectName('display_workaround_layout')
-        self.ignore_aspect_ratio_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
-        self.ignore_aspect_ratio_check_box.setObjectName('ignore_aspect_ratio_check_box')
-        self.display_workaround_layout.addWidget(self.ignore_aspect_ratio_check_box)
-        self.x11_bypass_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
-        self.x11_bypass_check_box.setObjectName('x11_bypass_check_box')
-        self.display_workaround_layout.addWidget(self.x11_bypass_check_box)
-        self.alternate_rows_check_box = QtWidgets.QCheckBox(self.display_workaround_group_box)
-        self.alternate_rows_check_box.setObjectName('alternate_rows_check_box')
-        self.display_workaround_layout.addWidget(self.alternate_rows_check_box)
-        self.right_layout.addWidget(self.display_workaround_group_box)
         self.right_layout.addStretch()
+        # Set up all the connections and things
         self.should_update_service_name_example = False
         self.service_name_check_box.toggled.connect(self.service_name_check_box_toggled)
         self.service_name_day.currentIndexChanged.connect(self.on_service_name_day_changed)
@@ -283,6 +289,8 @@ class AdvancedTab(SettingsTab):
                                                             'Auto-scroll the next slide to bottom'))
         self.enable_auto_close_check_box.setText(translate('OpenLP.AdvancedTab',
                                                            'Enable application exit confirmation'))
+        if HAS_DARK_STYLE:
+            self.use_dark_style_checkbox.setText(translate('OpenLP.AdvancedTab', 'Use dark style (needs restart)'))
         self.service_name_group_box.setTitle(translate('OpenLP.AdvancedTab', 'Default Service Name'))
         self.service_name_check_box.setText(translate('OpenLP.AdvancedTab', 'Enable default service name'))
         self.service_name_time_label.setText(translate('OpenLP.AdvancedTab', 'Date and Time:'))
@@ -350,6 +358,8 @@ class AdvancedTab(SettingsTab):
             if self.autoscroll_map[i] == autoscroll_value and i < self.autoscroll_combo_box.count():
                 self.autoscroll_combo_box.setCurrentIndex(i)
         self.enable_auto_close_check_box.setChecked(settings.value('enable exit confirmation'))
+        if HAS_DARK_STYLE:
+            self.use_dark_style_checkbox.setChecked(settings.value('use_dark_style'))
         self.hide_mouse_check_box.setChecked(settings.value('hide mouse'))
         self.service_name_day.setCurrentIndex(settings.value('default service day'))
         self.service_name_time.setTime(QtCore.QTime(settings.value('default service hour'),
@@ -421,6 +431,8 @@ class AdvancedTab(SettingsTab):
             self.settings_form.register_post_process('config_screen_changed')
         self.settings_form.register_post_process('slidecontroller_update_slide_limits')
         settings.setValue('search as type', self.is_search_as_you_type_enabled)
+        if HAS_DARK_STYLE:
+            settings.setValue('use_dark_style', self.use_dark_style_checkbox.isChecked())
         settings.endGroup()
 
     def on_search_as_type_check_box_changed(self, check_state):
@@ -492,24 +504,27 @@ class AdvancedTab(SettingsTab):
         self.service_name_edit.setText(UiStrings().DefaultServiceName)
         self.service_name_edit.setFocus()
 
-    def on_data_directory_path_edit_path_changed(self, new_data_path):
+    def on_data_directory_path_edit_path_changed(self, new_path):
         """
-        Browse for a new data directory location.
+        Handle the `editPathChanged` signal of the data_directory_path_edit
+
+        :param openlp.core.common.path.Path new_path: The new path
+        :rtype: None
         """
         # Make sure they want to change the data.
         answer = QtWidgets.QMessageBox.question(self, translate('OpenLP.AdvancedTab', 'Confirm Data Directory Change'),
                                                 translate('OpenLP.AdvancedTab', 'Are you sure you want to change the '
                                                           'location of the OpenLP data directory to:\n\n{path}'
                                                           '\n\nThe data directory will be changed when OpenLP is '
-                                                          'closed.').format(path=new_data_path),
+                                                          'closed.').format(path=new_path),
                                                 defaultButton=QtWidgets.QMessageBox.No)
         if answer != QtWidgets.QMessageBox.Yes:
             self.data_directory_path_edit.path = AppLocation.get_data_path()
             return
         # Check if data already exists here.
-        self.check_data_overwrite(path_to_str(new_data_path))
+        self.check_data_overwrite(new_path)
         # Save the new location.
-        self.main_window.set_new_data_path(path_to_str(new_data_path))
+        self.main_window.new_data_path = new_path
         self.data_directory_cancel_button.show()
 
     def on_data_directory_copy_check_box_toggled(self):
@@ -526,9 +541,10 @@ class AdvancedTab(SettingsTab):
     def check_data_overwrite(self, data_path):
         """
         Check if there's already data in the target directory.
+
+        :param openlp.core.common.path.Path data_path: The target directory to check
         """
-        test_path = os.path.join(data_path, 'songs')
-        if os.path.exists(test_path):
+        if (data_path / 'songs').exists():
             self.data_exists = True
             # Check is they want to replace existing data.
             answer = QtWidgets.QMessageBox.warning(self,
@@ -537,7 +553,7 @@ class AdvancedTab(SettingsTab):
                                                              'WARNING: \n\nThe location you have selected \n\n{path}'
                                                              '\n\nappears to contain OpenLP data files. Do you wish to '
                                                              'replace these files with the current data '
-                                                             'files?').format(path=os.path.abspath(data_path,)),
+                                                             'files?'.format(path=data_path)),
                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
                                                                                          QtWidgets.QMessageBox.No),
                                                    QtWidgets.QMessageBox.No)
@@ -559,7 +575,7 @@ class AdvancedTab(SettingsTab):
         """
         self.data_directory_path_edit.path = AppLocation.get_data_path()
         self.data_directory_copy_check_box.setChecked(False)
-        self.main_window.set_new_data_path(None)
+        self.main_window.new_data_path = None
         self.main_window.set_copy_data(False)
         self.data_directory_copy_check_box.hide()
         self.data_directory_cancel_button.hide()

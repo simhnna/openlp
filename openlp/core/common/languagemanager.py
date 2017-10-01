@@ -141,7 +141,7 @@ class LanguageManager(object):
             if reg_ex.exactMatch(qmf):
                 name = '{regex}'.format(regex=reg_ex.cap(1))
                 LanguageManager.__qm_list__[
-                    '{count:>2i} {name}'.format(count=counter + 1, name=LanguageManager.language_name(qmf))] = name
+                    '{count:>2d} {name}'.format(count=counter + 1, name=LanguageManager.language_name(qmf))] = name
 
     @staticmethod
     def get_qm_list():

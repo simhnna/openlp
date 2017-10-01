@@ -26,17 +26,24 @@ with OpenLP. It uses JSON to communicate with the remotes.
 """
 
 import logging
+import time
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtWidgets
 from waitress import serve
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.api.http import application
-from openlp.core.common import RegistryMixin, RegistryProperties, OpenLPMixin, Settings, Registry
+from openlp.core.common import AppLocation, RegistryMixin, RegistryProperties, OpenLPMixin, \
+    Settings, Registry, UiStrings, check_directory_exists
+from openlp.core.lib import translate
+
+from openlp.core.api.deploy import download_and_check, download_sha256
 from openlp.core.api.poll import Poller
 from openlp.core.api.endpoint.controller import controller_endpoint, api_controller_endpoint
 from openlp.core.api.endpoint.core import chords_endpoint, stage_endpoint, blank_endpoint, main_endpoint
 from openlp.core.api.endpoint.service import service_endpoint, api_service_endpoint
+from openlp.core.api.endpoint.remote import remote_endpoint
+
 
 log = logging.getLogger(__name__)
 
@@ -59,6 +66,7 @@ class HttpWorker(QtCore.QObject):
         """
         address = Settings().value('api/ip address')
         port = Settings().value('api/port')
+        Registry().execute('get_website_version')
         serve(application, host=address, port=port)
 
     def stop(self):
@@ -79,11 +87,15 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
         self.thread.start()
+        Registry().register_function('download_website', self.first_time)
+        Registry().register_function('get_website_version', self.website_version)
+        Registry().set_flag('website_version', '0.0')
 
     def bootstrap_post_set_up(self):
         """
         Register the poll return service and start the servers.
         """
+        self.initialise()
         self.poller = Poller()
         Registry().register('poller', self.poller)
         application.initialise()
@@ -95,3 +107,79 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         register_endpoint(main_endpoint)
         register_endpoint(service_endpoint)
         register_endpoint(api_service_endpoint)
+        register_endpoint(remote_endpoint)
+
+    @staticmethod
+    def initialise():
+        """
+        Create the internal file structure if it does not exist
+        :return:
+        """
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'assets')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'images')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'static')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'static' / 'index')
+        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'templates')
+
+    def first_time(self):
+        """
+        Import web site code if active
+        """
+        self.application.process_events()
+        progress = DownloadProgressDialog(self)
+        progress.forceShow()
+        self.application.process_events()
+        time.sleep(1)
+        download_and_check(progress)
+        self.application.process_events()
+        time.sleep(1)
+        progress.close()
+        self.application.process_events()
+        Settings().setValue('remotes/download version', self.version)
+
+    def website_version(self):
+        """
+        Download and save the website version and sha256
+        :return: None
+        """
+        sha256, self.version = download_sha256()
+        Registry().set_flag('website_sha256', sha256)
+        Registry().set_flag('website_version', self.version)
+
+
+class DownloadProgressDialog(QtWidgets.QProgressDialog):
+    """
+    Local class to handle download display based and supporting httputils:get_web_page
+    """
+    def __init__(self, parent):
+        super(DownloadProgressDialog, self).__init__(parent.main_window)
+        self.parent = parent
+        self.setWindowModality(QtCore.Qt.WindowModal)
+        self.setWindowTitle(translate('RemotePlugin', 'Importing Website'))
+        self.setLabelText(UiStrings().StartingImport)
+        self.setCancelButton(None)
+        self.setRange(0, 1)
+        self.setMinimumDuration(0)
+        self.was_cancelled = False
+        self.previous_size = 0
+
+    def _download_progress(self, count, block_size):
+        """
+        Calculate and display the download progress.
+        """
+        increment = (count * block_size) - self.previous_size
+        self._increment_progress_bar(None, increment)
+        self.previous_size = count * block_size
+
+    def _increment_progress_bar(self, status_text, increment=1):
+        """
+        Update the wizard progress page.
+
+        :param status_text: Current status information to display.
+        :param increment: The value to increment the progress bar by.
+        """
+        if status_text:
+            self.setText(status_text)
+        if increment > 0:
+            self.setValue(self.value() + increment)
+        self.parent.application.process_events()

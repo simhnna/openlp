@@ -27,10 +27,10 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, is_macosx, Settings
+from openlp.core.common import Registry, is_macosx
+from openlp.core.common.path import Path
 from openlp.core.lib import ScreenList, PluginManager
 from openlp.core.ui import MainDisplay, AudioPlayer
-from openlp.core.ui.media import MediaController
 from openlp.core.ui.maindisplay import TRANSPARENT_STYLESHEET, OPAQUE_STYLESHEET
 
 from tests.helpers.testmixin import TestMixin
@@ -184,7 +184,7 @@ class TestMainDisplay(TestCase, TestMixin):
         self.assertEqual(pyobjc_nsview.window().collectionBehavior(), NSWindowCollectionBehaviorManaged,
                          'Window collection behavior should be NSWindowCollectionBehaviorManaged')
 
-    @patch(u'openlp.core.ui.maindisplay.Settings')
+    @patch('openlp.core.ui.maindisplay.Settings')
     def test_show_display_startup_logo(self, MockedSettings):
         # GIVEN: Mocked show_display, setting for logo visibility
         display = MagicMock()
@@ -204,7 +204,7 @@ class TestMainDisplay(TestCase, TestMixin):
         # THEN: setVisible should had been called with "True"
         main_display.setVisible.assert_called_once_with(True)
 
-    @patch(u'openlp.core.ui.maindisplay.Settings')
+    @patch('openlp.core.ui.maindisplay.Settings')
     def test_show_display_hide_startup_logo(self, MockedSettings):
         # GIVEN: Mocked show_display, setting for logo visibility
         display = MagicMock()
@@ -224,8 +224,8 @@ class TestMainDisplay(TestCase, TestMixin):
         # THEN: setVisible should had not been called
         main_display.setVisible.assert_not_called()
 
-    @patch(u'openlp.core.ui.maindisplay.Settings')
-    @patch(u'openlp.core.ui.maindisplay.build_html')
+    @patch('openlp.core.ui.maindisplay.Settings')
+    @patch('openlp.core.ui.maindisplay.build_html')
     def test_build_html_no_video(self, MockedSettings, Mocked_build_html):
         # GIVEN: Mocked display
         display = MagicMock()
@@ -252,8 +252,8 @@ class TestMainDisplay(TestCase, TestMixin):
         self.assertEquals(main_display.media_controller.video.call_count, 0,
                           'Media Controller video should not have been called')
 
-    @patch(u'openlp.core.ui.maindisplay.Settings')
-    @patch(u'openlp.core.ui.maindisplay.build_html')
+    @patch('openlp.core.ui.maindisplay.Settings')
+    @patch('openlp.core.ui.maindisplay.build_html')
     def test_build_html_video(self, MockedSettings, Mocked_build_html):
         # GIVEN: Mocked display
         display = MagicMock()
@@ -270,7 +270,7 @@ class TestMainDisplay(TestCase, TestMixin):
         service_item.theme_data = MagicMock()
         service_item.theme_data.background_type = 'video'
         service_item.theme_data.theme_name = 'name'
-        service_item.theme_data.background_filename = 'background_filename'
+        service_item.theme_data.background_filename = Path('background_filename')
         mocked_plugin = MagicMock()
         display.plugin_manager = PluginManager()
         display.plugin_manager.plugins = [mocked_plugin]

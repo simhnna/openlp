@@ -143,7 +143,7 @@ class Registry(object):
                     log.exception('Exception for function {function}'.format(function=function))
         else:
             trace_error_handler(log)
-            log.error("Event {event} called but not registered".format(event=event))
+            log.exception('Event {event} called but not registered'.format(event=event))
         return results
 
     def get_flag(self, key):

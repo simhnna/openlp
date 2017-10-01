@@ -22,8 +22,9 @@
 """
 Package to test the openlp.core.lib.theme package.
 """
-from unittest import TestCase
 import os
+from pathlib import Path
+from unittest import TestCase
 
 from openlp.core.lib.theme import Theme
 
@@ -79,16 +80,16 @@ class TestTheme(TestCase):
         """
         # GIVEN: A theme object
         theme = Theme()
-        theme.theme_name = 'MyBeautifulTheme   '
-        theme.background_filename = '    video.mp4'
+        theme.theme_name = 'MyBeautifulTheme'
+        theme.background_filename = Path('video.mp4')
         theme.background_type = 'video'
-        path = os.path.expanduser('~')
+        path = Path.home()
 
         # WHEN: Theme.extend_image_filename is run
         theme.extend_image_filename(path)
 
         # THEN: The filename of the background should be correct
-        expected_filename = os.path.join(path, 'MyBeautifulTheme', 'video.mp4')
+        expected_filename = path / 'MyBeautifulTheme' / 'video.mp4'
         self.assertEqual(expected_filename, theme.background_filename)
         self.assertEqual('MyBeautifulTheme', theme.theme_name)
 
