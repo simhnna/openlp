@@ -183,7 +183,6 @@
     <file>projector_warmup.png</file>
     </qresource>
   <qresource prefix="remotes">
-    <file>android_app_qr.png</file>
-    <file>ios_app_qr.png</file>
-  </qresource>
+    <file>app_qr.svg</file>
+    </qresource>
 </RCC>
