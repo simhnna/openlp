@@ -25,14 +25,13 @@ The duplicate song removal logic for OpenLP.
 
 import logging
 import multiprocessing
-import os
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import Registry, RegistryProperties, translate
 from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.songs.lib import delete_song
-from openlp.plugins.songs.lib.db import Song, MediaFile
+from openlp.plugins.songs.lib.db import Song
 from openlp.plugins.songs.forms.songreviewwidget import SongReviewWidget
 from openlp.plugins.songs.lib.songcompare import songs_probably_equal
 

@@ -147,7 +147,7 @@ class UiStrings(object):
         self.SaveService = translate('OpenLP.Ui', 'Save Service')
         self.Service = translate('OpenLP.Ui', 'Service')
         self.ShortResults = translate('OpenLP.Ui', 'Please type more text to use \'Search As You Type\'')
-        self.Split = translate('OpenLP.Ui', 'Optional &Split')
+        self.Split = translate('OpenLP.Ui', 'Overflow &Split')
         self.SplitToolTip = translate('OpenLP.Ui',
                                       'Split a slide into two only if it does not fit on the screen as one slide.')
         self.StartingImport = translate('OpenLP.Ui', 'Starting import...')

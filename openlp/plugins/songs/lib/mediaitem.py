@@ -577,7 +577,7 @@ class SongMediaItem(MediaManagerItem):
         if not song.verse_order.strip():
             for verse in verse_list:
                 # We cannot use from_loose_input() here, because database is supposed to contain English lowercase
-                # singlechar tags.
+                # single char tags.
                 verse_tag = verse[0]['type']
                 verse_index = None
                 if len(verse_tag) > 1:
@@ -588,7 +588,9 @@ class SongMediaItem(MediaManagerItem):
                     verse_index = VerseType.from_tag(verse_tag)
                 verse_tag = VerseType.translated_tags[verse_index].upper()
                 verse_def = '{tag}{label}'.format(tag=verse_tag, label=verse[0]['label'])
-                service_item.add_from_text(str(verse[1]), verse_def)
+                force_verse = verse[1].split('[--}{--]\n')
+                for split_verse in force_verse:
+                    service_item.add_from_text(split_verse, verse_def)
         else:
             # Loop through the verse list and expand the song accordingly.
             for order in song.verse_order.lower().split():
@@ -603,7 +605,9 @@ class SongMediaItem(MediaManagerItem):
                             verse_index = VerseType.from_tag(verse[0]['type'])
                         verse_tag = VerseType.translated_tags[verse_index]
                         verse_def = '{tag}{label}'.format(tag=verse_tag, label=verse[0]['label'])
-                        service_item.add_from_text(verse[1], verse_def)
+                        force_verse = verse[1].split('[--}{--]\n')
+                        for split_verse in force_verse:
+                            service_item.add_from_text(split_verse, verse_def)
         service_item.title = song.title
         author_list = self.generate_footer(service_item, song)
         service_item.data_string = {'title': song.search_title, 'authors': ', '.join(author_list)}
