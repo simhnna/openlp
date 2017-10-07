@@ -320,7 +320,7 @@ def set_up_logging(log_path):
     :param openlp.core.common.path.Path log_path: The file to save the log to.
     :rtype: None
     """
-    create_paths(log_path, True)
+    create_paths(log_path, do_not_log=True)
     file_path = log_path / 'openlp.log'
     # TODO: FileHandler accepts a Path object in Py3.6
     logfile = logging.FileHandler(str(file_path), 'w', encoding='UTF-8')
