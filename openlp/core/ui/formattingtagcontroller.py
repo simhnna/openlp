@@ -24,9 +24,9 @@ The :mod:`formattingtagform` provides an Tag Edit facility. The Base set are pro
 Custom tags can be defined and saved. The Custom Tag arrays are saved in a pickle so QSettings works on them. Base Tags
 cannot be changed.
 """
-
 import re
-from openlp.core.common import translate
+
+from openlp.core.common.i18n import translate
 from openlp.core.lib import FormattingTags
 
 

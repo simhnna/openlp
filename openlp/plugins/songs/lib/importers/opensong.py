@@ -19,14 +19,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import logging
 import re
 
 from lxml import objectify
 from lxml.etree import Error, LxmlError
 
-from openlp.core.common import translate, Settings
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.ui import SongStrings

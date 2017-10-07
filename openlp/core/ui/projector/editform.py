@@ -20,21 +20,21 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    :mod: `openlp.core.ui.projector.editform` module
-
-    Provides the functions for adding/editing entries in the projector database.
+The :mod: `openlp.core.ui.projector.editform` module provides the functions for adding/editing entries in the projector
+database.
 """
-
 import logging
-log = logging.getLogger(__name__)
-log.debug('editform loaded')
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import translate, verify_ip_address
+from openlp.core.common import verify_ip_address
+from openlp.core.common.i18n import translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.projector.db import Projector
 from openlp.core.lib.projector.constants import PJLINK_PORT
+
+log = logging.getLogger(__name__)
+log.debug('editform loaded')
 
 
 class Ui_ProjectorEditForm(object):

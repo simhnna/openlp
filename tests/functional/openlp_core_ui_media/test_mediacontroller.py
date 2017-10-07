@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 
 from openlp.core.ui.media.mediacontroller import MediaController
 from openlp.core.ui.media.mediaplayer import MediaPlayer
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 
 from tests.helpers.testmixin import TestMixin
 

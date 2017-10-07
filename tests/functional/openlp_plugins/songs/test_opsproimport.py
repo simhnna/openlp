@@ -28,7 +28,7 @@ from unittest import TestCase, skipUnless
 from unittest.mock import patch, MagicMock
 
 try:
-    from openlp.core.common import Registry
+    from openlp.core.common.registry import Registry
     from openlp.plugins.songs.lib.importers.opspro import OPSProImport
     CAN_RUN_TESTS = True
 except ImportError:

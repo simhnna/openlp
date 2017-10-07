@@ -27,7 +27,7 @@ import logging
 
 from sqlalchemy import Column, Table
 
-from openlp.core.common import AppLocation
+from openlp.core.common.applocation import AppLocation
 from openlp.core.common.db import drop_columns
 from openlp.core.common.json import OpenLPJsonEncoder
 from openlp.core.common.path import Path

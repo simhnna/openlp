@@ -22,8 +22,9 @@
 
 import json
 
-from openlp.core.common import RegistryProperties, Settings
 from openlp.core.common.httputils import get_web_page
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
 
 
 class Poller(RegistryProperties):

@@ -27,8 +27,9 @@ from unittest.mock import MagicMock
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry, Settings
-from openlp.core.common.uistrings import UiStrings
+from openlp.core.common.i18n import UiStrings
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.forms.editsongform import EditSongForm
 
 from tests.helpers.testmixin import TestMixin

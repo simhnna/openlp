@@ -25,7 +25,7 @@ This module contains tests for the OpenOffice/LibreOffice importer.
 from unittest import TestCase, SkipTest
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 try:
     from openlp.plugins.songs.lib.importers.openoffice import OpenOfficeImport
 except ImportError:

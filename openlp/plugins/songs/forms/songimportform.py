@@ -22,14 +22,15 @@
 """
 The song import functions for OpenLP.
 """
-import codecs
 import logging
 import os
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import RegistryProperties, Settings, UiStrings, translate
-from openlp.core.common.path import path_to_str, str_to_path
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.path import path_to_str
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
@@ -201,7 +202,6 @@ class SongImportForm(OpenLPWizard, RegistryProperties):
         Re-implement the validateCurrentPage() method. Validate the current page before moving on to the next page.
         Provide each song format class with a chance to validate its input by overriding is_valid_source().
         """
-        completeChanged = QtCore.pyqtSignal()
         if self.currentPage() == self.welcome_page:
             return True
         elif self.currentPage() == self.source_page:

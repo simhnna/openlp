@@ -23,7 +23,6 @@
 Package to test the openlp.core.lib package.
 """
 import os
-from datetime import datetime, timedelta
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -496,7 +495,7 @@ class TestLib(TestCase):
         Test that the check_item_selected() function returns True when there are selected indexes
         """
         # GIVEN: A mocked out QtWidgets module and a list widget with selected indexes
-        mocked_QtWidgets = patch('openlp.core.lib.QtWidgets')
+        # mocked_QtWidgets = patch('openlp.core.lib.QtWidgets')
         mocked_list_widget = MagicMock()
         mocked_list_widget.selectedIndexes.return_value = True
         message = 'message'
@@ -595,7 +594,7 @@ class TestLib(TestCase):
         Test the validate_thumb() function when the thumbnail does not exist
         """
         # GIVEN: A mocked out os module, with path.exists returning False, and fake paths to a file and a thumb
-        with patch.object(Path, 'exists', return_value=False) as mocked_path_exists:
+        with patch.object(Path, 'exists', return_value=False):
             file_path = Path('path', 'to', 'file')
             thumb_path = Path('path', 'to', 'thumb')
 
@@ -678,40 +677,34 @@ class TestLib(TestCase):
         self.assertEqual(wanted_width, result_size.width(), 'The image should have the requested width.')
         self.assertEqual(image.pixel(0, 0), wanted_background_rgb, 'The background should be white.')
 
-    def test_create_separated_list_qlocate(self):
+    @patch('openlp.core.lib.QtCore.QLocale.createSeparatedList')
+    def test_create_separated_list_qlocate(self, mocked_createSeparatedList):
         """
         Test the create_separated_list function using the Qt provided method
         """
-        with patch('openlp.core.lib.Qt') as mocked_qt, \
-                patch('openlp.core.lib.QtCore.QLocale.createSeparatedList') as mocked_createSeparatedList:
-            # GIVEN: A list of strings and the mocked Qt module.
-            mocked_qt.PYQT_VERSION_STR = '4.9'
-            mocked_qt.qVersion.return_value = '4.8'
-            mocked_createSeparatedList.return_value = 'Author 1, Author 2, and Author 3'
-            string_list = ['Author 1', 'Author 2', 'Author 3']
+        # GIVEN: A list of strings and the mocked Qt module.
+        mocked_createSeparatedList.return_value = 'Author 1, Author 2, and Author 3'
+        string_list = ['Author 1', 'Author 2', 'Author 3']
 
-            # WHEN: We get a string build from the entries it the list and a separator.
-            string_result = create_separated_list(string_list)
+        # WHEN: We get a string build from the entries it the list and a separator.
+        string_result = create_separated_list(string_list)
 
-            # THEN: We should have "Author 1, Author 2, and Author 3"
-            self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
-                             'Author 2, and Author 3".')
+        # THEN: We should have "Author 1, Author 2, and Author 3"
+        self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
+                         'Author 2, and Author 3".')
 
     def test_create_separated_list_empty_list(self):
         """
         Test the create_separated_list function with an empty list
         """
-        with patch('openlp.core.lib.Qt') as mocked_qt:
-            # GIVEN: An empty list and the mocked Qt module.
-            mocked_qt.PYQT_VERSION_STR = '4.8'
-            mocked_qt.qVersion.return_value = '4.7'
-            string_list = []
+        # GIVEN: An empty list and the mocked Qt module.
+        string_list = []
 
-            # WHEN: We get a string build from the entries it the list and a separator.
-            string_result = create_separated_list(string_list)
+        # WHEN: We get a string build from the entries it the list and a separator.
+        string_result = create_separated_list(string_list)
 
-            # THEN: We shoud have an emptry string.
-            self.assertEqual(string_result, '', 'The string sould be empty.')
+        # THEN: We shoud have an emptry string.
+        self.assertEqual(string_result, '', 'The string sould be empty.')
 
     def test_create_separated_list_with_one_item(self):
         """
@@ -773,7 +766,6 @@ class TestLib(TestCase):
         """
         Test that the expanding of chords works as expected when special chars are involved.
         """
-        import html
         # GIVEN: A lyrics-line with chords
         text_with_chords = "I[D]'M NOT MOVED BY WHAT I SEE HALLE[F]LUJA[C]H"
 

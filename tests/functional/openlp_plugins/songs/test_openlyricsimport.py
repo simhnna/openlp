@@ -29,10 +29,11 @@ from unittest.mock import MagicMock, patch
 
 from lxml import etree, objectify
 
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib.importers.openlyrics import OpenLyricsImport
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
-from openlp.core.common import Registry, Settings
 
 from tests.helpers.testmixin import TestMixin
 
@@ -160,7 +161,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
         Test that _process_authors works
         """
         # GIVEN: A OpenLyric XML with authors and a mocked out manager
-        with patch('openlp.plugins.songs.lib.openlyricsxml.Author') as mocked_author:
+        with patch('openlp.plugins.songs.lib.openlyricsxml.Author'):
             mocked_manager = MagicMock()
             mocked_manager.get_object_filtered.return_value = None
             ol = OpenLyrics(mocked_manager)

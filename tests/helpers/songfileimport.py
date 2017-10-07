@@ -28,7 +28,7 @@ import logging
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
 
 log = logging.getLogger(__name__)

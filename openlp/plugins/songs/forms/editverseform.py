@@ -25,10 +25,11 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.plugins.songs.lib import VerseType, transpose_lyrics
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.common import translate, Settings
-from .editversedialog import Ui_EditVerseDialog
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
+from openlp.plugins.songs.forms.editversedialog import Ui_EditVerseDialog
+from openlp.plugins.songs.lib import VerseType, transpose_lyrics
 
 log = logging.getLogger(__name__)
 
@@ -217,7 +218,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         if Settings().value('songs/enable chords'):
             try:
-                transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
+                transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
                 super(EditVerseForm, self).accept()
             except ValueError as ve:
                 # Transposing failed

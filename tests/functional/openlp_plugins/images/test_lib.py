@@ -27,7 +27,7 @@ from unittest.mock import ANY, MagicMock, patch
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
 from openlp.plugins.images.lib.db import ImageFilenames, ImageGroups
 from openlp.plugins.images.lib.mediaitem import ImageMediaItem

@@ -22,8 +22,13 @@
 
 import logging
 
-from openlp.core.common import AppLocation, OpenLPMixin, RegistryProperties, Settings, translate, delete_file, UiStrings
+from openlp.core.common import delete_file
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.mixins import OpenLPMixin
 from openlp.core.common.path import Path
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.plugins.bibles.lib import LanguageSelection, parse_reference
 from openlp.plugins.bibles.lib.db import BibleDB, BibleMeta
 from .importers.csvbible import CSVBible

@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtTest
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.ui import settingsform
 from openlp.core.lib import ScreenList
 

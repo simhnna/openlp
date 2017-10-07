@@ -25,7 +25,8 @@ Provide Error Handling and login Services
 import logging
 import inspect
 
-from openlp.core.common import trace_error_handler
+from openlp.core.common import trace_error_handler, de_hump
+from openlp.core.common.registry import Registry
 
 DO_NOT_TRACE_EVENTS = ['timerEvent', 'paintEvent', 'drag_enter_event', 'drop_event', 'on_controller_size_changed',
                        'preview_size_changed', 'resizeEvent']
@@ -90,3 +91,32 @@ class OpenLPMixin(object):
         """
         trace_error_handler(self.logger)
         self.logger.exception(message)
+
+
+class RegistryMixin(object):
+    """
+    This adds registry components to classes to use at run time.
+    """
+    def __init__(self, parent):
+        """
+        Register the class and bootstrap hooks.
+        """
+        try:
+            super(RegistryMixin, self).__init__(parent)
+        except TypeError:
+            super(RegistryMixin, self).__init__()
+        Registry().register(de_hump(self.__class__.__name__), self)
+        Registry().register_function('bootstrap_initialise', self.bootstrap_initialise)
+        Registry().register_function('bootstrap_post_set_up', self.bootstrap_post_set_up)
+
+    def bootstrap_initialise(self):
+        """
+        Dummy method to be overridden
+        """
+        pass
+
+    def bootstrap_post_set_up(self):
+        """
+        Dummy method to be overridden
+        """
+        pass

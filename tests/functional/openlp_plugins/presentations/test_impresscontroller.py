@@ -27,7 +27,7 @@ from unittest.mock import MagicMock
 import shutil
 from tempfile import mkdtemp
 
-from openlp.core.common import Settings
+from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
 from openlp.plugins.presentations.lib.impresscontroller import ImpressController, ImpressDocument, TextType
 from openlp.plugins.presentations.presentationplugin import __default_settings__

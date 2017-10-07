@@ -29,7 +29,7 @@ import re
 from PyQt5.QtWidgets import QDialog
 from PyQt5 import QtCore
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.bibles.forms.booknamedialog import Ui_BookNameDialog
 from openlp.plugins.bibles.lib import BibleStrings

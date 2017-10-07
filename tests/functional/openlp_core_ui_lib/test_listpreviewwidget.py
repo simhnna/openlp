@@ -27,9 +27,8 @@ from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtGui
 
-from openlp.core.common import Settings
 from openlp.core.ui.lib.listpreviewwidget import ListPreviewWidget
-from openlp.core.lib import ImageSource, ServiceItem
+from openlp.core.lib import ImageSource
 
 
 class TestListPreviewWidget(TestCase):

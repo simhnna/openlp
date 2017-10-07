@@ -27,7 +27,7 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Settings
+from openlp.core.common.settings import Settings
 
 
 log = logging.getLogger(__name__)

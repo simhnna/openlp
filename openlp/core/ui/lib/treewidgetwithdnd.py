@@ -26,7 +26,8 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, is_win
+from openlp.core.common import is_win
+from openlp.core.common.registry import Registry
 
 
 class TreeWidgetWithDnD(QtWidgets.QTreeWidget):

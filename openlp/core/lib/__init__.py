@@ -29,9 +29,9 @@ import os
 import re
 import math
 
-from PyQt5 import QtCore, QtGui, Qt, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path
 
 log = logging.getLogger(__name__ + '.__init__')

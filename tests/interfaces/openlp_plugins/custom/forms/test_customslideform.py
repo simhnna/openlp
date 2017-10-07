@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.custom.forms.editcustomslideform import EditCustomSlideForm
 
 from tests.helpers.testmixin import TestMixin

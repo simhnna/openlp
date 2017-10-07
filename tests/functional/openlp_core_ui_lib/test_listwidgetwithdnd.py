@@ -23,11 +23,11 @@
 This module contains tests for the openlp.core.lib.listwidgetwithdnd module
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 from types import GeneratorType
 
-from openlp.core.common.uistrings import UiStrings
+from openlp.core.common.i18n import UiStrings
 from openlp.core.ui.lib.listwidgetwithdnd import ListWidgetWithDnD
-from unittest.mock import MagicMock, patch
 
 
 class TestListWidgetWithDnD(TestCase):

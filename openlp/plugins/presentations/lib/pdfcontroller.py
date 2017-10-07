@@ -25,9 +25,10 @@ import logging
 import re
 from subprocess import check_output, CalledProcessError
 
-from openlp.core.common import AppLocation, check_binary_exists
-from openlp.core.common import Settings, is_win
+from openlp.core.common import check_binary_exists, is_win
+from openlp.core.common.applocation import AppLocation
 from openlp.core.common.path import which
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ScreenList
 from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
@@ -131,7 +132,6 @@ class PdfController(PresentationController):
                 elif (application_path / 'mutool.exe').is_file():
                     self.mutoolbin = application_path / 'mutool.exe'
             else:
-                DEVNULL = open(os.devnull, 'wb')
                 # First try to find mudraw
                 self.mudrawbin = which('mudraw')
                 # if mudraw isn't installed, try mutool

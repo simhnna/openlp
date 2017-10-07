@@ -30,9 +30,12 @@ from threading import Lock
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, Settings, SlideLimits, UiStrings, translate, \
-    RegistryMixin, OpenLPMixin
+from openlp.core.common import SlideLimits
 from openlp.core.common.actions import ActionList, CategoryOrder
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, ServiceItem, ImageSource, ServiceItemAction, ScreenList, build_icon, \
     build_html
 from openlp.core.lib.ui import create_action

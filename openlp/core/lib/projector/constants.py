@@ -20,36 +20,14 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    :mod:`openlp.core.lib.projector.constants` module
-
-    Provides the constants used for projector errors/status/defaults
+The :mod:`openlp.core.lib.projector.constants` module provides the constants used for projector errors/status/defaults
 """
-
 import logging
+
+from openlp.core.common.i18n import translate
+
 log = logging.getLogger(__name__)
 log.debug('projector_constants loaded')
-
-from openlp.core.common import translate
-
-
-__all__ = ['S_OK', 'E_GENERAL', 'E_NOT_CONNECTED', 'E_FAN', 'E_LAMP', 'E_TEMP',
-           'E_COVER', 'E_FILTER', 'E_AUTHENTICATION', 'E_NO_AUTHENTICATION',
-           'E_UNDEFINED', 'E_PARAMETER', 'E_UNAVAILABLE', 'E_PROJECTOR',
-           'E_INVALID_DATA', 'E_WARN', 'E_ERROR', 'E_CLASS', 'E_PREFIX',
-           'E_CONNECTION_REFUSED', 'E_REMOTE_HOST_CLOSED_CONNECTION', 'E_HOST_NOT_FOUND',
-           'E_SOCKET_ACCESS', 'E_SOCKET_RESOURCE', 'E_SOCKET_TIMEOUT', 'E_DATAGRAM_TOO_LARGE',
-           'E_NETWORK', 'E_ADDRESS_IN_USE', 'E_SOCKET_ADDRESS_NOT_AVAILABLE',
-           'E_UNSUPPORTED_SOCKET_OPERATION', 'E_PROXY_AUTHENTICATION_REQUIRED',
-           'E_SLS_HANDSHAKE_FAILED', 'E_UNFINISHED_SOCKET_OPERATION', 'E_PROXY_CONNECTION_REFUSED',
-           'E_PROXY_CONNECTION_CLOSED', 'E_PROXY_CONNECTION_TIMEOUT', 'E_PROXY_NOT_FOUND',
-           'E_PROXY_PROTOCOL', 'E_UNKNOWN_SOCKET_ERROR',
-           'S_NOT_CONNECTED', 'S_CONNECTING', 'S_CONNECTED',
-           'S_STATUS', 'S_OFF', 'S_INITIALIZE', 'S_STANDBY', 'S_WARMUP', 'S_ON', 'S_COOLDOWN',
-           'S_INFO', 'S_NETWORK_SENDING', 'S_NETWORK_RECEIVED',
-           'ERROR_STRING', 'CR', 'LF', 'PJLINK_ERST_DATA', 'PJLINK_ERST_STATUS', 'PJLINK_POWR_STATUS',
-           'PJLINK_PORT', 'PJLINK_MAX_PACKET', 'TIMEOUT', 'ERROR_MSG', 'PJLINK_ERRORS',
-           'STATUS_STRING', 'PJLINK_VALID_CMD', 'CONNECTION_ERRORS',
-           'PJLINK_DEFAULT_SOURCES', 'PJLINK_DEFAULT_CODES', 'PJLINK_DEFAULT_ITEMS']
 
 # Set common constants.
 CR = chr(0x0D)  # \r

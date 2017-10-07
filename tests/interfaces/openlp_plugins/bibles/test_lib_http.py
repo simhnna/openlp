@@ -26,7 +26,7 @@ import os
 from unittest import TestCase, skipIf
 from unittest.mock import MagicMock
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.bibles.lib.importers.http import BGExtract, CWExtract, BSExtract
 
 

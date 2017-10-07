@@ -29,7 +29,7 @@ import re
 import chardet
 from lxml import objectify, etree
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.ui.lib.wizard import WizardStrings
 from .songimport import SongImport
 

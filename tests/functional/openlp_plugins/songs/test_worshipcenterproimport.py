@@ -27,7 +27,7 @@ from unittest.mock import patch, MagicMock
 
 try:
     import pyodbc
-    from openlp.core.common import Registry
+    from openlp.core.common.registry import Registry
     from openlp.plugins.songs.lib.importers.worshipcenterpro import WorshipCenterProImport
     CAN_RUN_TESTS = True
 except ImportError:

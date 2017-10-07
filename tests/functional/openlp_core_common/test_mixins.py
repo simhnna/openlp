@@ -22,12 +22,20 @@
 """
 Package to test the openlp.core.common package.
 """
-import os
 from unittest import TestCase
 
-from openlp.core.common import RegistryMixin, Registry
+from openlp.core.common.mixins import RegistryMixin
+from openlp.core.common.registry import Registry
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../', '..', 'resources'))
+
+class PlainStub(object):
+    def __init__(self):
+        pass
+
+
+class MixinStub(RegistryMixin):
+    def __init__(self):
+        super().__init__(None)
 
 
 class TestRegistryMixin(TestCase):
@@ -39,10 +47,10 @@ class TestRegistryMixin(TestCase):
         # GIVEN: A new registry
         Registry.create()
 
-        # WHEN: I create a new class
-        mock_1 = Test1()
+        # WHEN: I create an instance of a class that doesn't inherit from RegistryMixin
+        PlainStub()
 
-        # THEN: The following methods are missing
+        # THEN: Nothing is registered with the registry
         self.assertEqual(len(Registry().functions_list), 0), 'The function should not be in the dict anymore.'
 
     def test_registry_mixin_present(self):
@@ -52,18 +60,8 @@ class TestRegistryMixin(TestCase):
         # GIVEN: A new registry
         Registry.create()
 
-        # WHEN: I create a new class
-        mock_2 = Test2()
+        # WHEN: I create an instance of a class that inherits from RegistryMixin
+        MixinStub()
 
-        # THEN: The following bootstrap methods should be present
+        # THEN: The bootstrap methods should be registered
         self.assertEqual(len(Registry().functions_list), 2), 'The bootstrap functions should be in the dict.'
-
-
-class Test1(object):
-    def __init__(self):
-        pass
-
-
-class Test2(RegistryMixin):
-    def __init__(self):
-        super(Test2, self).__init__(None)

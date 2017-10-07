@@ -27,8 +27,10 @@ import os
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, AppLocation, check_directory_exists, translate
-from openlp.core.common.path import Path
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import translate
+from openlp.core.common.path import Path, create_paths
+from openlp.core.common.registry import Registry
 from openlp.core.ui.lib.wizard import WizardStrings
 from openlp.plugins.songs.lib import clean_song, VerseType
 from openlp.plugins.songs.lib.db import Song, Author, Topic, Book, MediaFile
@@ -424,7 +426,7 @@ class SongImport(QtCore.QObject):
         if not hasattr(self, 'save_path'):
             self.save_path = os.path.join(str(AppLocation.get_section_data_path(self.import_wizard.plugin.name)),
                                           'audio', str(song_id))
-        check_directory_exists(Path(self.save_path))
+        create_paths(Path(self.save_path))
         if not filename.startswith(self.save_path):
             old_file, filename = filename, os.path.join(self.save_path, os.path.split(filename)[1])
             shutil.copyfile(old_file, filename)

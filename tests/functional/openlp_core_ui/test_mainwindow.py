@@ -28,7 +28,8 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry, UiStrings
+from openlp.core.common.i18n import UiStrings
+from openlp.core.common.registry import Registry
 from openlp.core.ui.mainwindow import MainWindow
 
 from tests.helpers.testmixin import TestMixin
@@ -57,8 +58,8 @@ class TestMainWindow(TestCase, TestMixin):
                 patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget') as mocked_add_dock_method, \
                 patch('openlp.core.ui.mainwindow.ThemeManager') as mocked_theme_manager, \
                 patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer, \
-                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer') as mocked_websocketserver, \
-                patch('openlp.core.ui.mainwindow.server.HttpServer') as mocked_httpserver:
+                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer'), \
+                patch('openlp.core.ui.mainwindow.server.HttpServer'):
             self.mocked_settings_form = mocked_settings_form
             self.mocked_image_manager = mocked_image_manager
             self.mocked_live_controller = mocked_live_controller

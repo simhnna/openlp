@@ -25,7 +25,8 @@ Interface tests to test the themeManager class and related methods.
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from openlp.core.common import Registry, Settings
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
 from openlp.core.ui import ThemeManager
 
@@ -72,42 +73,22 @@ class TestThemeManager(TestCase, TestMixin):
         self.assertEqual(self.theme_manager.global_theme, 'my_theme',
                          'The global theme should have been set to my_theme')
 
-    def test_build_theme_path(self):
+    @patch('openlp.core.ui.thememanager.create_paths')
+    @patch('openlp.core.ui.thememanager.AppLocation.get_section_data_path')
+    def test_build_theme_path(self, mocked_get_section_data_path, mocked_create_paths):
         """
-        Test the thememanager build_theme_path - basic test
+        Test the thememanager build_theme_path
         """
-        # GIVEN: A new a call to initialise
-        with patch('openlp.core.common.applocation.check_directory_exists') as mocked_check_directory_exists:
-            # GIVEN: A mocked out Settings class and a mocked out AppLocation.get_directory()
-            mocked_check_directory_exists.return_value = True
-        Settings().setValue('themes/global theme', 'my_theme')
-
-        self.theme_manager.theme_form = MagicMock()
-        self.theme_manager.load_first_time_themes = MagicMock()
+        # GIVEN: A mocked out AppLocation.get_directory() and mocked create_paths
+        mocked_get_section_data_path.return_value = Path('tests/my_theme')
 
         # WHEN: the build_theme_path is run
         self.theme_manager.build_theme_path()
 
-        #  THEN:
-        assert self.theme_manager.thumb_path.startswith(self.theme_manager.path) is True, \
-            'The thumb path and the main path should start with the same value'
-
-    def test_build_theme_path(self):
-        """
-        Test the thememanager build_theme_path - basic test
-        """
-        # GIVEN: A new a call to initialise
-        with patch('openlp.core.common.AppLocation.get_section_data_path', return_value=Path('test/path')):
-            Settings().setValue('themes/global theme', 'my_theme')
-
-            self.theme_manager.theme_form = MagicMock()
-            self.theme_manager.load_first_time_themes = MagicMock()
-
-            # WHEN: the build_theme_path is run
-            self.theme_manager.build_theme_path()
-
-            #  THEN: The thumbnail path should be a sub path of the test path
-            self.assertEqual(self.theme_manager.thumb_path, Path('test/path/thumbnails'))
+        #  THEN: The theme path and the thumb path should be correct
+        assert self.theme_manager.theme_path == Path('tests/my_theme')
+        assert self.theme_manager.thumb_path == Path('tests/my_theme/thumbnails')
+        mocked_create_paths.assert_called_once_with(Path('tests/my_theme'), Path('tests/my_theme/thumbnails'))
 
     def test_click_on_new_theme(self):
         """

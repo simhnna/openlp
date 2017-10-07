@@ -34,9 +34,12 @@ from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, \
-    translate, clean_button_text, trace_error_handler
-from openlp.core.common.path import Path
+from openlp.core.common import clean_button_text, trace_error_handler
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import translate
+from openlp.core.common.path import Path, create_paths
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib import PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.common.httputils import get_web_page, get_url_file_size, url_get_file, CONNECTION_TIMEOUT
@@ -277,7 +280,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self.no_internet_cancel_button.setVisible(False)
         # Check if this is a re-run of the wizard.
         self.has_run_wizard = Settings().value('core/has run wizard')
-        check_directory_exists(Path(gettempdir(), 'openlp'))
+        create_paths(Path(gettempdir(), 'openlp'))
 
     def update_screen_list_combo(self):
         """
@@ -597,7 +600,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                                              'The following files were not able to be '
                                              'downloaded:<br \\>{text}'.format(text=file_list)))
             msg.setStandardButtons(msg.Ok)
-            ans = msg.exec()
+            msg.exec()
         return True
 
     def _set_plugin_status(self, field, tag):

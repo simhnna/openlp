@@ -70,11 +70,14 @@ try:
 except ImportError:
     VLC_VERSION = '-'
 
-from openlp.core.common import RegistryProperties, Settings, UiStrings, is_linux, translate
-from openlp.core.version import get_version
+from openlp.core.common import is_linux
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
+from openlp.core.ui.exceptiondialog import Ui_ExceptionDialog
 from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.version import get_version
 
-from .exceptiondialog import Ui_ExceptionDialog
 
 log = logging.getLogger(__name__)
 

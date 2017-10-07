@@ -24,11 +24,11 @@ import json
 import re
 import urllib
 
-from urllib.parse import urlparse
 from webob import Response
 
 from openlp.core.api.http.errors import NotFound
-from openlp.core.common import Registry, AppLocation
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.registry import Registry
 from openlp.core.lib import PluginStatus, image_to_byte
 
 

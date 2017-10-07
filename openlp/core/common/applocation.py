@@ -26,8 +26,10 @@ import logging
 import os
 import sys
 
-from openlp.core.common import Settings, is_win, is_macosx
-from openlp.core.common.path import Path
+import openlp
+from openlp.core.common import get_frozen_path, is_win, is_macosx
+from openlp.core.common.path import Path, create_paths
+from openlp.core.common.settings import Settings
 
 if not is_win() and not is_macosx():
     try:
@@ -35,10 +37,6 @@ if not is_win() and not is_macosx():
         XDG_BASE_AVAILABLE = True
     except ImportError:
         XDG_BASE_AVAILABLE = False
-
-import openlp
-from openlp.core.common import check_directory_exists, get_frozen_path
-
 
 log = logging.getLogger(__name__)
 
@@ -88,7 +86,7 @@ class AppLocation(object):
             path = Settings().value('advanced/data path')
         else:
             path = AppLocation.get_directory(AppLocation.DataDir)
-            check_directory_exists(path)
+            create_paths(path)
         return path
 
     @staticmethod
@@ -121,7 +119,7 @@ class AppLocation(object):
         :rtype: openlp.core.common.path.Path
         """
         path = AppLocation.get_data_path() / section
-        check_directory_exists(path)
+        create_paths(path)
         return path
 
 

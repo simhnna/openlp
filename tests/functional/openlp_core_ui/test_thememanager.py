@@ -30,7 +30,7 @@ from unittest.mock import ANY, MagicMock, patch
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
 from openlp.core.ui import ThemeManager
 
@@ -88,9 +88,9 @@ class TestThemeManager(TestCase):
         Test that we don't try to overwrite a theme background image with itself
         """
         # GIVEN: A new theme manager instance, with mocked builtins.open, copyfile,
-        #        theme, check_directory_exists and thememanager-attributes.
+        #        theme, create_paths and thememanager-attributes.
         with patch('openlp.core.ui.thememanager.copyfile') as mocked_copyfile, \
-                patch('openlp.core.ui.thememanager.check_directory_exists'):
+                patch('openlp.core.ui.thememanager.create_paths'):
             theme_manager = ThemeManager(None)
             theme_manager.old_background_image = None
             theme_manager.generate_and_save_image = MagicMock()
@@ -112,9 +112,9 @@ class TestThemeManager(TestCase):
         Test that we do overwrite a theme background image when a new is submitted
         """
         # GIVEN: A new theme manager instance, with mocked builtins.open, copyfile,
-        #        theme, check_directory_exists and thememanager-attributes.
+        #        theme, create_paths and thememanager-attributes.
         with patch('openlp.core.ui.thememanager.copyfile') as mocked_copyfile, \
-                patch('openlp.core.ui.thememanager.check_directory_exists'):
+                patch('openlp.core.ui.thememanager.create_paths'):
             theme_manager = ThemeManager(None)
             theme_manager.old_background_image = None
             theme_manager.generate_and_save_image = MagicMock()

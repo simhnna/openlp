@@ -31,7 +31,7 @@ from unittest.mock import patch
 
 from PyQt5.QtWidgets import QDialog
 
-from openlp.core.common import Registry, Settings
+from openlp.core.common.registry import Registry
 from openlp.core.lib.projector.db import ProjectorDB, Projector
 from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES, PJLINK_DEFAULT_SOURCES
 from openlp.core.ui.projector.sourceselectform import source_group, SourceSelectSingle

@@ -26,7 +26,8 @@ It is based on a QTableWidget but represents its contents in list form.
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import RegistryProperties, Settings
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ImageSource, ItemCapabilities, ServiceItem
 
 

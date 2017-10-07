@@ -28,8 +28,9 @@ from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import patch
 
-from openlp.core.common import AppLocation, Settings
+from openlp.core.common.applocation import AppLocation
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.core.lib.db import Manager
 from openlp.plugins.images.lib import upgrade
 from openlp.plugins.images.lib.db import ImageFilenames, init_schema

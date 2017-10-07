@@ -19,10 +19,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
+"""
+The :mod:`~openlp.core.api.tab` module contains the settings tab for the API
+"""
 from PyQt5 import QtCore, QtGui, QtNetwork, QtWidgets
 
-from openlp.core.common import UiStrings, Registry, Settings, translate
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
 
 ZERO_URL = '0.0.0.0'

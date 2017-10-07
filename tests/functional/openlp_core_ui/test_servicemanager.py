@@ -28,7 +28,8 @@ from unittest.mock import MagicMock, patch
 
 import PyQt5
 
-from openlp.core.common import Registry, ThemeLevel
+from openlp.core.common import ThemeLevel
+from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, ServiceItemType, ItemCapabilities
 from openlp.core.ui import ServiceManager
 from openlp.core.ui.lib.toolbar import OpenLPToolbar
@@ -695,7 +696,7 @@ class TestServiceManager(TestCase):
 
         # WHEN: The service manager has a Global theme
         mocked_renderer.theme_level = ThemeLevel.Global
-        result = service_manager.theme_change()
+        service_manager.theme_change()
 
         # THEN: The the theme toolbar should not be visible
         self.assertFalse(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
@@ -716,7 +717,7 @@ class TestServiceManager(TestCase):
 
         # WHEN: The service manager has a Service theme
         mocked_renderer.theme_level = ThemeLevel.Service
-        result = service_manager.theme_change()
+        service_manager.theme_change()
 
         # THEN: The the theme toolbar should be visible
         self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
@@ -737,7 +738,7 @@ class TestServiceManager(TestCase):
 
         # WHEN: The service manager has a Song theme
         mocked_renderer.theme_level = ThemeLevel.Song
-        result = service_manager.theme_change()
+        service_manager.theme_change()
 
         # THEN: The the theme toolbar should  be visible
         self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),

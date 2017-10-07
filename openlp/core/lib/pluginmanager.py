@@ -24,8 +24,11 @@ Provide plugin management
 """
 import os
 
+from openlp.core.common import extension_loader
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
 from openlp.core.lib import Plugin, PluginStatus
-from openlp.core.common import AppLocation, RegistryProperties, OpenLPMixin, RegistryMixin, extension_loader
 
 
 class PluginManager(RegistryMixin, OpenLPMixin, RegistryProperties):

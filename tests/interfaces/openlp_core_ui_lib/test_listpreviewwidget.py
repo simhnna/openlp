@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtGui, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem
 from openlp.core.ui.lib import ListWidgetWithDnD, ListPreviewWidget
 

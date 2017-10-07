@@ -33,11 +33,15 @@ import time
 from datetime import datetime
 from traceback import format_exception
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, OpenLPMixin, AppLocation, LanguageManager, Settings, UiStrings, \
-    check_directory_exists, is_macosx, is_win, translate
-from openlp.core.common.path import Path, copytree
+from openlp.core.common import is_macosx, is_win
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import LanguageManager, UiStrings, translate
+from openlp.core.common.mixins import OpenLPMixin
+from openlp.core.common.path import create_paths, copytree
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.version import check_for_update, get_version
 from openlp.core.lib import ScreenList
 from openlp.core.resources import qInitResources
@@ -316,7 +320,7 @@ def set_up_logging(log_path):
     :param openlp.core.common.path.Path log_path: The file to save the log to.
     :rtype: None
     """
-    check_directory_exists(log_path, True)
+    create_paths(log_path, True)
     file_path = log_path / 'openlp.log'
     # TODO: FileHandler accepts a Path object in Py3.6
     logfile = logging.FileHandler(str(file_path), 'w', encoding='UTF-8')

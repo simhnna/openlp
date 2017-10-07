@@ -24,7 +24,7 @@ Package to test the openlp.core.ui.advancedtab package.
 """
 from unittest import TestCase
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.ui.advancedtab import AdvancedTab
 from openlp.core.ui.settingsform import SettingsForm
 

@@ -27,7 +27,7 @@ import logging
 import fnmatch
 import os
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 
 log = logging.getLogger(__name__)
