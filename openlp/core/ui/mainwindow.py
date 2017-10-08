@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
                                             triggers=self.service_manager_contents.on_load_service_clicked)
         self.file_save_item = create_action(main_window, 'fileSaveItem', icon=':/general/general_save.png',
                                             can_shortcuts=True, category=UiStrings().File,
-                                            triggers=self.service_manager_contents.save_file)
+                                            triggers=self.service_manager_contents.decide_save_method)
         self.file_save_as_item = create_action(main_window, 'fileSaveAsItem', can_shortcuts=True,
                                                category=UiStrings().File,
                                                triggers=self.service_manager_contents.save_file_as)
