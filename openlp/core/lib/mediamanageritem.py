@@ -341,7 +341,9 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
             else:
                 new_files.append(file_name)
         if new_files:
-            self.validate_and_load(new_files, data['target'])
+            if 'target' in data:
+                self.validate_and_load(new_files, data['target'])
+            self.validate_and_load(new_files)
 
     def dnd_move_internal(self, target):
         """
