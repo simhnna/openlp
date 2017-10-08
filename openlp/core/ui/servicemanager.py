@@ -469,6 +469,12 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         Load a recent file as the service triggered by mainwindow recent service list.
         :param field:
         """
+        if self.is_modified():
+            result = self.save_modified_service()
+            if result == QtWidgets.QMessageBox.Cancel:
+                return False
+            elif result == QtWidgets.QMessageBox.Save:
+                self.decide_save_method()
         sender = self.sender()
         self.load_file(sender.data())
 
