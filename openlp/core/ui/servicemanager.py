@@ -713,18 +713,23 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
             default_file_path = directory_path / default_file_path
         # SaveAs from osz to oszl is not valid as the files will be deleted on exit which is not sensible or usable in
         # the long term.
+        lite_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files - lite (*.oszl)')
+        packaged_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz)')
+
         if self._file_name.endswith('oszl') or self.service_has_all_original_files:
             file_path, filter_used = FileDialog.getSaveFileName(
                 self.main_window, UiStrings().SaveService, default_file_path,
-                translate('OpenLP.ServiceManager',
-                          'OpenLP Service Files (*.osz);; OpenLP Service Files - lite (*.oszl)'))
+                '{packaged};; {lite}'.format(packaged=packaged_filter, lite=lite_filter))
         else:
             file_path, filter_used = FileDialog.getSaveFileName(
-                self.main_window, UiStrings().SaveService, file_path,
-                translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz);;'))
+                self.main_window, UiStrings().SaveService, default_file_path,
+                '{packaged};;'.format(packaged=packaged_filter))
         if not file_path:
             return False
-        file_path.with_suffix('.osz')
+        if filter_used == lite_filter:
+            file_path = file_path.with_suffix('.oszl')
+        else:
+            file_path = file_path.with_suffix('.osz')
         self.set_file_name(file_path)
         self.decide_save_method()
 
