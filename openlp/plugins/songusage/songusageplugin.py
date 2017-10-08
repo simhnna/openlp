@@ -44,9 +44,9 @@ if QtCore.QDate().currentDate().month() < 9:
 __default_settings__ = {
     'songusage/db type': 'sqlite',
     'songusage/db username': '',
-    'songuasge/db password': '',
-    'songuasge/db hostname': '',
-    'songuasge/db database': '',
+    'songusage/db password': '',
+    'songusage/db hostname': '',
+    'songusage/db database': '',
     'songusage/active': False,
     'songusage/to date': QtCore.QDate(YEAR, 8, 31),
     'songusage/from date': QtCore.QDate(YEAR - 1, 9, 1),
