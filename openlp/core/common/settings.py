@@ -271,8 +271,8 @@ class Settings(QtCore.QSettings):
     ]
 
     __setting_upgrade_3__ = [
-        ('songuasge/db password', 'songusage/db password', [])
-        ('songuasge/db hostname', 'songusage/db hostname', [])
+        ('songuasge/db password', 'songusage/db password', []),
+        ('songuasge/db hostname', 'songusage/db hostname', []),
         ('songuasge/db database', 'songusage/db database', [])
     ]
 

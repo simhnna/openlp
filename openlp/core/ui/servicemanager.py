@@ -1663,14 +1663,15 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 if start_pos == -1:
                     return
                 if item is None:
-                    end_pos = len(self.service_items)
+                    end_pos = len(self.service_items) - 1
                 else:
                     end_pos = get_parent_item_data(item) - 1
                 service_item = self.service_items[start_pos]
-                self.service_items.remove(service_item)
-                self.service_items.insert(end_pos, service_item)
-                self.repaint_service_list(end_pos, child)
-                self.set_modified()
+                if start_pos != end_pos:
+                    self.service_items.remove(service_item)
+                    self.service_items.insert(end_pos, service_item)
+                    self.repaint_service_list(end_pos, child)
+                    self.set_modified()
             else:
                 # we are not over anything so drop
                 replace = False
