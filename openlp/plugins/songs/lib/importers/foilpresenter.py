@@ -87,7 +87,7 @@ import re
 
 from lxml import etree, objectify
 
-from openlp.core.lib import translate
+from openlp.core.common.i18n import translate
 from openlp.core.ui.lib.wizard import WizardStrings
 from openlp.plugins.songs.lib import clean_song, VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport

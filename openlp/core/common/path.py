@@ -19,6 +19,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+import logging
 import shutil
 from contextlib import suppress
 
@@ -28,6 +29,45 @@ if is_win():
     from pathlib import WindowsPath as PathVariant
 else:
     from pathlib import PosixPath as PathVariant
+
+log = logging.getLogger(__name__)
+
+
+class Path(PathVariant):
+    """
+    Subclass pathlib.Path, so we can add json conversion methods
+    """
+    @staticmethod
+    def encode_json(obj, base_path=None, **kwargs):
+        """
+        Create a Path object from a dictionary representation. The dictionary has been constructed by JSON encoding of
+        a JSON reprensation of a Path object.
+
+        :param dict[str] obj: The dictionary representation
+        :param openlp.core.common.path.Path base_path: If specified, an absolute path to base the relative path off of.
+        :param kwargs: Contains any extra parameters. Not used!
+        :return: The reconstructed Path object
+        :rtype: openlp.core.common.path.Path
+        """
+        path = Path(*obj['__Path__'])
+        if base_path and not path.is_absolute():
+            return base_path / path
+        return path
+
+    def json_object(self, base_path=None, **kwargs):
+        """
+        Create a dictionary that can be JSON decoded.
+
+        :param openlp.core.common.path.Path base_path: If specified, an absolute path to make a relative path from.
+        :param kwargs: Contains any extra parameters. Not used!
+        :return: The dictionary representation of this Path object.
+        :rtype: dict[tuple]
+        """
+        path = self
+        if base_path:
+            with suppress(ValueError):
+                path = path.relative_to(base_path)
+        return {'__Path__': path.parts}
 
 
 def replace_params(args, kwargs, params):
@@ -179,38 +219,32 @@ def str_to_path(string):
     return Path(string)
 
 
-class Path(PathVariant):
+def create_paths(*paths, **kwargs):
     """
-    Subclass pathlib.Path, so we can add json conversion methods
+    Create one or more paths
+
+    :param openlp.core.common.path.Path paths: The paths to create
+    :param bool do_not_log: To not log anything. This is need for the start up, when the log isn't ready.
+    :rtype: None
     """
-    @staticmethod
-    def encode_json(obj, base_path=None, **kwargs):
-        """
-        Create a Path object from a dictionary representation. The dictionary has been constructed by JSON encoding of
-        a JSON reprensation of a Path object.
+    for path in paths:
+        if not kwargs.get('do_not_log', False):
+            log.debug('create_path {path}'.format(path=path))
+        try:
+            if not path.exists():
+                path.mkdir(parents=True)
+        except IOError:
+            if not kwargs.get('do_not_log', False):
+                log.exception('failed to check if directory exists or create directory')
 
-        :param dict[str] obj: The dictionary representation
-        :param openlp.core.common.path.Path base_path: If specified, an absolute path to base the relative path off of.
-        :param kwargs: Contains any extra parameters. Not used!
-        :return: The reconstructed Path object
-        :rtype: openlp.core.common.path.Path
-        """
-        path = Path(*obj['__Path__'])
-        if base_path and not path.is_absolute():
-            return base_path / path
-        return path
 
-    def json_object(self, base_path=None, **kwargs):
-        """
-        Create a dictionary that can be JSON decoded.
+def files_to_paths(file_names):
+    """
+    Convert a list of file names in to a list of file paths.
 
-        :param openlp.core.common.path.Path base_path: If specified, an absolute path to make a relative path from.
-        :param kwargs: Contains any extra parameters. Not used!
-        :return: The dictionary representation of this Path object.
-        :rtype: dict[tuple]
-        """
-        path = self
-        if base_path:
-            with suppress(ValueError):
-                path = path.relative_to(base_path)
-        return {'__Path__': path.parts}
+    :param list[str] file_names: The list of file names to convert.
+    :return: The list converted to file paths
+    :rtype: openlp.core.common.path.Path
+    """
+    if file_names:
+        return [str_to_path(file_name) for file_name in file_names]

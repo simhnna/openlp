@@ -27,7 +27,8 @@ from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, Settings
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem
 from openlp.plugins.songs.lib.db import AuthorType, Song
 from openlp.plugins.songs.lib.mediaitem import SongMediaItem
@@ -570,7 +571,6 @@ class TestMediaItem(TestCase, TestMixin):
         """
         # GIVEN: A song media item, a keyword and some mocks
         keyword = 'Jesus'
-        mocked_song = MagicMock()
         mocked_or.side_effect = lambda a, b, c, d, e: ' '.join([a, b, c, d, e])
         MockedSong.search_title.like.side_effect = lambda a: a
         MockedSong.search_lyrics.like.side_effect = lambda a: a

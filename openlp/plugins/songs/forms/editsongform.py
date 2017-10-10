@@ -24,14 +24,14 @@ The :mod:`~openlp.plugins.songs.forms.editsongform` module contains the form
 used to edit songs.
 """
 import logging
-import os
 import re
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, AppLocation, UiStrings, check_directory_exists, translate
-from openlp.core.common.languagemanager import get_natural_key
-from openlp.core.common.path import copyfile
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate, get_natural_key
+from openlp.core.common.path import create_paths, copyfile
+from openlp.core.common.registry import Registry, RegistryProperties
 from openlp.core.lib import PluginStatus, MediaType, create_separated_list
 from openlp.core.lib.ui import set_case_insensitive_completer, critical_error_message_box, find_and_set_in_combo_box
 from openlp.core.ui.lib.filedialog import FileDialog
@@ -1066,7 +1066,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         audio_paths = [a.file_path for a in self.song.media_files]
         log.debug(audio_paths)
         save_path = AppLocation.get_section_data_path(self.media_item.plugin.name) / 'audio' / str(self.song.id)
-        check_directory_exists(save_path)
+        create_paths(save_path)
         self.song.media_files = []
         file_paths = []
         for row in range(self.audio_list_widget.count()):

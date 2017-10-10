@@ -21,12 +21,13 @@
 ###############################################################################
 """
 The :mod:`lyrix` module provides the functionality for importing songs which are
-exproted from Lyrix."""
+exported from Lyrix."""
 import json
 import logging
 import re
 
-from openlp.core.common import translate, Settings
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.db import AuthorType

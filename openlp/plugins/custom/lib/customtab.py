@@ -23,10 +23,10 @@
 The :mod:`~openlp.plugins.custom.lib.customtab` module contains the settings tab
 for the Custom Slides plugin, which is inserted into the configuration dialog.
 """
-
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Settings, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
 
 

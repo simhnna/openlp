@@ -25,11 +25,10 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry
-from openlp.core.lib import ScreenList, ServiceItem, ItemCapabilities
+from openlp.core.common.registry import Registry
+from openlp.core.display.screens import ScreenList
+from openlp.core.lib import ServiceItem, ItemCapabilities
 from openlp.core.ui.mainwindow import MainWindow
-from openlp.core.ui.servicemanager import ServiceManagerList
-from openlp.core.lib.serviceitem import ServiceItem
 
 from tests.helpers.testmixin import TestMixin
 
@@ -48,18 +47,18 @@ class TestServiceManager(TestCase, TestMixin):
         ScreenList.create(self.app.desktop())
         Registry().register('application', MagicMock())
         # Mock classes and methods used by mainwindow.
-        with patch('openlp.core.ui.mainwindow.SettingsForm') as mocked_settings_form, \
-                patch('openlp.core.ui.mainwindow.ImageManager') as mocked_image_manager, \
-                patch('openlp.core.ui.mainwindow.LiveController') as mocked_live_controller, \
-                patch('openlp.core.ui.mainwindow.PreviewController') as mocked_preview_controller, \
-                patch('openlp.core.ui.mainwindow.OpenLPDockWidget') as mocked_dock_widget, \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox') as mocked_q_tool_box_class, \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget') as mocked_add_dock_method, \
-                patch('openlp.core.ui.mainwindow.ThemeManager') as mocked_theme_manager, \
-                patch('openlp.core.ui.mainwindow.ProjectorManager') as mocked_projector_manager, \
-                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer, \
-                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer') as mocked_websocketserver, \
-                patch('openlp.core.ui.mainwindow.server.HttpServer') as mocked_httpserver:
+        with patch('openlp.core.ui.mainwindow.SettingsForm'), \
+                patch('openlp.core.ui.mainwindow.ImageManager'), \
+                patch('openlp.core.ui.mainwindow.LiveController'), \
+                patch('openlp.core.ui.mainwindow.PreviewController'), \
+                patch('openlp.core.ui.mainwindow.OpenLPDockWidget'), \
+                patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox'), \
+                patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget'), \
+                patch('openlp.core.ui.mainwindow.ThemeManager'), \
+                patch('openlp.core.ui.mainwindow.ProjectorManager'), \
+                patch('openlp.core.ui.mainwindow.Renderer'), \
+                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer'), \
+                patch('openlp.core.ui.mainwindow.server.HttpServer'):
             self.main_window = MainWindow()
         self.service_manager = Registry().get('service_manager')
 

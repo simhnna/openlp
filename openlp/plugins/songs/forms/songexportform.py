@@ -27,7 +27,9 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, Settings, UiStrings, translate
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import create_separated_list
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.lib import PathEdit, PathType

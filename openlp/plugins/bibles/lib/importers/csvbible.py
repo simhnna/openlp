@@ -52,11 +52,11 @@ All CSV files are expected to use a comma (',') as the delimiter and double quot
 import csv
 from collections import namedtuple
 
-from openlp.core.common import get_file_encoding, translate
+from openlp.core.common import get_file_encoding
+from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path
 from openlp.core.lib.exceptions import ValidationError
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
-
 
 Book = namedtuple('Book', 'id, testament_id, name, abbreviation')
 Verse = namedtuple('Verse', 'book_id_name, chapter_number, number, text')

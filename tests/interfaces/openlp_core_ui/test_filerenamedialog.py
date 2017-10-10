@@ -20,14 +20,14 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    Package to test the openlp.core.ui package.
+Package to test the openlp.core.ui package.
 """
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtTest, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.ui import filerenameform
 
 from tests.helpers.testmixin import TestMixin
@@ -57,7 +57,7 @@ class TestStartFileRenameForm(TestCase, TestMixin):
         Test the windowTitle of the FileRenameDialog
         """
         # GIVEN: A mocked QDialog.exec() method
-        with patch('PyQt5.QtWidgets.QDialog.exec') as mocked_exec:
+        with patch('PyQt5.QtWidgets.QDialog.exec'):
 
             # WHEN: The form is executed with no args
             self.form.exec()

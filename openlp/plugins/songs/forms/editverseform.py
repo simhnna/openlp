@@ -25,10 +25,11 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.plugins.songs.lib import VerseType, transpose_lyrics
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.common import translate, Settings
-from .editversedialog import Ui_EditVerseDialog
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
+from openlp.plugins.songs.forms.editversedialog import Ui_EditVerseDialog
+from openlp.plugins.songs.lib import VerseType, transpose_lyrics
 
 log = logging.getLogger(__name__)
 
@@ -48,12 +49,13 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.setupUi(self)
         self.has_single_verse = False
         self.insert_button.clicked.connect(self.on_insert_button_clicked)
-        self.split_button.clicked.connect(self.on_split_button_clicked)
+        self.overflow_split_button.clicked.connect(self.on_overflow_split_button_clicked)
         self.verse_text_edit.cursorPositionChanged.connect(self.on_cursor_position_changed)
         self.verse_type_combo_box.currentIndexChanged.connect(self.on_verse_type_combo_box_changed)
+        self.forced_split_button.clicked.connect(self.on_forced_split_button_clicked)
         if Settings().value('songs/enable chords'):
-            self.transpose_down_button.clicked.connect(self.on_transepose_down_button_clicked)
-            self.transpose_up_button.clicked.connect(self.on_transepose_up_button_clicked)
+            self.transpose_down_button.clicked.connect(self.on_transpose_down_button_clicked)
+            self.transpose_up_button.clicked.connect(self.on_transpose_up_button_clicked)
 
     def insert_verse(self, verse_tag, verse_num=1):
         """
@@ -68,13 +70,27 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.verse_text_edit.insertPlainText('---[{tag}:{number}]---\n'.format(tag=verse_tag, number=verse_num))
         self.verse_text_edit.setFocus()
 
-    def on_split_button_clicked(self):
+    def on_overflow_split_button_clicked(self):
         """
-        The split button has been pressed
+        The optional split button has been pressed so we need add the split
+        """
+        self._add_splitter_to_text('[---]')
+
+    def on_forced_split_button_clicked(self):
+        """
+        The force split button has been pressed so we need add the split
+        """
+        self._add_splitter_to_text('[--}{--]')
+
+    def _add_splitter_to_text(self, insert_string):
+        """
+        Add a custom splitter to the song text
+
+        :param insert_string: The string to insert
+        :return:
         """
         text = self.verse_text_edit.toPlainText()
         position = self.verse_text_edit.textCursor().position()
-        insert_string = '[---]'
         if position and text[position - 1] != '\n':
             insert_string = '\n' + insert_string
         if position == len(text) or text[position] != '\n':
@@ -101,7 +117,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         self.update_suggested_verse_number()
 
-    def on_transepose_up_button_clicked(self):
+    def on_transpose_up_button_clicked(self):
         """
         The transpose up button clicked
         """
@@ -118,7 +134,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         self.verse_text_edit.setFocus()
         self.verse_text_edit.moveCursor(QtGui.QTextCursor.End)
 
-    def on_transepose_down_button_clicked(self):
+    def on_transpose_down_button_clicked(self):
         """
         The transpose down button clicked
         """
@@ -217,7 +233,7 @@ class EditVerseForm(QtWidgets.QDialog, Ui_EditVerseDialog):
         """
         if Settings().value('songs/enable chords'):
             try:
-                transposed_lyrics = transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
+                transpose_lyrics(self.verse_text_edit.toPlainText(), 1)
                 super(EditVerseForm, self).accept()
             except ValueError as ve:
                 # Transposing failed

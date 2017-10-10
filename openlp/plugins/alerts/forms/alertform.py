@@ -22,7 +22,8 @@
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.registry import Registry
 from openlp.plugins.alerts.lib.db import AlertItem
 
 from .alertdialog import Ui_AlertDialog

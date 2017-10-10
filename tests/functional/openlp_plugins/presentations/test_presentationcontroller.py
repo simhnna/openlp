@@ -162,14 +162,14 @@ class TestPresentationDocument(TestCase):
         """
         Set up the patches and mocks need for all tests.
         """
-        self.check_directory_exists_patcher = \
-            patch('openlp.plugins.presentations.lib.presentationcontroller.check_directory_exists')
+        self.create_paths_patcher = \
+            patch('openlp.plugins.presentations.lib.presentationcontroller.create_paths')
         self.get_thumbnail_folder_patcher = \
             patch('openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument.get_thumbnail_folder')
         self._setup_patcher = \
             patch('openlp.plugins.presentations.lib.presentationcontroller.PresentationDocument._setup')
 
-        self.mock_check_directory_exists = self.check_directory_exists_patcher.start()
+        self.mock_create_paths = self.create_paths_patcher.start()
         self.mock_get_thumbnail_folder = self.get_thumbnail_folder_patcher.start()
         self.mock_setup = self._setup_patcher.start()
 
@@ -181,7 +181,7 @@ class TestPresentationDocument(TestCase):
         """
         Stop the patches
         """
-        self.check_directory_exists_patcher.stop()
+        self.create_paths_patcher.stop()
         self.get_thumbnail_folder_patcher.stop()
         self._setup_patcher.stop()
 
@@ -204,13 +204,13 @@ class TestPresentationDocument(TestCase):
         """
         self._setup_patcher.stop()
 
-        # GIVEN: A mocked controller, patched check_directory_exists and get_thumbnail_folder methods
+        # GIVEN: A mocked controller, patched create_paths and get_thumbnail_folder methods
 
         # WHEN: Creating an instance of PresentationDocument
         PresentationDocument(self.mock_controller, 'Name')
 
-        # THEN: check_directory_exists should have been called with 'returned/path/'
-        self.mock_check_directory_exists.assert_called_once_with(Path('returned', 'path/'))
+        # THEN: create_paths should have been called with 'returned/path/'
+        self.mock_create_paths.assert_called_once_with(Path('returned', 'path/'))
 
         self._setup_patcher.start()
 

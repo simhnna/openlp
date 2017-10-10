@@ -27,7 +27,7 @@ from unittest.mock import MagicMock
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Settings
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.forms.editverseform import EditVerseForm
 
 from tests.helpers.testmixin import TestMixin
@@ -72,3 +72,31 @@ class TestEditVerseForm(TestCase, TestMixin):
 
         # THEN the verse number must not be changed
         self.assertEqual(3, self.edit_verse_form.verse_number_box.value(), 'The verse number should be 3')
+
+    def test_on_divide_split_button_clicked(self):
+        """
+        Test that divide adds text at the correct position
+        """
+        # GIVEN some input values
+        self.edit_verse_form.verse_type_combo_box.currentIndex = MagicMock(return_value=4)
+        self.edit_verse_form.verse_text_edit.setPlainText('Text\n')
+
+        # WHEN the method is called
+        self.edit_verse_form.on_forced_split_button_clicked()
+        # THEN the verse number must not be changed
+        self.assertEqual('[--}{--]\nText\n', self.edit_verse_form.verse_text_edit.toPlainText(),
+                         'The verse number should be [--}{--]\nText\n')
+
+    def test_on_split_button_clicked(self):
+        """
+        Test that divide adds text at the correct position
+        """
+        # GIVEN some input values
+        self.edit_verse_form.verse_type_combo_box.currentIndex = MagicMock(return_value=4)
+        self.edit_verse_form.verse_text_edit.setPlainText('Text\n')
+
+        # WHEN the method is called
+        self.edit_verse_form.on_overflow_split_button_clicked()
+        # THEN the verse number must not be changed
+        self.assertEqual('[---]\nText\n', self.edit_verse_form.verse_text_edit.toPlainText(),
+                         'The verse number should be [---]\nText\n')

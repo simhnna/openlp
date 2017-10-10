@@ -27,7 +27,7 @@ import webbrowser
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.version import get_version
-from openlp.core.lib import translate
+from openlp.core.common.i18n import translate
 from .aboutdialog import UiAboutDialog
 
 

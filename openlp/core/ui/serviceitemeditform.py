@@ -24,9 +24,8 @@ The service item edit dialog
 """
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties
-
-from .serviceitemeditdialog import Ui_ServiceItemEditDialog
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.ui.serviceitemeditdialog import Ui_ServiceItemEditDialog
 
 
 class ServiceItemEditForm(QtWidgets.QDialog, Ui_ServiceItemEditDialog, RegistryProperties):

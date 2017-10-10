@@ -36,21 +36,26 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.api import websockets
 from openlp.core.api.http import server
-from openlp.core.common import Registry, RegistryProperties, AppLocation, LanguageManager, Settings, UiStrings, \
-    check_directory_exists, translate, is_win, is_macosx, add_actions
+from openlp.core.common import is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
-from openlp.core.common.path import Path, copyfile, path_to_str, str_to_path
-from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import LanguageManager, UiStrings, translate
+from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, str_to_path
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
+from openlp.core.display.screens import ScreenList
+from openlp.core.display.renderer import Renderer
+from openlp.core.lib import PluginManager, ImageManager, PluginStatus, build_icon
 from openlp.core.lib.ui import create_action
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
-from openlp.core.ui.media import MediaController
-from openlp.core.ui.printserviceform import PrintServiceForm
-from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+from openlp.core.ui.media import MediaController
+from openlp.core.ui.printserviceform import PrintServiceForm
+from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.style import PROGRESSBAR_STYLE, get_library_stylesheet
 from openlp.core.version import get_version
 
@@ -853,7 +858,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         setting_sections.extend([plugin.name for plugin in self.plugin_manager.plugins])
         # Copy the settings file to the tmp dir, because we do not want to change the original one.
         temp_dir_path = Path(gettempdir(), 'openlp')
-        check_directory_exists(temp_dir_path)
+        create_paths(temp_dir_path)
         temp_config_path = temp_dir_path / import_file_path.name
         copyfile(import_file_path, temp_config_path)
         settings = Settings()
@@ -896,6 +901,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             try:
                 value = import_settings.value(section_key)
             except KeyError:
+                value = None
                 log.warning('The key "{key}" does not exist (anymore), so it will be skipped.'.format(key=section_key))
             if value is not None:
                 settings.setValue('{key}'.format(key=section_key), value)
@@ -929,7 +935,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # Make sure it's a .conf file.
         export_file_path = export_file_path.with_suffix('.conf')
         self.save_settings()
-        Settings().export(export_file_path)
+        try:
+            Settings().export(export_file_path)
+        except OSError as ose:
+            QtWidgets.QMessageBox.critical(self, translate('OpenLP.MainWindow', 'Export setting error'),
+                                           translate('OpenLP.MainWindow',
+                                                     'An error occurred while exporting the settings: {err}'
+                                                     ).format(err=ose.strerror),
+                                           QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
 
     def on_mode_default_item_clicked(self):
         """

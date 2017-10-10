@@ -26,19 +26,22 @@ Some of the code for this form is based on the examples at:
 
 * `http://www.steveheffernan.com/html5-video-player/demo-video-player.html`_
 * `http://html5demos.com/two-videos`_
-
 """
-
 import html
 import logging
 import os
 
 from PyQt5 import QtCore, QtWidgets, QtWebKit, QtWebKitWidgets, QtGui, QtMultimedia
 
-from openlp.core.common import AppLocation, Registry, RegistryProperties, OpenLPMixin, Settings, translate,\
-    is_macosx, is_win
+from openlp.core.common import is_macosx, is_win
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import OpenLPMixin
 from openlp.core.common.path import path_to_str
-from openlp.core.lib import ServiceItem, ImageSource, ScreenList, build_html, expand_tags, image_to_byte
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
+from openlp.core.display.screens import ScreenList
+from openlp.core.lib import ServiceItem, ImageSource, build_html, expand_tags, image_to_byte
 from openlp.core.lib.theme import BackgroundType
 from openlp.core.ui import HideMode, AlertLocation, DisplayControllerType
 

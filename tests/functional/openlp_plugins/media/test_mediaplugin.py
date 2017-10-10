@@ -23,9 +23,9 @@
 Test the media plugin
 """
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-from openlp.core import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.media.mediaplugin import MediaPlugin, process_check_binary
 
 from tests.helpers.testmixin import TestMixin

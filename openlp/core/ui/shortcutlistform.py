@@ -20,15 +20,18 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-The :mod:`~openlp.core.ui.shortcutlistform` module contains the form class"""
+The :mod:`~openlp.core.ui.shortcutlistform` module contains the form class
+"""
 import logging
 import re
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import RegistryProperties, Settings, translate
 from openlp.core.common.actions import ActionList
-from .shortcutlistdialog import Ui_ShortcutListDialog
+from openlp.core.common.i18n import translate
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
+from openlp.core.ui.shortcutlistdialog import Ui_ShortcutListDialog
 
 REMOVE_AMPERSAND = re.compile(r'&{1}')
 

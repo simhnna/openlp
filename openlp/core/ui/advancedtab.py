@@ -27,9 +27,10 @@ from datetime import datetime, timedelta
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import AppLocation, Settings, SlideLimits, UiStrings, translate
-from openlp.core.common.languagemanager import format_time
-from openlp.core.common.path import path_to_str
+from openlp.core.common import SlideLimits
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, format_time, translate
+from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab, build_icon
 from openlp.core.ui.lib import PathEdit, PathType
 from openlp.core.ui.style import HAS_DARK_STYLE

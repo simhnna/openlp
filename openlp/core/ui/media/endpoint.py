@@ -19,15 +19,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+"""
+The :mod:`~openlp.core.api.endpoint` module contains various API endpoints
+"""
 import logging
 
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import requires_auth
-from openlp.core.common import Registry
-
+from openlp.core.common.registry import Registry
 
 log = logging.getLogger(__name__)
-
 media_endpoint = Endpoint('media')
 
 

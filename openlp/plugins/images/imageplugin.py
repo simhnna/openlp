@@ -25,7 +25,8 @@ from PyQt5 import QtGui
 import logging
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import Settings, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
 from openlp.core.lib import Plugin, StringContent, ImageSource, build_icon
 from openlp.core.lib.db import Manager
 from openlp.plugins.images.endpoint import api_images_endpoint, images_endpoint

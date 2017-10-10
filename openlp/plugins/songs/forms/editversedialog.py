@@ -22,8 +22,9 @@
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Settings, UiStrings
-from openlp.core.lib import build_icon, translate
+from openlp.core.common.settings import Settings
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 from openlp.core.ui.lib import SpellTextEdit
 from openlp.plugins.songs.lib import VerseType
@@ -42,10 +43,14 @@ class Ui_EditVerseDialog(object):
         self.dialog_layout.addWidget(self.verse_text_edit)
         self.verse_type_layout = QtWidgets.QHBoxLayout()
         self.verse_type_layout.setObjectName('verse_type_layout')
-        self.split_button = QtWidgets.QPushButton(edit_verse_dialog)
-        self.split_button.setIcon(build_icon(':/general/general_add.png'))
-        self.split_button.setObjectName('split_button')
-        self.verse_type_layout.addWidget(self.split_button)
+        self.forced_split_button = QtWidgets.QPushButton(edit_verse_dialog)
+        self.forced_split_button.setIcon(build_icon(':/general/general_add.png'))
+        self.forced_split_button.setObjectName('forced_split_button')
+        self.verse_type_layout.addWidget(self.forced_split_button)
+        self.overflow_split_button = QtWidgets.QPushButton(edit_verse_dialog)
+        self.overflow_split_button.setIcon(build_icon(':/general/general_add.png'))
+        self.overflow_split_button.setObjectName('overflow_split_button')
+        self.verse_type_layout.addWidget(self.overflow_split_button)
         self.verse_type_label = QtWidgets.QLabel(edit_verse_dialog)
         self.verse_type_label.setObjectName('verse_type_label')
         self.verse_type_layout.addWidget(self.verse_type_label)
@@ -93,8 +98,11 @@ class Ui_EditVerseDialog(object):
         self.verse_type_combo_box.setItemText(VerseType.Intro, VerseType.translated_names[VerseType.Intro])
         self.verse_type_combo_box.setItemText(VerseType.Ending, VerseType.translated_names[VerseType.Ending])
         self.verse_type_combo_box.setItemText(VerseType.Other, VerseType.translated_names[VerseType.Other])
-        self.split_button.setText(UiStrings().Split)
-        self.split_button.setToolTip(UiStrings().SplitToolTip)
+        self.overflow_split_button.setText(UiStrings().Split)
+        self.overflow_split_button.setToolTip(UiStrings().SplitToolTip)
+        self.forced_split_button.setText(translate('SongsPlugin.EditVerseForm', '&Forced Split'))
+        self.forced_split_button.setToolTip(translate('SongsPlugin.EditVerseForm', 'Split the verse when displayed '
+                                                                                   'regardless of the screen size.'))
         self.insert_button.setText(translate('SongsPlugin.EditVerseForm', '&Insert'))
         self.insert_button.setToolTip(translate('SongsPlugin.EditVerseForm',
                                       'Split a slide into two by inserting a verse splitter.'))

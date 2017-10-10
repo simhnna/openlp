@@ -23,14 +23,11 @@
 The :mod:`db` module provides the database and schema that is the backend for
 the Songs plugin
 """
-from contextlib import suppress
 from sqlalchemy import Column, ForeignKey, Table, types
 from sqlalchemy.orm import mapper, relation, reconstructor
 from sqlalchemy.sql.expression import func, text
 
-from openlp.core.common.applocation import AppLocation
-from openlp.core.common.languagemanager import get_natural_key
-from openlp.core.lib import translate
+from openlp.core.common.i18n import translate, get_natural_key
 from openlp.core.lib.db import BaseModel, PathType, init_db
 
 

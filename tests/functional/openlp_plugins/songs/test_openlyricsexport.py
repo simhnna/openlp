@@ -27,7 +27,7 @@ from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path, rmtree
 from openlp.plugins.songs.lib.openlyricsexport import OpenLyricsExport
 

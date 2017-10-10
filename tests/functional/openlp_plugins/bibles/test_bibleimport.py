@@ -29,8 +29,7 @@ from unittest.mock import MagicMock, patch
 from lxml import etree, objectify
 from PyQt5.QtWidgets import QDialog
 
-from openlp.core.common.languages import Language
-from openlp.core.common.path import Path
+from openlp.core.common.i18n import Language
 from openlp.core.lib.exceptions import ValidationError
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB

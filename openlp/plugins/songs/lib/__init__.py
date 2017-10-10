@@ -29,8 +29,11 @@ import re
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import AppLocation, CONTROL_CHARS, Settings
-from openlp.core.lib import translate, clean_tags
+from openlp.core.common import CONTROL_CHARS
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
+from openlp.core.lib import clean_tags
 from openlp.plugins.songs.lib.db import Author, MediaFile, Song, Topic
 from openlp.plugins.songs.lib.ui import SongStrings
 
@@ -546,12 +549,12 @@ def delete_song(song_id, song_plugin):
     song_plugin.manager.delete_object(Song, song_id)
 
 
-def transpose_lyrics(lyrics, transepose_value):
+def transpose_lyrics(lyrics, transpose_value):
     """
-    Transepose lyrics
+    Transpose lyrics
 
-    :param lyrcs: The lyrics to be transposed
-    :param transepose_value: The value to transpose the lyrics with
+    :param lyrics: The lyrics to be transposed
+    :param transpose_value: The value to transpose the lyrics with
     :return: The transposed lyrics
     """
     # Split text by verse delimiter - both normal and optional
@@ -562,16 +565,17 @@ def transpose_lyrics(lyrics, transepose_value):
         if verse.startswith('---[') or verse == '[---]':
             transposed_lyrics += verse
         else:
-            transposed_lyrics += transpose_verse(verse, transepose_value, notation)
+            transposed_lyrics += transpose_verse(verse, transpose_value, notation)
     return transposed_lyrics
 
 
-def transpose_verse(verse_text, transepose_value, notation):
+def transpose_verse(verse_text, transpose_value, notation):
     """
-    Transepose lyrics
+    Transpose Verse
 
-    :param lyrcs: The lyrics to be transposed
-    :param transepose_value: The value to transpose the lyrics with
+    :param verse_text: The lyrics to be transposed
+    :param transpose_value: The value to transpose the lyrics with
+    :param notation: which notation to use
     :return: The transposed lyrics
     """
     if '[' not in verse_text:
@@ -589,11 +593,11 @@ def transpose_verse(verse_text, transepose_value, notation):
             if word == ']':
                 in_tag = False
                 transposed_lyrics += word
-            elif word == '/':
+            elif word == '/' or word == '--}{--':
                 transposed_lyrics += word
             else:
                 # This MUST be a chord
-                transposed_lyrics += transpose_chord(word, transepose_value, notation)
+                transposed_lyrics += transpose_chord(word, transpose_value, notation)
     # If still inside a chord tag something is wrong!
     if in_tag:
         return verse_text
@@ -629,36 +633,36 @@ def transpose_chord(chord, transpose_value, notation):
     for i in range(0, len(chord_split)):
         if i > 0:
             transposed_chord += '/'
-        currentchord = chord_split[i]
-        if currentchord and currentchord[0] == '(':
+        current_chord = chord_split[i]
+        if current_chord and current_chord[0] == '(':
             transposed_chord += '('
-            if len(currentchord) > 1:
-                currentchord = currentchord[1:]
+            if len(current_chord) > 1:
+                current_chord = current_chord[1:]
             else:
-                currentchord = ''
-        if len(currentchord) > 0:
-            if len(currentchord) > 1:
-                if '#b'.find(currentchord[1]) == -1:
-                    note = currentchord[0:1]
-                    rest = currentchord[1:]
+                current_chord = ''
+        if len(current_chord) > 0:
+            if len(current_chord) > 1:
+                if '#b'.find(current_chord[1]) == -1:
+                    note = current_chord[0:1]
+                    rest = current_chord[1:]
                 else:
-                    note = currentchord[0:2]
-                    rest = currentchord[2:]
+                    note = current_chord[0:2]
+                    rest = current_chord[2:]
             else:
-                note = currentchord
+                note = current_chord
                 rest = ''
-            notenumber = notes_flat.index(note) if note not in notes_sharp else notes_sharp.index(note)
-            notenumber += transpose_value
-            while notenumber > 11:
-                notenumber -= 12
-            while notenumber < 0:
-                notenumber += 12
+            note_number = notes_flat.index(note) if note not in notes_sharp else notes_sharp.index(note)
+            note_number += transpose_value
+            while note_number > 11:
+                note_number -= 12
+            while note_number < 0:
+                note_number += 12
             if i == 0:
-                current_chord = notes_sharp[notenumber] if notes_preferred[notenumber] == '#' else notes_flat[
-                    notenumber]
+                current_chord = notes_sharp[note_number] if notes_preferred[note_number] == '#' else notes_flat[
+                    note_number]
                 last_chord = current_chord
             else:
-                current_chord = notes_flat[notenumber] if last_chord not in notes_sharp else notes_sharp[notenumber]
+                current_chord = notes_flat[note_number] if last_chord not in notes_sharp else notes_sharp[note_number]
             if not (note not in notes_flat and note not in notes_sharp):
                 transposed_chord += current_chord + rest
             else:

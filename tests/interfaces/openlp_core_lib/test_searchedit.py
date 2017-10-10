@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, call, patch
 
 from PyQt5 import QtCore, QtGui, QtTest, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.lib.searchedit import SearchEdit
 
 from tests.helpers.testmixin import TestMixin

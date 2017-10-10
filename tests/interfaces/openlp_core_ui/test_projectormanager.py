@@ -26,12 +26,12 @@ import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from openlp.core.common import Registry, Settings
+from openlp.core.common.registry import Registry
 from openlp.core.ui import ProjectorManager, ProjectorEditForm
-from openlp.core.lib.projector.db import Projector, ProjectorDB
+from openlp.core.lib.projector.db import ProjectorDB
 
 from tests.helpers.testmixin import TestMixin
-from tests.resources.projector.data import TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
+from tests.resources.projector.data import TEST_DB
 
 
 class TestProjectorManager(TestCase, TestMixin):

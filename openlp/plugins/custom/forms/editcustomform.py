@@ -24,7 +24,8 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.registry import Registry
 from openlp.core.lib.ui import critical_error_message_box, find_and_set_in_combo_box
 from openlp.plugins.custom.lib import CustomXMLBuilder, CustomXMLParser
 from openlp.plugins.custom.lib.db import CustomSlide

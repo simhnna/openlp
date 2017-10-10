@@ -22,7 +22,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import UiStrings, translate
+from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box, create_button
 from openlp.core.ui import SingleColumnTableWidget

@@ -22,16 +22,15 @@
 """
 The :mod:`~openlp.plugins.songs.forms.songselectform` module contains the GUI for the SongSelect importer
 """
-
 import logging
-import os
 from time import sleep
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core import Settings
-from openlp.core.common import Registry, is_win
-from openlp.core.lib import translate
+from openlp.core.common import is_win
+from openlp.core.common.i18n import translate
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.forms.songselectdialog import Ui_SongSelectDialog
 from openlp.plugins.songs.lib.songselect import SongSelectImport
 

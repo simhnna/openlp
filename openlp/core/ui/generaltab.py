@@ -26,9 +26,13 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, Settings, UiStrings, translate, get_images_filter
-from openlp.core.common.path import Path, path_to_str, str_to_path
-from openlp.core.lib import SettingsTab, ScreenList
+from openlp.core.common import get_images_filter
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
+from openlp.core.display.screens import ScreenList
+from openlp.core.lib import SettingsTab
 from openlp.core.ui.lib import ColorButton, PathEdit
 
 log = logging.getLogger(__name__)

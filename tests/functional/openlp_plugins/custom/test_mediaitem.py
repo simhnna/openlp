@@ -27,7 +27,7 @@ from unittest.mock import patch, MagicMock
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, PluginStatus
 from openlp.plugins.custom.lib import CustomMediaItem
 

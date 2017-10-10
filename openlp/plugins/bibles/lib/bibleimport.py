@@ -23,7 +23,9 @@
 from lxml import etree, objectify
 from zipfile import is_zipfile
 
-from openlp.core.common import OpenLPMixin, Registry, RegistryProperties, languages, translate
+from openlp.core.common.mixins import OpenLPMixin
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.i18n import get_language, translate
 from openlp.core.lib import ValidationError
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.bibles.lib.db import AlternativeBookNamesDB, BibleDB, BiblesResourcesDB
@@ -109,7 +111,7 @@ class BibleImport(OpenLPMixin, RegistryProperties, BibleDB):
         """
         language_id = None
         if file_language:
-            language = languages.get_language(file_language)
+            language = get_language(file_language)
             if language and language.id:
                 language_id = language.id
         if not language_id:

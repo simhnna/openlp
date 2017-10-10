@@ -25,9 +25,9 @@ Package to test the openlp.core.ui.shortcutform package.
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.ui.shortcutlistform import ShortcutListForm
 
 from tests.helpers.testmixin import TestMixin
