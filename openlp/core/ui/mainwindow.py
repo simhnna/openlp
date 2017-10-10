@@ -899,6 +899,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             try:
                 value = import_settings.value(section_key)
             except KeyError:
+                value = None
                 log.warning('The key "{key}" does not exist (anymore), so it will be skipped.'.format(key=section_key))
             if value is not None:
                 settings.setValue('{key}'.format(key=section_key), value)
