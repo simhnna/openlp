@@ -27,6 +27,7 @@ import json
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
+from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB
 from openlp.plugins.bibles.lib.importers.osis import OSISBible
@@ -63,7 +64,7 @@ class TestOsisImport(TestCase):
         mocked_manager = MagicMock()
 
         # WHEN: An importer object is created
-        importer = OSISBible(mocked_manager, path='.', name='.', filename='')
+        importer = OSISBible(mocked_manager, path='.', name='.', file_path=None)
 
         # THEN: The importer should be an instance of BibleDB
         self.assertIsInstance(importer, BibleDB)
@@ -73,7 +74,7 @@ class TestOsisImport(TestCase):
         Test process_books when stop_import is set to True
         """
         # GIVEN: An instance of OSISBible adn some mocked data
-        importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+        importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
         mocked_data = MagicMock(**{'xpath.return_value': ['Book']})
 
         # WHEN: stop_import_flag is set to True and process_books is called
@@ -90,7 +91,7 @@ class TestOsisImport(TestCase):
         # GIVEN: An instance of OSISBible Importer and two mocked books
         self.mocked_find_and_create_book.side_effect = ['db_book1', 'db_book2']
         with patch.object(OSISBible, 'process_chapters') as mocked_process_chapters:
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
             book1 = MagicMock()
             book1.get.return_value = 'Name1'
@@ -128,7 +129,7 @@ class TestOsisImport(TestCase):
             test_chapter = MagicMock()
             test_chapter.__iter__.return_value = [test_verse]
             test_chapter.get.side_effect = lambda x: {'osisID': '1.2.4', 'sID': '999'}.get(x)
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
             # WHEN: Calling process_chapters
             importer.process_chapters(test_book, [test_chapter])
@@ -155,7 +156,7 @@ class TestOsisImport(TestCase):
             test_chapter = MagicMock()
             test_chapter.__iter__.return_value = [test_verse]
             test_chapter.get.side_effect = lambda x: {'osisID': '1.2.4', 'sID': '999'}.get(x)
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
             # WHEN: Calling process_chapters
             importer.process_chapters(test_book, [test_chapter])
@@ -180,7 +181,7 @@ class TestOsisImport(TestCase):
             test_chapter.get.side_effect = lambda x: {'osisID': '1.2.4'}.get(x)
 
             # WHEN: Calling process_chapters
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
             importer.process_chapters(test_book, [test_chapter])
 
             # THEN: neither set_current_chapter or process_verse should have been called
@@ -201,7 +202,7 @@ class TestOsisImport(TestCase):
             test_chapter = MagicMock()
             test_chapter.tag = '{http://www.bibletechnologies.net/2003/OSIS/namespace}chapter'
             test_chapter.get.side_effect = lambda x: {'osisID': '1.2.4', 'sID': '999'}.get(x)
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
             # WHEN: Calling process_chapters
             importer.process_chapters(test_book, [test_chapter])
@@ -228,7 +229,7 @@ class TestOsisImport(TestCase):
             test_verse.text = 'Verse Text'
 
             # WHEN: Calling process_chapters
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
             importer.process_chapters(test_book, [test_verse])
 
             # THEN: process_verse should have been called with the test data
@@ -245,7 +246,7 @@ class TestOsisImport(TestCase):
         test_verse.get.side_effect = lambda x: {}.get(x)
         test_verse.tail = 'Verse Text'
         test_verse.text = None
-        importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+        importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling process_verse with the test data
         importer.process_verse(test_book, 2, test_verse)
@@ -264,7 +265,7 @@ class TestOsisImport(TestCase):
         test_verse.get.side_effect = lambda x: {}.get(x)
         test_verse.tail = 'Verse Text'
         test_verse.text = None
-        importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+        importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling process_verse with the test data
         importer.process_verse(test_book, 2, test_verse)
@@ -282,7 +283,7 @@ class TestOsisImport(TestCase):
         test_verse.tail = None
         test_verse.text = None
         test_verse.get.side_effect = lambda x: {'osisID': '1.2.4', 'sID': '999'}.get(x)
-        importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+        importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling process_verse with the test data
         importer.process_verse(test_book, 2, test_verse, use_milestones=True)
@@ -301,7 +302,7 @@ class TestOsisImport(TestCase):
         test_verse.tail = 'Verse Text'
         test_verse.text = None
         test_verse.get.side_effect = lambda x: {'osisID': '1.2.4', 'sID': '999'}.get(x)
-        importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+        importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling process_verse with the test data
         importer.process_verse(test_book, 2, test_verse, use_milestones=True)
@@ -320,7 +321,7 @@ class TestOsisImport(TestCase):
         test_verse.tail = '\n    '  # Whitespace
         test_verse.text = None
         test_verse.get.side_effect = lambda x: {'osisID': '1.2.4', 'sID': '999'}.get(x)
-        importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+        importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling process_verse with the test data
         importer.process_verse(test_book, 2, test_verse)
@@ -339,7 +340,7 @@ class TestOsisImport(TestCase):
         test_verse.tail = '\n    '  # Whitespace
         test_verse.text = 'Verse Text'
         test_verse.get.side_effect = lambda x: {'osisID': '1.2.4', 'sID': '999'}.get(x)
-        importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+        importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling process_verse with the test data
         importer.process_verse(test_book, 2, test_verse)
@@ -356,7 +357,7 @@ class TestOsisImport(TestCase):
                 patch.object(OSISBible, 'validate_xml_file'), \
                 patch.object(OSISBible, 'parse_xml', return_value=None), \
                 patch.object(OSISBible, 'get_language_id') as mocked_language_id:
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
             # WHEN: Calling do_import
             result = importer.do_import()
@@ -375,7 +376,7 @@ class TestOsisImport(TestCase):
                 patch.object(OSISBible, 'parse_xml'), \
                 patch.object(OSISBible, 'get_language_id', **{'return_value': False}), \
                 patch.object(OSISBible, 'process_books') as mocked_process_books:
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
             # WHEN: Calling do_import
             result = importer.do_import()
@@ -394,7 +395,7 @@ class TestOsisImport(TestCase):
                 patch.object(OSISBible, 'parse_xml'), \
                 patch.object(OSISBible, 'get_language_id', **{'return_value': 10}), \
                 patch.object(OSISBible, 'process_books'):
-            importer = OSISBible(MagicMock(), path='.', name='.', filename='')
+            importer = OSISBible(MagicMock(), path='.', name='.', file_path=None)
 
             # WHEN: Calling do_import
             result = importer.do_import()
@@ -427,7 +428,7 @@ class TestOsisImportFileImports(TestCase):
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OSISBible(mocked_manager, path='.', name='.', filename='')
+            importer = OSISBible(mocked_manager, path='.', name='.', file_path=None)
             importer.wizard = mocked_import_wizard
             importer.get_book_ref_id_by_name = MagicMock()
             importer.create_verse = MagicMock()
@@ -437,7 +438,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'Danish'
 
             # WHEN: Importing bible file
-            importer.filename = os.path.join(TEST_PATH, bible_file)
+            importer.file_path = Path(TEST_PATH, bible_file)
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -457,7 +458,7 @@ class TestOsisImportFileImports(TestCase):
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OSISBible(mocked_manager, path='.', name='.', filename='')
+            importer = OSISBible(mocked_manager, path='.', name='.', file_path=None)
             importer.wizard = mocked_import_wizard
             importer.get_book_ref_id_by_name = MagicMock()
             importer.create_verse = MagicMock()
@@ -467,7 +468,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'English'
 
             # WHEN: Importing bible file
-            importer.filename = os.path.join(TEST_PATH, bible_file)
+            importer.file_path = Path(TEST_PATH, bible_file)
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -487,7 +488,7 @@ class TestOsisImportFileImports(TestCase):
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OSISBible(mocked_manager, path='.', name='.', filename='')
+            importer = OSISBible(mocked_manager, path='.', name='.', file_path=None)
             importer.wizard = mocked_import_wizard
             importer.get_book_ref_id_by_name = MagicMock()
             importer.create_verse = MagicMock()
@@ -497,7 +498,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'English'
 
             # WHEN: Importing bible file
-            importer.filename = os.path.join(TEST_PATH, bible_file)
+            importer.file_path = Path(TEST_PATH, bible_file)
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -517,7 +518,7 @@ class TestOsisImportFileImports(TestCase):
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OSISBible(mocked_manager, path='.', name='.', filename='')
+            importer = OSISBible(mocked_manager, path='.', name='.', file_path=None)
             importer.wizard = mocked_import_wizard
             importer.get_book_ref_id_by_name = MagicMock()
             importer.create_verse = MagicMock()
@@ -527,7 +528,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'Danish'
 
             # WHEN: Importing bible file
-            importer.filename = os.path.join(TEST_PATH, bible_file)
+            importer.file_path = Path(TEST_PATH, bible_file)
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.

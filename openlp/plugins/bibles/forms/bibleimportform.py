@@ -23,7 +23,6 @@
 The bible import functions for OpenLP
 """
 import logging
-import os
 import urllib.error
 from lxml import etree
 
@@ -39,6 +38,7 @@ from openlp.core.common.languagemanager import get_locale_key
 from openlp.core.lib.db import delete_database
 from openlp.core.lib.exceptions import ValidationError
 from openlp.core.lib.ui import critical_error_message_box
+from openlp.core.ui.lib.pathedit import PathEdit
 from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.bibles.lib.db import clean_filename
 from openlp.plugins.bibles.lib.importers.http import CWExtract, BGExtract, BSExtract
@@ -120,15 +120,9 @@ class BibleImportForm(OpenLPWizard):
         Set up the signals used in the bible importer.
         """
         self.web_source_combo_box.currentIndexChanged.connect(self.on_web_source_combo_box_index_changed)
-        self.osis_browse_button.clicked.connect(self.on_osis_browse_button_clicked)
-        self.csv_books_button.clicked.connect(self.on_csv_books_browse_button_clicked)
-        self.csv_verses_button.clicked.connect(self.on_csv_verses_browse_button_clicked)
-        self.open_song_browse_button.clicked.connect(self.on_open_song_browse_button_clicked)
-        self.zefania_browse_button.clicked.connect(self.on_zefania_browse_button_clicked)
-        self.wordproject_browse_button.clicked.connect(self.on_wordproject_browse_button_clicked)
         self.web_update_button.clicked.connect(self.on_web_update_button_clicked)
-        self.sword_browse_button.clicked.connect(self.on_sword_browse_button_clicked)
-        self.sword_zipbrowse_button.clicked.connect(self.on_sword_zipbrowse_button_clicked)
+        self.sword_folder_path_edit.pathChanged.connect(self.on_sword_folder_path_edit_path_changed)
+        self.sword_zipfile_path_edit.pathChanged.connect(self.on_sword_zipfile_path_edit_path_changed)
 
     def add_custom_pages(self):
         """
@@ -159,17 +153,12 @@ class BibleImportForm(OpenLPWizard):
         self.osis_layout.setObjectName('OsisLayout')
         self.osis_file_label = QtWidgets.QLabel(self.osis_widget)
         self.osis_file_label.setObjectName('OsisFileLabel')
-        self.osis_file_layout = QtWidgets.QHBoxLayout()
-        self.osis_file_layout.setObjectName('OsisFileLayout')
-        self.osis_file_edit = QtWidgets.QLineEdit(self.osis_widget)
-        self.osis_file_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.osis_file_edit.setObjectName('OsisFileEdit')
-        self.osis_file_layout.addWidget(self.osis_file_edit)
-        self.osis_browse_button = QtWidgets.QToolButton(self.osis_widget)
-        self.osis_browse_button.setIcon(self.open_icon)
-        self.osis_browse_button.setObjectName('OsisBrowseButton')
-        self.osis_file_layout.addWidget(self.osis_browse_button)
-        self.osis_layout.addRow(self.osis_file_label, self.osis_file_layout)
+        self.osis_path_edit = PathEdit(
+            self.osis_widget,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.OSIS),
+            show_revert=False)
+        self.osis_layout.addRow(self.osis_file_label, self.osis_path_edit)
         self.osis_layout.setItem(1, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.select_stack.addWidget(self.osis_widget)
         self.csv_widget = QtWidgets.QWidget(self.select_page)
@@ -179,30 +168,27 @@ class BibleImportForm(OpenLPWizard):
         self.csv_layout.setObjectName('CsvLayout')
         self.csv_books_label = QtWidgets.QLabel(self.csv_widget)
         self.csv_books_label.setObjectName('CsvBooksLabel')
-        self.csv_books_layout = QtWidgets.QHBoxLayout()
-        self.csv_books_layout.setObjectName('CsvBooksLayout')
-        self.csv_books_edit = QtWidgets.QLineEdit(self.csv_widget)
-        self.csv_books_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.csv_books_edit.setObjectName('CsvBooksEdit')
-        self.csv_books_layout.addWidget(self.csv_books_edit)
-        self.csv_books_button = QtWidgets.QToolButton(self.csv_widget)
-        self.csv_books_button.setIcon(self.open_icon)
-        self.csv_books_button.setObjectName('CsvBooksButton')
-        self.csv_books_layout.addWidget(self.csv_books_button)
-        self.csv_layout.addRow(self.csv_books_label, self.csv_books_layout)
+        self.csv_books_path_edit = PathEdit(
+            self.csv_widget,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.CSV),
+            show_revert=False,
+        )
+        self.csv_books_path_edit.filters = \
+            '{name} (*.csv)'.format(name=translate('BiblesPlugin.ImportWizardForm', 'CSV File'))
+        self.csv_layout.addRow(self.csv_books_label, self.csv_books_path_edit)
         self.csv_verses_label = QtWidgets.QLabel(self.csv_widget)
         self.csv_verses_label.setObjectName('CsvVersesLabel')
-        self.csv_verses_layout = QtWidgets.QHBoxLayout()
-        self.csv_verses_layout.setObjectName('CsvVersesLayout')
-        self.csv_verses_edit = QtWidgets.QLineEdit(self.csv_widget)
-        self.csv_verses_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.csv_verses_edit.setObjectName('CsvVersesEdit')
-        self.csv_verses_layout.addWidget(self.csv_verses_edit)
-        self.csv_verses_button = QtWidgets.QToolButton(self.csv_widget)
-        self.csv_verses_button.setIcon(self.open_icon)
-        self.csv_verses_button.setObjectName('CsvVersesButton')
-        self.csv_verses_layout.addWidget(self.csv_verses_button)
-        self.csv_layout.addRow(self.csv_verses_label, self.csv_verses_layout)
+        self.csv_verses_path_edit = PathEdit(
+            self.csv_widget,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.CSV),
+            show_revert=False,
+        )
+        self.csv_verses_path_edit.filters = \
+            '{name} (*.csv)'.format(name=translate('BiblesPlugin.ImportWizardForm', 'CSV File'))
+        self.csv_layout.addRow(self.csv_books_label, self.csv_books_path_edit)
+        self.csv_layout.addRow(self.csv_verses_label, self.csv_verses_path_edit)
         self.csv_layout.setItem(3, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.select_stack.addWidget(self.csv_widget)
         self.open_song_widget = QtWidgets.QWidget(self.select_page)
@@ -212,17 +198,13 @@ class BibleImportForm(OpenLPWizard):
         self.open_song_layout.setObjectName('OpenSongLayout')
         self.open_song_file_label = QtWidgets.QLabel(self.open_song_widget)
         self.open_song_file_label.setObjectName('OpenSongFileLabel')
-        self.open_song_file_layout = QtWidgets.QHBoxLayout()
-        self.open_song_file_layout.setObjectName('OpenSongFileLayout')
-        self.open_song_file_edit = QtWidgets.QLineEdit(self.open_song_widget)
-        self.open_song_file_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.open_song_file_edit.setObjectName('OpenSongFileEdit')
-        self.open_song_file_layout.addWidget(self.open_song_file_edit)
-        self.open_song_browse_button = QtWidgets.QToolButton(self.open_song_widget)
-        self.open_song_browse_button.setIcon(self.open_icon)
-        self.open_song_browse_button.setObjectName('OpenSongBrowseButton')
-        self.open_song_file_layout.addWidget(self.open_song_browse_button)
-        self.open_song_layout.addRow(self.open_song_file_label, self.open_song_file_layout)
+        self.open_song_path_edit = PathEdit(
+            self.open_song_widget,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.OS),
+            show_revert=False,
+        )
+        self.open_song_layout.addRow(self.open_song_file_label, self.open_song_path_edit)
         self.open_song_layout.setItem(1, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.select_stack.addWidget(self.open_song_widget)
         self.web_tab_widget = QtWidgets.QTabWidget(self.select_page)
@@ -290,17 +272,14 @@ class BibleImportForm(OpenLPWizard):
         self.zefania_layout.setObjectName('ZefaniaLayout')
         self.zefania_file_label = QtWidgets.QLabel(self.zefania_widget)
         self.zefania_file_label.setObjectName('ZefaniaFileLabel')
-        self.zefania_file_layout = QtWidgets.QHBoxLayout()
-        self.zefania_file_layout.setObjectName('ZefaniaFileLayout')
-        self.zefania_file_edit = QtWidgets.QLineEdit(self.zefania_widget)
-        self.zefania_file_edit.setObjectName('ZefaniaFileEdit')
-        self.zefania_file_layout.addWidget(self.zefania_file_edit)
-        self.zefania_browse_button = QtWidgets.QToolButton(self.zefania_widget)
-        self.zefania_browse_button.setIcon(self.open_icon)
-        self.zefania_browse_button.setObjectName('ZefaniaBrowseButton')
-        self.zefania_file_layout.addWidget(self.zefania_browse_button)
-        self.zefania_layout.addRow(self.zefania_file_label, self.zefania_file_layout)
-        self.zefania_layout.setItem(5, QtWidgets.QFormLayout.LabelRole, self.spacer)
+        self.zefania_path_edit = PathEdit(
+            self.zefania_widget,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.ZEF),
+            show_revert=False,
+        )
+        self.zefania_layout.addRow(self.zefania_file_label, self.zefania_path_edit)
+        self.zefania_layout.setItem(2, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.select_stack.addWidget(self.zefania_widget)
         self.sword_widget = QtWidgets.QWidget(self.select_page)
         self.sword_widget.setObjectName('SwordWidget')
@@ -316,16 +295,13 @@ class BibleImportForm(OpenLPWizard):
         self.sword_folder_label = QtWidgets.QLabel(self.sword_folder_tab)
         self.sword_folder_label.setObjectName('SwordSourceLabel')
         self.sword_folder_label.setObjectName('SwordFolderLabel')
-        self.sword_folder_edit = QtWidgets.QLineEdit(self.sword_folder_tab)
-        self.sword_folder_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.sword_folder_edit.setObjectName('SwordFolderEdit')
-        self.sword_browse_button = QtWidgets.QToolButton(self.sword_folder_tab)
-        self.sword_browse_button.setIcon(self.open_icon)
-        self.sword_browse_button.setObjectName('SwordBrowseButton')
-        self.sword_folder_layout = QtWidgets.QHBoxLayout()
-        self.sword_folder_layout.addWidget(self.sword_folder_edit)
-        self.sword_folder_layout.addWidget(self.sword_browse_button)
-        self.sword_folder_tab_layout.addRow(self.sword_folder_label, self.sword_folder_layout)
+        self.sword_folder_path_edit = PathEdit(
+            self.sword_folder_tab,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.SWORD),
+            show_revert=False,
+        )
+        self.sword_folder_tab_layout.addRow(self.sword_folder_label, self.sword_folder_path_edit)
         self.sword_bible_label = QtWidgets.QLabel(self.sword_folder_tab)
         self.sword_bible_label.setObjectName('SwordBibleLabel')
         self.sword_bible_combo_box = QtWidgets.QComboBox(self.sword_folder_tab)
@@ -340,16 +316,13 @@ class BibleImportForm(OpenLPWizard):
         self.sword_zip_layout.setObjectName('SwordZipLayout')
         self.sword_zipfile_label = QtWidgets.QLabel(self.sword_zip_tab)
         self.sword_zipfile_label.setObjectName('SwordZipFileLabel')
-        self.sword_zipfile_edit = QtWidgets.QLineEdit(self.sword_zip_tab)
-        self.sword_zipfile_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.sword_zipfile_edit.setObjectName('SwordZipFileEdit')
-        self.sword_zipbrowse_button = QtWidgets.QToolButton(self.sword_zip_tab)
-        self.sword_zipbrowse_button.setIcon(self.open_icon)
-        self.sword_zipbrowse_button.setObjectName('SwordZipBrowseButton')
-        self.sword_zipfile_layout = QtWidgets.QHBoxLayout()
-        self.sword_zipfile_layout.addWidget(self.sword_zipfile_edit)
-        self.sword_zipfile_layout.addWidget(self.sword_zipbrowse_button)
-        self.sword_zip_layout.addRow(self.sword_zipfile_label, self.sword_zipfile_layout)
+        self.sword_zipfile_path_edit = PathEdit(
+            self.sword_zip_tab,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.SWORD),
+            show_revert=False,
+        )
+        self.sword_zip_layout.addRow(self.sword_zipfile_label, self.sword_zipfile_path_edit)
         self.sword_zipbible_label = QtWidgets.QLabel(self.sword_folder_tab)
         self.sword_zipbible_label.setObjectName('SwordZipBibleLabel')
         self.sword_zipbible_combo_box = QtWidgets.QComboBox(self.sword_zip_tab)
@@ -370,18 +343,13 @@ class BibleImportForm(OpenLPWizard):
         self.wordproject_layout.setObjectName('WordProjectLayout')
         self.wordproject_file_label = QtWidgets.QLabel(self.wordproject_widget)
         self.wordproject_file_label.setObjectName('WordProjectFileLabel')
-        self.wordproject_file_layout = QtWidgets.QHBoxLayout()
-        self.wordproject_file_layout.setObjectName('WordProjectFileLayout')
-        self.wordproject_file_edit = QtWidgets.QLineEdit(self.wordproject_widget)
-        self.wordproject_file_edit.setSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Preferred)
-        self.wordproject_file_edit.setObjectName('WordProjectFileEdit')
-        self.wordproject_file_layout.addWidget(self.wordproject_file_edit)
-        self.wordproject_browse_button = QtWidgets.QToolButton(self.wordproject_widget)
-        self.wordproject_browse_button.setIcon(self.open_icon)
-        self.wordproject_browse_button.setObjectName('WordProjectBrowseButton')
-        self.wordproject_file_layout.addWidget(self.wordproject_browse_button)
-        self.wordproject_layout.addRow(self.wordproject_file_label, self.wordproject_file_layout)
-        self.wordproject_layout.setItem(5, QtWidgets.QFormLayout.LabelRole, self.spacer)
+        self.wordproject_path_edit = PathEdit(
+            self.wordproject_widget,
+            default_path=Settings().value('bibles/last directory import'),
+            dialog_caption=WizardStrings.OpenTypeFile.format(file_type=WizardStrings.WordProject),
+            show_revert=False)
+        self.wordproject_layout.addRow(self.wordproject_file_label, self.wordproject_path_edit)
+        self.wordproject_layout.setItem(1, QtWidgets.QFormLayout.LabelRole, self.spacer)
         self.select_stack.addWidget(self.wordproject_widget)
         self.select_page_layout.addLayout(self.select_stack)
         self.addPage(self.select_page)
@@ -466,8 +434,6 @@ class BibleImportForm(OpenLPWizard):
         self.sword_bible_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Bibles:'))
         self.sword_folder_label.setText(translate('BiblesPlugin.ImportWizardForm', 'SWORD data folder:'))
         self.sword_zipfile_label.setText(translate('BiblesPlugin.ImportWizardForm', 'SWORD zip-file:'))
-        self.sword_folder_edit.setPlaceholderText(translate('BiblesPlugin.ImportWizardForm',
-                                                            'Defaults to the standard SWORD data folder'))
         self.sword_zipbible_label.setText(translate('BiblesPlugin.ImportWizardForm', 'Bibles:'))
         self.sword_tab_widget.setTabText(self.sword_tab_widget.indexOf(self.sword_folder_tab),
                                          translate('BiblesPlugin.ImportWizardForm', 'Import from folder'))
@@ -516,7 +482,7 @@ class BibleImportForm(OpenLPWizard):
             if self.field('source_format') == BibleFormat.OSIS:
                 if not self.field('osis_location'):
                     critical_error_message_box(UiStrings().NFSs, WizardStrings.YouSpecifyFile % WizardStrings.OSIS)
-                    self.osis_file_edit.setFocus()
+                    self.osis_path_edit.setFocus()
                     return False
             elif self.field('source_format') == BibleFormat.CSV:
                 if not self.field('csv_booksfile'):
@@ -536,18 +502,18 @@ class BibleImportForm(OpenLPWizard):
             elif self.field('source_format') == BibleFormat.OpenSong:
                 if not self.field('opensong_file'):
                     critical_error_message_box(UiStrings().NFSs, WizardStrings.YouSpecifyFile % WizardStrings.OS)
-                    self.open_song_file_edit.setFocus()
+                    self.open_song_path_edit.setFocus()
                     return False
             elif self.field('source_format') == BibleFormat.Zefania:
                 if not self.field('zefania_file'):
                     critical_error_message_box(UiStrings().NFSs, WizardStrings.YouSpecifyFile % WizardStrings.ZEF)
-                    self.zefania_file_edit.setFocus()
+                    self.zefania_path_edit.setFocus()
                     return False
             elif self.field('source_format') == BibleFormat.WordProject:
                 if not self.field('wordproject_file'):
                     critical_error_message_box(UiStrings().NFSs,
                                                WizardStrings.YouSpecifyFile % WizardStrings.WordProject)
-                    self.wordproject_file_edit.setFocus()
+                    self.wordproject_path_edit.setFocus()
                     return False
             elif self.field('source_format') == BibleFormat.WebDownload:
                 # If count is 0 the bible list has not yet been downloaded
@@ -561,7 +527,7 @@ class BibleImportForm(OpenLPWizard):
                     if not self.field('sword_folder_path') and self.sword_bible_combo_box.count() == 0:
                         critical_error_message_box(UiStrings().NFSs,
                                                    WizardStrings.YouSpecifyFolder % WizardStrings.SWORD)
-                        self.sword_folder_edit.setFocus()
+                        self.sword_folder_path_edit.setFocus()
                         return False
                     key = self.sword_bible_combo_box.itemData(self.sword_bible_combo_box.currentIndex())
                     if 'description' in self.pysword_folder_modules_json[key]:
@@ -573,7 +539,7 @@ class BibleImportForm(OpenLPWizard):
                 elif self.sword_tab_widget.currentIndex() == self.sword_tab_widget.indexOf(self.sword_zip_tab):
                     if not self.field('sword_zip_path'):
                         critical_error_message_box(UiStrings().NFSs, WizardStrings.YouSpecifyFile % WizardStrings.SWORD)
-                        self.sword_zipfile_edit.setFocus()
+                        self.sword_zipfile_path_edit.setFocus()
                         return False
                     key = self.sword_zipbible_combo_box.itemData(self.sword_zipbible_combo_box.currentIndex())
                     if 'description' in self.pysword_zip_modules_json[key]:
@@ -584,7 +550,6 @@ class BibleImportForm(OpenLPWizard):
         elif self.currentPage() == self.license_details_page:
             license_version = self.field('license_version')
             license_copyright = self.field('license_copyright')
-            path = str(AppLocation.get_section_data_path('bibles'))
             if not license_version:
                 critical_error_message_box(
                     UiStrings().EmptyField,
@@ -606,7 +571,7 @@ class BibleImportForm(OpenLPWizard):
                               'existing one.'))
                 self.version_name_edit.setFocus()
                 return False
-            elif os.path.exists(os.path.join(path, clean_filename(license_version))):
+            elif (AppLocation.get_section_data_path('bibles') / clean_filename(license_version)).exists():
                 critical_error_message_box(
                     translate('BiblesPlugin.ImportWizardForm', 'Bible Exists'),
                     translate('BiblesPlugin.ImportWizardForm', 'This Bible already exists. Please import '
@@ -628,57 +593,6 @@ class BibleImportForm(OpenLPWizard):
             bibles = list(self.web_bible_list[index].keys())
             bibles.sort(key=get_locale_key)
             self.web_translation_combo_box.addItems(bibles)
-
-    def on_osis_browse_button_clicked(self):
-        """
-        Show the file open dialog for the OSIS file.
-        """
-        self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.OSIS, self.osis_file_edit,
-                           'last directory import')
-
-    def on_csv_books_browse_button_clicked(self):
-        """
-        Show the file open dialog for the books CSV file.
-        """
-        # TODO: Verify format() with varible template
-        self.get_file_name(
-            WizardStrings.OpenTypeFile % WizardStrings.CSV,
-            self.csv_books_edit,
-            'last directory import',
-            '{name} (*.csv)'.format(name=translate('BiblesPlugin.ImportWizardForm', 'CSV File')))
-
-    def on_csv_verses_browse_button_clicked(self):
-        """
-        Show the file open dialog for the verses CSV file.
-        """
-        # TODO: Verify format() with variable template
-        self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.CSV, self.csv_verses_edit,
-                           'last directory import',
-                           '{name} (*.csv)'.format(name=translate('BiblesPlugin.ImportWizardForm', 'CSV File')))
-
-    def on_open_song_browse_button_clicked(self):
-        """
-        Show the file open dialog for the OpenSong file.
-        """
-        # TODO: Verify format() with variable template
-        self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.OS, self.open_song_file_edit,
-                           'last directory import')
-
-    def on_zefania_browse_button_clicked(self):
-        """
-        Show the file open dialog for the Zefania file.
-        """
-        # TODO: Verify format() with variable template
-        self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.ZEF, self.zefania_file_edit,
-                           'last directory import')
-
-    def on_wordproject_browse_button_clicked(self):
-        """
-        Show the file open dialog for the WordProject file.
-        """
-        # TODO: Verify format() with variable template
-        self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.WordProject, self.wordproject_file_edit,
-                           'last directory import')
 
     def on_web_update_button_clicked(self):
         """
@@ -716,15 +630,13 @@ class BibleImportForm(OpenLPWizard):
         self.web_update_button.setEnabled(True)
         self.web_progress_bar.setVisible(False)
 
-    def on_sword_browse_button_clicked(self):
+    def on_sword_folder_path_edit_path_changed(self, new_path):
         """
         Show the file open dialog for the SWORD folder.
         """
-        self.get_folder(WizardStrings.OpenTypeFolder % WizardStrings.SWORD, self.sword_folder_edit,
-                        'last directory import')
-        if self.sword_folder_edit.text():
+        if new_path:
             try:
-                self.pysword_folder_modules = modules.SwordModules(self.sword_folder_edit.text())
+                self.pysword_folder_modules = modules.SwordModules(str(new_path))
                 self.pysword_folder_modules_json = self.pysword_folder_modules.parse_modules()
                 bible_keys = self.pysword_folder_modules_json.keys()
                 self.sword_bible_combo_box.clear()
@@ -733,15 +645,13 @@ class BibleImportForm(OpenLPWizard):
             except:
                 self.sword_bible_combo_box.clear()
 
-    def on_sword_zipbrowse_button_clicked(self):
+    def on_sword_zipfile_path_edit_path_changed(self, new_path):
         """
         Show the file open dialog for a SWORD zip-file.
         """
-        self.get_file_name(WizardStrings.OpenTypeFile % WizardStrings.SWORD, self.sword_zipfile_edit,
-                           'last directory import')
-        if self.sword_zipfile_edit.text():
+        if new_path:
             try:
-                self.pysword_zip_modules = modules.SwordModules(self.sword_zipfile_edit.text())
+                self.pysword_zip_modules = modules.SwordModules(str(new_path))
                 self.pysword_zip_modules_json = self.pysword_zip_modules.parse_modules()
                 bible_keys = self.pysword_zip_modules_json.keys()
                 self.sword_zipbible_combo_box.clear()
@@ -755,16 +665,16 @@ class BibleImportForm(OpenLPWizard):
         Register the bible import wizard fields.
         """
         self.select_page.registerField('source_format', self.format_combo_box)
-        self.select_page.registerField('osis_location', self.osis_file_edit)
-        self.select_page.registerField('csv_booksfile', self.csv_books_edit)
-        self.select_page.registerField('csv_versefile', self.csv_verses_edit)
-        self.select_page.registerField('opensong_file', self.open_song_file_edit)
-        self.select_page.registerField('zefania_file', self.zefania_file_edit)
-        self.select_page.registerField('wordproject_file', self.wordproject_file_edit)
+        self.select_page.registerField('osis_location', self.osis_path_edit, 'path', PathEdit.pathChanged)
+        self.select_page.registerField('csv_booksfile', self.csv_books_path_edit, 'path', PathEdit.pathChanged)
+        self.select_page.registerField('csv_versefile', self.csv_verses_path_edit, 'path', PathEdit.pathChanged)
+        self.select_page.registerField('opensong_file', self.open_song_path_edit, 'path', PathEdit.pathChanged)
+        self.select_page.registerField('zefania_file', self.zefania_path_edit, 'path', PathEdit.pathChanged)
+        self.select_page.registerField('wordproject_file', self.wordproject_path_edit, 'path', PathEdit.pathChanged)
         self.select_page.registerField('web_location', self.web_source_combo_box)
         self.select_page.registerField('web_biblename', self.web_translation_combo_box)
-        self.select_page.registerField('sword_folder_path', self.sword_folder_edit)
-        self.select_page.registerField('sword_zip_path', self.sword_zipfile_edit)
+        self.select_page.registerField('sword_folder_path', self.sword_folder_path_edit, 'path', PathEdit.pathChanged)
+        self.select_page.registerField('sword_zip_path', self.sword_zipfile_path_edit, 'path', PathEdit.pathChanged)
         self.select_page.registerField('proxy_server', self.web_server_edit)
         self.select_page.registerField('proxy_username', self.web_user_edit)
         self.select_page.registerField('proxy_password', self.web_password_edit)
@@ -783,13 +693,13 @@ class BibleImportForm(OpenLPWizard):
         self.finish_button.setVisible(False)
         self.cancel_button.setVisible(True)
         self.setField('source_format', 0)
-        self.setField('osis_location', '')
-        self.setField('csv_booksfile', '')
-        self.setField('csv_versefile', '')
-        self.setField('opensong_file', '')
-        self.setField('zefania_file', '')
-        self.setField('sword_folder_path', '')
-        self.setField('sword_zip_path', '')
+        self.setField('osis_location', None)
+        self.setField('csv_booksfile', None)
+        self.setField('csv_versefile', None)
+        self.setField('opensong_file', None)
+        self.setField('zefania_file', None)
+        self.setField('sword_folder_path', None)
+        self.setField('sword_zip_path', None)
         self.setField('web_location', WebDownload.Crosswalk)
         self.setField('web_biblename', self.web_translation_combo_box.currentIndex())
         self.setField('proxy_server', settings.value('proxy address'))
@@ -831,16 +741,16 @@ class BibleImportForm(OpenLPWizard):
         if bible_type == BibleFormat.OSIS:
             # Import an OSIS bible.
             importer = self.manager.import_bible(BibleFormat.OSIS, name=license_version,
-                                                 filename=self.field('osis_location'))
+                                                 file_path=self.field('osis_location'))
         elif bible_type == BibleFormat.CSV:
             # Import a CSV bible.
             importer = self.manager.import_bible(BibleFormat.CSV, name=license_version,
-                                                 booksfile=self.field('csv_booksfile'),
-                                                 versefile=self.field('csv_versefile'))
+                                                 books_path=self.field('csv_booksfile'),
+                                                 verse_path=self.field('csv_versefile'))
         elif bible_type == BibleFormat.OpenSong:
             # Import an OpenSong bible.
             importer = self.manager.import_bible(BibleFormat.OpenSong, name=license_version,
-                                                 filename=self.field('opensong_file'))
+                                                 file_path=self.field('opensong_file'))
         elif bible_type == BibleFormat.WebDownload:
             # Import a bible from the web.
             self.progress_bar.setMaximum(1)
@@ -859,11 +769,11 @@ class BibleImportForm(OpenLPWizard):
         elif bible_type == BibleFormat.Zefania:
             # Import a Zefania bible.
             importer = self.manager.import_bible(BibleFormat.Zefania, name=license_version,
-                                                 filename=self.field('zefania_file'))
+                                                 file_path=self.field('zefania_file'))
         elif bible_type == BibleFormat.WordProject:
             # Import a WordProject bible.
             importer = self.manager.import_bible(BibleFormat.WordProject, name=license_version,
-                                                 filename=self.field('wordproject_file'))
+                                                 file_path=self.field('wordproject_file'))
         elif bible_type == BibleFormat.SWORD:
             # Import a SWORD bible.
             if self.sword_tab_widget.currentIndex() == self.sword_tab_widget.indexOf(self.sword_folder_tab):

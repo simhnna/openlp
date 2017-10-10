@@ -159,14 +159,14 @@ class OSISBible(BibleImport):
         """
         Loads a Bible from file.
         """
-        self.log_debug('Starting OSIS import from "{name}"'.format(name=self.filename))
-        self.validate_xml_file(self.filename, '{http://www.bibletechnologies.net/2003/osis/namespace}osis')
-        bible = self.parse_xml(self.filename, elements=REMOVABLE_ELEMENTS, tags=REMOVABLE_TAGS)
+        self.log_debug('Starting OSIS import from "{name}"'.format(name=self.file_path))
+        self.validate_xml_file(self.file_path, '{http://www.bibletechnologies.net/2003/osis/namespace}osis')
+        bible = self.parse_xml(self.file_path, elements=REMOVABLE_ELEMENTS, tags=REMOVABLE_TAGS)
         if bible is None:
             return False
         # Find bible language
         language = bible.xpath("//ns:osisText/@xml:lang", namespaces=NS)
-        self.language_id = self.get_language_id(language[0] if language else None, bible_name=self.filename)
+        self.language_id = self.get_language_id(language[0] if language else None, bible_name=str(self.file_path))
         if not self.language_id:
             return False
         self.process_books(bible)

@@ -27,6 +27,7 @@ import json
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.importers.zefania import ZefaniaBible
 from openlp.plugins.bibles.lib.db import BibleDB
 
@@ -55,7 +56,7 @@ class TestZefaniaImport(TestCase):
         mocked_manager = MagicMock()
 
         # WHEN: An importer object is created
-        importer = ZefaniaBible(mocked_manager, path='.', name='.', filename='')
+        importer = ZefaniaBible(mocked_manager, path='.', name='.', file_path=None)
 
         # THEN: The importer should be an instance of BibleDB
         self.assertIsInstance(importer, BibleDB)
@@ -72,7 +73,7 @@ class TestZefaniaImport(TestCase):
         with patch('openlp.plugins.bibles.lib.importers.zefania.ZefaniaBible.application'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = ZefaniaBible(mocked_manager, path='.', name='.', filename='')
+            importer = ZefaniaBible(mocked_manager, path='.', name='.', file_path=None)
             importer.wizard = mocked_import_wizard
             importer.create_verse = MagicMock()
             importer.create_book = MagicMock()
@@ -81,7 +82,7 @@ class TestZefaniaImport(TestCase):
             importer.get_language.return_value = 'Danish'
 
             # WHEN: Importing bible file
-            importer.filename = os.path.join(TEST_PATH, bible_file)
+            importer.file_path = Path(TEST_PATH, bible_file)
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -102,7 +103,7 @@ class TestZefaniaImport(TestCase):
         with patch('openlp.plugins.bibles.lib.importers.zefania.ZefaniaBible.application'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = ZefaniaBible(mocked_manager, path='.', name='.', filename='')
+            importer = ZefaniaBible(mocked_manager, path='.', name='.', file_path=None)
             importer.wizard = mocked_import_wizard
             importer.create_verse = MagicMock()
             importer.create_book = MagicMock()
@@ -111,7 +112,7 @@ class TestZefaniaImport(TestCase):
             importer.get_language.return_value = 'Russian'
 
             # WHEN: Importing bible file
-            importer.filename = os.path.join(TEST_PATH, bible_file)
+            importer.file_path = Path(TEST_PATH, bible_file)
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.

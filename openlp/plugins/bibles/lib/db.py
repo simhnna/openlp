@@ -34,6 +34,7 @@ from sqlalchemy.orm import class_mapper, mapper, relation
 from sqlalchemy.orm.exc import UnmappedClassError
 
 from openlp.core.common import AppLocation, translate, clean_filename
+from openlp.core.common.path import Path
 from openlp.core.lib.db import BaseModel, init_db, Manager
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.bibles.lib import BibleStrings, LanguageSelection, upgrade
@@ -128,10 +129,15 @@ class BibleDB(Manager):
         :param parent:
         :param kwargs:
             ``path``
-                The path to the bible database file.
+                The path to the bible database file. Type: openlp.core.common.path.Path
 
             ``name``
                 The name of the database. This is also used as the file name for SQLite databases.
+
+            ``file``
+                Type: openlp.core.common.path.Path
+
+        :rtype: None
         """
         log.info('BibleDB loaded')
         self._setup(parent, **kwargs)
@@ -144,20 +150,20 @@ class BibleDB(Manager):
         self.session = None
         if 'path' not in kwargs:
             raise KeyError('Missing keyword argument "path".')
+        self.path = kwargs['path']
         if 'name' not in kwargs and 'file' not in kwargs:
             raise KeyError('Missing keyword argument "name" or "file".')
         if 'name' in kwargs:
             self.name = kwargs['name']
             if not isinstance(self.name, str):
                 self.name = str(self.name, 'utf-8')
-            self.file = clean_filename(self.name) + '.sqlite'
+            # TODO: To path object
+            file_path = Path(clean_filename(self.name) + '.sqlite')
         if 'file' in kwargs:
-            self.file = kwargs['file']
-        Manager.__init__(self, 'bibles', init_schema, self.file, upgrade)
+            file_path = kwargs['file']
+        Manager.__init__(self, 'bibles', init_schema, file_path, upgrade)
         if self.session and 'file' in kwargs:
                 self.get_name()
-        if 'path' in kwargs:
-            self.path = kwargs['path']
         self._is_web_bible = None
 
     def get_name(self):
@@ -470,9 +476,9 @@ class BiblesResourcesDB(QtCore.QObject, Manager):
         Return the cursor object. Instantiate one if it doesn't exist yet.
         """
         if BiblesResourcesDB.cursor is None:
-            file_path = os.path.join(str(AppLocation.get_directory(AppLocation.PluginsDir)),
-                                     'bibles', 'resources', 'bibles_resources.sqlite')
-            conn = sqlite3.connect(file_path)
+            file_path = \
+                AppLocation.get_directory(AppLocation.PluginsDir) / 'bibles' / 'resources' / 'bibles_resources.sqlite'
+            conn = sqlite3.connect(str(file_path))
             BiblesResourcesDB.cursor = conn.cursor()
         return BiblesResourcesDB.cursor
 
@@ -758,17 +764,13 @@ class AlternativeBookNamesDB(QtCore.QObject, Manager):
         If necessary loads up the database and creates the tables if the database doesn't exist.
         """
         if AlternativeBookNamesDB.cursor is None:
-            file_path = os.path.join(
-                str(AppLocation.get_directory(AppLocation.DataDir)), 'bibles', 'alternative_book_names.sqlite')
-            if not os.path.exists(file_path):
+            file_path = AppLocation.get_directory(AppLocation.DataDir) / 'bibles' / 'alternative_book_names.sqlite'
+            AlternativeBookNamesDB.conn = sqlite3.connect(str(file_path))
+            if not file_path.exists():
                 # create new DB, create table alternative_book_names
-                AlternativeBookNamesDB.conn = sqlite3.connect(file_path)
                 AlternativeBookNamesDB.conn.execute(
                     'CREATE TABLE alternative_book_names(id INTEGER NOT NULL, '
                     'book_reference_id INTEGER, language_id INTEGER, name VARCHAR(50), PRIMARY KEY (id))')
-            else:
-                # use existing DB
-                AlternativeBookNamesDB.conn = sqlite3.connect(file_path)
             AlternativeBookNamesDB.cursor = AlternativeBookNamesDB.conn.cursor()
         return AlternativeBookNamesDB.cursor
 

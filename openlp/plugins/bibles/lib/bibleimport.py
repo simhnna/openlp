@@ -35,23 +35,23 @@ class BibleImport(OpenLPMixin, RegistryProperties, BibleDB):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.filename = kwargs['filename'] if 'filename' in kwargs else None
+        self.file_path = kwargs.get('file_path')
         self.wizard = None
         self.stop_import_flag = False
         Registry().register_function('openlp_stop_wizard', self.stop_import)
 
     @staticmethod
-    def is_compressed(file):
+    def is_compressed(file_path):
         """
         Check if the supplied file is compressed
 
-        :param file: A path to the file to check
+        :param file_path: A path to the file to check
         """
-        if is_zipfile(file):
+        if is_zipfile(str(file_path)):
             critical_error_message_box(
                 message=translate('BiblesPlugin.BibleImport',
                                   'The file "{file}" you supplied is compressed. You must decompress it before import.'
-                                  ).format(file=file))
+                                  ).format(file=file_path))
             return True
         return False
 
@@ -139,24 +139,24 @@ class BibleImport(OpenLPMixin, RegistryProperties, BibleDB):
             self.log_debug('No book name supplied. Falling back to guess_id')
             book_ref_id = guess_id
         if not book_ref_id:
-            raise ValidationError(msg='Could not resolve book_ref_id in "{}"'.format(self.filename))
+            raise ValidationError(msg='Could not resolve book_ref_id in "{}"'.format(self.file_path))
         book_details = BiblesResourcesDB.get_book_by_id(book_ref_id)
         if book_details is None:
             raise ValidationError(msg='book_ref_id: {book_ref} Could not be found in the BibleResourcesDB while '
-                                      'importing {file}'.format(book_ref=book_ref_id, file=self.filename))
+                                      'importing {file}'.format(book_ref=book_ref_id, file=self.file_path))
         return self.create_book(name, book_ref_id, book_details['testament_id'])
 
-    def parse_xml(self, filename, use_objectify=False, elements=None, tags=None):
+    def parse_xml(self, file_path, use_objectify=False, elements=None, tags=None):
         """
         Parse and clean the supplied file by removing any elements or tags we don't use.
-        :param filename: The filename of the xml file to parse. Str
+        :param file_path: The filename of the xml file to parse. Str
         :param use_objectify: Use the objectify parser rather than the etree parser. (Bool)
         :param elements: A tuple of element names (Str) to remove along with their content.
         :param tags: A tuple of element names (Str) to remove, preserving their content.
         :return: The root element of the xml document
         """
         try:
-            with open(filename, 'rb') as import_file:
+            with file_path.open('rb') as import_file:
                 # NOTE: We don't need to do any of the normal encoding detection here, because lxml does it's own
                 # encoding detection, and the two mechanisms together interfere with each other.
                 if not use_objectify:
@@ -203,17 +203,17 @@ class BibleImport(OpenLPMixin, RegistryProperties, BibleDB):
         self.log_debug('Stopping import')
         self.stop_import_flag = True
 
-    def validate_xml_file(self, filename, tag):
+    def validate_xml_file(self, file_path, tag):
         """
         Validate the supplied file
 
-        :param filename: The supplied file
+        :param file_path: The supplied file
         :param tag: The expected root tag type
         :return: True if valid. ValidationError is raised otherwise.
         """
-        if BibleImport.is_compressed(filename):
+        if BibleImport.is_compressed(file_path):
             raise ValidationError(msg='Compressed file')
-        bible = self.parse_xml(filename, use_objectify=True)
+        bible = self.parse_xml(file_path, use_objectify=True)
         if bible is None:
             raise ValidationError(msg='Error when opening file')
         root_tag = bible.tag.lower()
