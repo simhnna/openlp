@@ -20,7 +20,6 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
-import os
 import time
 
 from PyQt5 import QtCore
@@ -70,12 +69,11 @@ class OpenOfficeImport(SongImport):
             log.error(exc)
             return
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-        for filename in self.import_source:
+        for file_path in self.import_source:
             if self.stop_import_flag:
                 break
-            filename = str(filename)
-            if os.path.isfile(filename):
-                self.open_ooo_file(filename)
+            if file_path.is_file():
+                self.open_ooo_file(file_path)
                 if self.document:
                     self.process_ooo_document()
                     self.close_ooo_file()
@@ -144,12 +142,7 @@ class OpenOfficeImport(SongImport):
         Open the passed file in OpenOffice.org Impress
         """
         self.file_path = file_path
-        if is_win():
-            url = file_path.replace('\\', '/')
-            url = url.replace(':', '|').replace(' ', '%20')
-            url = 'file:///' + url
-        else:
-            url = uno.systemPathToFileUrl(file_path)
+        url = file_path.as_uri()
         properties = []
         properties.append(self.create_property('Hidden', True))
         properties = tuple(properties)
@@ -159,7 +152,7 @@ class OpenOfficeImport(SongImport):
                     self.document.supportsService("com.sun.star.text.TextDocument"):
                 self.close_ooo_file()
             else:
-                self.import_wizard.increment_progress_bar('Processing file ' + file_path, 0)
+                self.import_wizard.increment_progress_bar('Processing file {file_path}'.format(file_path=file_path), 0)
         except AttributeError:
             log.exception("open_ooo_file failed: {url}".format(url=url))
         return

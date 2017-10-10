@@ -24,6 +24,8 @@ This module contains tests for the SundayPlus song importer.
 import os
 from unittest.mock import patch
 
+from openlp.core.common.path import Path
+
 from tests.helpers.songfileimport import SongImportTestHelper
 
 TEST_PATH = os.path.abspath(
@@ -44,5 +46,5 @@ class TestSundayPlusFileImport(SongImportTestHelper):
         with patch('openlp.plugins.songs.lib.importers.sundayplus.retrieve_windows_encoding') as \
                 mocked_retrieve_windows_encoding:
             mocked_retrieve_windows_encoding.return_value = 'cp1252'
-            self.file_import([os.path.join(TEST_PATH, 'Amazing Grace.ptf')],
+            self.file_import([Path(TEST_PATH, 'Amazing Grace.ptf')],
                              self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))

@@ -27,6 +27,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from openlp.core.common.registry import Registry
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
 
 from tests.helpers.songfileimport import SongImportTestHelper
@@ -52,15 +53,15 @@ class TestOpenSongFileImport(SongImportTestHelper):
         mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
         # Do the test import
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([os.path.join(TEST_PATH, 'Beautiful Garden Of Prayer')],
+        self.file_import([Path(TEST_PATH, 'Beautiful Garden Of Prayer')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Beautiful Garden Of Prayer.json')))
-        self.file_import([os.path.join(TEST_PATH, 'One, Two, Three, Four, Five')],
+        self.file_import([Path(TEST_PATH, 'One, Two, Three, Four, Five')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'One, Two, Three, Four, Five.json')))
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace2')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace2')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([os.path.join(TEST_PATH, 'Amazing Grace with bad CCLI')],
+        self.file_import([Path(TEST_PATH, 'Amazing Grace with bad CCLI')],
                          self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace without CCLI.json')))
 
 
@@ -83,7 +84,7 @@ class TestOpenSongImport(TestCase):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = OpenSongImport(mocked_manager, filenames=[])
+            importer = OpenSongImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
             self.assertIsNotNone(importer, 'Import should not be none')
@@ -96,7 +97,7 @@ class TestOpenSongImport(TestCase):
         with patch('openlp.plugins.songs.lib.importers.opensong.SongImport'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OpenSongImport(mocked_manager, filenames=[])
+            importer = OpenSongImport(mocked_manager, file_paths=[])
             importer.import_wizard = mocked_import_wizard
             importer.stop_import_flag = True
 
@@ -117,7 +118,7 @@ class TestOpenSongImport(TestCase):
         with patch('openlp.plugins.songs.lib.importers.opensong.SongImport'):
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OpenSongImport(mocked_manager, filenames=[])
+            importer = OpenSongImport(mocked_manager, file_paths=[])
             importer.import_wizard = mocked_import_wizard
             importer.stop_import_flag = True
 

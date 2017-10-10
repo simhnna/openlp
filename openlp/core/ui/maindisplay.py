@@ -686,7 +686,7 @@ class AudioPlayer(OpenLPMixin, QtCore.QObject):
         if not isinstance(file_names, list):
             file_names = [file_names]
         for file_name in file_names:
-            self.playlist.addMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(file_name)))
+            self.playlist.addMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(str(file_name))))
 
     def next(self):
         """

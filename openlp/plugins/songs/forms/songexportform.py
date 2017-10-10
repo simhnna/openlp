@@ -29,8 +29,10 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.registry import Registry
-from openlp.core.lib import create_separated_list, build_icon
+from openlp.core.common.settings import Settings
+from openlp.core.lib import create_separated_list
 from openlp.core.lib.ui import critical_error_message_box
+from openlp.core.ui.lib import PathEdit, PathType
 from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.songs.lib.db import Song
 from openlp.plugins.songs.lib.openlyricsexport import OpenLyricsExport
@@ -77,7 +79,6 @@ class SongExportForm(OpenLPWizard):
         self.search_line_edit.textEdited.connect(self.on_search_line_edit_changed)
         self.uncheck_button.clicked.connect(self.on_uncheck_button_clicked)
         self.check_button.clicked.connect(self.on_check_button_clicked)
-        self.directory_button.clicked.connect(self.on_directory_button_clicked)
 
     def add_custom_pages(self):
         """
@@ -121,21 +122,15 @@ class SongExportForm(OpenLPWizard):
         self.grid_layout.setObjectName('range_layout')
         self.selected_list_widget = QtWidgets.QListWidget(self.export_song_page)
         self.selected_list_widget.setObjectName('selected_list_widget')
-        self.grid_layout.addWidget(self.selected_list_widget, 1, 0, 1, 1)
-        # FIXME: self.horizontal_layout is already defined above?!?!? Replace with Path Eidt!
-        self.horizontal_layout = QtWidgets.QHBoxLayout()
-        self.horizontal_layout.setObjectName('horizontal_layout')
+        self.grid_layout.addWidget(self.selected_list_widget, 1, 0, 1, 2)
+        self.output_directory_path_edit = PathEdit(
+            self.export_song_page, PathType.Directories,
+            dialog_caption=translate('SongsPlugin.ExportWizardForm', 'Select Destination Folder'), show_revert=False)
+        self.output_directory_path_edit.path = Settings().value('songs/last directory export')
         self.directory_label = QtWidgets.QLabel(self.export_song_page)
         self.directory_label.setObjectName('directory_label')
-        self.horizontal_layout.addWidget(self.directory_label)
-        self.directory_line_edit = QtWidgets.QLineEdit(self.export_song_page)
-        self.directory_line_edit.setObjectName('directory_line_edit')
-        self.horizontal_layout.addWidget(self.directory_line_edit)
-        self.directory_button = QtWidgets.QToolButton(self.export_song_page)
-        self.directory_button.setIcon(build_icon(':/exports/export_load.png'))
-        self.directory_button.setObjectName('directory_button')
-        self.horizontal_layout.addWidget(self.directory_button)
-        self.grid_layout.addLayout(self.horizontal_layout, 0, 0, 1, 1)
+        self.grid_layout.addWidget(self.directory_label, 0, 0)
+        self.grid_layout.addWidget(self.output_directory_path_edit, 0, 1)
         self.export_song_layout.addLayout(self.grid_layout)
         self.addPage(self.export_song_page)
 
@@ -189,11 +184,12 @@ class SongExportForm(OpenLPWizard):
                 self.selected_list_widget.addItem(song)
             return True
         elif self.currentPage() == self.export_song_page:
-            if not self.directory_line_edit.text():
+            if not self.output_directory_path_edit.path:
                 critical_error_message_box(
                     translate('SongsPlugin.ExportWizardForm', 'No Save Location specified'),
                     translate('SongsPlugin.ExportWizardForm', 'You need to specify a directory.'))
                 return False
+            Settings().setValue('songs/last directory export', self.output_directory_path_edit.path)
             return True
         elif self.currentPage() == self.progress_page:
             self.available_list_widget.clear()
@@ -212,8 +208,6 @@ class SongExportForm(OpenLPWizard):
         self.finish_button.setVisible(False)
         self.cancel_button.setVisible(True)
         self.available_list_widget.clear()
-        self.selected_list_widget.clear()
-        self.directory_line_edit.clear()
         self.search_line_edit.clear()
         # Load the list of songs.
         self.application.set_busy_cursor()
@@ -248,7 +242,7 @@ class SongExportForm(OpenLPWizard):
             song.data(QtCore.Qt.UserRole)
             for song in find_list_widget_items(self.selected_list_widget)
         ]
-        exporter = OpenLyricsExport(self, songs, self.directory_line_edit.text())
+        exporter = OpenLyricsExport(self, songs, self.output_directory_path_edit.path)
         try:
             if exporter.do_export():
                 self.progress_label.setText(
@@ -291,15 +285,6 @@ class SongExportForm(OpenLPWizard):
             item = self.available_list_widget.item(row)
             if not item.isHidden():
                 item.setCheckState(QtCore.Qt.Checked)
-
-    def on_directory_button_clicked(self):
-        """
-        Called when the *directory_button* was clicked. Opens a dialog and writes
-        the path to *directory_line_edit*.
-        """
-        self.get_folder(
-            translate('SongsPlugin.ExportWizardForm', 'Select Destination Folder'),
-            self.directory_line_edit, 'last directory export')
 
 
 def find_list_widget_items(list_widget, text=''):

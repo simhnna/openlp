@@ -22,15 +22,16 @@
 """
 The :mod:`easyworship` module provides the functionality for importing EasyWorship song databases into OpenLP.
 """
-
-import os
-import struct
-import re
-import zlib
 import logging
+import os
+import re
+import struct
+import zlib
+
 import sqlite3
 
 from openlp.core.common.i18n import translate
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib import retrieve_windows_encoding, strip_rtf
 from .songimport import SongImport
@@ -76,9 +77,11 @@ class EasyWorshipSongImport(SongImport):
         """
         Determines the type of file to import and calls the appropiate method
         """
-        if self.import_source.lower().endswith('ews'):
+        self.import_source = Path(self.import_source)
+        ext = self.import_source.suffix.lower()
+        if ext == '.ews':
             self.import_ews()
-        elif self.import_source.endswith('DB'):
+        elif ext == '.db':
             self.import_db()
         else:
             self.import_sqlite_db()
@@ -91,11 +94,11 @@ class EasyWorshipSongImport(SongImport):
         or here: http://wiki.openlp.org/Development:EasyWorship_EWS_Format
         """
         # Open ews file if it exists
-        if not os.path.isfile(self.import_source):
+        if not self.import_source.is_file():
             log.debug('Given ews file does not exists.')
             return
         # Make sure there is room for at least a header and one entry
-        if os.path.getsize(self.import_source) < 892:
+        if self.import_source.stat().st_size < 892:
             log.debug('Given ews file is to small to contain valid data.')
             return
         # Take a stab at how text is encoded
@@ -104,7 +107,7 @@ class EasyWorshipSongImport(SongImport):
         if not self.encoding:
             log.debug('No encoding set.')
             return
-        self.ews_file = open(self.import_source, 'rb')
+        self.ews_file = self.import_source.open('rb')
         # EWS header, version '1.6'/'  3'/'  5':
         # Offset   Field             Data type    Length    Details
         # --------------------------------------------------------------------------------------------------
@@ -199,23 +202,22 @@ class EasyWorshipSongImport(SongImport):
         Import the songs from the database
         """
         # Open the DB and MB files if they exist
-        import_source_mb = self.import_source.replace('.DB', '.MB')
-        if not os.path.isfile(self.import_source):
+        import_source_mb = self.import_source.with_suffix('.MB')
+        if not self.import_source.is_file():
             self.log_error(self.import_source, translate('SongsPlugin.EasyWorshipSongImport',
                                                          'This file does not exist.'))
             return
-        if not os.path.isfile(import_source_mb):
+        if not import_source_mb.is_file():
             self.log_error(self.import_source, translate('SongsPlugin.EasyWorshipSongImport',
                                                          'Could not find the "Songs.MB" file. It must be in the same '
                                                          'folder as the "Songs.DB" file.'))
             return
-        db_size = os.path.getsize(self.import_source)
-        if db_size < 0x800:
+        if self.import_source.stat().st_size < 0x800:
             self.log_error(self.import_source, translate('SongsPlugin.EasyWorshipSongImport',
                                                          'This file is not a valid EasyWorship database.'))
             return
-        db_file = open(self.import_source, 'rb')
-        self.memo_file = open(import_source_mb, 'rb')
+        db_file = self.import_source.open('rb')
+        self.memo_file = import_source_mb.open('rb')
         # Don't accept files that are clearly not paradox files
         record_size, header_size, block_size, first_block, num_fields = struct.unpack('<hhxb8xh17xh', db_file.read(35))
         if header_size != 0x800 or block_size < 1 or block_size > 4:
@@ -340,52 +342,34 @@ class EasyWorshipSongImport(SongImport):
         db_file.close()
         self.memo_file.close()
 
-    def _find_file(self, base_path, path_list):
-        """
-        Find the specified file, with the option of the file being at any level in the specified directory structure.
-
-        :param base_path: the location search in
-        :param path_list: the targeted file, preceded by directories that may be their parents relative to the base_path
-        :return: path for targeted file
-        """
-        target_file = ''
-        while len(path_list) > 0:
-            target_file = os.path.join(path_list[-1], target_file)
-            path_list = path_list[:len(path_list) - 1]
-            full_path = os.path.join(base_path, target_file)
-            full_path = full_path[:len(full_path) - 1]
-            if os.path.isfile(full_path):
-                return full_path
-        return ''
-
     def import_sqlite_db(self):
         """
         Import the songs from an EasyWorship 6 SQLite database
         """
-        songs_db_path = self._find_file(self.import_source, ["Databases", "Data", "Songs.db"])
-        song_words_db_path = self._find_file(self.import_source, ["Databases", "Data", "SongWords.db"])
-        invalid_dir_msg = 'This does not appear to be a valid Easy Worship 6 database directory.'
+        songs_db_path = next(self.import_source.rglob('Songs.db'), None)
+        song_words_db_path = next(self.import_source.rglob('SongWords.db'), None)
+        invalid_dir_msg = translate('SongsPlugin.EasyWorshipSongImport',
+                                    'This does not appear to be a valid Easy Worship 6 database directory.')
+        invalid_db_msg = translate('SongsPlugin.EasyWorshipSongImport', 'This is not a valid Easy Worship 6 database.')
         # check to see if needed files are there
-        if not os.path.isfile(songs_db_path):
-            self.log_error(songs_db_path, translate('SongsPlugin.EasyWorshipSongImport', invalid_dir_msg))
+        if not (songs_db_path and songs_db_path.is_file()):
+            self.log_error(self.import_source, invalid_dir_msg)
             return
-        if not os.path.isfile(song_words_db_path):
-            self.log_error(song_words_db_path, translate('SongsPlugin.EasyWorshipSongImport', invalid_dir_msg))
+        if not (song_words_db_path and song_words_db_path.is_file()):
+            self.log_error(self.import_source, invalid_dir_msg)
             return
         # get database handles
-        songs_conn = sqlite3.connect(songs_db_path)
-        words_conn = sqlite3.connect(song_words_db_path)
+        songs_conn = sqlite3.connect(str(songs_db_path))
+        words_conn = sqlite3.connect(str(song_words_db_path))
         if songs_conn is None or words_conn is None:
-            self.log_error(self.import_source, translate('SongsPlugin.EasyWorshipSongImport',
-                                                         'This is not a valid Easy Worship 6 database.'))
+            self.log_error(self.import_source, invalid_db_msg)
             songs_conn.close()
             words_conn.close()
             return
         songs_db = songs_conn.cursor()
         words_db = words_conn.cursor()
         if songs_conn is None or words_conn is None:
-            self.log_error(self.import_source, translate('SongsPlugin.EasyWorshipSongImport',
-                                                         'This is not a valid Easy Worship 6 database.'))
+            self.log_error(self.import_source, invalid_db_msg)
             songs_conn.close()
             words_conn.close()
             return

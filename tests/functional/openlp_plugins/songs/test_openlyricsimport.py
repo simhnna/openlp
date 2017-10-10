@@ -29,6 +29,7 @@ from unittest.mock import MagicMock, patch
 
 from lxml import etree, objectify
 
+from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib.importers.openlyrics import OpenLyricsImport
@@ -110,7 +111,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = OpenLyricsImport(mocked_manager, filenames=[])
+            importer = OpenLyricsImport(mocked_manager, file_paths=[])
 
             # THEN: The importer should be an instance of SongImport
             self.assertIsInstance(importer, SongImport)
@@ -123,13 +124,13 @@ class TestOpenLyricsImport(TestCase, TestMixin):
         for song_file in SONG_TEST_DATA:
             mocked_manager = MagicMock()
             mocked_import_wizard = MagicMock()
-            importer = OpenLyricsImport(mocked_manager, filenames=[])
+            importer = OpenLyricsImport(mocked_manager, file_paths=[])
             importer.import_wizard = mocked_import_wizard
             importer.open_lyrics = MagicMock()
             importer.open_lyrics.xml_to_song = MagicMock()
 
             # WHEN: Importing each file
-            importer.import_source = [os.path.join(TEST_PATH, song_file)]
+            importer.import_source = [Path(TEST_PATH, song_file)]
             importer.do_import()
 
             # THEN: The xml_to_song() method should have been called

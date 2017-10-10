@@ -72,10 +72,14 @@ class PowerSongImport(SongImport):
         Checks if source is a PowerSong 1.0 folder:
             * is a directory
             * contains at least one \*.song file
+
+        :param openlp.core.common.path.Path import_source: Should be a Path object that fulfills the above criteria
+        :return: If the source is valid
+        :rtype: bool
         """
-        if os.path.isdir(import_source):
-            for file in os.listdir(import_source):
-                if fnmatch.fnmatch(file, '*.song'):
+        if import_source.is_dir():
+            for file_path in import_source.iterdir():
+                if file_path.suffix == '.song':
                     return True
         return False
 

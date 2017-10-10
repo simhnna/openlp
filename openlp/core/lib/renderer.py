@@ -245,6 +245,9 @@ class Renderer(OpenLPMixin, RegistryMixin, RegistryProperties):
         elif item.is_capable(ItemCapabilities.CanSoftBreak):
             pages = []
             if '[---]' in text:
+                # Remove Overflow split if at start of the text
+                if text.startswith('[---]'):
+                    text = text[5:]
                 # Remove two or more option slide breaks next to each other (causing infinite loop).
                 while '\n[---]\n[---]\n' in text:
                     text = text.replace('\n[---]\n[---]\n', '\n[---]\n')

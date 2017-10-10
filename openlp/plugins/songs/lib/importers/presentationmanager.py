@@ -23,13 +23,12 @@
 The :mod:`presentationmanager` module provides the functionality for importing
 Presentationmanager song files into the current database.
 """
-import os
 import re
 
-import chardet
 from lxml import objectify, etree
 
 from openlp.core.common.i18n import translate
+from openlp.core.common import get_file_encoding
 from openlp.core.ui.lib.wizard import WizardStrings
 from .songimport import SongImport
 
@@ -44,17 +43,14 @@ class PresentationManagerImport(SongImport):
         for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            self.import_wizard.increment_progress_bar(
-                WizardStrings.ImportingType.format(source=os.path.basename(file_path)))
+            self.import_wizard.increment_progress_bar(WizardStrings.ImportingType.format(source=file_path.name))
             try:
-                tree = etree.parse(file_path, parser=etree.XMLParser(recover=True))
+                tree = etree.parse(str(file_path), parser=etree.XMLParser(recover=True))
             except etree.XMLSyntaxError:
                 # Try to detect encoding and use it
-                file = open(file_path, mode='rb')
-                encoding = chardet.detect(file.read())['encoding']
-                file.close()
+                encoding = get_file_encoding(file_path)['encoding']
                 # Open file with detected encoding and remove encoding declaration
-                text = open(file_path, mode='r', encoding=encoding).read()
+                text = file_path.read_text(encoding=encoding)
                 text = re.sub('.+\?>\n', '', text)
                 try:
                     tree = etree.fromstring(text, parser=etree.XMLParser(recover=True))
@@ -80,6 +76,11 @@ class PresentationManagerImport(SongImport):
             return ''
 
     def process_song(self, root, file_path):
+        """
+        :param root:
+        :param openlp.core.common.path.Path file_path: Path to the file to process
+        :rtype: None
+        """
         self.set_defaults()
         attrs = None
         if hasattr(root, 'attributes'):
@@ -123,4 +124,4 @@ class PresentationManagerImport(SongImport):
 
         self.verse_order_list = verse_order_list
         if not self.finish():
-            self.log_error(os.path.basename(file_path))
+            self.log_error(file_path.name)

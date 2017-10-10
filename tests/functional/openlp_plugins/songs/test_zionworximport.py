@@ -26,9 +26,10 @@ import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from openlp.core.common.registry import Registry
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.zionworx import ZionWorxImport
 from openlp.plugins.songs.lib.importers.songimport import SongImport
-from openlp.core.common.registry import Registry
 
 from tests.helpers.songfileimport import SongImportTestHelper
 
@@ -55,7 +56,7 @@ class TestZionWorxImport(TestCase):
             mocked_manager = MagicMock()
 
             # WHEN: An importer object is created
-            importer = ZionWorxImport(mocked_manager, filenames=[])
+            importer = ZionWorxImport(mocked_manager, file_paths=[])
 
             # THEN: The importer should be an instance of SongImport
             self.assertIsInstance(importer, SongImport)
@@ -72,5 +73,5 @@ class TestZionWorxFileImport(SongImportTestHelper):
         """
         Test that loading an ZionWorx file works correctly on various files
         """
-        self.file_import(os.path.join(TEST_PATH, 'zionworx.csv'),
+        self.file_import(Path(TEST_PATH, 'zionworx.csv'),
                          self.load_external_result_data(os.path.join(TEST_PATH, 'zionworx.json')))
