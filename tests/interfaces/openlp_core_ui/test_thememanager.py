@@ -58,20 +58,21 @@ class TestThemeManager(TestCase, TestMixin):
         Test the thememanager initialise - basic test
         """
         # GIVEN: A new a call to initialise
+        self.theme_manager.setup_ui = MagicMock()
         self.theme_manager.build_theme_path = MagicMock()
         self.theme_manager.load_first_time_themes = MagicMock()
+        self.theme_manager.upgrade_themes = MagicMock()
         Settings().setValue('themes/global theme', 'my_theme')
 
         # WHEN: the initialisation is run
         self.theme_manager.bootstrap_initialise()
 
         # THEN:
-        self.assertEqual(1, self.theme_manager.build_theme_path.call_count,
-                         'The function build_theme_path should have been called')
-        self.assertEqual(1, self.theme_manager.load_first_time_themes.call_count,
-                         'The function load_first_time_themes should have been called only once')
-        self.assertEqual(self.theme_manager.global_theme, 'my_theme',
-                         'The global theme should have been set to my_theme')
+        self.theme_manager.setup_ui.assert_called_once_with(self.theme_manager)
+        assert self.theme_manager.global_theme == 'my_theme'
+        self.theme_manager.build_theme_path.assert_called_once_with()
+        self.theme_manager.load_first_time_themes.assert_called_once_with()
+        self.theme_manager.upgrade_themes.assert_called_once_with()
 
     @patch('openlp.core.ui.thememanager.create_paths')
     @patch('openlp.core.ui.thememanager.AppLocation.get_section_data_path')
