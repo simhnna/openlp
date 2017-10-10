@@ -34,7 +34,6 @@ from sqlalchemy import MetaData
 
 from openlp.core.common.path import Path
 from openlp.core.lib.db import init_db, get_upgrade_op, delete_database, upgrade_db
-from openlp.core.lib.projector import upgrade as pjlink_upgrade
 
 
 class TestDB(TestCase):
@@ -163,16 +162,16 @@ class TestDB(TestCase):
             mocked_delete_file.assert_called_with(test_location)
             self.assertFalse(result, 'The result of delete_file should be False (was rigged that way)')
 
-    @patch('tests.functional.openlp_core_lib.test_db.pjlink_upgrade')
-    def test_skip_db_upgrade_with_no_database(self, mocked_upgrade):
+    def test_skip_db_upgrade_with_no_database(self):
         """
         Test the upgrade_db function does not try to update a missing database
         """
         # GIVEN: Database URL that does not (yet) exist
         url = 'sqlite:///{tmp}/test_db.sqlite'.format(tmp=self.tmp_folder)
+        mocked_upgrade = MagicMock()
 
         # WHEN: We attempt to upgrade a non-existant database
-        upgrade_db(url, pjlink_upgrade)
+        upgrade_db(url, mocked_upgrade)
 
         # THEN: upgrade should NOT have been called
         self.assertFalse(mocked_upgrade.called, 'Database upgrade function should NOT have been called')

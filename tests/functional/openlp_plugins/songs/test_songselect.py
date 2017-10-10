@@ -30,11 +30,11 @@ from urllib.error import URLError
 
 from PyQt5 import QtWidgets
 
-from openlp.core import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
 from openlp.plugins.songs.forms.songselectform import SongSelectForm, SearchWorker
 from openlp.plugins.songs.lib import Song
-from openlp.plugins.songs.lib.songselect import SongSelectImport, LOGIN_PAGE, LOGOUT_URL, BASE_URL
+from openlp.plugins.songs.lib.songselect import SongSelectImport, LOGOUT_URL, BASE_URL
 
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.helpers.testmixin import TestMixin
@@ -308,7 +308,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         importer.run_search = True
 
         # WHEN: The stop method is called
-        results = importer.stop()
+        importer.stop()
 
         # THEN: Searching should have stopped
         self.assertFalse(importer.run_search, 'Searching should have been stopped')

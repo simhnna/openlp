@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
-from openlp.core import Settings
+from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
 from openlp.plugins.media.lib.mediaitem import MediaMediaItem
 

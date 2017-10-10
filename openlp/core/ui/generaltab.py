@@ -31,7 +31,8 @@ from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.lib import SettingsTab, ScreenList
+from openlp.core.display.screens import ScreenList
+from openlp.core.lib import SettingsTab
 from openlp.core.ui.lib import ColorButton, PathEdit
 
 log = logging.getLogger(__name__)

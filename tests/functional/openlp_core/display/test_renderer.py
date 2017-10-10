@@ -28,8 +28,9 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtCore
 
 from openlp.core.common.registry import Registry
-from openlp.core.lib import Renderer, ScreenList, ServiceItem, FormattingTags
-from openlp.core.lib.renderer import words_split, get_start_tags
+from openlp.core.display.screens import ScreenList
+from openlp.core.display.renderer import Renderer, words_split, get_start_tags
+from openlp.core.lib import ServiceItem
 from openlp.core.lib.theme import Theme
 
 
@@ -83,15 +84,16 @@ class TestRenderer(TestCase):
         Test the default layout calculations
         """
         # GIVEN: A new renderer instance.
-        renderer = Renderer()
         # WHEN: given the default screen size has been created.
-        # THEN: The renderer have created a default screen.
-        self.assertEqual(renderer.width, 1024, 'The base renderer should be a live controller')
-        self.assertEqual(renderer.height, 768, 'The base renderer should be a live controller')
-        self.assertEqual(renderer.screen_ratio, 0.75, 'The base renderer should be a live controller')
-        self.assertEqual(renderer.footer_start, 691, 'The base renderer should be a live controller')
+        renderer = Renderer()
 
-    @patch('openlp.core.lib.renderer.FormattingTags.get_html_tags')
+        # THEN: The renderer have created a default screen.
+        assert renderer.width == 1024, 'The base renderer should be a live controller'
+        assert renderer.height == 768, 'The base renderer should be a live controller'
+        assert renderer.screen_ratio == 0.75, 'The base renderer should be a live controller'
+        assert renderer.footer_start == 691, 'The base renderer should be a live controller'
+
+    @patch('openlp.core.display.renderer.FormattingTags.get_html_tags')
     def test_get_start_tags(self, mocked_get_html_tags):
         """
         Test the get_start_tags() method
@@ -179,10 +181,10 @@ class TestRenderer(TestCase):
         # THEN: The blanks have been removed.
         self.assertListEqual(result_words, expected_words)
 
-    @patch('openlp.core.lib.renderer.QtWebKitWidgets.QWebView')
-    @patch('openlp.core.lib.renderer.build_lyrics_format_css')
-    @patch('openlp.core.lib.renderer.build_lyrics_outline_css')
-    @patch('openlp.core.lib.renderer.build_chords_css')
+    @patch('openlp.core.display.renderer.QtWebKitWidgets.QWebView')
+    @patch('openlp.core.display.renderer.build_lyrics_format_css')
+    @patch('openlp.core.display.renderer.build_lyrics_outline_css')
+    @patch('openlp.core.display.renderer.build_chords_css')
     def test_set_text_rectangle(self, mock_build_chords_css, mock_outline_css, mock_lyrics_css, mock_webview):
         """
         Test set_text_rectangle returns a proper html string

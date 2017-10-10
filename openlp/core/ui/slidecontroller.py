@@ -36,8 +36,8 @@ from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
 from openlp.core.common.registry import Registry, RegistryProperties
 from openlp.core.common.settings import Settings
-from openlp.core.lib import ItemCapabilities, ServiceItem, ImageSource, ServiceItemAction, ScreenList, build_icon, \
-    build_html
+from openlp.core.display.screens import ScreenList
+from openlp.core.lib import ItemCapabilities, ServiceItem, ImageSource, ServiceItemAction, build_icon, build_html
 from openlp.core.lib.ui import create_action
 from openlp.core.ui.lib.toolbar import OpenLPToolbar
 from openlp.core.ui.lib.listpreviewwidget import ListPreviewWidget

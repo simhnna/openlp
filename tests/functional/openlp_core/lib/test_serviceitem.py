@@ -57,7 +57,7 @@ RENDERED_VERSE = 'The Lord said to <span style="-webkit-text-fill-color:red">Noa
                  '<span style="-webkit-text-fill-color:#FFA500">e</span><span style="-webkit-text-fill-color:#800080">'\
                  'n</span> of the Lord\n'
 FOOTER = ['Arky Arky (Unknown)', 'Public Domain', 'CCLI 123456']
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources', 'service'))
+TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'service'))
 
 
 class TestServiceItem(TestCase):

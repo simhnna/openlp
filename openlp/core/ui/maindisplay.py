@@ -40,7 +40,8 @@ from openlp.core.common.mixins import OpenLPMixin
 from openlp.core.common.path import path_to_str
 from openlp.core.common.registry import Registry, RegistryProperties
 from openlp.core.common.settings import Settings
-from openlp.core.lib import ServiceItem, ImageSource, ScreenList, build_html, expand_tags, image_to_byte
+from openlp.core.display.screens import ScreenList
+from openlp.core.lib import ServiceItem, ImageSource, build_html, expand_tags, image_to_byte
 from openlp.core.lib.theme import BackgroundType
 from openlp.core.ui import HideMode, AlertLocation, DisplayControllerType
 
