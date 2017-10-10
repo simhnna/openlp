@@ -43,17 +43,19 @@ from openlp.core.common.i18n import LanguageManager, UiStrings, translate
 from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, str_to_path
 from openlp.core.common.registry import Registry, RegistryProperties
 from openlp.core.common.settings import Settings
-from openlp.core.lib import Renderer, PluginManager, ImageManager, PluginStatus, ScreenList, build_icon
+from openlp.core.display.screens import ScreenList
+from openlp.core.display.renderer import Renderer
+from openlp.core.lib import PluginManager, ImageManager, PluginStatus, build_icon
 from openlp.core.lib.ui import create_action
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
-from openlp.core.ui.media import MediaController
-from openlp.core.ui.printserviceform import PrintServiceForm
-from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
 from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+from openlp.core.ui.media import MediaController
+from openlp.core.ui.printserviceform import PrintServiceForm
+from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.style import PROGRESSBAR_STYLE, get_library_stylesheet
 from openlp.core.version import get_version
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
@@ -20,40 +19,45 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-"""
-The entrypoint for OpenLP
-"""
-import faulthandler
-import multiprocessing
-import sys
 
-from openlp.core.app import main
-from openlp.core.common import is_win, is_macosx
-from openlp.core.common.applocation import AppLocation
-from openlp.core.common.path import create_paths
+import os
+import shutil
+from tempfile import mkdtemp
+from unittest import TestCase
+
+from openlp.core.api.deploy import deploy_zipfile
+
+TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
 
 
-def set_up_fault_handling():
+class TestRemoteDeploy(TestCase):
     """
-    Set up the Python fault handler
+    Test the Remote plugin deploy functions
     """
-    # Create the cache directory if it doesn't exist, and enable the fault handler to log to an error log file
-    create_paths(AppLocation.get_directory(AppLocation.CacheDir))
-    faulthandler.enable(open(str(AppLocation.get_directory(AppLocation.CacheDir) / 'error.log'), 'wb'))
 
+    def setUp(self):
+        """
+        Setup for tests
+        """
+        self.app_root = mkdtemp()
 
-if __name__ == '__main__':
-    """
-    Instantiate and run the application.
-    """
-    set_up_fault_handling()
-    # Add support for using multiprocessing from frozen Windows executable (built using PyInstaller),
-    # see https://docs.python.org/3/library/multiprocessing.html#multiprocessing.freeze_support
-    if is_win():
-        multiprocessing.freeze_support()
-    # Mac OS X passes arguments like '-psn_XXXX' to the application. This argument is actually a process serial number.
-    # However, this causes a conflict with other OpenLP arguments. Since we do not use this argument we can delete it
-    # to avoid any potential conflicts.
-    if is_macosx():
-        sys.argv = [x for x in sys.argv if not x.startswith('-psn')]
-    main()
+    def tearDown(self):
+        """
+        Clean up after tests
+        """
+        shutil.rmtree(self.app_root)
+
+    def test_deploy_zipfile(self):
+        """
+        Remote Deploy tests - test the dummy zip file is processed correctly
+        """
+        # GIVEN: A new downloaded zip file
+        aa = TEST_PATH
+        zip_file = os.path.join(TEST_PATH, 'remotes', 'site.zip')
+        app_root = os.path.join(self.app_root, 'site.zip')
+        shutil.copyfile(zip_file, app_root)
+        # WHEN: I process the zipfile
+        deploy_zipfile(self.app_root, 'site.zip')
+
+        # THEN test if www directory has been created
+        self.assertTrue(os.path.isdir(os.path.join(self.app_root, 'www')), 'We should have a www directory')

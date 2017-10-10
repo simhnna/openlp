@@ -33,7 +33,7 @@ from openlp.core.lib import FormattingTags, build_icon, check_item_selected, cle
     create_separated_list, create_thumb, expand_chords, expand_chords_for_printing, expand_tags, find_formatting_tags, \
     get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'resources'))
+TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
 
 
 class TestLib(TestCase):

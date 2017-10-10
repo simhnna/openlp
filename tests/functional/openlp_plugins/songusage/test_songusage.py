@@ -25,7 +25,7 @@ This module contains tests for the Songusage plugin.
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.songusage.lib import upgrade
 from openlp.plugins.songusage.lib.db import init_schema
 from openlp.plugins.songusage.songusageplugin import SongUsagePlugin

@@ -29,7 +29,7 @@ from openlp.core.common import check_binary_exists, is_win
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.path import which
 from openlp.core.common.settings import Settings
-from openlp.core.lib import ScreenList
+from openlp.core.display.screens import ScreenList
 from openlp.plugins.presentations.lib.presentationcontroller import PresentationController, PresentationDocument
 
 if is_win():

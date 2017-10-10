@@ -23,7 +23,6 @@
 The :mod:`screen` module provides management functionality for a machines'
 displays.
 """
-
 import logging
 import copy
 
