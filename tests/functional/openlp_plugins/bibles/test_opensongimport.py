@@ -29,7 +29,7 @@ from unittest.mock import MagicMock, patch, call
 
 from lxml import objectify
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.bibles.lib.importers.opensong import OpenSongBible, get_text, parse_chapter_number
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 

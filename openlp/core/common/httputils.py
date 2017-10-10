@@ -30,7 +30,8 @@ from random import randint
 
 import requests
 
-from openlp.core.common import Registry, trace_error_handler
+from openlp.core.common import trace_error_handler
+from openlp.core.common.registry import Registry
 
 log = logging.getLogger(__name__ + '.__init__')
 

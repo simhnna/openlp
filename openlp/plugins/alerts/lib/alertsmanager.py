@@ -23,10 +23,12 @@
 The :mod:`~openlp.plugins.alerts.lib.alertsmanager` module contains the part of the plugin which manages storing and
 displaying of alerts.
 """
-
 from PyQt5 import QtCore
 
-from openlp.core.common import OpenLPMixin, RegistryMixin, Registry, RegistryProperties, Settings, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 
 
 class AlertsManager(OpenLPMixin, RegistryMixin, QtCore.QObject, RegistryProperties):

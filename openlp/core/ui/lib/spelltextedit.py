@@ -38,7 +38,8 @@ except ImportError:
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.lib import translate, FormattingTags
+from openlp.core.common.i18n import translate
+from openlp.core.lib import FormattingTags
 from openlp.core.lib.ui import create_action
 
 log = logging.getLogger(__name__)

@@ -35,7 +35,7 @@ from ipaddress import IPv4Address, IPv6Address, AddressValueError
 from shutil import which
 from subprocess import check_output, CalledProcessError, STDOUT
 
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtGui
 from PyQt5.QtCore import QCryptographicHash as QHash
 
 log = logging.getLogger(__name__ + '.__init__')
@@ -56,28 +56,8 @@ def trace_error_handler(logger):
     """
     log_string = "OpenLP Error trace"
     for tb in traceback.extract_stack():
-        log_string += '\n   File {file} at line {line} \n\t called {data}'.format(file=tb[0],
-                                                                                  line=tb[1],
-                                                                                  data=tb[3])
+        log_string += '\n   File {file} at line {line} \n\t called {data}'.format(file=tb[0], line=tb[1], data=tb[3])
     logger.error(log_string)
-
-
-def check_directory_exists(directory, do_not_log=False):
-    """
-    Check a directory exists and if not create it
-
-    :param openlp.core.common.path.Path directory: The directory to make sure exists
-    :param bool do_not_log: To not log anything. This is need for the start up, when the log isn't ready.
-    :rtype: None
-    """
-    if not do_not_log:
-        log.debug('check_directory_exists {text}'.format(text=directory))
-    try:
-        if not directory.exists():
-            directory.mkdir(parents=True)
-    except IOError:
-        if not do_not_log:
-            log.exception('failed to check if directory exists or create directory')
 
 
 def extension_loader(glob_pattern, excluded_files=[]):
@@ -90,6 +70,7 @@ def extension_loader(glob_pattern, excluded_files=[]):
     :param list[str] excluded_files: A list of file names to exclude that the glob pattern may find.
     :rtype: None
     """
+    from openlp.core.common.applocation import AppLocation
     app_dir = AppLocation.get_directory(AppLocation.AppDir)
     for extension_path in app_dir.glob(glob_pattern):
         extension_path = extension_path.relative_to(app_dir)
@@ -135,19 +116,6 @@ class ThemeLevel(object):
     Global = 1
     Service = 2
     Song = 3
-
-
-def translate(context, text, comment=None, qt_translate=QtCore.QCoreApplication.translate):
-    """
-    A special shortcut method to wrap around the Qt5 translation functions. This abstracts the translation procedure so
-    that we can change it if at a later date if necessary, without having to redo the whole of OpenLP.
-
-    :param context: The translation context, used to give each string a context or a namespace.
-    :param text: The text to put into the translation tables for translation.
-    :param comment: An identifying string for when the same text is used in different roles within the same context.
-    :param qt_translate:
-    """
-    return qt_translate(context, text, comment)
 
 
 class SlideLimits(object):
@@ -203,7 +171,7 @@ def verify_ipv4(addr):
     :returns: bool
     """
     try:
-        valid = IPv4Address(addr)
+        IPv4Address(addr)
         return True
     except AddressValueError:
         return False
@@ -217,7 +185,7 @@ def verify_ipv6(addr):
     :returns: bool
     """
     try:
-        valid = IPv6Address(addr)
+        IPv6Address(addr)
         return True
     except AddressValueError:
         return False
@@ -288,20 +256,6 @@ def clean_button_text(button_text):
     :param button_text: The text to clean
     """
     return button_text.replace('&', '').replace('< ', '').replace(' >', '')
-
-
-from .openlpmixin import OpenLPMixin
-from .registry import Registry
-from .registrymixin import RegistryMixin
-from .registryproperties import RegistryProperties
-from .uistrings import UiStrings
-from .settings import Settings
-from .applocation import AppLocation
-from .actions import ActionList
-from .languagemanager import LanguageManager
-
-if is_win():
-    from subprocess import STARTUPINFO, STARTF_USESHOWWINDOW
 
 
 def add_actions(target, actions):
@@ -394,6 +348,7 @@ def get_images_filter():
     """
     Returns a filter string for a file dialog containing all the supported image formats.
     """
+    from openlp.core.common.i18n import translate
     global IMAGES_FILTER
     if not IMAGES_FILTER:
         log.debug('Generating images filter.')
@@ -446,6 +401,7 @@ def check_binary_exists(program_path):
     try:
         # Setup startupinfo options for check_output to avoid console popping up on windows
         if is_win():
+            from subprocess import STARTUPINFO, STARTF_USESHOWWINDOW
             startupinfo = STARTUPINFO()
             startupinfo.dwFlags |= STARTF_USESHOWWINDOW
         else:

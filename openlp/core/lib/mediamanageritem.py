@@ -28,8 +28,10 @@ import re
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, Settings, UiStrings, translate
+from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem, StringContent, ServiceItemContext
 from openlp.core.lib.searchedit import SearchEdit
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box

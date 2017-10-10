@@ -27,7 +27,7 @@ from unittest.mock import MagicMock
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.lib import ScreenList
 
 SCREEN = {

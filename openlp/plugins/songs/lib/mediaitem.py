@@ -19,16 +19,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import logging
 import os
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_, or_
 
-from openlp.core.common import Registry, AppLocation, Settings, check_directory_exists, UiStrings, translate
-from openlp.core.common.languagemanager import get_natural_key
-from openlp.core.common.path import copyfile
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate, get_natural_key
+from openlp.core.common.path import copyfile, create_paths
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import MediaManagerItem, ItemCapabilities, PluginStatus, ServiceItemContext, \
     check_item_selected, create_separated_list
 from openlp.core.lib.ui import create_widget_action
@@ -89,7 +90,7 @@ class SongMediaItem(MediaManagerItem):
         for i, bga in enumerate(item.background_audio):
             dest_path =\
                 AppLocation.get_section_data_path(self.plugin.name) / 'audio' / str(song.id) / os.path.split(bga)[1]
-            check_directory_exists(dest_path.parent)
+            create_paths(dest_path.parent)
             copyfile(AppLocation.get_section_data_path('servicemanager') / bga, dest_path)
             song.media_files.append(MediaFile.populate(weight=i, file_path=dest_path))
         self.plugin.manager.save_object(song, True)
@@ -534,7 +535,7 @@ class SongMediaItem(MediaManagerItem):
             # Copy audio files from the old to the new song
             if len(old_song.media_files) > 0:
                 save_path = AppLocation.get_section_data_path(self.plugin.name) / 'audio' / str(new_song.id)
-                check_directory_exists(save_path)
+                create_paths(save_path)
                 for media_file in old_song.media_files:
                     new_media_file_path = save_path / media_file.file_path.name
                     copyfile(media_file.file_path, new_media_file_path)

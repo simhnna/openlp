@@ -28,7 +28,7 @@ import urllib
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
 from openlp.core.ui.firsttimeform import FirstTimeForm
 
@@ -111,7 +111,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
                 patch.object(Registry, 'register_function') as mocked_register_function, \
                 patch('openlp.core.ui.firsttimeform.Settings') as MockedSettings, \
                 patch('openlp.core.ui.firsttimeform.gettempdir') as mocked_gettempdir, \
-                patch('openlp.core.ui.firsttimeform.check_directory_exists') as mocked_check_directory_exists, \
+                patch('openlp.core.ui.firsttimeform.create_paths') as mocked_create_paths, \
                 patch.object(frw.application, 'set_normal_cursor'):
             mocked_settings = MagicMock()
             mocked_settings.value.return_value = True
@@ -132,7 +132,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
             mocked_no_internet_finish_btn.setVisible.assert_called_with(False)
             mocked_settings.value.assert_called_with('core/has run wizard')
             mocked_gettempdir.assert_called_with()
-            mocked_check_directory_exists.assert_called_with(expected_temp_path)
+            mocked_create_paths.assert_called_with(expected_temp_path)
 
     def test_update_screen_list_combo(self):
         """

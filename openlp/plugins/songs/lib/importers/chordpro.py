@@ -23,27 +23,25 @@
 The :mod:`chordpro` module provides the functionality for importing
 ChordPro files into the current database.
 """
-
 import logging
 import re
 
-from openlp.core.common import Settings
-
-from .songimport import SongImport
-
+from openlp.core.common.settings import Settings
+from openlp.plugins.songs.lib.importers.songimport import SongImport
 
 log = logging.getLogger(__name__)
 
 
 class ChordProImport(SongImport):
     """
-    The :class:`ChordProImport` class provides OpenLP with the
-    ability to import ChordPro files.
+    The :class:`ChordProImport` class provides OpenLP with the ability to import ChordPro files.
+
     This importer is based on the information available on these webpages:
-    http://webchord.sourceforge.net/tech.html
-    http://www.vromans.org/johan/projects/Chordii/chordpro/
-    http://www.tenbyten.com/software/songsgen/help/HtmlHelp/files_reference.htm
-    http://linkesoft.com/songbook/chordproformat.html
+
+    - http://webchord.sourceforge.net/tech.html
+    - http://www.vromans.org/johan/projects/Chordii/chordpro/
+    - http://www.tenbyten.com/software/songsgen/help/HtmlHelp/files_reference.htm
+    - http://linkesoft.com/songbook/chordproformat.html
     """
     def do_import(self):
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))

@@ -26,8 +26,10 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, UiStrings, translate, is_macosx
+from openlp.core.common import is_macosx
 from openlp.core.common.actions import ActionList
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.registry import Registry
 from openlp.core.lib import build_icon
 
 

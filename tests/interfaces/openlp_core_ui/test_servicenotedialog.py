@@ -27,7 +27,7 @@ from unittest.mock import patch
 
 from PyQt5 import QtCore, QtTest, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.ui import servicenoteform
 
 from tests.helpers.testmixin import TestMixin

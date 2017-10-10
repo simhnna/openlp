@@ -61,7 +61,8 @@ import re
 
 from lxml import etree, objectify
 
-from openlp.core.common import translate, Settings
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
 from openlp.core.version import get_version
 from openlp.core.lib import FormattingTags
 from openlp.plugins.songs.lib import VerseType, clean_song

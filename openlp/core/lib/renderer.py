@@ -25,8 +25,10 @@ import re
 from string import Template
 from PyQt5 import QtGui, QtCore, QtWebKitWidgets
 
-from openlp.core.common import Registry, RegistryProperties, OpenLPMixin, RegistryMixin, Settings
+from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
 from openlp.core.common.path import path_to_str
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib import FormattingTags, ImageSource, ItemCapabilities, ScreenList, ServiceItem, expand_tags, \
     build_lyrics_format_css, build_lyrics_outline_css, build_chords_css
 from openlp.core.common import ThemeLevel

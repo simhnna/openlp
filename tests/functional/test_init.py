@@ -29,7 +29,7 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core import OpenLP
-from openlp.core.common import Settings
+from openlp.core.common.settings import Settings
 
 from tests.helpers.testmixin import TestMixin
 
@@ -39,7 +39,7 @@ TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resou
 class TestInit(TestCase, TestMixin):
     def setUp(self):
         self.build_settings()
-        with patch('openlp.core.common.OpenLPMixin.__init__') as constructor:
+        with patch('openlp.core.OpenLPMixin.__init__') as constructor:
             constructor.return_value = None
             self.openlp = OpenLP(list())
 

@@ -411,7 +411,7 @@ import logging
 from string import Template
 from PyQt5 import QtWebKit
 
-from openlp.core.common import Settings
+from openlp.core.common.settings import Settings
 from openlp.core.lib.theme import BackgroundType, BackgroundGradientType, VerticalType, HorizontalType
 
 log = logging.getLogger(__name__)

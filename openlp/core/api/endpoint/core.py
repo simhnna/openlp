@@ -19,13 +19,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+"""
+The :mod:`~openlp.core.api.endpoint.core` module contains the core API endpoints
+"""
 import logging
 import os
 
-from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import requires_auth
-from openlp.core.common import Registry, UiStrings, translate
-from openlp.core.lib import image_to_byte, PluginStatus, StringContent
+from openlp.core.api.http.endpoint import Endpoint
+from openlp.core.common.registry import Registry
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.lib import PluginStatus, StringContent, image_to_byte
 
 
 template_dir = 'templates'

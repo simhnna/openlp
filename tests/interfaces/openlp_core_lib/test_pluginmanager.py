@@ -31,7 +31,8 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry, Settings
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
 from openlp.core.lib.pluginmanager import PluginManager
 

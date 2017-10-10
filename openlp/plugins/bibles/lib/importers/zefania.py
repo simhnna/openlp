@@ -22,7 +22,7 @@
 
 import logging
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BiblesResourcesDB

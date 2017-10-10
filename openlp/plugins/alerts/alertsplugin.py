@@ -25,8 +25,9 @@ import logging
 from PyQt5 import QtGui
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import Settings, UiStrings, translate
 from openlp.core.common.actions import ActionList
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.settings import Settings
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.core.lib.theme import VerticalType

@@ -23,7 +23,7 @@ import chardet
 import codecs
 import logging
 
-from openlp.core.lib import translate
+from openlp.core.common.i18n import translate
 from openlp.plugins.songs.lib import VerseType
 from .songimport import SongImport
 

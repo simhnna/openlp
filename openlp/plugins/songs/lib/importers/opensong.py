@@ -25,7 +25,8 @@ import re
 from lxml import objectify
 from lxml.etree import Error, LxmlError
 
-from openlp.core.common import translate, Settings
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.ui import SongStrings

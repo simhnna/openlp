@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtWebKit
 
-from openlp.core.common import Settings
+from openlp.core.common.settings import Settings
 from openlp.core.lib.htmlbuilder import build_html, build_background_css, build_lyrics_css, build_lyrics_outline_css, \
     build_lyrics_format_css, build_footer_css, webkit_version, build_chords_css
 from openlp.core.lib.theme import HorizontalType, VerticalType

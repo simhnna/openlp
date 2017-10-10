@@ -30,7 +30,7 @@ from unittest.mock import patch
 
 from PyQt5 import QtGui
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.lib import ImageManager, ScreenList
 from openlp.core.lib.imagemanager import Priority
 

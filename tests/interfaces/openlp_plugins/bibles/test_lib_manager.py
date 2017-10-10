@@ -25,7 +25,8 @@ Functional tests to test the Bible Manager class and related methods.
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry, Settings
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.plugins.bibles.lib import BibleManager, LanguageSelection
 
 from tests.utils.constants import TEST_RESOURCES_PATH
@@ -54,13 +55,13 @@ class TestBibleManager(TestCase, TestMixin):
         }
         Settings().extend_default_settings(bible_settings)
         with patch('openlp.core.common.applocation.Settings') as mocked_class, \
-                patch('openlp.core.common.AppLocation.get_section_data_path') as mocked_get_section_data_path, \
-                patch('openlp.core.common.AppLocation.get_files') as mocked_get_files:
+                patch('openlp.core.common.applocation.AppLocation.get_section_data_path') as mocked_get_data_path, \
+                patch('openlp.core.common.applocation.AppLocation.get_files') as mocked_get_files:
             # GIVEN: A mocked out Settings class and a mocked out AppLocation.get_files()
             mocked_settings = mocked_class.return_value
             mocked_settings.contains.return_value = False
             mocked_get_files.return_value = ["tests.sqlite"]
-            mocked_get_section_data_path.return_value = TEST_RESOURCES_PATH + "/bibles"
+            mocked_get_data_path.return_value = TEST_RESOURCES_PATH + "/bibles"
             self.manager = BibleManager(MagicMock())
 
     def tearDown(self):

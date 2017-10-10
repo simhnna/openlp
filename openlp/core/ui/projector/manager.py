@@ -29,9 +29,10 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import RegistryProperties, Settings, OpenLPMixin, \
-    RegistryMixin, translate
-from openlp.core.ui.lib import OpenLPToolbar
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib.ui import create_widget_action
 from openlp.core.lib.projector import DialogSourceStyle
 from openlp.core.lib.projector.constants import ERROR_MSG, ERROR_STRING, E_AUTHENTICATION, E_ERROR, \
@@ -39,6 +40,7 @@ from openlp.core.lib.projector.constants import ERROR_MSG, ERROR_STRING, E_AUTHE
     S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
 from openlp.core.lib.projector.db import ProjectorDB
 from openlp.core.lib.projector.pjlink import PJLink, PJLinkUDP
+from openlp.core.ui.lib import OpenLPToolbar
 from openlp.core.ui.projector.editform import ProjectorEditForm
 from openlp.core.ui.projector.sourceselectform import SourceSelectTabs, SourceSelectSingle
 

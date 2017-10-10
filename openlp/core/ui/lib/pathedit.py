@@ -23,7 +23,7 @@ from enum import Enum
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import UiStrings, translate
+from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.lib import build_icon
 from openlp.core.ui.lib.filedialog import FileDialog

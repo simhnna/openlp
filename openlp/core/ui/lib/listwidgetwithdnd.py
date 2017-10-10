@@ -26,7 +26,8 @@ import os
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, UiStrings
+from openlp.core.common.i18n import UiStrings
+from openlp.core.common.registry import Registry
 
 
 class ListWidgetWithDnD(QtWidgets.QListWidget):

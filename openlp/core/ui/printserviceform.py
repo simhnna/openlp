@@ -23,16 +23,17 @@
 The actual print service dialog
 """
 import datetime
-import os
 import html
 import lxml.html
 
 from PyQt5 import QtCore, QtGui, QtWidgets, QtPrintSupport
 
-from openlp.core.common import Registry, RegistryProperties, Settings, UiStrings, translate
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib import get_text_file_string
 from openlp.core.ui.printservicedialog import Ui_PrintServiceDialog, ZoomSize
-from openlp.core.common import AppLocation
 
 DEFAULT_CSS = """/*
 Edit this file to customize the service order print. Note, that not all CSS

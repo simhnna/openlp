@@ -34,8 +34,10 @@ try:
 except:
     PYSWORD_AVAILABLE = False
 
-from openlp.core.common import AppLocation, Settings, UiStrings, trace_error_handler, translate
-from openlp.core.common.languagemanager import get_locale_key
+from openlp.core.common import trace_error_handler
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.settings import Settings
 from openlp.core.lib.db import delete_database
 from openlp.core.lib.exceptions import ValidationError
 from openlp.core.lib.ui import critical_error_message_box

@@ -20,13 +20,14 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
-import os
 
 from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_
 
-from openlp.core.common import RegistryProperties, Settings, check_directory_exists, translate
-from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.i18n import translate
+from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.settings import Settings
+from openlp.core.common.path import create_paths
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songusage.lib.db import SongUsageItem
 from .songusagedetaildialog import Ui_SongUsageDetailDialog
@@ -79,7 +80,7 @@ class SongUsageDetailForm(QtWidgets.QDialog, Ui_SongUsageDetailDialog, RegistryP
                           ' song usage report. \nPlease select an existing path on your computer.')
             )
             return
-        check_directory_exists(path)
+        create_paths(path)
         file_name = translate('SongUsagePlugin.SongUsageDetailForm',
                               'usage_detail_{old}_{new}.txt'
                               ).format(old=self.from_date_calendar.selectedDate().toString('ddMMyyyy'),

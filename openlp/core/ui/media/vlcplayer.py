@@ -31,8 +31,9 @@ import sys
 import ctypes
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Settings, is_win, is_macosx, is_linux
-from openlp.core.lib import translate
+from openlp.core.common import is_win, is_macosx, is_linux
+from openlp.core.common.i18n import translate
+from openlp.core.common.settings import Settings
 from openlp.core.ui.media import MediaState, MediaType
 from openlp.core.ui.media.mediaplayer import MediaPlayer
 

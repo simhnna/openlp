@@ -33,7 +33,7 @@ if os.name == 'nt' and not get_vlc():
 
 from PyQt5 import QtTest, QtCore, QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.media.forms.mediaclipselectorform import MediaClipSelectorForm
 
 from tests.helpers.testmixin import TestMixin

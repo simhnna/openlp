@@ -28,9 +28,10 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from tempfile import mkdtemp
 
-from openlp.plugins.presentations.lib.powerpointcontroller import PowerpointController, PowerpointDocument,\
+from openlp.core.common import is_win
+from openlp.core.common.settings import Settings
+from openlp.plugins.presentations.lib.powerpointcontroller import PowerpointController, PowerpointDocument, \
     _get_text_from_shapes
-from openlp.core.common import is_win, Settings
 
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH

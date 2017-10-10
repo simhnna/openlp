@@ -26,8 +26,8 @@ import os
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
-from openlp.core.common.path import Path, copy, copyfile, copytree, path_to_str, replace_params, rmtree, str_to_path, \
-    which
+from openlp.core.common.path import Path, copy, copyfile, copytree, create_paths, path_to_str, replace_params, rmtree, \
+    str_to_path, which
 
 
 class TestShutil(TestCase):
@@ -337,3 +337,64 @@ class TestPath(TestCase):
 
         # THEN: A JSON decodable object should have been returned.
         self.assertEqual(obj, {'__Path__': ('path', 'to', 'fi.le')})
+
+    def test_create_paths_dir_exists(self):
+        """
+        Test the create_paths() function when the path already exists
+        """
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        mocked_path = MagicMock()
+        mocked_path.exists.return_value = True
+
+        # WHEN: `create_paths` is called and the path exists
+        create_paths(mocked_path)
+
+        # THEN: The function should not attempt to create the directory
+        mocked_path.exists.assert_called_once_with()
+        assert mocked_path.mkdir.call_count == 0, 'mkdir should not have been called'
+
+    def test_create_paths_dir_doesnt_exists(self):
+        """
+        Test the create_paths() function when the path does not already exist
+        """
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        mocked_path = MagicMock()
+        mocked_path.exists.return_value = False
+
+        # WHEN: `create_paths` is called and the path does not exist
+        create_paths(mocked_path)
+
+        # THEN: The directory should have been created
+        mocked_path.exists.assert_called_once_with()
+        mocked_path.mkdir.assert_called_once_with(parents=True)
+
+    @patch('openlp.core.common.path.log')
+    def test_create_paths_dir_io_error(self, mocked_logger):
+        """
+        Test the create_paths() when an IOError is raised
+        """
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        mocked_path = MagicMock()
+        mocked_path.exists.side_effect = IOError('Cannot make directory')
+
+        # WHEN: An IOError is raised when checking the if the path exists.
+        create_paths(mocked_path)
+
+        # THEN: The Error should have been logged
+        mocked_logger.exception.assert_called_once_with('failed to check if directory exists or create directory')
+
+    def test_create_paths_dir_value_error(self):
+        """
+        Test the create_paths() when an error other than IOError is raised
+        """
+        # GIVEN: A `Path` to check with patched out mkdir and exists methods
+        mocked_path = MagicMock()
+        mocked_path.exists.side_effect = ValueError('Some other error')
+
+        # WHEN: Some other exception is raised
+        try:
+            create_paths(mocked_path)
+            assert False, 'create_paths should have thrown an exception'
+        except:
+            # THEN: `create_paths` raises an exception
+            pass

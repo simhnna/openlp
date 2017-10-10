@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.lib import Renderer, ScreenList, ServiceItem, FormattingTags
 from openlp.core.lib.renderer import words_split, get_start_tags
 from openlp.core.lib.theme import Theme

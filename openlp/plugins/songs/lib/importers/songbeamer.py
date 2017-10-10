@@ -28,7 +28,8 @@ import re
 import base64
 import math
 
-from openlp.core.common import Settings, is_win, is_macosx, get_file_encoding
+from openlp.core.common import is_win, is_macosx, get_file_encoding
+from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
@@ -313,7 +314,8 @@ class SongBeamerImport(SongImport):
         elif tag_val[0] == '#QuickFind':
             pass
         elif tag_val[0] == '#Rights':
-            song_book_pub = tag_val[1]
+            # song_book_pub = tag_val[1]
+            pass
         elif tag_val[0] == '#Songbook' or tag_val[0] == '#SongBook':
             book_data = tag_val[1].split('/')
             self.song_book_name = book_data[0].strip()

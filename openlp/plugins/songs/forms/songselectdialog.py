@@ -25,9 +25,10 @@ The :mod:`~openlp.plugins.songs.forms.songselectdialog` module contains the user
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.ui.lib.historycombobox import HistoryComboBox
-from openlp.core.lib import translate, build_icon
+from openlp.core.common.i18n import translate
+from openlp.core.lib import build_icon
 from openlp.core.ui import SingleColumnTableWidget
+from openlp.core.ui.lib.historycombobox import HistoryComboBox
 
 
 class Ui_SongSelectDialog(object):

@@ -24,9 +24,9 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 
+from openlp.core.common.settings import Settings
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_widget_action
-from openlp.core.common import Settings
 
 log = logging.getLogger(__name__)
 

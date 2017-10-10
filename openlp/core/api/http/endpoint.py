@@ -22,11 +22,11 @@
 """
 The Endpoint class, which provides plugins with a way to serve their own portion of the API
 """
-
 import os
 
-from openlp.core.common import AppLocation
 from mako.template import Template
+
+from openlp.core.common.applocation import AppLocation
 
 
 class Endpoint(object):

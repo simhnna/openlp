@@ -27,8 +27,9 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, is_macosx
+from openlp.core.common import is_macosx
 from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
 from openlp.core.lib import ScreenList, PluginManager
 from openlp.core.ui import MainDisplay, AudioPlayer
 from openlp.core.ui.maindisplay import TRANSPARENT_STYLESHEET, OPAQUE_STYLESHEET

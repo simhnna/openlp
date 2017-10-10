@@ -25,7 +25,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.lib import ScreenList, ServiceItem, ItemCapabilities
 from openlp.core.ui.mainwindow import MainWindow
 from openlp.core.ui.servicemanager import ServiceManagerList

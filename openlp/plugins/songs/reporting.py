@@ -25,8 +25,9 @@ The :mod:`db` module provides the ability to provide a csv file of all songs
 import csv
 import logging
 
-from openlp.core.common import Registry, translate
+from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.lib.filedialog import FileDialog
 from openlp.plugins.songs.lib.db import Song

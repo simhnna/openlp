@@ -19,12 +19,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 """
 The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
 with OpenLP. It uses JSON to communicate with the remotes.
 """
-
 import asyncio
 import websockets
 import json
@@ -33,7 +31,9 @@ import time
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Settings, RegistryProperties, OpenLPMixin, Registry
+from openlp.core.common.mixins import OpenLPMixin
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 
 log = logging.getLogger(__name__)
 

@@ -27,16 +27,26 @@ import faulthandler
 import multiprocessing
 import sys
 
+from openlp.core import main
 from openlp.core.common import is_win, is_macosx
 from openlp.core.common.applocation import AppLocation
-from openlp.core import main
+from openlp.core.common.path import create_paths
 
-faulthandler.enable(open(str(AppLocation.get_directory(AppLocation.CacheDir) / 'error.log'), 'wb'))
+
+def set_up_fault_handling():
+    """
+    Set up the Python fault handler
+    """
+    # Create the cache directory if it doesn't exist, and enable the fault handler to log to an error log file
+    create_paths(AppLocation.get_directory(AppLocation.CacheDir))
+    faulthandler.enable(open(str(AppLocation.get_directory(AppLocation.CacheDir) / 'error.log'), 'wb'))
+
 
 if __name__ == '__main__':
     """
     Instantiate and run the application.
     """
+    set_up_fault_handling()
     # Add support for using multiprocessing from frozen Windows executable (built using PyInstaller),
     # see https://docs.python.org/3/library/multiprocessing.html#multiprocessing.freeze_support
     if is_win():

@@ -23,7 +23,6 @@
 The :mod:`powerpraiseimport` module provides the functionality for importing
 ProPresenter song files into the current installation database.
 """
-
 import os
 
 from openlp.core.common.path import Path

@@ -27,7 +27,7 @@ from unittest import TestCase
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.ui.lib.historycombobox import HistoryComboBox
 from tests.helpers.testmixin import TestMixin
 

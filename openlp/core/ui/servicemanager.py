@@ -32,11 +32,14 @@ from tempfile import mkstemp
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, ThemeLevel, OpenLPMixin, \
-    RegistryMixin, check_directory_exists, UiStrings, translate, split_filename, delete_file
+from openlp.core.common import ThemeLevel, split_filename, delete_file
 from openlp.core.common.actions import ActionList, CategoryOrder
-from openlp.core.common.languagemanager import format_time
-from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, format_time, translate
+from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.path import Path, create_paths, path_to_str, str_to_path
+from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem, ItemCapabilities, PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action, find_and_set_in_combo_box
 from openlp.core.ui import ServiceNoteForm, ServiceItemEditForm, StartTimeForm
@@ -594,7 +597,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                     audio_from = os.path.join(self.service_path, audio_from)
                 save_file = os.path.join(self.service_path, audio_to)
                 save_path = os.path.split(save_file)[0]
-                check_directory_exists(Path(save_path))
+                create_paths(Path(save_path))
                 if not os.path.exists(save_file):
                     shutil.copy(audio_from, save_file)
                 zip_file.write(audio_from, audio_to)

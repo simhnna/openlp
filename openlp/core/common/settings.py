@@ -28,11 +28,11 @@ import json
 import os
 from tempfile import gettempdir
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui
 
-from openlp.core.common import SlideLimits, ThemeLevel, UiStrings, is_linux, is_win, translate
+from openlp.core.common import SlideLimits, ThemeLevel, is_linux, is_win
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
-from openlp.core.common.path import Path, str_to_path
+from openlp.core.common.path import Path, str_to_path, files_to_paths
 
 log = logging.getLogger(__name__)
 
@@ -60,18 +60,6 @@ def media_players_conv(string):
             values[index] = 'system'
     string = ','.join(values)
     return string
-
-
-def file_names_conv(file_names):
-    """
-    Convert a list of file names in to a list of file paths.
-
-    :param list[str] file_names: The list of file names to convert.
-    :return: The list converted to file paths
-    :rtype: openlp.core.common.path.Path
-    """
-    if file_names:
-        return [str_to_path(file_name) for file_name in file_names]
 
 
 class Settings(QtCore.QSettings):
@@ -116,7 +104,7 @@ class Settings(QtCore.QSettings):
         'advanced/default service enabled': True,
         'advanced/default service hour': 11,
         'advanced/default service minute': 0,
-        'advanced/default service name': UiStrings().DefaultServiceName,
+        'advanced/default service name': 'Service %Y-%m-%d %H-%M',
         'advanced/display size': 0,
         'advanced/double click live': False,
         'advanced/enable exit confirmation': True,
@@ -261,9 +249,9 @@ class Settings(QtCore.QSettings):
         ('songs/last directory import', 'songs/last directory import', [(str_to_path, None)]),
         ('songs/last directory export', 'songs/last directory export', [(str_to_path, None)]),
         ('songusage/last directory export', 'songusage/last directory export', [(str_to_path, None)]),
-        ('core/recent files', 'core/recent files', [(file_names_conv, None)]),
-        ('media/media files', 'media/media files', [(file_names_conv, None)]),
-        ('presentations/presentations files', 'presentations/presentations files', [(file_names_conv, None)]),
+        ('core/recent files', 'core/recent files', [(files_to_paths, None)]),
+        ('media/media files', 'media/media files', [(files_to_paths, None)]),
+        ('presentations/presentations files', 'presentations/presentations files', [(files_to_paths, None)]),
         ('core/logo file', 'core/logo file', [(str_to_path, None)]),
         ('presentations/last directory', 'presentations/last directory', [(str_to_path, None)]),
         ('images/last directory', 'images/last directory', [(str_to_path, None)]),
@@ -298,6 +286,7 @@ class Settings(QtCore.QSettings):
         """
         # Make sure the string is translated (when building the dict the string is not translated because the translate
         # function was not set up as this stage).
+        from openlp.core.common.i18n import UiStrings
         Settings.__default_settings__['advanced/default service name'] = UiStrings().DefaultServiceName
 
     def __init__(self, *args):
@@ -609,11 +598,5 @@ class Settings(QtCore.QSettings):
                     if file_record.find('@Invalid()') == -1:
                         file_record = file_record.replace('%20', ' ')
                         export_conf_file.write(file_record)
-        except OSError as ose:
-            QtWidgets.QMessageBox.critical(self, translate('OpenLP.MainWindow', 'Export setting error'),
-                                           translate('OpenLP.MainWindow',
-                                                     'An error occurred while exporting the settings: {err}'
-                                                     ).format(err=ose.strerror),
-                                           QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
         finally:
             temp_path.unlink()

@@ -29,7 +29,9 @@ import copy
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, Settings, translate
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
+from openlp.core.common.i18n import translate
 
 log = logging.getLogger(__name__)
 

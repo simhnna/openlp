@@ -27,8 +27,8 @@ from unittest.mock import MagicMock
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-from openlp.core.common import Settings
 from openlp.core.common.actions import CategoryActionList, ActionList
+from openlp.core.common.settings import Settings
 
 from tests.helpers.testmixin import TestMixin
 

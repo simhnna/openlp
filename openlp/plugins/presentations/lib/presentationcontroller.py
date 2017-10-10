@@ -23,8 +23,11 @@ import logging
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, AppLocation, Settings, check_directory_exists, md5_hash
-from openlp.core.common.path import Path, rmtree
+from openlp.core.common import md5_hash
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.path import Path, create_paths, rmtree
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import create_thumb, validate_thumb
 
 log = logging.getLogger(__name__)
@@ -103,7 +106,7 @@ class PresentationDocument(object):
         """
         self.slide_number = 0
         self.file_path = document_path
-        check_directory_exists(self.get_thumbnail_folder())
+        create_paths(self.get_thumbnail_folder())
 
     def load_presentation(self):
         """
@@ -428,8 +431,7 @@ class PresentationController(object):
         self.temp_folder = AppLocation.get_section_data_path(self.settings_section) / name
         self.thumbnail_folder = AppLocation.get_section_data_path(self.settings_section) / 'thumbnails'
         self.thumbnail_prefix = 'slide'
-        check_directory_exists(self.thumbnail_folder)
-        check_directory_exists(self.temp_folder)
+        create_paths(self.thumbnail_folder, self.temp_folder)
 
     def enabled(self):
         """

@@ -22,11 +22,10 @@
 """
 Functional tests to test the Http Server Class.
 """
-
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.api.http.server import HttpServer
 
 
@@ -50,7 +49,7 @@ class TestHttpServer(TestCase):
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        server = HttpServer()
+        HttpServer()
 
         # THEN: the api environment should have been created
         self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
