@@ -128,7 +128,7 @@ class Registry(object):
         :param event: The function description..
         :param function: The function to be called when the event happens.
         """
-        if event in self.functions_list:
+        if event in self.functions_list and function in self.functions_list[event]:
             self.functions_list[event].remove(function)
 
     def execute(self, event, *args, **kwargs):
