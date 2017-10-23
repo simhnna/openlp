@@ -23,45 +23,76 @@
 Package to test the openlp.core.common package.
 """
 from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from openlp.core.common.mixins import RegistryMixin
+from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
 
 
-class PlainStub(object):
-    def __init__(self):
-        pass
-
-
-class MixinStub(RegistryMixin):
-    def __init__(self):
-        super().__init__(None)
-
-
-class TestRegistryMixin(TestCase):
-
-    def test_registry_mixin_missing(self):
+class TestRegistryProperties(TestCase, RegistryProperties):
+    """
+    Test the functions in the ThemeManager module
+    """
+    def setUp(self):
         """
-        Test the registry creation and its usage
+        Create the Register
         """
-        # GIVEN: A new registry
         Registry.create()
 
-        # WHEN: I create an instance of a class that doesn't inherit from RegistryMixin
-        PlainStub()
-
-        # THEN: Nothing is registered with the registry
-        self.assertEqual(len(Registry().functions_list), 0), 'The function should not be in the dict anymore.'
-
-    def test_registry_mixin_present(self):
+    def test_no_application(self):
         """
-        Test the registry creation and its usage
+        Test property if no registry value assigned
         """
-        # GIVEN: A new registry
-        Registry.create()
+        # GIVEN an Empty Registry
+        # WHEN there is no Application
+        # THEN the application should be none
+        self.assertEqual(self.application, None, 'The application value should be None')
 
-        # WHEN: I create an instance of a class that inherits from RegistryMixin
-        MixinStub()
+    def test_application(self):
+        """
+        Test property if registry value assigned
+        """
+        # GIVEN an Empty Registry
+        application = MagicMock()
 
-        # THEN: The bootstrap methods should be registered
-        self.assertEqual(len(Registry().functions_list), 2), 'The bootstrap functions should be in the dict.'
+        # WHEN the application is registered
+        Registry().register('application', application)
+
+        # THEN the application should be none
+        self.assertEqual(self.application, application, 'The application value should match')
+
+    @patch('openlp.core.common.mixins.is_win')
+    def test_application_on_windows(self, mocked_is_win):
+        """
+        Test property if registry value assigned on Windows
+        """
+        # GIVEN an Empty Registry and we're on Windows
+        application = MagicMock()
+        mocked_is_win.return_value = True
+
+        # WHEN the application is registered
+        Registry().register('application', application)
+
+        # THEN the application should be none
+        self.assertEqual(self.application, application, 'The application value should match')
+
+    @patch('openlp.core.common.mixins.is_win')
+    def test_get_application_on_windows(self, mocked_is_win):
+        """
+        Set that getting the application object on Windows happens dynamically
+        """
+        # GIVEN an Empty Registry and we're on Windows
+        mocked_is_win.return_value = True
+        mock_application = MagicMock()
+        reg_props = RegistryProperties()
+        registry = Registry()
+
+        # WHEN the application is accessed
+        with patch.object(registry, 'get') as mocked_get:
+            mocked_get.return_value = mock_application
+            actual_application = reg_props.application
+
+        # THEN the application should be the mock object, and the correct function should have been called
+        self.assertEqual(mock_application, actual_application, 'The application value should match')
+        mocked_is_win.assert_called_with()
+        mocked_get.assert_called_with('application')

@@ -31,8 +31,8 @@ import time
 
 from PyQt5 import QtCore
 
-from openlp.core.common.mixins import OpenLPMixin
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 
 log = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class WebSocketWorker(QtCore.QObject):
         self.ws_server.stop = True
 
 
-class WebSocketServer(RegistryProperties, OpenLPMixin):
+class WebSocketServer(RegistryProperties, LogMixin):
     """
     Wrapper round a server instance
     """

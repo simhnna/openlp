@@ -23,6 +23,7 @@
 The :mod:`~openlp.core.ui.media.playertab` module holds the configuration tab for the media stuff.
 """
 import platform
+
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
@@ -31,7 +32,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
 from openlp.core.lib.ui import create_button
 from openlp.core.ui.media import get_media_players, set_media_players
-from openlp.core.ui.lib.colorbutton import ColorButton
+from openlp.core.widgets.buttons import ColorButton
 
 
 class MediaQCheckBox(QtWidgets.QCheckBox):

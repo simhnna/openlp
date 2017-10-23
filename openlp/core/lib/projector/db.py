@@ -49,7 +49,7 @@ from openlp.core.lib.projector import upgrade
 Base = declarative_base(MetaData())
 
 
-class CommonBase(object):
+class CommonMixin(object):
     """
     Base class to automate table name and ID column.
     """
@@ -60,7 +60,7 @@ class CommonBase(object):
     id = Column(Integer, primary_key=True)
 
 
-class Manufacturer(CommonBase, Base):
+class Manufacturer(Base, CommonMixin):
     """
     Projector manufacturer table.
 
@@ -85,7 +85,7 @@ class Manufacturer(CommonBase, Base):
                           lazy='joined')
 
 
-class Model(CommonBase, Base):
+class Model(Base, CommonMixin):
     """
     Projector model table.
 
@@ -113,7 +113,7 @@ class Model(CommonBase, Base):
                            lazy='joined')
 
 
-class Source(CommonBase, Base):
+class Source(Base, CommonMixin):
     """
     Projector video source table.
 
@@ -140,7 +140,7 @@ class Source(CommonBase, Base):
     text = Column(String(30))
 
 
-class Projector(CommonBase, Base):
+class Projector(Base, CommonMixin):
     """
     Projector table.
 
@@ -213,7 +213,7 @@ class Projector(CommonBase, Base):
                                lazy='joined')
 
 
-class ProjectorSource(CommonBase, Base):
+class ProjectorSource(Base, CommonMixin):
     """
     Projector local source table
     This table allows mapping specific projector source input to a local

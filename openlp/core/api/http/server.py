@@ -39,9 +39,9 @@ from openlp.core.api.http import application
 from openlp.core.api.poll import Poller
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import create_paths
-from openlp.core.common.registry import RegistryProperties, Registry
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.common.i18n import translate
 
@@ -73,7 +73,7 @@ class HttpWorker(QtCore.QObject):
         pass
 
 
-class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
+class HttpServer(RegistryBase, RegistryProperties, LogMixin):
     """
     Wrapper round a server instance
     """

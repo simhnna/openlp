@@ -23,7 +23,7 @@
 import json
 
 from openlp.core.common.httputils import get_web_page
-from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.settings import Settings
 
 

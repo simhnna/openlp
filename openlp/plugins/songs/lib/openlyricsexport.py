@@ -30,7 +30,7 @@ from lxml import etree
 from openlp.core.common import clean_filename
 from openlp.core.common.i18n import translate
 from openlp.core.common.path import create_paths
-from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
 
 log = logging.getLogger(__name__)

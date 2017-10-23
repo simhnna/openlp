@@ -5,12 +5,12 @@ from unittest.mock import patch
 from PyQt5 import QtWidgets
 
 from openlp.core.common.path import Path
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
 
 
 class TestFileDialogPatches(TestCase):
     """
-    Tests for the :mod:`openlp.core.ui.lib.filedialogpatches` module
+    Tests for the :mod:`openlp.core.widgets.dialogs` module
     """
 
     def test_file_dialog(self):
@@ -55,7 +55,7 @@ class TestFileDialogPatches(TestCase):
         order
         """
         # GIVEN: FileDialog
-        with patch('openlp.core.ui.lib.filedialog.QtWidgets.QFileDialog.getExistingDirectory', return_value='') \
+        with patch('openlp.core.widgets.dialogs.QtWidgets.QFileDialog.getExistingDirectory', return_value='') \
                 as mocked_get_existing_directory:
 
             # WHEN: Calling the getExistingDirectory method with all parameters set

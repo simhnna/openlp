@@ -20,15 +20,17 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.ui.lib.listpreviewwidget package.
+Package to test the openlp.core.widgets.views package.
 """
+from types import GeneratorType
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtGui
 
-from openlp.core.ui.lib.listpreviewwidget import ListPreviewWidget
+from openlp.core.common.i18n import UiStrings
 from openlp.core.lib import ImageSource
+from openlp.core.widgets.views import ListPreviewWidget, ListWidgetWithDnD, TreeWidgetWithDnD
 
 
 class TestListPreviewWidget(TestCase):
@@ -38,13 +40,13 @@ class TestListPreviewWidget(TestCase):
         Mock out stuff for all the tests
         """
         # Mock self.parent().width()
-        self.parent_patcher = patch('openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.parent')
+        self.parent_patcher = patch('openlp.core.widgets.views.ListPreviewWidget.parent')
         self.mocked_parent = self.parent_patcher.start()
         self.mocked_parent.width.return_value = 100
         self.addCleanup(self.parent_patcher.stop)
 
         # Mock Settings().value()
-        self.Settings_patcher = patch('openlp.core.ui.lib.listpreviewwidget.Settings')
+        self.Settings_patcher = patch('openlp.core.widgets.views.Settings')
         self.mocked_Settings = self.Settings_patcher.start()
         self.mocked_Settings_obj = MagicMock()
         self.mocked_Settings_obj.value.return_value = None
@@ -52,7 +54,7 @@ class TestListPreviewWidget(TestCase):
         self.addCleanup(self.Settings_patcher.stop)
 
         # Mock self.viewport().width()
-        self.viewport_patcher = patch('openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.viewport')
+        self.viewport_patcher = patch('openlp.core.widgets.views.ListPreviewWidget.viewport')
         self.mocked_viewport = self.viewport_patcher.start()
         self.mocked_viewport_obj = MagicMock()
         self.mocked_viewport_obj.width.return_value = 200
@@ -72,9 +74,9 @@ class TestListPreviewWidget(TestCase):
         self.assertIsNotNone(list_preview_widget, 'The ListPreviewWidget object should not be None')
         self.assertEquals(list_preview_widget.screen_ratio, 1, 'Should not be called')
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.image_manager')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.image_manager')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
     def test_replace_service_item_thumbs(self, mocked_setRowHeight, mocked_resizeRowsToContents,
                                          mocked_image_manager):
         """
@@ -119,8 +121,8 @@ class TestListPreviewWidget(TestCase):
                  call('TEST3', ImageSource.CommandPlugins), call('TEST4', ImageSource.CommandPlugins)]
         mocked_image_manager.get_image.assert_has_calls(calls)
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
     def test_replace_recalculate_layout_text(self, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." enabled, txt slides unchanged in replace_service_item & __recalc...
@@ -151,8 +153,8 @@ class TestListPreviewWidget(TestCase):
         self.assertEquals(mocked_resizeRowsToContents.call_count, 2, 'Should be called')
         self.assertEquals(mocked_setRowHeight.call_count, 0, 'Should not be called')
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
     def test_replace_recalculate_layout_img(self, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." disabled, img slides unchanged in replace_service_item & __recalc...
@@ -188,8 +190,8 @@ class TestListPreviewWidget(TestCase):
         calls = [call(0, 200), call(1, 200), call(0, 400), call(1, 400), call(0, 400), call(1, 400)]
         mocked_setRowHeight.assert_has_calls(calls)
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
     def test_replace_recalculate_layout_img_max(self, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." enabled, img slides resized in replace_service_item & __recalc...
@@ -223,8 +225,8 @@ class TestListPreviewWidget(TestCase):
         calls = [call(0, 100), call(1, 100), call(0, 100), call(1, 100)]
         mocked_setRowHeight.assert_has_calls(calls)
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
     def test_replace_recalculate_layout_img_auto(self, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." auto, img slides resized in replace_service_item & __recalc...
@@ -261,9 +263,9 @@ class TestListPreviewWidget(TestCase):
         calls = [call(0, 100), call(1, 100), call(0, 150), call(1, 150), call(0, 100), call(1, 100)]
         mocked_setRowHeight.assert_has_calls(calls)
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.cellWidget')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.cellWidget')
     def test_row_resized_text(self, mocked_cellWidget, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." enabled, text-based slides not affected in row_resized.
@@ -295,9 +297,9 @@ class TestListPreviewWidget(TestCase):
         # THEN: self.cellWidget(row, 0).children()[1].setMaximumWidth() should not be called
         self.assertEquals(mocked_cellWidget_child.setMaximumWidth.call_count, 0, 'Should not be called')
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.cellWidget')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.cellWidget')
     def test_row_resized_img(self, mocked_cellWidget, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." disabled, image-based slides not affected in row_resized.
@@ -332,9 +334,9 @@ class TestListPreviewWidget(TestCase):
         # THEN: self.cellWidget(row, 0).children()[1].setMaximumWidth() should not be called
         self.assertEquals(mocked_cellWidget_child.setMaximumWidth.call_count, 0, 'Should not be called')
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.cellWidget')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.cellWidget')
     def test_row_resized_img_max(self, mocked_cellWidget, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." enabled, image-based slides are scaled in row_resized.
@@ -367,9 +369,9 @@ class TestListPreviewWidget(TestCase):
         # THEN: self.cellWidget(row, 0).children()[1].setMaximumWidth() should be called
         mocked_cellWidget_child.setMaximumWidth.assert_called_once_with(150)
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.resizeRowsToContents')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.setRowHeight')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.cellWidget')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.setRowHeight')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.cellWidget')
     def test_row_resized_setting_changed(self, mocked_cellWidget, mocked_setRowHeight, mocked_resizeRowsToContents):
         """
         Test if "Max height for non-text slides..." enabled while item live, program doesn't crash on row_resized.
@@ -402,10 +404,10 @@ class TestListPreviewWidget(TestCase):
         # THEN: self.cellWidget(row, 0).children()[1].setMaximumWidth() should fail
         self.assertRaises(Exception)
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.selectRow')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.scrollToItem')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.item')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.slide_count')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.selectRow')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.scrollToItem')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.item')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.slide_count')
     def test_autoscroll_setting_invalid(self, mocked_slide_count, mocked_item, mocked_scrollToItem, mocked_selectRow):
         """
         Test if 'advanced/autoscrolling' setting None or invalid, that no autoscrolling occurs on change_slide().
@@ -438,10 +440,10 @@ class TestListPreviewWidget(TestCase):
         self.assertEquals(mocked_selectRow.call_count, 0, 'Should not be called')
         self.assertEquals(mocked_item.call_count, 0, 'Should not be called')
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.selectRow')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.scrollToItem')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.item')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.slide_count')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.selectRow')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.scrollToItem')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.item')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.slide_count')
     def test_autoscroll_dist_bounds(self, mocked_slide_count, mocked_item, mocked_scrollToItem, mocked_selectRow):
         """
         Test if 'advanced/autoscrolling' setting asks to scroll beyond list bounds, that it does not beyond.
@@ -468,10 +470,10 @@ class TestListPreviewWidget(TestCase):
         calls = [call(0, 0), call(0, 0)]
         mocked_item.assert_has_calls(calls)
 
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.selectRow')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.scrollToItem')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.item')
-    @patch(u'openlp.core.ui.lib.listpreviewwidget.ListPreviewWidget.slide_count')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.selectRow')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.scrollToItem')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.item')
+    @patch(u'openlp.core.widgets.views.ListPreviewWidget.slide_count')
     def test_autoscroll_normal(self, mocked_slide_count, mocked_item, mocked_scrollToItem, mocked_selectRow):
         """
         Test if 'advanced/autoscrolling' setting valid, autoscrolling called as expected.
@@ -499,3 +501,130 @@ class TestListPreviewWidget(TestCase):
         self.assertEquals(mocked_item.call_count, 3, 'Should be called')
         calls = [call(0, 0), call(1, 0), call(2, 0)]
         mocked_item.assert_has_calls(calls)
+
+
+class TestListWidgetWithDnD(TestCase):
+    """
+    Test the :class:`~openlp.core.widgets.views.ListWidgetWithDnD` class
+    """
+    def test_clear(self):
+        """
+        Test the clear method when called without any arguments.
+        """
+        # GIVEN: An instance of ListWidgetWithDnD
+        widget = ListWidgetWithDnD()
+
+        # WHEN: Calling clear with out any arguments
+        widget.clear()
+
+        # THEN: The results text should be the standard 'no results' text.
+        self.assertEqual(widget.no_results_text, UiStrings().NoResults)
+
+    def test_clear_search_while_typing(self):
+        """
+        Test the clear method when called with the search_while_typing argument set to True
+        """
+        # GIVEN: An instance of ListWidgetWithDnD
+        widget = ListWidgetWithDnD()
+
+        # WHEN: Calling clear with search_while_typing set to True
+        widget.clear(search_while_typing=True)
+
+        # THEN: The results text should be the 'short results' text.
+        self.assertEqual(widget.no_results_text, UiStrings().ShortResults)
+
+    def test_all_items_no_list_items(self):
+        """
+        Test allItems when there are no items in the list widget
+        """
+        # GIVEN: An instance of ListWidgetWithDnD
+        widget = ListWidgetWithDnD()
+        with patch.object(widget, 'count', return_value=0), \
+                patch.object(widget, 'item', side_effect=lambda x: [][x]):
+
+            # WHEN: Calling allItems
+            result = widget.allItems()
+
+            # THEN: An instance of a Generator object should be returned. The generator should not yeild any results
+            self.assertIsInstance(result, GeneratorType)
+            self.assertEqual(list(result), [])
+
+    def test_all_items_list_items(self):
+        """
+        Test allItems when the list widget contains some items.
+        """
+        # GIVEN: An instance of ListWidgetWithDnD
+        widget = ListWidgetWithDnD()
+        with patch.object(widget, 'count', return_value=2), \
+                patch.object(widget, 'item', side_effect=lambda x: [5, 3][x]):
+
+            # WHEN: Calling allItems
+            result = widget.allItems()
+
+            # THEN: An instance of a Generator object should be returned. The generator should not yeild any results
+            self.assertIsInstance(result, GeneratorType)
+            self.assertEqual(list(result), [5, 3])
+
+    def test_paint_event(self):
+        """
+        Test the paintEvent method when the list is not empty
+        """
+        # GIVEN: An instance of ListWidgetWithDnD with a mocked out count methode which returns 1
+        #       (i.e the list has an item)
+        widget = ListWidgetWithDnD()
+        with patch('openlp.core.widgets.views.QtWidgets.QListWidget.paintEvent') as mocked_paint_event, \
+                patch.object(widget, 'count', return_value=1), \
+                patch.object(widget, 'viewport') as mocked_viewport:
+            mocked_event = MagicMock()
+
+            # WHEN: Calling paintEvent
+            widget.paintEvent(mocked_event)
+
+            # THEN: The overridden paintEvnet should have been called
+            mocked_paint_event.assert_called_once_with(mocked_event)
+            self.assertFalse(mocked_viewport.called)
+
+    def test_paint_event_no_items(self):
+        """
+        Test the paintEvent method when the list is empty
+        """
+        # GIVEN: An instance of ListWidgetWithDnD with a mocked out count methode which returns 0
+        #       (i.e the list is empty)
+        widget = ListWidgetWithDnD()
+        mocked_painter_instance = MagicMock()
+        mocked_qrect = MagicMock()
+        with patch('openlp.core.widgets.views.QtWidgets.QListWidget.paintEvent') as mocked_paint_event, \
+                patch.object(widget, 'count', return_value=0), \
+                patch.object(widget, 'viewport'), \
+                patch('openlp.core.widgets.views.QtGui.QPainter',
+                      return_value=mocked_painter_instance) as mocked_qpainter, \
+                patch('openlp.core.widgets.views.QtCore.QRect', return_value=mocked_qrect):
+            mocked_event = MagicMock()
+
+            # WHEN: Calling paintEvent
+            widget.paintEvent(mocked_event)
+
+            # THEN: The overridden paintEvnet should have been called, and some text should be drawn.
+            mocked_paint_event.assert_called_once_with(mocked_event)
+            mocked_qpainter.assert_called_once_with(widget.viewport())
+            mocked_painter_instance.drawText.assert_called_once_with(mocked_qrect, 4100, 'No Search Results')
+
+
+class TestTreeWidgetWithDnD(TestCase):
+    """
+    Test the :class:`~openlp.core.widgets.views.TreeWidgetWithDnD` class
+    """
+    def test_constructor(self):
+        """
+        Test the constructor
+        """
+        # GIVEN: A TreeWidgetWithDnD
+        # WHEN: An instance is created
+        widget = TreeWidgetWithDnD(name='Test')
+
+        # THEN: It should be initialised correctly
+        assert widget.mime_data_text == 'Test'
+        assert widget.allow_internal_dnd is False
+        assert widget.indentation() == 0
+        assert widget.isAnimated() is True
+

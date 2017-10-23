@@ -26,10 +26,11 @@ import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings
 from openlp.core.common.registry import Registry
+from openlp.core.display.screens import ScreenList
 from openlp.core.ui.mainwindow import MainWindow
 
 from tests.helpers.testmixin import TestMixin
@@ -37,8 +38,23 @@ from tests.utils.constants import TEST_RESOURCES_PATH
 
 
 class TestMainWindow(TestCase, TestMixin):
+    """
+    Test the main window
+    """
+    def _create_mock_action(self, parent, name, **kwargs):
+        """
+        Create a fake action with some "real" attributes
+        """
+        action = QtWidgets.QAction(parent)
+        action.setObjectName(name)
+        if kwargs.get('triggers'):
+            action.triggered.connect(kwargs.pop('triggers'))
+        return action
 
     def setUp(self):
+        """
+        Set up the objects we need for all of the tests
+        """
         Registry.create()
         self.registry = Registry()
         self.setup_application()
@@ -48,30 +64,18 @@ class TestMainWindow(TestCase, TestMixin):
         self.app.args = []
         Registry().register('application', self.app)
         Registry().set_flag('no_web_server', False)
-        # Mock classes and methods used by mainwindow.
-        with patch('openlp.core.ui.mainwindow.SettingsForm') as mocked_settings_form, \
-                patch('openlp.core.ui.mainwindow.ImageManager') as mocked_image_manager, \
-                patch('openlp.core.ui.mainwindow.LiveController') as mocked_live_controller, \
-                patch('openlp.core.ui.mainwindow.PreviewController') as mocked_preview_controller, \
-                patch('openlp.core.ui.mainwindow.OpenLPDockWidget') as mocked_dock_widget, \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox') as mocked_q_tool_box_class, \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget') as mocked_add_dock_method, \
-                patch('openlp.core.ui.mainwindow.ThemeManager') as mocked_theme_manager, \
-                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer, \
-                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer'), \
-                patch('openlp.core.ui.mainwindow.server.HttpServer'):
-            self.mocked_settings_form = mocked_settings_form
-            self.mocked_image_manager = mocked_image_manager
-            self.mocked_live_controller = mocked_live_controller
-            self.mocked_preview_controller = mocked_preview_controller
-            self.mocked_dock_widget = mocked_dock_widget
-            self.mocked_q_tool_box_class = mocked_q_tool_box_class
-            self.mocked_add_dock_method = mocked_add_dock_method
-            self.mocked_theme_manager = mocked_theme_manager
-            self.mocked_renderer = mocked_renderer
+        self.add_toolbar_action_patcher = patch('openlp.core.ui.mainwindow.create_action')
+        self.mocked_add_toolbar_action = self.add_toolbar_action_patcher.start()
+        self.mocked_add_toolbar_action.side_effect = self._create_mock_action
+        with patch('openlp.core.display.screens.ScreenList.__instance__', spec=ScreenList) as mocked_screen_list:
+            mocked_screen_list.current = {'number': 0, 'size': QtCore.QSize(600, 800), 'primary': True}
             self.main_window = MainWindow()
 
     def tearDown(self):
+        """
+        Delete all the C++ objects and stop all the patchers
+        """
+        self.add_toolbar_action_patcher.stop()
         del self.main_window
 
     def test_cmd_line_file(self):
@@ -81,13 +85,13 @@ class TestMainWindow(TestCase, TestMixin):
         # GIVEN a service as an argument to openlp
         service = os.path.join(TEST_RESOURCES_PATH, 'service', 'test.osz')
         self.main_window.arguments = [service]
-        with patch('openlp.core.ui.servicemanager.ServiceManager.load_file') as mocked_load_path:
 
-            # WHEN the argument is processed
+        # WHEN the argument is processed
+        with patch.object(self.main_window.service_manager, 'load_file') as mocked_load_file:
             self.main_window.open_cmd_line_files(service)
 
-            # THEN the service from the arguments is loaded
-            mocked_load_path.assert_called_with(service), 'load_path should have been called with the service\'s path'
+        # THEN the service from the arguments is loaded
+        mocked_load_file.assert_called_with(service)
 
     def test_cmd_line_arg(self):
         """
@@ -96,13 +100,13 @@ class TestMainWindow(TestCase, TestMixin):
         # GIVEN a non service file as an argument to openlp
         service = os.path.join('openlp.py')
         self.main_window.arguments = [service]
-        with patch('openlp.core.ui.servicemanager.ServiceManager.load_file') as mocked_load_path:
+        with patch('openlp.core.ui.servicemanager.ServiceManager.load_file') as mocked_load_file:
 
             # WHEN the argument is processed
             self.main_window.open_cmd_line_files("")
 
             # THEN the file should not be opened
-            assert not mocked_load_path.called, 'load_path should not have been called'
+            assert not mocked_load_file.called, 'load_file should not have been called'
 
     def test_main_window_title(self):
         """
@@ -151,14 +155,14 @@ class TestMainWindow(TestCase, TestMixin):
         # WHEN: you check the started functions
 
         # THEN: the following registry functions should have been registered
-        self.assertEqual(len(self.registry.service_list), 6, 'The registry should have 6 services.')
-        self.assertEqual(len(self.registry.functions_list), 18, 'The registry should have 18 functions')
-        self.assertTrue('application' in self.registry.service_list, 'The application should have been registered.')
-        self.assertTrue('main_window' in self.registry.service_list, 'The main_window should have been registered.')
-        self.assertTrue('media_controller' in self.registry.service_list, 'The media_controller should have been '
-                                                                          'registered.')
-        self.assertTrue('plugin_manager' in self.registry.service_list,
-                        'The plugin_manager should have been registered.')
+        assert len(self.registry.service_list) == 12, \
+            'The registry should have 12 services, got {}'.format(self.registry.service_list.keys())
+        assert len(self.registry.functions_list) == 19, \
+            'The registry should have 19 functions, got {}'.format(self.registry.functions_list.keys())
+        assert 'application' in self.registry.service_list, 'The application should have been registered.'
+        assert 'main_window' in self.registry.service_list, 'The main_window should have been registered.'
+        assert 'media_controller' in self.registry.service_list, 'The media_controller should have been registered.'
+        assert 'plugin_manager' in self.registry.service_list, 'The plugin_manager should have been registered.'
 
     def test_projector_manager_hidden_on_startup(self):
         """
@@ -167,7 +171,7 @@ class TestMainWindow(TestCase, TestMixin):
         # GIVEN: A built main window
         # WHEN: OpenLP is started
         # THEN: The projector manager should be hidden
-        self.main_window.projector_manager_dock.setVisible.assert_called_once_with(False)
+        assert self.main_window.projector_manager_dock.isVisible() is False
 
     def test_on_search_shortcut_triggered_shows_media_manager(self):
         """
@@ -203,56 +207,38 @@ class TestMainWindow(TestCase, TestMixin):
             self.assertEqual(0, mocked_media_manager_dock.setVisible.call_count)
             mocked_widget.on_focus.assert_called_with()
 
-    @patch('openlp.core.ui.mainwindow.MainWindow.plugin_manager')
-    @patch('openlp.core.ui.mainwindow.MainWindow.first_time')
-    @patch('openlp.core.ui.mainwindow.MainWindow.application')
     @patch('openlp.core.ui.mainwindow.FirstTimeForm')
     @patch('openlp.core.ui.mainwindow.QtWidgets.QMessageBox.warning')
     @patch('openlp.core.ui.mainwindow.Settings')
-    def test_on_first_time_wizard_clicked_show_projectors_after(self, mocked_Settings, mocked_warning,
-                                                                mocked_FirstTimeForm, mocked_application,
-                                                                mocked_first_time,
-                                                                mocked_plugin_manager):
+    def test_on_first_time_wizard_clicked_show_projectors_after(self, MockSettings, mocked_warning, MockWizard):
+        """Test that the projector manager is shown after the FTW is run"""
         # GIVEN: Main_window, patched things, patched "Yes" as confirmation to re-run wizard, settings to True.
-        mocked_Settings_obj = MagicMock()
-        mocked_Settings_obj.value.return_value = True
-        mocked_Settings.return_value = mocked_Settings_obj
+        MockSettings.return_value.value.return_value = True
         mocked_warning.return_value = QtWidgets.QMessageBox.Yes
-        mocked_FirstTimeForm_obj = MagicMock()
-        mocked_FirstTimeForm_obj.was_cancelled = False
-        mocked_FirstTimeForm.return_value = mocked_FirstTimeForm_obj
-        mocked_plugin_manager.plugins = []
-        self.main_window.projector_manager_dock = MagicMock()
+        MockWizard.return_value.was_cancelled = False
 
-        # WHEN: on_first_time_wizard_clicked is called
-        self.main_window.on_first_time_wizard_clicked()
+        with patch.object(self.main_window, 'projector_manager_dock') as mocked_dock, \
+                patch.object(self.registry, 'execute'), patch.object(self.main_window, 'theme_manager_contents'):
+            # WHEN: on_first_time_wizard_clicked is called
+            self.main_window.on_first_time_wizard_clicked()
 
         # THEN: projector_manager_dock.setVisible should had been called once
-        self.main_window.projector_manager_dock.setVisible.assert_called_once_with(True)
+        mocked_dock.setVisible.assert_called_once_with(True)
 
-    @patch('openlp.core.ui.mainwindow.MainWindow.plugin_manager')
-    @patch('openlp.core.ui.mainwindow.MainWindow.first_time')
-    @patch('openlp.core.ui.mainwindow.MainWindow.application')
     @patch('openlp.core.ui.mainwindow.FirstTimeForm')
     @patch('openlp.core.ui.mainwindow.QtWidgets.QMessageBox.warning')
     @patch('openlp.core.ui.mainwindow.Settings')
-    def test_on_first_time_wizard_clicked_hide_projectors_after(self, mocked_Settings, mocked_warning,
-                                                                mocked_FirstTimeForm, mocked_application,
-                                                                mocked_first_time,
-                                                                mocked_plugin_manager):
+    def test_on_first_time_wizard_clicked_hide_projectors_after(self, MockSettings, mocked_warning, MockWizard):
+        """Test that the projector manager is hidden after the FTW is run"""
         # GIVEN: Main_window, patched things, patched "Yes" as confirmation to re-run wizard, settings to False.
-        mocked_Settings_obj = MagicMock()
-        mocked_Settings_obj.value.return_value = False
-        mocked_Settings.return_value = mocked_Settings_obj
+        MockSettings.return_value.value.return_value = False
         mocked_warning.return_value = QtWidgets.QMessageBox.Yes
-        mocked_FirstTimeForm_obj = MagicMock()
-        mocked_FirstTimeForm_obj.was_cancelled = False
-        mocked_FirstTimeForm.return_value = mocked_FirstTimeForm_obj
-        mocked_plugin_manager.plugins = []
-        self.main_window.projector_manager_dock = MagicMock()
+        MockWizard.return_value.was_cancelled = False
 
         # WHEN: on_first_time_wizard_clicked is called
-        self.main_window.on_first_time_wizard_clicked()
+        with patch.object(self.main_window, 'projector_manager_dock') as mocked_dock, \
+                patch.object(self.registry, 'execute'), patch.object(self.main_window, 'theme_manager_contents'):
+            self.main_window.on_first_time_wizard_clicked()
 
         # THEN: projector_manager_dock.setVisible should had been called once
-        self.main_window.projector_manager_dock.setVisible.assert_called_once_with(False)
+        mocked_dock.setVisible.assert_called_once_with(False)
