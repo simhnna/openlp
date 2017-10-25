@@ -25,102 +25,103 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from PyQt5 import QtCore, QtGui, QtWidgets
+
 from openlp.core.common.registry import Registry
-from openlp.core.display.screens import ScreenList
 from openlp.core.lib import ServiceItem, ItemCapabilities
-from openlp.core.ui.mainwindow import MainWindow
+from openlp.core.ui.servicemanager import ServiceManager
 
 from tests.helpers.testmixin import TestMixin
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class TestServiceManager(TestCase, TestMixin):
+    """
+    Test the service manager
+    """
+
+    def _create_mock_action(self, name, **kwargs):
+        """
+        Create a fake action with some "real" attributes
+        """
+        action = QtWidgets.QAction(self.service_manager)
+        action.setObjectName(name)
+        if kwargs.get('triggers'):
+            action.triggered.connect(kwargs.pop('triggers'))
+        self.service_manager.toolbar.actions[name] = action
+        return action
 
     def setUp(self):
         """
         Create the UI
         """
         Registry.create()
-        Registry().set_flag('no_web_server', False)
         self.setup_application()
-        ScreenList.create(self.app.desktop())
         Registry().register('application', MagicMock())
-        # Mock classes and methods used by mainwindow.
-        with patch('openlp.core.ui.mainwindow.SettingsForm'), \
-                patch('openlp.core.ui.mainwindow.ImageManager'), \
-                patch('openlp.core.ui.mainwindow.LiveController'), \
-                patch('openlp.core.ui.mainwindow.PreviewController'), \
-                patch('openlp.core.ui.mainwindow.OpenLPDockWidget'), \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox'), \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget'), \
-                patch('openlp.core.ui.mainwindow.ThemeManager'), \
-                patch('openlp.core.ui.mainwindow.ProjectorManager'), \
-                patch('openlp.core.ui.mainwindow.Renderer'), \
-                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer'), \
-                patch('openlp.core.ui.mainwindow.server.HttpServer'):
-            self.main_window = MainWindow()
-        self.service_manager = Registry().get('service_manager')
+        Registry().register('main_window', MagicMock(service_manager_settings_section='servicemanager'))
+        self.service_manager = ServiceManager()
+        self.add_toolbar_action_patcher = patch('openlp.core.ui.servicemanager.OpenLPToolbar.add_toolbar_action')
+        self.mocked_add_toolbar_action = self.add_toolbar_action_patcher.start()
+        self.mocked_add_toolbar_action.side_effect = self._create_mock_action
 
     def tearDown(self):
         """
         Delete all the C++ objects at the end so that we don't have a segfault
         """
-        del self.main_window
+        self.add_toolbar_action_patcher.stop()
+        del self.service_manager
 
     def test_basic_service_manager(self):
         """
         Test the Service Manager UI Functionality
         """
         # GIVEN: A New Service Manager instance
-
         # WHEN I have set up the display
         self.service_manager.setup_ui(self.service_manager)
+
         # THEN the count of items should be zero
         self.assertEqual(self.service_manager.service_manager_list.topLevelItemCount(), 0,
                          'The service manager list should be empty ')
 
-    def test_default_context_menu(self):
+    @patch('openlp.core.ui.servicemanager.QtWidgets.QTreeWidget.itemAt')
+    @patch('openlp.core.ui.servicemanager.QtWidgets.QWidget.mapToGlobal')
+    @patch('openlp.core.ui.servicemanager.QtWidgets.QMenu.exec')
+    def test_default_context_menu(self, mocked_exec, mocked_mapToGlobal, mocked_item_at_method):
         """
         Test the context_menu() method with a default service item
         """
         # GIVEN: A service item added
+        mocked_item = MagicMock()
+        mocked_item.parent.return_value = None
+        mocked_item_at_method.return_value = mocked_item
+        mocked_item.data.return_value = 1
         self.service_manager.setup_ui(self.service_manager)
-        with patch('PyQt5.QtWidgets.QTreeWidget.itemAt') as mocked_item_at_method, \
-                patch('PyQt5.QtWidgets.QWidget.mapToGlobal'), \
-                patch('PyQt5.QtWidgets.QMenu.exec'):
-            mocked_item = MagicMock()
-            mocked_item.parent.return_value = None
-            mocked_item_at_method.return_value = mocked_item
-            # We want 1 to be returned for the position
-            mocked_item.data.return_value = 1
-            # A service item without capabilities.
-            service_item = ServiceItem()
-            self.service_manager.service_items = [{'service_item': service_item}]
-            q_point = None
-            # Mocked actions.
-            self.service_manager.edit_action.setVisible = MagicMock()
-            self.service_manager.create_custom_action.setVisible = MagicMock()
-            self.service_manager.maintain_action.setVisible = MagicMock()
-            self.service_manager.notes_action.setVisible = MagicMock()
-            self.service_manager.time_action.setVisible = MagicMock()
-            self.service_manager.auto_start_action.setVisible = MagicMock()
+        # A service item without capabilities.
+        service_item = ServiceItem()
+        self.service_manager.service_items = [{'service_item': service_item}]
+        q_point = None
+        # Mocked actions.
+        self.service_manager.edit_action.setVisible = MagicMock()
+        self.service_manager.create_custom_action.setVisible = MagicMock()
+        self.service_manager.maintain_action.setVisible = MagicMock()
+        self.service_manager.notes_action.setVisible = MagicMock()
+        self.service_manager.time_action.setVisible = MagicMock()
+        self.service_manager.auto_start_action.setVisible = MagicMock()
 
-            # WHEN: Show the context menu.
-            self.service_manager.context_menu(q_point)
+        # WHEN: Show the context menu.
+        self.service_manager.context_menu(q_point)
 
-            # THEN: The following actions should be not visible.
-            self.service_manager.edit_action.setVisible.assert_called_once_with(False), \
-                'The action should be set invisible.'
-            self.service_manager.create_custom_action.setVisible.assert_called_once_with(False), \
-                'The action should be set invisible.'
-            self.service_manager.maintain_action.setVisible.assert_called_once_with(False), \
-                'The action should be set invisible.'
-            self.service_manager.notes_action.setVisible.assert_called_with(True), 'The action should be set visible.'
-            self.service_manager.time_action.setVisible.assert_called_once_with(False), \
-                'The action should be set invisible.'
-            self.service_manager.auto_start_action.setVisible.assert_called_once_with(False), \
-                'The action should be set invisible.'
+        # THEN: The following actions should be not visible.
+        self.service_manager.edit_action.setVisible.assert_called_once_with(False), \
+            'The action should be set invisible.'
+        self.service_manager.create_custom_action.setVisible.assert_called_once_with(False), \
+            'The action should be set invisible.'
+        self.service_manager.maintain_action.setVisible.assert_called_once_with(False), \
+            'The action should be set invisible.'
+        self.service_manager.notes_action.setVisible.assert_called_with(True), 'The action should be set visible.'
+        self.service_manager.time_action.setVisible.assert_called_once_with(False), \
+            'The action should be set invisible.'
+        self.service_manager.auto_start_action.setVisible.assert_called_once_with(False), \
+            'The action should be set invisible.'
 
     def test_edit_context_menu(self):
         """

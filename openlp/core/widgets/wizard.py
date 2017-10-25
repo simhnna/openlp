@@ -28,11 +28,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_macosx
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import add_welcome_page
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
 
 log = logging.getLogger(__name__)
 

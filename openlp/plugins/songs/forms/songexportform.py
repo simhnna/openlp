@@ -32,8 +32,9 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import create_separated_list
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.ui.lib import PathEdit, PathType
-from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
+from openlp.core.widgets.edits import PathEdit
+from openlp.core.widgets.enums import PathEditType
+from openlp.core.widgets.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.songs.lib.db import Song
 from openlp.plugins.songs.lib.openlyricsexport import OpenLyricsExport
 
@@ -124,7 +125,7 @@ class SongExportForm(OpenLPWizard):
         self.selected_list_widget.setObjectName('selected_list_widget')
         self.grid_layout.addWidget(self.selected_list_widget, 1, 0, 1, 2)
         self.output_directory_path_edit = PathEdit(
-            self.export_song_page, PathType.Directories,
+            self.export_song_page, PathEditType.Directories,
             dialog_caption=translate('SongsPlugin.ExportWizardForm', 'Select Destination Folder'), show_revert=False)
         self.output_directory_path_edit.path = Settings().value('songs/last directory export')
         self.directory_label = QtWidgets.QLabel(self.export_song_page)

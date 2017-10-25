@@ -19,18 +19,3 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-from .colorbutton import ColorButton
-from .listpreviewwidget import ListPreviewWidget
-from .listwidgetwithdnd import ListWidgetWithDnD
-from .mediadockmanager import MediaDockManager
-from .dockwidget import OpenLPDockWidget
-from .toolbar import OpenLPToolbar
-from .wizard import OpenLPWizard, WizardStrings
-from .pathedit import PathEdit, PathType
-from .spelltextedit import SpellTextEdit
-from .treewidgetwithdnd import TreeWidgetWithDnD
-
-__all__ = ['ColorButton', 'ListPreviewWidget', 'ListWidgetWithDnD', 'MediaDockManager', 'OpenLPDockWidget',
-           'OpenLPToolbar', 'OpenLPWizard', 'PathEdit', 'PathType', 'SpellTextEdit', 'TreeWidgetWithDnD',
-           'WizardStrings']

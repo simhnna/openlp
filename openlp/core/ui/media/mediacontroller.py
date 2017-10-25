@@ -31,8 +31,8 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.api.http import register_endpoint
 from openlp.core.common import extension_loader
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities
 from openlp.core.lib.ui import critical_error_message_box
@@ -42,7 +42,7 @@ from openlp.core.ui.media.vendor.mediainfoWrapper import MediaInfoWrapper
 from openlp.core.ui.media.mediaplayer import MediaPlayer
 from openlp.core.ui.media import MediaState, MediaInfo, MediaType, get_media_players, set_media_players,\
     parse_optical_path
-from openlp.core.ui.lib.toolbar import OpenLPToolbar
+from openlp.core.widgets.toolbar import OpenLPToolbar
 
 
 log = logging.getLogger(__name__)
@@ -91,7 +91,7 @@ class MediaSlider(QtWidgets.QSlider):
         QtWidgets.QSlider.mouseReleaseEvent(self, event)
 
 
-class MediaController(RegistryMixin, OpenLPMixin, RegistryProperties):
+class MediaController(RegistryBase, LogMixin, RegistryProperties):
     """
     The implementation of the Media Controller. The Media Controller adds an own class for every Player.
     Currently these are QtWebkit, Phonon and Vlc. display_controllers are an array of controllers keyed on the

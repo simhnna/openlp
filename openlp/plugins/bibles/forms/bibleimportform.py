@@ -41,7 +41,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib.db import delete_database
 from openlp.core.lib.exceptions import ValidationError
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
+from openlp.core.widgets.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.bibles.lib.db import clean_filename
 from openlp.plugins.bibles.lib.importers.http import CWExtract, BGExtract, BSExtract
 from openlp.plugins.bibles.lib.manager import BibleFormat

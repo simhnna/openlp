@@ -27,7 +27,7 @@ import logging
 
 from lxml import etree
 
-from openlp.core.ui.lib.wizard import WizardStrings
+from openlp.core.widgets.wizard import WizardStrings
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.ui import SongStrings
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics, OpenLyricsError

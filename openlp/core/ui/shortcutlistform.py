@@ -29,7 +29,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common.actions import ActionList
 from openlp.core.common.i18n import translate
-from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.settings import Settings
 from openlp.core.ui.shortcutlistdialog import Ui_ShortcutListDialog
 

@@ -31,17 +31,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import delete_file
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate, get_locale_key
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, rmtree
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action
 from openlp.core.ui import FileRenameForm, ThemeForm
-from openlp.core.ui.lib import OpenLPToolbar
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.toolbar import OpenLPToolbar
 
 
 class Ui_ThemeManager(object):
@@ -125,7 +125,7 @@ class Ui_ThemeManager(object):
         self.theme_list_widget.currentItemChanged.connect(self.check_list_state)
 
 
-class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManager, RegistryProperties):
+class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, RegistryProperties):
     """
     Manages the orders of Theme.
     """

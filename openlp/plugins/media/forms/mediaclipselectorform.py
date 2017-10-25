@@ -29,7 +29,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_win, is_linux, is_macosx
 from openlp.core.common.i18n import translate
-from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
 from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.media.vlcplayer import get_vlc

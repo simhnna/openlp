@@ -29,7 +29,8 @@ from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.theme import HorizontalType, BackgroundType, BackgroundGradientType
 from openlp.core.lib.ui import add_welcome_page, create_valign_selection_widgets
-from openlp.core.ui.lib import ColorButton, PathEdit
+from openlp.core.widgets.buttons import ColorButton
+from openlp.core.widgets.edits import PathEdit
 
 
 class Ui_ThemeWizard(object):

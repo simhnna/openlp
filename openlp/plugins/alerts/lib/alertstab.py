@@ -26,7 +26,7 @@ from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
 from openlp.core.lib.ui import create_valign_selection_widgets
-from openlp.core.ui.lib.colorbutton import ColorButton
+from openlp.core.widgets.buttons import ColorButton
 
 
 class AlertsTab(SettingsTab):

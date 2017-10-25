@@ -41,7 +41,8 @@ from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import LanguageManager, UiStrings, translate
 from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, str_to_path
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
 from openlp.core.display.renderer import Renderer
@@ -50,9 +51,8 @@ from openlp.core.lib.ui import create_action
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
-from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
-from openlp.core.ui.lib.filedialog import FileDialog
-from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.printserviceform import PrintServiceForm
 from openlp.core.ui.projector.manager import ProjectorManager

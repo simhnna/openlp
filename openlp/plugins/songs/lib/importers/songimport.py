@@ -29,7 +29,7 @@ from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import translate
 from openlp.core.common.path import copyfile, create_paths
 from openlp.core.common.registry import Registry
-from openlp.core.ui.lib.wizard import WizardStrings
+from openlp.core.widgets.wizard import WizardStrings
 from openlp.plugins.songs.lib import clean_song, VerseType
 from openlp.plugins.songs.lib.db import Song, Author, Topic, Book, MediaFile
 from openlp.plugins.songs.lib.ui import SongStrings

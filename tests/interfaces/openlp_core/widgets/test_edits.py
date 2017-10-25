@@ -28,7 +28,7 @@ from unittest.mock import MagicMock, call, patch
 from PyQt5 import QtCore, QtGui, QtTest, QtWidgets
 
 from openlp.core.common.registry import Registry
-from openlp.core.lib.searchedit import SearchEdit
+from openlp.core.widgets.edits import SearchEdit, HistoryComboBox
 
 from tests.helpers.testmixin import TestMixin
 
@@ -60,7 +60,7 @@ class TestSearchEdit(TestCase, TestMixin):
         Registry().register('main_window', self.main_window)
 
         settings_patcher = patch(
-            'openlp.core.lib.searchedit.Settings', return_value=MagicMock(**{'value.return_value': SearchTypes.First}))
+            'openlp.core.widgets.edits.Settings', return_value=MagicMock(**{'value.return_value': SearchTypes.First}))
         self.addCleanup(settings_patcher.stop)
         self.mocked_settings = settings_patcher.start()
 
@@ -135,3 +135,35 @@ class TestSearchEdit(TestCase, TestMixin):
         # THEN: The search edit text should be cleared and the button be hidden.
         assert not self.search_edit.text(), "The search edit should not have any text."
         assert self.search_edit.clear_button.isHidden(), "The clear button should be hidden."
+
+
+class TestHistoryComboBox(TestCase, TestMixin):
+    def setUp(self):
+        """
+        Some pre-test setup required.
+        """
+        Registry.create()
+        self.setup_application()
+        self.main_window = QtWidgets.QMainWindow()
+        Registry().register('main_window', self.main_window)
+        self.combo = HistoryComboBox(self.main_window)
+
+    def tearDown(self):
+        """
+        Delete all the C++ objects at the end so that we don't have a segfault
+        """
+        del self.combo
+        del self.main_window
+
+    def test_get_items(self):
+        """
+        Test the getItems() method
+        """
+        # GIVEN: The combo.
+
+        # WHEN: Add two items.
+        self.combo.addItem('test1')
+        self.combo.addItem('test2')
+
+        # THEN: The list of items should contain both strings.
+        self.assertEqual(self.combo.getItems(), ['test1', 'test2'])

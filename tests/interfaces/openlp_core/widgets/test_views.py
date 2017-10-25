@@ -20,7 +20,7 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    Package to test the openlp.core.ui.lib.listpreviewwidget.
+    Package to test the openlp.core.widgets.views.
 """
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
@@ -29,7 +29,7 @@ from PyQt5 import QtGui, QtWidgets
 
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem
-from openlp.core.ui.lib import ListWidgetWithDnD, ListPreviewWidget
+from openlp.core.widgets.views import ListPreviewWidget
 
 from tests.utils.osdinteraction import read_service_from_file
 from tests.helpers.testmixin import TestMixin
