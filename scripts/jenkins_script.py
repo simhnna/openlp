@@ -21,15 +21,24 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-This script helps to trigger builds of branches. To use it you have to install the jenkins-webapi package:
+This script helps to trigger builds of branches. To use it you have to install the python-jenkins module. On Fedora
+and Ubuntu/Debian, it is available as the ``python3-jenkins`` package::
 
-    pip3 install jenkins-webapi
+    $ sudo dnf/apt install python3-jenkins
 
-You probably want to create an alias. Add this to your ~/.bashrc file and then logout and login (to apply the alias):
+To make it easier to run you may want to create a shell script or an alias. To create an alias, add this to your
+``~/.bashrc`` (or ``~/.zshrc``) file and then log out and log back in again (to apply the alias)::
 
-    alias ci="python3 ./scripts/jenkins_script.py TOKEN"
+    alias ci="python3 /path/to/openlp_root/scripts/jenkins_script.py -u USERNAME -p PASSWORD"
 
-You can look up the token in the Branch-01-Pull job configuration or ask in IRC.
+To create a shell script, create the following file in a location in your ``$PATH`` (I called mine ``ci``)::
+
+    #!/bin/bash
+    python3 /path/to/openlp_root/scripts/jenkins_script.py -u USERNAME -p PASSWORD
+
+``USERNAME`` is your Jenkins username, and ``PASSWORD`` is your Jenkins password or personal token.
+
+An older version of this script used to use a shared TOKEN, but this has been replaced with the username and password.
 """
 import os
 import re
@@ -154,7 +163,7 @@ class JenkinsTrigger(object):
          variables from the :class:`OpenLPJobs` class.
         """
         self.current_build = self._get_build_info(job_name, self.build_number[job_name])
-        print('{:<60} [RUNNING]'.format(self.current_build['url']), end='', flush=True)
+        print('{:<70} [RUNNING]'.format(self.current_build['url']), end='', flush=True)
         is_success = False
         while self.current_build['building'] is True:
             time.sleep(0.5)
