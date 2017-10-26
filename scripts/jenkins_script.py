@@ -80,7 +80,7 @@ class JenkinsTrigger(object):
         """
         Create the JenkinsTrigger instance.
         """
-        self.build_numbers = {}
+        self.build_number = {}
         self.can_use_colour = can_use_colour and not os.name.startswith('nt')
         self.repo_name = get_repo_name()
         self.server = Jenkins(JENKINS_URL, username=username, password=password)
@@ -102,6 +102,7 @@ class JenkinsTrigger(object):
         # We just want the name (not the email).
         name = ' '.join(raw_output.decode().split()[:-1])
         cause = 'Build triggered by %s (%s)' % (name, self.repo_name)
+        self.fetch_build_numbers()
         self.server.build_job(OpenLPJobs.Branch_Pull, {'BRANCH_NAME': self.repo_name, 'cause': cause})
 
     def print_output(self):
@@ -117,7 +118,10 @@ class JenkinsTrigger(object):
 
         for job in OpenLPJobs.Jobs:
             if not self.__print_build_info(job):
-                print('Stopping after failure')
+                if self.current_build:
+                    print('Stopping after failure, see {}console for more details'.format(self.current_build['url']))
+                else:
+                    print('Stopping after failure')
                 break
 
     def open_browser(self):
@@ -149,21 +153,22 @@ class JenkinsTrigger(object):
         :param job_name: The name of the job we want the information from. For example *Branch-01-Pull*. Use the class
          variables from the :class:`OpenLPJobs` class.
         """
-        build_info = self._get_build_info(job_name, self.build_number[job_name])
-        print('{} ... '.format(build_info['url']), end='', flush=True)
+        self.current_build = self._get_build_info(job_name, self.build_number[job_name])
+        print('{:<60} [RUNNING]'.format(self.current_build['url']), end='', flush=True)
         is_success = False
-        while build_info['building'] is True:
+        while self.current_build['building'] is True:
             time.sleep(0.5)
-            build_info = self.server.get_build_info(job_name, self.build_number[job_name])
-        result_string = build_info['result']
-        if self.can_use_colour and result_string == 'SUCCESS':
-            # Make 'SUCCESS' green.
-            result_string = '%s%s%s' % (Colour.GREEN_START, result_string, Colour.GREEN_END)
-            is_success = True
-        elif self.can_use_colour:
-            # Make 'FAILURE' red.
-            result_string = '%s%s%s' % (Colour.RED_START, result_string, Colour.RED_END)
-        print('[{}]'.format(result_string))
+            self.current_build = self.server.get_build_info(job_name, self.build_number[job_name])
+        result_string = self.current_build['result']
+        is_success = result_string == 'SUCCESS'
+        if self.can_use_colour:
+            if is_success:
+                # Make 'SUCCESS' green.
+                result_string = '{}{}{}'.format(Colour.GREEN_START, result_string, Colour.GREEN_END)
+            else:
+                # Make 'FAILURE' red.
+                result_string = '{}{}{}'.format(Colour.RED_START, result_string, Colour.RED_END)
+        print('\b\b\b\b\b\b\b\b\b[{:>7}]'.format(result_string))
         return is_success
 
 
@@ -203,11 +208,11 @@ def main():
     Run the script
     """
     parser = ArgumentParser()
-    parser.add_argument('-d', '--disable-output', action='store_false', default=True, help='Disable output')
+    parser.add_argument('-d', '--disable-output', action='store_true', default=False, help='Disable output')
     parser.add_argument('-b', '--open-browser', action='store_true', default=False,
                         help='Opens the jenkins page in your browser')
-    parser.add_argument('-c', '--enable-colour', action='store_false', default=True,
-                        help='Enable coloured output. Disabled on Windows')
+    parser.add_argument('-n', '--no-colour', action='store_true', default=False,
+                        help='Disable coloured output (always disabled on Windows)')
     parser.add_argument('-u', '--username', required=True, help='Your Jenkins username')
     parser.add_argument('-p', '--password', required=True, help='Your Jenkins password or personal token')
     args = parser.parse_args()
@@ -215,7 +220,7 @@ def main():
     if not get_repo_name():
         print('Not a branch. Have you pushed it to launchpad? Did you cd to the branch?')
         return
-    jenkins_trigger = JenkinsTrigger(username=args.username, password=args.password)
+    jenkins_trigger = JenkinsTrigger(args.username, args.password, not args.no_colour)
     jenkins_trigger.trigger_build()
     # Open the browser before printing the output.
     if args.open_browser:
