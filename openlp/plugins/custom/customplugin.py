@@ -27,7 +27,8 @@ for the Custom Slides plugin.
 import logging
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.lib import Plugin, StringContent, build_icon, translate
+from openlp.core.common.i18n import translate
+from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.plugins.custom.endpoint import api_custom_endpoint, custom_endpoint
 from openlp.plugins.custom.lib import CustomMediaItem, CustomTab

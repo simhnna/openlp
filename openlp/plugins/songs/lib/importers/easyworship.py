@@ -30,8 +30,8 @@ import zlib
 
 import sqlite3
 
+from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path
-from openlp.core.lib import translate
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib import retrieve_windows_encoding, strip_rtf
 from .songimport import SongImport
@@ -44,7 +44,7 @@ NOTE_REGEX = re.compile(r'\(.*?\)')
 log = logging.getLogger(__name__)
 
 
-class FieldDescEntry:
+class FieldDescEntry(object):
     def __init__(self, name, field_type, size):
         self.name = name
         self.field_type = field_type

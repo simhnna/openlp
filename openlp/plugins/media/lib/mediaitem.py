@@ -25,15 +25,17 @@ import os
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, check_directory_exists, UiStrings,\
-    translate
-from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.path import Path, path_to_str, create_paths
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, MediaManagerItem, MediaType, ServiceItem, ServiceItemContext, \
     build_icon, check_item_selected
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box, create_horizontal_adjusting_combo_box
 from openlp.core.ui import DisplayControllerType
 from openlp.core.ui.media import get_media_players, set_media_players, parse_optical_path, format_milliseconds
-from openlp.core.common.languagemanager import get_locale_key
 from openlp.core.ui.media.vlcplayer import get_vlc
 
 if get_vlc() is not None:
@@ -302,7 +304,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         """
         self.list_view.clear()
         self.service_path = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
-        check_directory_exists(Path(self.service_path))
+        create_paths(Path(self.service_path))
         self.load_list([path_to_str(file) for file in Settings().value(self.settings_section + '/media files')])
         self.rebuild_players()
 

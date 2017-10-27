@@ -22,14 +22,16 @@
 """
 The Media plugin
 """
-
 import logging
 import os
 import re
+
 from PyQt5 import QtCore
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import AppLocation, translate, check_binary_exists
+from openlp.core.common import check_binary_exists
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.media.endpoint import api_media_endpoint, media_endpoint

@@ -27,9 +27,10 @@ import re
 
 from lxml import objectify, etree
 
-from openlp.core.common import get_file_encoding, translate
-from openlp.core.ui.lib.wizard import WizardStrings
-from .songimport import SongImport
+from openlp.core.common.i18n import translate
+from openlp.core.common import get_file_encoding
+from openlp.core.widgets.wizard import WizardStrings
+from openlp.plugins.songs.lib.importers.songimport import SongImport
 
 
 class PresentationManagerImport(SongImport):

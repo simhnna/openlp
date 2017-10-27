@@ -20,20 +20,19 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    :mod:`openlp.core.ui.projector.tab`
-
-    Provides the settings tab in the settings dialog.
+The :mod:`openlp.core.ui.projector.tab` module provides the settings tab in the settings dialog.
 """
-
 import logging
-log = logging.getLogger(__name__)
-log.debug('projectortab module loaded')
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common import Settings, UiStrings, translate
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
 from openlp.core.lib.projector import DialogSourceStyle
+
+log = logging.getLogger(__name__)
+log.debug('projectortab module loaded')
 
 
 class ProjectorTab(SettingsTab):

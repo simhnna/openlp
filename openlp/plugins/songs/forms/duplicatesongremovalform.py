@@ -28,8 +28,10 @@ import multiprocessing
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, translate
-from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
+from openlp.core.widgets.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.songs.lib import delete_song
 from openlp.plugins.songs.lib.db import Song
 from openlp.plugins.songs.forms.songreviewwidget import SongReviewWidget

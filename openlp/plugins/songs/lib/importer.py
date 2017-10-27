@@ -22,11 +22,11 @@
 """
 The :mod:`importer` modules provides the general song import functionality.
 """
-import os
 import logging
 
-from openlp.core.common import translate, UiStrings, is_win
-from openlp.core.ui.lib.wizard import WizardStrings
+from openlp.core.common import is_win
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.widgets.wizard import WizardStrings
 from .importers.opensong import OpenSongImport
 from .importers.easyslides import EasySlidesImport
 from .importers.openlp import OpenLPSongImport

@@ -21,10 +21,11 @@
 ###############################################################################
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
-from openlp.core.ui.lib import PathEdit, PathType
+from openlp.core.widgets.edits import PathEdit
+from openlp.core.widgets.enums import PathEditType
 
 
 class Ui_SongUsageDetailDialog(object):
@@ -68,7 +69,7 @@ class Ui_SongUsageDetailDialog(object):
         self.file_horizontal_layout.setSpacing(8)
         self.file_horizontal_layout.setContentsMargins(8, 8, 8, 8)
         self.file_horizontal_layout.setObjectName('file_horizontal_layout')
-        self.report_path_edit = PathEdit(self.file_group_box, path_type=PathType.Directories, show_revert=False)
+        self.report_path_edit = PathEdit(self.file_group_box, path_type=PathEditType.Directories, show_revert=False)
         self.file_horizontal_layout.addWidget(self.report_path_edit)
         self.vertical_layout.addWidget(self.file_group_box)
         self.button_box = create_button_box(song_usage_detail_dialog, 'button_box', ['cancel', 'ok'])

@@ -27,12 +27,14 @@ from datetime import datetime, timedelta
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import AppLocation, Settings, SlideLimits, UiStrings, translate
-from openlp.core.common.languagemanager import format_time
-from openlp.core.common.path import path_to_str
+from openlp.core.common import SlideLimits
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, format_time, translate
+from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab, build_icon
-from openlp.core.ui.lib import PathEdit, PathType
 from openlp.core.ui.style import HAS_DARK_STYLE
+from openlp.core.widgets.edits import PathEdit
+from openlp.core.widgets.enums import PathEditType
 
 log = logging.getLogger(__name__)
 
@@ -121,7 +123,7 @@ class AdvancedTab(SettingsTab):
         self.data_directory_layout.setObjectName('data_directory_layout')
         self.data_directory_new_label = QtWidgets.QLabel(self.data_directory_group_box)
         self.data_directory_new_label.setObjectName('data_directory_current_label')
-        self.data_directory_path_edit = PathEdit(self.data_directory_group_box, path_type=PathType.Directories,
+        self.data_directory_path_edit = PathEdit(self.data_directory_group_box, path_type=PathEditType.Directories,
                                                  default_path=AppLocation.get_directory(AppLocation.DataDir))
         self.data_directory_layout.addRow(self.data_directory_new_label, self.data_directory_path_edit)
         self.new_data_directory_has_files_label = QtWidgets.QLabel(self.data_directory_group_box)

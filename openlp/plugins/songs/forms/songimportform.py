@@ -26,11 +26,14 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import RegistryProperties, Settings, UiStrings, translate
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.settings import Settings
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.ui.lib import PathEdit, PathType
-from openlp.core.ui.lib.filedialog import FileDialog
-from openlp.core.ui.lib.wizard import OpenLPWizard, WizardStrings
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.edits import PathEdit
+from openlp.core.widgets.enums import PathEditType
+from openlp.core.widgets.wizard import OpenLPWizard, WizardStrings
 from openlp.plugins.songs.lib.importer import SongFormat, SongFormatSelect
 
 log = logging.getLogger(__name__)
@@ -191,7 +194,6 @@ class SongImportForm(OpenLPWizard, RegistryProperties):
         Re-implement the validateCurrentPage() method. Validate the current page before moving on to the next page.
         Provide each song format class with a chance to validate its input by overriding is_valid_source().
         """
-        completeChanged = QtCore.pyqtSignal()
         if self.currentPage() == self.welcome_page:
             return True
         elif self.currentPage() == self.source_page:
@@ -382,10 +384,10 @@ class SongImportForm(OpenLPWizard, RegistryProperties):
             file_path_label = QtWidgets.QLabel(import_widget)
             file_path_layout.addWidget(file_path_label)
             if select_mode == SongFormatSelect.SingleFile:
-                path_type = PathType.Files
+                path_type = PathEditType.Files
                 dialog_caption = WizardStrings.OpenTypeFile.format(file_type=format_name)
             else:
-                path_type = PathType.Directories
+                path_type = PathEditType.Directories
                 dialog_caption = WizardStrings.OpenTypeFolder.format(folder_name=format_name)
             path_edit = PathEdit(
                 parent=import_widget, path_type=path_type, dialog_caption=dialog_caption, show_revert=False)

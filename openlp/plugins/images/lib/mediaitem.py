@@ -24,14 +24,16 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, AppLocation, Settings, UiStrings, check_directory_exists, translate, \
-    delete_file, get_images_filter
-from openlp.core.common.path import Path
+from openlp.core.common import delete_file, get_images_filter
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.path import Path, create_paths
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, MediaManagerItem, ServiceItemContext, StringContent, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box
-from openlp.core.ui.lib.treewidgetwithdnd import TreeWidgetWithDnD
-from openlp.core.common.languagemanager import get_locale_key
+from openlp.core.widgets.views import TreeWidgetWithDnD
 from openlp.plugins.images.forms import AddGroupForm, ChooseGroupForm
 from openlp.plugins.images.lib.db import ImageFilenames, ImageGroups
 
@@ -99,7 +101,7 @@ class ImageMediaItem(MediaManagerItem):
         self.list_view.setIndentation(self.list_view.default_indentation)
         self.list_view.allow_internal_dnd = True
         self.service_path = AppLocation.get_section_data_path(self.settings_section) / 'thumbnails'
-        check_directory_exists(self.service_path)
+        create_paths(self.service_path)
         # Load images from the database
         self.load_full_list(
             self.manager.get_all_objects(ImageFilenames, order_by_ref=ImageFilenames.file_path), initial_load=True)

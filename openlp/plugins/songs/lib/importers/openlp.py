@@ -29,9 +29,9 @@ from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import class_mapper, mapper, relation, scoped_session, sessionmaker
 from sqlalchemy.orm.exc import UnmappedClassError
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.lib.db import BaseModel
-from openlp.core.ui.lib.wizard import WizardStrings
+from openlp.core.widgets.wizard import WizardStrings
 from openlp.plugins.songs.lib import clean_song
 from openlp.plugins.songs.lib.db import Author, Book, Song, Topic, MediaFile
 from .songimport import SongImport

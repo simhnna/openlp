@@ -30,9 +30,11 @@ import urllib.error
 
 from bs4 import BeautifulSoup, NavigableString, Tag
 
-from openlp.core.common import Registry, RegistryProperties, translate
-from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.common.httputils import get_web_page
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
+from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.bibles.lib import SearchResults
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB, BiblesResourcesDB, Book

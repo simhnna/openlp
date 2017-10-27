@@ -24,11 +24,14 @@ Provide plugin management
 """
 import os
 
+from openlp.core.common import extension_loader
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.registry import RegistryBase
 from openlp.core.lib import Plugin, PluginStatus
-from openlp.core.common import AppLocation, RegistryProperties, OpenLPMixin, RegistryMixin, extension_loader
 
 
-class PluginManager(RegistryMixin, OpenLPMixin, RegistryProperties):
+class PluginManager(RegistryBase, LogMixin, RegistryProperties):
     """
     This is the Plugin manager, which loads all the plugins,
     and executes all the hooks, as and when necessary.

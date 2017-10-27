@@ -19,7 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import os
 import logging
 import re
@@ -28,7 +27,9 @@ from datetime import datetime
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import translate, is_win, is_linux, is_macosx, RegistryProperties
+from openlp.core.common import is_win, is_linux, is_macosx
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import RegistryProperties
 from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.media.vlcplayer import get_vlc
@@ -683,7 +684,6 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         elif is_macosx():
             # Look for DVD folders in devices to find optical devices
             volumes = os.listdir('/Volumes')
-            candidates = list()
             for volume in volumes:
                 if volume.startswith('.'):
                     continue

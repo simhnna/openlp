@@ -20,45 +20,51 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    :mod:`openlp.core.lib.projector.pjlink` module
-    Provides the necessary functions for connecting to a PJLink-capable projector.
+The :mod:`openlp.core.lib.projector.pjlink` module provides the necessary functions for connecting to a PJLink-capable
+projector.
 
-    PJLink Class 1 Specifications.
-    http://pjlink.jbmia.or.jp/english/dl_class1.html
-        Section 5-1 PJLink Specifications
-        Section 5-5 Guidelines for Input Terminals
+PJLink Class 1 Specifications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    PJLink Class 2 Specifications.
-    http://pjlink.jbmia.or.jp/english/dl_class2.html
-        Section 5-1 PJLink Specifications
-        Section 5-5 Guidelines for Input Terminals
+Website: http://pjlink.jbmia.or.jp/english/dl_class1.html
 
-    NOTE:
-      Function names follow  the following syntax:
-            def process_CCCC(...):
-      WHERE:
-            CCCC = PJLink command being processed.
+- Section 5-1 PJLink Specifications
+- Section 5-5 Guidelines for Input Terminals
+
+PJLink Class 2 Specifications
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Website: http://pjlink.jbmia.or.jp/english/dl_class2.html
+
+- Section 5-1 PJLink Specifications
+- Section 5-5 Guidelines for Input Terminals
+
+.. note:
+    Function names follow the following syntax::
+
+        def process_CCCC(...):
+
+    where ``CCCC`` is the PJLink command being processed
 """
-
 import logging
-log = logging.getLogger(__name__)
-
-log.debug('pjlink loaded')
-
-__all__ = ['PJLink']
-
 import re
 from codecs import decode
 
 from PyQt5 import QtCore, QtNetwork
 
-from openlp.core.common import translate, qmd5_hash
+from openlp.core.common import qmd5_hash
+from openlp.core.common.i18n import translate
 from openlp.core.lib.projector.constants import CONNECTION_ERRORS, CR, ERROR_MSG, ERROR_STRING, \
     E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_INVALID_DATA, E_NETWORK, E_NOT_CONNECTED, E_OK, \
     E_PARAMETER, E_PROJECTOR, E_SOCKET_TIMEOUT, E_UNAVAILABLE, E_UNDEFINED, PJLINK_ERRORS, PJLINK_ERST_DATA, \
     PJLINK_ERST_STATUS, PJLINK_MAX_PACKET, PJLINK_PORT, PJLINK_POWR_STATUS, PJLINK_VALID_CMD, \
     STATUS_STRING, S_CONNECTED, S_CONNECTING, S_INFO, S_NETWORK_RECEIVED, S_NETWORK_SENDING, \
     S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STATUS
+
+log = logging.getLogger(__name__)
+log.debug('pjlink loaded')
+
+__all__ = ['PJLink']
 
 # Shortcuts
 SocketError = QtNetwork.QAbstractSocket.SocketError
@@ -508,7 +514,7 @@ class PJLinkCommands(object):
                 self.sw_version_received = data
 
 
-class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
+class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
     """
     Socket service for PJLink TCP socket.
     """

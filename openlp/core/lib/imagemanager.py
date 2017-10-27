@@ -31,8 +31,10 @@ import queue
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, Settings
-from openlp.core.lib import ScreenList, resize_image, image_to_byte
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
+from openlp.core.display.screens import ScreenList
+from openlp.core.lib import resize_image, image_to_byte
 
 log = logging.getLogger(__name__)
 

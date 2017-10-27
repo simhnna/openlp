@@ -23,12 +23,11 @@
 The :mod:`db` module provides the database and schema that is the backend for
 the Custom plugin
 """
-
 from sqlalchemy import Column, Table, types
 from sqlalchemy.orm import mapper
 
+from openlp.core.common.i18n import get_locale_key
 from openlp.core.lib.db import BaseModel, init_db
-from openlp.core.common.languagemanager import get_locale_key
 
 
 class CustomSlide(BaseModel):

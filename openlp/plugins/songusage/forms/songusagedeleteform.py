@@ -22,9 +22,10 @@
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import RegistryProperties, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import RegistryProperties
 from openlp.plugins.songusage.lib.db import SongUsageItem
-from .songusagedeletedialog import Ui_SongUsageDeleteDialog
+from openlp.plugins.songusage.forms.songusagedeletedialog import Ui_SongUsageDeleteDialog
 
 
 class SongUsageDeleteForm(QtWidgets.QDialog, Ui_SongUsageDeleteDialog, RegistryProperties):

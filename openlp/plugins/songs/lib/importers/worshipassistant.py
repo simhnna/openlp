@@ -23,12 +23,12 @@
 The :mod:`worshipassistant` module provides the functionality for importing
 Worship Assistant songs into the OpenLP database.
 """
-import chardet
 import csv
 import logging
 import re
 
-from openlp.core.common import get_file_encoding, translate
+from openlp.core.common import get_file_encoding
+from openlp.core.common.i18n import translate
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 

@@ -28,17 +28,20 @@ from xml.etree.ElementTree import ElementTree, XML
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import Registry, RegistryProperties, AppLocation, Settings, OpenLPMixin, RegistryMixin, \
-    UiStrings, check_directory_exists, translate, delete_file
-from openlp.core.common.languagemanager import get_locale_key
-from openlp.core.common.path import Path, copyfile, path_to_str, rmtree
+from openlp.core.common import delete_file
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, rmtree
+from openlp.core.common.registry import Registry, RegistryBase
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action
 from openlp.core.ui import FileRenameForm, ThemeForm
-from openlp.core.ui.lib import OpenLPToolbar
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.toolbar import OpenLPToolbar
 
 
 class Ui_ThemeManager(object):
@@ -122,7 +125,7 @@ class Ui_ThemeManager(object):
         self.theme_list_widget.currentItemChanged.connect(self.check_list_state)
 
 
-class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManager, RegistryProperties):
+class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, RegistryProperties):
     """
     Manages the orders of Theme.
     """
@@ -176,9 +179,8 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         :rtype: None
         """
         self.theme_path = AppLocation.get_section_data_path(self.settings_section)
-        check_directory_exists(self.theme_path)
         self.thumb_path = self.theme_path / 'thumbnails'
-        check_directory_exists(self.thumb_path)
+        create_paths(self.theme_path, self.thumb_path)
 
     def check_list_state(self, item, field=None):
         """
@@ -594,7 +596,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                         # is directory or preview file
                         continue
                     full_name = directory_path / zipped_file_rel_path
-                    check_directory_exists(full_name.parent)
+                    create_paths(full_name.parent)
                     if zipped_file_rel_path.suffix.lower() == '.xml' or zipped_file_rel_path.suffix.lower() == '.json':
                         file_xml = str(theme_zip.read(zipped_file), 'utf-8')
                         with full_name.open('w', encoding='utf-8') as out_file:
@@ -661,7 +663,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         name = theme.theme_name
         theme_pretty = theme.export_theme(self.theme_path)
         theme_dir = self.theme_path / name
-        check_directory_exists(theme_dir)
+        create_paths(theme_dir)
         theme_path = theme_dir / '{file_name}.json'.format(file_name=name)
         try:
                 theme_path.write_text(theme_pretty)

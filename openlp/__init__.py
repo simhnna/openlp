@@ -22,7 +22,3 @@
 """
 The :mod:`openlp` module contains all the project produced OpenLP functionality
 """
-
-from openlp import core, plugins
-
-__all__ = ['core', 'plugins']

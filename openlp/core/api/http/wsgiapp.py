@@ -31,7 +31,7 @@ import re
 from webob import Request, Response
 from webob.static import DirectoryApp
 
-from openlp.core.common import AppLocation
+from openlp.core.common.applocation import AppLocation
 from openlp.core.api.http.errors import HttpError, NotFound, ServerError
 
 

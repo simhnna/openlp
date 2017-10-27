@@ -25,7 +25,7 @@ This module contains tests for the OpenLP song importer.
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.plugins.songs.lib.importers.openlp import OpenLPSongImport
 
 

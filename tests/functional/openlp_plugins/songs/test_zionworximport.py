@@ -26,7 +26,7 @@ import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import Registry
+from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.zionworx import ZionWorxImport
 from openlp.plugins.songs.lib.importers.songimport import SongImport

@@ -19,7 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import chardet
 import logging
 import os
@@ -33,7 +32,9 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import class_mapper, mapper, relation
 from sqlalchemy.orm.exc import UnmappedClassError
 
-from openlp.core.common import AppLocation, translate, clean_filename
+from openlp.core.common import clean_filename
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import translate
 from openlp.core.lib.db import BaseModel, init_db, Manager
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.bibles.lib import BibleStrings, LanguageSelection, upgrade
@@ -546,7 +547,7 @@ class BiblesResourcesDB(QtCore.QObject, Manager):
         """
         log.debug('BiblesResourcesDB.get_book_like("{text}")'.format(text=string))
         if not isinstance(string, str):
-            name = str(string)
+            string = str(string)
         books = BiblesResourcesDB.run_sql(
             'SELECT id, testament_id, name, abbreviation, chapters FROM book_reference WHERE '
             'LOWER(name) LIKE ? OR LOWER(abbreviation) LIKE ?',

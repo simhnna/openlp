@@ -24,9 +24,9 @@ The UI widgets of the print service dialog.
 """
 from PyQt5 import QtCore, QtWidgets, QtPrintSupport
 
-from openlp.core.common import UiStrings, translate
+from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.lib import build_icon
-from openlp.core.ui.lib import SpellTextEdit
+from openlp.core.widgets.edits import SpellTextEdit
 
 
 class ZoomSize(object):

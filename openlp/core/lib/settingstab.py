@@ -23,12 +23,9 @@
 The :mod:`~openlp.core.lib.settingstab` module contains the base SettingsTab class which plugins use for adding their
 own tab to the settings dialog.
 """
-
-
 from PyQt5 import QtWidgets
 
-
-from openlp.core.common import RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
 
 
 class SettingsTab(QtWidgets.QWidget, RegistryProperties):

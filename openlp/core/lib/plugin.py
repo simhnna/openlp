@@ -26,7 +26,10 @@ import logging
 
 from PyQt5 import QtCore
 
-from openlp.core.common import Registry, RegistryProperties, Settings, UiStrings
+from openlp.core.common.i18n import UiStrings
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.version import get_version
 
 log = logging.getLogger(__name__)

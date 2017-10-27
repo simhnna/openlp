@@ -23,7 +23,7 @@
 The :mod:`openlp.plugins.songs.lib.ui` module provides standard UI components
 for the songs plugin.
 """
-from openlp.core.lib import translate
+from openlp.core.common.i18n import translate
 
 
 class SongStrings(object):

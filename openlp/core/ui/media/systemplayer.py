@@ -28,7 +28,7 @@ import mimetypes
 
 from PyQt5 import QtCore, QtMultimedia, QtMultimediaWidgets
 
-from openlp.core.lib import translate
+from openlp.core.common.i18n import translate
 from openlp.core.ui.media import MediaState
 from openlp.core.ui.media.mediaplayer import MediaPlayer
 

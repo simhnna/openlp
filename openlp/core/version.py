@@ -34,7 +34,8 @@ from subprocess import Popen, PIPE
 import requests
 from PyQt5 import QtCore
 
-from openlp.core.common import AppLocation, Settings
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.settings import Settings
 from openlp.core.threading import run_thread
 
 log = logging.getLogger(__name__)

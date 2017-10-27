@@ -26,9 +26,10 @@ import logging
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import RegistryProperties, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import RegistryProperties
 from openlp.core.lib import PluginStatus
-from .plugindialog import Ui_PluginViewDialog
+from openlp.core.ui.plugindialog import Ui_PluginViewDialog
 
 log = logging.getLogger(__name__)
 

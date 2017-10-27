@@ -22,7 +22,7 @@
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 from openlp.plugins.bibles.lib import LanguageSelection, BibleStrings

@@ -19,31 +19,31 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 """
 The :mod:`http` module contains the API web server. This is a lightweight web server used by remotes to interact
 with OpenLP. It uses JSON to communicate with the remotes.
 """
-
 import logging
 import time
 
 from PyQt5 import QtCore, QtWidgets
 from waitress import serve
 
-from openlp.core.api.http import register_endpoint
-from openlp.core.api.http import application
-from openlp.core.common import AppLocation, RegistryMixin, RegistryProperties, OpenLPMixin, \
-    Settings, Registry, UiStrings, check_directory_exists
-from openlp.core.lib import translate
-
 from openlp.core.api.deploy import download_and_check, download_sha256
-from openlp.core.api.poll import Poller
 from openlp.core.api.endpoint.controller import controller_endpoint, api_controller_endpoint
 from openlp.core.api.endpoint.core import chords_endpoint, stage_endpoint, blank_endpoint, main_endpoint
 from openlp.core.api.endpoint.service import service_endpoint, api_service_endpoint
 from openlp.core.api.endpoint.remote import remote_endpoint
-
+from openlp.core.api.http import register_endpoint
+from openlp.core.api.http import application
+from openlp.core.api.poll import Poller
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import UiStrings
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.path import create_paths
+from openlp.core.common.registry import Registry, RegistryBase
+from openlp.core.common.settings import Settings
+from openlp.core.common.i18n import translate
 
 log = logging.getLogger(__name__)
 
@@ -73,7 +73,7 @@ class HttpWorker(QtCore.QObject):
         pass
 
 
-class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
+class HttpServer(RegistryBase, RegistryProperties, LogMixin):
     """
     Wrapper round a server instance
     """
@@ -115,11 +115,11 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         Create the internal file structure if it does not exist
         :return:
         """
-        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'assets')
-        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'images')
-        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'static')
-        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'static' / 'index')
-        check_directory_exists(AppLocation.get_section_data_path('remotes') / 'templates')
+        create_paths(AppLocation.get_section_data_path('remotes') / 'assets',
+                     AppLocation.get_section_data_path('remotes') / 'images',
+                     AppLocation.get_section_data_path('remotes') / 'static',
+                     AppLocation.get_section_data_path('remotes') / 'static' / 'index',
+                     AppLocation.get_section_data_path('remotes') / 'templates')
 
     def first_time(self):
         """

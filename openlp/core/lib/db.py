@@ -29,17 +29,19 @@ import os
 from copy import copy
 from urllib.parse import quote_plus as urlquote
 
-from sqlalchemy import Table, MetaData, Column, types, create_engine, UnicodeText
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
+from sqlalchemy import Table, MetaData, Column, UnicodeText, types, create_engine
 from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import SQLAlchemyError, InvalidRequestError, DBAPIError, OperationalError, ProgrammingError
 from sqlalchemy.orm import scoped_session, sessionmaker, mapper
 from sqlalchemy.pool import NullPool
 
-from alembic.migration import MigrationContext
-from alembic.operations import Operations
-
-from openlp.core.common import AppLocation, Settings, delete_file, translate
+from openlp.core.common import delete_file
+from openlp.core.common.applocation import AppLocation
+from openlp.core.common.i18n import translate
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
+from openlp.core.common.settings import Settings
 from openlp.core.lib.ui import critical_error_message_box
 
 log = logging.getLogger(__name__)
@@ -348,6 +350,7 @@ class Manager(object):
             resulting in the plugin_name being used.
         :param upgrade_mod: The upgrade_schema function for this database
         """
+        super().__init__()
         self.is_dirty = False
         self.session = None
         self.db_url = None

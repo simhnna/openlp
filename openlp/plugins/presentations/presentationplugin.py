@@ -29,7 +29,8 @@ import logging
 from PyQt5 import QtCore
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common import extension_loader, translate
+from openlp.core.common import extension_loader
+from openlp.core.common.i18n import translate
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.presentations.endpoint import api_presentations_endpoint, presentations_endpoint
 from openlp.plugins.presentations.lib import PresentationController, PresentationMediaItem, PresentationTab

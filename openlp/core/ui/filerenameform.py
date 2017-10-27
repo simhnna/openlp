@@ -22,12 +22,12 @@
 """
 The file rename dialog.
 """
-
 from PyQt5 import QtCore, QtWidgets
 
-from .filerenamedialog import Ui_FileRenameDialog
-
-from openlp.core.common import Registry, RegistryProperties, translate
+from openlp.core.common.i18n import translate
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
+from openlp.core.ui.filerenamedialog import Ui_FileRenameDialog
 
 
 class FileRenameForm(QtWidgets.QDialog, Ui_FileRenameDialog, RegistryProperties):

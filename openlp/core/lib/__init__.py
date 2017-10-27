@@ -29,9 +29,9 @@ import os
 import re
 import math
 
-from PyQt5 import QtCore, QtGui, Qt, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import translate
+from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path
 
 log = logging.getLogger(__name__ + '.__init__')
@@ -612,7 +612,6 @@ def create_separated_list(string_list):
 
 
 from .exceptions import ValidationError
-from .screen import ScreenList
 from .formattingtags import FormattingTags
 from .plugin import PluginStatus, StringContent, Plugin
 from .pluginmanager import PluginManager
@@ -620,7 +619,6 @@ from .settingstab import SettingsTab
 from .serviceitem import ServiceItem, ServiceItemType, ItemCapabilities
 from .htmlbuilder import build_html, build_lyrics_format_css, build_lyrics_outline_css, build_chords_css
 from .imagemanager import ImageManager
-from .renderer import Renderer
 from .mediamanageritem import MediaManagerItem
 from .projector.db import ProjectorDB, Projector
 from .projector.pjlink import PJLink
