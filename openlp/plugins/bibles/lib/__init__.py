@@ -224,13 +224,13 @@ def update_reference_separators():
     range_regex = '(?:(?P<from_chapter>[0-9]+){sep_v})?' \
         '(?P<from_verse>[0-9]+)(?P<range_to>{sep_r}(?:(?:(?P<to_chapter>' \
         '[0-9]+){sep_v})?(?P<to_verse>[0-9]+)|{sep_e})?)?'.format_map(REFERENCE_SEPARATORS)
-    REFERENCE_MATCHES['range'] = re.compile(r'^\s*{range}\s*$'.format(range=range_regex), re.UNICODE)
-    REFERENCE_MATCHES['range_separator'] = re.compile(REFERENCE_SEPARATORS['sep_l'], re.UNICODE)
+    REFERENCE_MATCHES['range'] = re.compile(r'^\s*{range}\s*$'.format(range=range_regex))
+    REFERENCE_MATCHES['range_separator'] = re.compile(REFERENCE_SEPARATORS['sep_l'])
     # full reference match: <book>(<range>(,(?!$)|(?=$)))+
     REFERENCE_MATCHES['full'] = \
         re.compile(r'^\s*(?!\s)(?P<book>[\d]*[.]?[^\d\.]+)\.*(?<!\s)\s*'
                    r'(?P<ranges>(?:{range_regex}(?:{sep_l}(?!\s*$)|(?=\s*$)))+)\s*$'.format(
-                       range_regex=range_regex, sep_l=REFERENCE_SEPARATORS['sep_l']), re.UNICODE)
+                       range_regex=range_regex, sep_l=REFERENCE_SEPARATORS['sep_l']))
 
 
 def get_reference_separator(separator_type):

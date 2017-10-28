@@ -43,9 +43,13 @@ log = logging.getLogger(__name__ + '.__init__')
 
 FIRST_CAMEL_REGEX = re.compile('(.)([A-Z][a-z]+)')
 SECOND_CAMEL_REGEX = re.compile('([a-z0-9])([A-Z])')
-CONTROL_CHARS = re.compile(r'[\x00-\x1F\x7F-\x9F]', re.UNICODE)
-INVALID_FILE_CHARS = re.compile(r'[\\/:\*\?"<>\|\+\[\]%]', re.UNICODE)
+CONTROL_CHARS = re.compile(r'[\x00-\x1F\x7F-\x9F]')
+INVALID_FILE_CHARS = re.compile(r'[\\/:\*\?"<>\|\+\[\]%]')
 IMAGES_FILTER = None
+REPLACMENT_CHARS_MAP = str.maketrans({'\u2018': '\'', '\u2019': '\'', '\u201c': '"', '\u201d': '"', '\u2026': '...',
+                                      '\u2013': '-', '\u2014': '-', '\v': '\n\n', '\f': '\n\n'})
+NEW_LINE_REGEX = re.compile(r' ?(\r\n?|\n) ?')
+WHITESPACE_REGEX = re.compile(r'[ \t]+')
 
 
 def trace_error_handler(logger):
@@ -436,3 +440,13 @@ def get_file_encoding(file_path):
         return detector.result
     except OSError:
         log.exception('Error detecting file encoding')
+
+def normalize_str(irreg_str):
+    """
+
+    :param str irreg_str:
+    :return:
+    """
+    irreg_str = irreg_str.translate(REPLACMENT_CHARS_MAP)
+    irreg_str = NEW_LINE_REGEX.sub('\n', irreg_str)
+    return WHITESPACE_REGEX.sub(' ', irreg_str)

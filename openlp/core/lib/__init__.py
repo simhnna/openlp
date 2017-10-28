@@ -38,7 +38,6 @@ log = logging.getLogger(__name__ + '.__init__')
 
 SLIMCHARS = 'fiíIÍjlĺľrtť.,;/ ()|"\'!:\\'
 
-
 class ServiceItemContext(object):
     """
     The context in which a Service Item is being generated

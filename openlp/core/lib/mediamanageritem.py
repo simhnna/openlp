@@ -92,7 +92,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         Run some initial setup. This method is separate from __init__ in order to mock it out in tests.
         """
         self.hide()
-        self.whitespace = re.compile(r'[\W_]+', re.UNICODE)
+        self.whitespace = re.compile(r'[\W_]+')
         visible_title = self.plugin.get_string(StringContent.VisibleName)
         self.title = str(visible_title['title'])
         Registry().register(self.plugin.name, self)
