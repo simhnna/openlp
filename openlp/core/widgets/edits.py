@@ -27,6 +27,7 @@ import re
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from openlp.core.common import CONTROL_CHARS
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.common.settings import Settings
@@ -470,12 +471,21 @@ class SpellTextEdit(QtWidgets.QPlainTextEdit):
                     cursor.insertText(html['start tag'])
                     cursor.insertText(html['end tag'])
 
+    def insertFromMimeData(self, source):
+        """
+        Reimplement `insertFromMimeData` so that we can remove any control characters
+
+        :param QtCore.QMimeData source: The mime data to insert
+        :rtype: None
+        """
+        self.insertPlainText(CONTROL_CHARS.sub('', source.text()))
+
 
 class Highlighter(QtGui.QSyntaxHighlighter):
     """
     Provides a text highlighter for pointing out spelling errors in text.
     """
-    WORDS = r'(?iu)[\w\']+'
+    WORDS = r'(?i)[\w\']+'
 
     def __init__(self, *args):
         """
