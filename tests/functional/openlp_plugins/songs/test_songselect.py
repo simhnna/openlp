@@ -135,7 +135,7 @@ class TestSongSelectImport(TestCase, TestMixin):
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
-    def login_url_from_form_test(self, MockedBeautifulSoup, mocked_build_opener):
+    def test_login_url_from_form(self, MockedBeautifulSoup, mocked_build_opener):
         """
         Test that the login URL is from the form
         """

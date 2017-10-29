@@ -347,7 +347,7 @@ class TestInit(TestCase, TestMixin):
             self.assertTrue(mocked_log.exception.called)
             self.assertFalse(result, 'delete_file should return False when an OSError is raised')
 
-    def test_get_file_encoding_done_test(self):
+    def test_get_file_encoding_done(self):
         """
         Test get_file_encoding when the detector sets done to True
         """
@@ -368,7 +368,7 @@ class TestInit(TestCase, TestMixin):
             mocked_universal_detector_inst.close.assert_called_once_with()
             self.assertEqual(result, encoding_result)
 
-    def test_get_file_encoding_eof_test(self):
+    def test_get_file_encoding_eof(self):
         """
         Test get_file_encoding when the end of the file is reached
         """
@@ -390,7 +390,7 @@ class TestInit(TestCase, TestMixin):
             mocked_universal_detector_inst.close.assert_called_once_with()
             self.assertEqual(result, encoding_result)
 
-    def test_get_file_encoding_oserror_test(self):
+    def test_get_file_encoding_oserror(self):
         """
         Test get_file_encoding when the end of the file is reached
         """

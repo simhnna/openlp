@@ -62,7 +62,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
         self.assertTrue('OpenLP 3.1.5 build 3000' in about_form.about_text_edit.toPlainText(),
                         "The build number should be set correctly")
 
-    def test_about_form_date_test(self):
+    def test_about_form_date(self):
         """
         Test that the copyright date is included correctly
         """
