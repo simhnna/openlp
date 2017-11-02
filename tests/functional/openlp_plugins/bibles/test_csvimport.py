@@ -66,7 +66,7 @@ class TestCSVImport(TestCase):
         self.assertEqual(importer.books_file, 'books.csv')
         self.assertEqual(importer.verses_file, 'verse.csv')
 
-    def book_namedtuple_test(self):
+    def test_book_namedtuple(self):
         """
         Test that the Book namedtuple is created as expected
         """
@@ -80,7 +80,7 @@ class TestCSVImport(TestCase):
         self.assertEqual(result.name, 'name')
         self.assertEqual(result.abbreviation, 'abbreviation')
 
-    def verse_namedtuple_test(self):
+    def test_verse_namedtuple(self):
         """
         Test that the Verse namedtuple is created as expected
         """
@@ -94,7 +94,7 @@ class TestCSVImport(TestCase):
         self.assertEqual(result.number, 'number')
         self.assertEqual(result.text, 'text')
 
-    def get_book_name_id_test(self):
+    def test_get_book_name_id(self):
         """
         Test that get_book_name() returns the correct book when called with an id
         """
@@ -109,7 +109,7 @@ class TestCSVImport(TestCase):
             # THEN: get_book_name() should return the book name associated with that id from the books dictionary
             self.assertEqual(actual_result, expected_result)
 
-    def get_book_name_test(self):
+    def test_get_book_name(self):
         """
         Test that get_book_name() returns the name when called with a non integer value
         """
@@ -124,7 +124,7 @@ class TestCSVImport(TestCase):
             # THEN: get_book_name() should return the input
             self.assertEqual(actual_result, expected_result)
 
-    def parse_csv_file_test(self):
+    def test_parse_csv_file(self):
         """
         Test the parse_csv_file() with sample data
         """
@@ -147,7 +147,7 @@ class TestCSVImport(TestCase):
             mocked_open.assert_called_once_with('file.csv', 'r', encoding='utf-8', newline='')
             mocked_reader.assert_called_once_with(ANY, delimiter=',', quotechar='"')
 
-    def parse_csv_file_oserror_test(self):
+    def test_parse_csv_file_oserror(self):
         """
         Test the parse_csv_file() handles an OSError correctly
         """
@@ -162,7 +162,7 @@ class TestCSVImport(TestCase):
                 CSVBible.parse_csv_file('file.csv', None)
             self.assertEqual(context.exception.msg, 'Parsing "file.csv" failed')
 
-    def parse_csv_file_csverror_test(self):
+    def test_parse_csv_file_csverror(self):
         """
         Test the parse_csv_file() handles an csv.Error correctly
         """
@@ -178,7 +178,7 @@ class TestCSVImport(TestCase):
                 CSVBible.parse_csv_file('file.csv', None)
             self.assertEqual(context.exception.msg, 'Parsing "file.csv" failed')
 
-    def process_books_stopped_import_test(self):
+    def test_process_books_stopped_import(self):
         """
         Test process books when the import is stopped
         """
@@ -197,7 +197,7 @@ class TestCSVImport(TestCase):
             self.assertFalse(importer.wizard.increment_progress_bar.called)
             self.assertEqual(result, {})
 
-    def process_books_test(self):
+    def test_process_books(self):
         """
         Test process books when it completes successfully
         """
@@ -222,7 +222,7 @@ class TestCSVImport(TestCase):
                              [call('1. Mosebog', 2, 10), call('2. Mosebog', 2, 10)])
             self.assertDictEqual(result, {1: '1. Mosebog', 2: '2. Mosebog'})
 
-    def process_verses_stopped_import_test(self):
+    def test_process_verses_stopped_import(self):
         """
         Test process_verses when the import is stopped
         """
@@ -242,7 +242,7 @@ class TestCSVImport(TestCase):
             self.assertFalse(importer.get_book_name.called)
             self.assertIsNone(result)
 
-    def process_verses_successful_test(self):
+    def test_process_verses_successful(self):
         """
         Test process_verses when the import is successful
         """
@@ -274,7 +274,7 @@ class TestCSVImport(TestCase):
                               call('1', 1, 2, 'Og Jorden var øde og tom, og der var Mørke over Verdensdybet. '
                                               'Men Guds Ånd svævede over Vandene.')])
 
-    def do_import_invalid_language_id_test(self):
+    def test_do_import_invalid_language_id(self):
         """
         Test do_import when the user cancels the language selection dialog box
         """
@@ -291,7 +291,7 @@ class TestCSVImport(TestCase):
             importer.get_language.assert_called_once_with('Bible Name')
             self.assertFalse(result)
 
-    def do_import_success_test(self):
+    def test_do_import_success(self):
         """
         Test do_import when the import succeeds
         """
@@ -317,7 +317,7 @@ class TestCSVImport(TestCase):
             importer.process_verses.assert_called_once_with(['Verse 1'], ['Book 1'])
             self.assertTrue(result)
 
-    def file_import_test(self):
+    def test_file_import(self):
         """
         Test the actual import of CSV Bible file
         """
