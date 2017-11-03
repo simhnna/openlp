@@ -103,7 +103,7 @@ def get_text_file_string(text_file_path):
                 # no BOM was found
                 file_handle.seek(0)
             content = file_handle.read()
-    except (IOError, UnicodeError):
+    except (OSError, UnicodeError):
         log.exception('Failed to open text file {text}'.format(text=text_file_path))
     return content
 

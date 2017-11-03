@@ -609,7 +609,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 if not os.path.exists(save_file):
                     shutil.copy(audio_from, save_file)
                 zip_file.write(audio_from, audio_to)
-        except IOError:
+        except OSError:
             self.log_exception('Failed to save service to disk: {name}'.format(name=temp_file_name))
             self.main_window.error_message(translate('OpenLP.ServiceManager', 'Error Saving File'),
                                            translate('OpenLP.ServiceManager', 'There was an error saving your file.'))
@@ -670,7 +670,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             zip_file = zipfile.ZipFile(temp_file_name, 'w', zipfile.ZIP_STORED, True)
             # First we add service contents.
             zip_file.writestr(service_file_name, service_content)
-        except IOError:
+        except OSError:
             self.log_exception('Failed to save service to disk: {name}'.format(name=temp_file_name))
             self.main_window.error_message(translate('OpenLP.ServiceManager', 'Error Saving File'),
                                            translate('OpenLP.ServiceManager', 'There was an error saving your file.'))
@@ -802,11 +802,11 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             else:
                 critical_error_message_box(message=translate('OpenLP.ServiceManager', 'File is not a valid service.'))
                 self.log_error('File contains no service data')
-        except (IOError, NameError):
+        except (OSError, NameError):
             self.log_exception('Problem loading service file {name}'.format(name=file_name))
             critical_error_message_box(message=translate('OpenLP.ServiceManager',
                                        'File could not be opened because it is corrupt.'))
-        except zipfile.BadZipfile:
+        except zipfile.BadZipFile:
             if os.path.getsize(file_name) == 0:
                 self.log_exception('Service file is zero sized: {name}'.format(name=file_name))
                 QtWidgets.QMessageBox.information(self, translate('OpenLP.ServiceManager', 'Empty File'),

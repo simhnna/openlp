@@ -1367,7 +1367,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                               '- Please wait for copy to finish').format(path=self.new_data_path))
                 dir_util.copy_tree(str(old_data_path), str(self.new_data_path))
                 log.info('Copy successful')
-            except (IOError, os.error, DistutilsFileError) as why:
+            except (OSError, DistutilsFileError) as why:
                 self.application.set_normal_cursor()
                 log.exception('Data copy failed {err}'.format(err=str(why)))
                 err_text = translate('OpenLP.MainWindow',

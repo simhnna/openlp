@@ -604,7 +604,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
                     else:
                         with full_name.open('wb') as out_file:
                             out_file.write(theme_zip.read(zipped_file))
-        except (IOError, zipfile.BadZipfile):
+        except (OSError, zipfile.BadZipFile):
             self.log_exception('Importing theme from zip failed {name}'.format(name=file_path))
             raise ValidationError
         except ValidationError:
@@ -667,7 +667,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
         theme_path = theme_dir / '{file_name}.json'.format(file_name=name)
         try:
                 theme_path.write_text(theme_pretty)
-        except IOError:
+        except OSError:
             self.log_exception('Saving theme to file failed')
         if image_source_path and image_destination_path:
             if self.old_background_image_path and image_destination_path != self.old_background_image_path:
@@ -675,7 +675,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
             if image_source_path != image_destination_path:
                 try:
                     copyfile(image_source_path, image_destination_path)
-                except IOError:
+                except OSError:
                     self.log_exception('Failed to save theme image')
         self.generate_and_save_image(name, theme)
 

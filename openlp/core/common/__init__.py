@@ -343,7 +343,7 @@ def delete_file(file_path):
         if file_path.exists():
             file_path.unlink()
         return True
-    except (IOError, OSError):
+    except OSError:
         log.exception('Unable to delete file {file_path}'.format(file_path=file_path))
         return False
 
