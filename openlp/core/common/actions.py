@@ -366,6 +366,7 @@ class ActionList(object):
                 continue
             if existing_action in affected_actions:
                 return False
+            print(existing_action.shortcutContext())
             if existing_action.shortcutContext() in [QtCore.Qt.WindowShortcut, QtCore.Qt.ApplicationShortcut]:
                 return False
             elif action in self.get_all_child_objects(existing_action.parent()):
