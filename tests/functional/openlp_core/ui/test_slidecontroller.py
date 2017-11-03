@@ -691,7 +691,7 @@ class TestSlideController(TestCase):
         ])
 
     @patch('openlp.core.ui.slidecontroller.Settings')
-    def on_preview_double_click_unblank_display_test(self, MockedSettings):
+    def test_on_preview_double_click_unblank_display(self, MockedSettings):
         # GIVEN: A slide controller, actions needed, settins set to True.
         slide_controller = SlideController(None)
         mocked_settings = MagicMock()
@@ -714,7 +714,7 @@ class TestSlideController(TestCase):
         self.assertEqual(0, slide_controller.on_preview_add_to_service.call_count, 'Should have not been called.')
 
     @patch('openlp.core.ui.slidecontroller.Settings')
-    def on_preview_double_click_add_to_service_test(self, MockedSettings):
+    def test_on_preview_double_click_add_to_service(self, MockedSettings):
         # GIVEN: A slide controller, actions needed, settins set to False.
         slide_controller = SlideController(None)
         mocked_settings = MagicMock()

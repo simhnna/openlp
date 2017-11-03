@@ -68,7 +68,7 @@ class TestOsisImport(TestCase):
         # THEN: The importer should be an instance of BibleDB
         self.assertIsInstance(importer, BibleDB)
 
-    def process_books_stop_import_test(self):
+    def test_process_books_stop_import(self):
         """
         Test process_books when stop_import is set to True
         """
@@ -83,7 +83,7 @@ class TestOsisImport(TestCase):
         # THEN: find_and_create_book should not have been called
         self.assertFalse(self.mocked_find_and_create_book.called)
 
-    def process_books_completes_test(self):
+    def test_process_books_completes(self):
         """
         Test process_books when it processes all books
         """
@@ -111,7 +111,7 @@ class TestOsisImport(TestCase):
                              [call('db_book1', book1), call('db_book2', book2)])
             self.assertEqual(importer.session.commit.call_count, 2)
 
-    def process_chapters_verse_in_chapter_verse_text_test(self):
+    def test_process_chapters_verse_in_chapter_verse_text(self):
         """
         Test process_chapters when supplied with an etree element with a verse element nested in it
         """
@@ -137,7 +137,7 @@ class TestOsisImport(TestCase):
             mocked_set_current_chapter.assert_called_once_with(test_book.name, 2)
             mocked_process_verse.assert_called_once_with(test_book, 2, test_verse)
 
-    def process_chapters_verse_in_chapter_verse_milestone_test(self):
+    def test_process_chapters_verse_in_chapter_verse_milestone(self):
         """
         Test process_chapters when supplied with an etree element with a verse element nested, when the verse system is
         based on milestones
@@ -164,7 +164,7 @@ class TestOsisImport(TestCase):
             mocked_set_current_chapter.assert_called_once_with(test_book.name, 2)
             mocked_process_verse.assert_called_once_with(test_book, 2, test_verse, use_milestones=True)
 
-    def process_chapters_milestones_chapter_no_sid_test(self):
+    def test_process_chapters_milestones_chapter_no_sid(self):
         """
         Test process_chapters when supplied with an etree element with a chapter and verse element in the milestone
         configuration, where the chapter is the "closing" milestone. (Missing the sID attribute)
@@ -187,7 +187,7 @@ class TestOsisImport(TestCase):
             self.assertFalse(mocked_set_current_chapter.called)
             self.assertFalse(mocked_process_verse.called)
 
-    def process_chapters_milestones_chapter_sid_test(self):
+    def test_process_chapters_milestones_chapter_sid(self):
         """
         Test process_chapters when supplied with an etree element with a chapter and verse element in the milestone
         configuration, where the chapter is the "opening" milestone. (Has the sID attribute)
@@ -210,7 +210,7 @@ class TestOsisImport(TestCase):
             mocked_set_current_chapter.assert_called_once_with(test_book.name, 2)
             self.assertFalse(mocked_process_verse.called)
 
-    def process_chapters_milestones_verse_tag_test(self):
+    def test_process_chapters_milestones_verse_tag(self):
         """
         Test process_chapters when supplied with an etree element with a chapter and verse element in the milestone
         configuration, where the verse is the "opening" milestone. (Has the sID attribute)
@@ -235,7 +235,7 @@ class TestOsisImport(TestCase):
             self.assertFalse(mocked_set_current_chapter.called)
             mocked_process_verse.assert_called_once_with(test_book, 0, test_verse, use_milestones=True)
 
-    def process_verse_no_osis_id_test(self):
+    def test_process_verse_no_osis_id(self):
         """
         Test process_verse when the element supplied does not have and osisID attribute
         """
@@ -253,7 +253,7 @@ class TestOsisImport(TestCase):
         # THEN: create_verse should not have been called
         self.assertFalse(self.mocked_create_verse.called)
 
-    def process_verse_use_milestones_no_s_id_test(self):
+    def test_process_verse_use_milestones_no_s_id(self):
         """
         Test process_verse when called with use_milestones set to True, but the element supplied does not have and sID
         attribute
@@ -272,7 +272,7 @@ class TestOsisImport(TestCase):
         # THEN: create_verse should not have been called
         self.assertFalse(self.mocked_create_verse.called)
 
-    def process_verse_use_milestones_no_tail_test(self):
+    def test_process_verse_use_milestones_no_tail(self):
         """
         Test process_verse when called with use_milestones set to True, but the element supplied does not have a 'tail'
         """
@@ -290,7 +290,7 @@ class TestOsisImport(TestCase):
         # THEN: create_verse should not have been called
         self.assertFalse(self.mocked_create_verse.called)
 
-    def process_verse_use_milestones_success_test(self):
+    def test_process_verse_use_milestones_success(self):
         """
         Test process_verse when called with use_milestones set to True, and the verse element successfully imports
         """
@@ -309,7 +309,7 @@ class TestOsisImport(TestCase):
         # THEN: create_verse should have been called with the test data
         self.mocked_create_verse.assert_called_once_with(1, 2, 4, 'Verse Text')
 
-    def process_verse_no_text_test(self):
+    def test_process_verse_no_text(self):
         """
         Test process_verse when called with an empty verse element
         """
@@ -328,7 +328,7 @@ class TestOsisImport(TestCase):
         # THEN: create_verse should not have been called
         self.assertFalse(self.mocked_create_verse.called)
 
-    def process_verse_success_test(self):
+    def test_process_verse_success(self):
         """
         Test process_verse when called with an element with text set
         """
@@ -347,7 +347,7 @@ class TestOsisImport(TestCase):
         # THEN: create_verse should have been called with the test data
         self.mocked_create_verse.assert_called_once_with(1, 2, 4, 'Verse Text')
 
-    def do_import_parse_xml_fails_test(self):
+    def test_do_import_parse_xml_fails(self):
         """
         Test do_import when parse_xml fails (returns None)
         """
@@ -365,7 +365,7 @@ class TestOsisImport(TestCase):
             self.assertFalse(result)
             self.assertFalse(mocked_language_id.called)
 
-    def do_import_no_language_test(self):
+    def test_do_import_no_language(self):
         """
         Test do_import when the user cancels the language selection dialog
         """
@@ -384,7 +384,7 @@ class TestOsisImport(TestCase):
             self.assertFalse(result)
             self.assertFalse(mocked_process_books.called)
 
-    def do_import_completes_test(self):
+    def test_do_import_completes(self):
         """
         Test do_import when it completes successfully
         """
