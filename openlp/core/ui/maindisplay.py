@@ -36,9 +36,9 @@ from PyQt5 import QtCore, QtWidgets, QtWebKit, QtWebKitWidgets, QtGui, QtMultime
 from openlp.core.common import is_macosx, is_win
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import translate
-from openlp.core.common.mixins import OpenLPMixin
+from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import path_to_str
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
 from openlp.core.lib import ServiceItem, ImageSource, build_html, expand_tags, image_to_byte
@@ -131,7 +131,7 @@ class Display(QtWidgets.QGraphicsView):
         self.web_loaded = True
 
 
-class MainDisplay(OpenLPMixin, Display, RegistryProperties):
+class MainDisplay(Display, LogMixin, RegistryProperties):
     """
     This is the display screen as a specialized class from the Display class
     """
@@ -603,7 +603,7 @@ class MainDisplay(OpenLPMixin, Display, RegistryProperties):
         self.web_view.setGeometry(0, 0, self.width(), self.height())
 
 
-class AudioPlayer(OpenLPMixin, QtCore.QObject):
+class AudioPlayer(LogMixin, QtCore.QObject):
     """
     This Class will play audio only allowing components to work with a soundtrack independent of the user interface.
     """

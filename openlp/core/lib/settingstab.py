@@ -25,7 +25,7 @@ own tab to the settings dialog.
 """
 from PyQt5 import QtWidgets
 
-from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
 
 
 class SettingsTab(QtWidgets.QWidget, RegistryProperties):

@@ -25,7 +25,8 @@ from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_
 
 from openlp.core.common.i18n import UiStrings, translate, get_natural_key
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songs.forms.authorsform import AuthorsForm
 from openlp.plugins.songs.forms.topicsform import TopicsForm

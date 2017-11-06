@@ -25,9 +25,9 @@ import re
 from string import Template
 from PyQt5 import QtGui, QtCore, QtWebKitWidgets
 
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import path_to_str
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
 from openlp.core.lib import FormattingTags, ImageSource, ItemCapabilities, ServiceItem, expand_tags, build_chords_css, \
@@ -46,7 +46,7 @@ VERSE_FOR_LINE_COUNT = '\n'.join(map(str, range(100)))
 FOOTER = ['Arky Arky (Unknown)', 'Public Domain', 'CCLI 123456']
 
 
-class Renderer(OpenLPMixin, RegistryMixin, RegistryProperties):
+class Renderer(RegistryBase, LogMixin, RegistryProperties):
     """
     Class to pull all Renderer interactions into one place. The plugins will call helper methods to do the rendering but
     this class will provide display defense code.

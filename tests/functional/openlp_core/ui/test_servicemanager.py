@@ -32,7 +32,7 @@ from openlp.core.common import ThemeLevel
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, ServiceItemType, ItemCapabilities
 from openlp.core.ui import ServiceManager
-from openlp.core.ui.lib.toolbar import OpenLPToolbar
+from openlp.core.widgets.toolbar import OpenLPToolbar
 
 
 class TestServiceManager(TestCase):

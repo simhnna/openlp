@@ -20,23 +20,24 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-This module contains tests for the openlp.core.ui.lib.pathedit module
+This module contains tests for the openlp.core.widgets.edits module
 """
 import os
 from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, patch
 
 from openlp.core.common.path import Path
-from openlp.core.ui.lib import PathEdit, PathType
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.edits import PathEdit
+from openlp.core.widgets.enums import PathEditType
+from openlp.core.widgets.dialogs import FileDialog
 
 
 class TestPathEdit(TestCase):
     """
-    Test the :class:`~openlp.core.lib.pathedit.PathEdit` class
+    Test the :class:`~openlp.core.widgets.edits.PathEdit` class
     """
     def setUp(self):
-        with patch('openlp.core.ui.lib.pathedit.PathEdit._setup'):
+        with patch('openlp.core.widgets.edits.PathEdit._setup'):
             self.widget = PathEdit()
 
     def test_path_getter(self):
@@ -73,7 +74,7 @@ class TestPathEdit(TestCase):
         # GIVEN: An instance of PathEdit
         # WHEN: Reading the `path` property
         # THEN: The default value should be returned
-        self.assertEqual(self.widget.path_type, PathType.Files)
+        self.assertEqual(self.widget.path_type, PathEditType.Files)
 
     def test_path_type_setter(self):
         """
@@ -83,11 +84,11 @@ class TestPathEdit(TestCase):
         with patch.object(self.widget, 'update_button_tool_tips') as mocked_update_button_tool_tips:
 
             # WHEN: Writing to a different value than default to the `path_type` property
-            self.widget.path_type = PathType.Directories
+            self.widget.path_type = PathEditType.Directories
 
             # THEN: The `_path_type` instance variable should be set with the test data and not the default. The
             #       update_button_tool_tips should have been called.
-            self.assertEqual(self.widget._path_type, PathType.Directories)
+            self.assertEqual(self.widget._path_type, PathEditType.Directories)
             mocked_update_button_tool_tips.assert_called_once_with()
 
     def test_update_button_tool_tips_directories(self):
@@ -97,7 +98,7 @@ class TestPathEdit(TestCase):
         # GIVEN: An instance of PathEdit with the `path_type` set to `Directories`
         self.widget.browse_button = MagicMock()
         self.widget.revert_button = MagicMock()
-        self.widget._path_type = PathType.Directories
+        self.widget._path_type = PathEditType.Directories
 
         # WHEN: Calling update_button_tool_tips
         self.widget.update_button_tool_tips()
@@ -112,7 +113,7 @@ class TestPathEdit(TestCase):
         # GIVEN: An instance of PathEdit with the `path_type` set to `Files`
         self.widget.browse_button = MagicMock()
         self.widget.revert_button = MagicMock()
-        self.widget._path_type = PathType.Files
+        self.widget._path_type = PathEditType.Files
 
         # WHEN: Calling update_button_tool_tips
         self.widget.update_button_tool_tips()
@@ -120,26 +121,25 @@ class TestPathEdit(TestCase):
         self.widget.browse_button.setToolTip.assert_called_once_with('Browse for file.')
         self.widget.revert_button.setToolTip.assert_called_once_with('Revert to default file.')
 
-    def test_on_browse_button_clicked_directory(self):
+    @patch('openlp.core.widgets.edits.FileDialog.getExistingDirectory', return_value=None)
+    @patch('openlp.core.widgets.edits.FileDialog.getOpenFileName')
+    def test_on_browse_button_clicked_directory(self, mocked_get_open_file_name, mocked_get_existing_directory):
         """
         Test the `browse_button` `clicked` handler on_browse_button_clicked when the `path_type` is set to Directories.
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Directories` and a mocked
         #        QFileDialog.getExistingDirectory
-        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory', return_value=None) as \
-                mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName') as mocked_get_open_file_name:
-            self.widget._path_type = PathType.Directories
-            self.widget._path = Path('test', 'path')
+        self.widget._path_type = PathEditType.Directories
+        self.widget._path = Path('test', 'path')
 
-            # WHEN: Calling on_browse_button_clicked
-            self.widget.on_browse_button_clicked()
+        # WHEN: Calling on_browse_button_clicked
+        self.widget.on_browse_button_clicked()
 
-            # THEN: The FileDialog.getExistingDirectory should have been called with the default caption
-            mocked_get_existing_directory.assert_called_once_with(self.widget, 'Select Directory',
-                                                                  Path('test', 'path'),
-                                                                  FileDialog.ShowDirsOnly)
-            self.assertFalse(mocked_get_open_file_name.called)
+        # THEN: The FileDialog.getExistingDirectory should have been called with the default caption
+        mocked_get_existing_directory.assert_called_once_with(self.widget, 'Select Directory',
+                                                              Path('test', 'path'),
+                                                              FileDialog.ShowDirsOnly)
+        self.assertFalse(mocked_get_open_file_name.called)
 
     def test_on_browse_button_clicked_directory_custom_caption(self):
         """
@@ -148,10 +148,10 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Directories` and a mocked
         #        QFileDialog.getExistingDirectory with `default_caption` set.
-        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory', return_value=None) as \
+        with patch('openlp.core.widgets.edits.FileDialog.getExistingDirectory', return_value=None) as \
                 mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName') as mocked_get_open_file_name:
-            self.widget._path_type = PathType.Directories
+                patch('openlp.core.widgets.edits.FileDialog.getOpenFileName') as mocked_get_open_file_name:
+            self.widget._path_type = PathEditType.Directories
             self.widget._path = Path('test', 'path')
             self.widget.dialog_caption = 'Directory Caption'
 
@@ -169,10 +169,10 @@ class TestPathEdit(TestCase):
         Test the `browse_button` `clicked` handler on_browse_button_clicked when the `path_type` is set to Files.
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Files` and a mocked QFileDialog.getOpenFileName
-        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
+        with patch('openlp.core.widgets.edits.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
+                patch('openlp.core.widgets.edits.FileDialog.getOpenFileName', return_value=(None, '')) as \
                 mocked_get_open_file_name:
-            self.widget._path_type = PathType.Files
+            self.widget._path_type = PathEditType.Files
             self.widget._path = Path('test', 'pat.h')
 
             # WHEN: Calling on_browse_button_clicked
@@ -190,10 +190,10 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with the `path_type` set to `Files` and a mocked QFileDialog.getOpenFileName
         #        with `default_caption` set.
-        with patch('openlp.core.ui.lib.pathedit.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
-                patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
+        with patch('openlp.core.widgets.edits.FileDialog.getExistingDirectory') as mocked_get_existing_directory, \
+                patch('openlp.core.widgets.edits.FileDialog.getOpenFileName', return_value=(None, '')) as \
                 mocked_get_open_file_name:
-            self.widget._path_type = PathType.Files
+            self.widget._path_type = PathEditType.Files
             self.widget._path = Path('test', 'pat.h')
             self.widget.dialog_caption = 'File Caption'
 
@@ -212,7 +212,7 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked QFileDialog.getOpenFileName which returns an empty str for the
         #        file path.
-        with patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName', return_value=(None, '')) as \
+        with patch('openlp.core.widgets.edits.FileDialog.getOpenFileName', return_value=(None, '')) as \
                 mocked_get_open_file_name:
 
             # WHEN: Calling on_browse_button_clicked
@@ -228,7 +228,7 @@ class TestPathEdit(TestCase):
         """
         # GIVEN: An instance of PathEdit with a mocked QFileDialog.getOpenFileName which returns a str for the file
         #        path.
-        with patch('openlp.core.ui.lib.pathedit.FileDialog.getOpenFileName',
+        with patch('openlp.core.widgets.edits.FileDialog.getOpenFileName',
                    return_value=(Path('test', 'pat.h'), '')) as mocked_get_open_file_name, \
                 patch.object(self.widget, 'on_new_path'):
 
@@ -272,7 +272,7 @@ class TestPathEdit(TestCase):
         Test `on_new_path` when called with a path that is the same as the existing path.
         """
         # GIVEN: An instance of PathEdit with a test path and mocked `pathChanged` signal
-        with patch('openlp.core.ui.lib.pathedit.PathEdit.path', new_callable=PropertyMock):
+        with patch('openlp.core.widgets.edits.PathEdit.path', new_callable=PropertyMock):
             self.widget._path = Path('/old', 'test', 'pat.h')
             self.widget.pathChanged = MagicMock()
 
@@ -287,7 +287,7 @@ class TestPathEdit(TestCase):
         Test `on_new_path` when called with a path that is the different to the existing path.
         """
         # GIVEN: An instance of PathEdit with a test path and mocked `pathChanged` signal
-        with patch('openlp.core.ui.lib.pathedit.PathEdit.path', new_callable=PropertyMock):
+        with patch('openlp.core.widgets.edits.PathEdit.path', new_callable=PropertyMock):
             self.widget._path = Path('/old', 'test', 'pat.h')
             self.widget.pathChanged = MagicMock()
 

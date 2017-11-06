@@ -20,12 +20,12 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-This module contains tests for the openlp.core.ui.lib.colorbutton module
+This module contains tests for the openlp.core.widgets.buttons module
 """
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
-from openlp.core.ui.lib import ColorButton
+from openlp.core.widgets.buttons import ColorButton
 
 
 class TestColorDialog(TestCase):
@@ -33,11 +33,11 @@ class TestColorDialog(TestCase):
     Test the :class:`~openlp.core.lib.colorbutton.ColorButton` class
     """
     def setUp(self):
-        self.change_color_patcher = patch('openlp.core.ui.lib.colorbutton.ColorButton.change_color')
-        self.clicked_patcher = patch('openlp.core.ui.lib.colorbutton.ColorButton.clicked')
-        self.color_changed_patcher = patch('openlp.core.ui.lib.colorbutton.ColorButton.colorChanged')
-        self.qt_gui_patcher = patch('openlp.core.ui.lib.colorbutton.QtWidgets')
-        self.translate_patcher = patch('openlp.core.ui.lib.colorbutton.translate', **{'return_value': 'Tool Tip Text'})
+        self.change_color_patcher = patch('openlp.core.widgets.buttons.ColorButton.change_color')
+        self.clicked_patcher = patch('openlp.core.widgets.buttons.ColorButton.clicked')
+        self.color_changed_patcher = patch('openlp.core.widgets.buttons.ColorButton.colorChanged')
+        self.qt_gui_patcher = patch('openlp.core.widgets.buttons.QtWidgets')
+        self.translate_patcher = patch('openlp.core.widgets.buttons.translate', **{'return_value': 'Tool Tip Text'})
         self.addCleanup(self.change_color_patcher.stop)
         self.addCleanup(self.clicked_patcher.stop)
         self.addCleanup(self.color_changed_patcher.stop)
@@ -49,41 +49,40 @@ class TestColorDialog(TestCase):
         self.mocked_qt_widgets = self.qt_gui_patcher.start()
         self.mocked_translate = self.translate_patcher.start()
 
-    def test_constructor(self):
+    @patch('openlp.core.widgets.buttons.ColorButton.setToolTip')
+    def test_constructor(self, mocked_set_tool_tip):
         """
         Test that constructing a ColorButton object works correctly
         """
 
         # GIVEN: The ColorButton class, a mocked change_color, setToolTip methods and clicked signal
-        with patch('openlp.core.ui.lib.colorbutton.ColorButton.setToolTip') as mocked_set_tool_tip:
+        # WHEN: The ColorButton object is instantiated
+        widget = ColorButton()
 
-            # WHEN: The ColorButton object is instantiated
-            widget = ColorButton()
+        # THEN: The widget __init__ method should have the correct properties and methods called
+        self.assertEqual(widget.parent, None,
+                         'The parent should be the same as the one that the class was instianted with')
+        self.mocked_change_color.assert_called_once_with('#ffffff')
+        mocked_set_tool_tip.assert_called_once_with('Tool Tip Text')
+        self.mocked_clicked.connect.assert_called_once_with(widget.on_clicked)
 
-            # THEN: The widget __init__ method should have the correct properties and methods called
-            self.assertEqual(widget.parent, None,
-                             'The parent should be the same as the one that the class was instianted with')
-            self.mocked_change_color.assert_called_once_with('#ffffff')
-            mocked_set_tool_tip.assert_called_once_with('Tool Tip Text')
-            self.mocked_clicked.connect.assert_called_once_with(widget.on_clicked)
-
-    def test_change_color(self):
+    @patch('openlp.core.widgets.buttons.ColorButton.setStyleSheet')
+    def test_change_color(self, mocked_set_style_sheet):
         """
         Test that change_color sets the new color and the stylesheet
         """
         self.change_color_patcher.stop()
 
         # GIVEN: An instance of the ColorButton object, and a mocked out setStyleSheet
-        with patch('openlp.core.ui.lib.colorbutton.ColorButton.setStyleSheet') as mocked_set_style_sheet:
-            widget = ColorButton()
+        widget = ColorButton()
 
-            # WHEN: Changing the color
-            widget.change_color('#000000')
+        # WHEN: Changing the color
+        widget.change_color('#000000')
 
-            # THEN: The _color attribute should be set to #000000 and setStyleSheet should have been called twice
-            self.assertEqual(widget._color, '#000000', '_color should have been set to #000000')
-            mocked_set_style_sheet.assert_has_calls(
-                [call('background-color: #ffffff'), call('background-color: #000000')])
+        # THEN: The _color attribute should be set to #000000 and setStyleSheet should have been called twice
+        self.assertEqual(widget._color, '#000000', '_color should have been set to #000000')
+        mocked_set_style_sheet.assert_has_calls(
+            [call('background-color: #ffffff'), call('background-color: #000000')])
 
         self.mocked_change_color = self.change_color_patcher.start()
 
@@ -91,7 +90,6 @@ class TestColorDialog(TestCase):
         """
         Test that the color property method returns the set color
         """
-
         # GIVEN: An instance of ColorButton, with a set _color attribute
         widget = ColorButton()
         widget._color = '#000000'
@@ -102,35 +100,19 @@ class TestColorDialog(TestCase):
         # THEN: The value set in _color should be returned
         self.assertEqual(value, '#000000', 'The value returned should be equal to the one we set')
 
-    def test_color(self):
-        """
-        Test that the color property method returns the set color
-        """
-
-        # GIVEN: An instance of ColorButton, with a set _color attribute
-        widget = ColorButton()
-        widget._color = '#000000'
-
-        # WHEN: Accesing the color property
-        value = widget.color
-
-        # THEN: The value set in _color should be returned
-        self.assertEqual(value, '#000000', 'The value returned should be equal to the one we set')
-
+    # @patch('openlp.core.widgets.buttons.ColorButton.__init__', **{'return_value': None})
     def test_color_setter(self):
         """
         Test that the color property setter method sets the color
         """
-
         # GIVEN: An instance of ColorButton, with a mocked __init__
-        with patch('openlp.core.ui.lib.colorbutton.ColorButton.__init__', **{'return_value': None}):
-            widget = ColorButton()
+        widget = ColorButton()
 
-            # WHEN: Setting the color property
-            widget.color = '#000000'
+        # WHEN: Setting the color property
+        widget.color = '#000000'
 
-            # THEN: Then change_color should have been called with the value we set
-            self.mocked_change_color.assert_called_once_with('#000000')
+        # THEN: Then change_color should have been called with the value we set
+        self.mocked_change_color.assert_called_with('#000000')
 
     def test_on_clicked_invalid_color(self):
         """

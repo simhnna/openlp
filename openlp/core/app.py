@@ -38,7 +38,7 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common import is_macosx, is_win
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import LanguageManager, UiStrings, translate
-from openlp.core.common.mixins import OpenLPMixin
+from openlp.core.common.mixins import LogMixin
 from openlp.core.common.path import create_paths, copytree
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -59,7 +59,7 @@ __all__ = ['OpenLP', 'main']
 log = logging.getLogger()
 
 
-class OpenLP(OpenLPMixin, QtWidgets.QApplication):
+class OpenLP(QtWidgets.QApplication, LogMixin):
     """
     The core application class. This class inherits from Qt's QApplication
     class in order to provide the core of the application.

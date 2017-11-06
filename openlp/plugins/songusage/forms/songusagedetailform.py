@@ -25,7 +25,7 @@ from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_
 
 from openlp.core.common.i18n import translate
-from openlp.core.common.registry import RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.settings import Settings
 from openlp.core.common.path import create_paths
 from openlp.core.lib.ui import critical_error_message_box

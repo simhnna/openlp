@@ -27,7 +27,8 @@ import logging
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.api import ApiTab
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.lib import build_icon
 from openlp.core.ui import AdvancedTab, GeneralTab, ThemesTab
 from openlp.core.ui.media import PlayerTab

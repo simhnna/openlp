@@ -29,8 +29,6 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.app import OpenLP, parse_options
 from openlp.core.common.settings import Settings
 
-from tests.helpers.testmixin import TestMixin
-
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
 
 
@@ -141,23 +139,33 @@ class TestOpenLP(TestCase):
     """
     Test the OpenLP app class
     """
-    @patch('openlp.core.app.QtWidgets.QApplication.exec')
-    def test_exec(self, mocked_exec):
+    def setUp(self):
+        self.build_settings()
+        self.qapplication_patcher = patch('openlp.core.app.QtGui.QApplication')
+        self.mocked_qapplication = self.qapplication_patcher.start()
+        self.openlp = OpenLP([])
+
+    def tearDown(self):
+        self.qapplication_patcher.stop()
+        self.destroy_settings()
+        del self.openlp
+        self.openlp = None
+
+    def test_exec(self):
         """
         Test the exec method
         """
         # GIVEN: An app
-        app = OpenLP([])
-        app.shared_memory = MagicMock()
-        mocked_exec.return_value = False
+        self.openlp.shared_memory = MagicMock()
+        self.mocked_qapplication.exec.return_value = False
 
         # WHEN: exec() is called
-        result = app.exec()
+        result = self.openlp.exec()
 
         # THEN: The right things should be called
-        assert app.is_event_loop_active is True
-        mocked_exec.assert_called_once_with()
-        app.shared_memory.detach.assert_called_once_with()
+        assert self.openlp.is_event_loop_active is True
+        self.mocked_qapplication.exec.assert_called_once_with()
+        self.openlp.shared_memory.detach.assert_called_once_with()
         assert result is False
 
     @patch('openlp.core.app.QtCore.QSharedMemory')
@@ -169,10 +177,9 @@ class TestOpenLP(TestCase):
         mocked_shared_memory = MagicMock()
         mocked_shared_memory.attach.return_value = False
         MockedSharedMemory.return_value = mocked_shared_memory
-        app = OpenLP([])
 
         # WHEN: is_already_running() is called
-        result = app.is_already_running()
+        result = self.openlp.is_already_running()
 
         # THEN: The result should be false
         MockedSharedMemory.assert_called_once_with('OpenLP')
@@ -193,10 +200,9 @@ class TestOpenLP(TestCase):
         MockedSharedMemory.return_value = mocked_shared_memory
         MockedStandardButtons.return_value = 0
         mocked_critical.return_value = QtWidgets.QMessageBox.Yes
-        app = OpenLP([])
 
         # WHEN: is_already_running() is called
-        result = app.is_already_running()
+        result = self.openlp.is_already_running()
 
         # THEN: The result should be false
         MockedSharedMemory.assert_called_once_with('OpenLP')
@@ -218,10 +224,9 @@ class TestOpenLP(TestCase):
         MockedSharedMemory.return_value = mocked_shared_memory
         MockedStandardButtons.return_value = 0
         mocked_critical.return_value = QtWidgets.QMessageBox.No
-        app = OpenLP([])
 
         # WHEN: is_already_running() is called
-        result = app.is_already_running()
+        result = self.openlp.is_already_running()
 
         # THEN: The result should be false
         MockedSharedMemory.assert_called_once_with('OpenLP')
@@ -235,11 +240,9 @@ class TestOpenLP(TestCase):
         Test that the app.process_events() method simply calls the Qt method
         """
         # GIVEN: An app
-        app = OpenLP([])
-
         # WHEN: process_events() is called
-        with patch.object(app, 'processEvents') as mocked_processEvents:
-            app.process_events()
+        with patch.object(self.openlp, 'processEvents') as mocked_processEvents:
+            self.openlp.process_events()
 
         # THEN: processEvents was called
         mocked_processEvents.assert_called_once_with()
@@ -249,12 +252,10 @@ class TestOpenLP(TestCase):
         Test that the set_busy_cursor() method sets the cursor
         """
         # GIVEN: An app
-        app = OpenLP([])
-
         # WHEN: set_busy_cursor() is called
-        with patch.object(app, 'setOverrideCursor') as mocked_setOverrideCursor, \
-                patch.object(app, 'processEvents') as mocked_processEvents:
-            app.set_busy_cursor()
+        with patch.object(self.openlp, 'setOverrideCursor') as mocked_setOverrideCursor, \
+                patch.object(self.openlp, 'processEvents') as mocked_processEvents:
+            self.openlp.set_busy_cursor()
 
         # THEN: The cursor should have been set
         mocked_setOverrideCursor.assert_called_once_with(QtCore.Qt.BusyCursor)
@@ -265,28 +266,14 @@ class TestOpenLP(TestCase):
         Test that the set_normal_cursor() method resets the cursor
         """
         # GIVEN: An app
-        app = OpenLP([])
-
         # WHEN: set_normal_cursor() is called
-        with patch.object(app, 'restoreOverrideCursor') as mocked_restoreOverrideCursor, \
-                patch.object(app, 'processEvents') as mocked_processEvents:
-            app.set_normal_cursor()
+        with patch.object(self.openlp, 'restoreOverrideCursor') as mocked_restoreOverrideCursor, \
+                patch.object(self.openlp, 'processEvents') as mocked_processEvents:
+            self.openlp.set_normal_cursor()
 
         # THEN: The cursor should have been set
         mocked_restoreOverrideCursor.assert_called_once_with()
         mocked_processEvents.assert_called_once_with()
-
-
-class TestInit(TestCase, TestMixin):
-    def setUp(self):
-        self.build_settings()
-        with patch('openlp.core.app.OpenLPMixin.__init__') as constructor:
-            constructor.return_value = None
-            self.openlp = OpenLP(list())
-
-    def tearDown(self):
-        self.destroy_settings()
-        del self.openlp
 
     def test_event(self):
         """

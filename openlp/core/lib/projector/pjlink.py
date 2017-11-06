@@ -514,7 +514,7 @@ class PJLinkCommands(object):
                 self.sw_version_received = data
 
 
-class PJLink(PJLinkCommands, QtNetwork.QTcpSocket):
+class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
     """
     Socket service for PJLink TCP socket.
     """

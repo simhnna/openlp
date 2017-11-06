@@ -26,7 +26,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
-from openlp.core.ui.lib import SpellTextEdit
+from openlp.core.widgets.edits import SpellTextEdit
 from openlp.plugins.songs.lib import VerseType
 
 

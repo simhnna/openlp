@@ -44,7 +44,7 @@ NOTE_REGEX = re.compile(r'\(.*?\)')
 log = logging.getLogger(__name__)
 
 
-class FieldDescEntry:
+class FieldDescEntry(object):
     def __init__(self, name, field_type, size):
         self.name = name
         self.field_type = field_type
