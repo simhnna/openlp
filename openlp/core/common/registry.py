@@ -151,7 +151,7 @@ class Registry(object):
                     trace_error_handler(log)
                     log.exception('Exception for function {function}'.format(function=function))
         else:
-            if self._logger.getEffectiveLevel() == logging.DEBUG:
+            if log.getEffectiveLevel() == logging.DEBUG:
                 trace_error_handler(log)
                 log.exception('Event {event} called but not registered'.format(event=event))
         return results
