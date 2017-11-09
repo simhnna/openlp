@@ -1429,10 +1429,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         """
         row = self.preview_widget.current_slide_number()
         if -1 < row < self.preview_widget.slide_count():
-            if self.service_item.from_service:
-                self.service_manager.preview_live(self.service_item.unique_identifier, row)
-            else:
-                self.preview_controller.add_service_manager_item(self.service_item, row)
+            self.preview_controller.add_service_manager_item(self.service_item, row)
             self.preview_controller.preview_widget.setFocus()
 
     def on_media_start(self, item):
