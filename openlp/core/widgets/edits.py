@@ -242,7 +242,7 @@ class PathEdit(QtWidgets.QWidget):
         self.line_edit.editingFinished.connect(self.on_line_edit_editing_finished)
         self.update_button_tool_tips()
 
-    @property
+    @QtCore.pyqtProperty('QVariant')
     def path(self):
         """
         A property getter method to return the selected path.
@@ -350,7 +350,7 @@ class PathEdit(QtWidgets.QWidget):
         :rtype: None
         """
         if self._path != path:
-            self.path = path
+            self._path = path
             self.pathChanged.emit(path)
 
 
