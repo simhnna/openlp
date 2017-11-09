@@ -193,18 +193,6 @@ class Ui_ServiceManager(object):
             text=translate('OpenLP.ServiceManager', 'Move to &bottom'), icon=':/services/service_bottom.png',
             tooltip=translate('OpenLP.ServiceManager', 'Move item to the end of the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_end)
-        self.down_action = self.order_toolbar.add_toolbar_action(
-            'down',
-            text=translate('OpenLP.ServiceManager', 'Move &down'), can_shortcuts=True,
-            tooltip=translate('OpenLP.ServiceManager', 'Moves the selection down the window.'), visible=False,
-            triggers=self.on_move_selection_down)
-        action_list.add_action(self.down_action)
-        self.up_action = self.order_toolbar.add_toolbar_action(
-            'up',
-            text=translate('OpenLP.ServiceManager', 'Move up'), can_shortcuts=True,
-            tooltip=translate('OpenLP.ServiceManager', 'Moves the selection up the window.'), visible=False,
-            triggers=self.on_move_selection_up)
-        action_list.add_action(self.up_action)
         self.order_toolbar.addSeparator()
         self.delete_action = self.order_toolbar.add_toolbar_action(
             'delete', can_shortcuts=True,
@@ -300,8 +288,8 @@ class Ui_ServiceManager(object):
         self.theme_menu = QtWidgets.QMenu(translate('OpenLP.ServiceManager', '&Change Item Theme'))
         self.menu.addMenu(self.theme_menu)
         self.service_manager_list.addActions([self.move_down_action, self.move_up_action, self.make_live_action,
-                                              self.move_top_action, self.move_bottom_action, self.up_action,
-                                              self.down_action, self.expand_action, self.collapse_action])
+                                              self.move_top_action, self.move_bottom_action, self.expand_action,
+                                              self.collapse_action])
         Registry().register_function('theme_update_list', self.update_theme_list)
         Registry().register_function('config_screen_changed', self.regenerate_service_items)
         Registry().register_function('theme_update_global', self.theme_change)
