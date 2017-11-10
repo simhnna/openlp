@@ -32,9 +32,9 @@ from unittest.mock import patch
 from PyQt5.QtWidgets import QDialog
 
 from openlp.core.common.registry import Registry
-from openlp.core.lib.projector.db import ProjectorDB, Projector
-from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES, PJLINK_DEFAULT_SOURCES
-from openlp.core.ui.projector.sourceselectform import source_group, SourceSelectSingle
+from openlp.core.projectors.db import ProjectorDB, Projector
+from openlp.core.projectors.constants import PJLINK_DEFAULT_CODES, PJLINK_DEFAULT_SOURCES
+from openlp.core.projectors.sourceselectform import source_group, SourceSelectSingle
 
 from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB, TEST1_DATA
@@ -58,7 +58,7 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
     """
     Test class for the Projector Source Select form module
     """
-    @patch('openlp.core.lib.projector.db.init_url')
+    @patch('openlp.core.projectors.db.init_url')
     def setUp(self, mocked_init_url):
         """
         Set up anything necessary for all tests

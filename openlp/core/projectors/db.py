@@ -43,8 +43,8 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import relationship
 
 from openlp.core.lib.db import Manager, init_db, init_url
-from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES
-from openlp.core.lib.projector import upgrade
+from openlp.core.projectors.constants import PJLINK_DEFAULT_CODES
+from openlp.core.projectors import upgrade
 
 Base = declarative_base(MetaData())
 

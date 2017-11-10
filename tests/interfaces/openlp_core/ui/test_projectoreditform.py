@@ -20,7 +20,7 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Interface tests to test the openlp.core.ui.projector.editform.ProjectorEditForm()
+Interface tests to test the openlp.core.projectors.editform.ProjectorEditForm()
 class and methods.
 """
 import os
@@ -28,8 +28,7 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from openlp.core.common.registry import Registry
-from openlp.core.lib.projector.db import Projector, ProjectorDB
-from openlp.core.ui import ProjectorEditForm
+from openlp.core.projectors import Projector, ProjectorDB, ProjectorEditForm, ProjectorManager
 
 from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB, TEST1_DATA, TEST2_DATA
@@ -48,7 +47,7 @@ class TestProjectorEditForm(TestCase, TestMixin):
         self.setup_application()
         self.build_settings()
         Registry.create()
-        with patch('openlp.core.lib.projector.db.init_url') as mocked_init_url:
+        with patch('openlp.core.projectors.db.init_url') as mocked_init_url:
             if os.path.exists(TEST_DB):
                 os.unlink(TEST_DB)
             mocked_init_url.return_value = 'sqlite:///' + TEST_DB
@@ -66,7 +65,7 @@ class TestProjectorEditForm(TestCase, TestMixin):
         del self.projector_form
         self.destroy_settings()
 
-    @patch('openlp.core.ui.projector.editform.QtWidgets.QDialog.exec')
+    @patch('openlp.core.projectors.editform.QtWidgets.QDialog.exec')
     def test_edit_form_add_projector(self, mocked_exec):
         """
         Test projector edit form with no parameters creates a new entry.
@@ -84,7 +83,7 @@ class TestProjectorEditForm(TestCase, TestMixin):
         self.assertTrue((item.ip is None and item.name is None),
                         'Projector edit form should have a new Projector() instance to edit')
 
-    @patch('openlp.core.ui.projector.editform.QtWidgets.QDialog.exec')
+    @patch('openlp.core.projectors.editform.QtWidgets.QDialog.exec')
     def test_edit_form_edit_projector(self, mocked_exec):
         """
         Test projector edit form with existing projector entry

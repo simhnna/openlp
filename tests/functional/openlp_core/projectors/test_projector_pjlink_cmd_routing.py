@@ -20,20 +20,19 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.lib.projector.pjlink class command routing.
+Package to test the openlp.core.projectors.pjlink command routing.
 """
 
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-import openlp.core.lib.projector.pjlink
-from openlp.core.lib.projector.db import Projector
-from openlp.core.lib.projector.pjlink import PJLink
-from openlp.core.lib.projector.constants import PJLINK_ERRORS, \
+import openlp.core.projectors.pjlink
+from openlp.core.projectors import PJLink, Projector
+from openlp.core.projectors.constants import PJLINK_ERRORS, \
     E_AUTHENTICATION, E_PARAMETER, E_PROJECTOR, E_UNAVAILABLE, E_UNDEFINED
 
 '''
-from openlp.core.lib.projector.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
+from openlp.core.projectors.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
     PJLINK_POWR_STATUS, PJLINK_VALID_CMD, E_WARN, E_ERROR, S_OFF, S_STANDBY, S_ON
 '''
 from tests.resources.projector.data import TEST_PIN, TEST1_DATA
@@ -46,7 +45,7 @@ class TestPJLinkRouting(TestCase):
     """
     Tests for the PJLink module command routing
     """
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_call_clss(self, mock_log):
         """
         Test process_command calls proper function
@@ -66,7 +65,7 @@ class TestPJLinkRouting(TestCase):
         mock_process_clss.assert_called_with('1')
 
     @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_err1(self, mock_log, mock_change_status):
         """
         Test ERR1 - Undefined projector function
@@ -85,7 +84,7 @@ class TestPJLinkRouting(TestCase):
         mock_log.error.assert_called_with(log_text)
 
     @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_err2(self, mock_log, mock_change_status):
         """
         Test ERR2 - Parameter Error
@@ -104,7 +103,7 @@ class TestPJLinkRouting(TestCase):
         mock_log.error.assert_called_with(log_text)
 
     @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_err3(self, mock_log, mock_change_status):
         """
         Test ERR3 - Unavailable error
@@ -123,7 +122,7 @@ class TestPJLinkRouting(TestCase):
         mock_log.error.assert_called_with(log_text)
 
     @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_err4(self, mock_log, mock_change_status):
         """
         Test ERR3 - Unavailable error
@@ -144,7 +143,7 @@ class TestPJLinkRouting(TestCase):
     @patch.object(pjlink_test, 'projectorAuthentication')
     @patch.object(pjlink_test, 'change_status')
     @patch.object(pjlink_test, 'disconnect_from_host')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_erra(self, mock_log, mock_disconnect, mock_change_status, mock_err_authenticate):
         """
         Test ERRA - Authentication Error
@@ -163,7 +162,7 @@ class TestPJLinkRouting(TestCase):
         mock_change_status.assert_called_once_with(E_AUTHENTICATION)
         mock_log.error.assert_called_with(log_text)
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_future(self, mock_log):
         """
         Test command valid but no method to process yet
@@ -184,7 +183,7 @@ class TestPJLinkRouting(TestCase):
         mock_log.warning.assert_called_once_with(log_text)
 
     @patch.object(pjlink_test, 'pjlink_functions')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_invalid(self, mock_log, mock_functions):
         """
         Test not a valid command
@@ -203,7 +202,7 @@ class TestPJLinkRouting(TestCase):
         mock_log.error.assert_called_once_with(log_text)
 
     @patch.object(pjlink_test, 'pjlink_functions')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_ok(self, mock_log, mock_functions):
         """
         Test command returned success

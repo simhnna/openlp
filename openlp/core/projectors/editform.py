@@ -30,8 +30,8 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common import verify_ip_address
 from openlp.core.common.i18n import translate
 from openlp.core.lib import build_icon
-from openlp.core.lib.projector.db import Projector
-from openlp.core.lib.projector.constants import PJLINK_PORT
+from openlp.core.projectors.db import Projector
+from openlp.core.projectors.constants import PJLINK_PORT
 
 log = logging.getLogger(__name__)
 log.debug('editform loaded')

@@ -55,7 +55,7 @@ from openlp.core.widgets.dialogs import FileDialog
 from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.printserviceform import PrintServiceForm
-from openlp.core.ui.projector.manager import ProjectorManager
+from openlp.core.projectors import ProjectorManager
 from openlp.core.ui.style import PROGRESSBAR_STYLE, get_library_stylesheet
 from openlp.core.version import get_version
 

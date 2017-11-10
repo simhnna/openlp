@@ -20,14 +20,13 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.lib.projector.pjlink base package.
+Package to test the openlp.core.projectors.pjlink base package.
 """
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
 
-from openlp.core.lib.projector.db import Projector
-from openlp.core.lib.projector.pjlink import PJLink
-from openlp.core.lib.projector.constants import E_PARAMETER, ERROR_STRING, S_ON, S_CONNECTED
+from openlp.core.projectors import PJLink, Projector
+from openlp.core.projectors.constants import E_PARAMETER, ERROR_STRING, S_ON, S_CONNECTED
 
 from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_CONNECT_AUTHENTICATE, TEST_HASH, TEST1_DATA
 

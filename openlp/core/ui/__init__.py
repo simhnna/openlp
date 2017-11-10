@@ -115,9 +115,10 @@ from .formattingtagcontroller import FormattingTagController
 from .shortcutlistform import ShortcutListForm
 from .servicemanager import ServiceManager
 from .thememanager import ThemeManager
-from .projector.manager import ProjectorManager
-from .projector.tab import ProjectorTab
-from .projector.editform import ProjectorEditForm
+
+from openlp.core.projectors import ProjectorManager
+from openlp.core.projectors import ProjectorTab
+from openlp.core.projectors import ProjectorEditForm
 
 __all__ = ['SplashScreen', 'AboutForm', 'SettingsForm', 'MainDisplay', 'SlideController', 'ServiceManager', 'ThemeForm',
            'ThemeManager', 'ServiceItemEditForm', 'FirstTimeForm', 'FirstTimeLanguageForm', 'Display', 'AudioPlayer',

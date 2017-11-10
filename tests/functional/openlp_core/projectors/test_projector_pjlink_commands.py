@@ -20,15 +20,14 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.lib.projector.pjlink commands package.
+Package to test the openlp.core.projectors.pjlink commands package.
 """
 from unittest import TestCase
 from unittest.mock import patch
 
-import openlp.core.lib.projector.pjlink
-from openlp.core.lib.projector.db import Projector
-from openlp.core.lib.projector.pjlink import PJLink
-from openlp.core.lib.projector.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
+import openlp.core.projectors.pjlink
+from openlp.core.projectors import PJLink, Projector
+from openlp.core.projectors.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
     PJLINK_POWR_STATUS, \
     E_ERROR, E_NOT_CONNECTED, E_SOCKET_ADDRESS_NOT_AVAILABLE, E_UNKNOWN_SOCKET_ERROR, E_WARN, \
     S_CONNECTED, S_OFF, S_ON, S_NOT_CONNECTED, S_CONNECTING, S_STANDBY
@@ -50,7 +49,7 @@ class TestPJLinkCommands(TestCase):
     Tests for the PJLink module
     """
     @patch.object(pjlink_test, 'changeStatus')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_change_status_connection_error(self, mock_log, mock_change_status):
         """
         Test change_status with connection error
@@ -74,7 +73,7 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(mock_log.debug.call_count, 3, 'Debug log should have been called 3 times')
 
     @patch.object(pjlink_test, 'changeStatus')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_change_status_connection_status_connecting(self, mock_log, mock_change_status):
         """
         Test change_status with connection status
@@ -97,7 +96,7 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(mock_log.debug.call_count, 3, 'Debug log should have been called 3 times')
 
     @patch.object(pjlink_test, 'changeStatus')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_change_status_connection_status_connected(self, mock_log, mock_change_status):
         """
         Test change_status with connection status
@@ -120,7 +119,7 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(mock_log.debug.call_count, 3, 'Debug log should have been called 3 times')
 
     @patch.object(pjlink_test, 'changeStatus')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_change_status_connection_status_with_message(self, mock_log, mock_change_status):
         """
         Test change_status with connection status
@@ -144,7 +143,7 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(mock_log.debug.call_count, 3, 'Debug log should have been called 3 times')
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_av_mute_status(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve shutter/audio state
@@ -164,7 +163,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_available_inputs(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve avaliable inputs
@@ -184,7 +183,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_error_status(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve projector error status
@@ -204,7 +203,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_input_source(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve current input
@@ -224,7 +223,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_lamp_status(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve lamp(s) status
@@ -244,7 +243,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_manufacturer(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve manufacturer name
@@ -264,7 +263,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_model(self, mock_log, mock_send_command):
         """
         Test sending command to get model information
@@ -284,7 +283,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_name(self, mock_log, mock_send_command):
         """
         Test sending command to get user-assigned name
@@ -304,7 +303,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_other_info(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve other information
@@ -324,7 +323,7 @@ class TestPJLinkCommands(TestCase):
         mock_send_command.assert_called_once_with(cmd=test_data)
 
     @patch.object(pjlink_test, 'send_command')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_get_power_status(self, mock_log, mock_send_command):
         """
         Test sending command to retrieve current power state
@@ -599,7 +598,7 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(pjlink.pjlink_class, '2',
                          'Non-standard class reply should have set class=2')
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_clss_invalid_nan(self, mock_log):
         """
         Test CLSS reply has no class number
@@ -616,7 +615,7 @@ class TestPJLinkCommands(TestCase):
                          'Non-standard class reply should have set class=1')
         mock_log.error.assert_called_once_with(log_text)
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_clss_invalid_no_version(self, mock_log):
         """
         Test CLSS reply has no class number
@@ -648,7 +647,7 @@ class TestPJLinkCommands(TestCase):
         # THEN: PJLink instance errors should be None
         self.assertIsNone(pjlink.projector_errors, 'projector_errors should have been set to None')
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_erst_data_invalid_length(self, mock_log):
         """
         Test test_projector_process_erst_data_invalid_length
@@ -666,7 +665,7 @@ class TestPJLinkCommands(TestCase):
         self.assertTrue(mock_log.warning.called, 'Warning should have been logged')
         mock_log.warning.assert_called_once_with(log_text)
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_erst_data_invalid_nan(self, mock_log):
         """
         Test test_projector_process_erst_data_invalid_nan
@@ -764,7 +763,7 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(pjlink.source, '1', 'Input source should be set to "1"')
 
     @patch.object(pjlink_test, 'projectorUpdateIcons')
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_inst(self, mock_log, mock_UpdateIcons):
         """
         Test saving video source available information
@@ -787,7 +786,7 @@ class TestPJLinkCommands(TestCase):
         mock_log.debug.assert_called_once_with(log_data)
         self.assertTrue(mock_UpdateIcons.emit.called, 'Update Icons should have been called')
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_lamp_invalid(self, mock_log):
         """
         Test status multiple lamp on/off and hours
@@ -858,7 +857,7 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(pjlink.lamp[0]['Hours'], 22222,
                          'Lamp hours should have been set to 22222')
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_name(self, mock_log):
         """
         Test saving NAME data from projector
@@ -1040,7 +1039,7 @@ class TestPJLinkCommands(TestCase):
         self.assertNotEquals(pjlink.serial_no, test_number,
                              'Projector serial number should NOT have been set')
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_sver(self, mock_log):
         """
         Test invalid software version information - too long
@@ -1061,7 +1060,7 @@ class TestPJLinkCommands(TestCase):
         self.assertIsNone(pjlink.sw_version_received, 'Received software version should not have changed')
         mock_log.debug.assert_called_once_with(test_log)
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_sver_changed(self, mock_log):
         """
         Test invalid software version information - Received different than saved
@@ -1086,7 +1085,7 @@ class TestPJLinkCommands(TestCase):
         # There was 4 calls, but only the last one is checked with this method
         mock_log.warning.assert_called_with(test_log)
 
-    @patch.object(openlp.core.lib.projector.pjlink, 'log')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_sver_invalid(self, mock_log):
         """
         Test invalid software version information - too long
