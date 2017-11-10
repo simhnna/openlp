@@ -89,18 +89,18 @@ class JenkinsTrigger(object):
         """
         Create the JenkinsTrigger instance.
         """
-        self.build_number = {}
+        self.jobs = {}
         self.can_use_colour = can_use_colour and not os.name.startswith('nt')
         self.repo_name = get_repo_name()
         self.server = Jenkins(JENKINS_URL, username=username, password=password)
 
-    def fetch_build_numbers(self):
+    def fetch_jobs(self):
         """
-        Get the next build number from all the jobs
+        Get the job info for all the jobs
         """
         for job_name in OpenLPJobs.Jobs:
             job_info = self.server.get_job_info(job_name)
-            self.build_number[job_name] = job_info['nextBuildNumber']
+            self.jobs[job_name] = job_info
 
     def trigger_build(self):
         """
@@ -111,7 +111,7 @@ class JenkinsTrigger(object):
         # We just want the name (not the email).
         name = ' '.join(raw_output.decode().split()[:-1])
         cause = 'Build triggered by %s (%s)' % (name, self.repo_name)
-        self.fetch_build_numbers()
+        self.fetch_jobs()
         self.server.build_job(OpenLPJobs.Branch_Pull, {'BRANCH_NAME': self.repo_name, 'cause': cause})
 
     def print_output(self):
@@ -162,8 +162,10 @@ class JenkinsTrigger(object):
         :param job_name: The name of the job we want the information from. For example *Branch-01-Pull*. Use the class
          variables from the :class:`OpenLPJobs` class.
         """
-        self.current_build = self._get_build_info(job_name, self.build_number[job_name])
-        print('{:<70} [RUNNING]'.format(self.current_build['url']), end='', flush=True)
+        job = self.jobs[job_name]
+        print('{:<70} [WAITING]'.format(job['url'] + '/' + job['nextBuildNumber']), end='', flush=True)
+        self.current_build = self._get_build_info(job_name, job[job_name]['nextBuildNumber'])
+        print('\b\b\b\b\b\b\b\b\b[RUNNING]', end='', flush=True)
         is_success = False
         while self.current_build['building'] is True:
             time.sleep(0.5)
