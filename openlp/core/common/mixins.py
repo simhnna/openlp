@@ -101,6 +101,20 @@ class RegistryProperties(object):
     """
     This adds registry components to classes to use at run time.
     """
+    _application = None
+    _plugin_manager = None
+    _image_manager = None
+    _media_controller = None
+    _service_manager = None
+    _preview_controller = None
+    _live_controller = None
+    _main_window = None
+    _renderer = None
+    _theme_manager = None
+    _settings_form = None
+    _alerts_manager = None
+    _projector_manager = None
+
     @property
     def application(self):
         """
