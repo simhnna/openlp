@@ -96,6 +96,8 @@ class BibleImport(BibleDB, LogMixin, RegistryProperties):
         if language_form.exec(bible_name):
             combo_box = language_form.language_combo_box
             language_id = combo_box.itemData(combo_box.currentIndex())
+        else:
+            return False
         if not language_id:
             return None
         self.save_meta('language_id', language_id)
