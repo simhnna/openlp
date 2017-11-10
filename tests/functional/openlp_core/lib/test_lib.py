@@ -168,7 +168,7 @@ class TestLib(TestCase):
                 patch.object(Path, 'open'):
             file_path = Path('testfile.txt')
             file_path.is_file.return_value = True
-            file_path.open.side_effect = IOError()
+            file_path.open.side_effect = OSError()
 
             # WHEN: get_text_file_string is called
             result = get_text_file_string(file_path)

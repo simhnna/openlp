@@ -366,7 +366,7 @@ class ImageMediaItem(MediaManagerItem):
                 if validate_thumb(image.file_path, thumbnail_path):
                     icon = build_icon(thumbnail_path)
                 else:
-                    icon = create_thumb(image.file_path, thumbnail_path)
+                    icon = create_thumb(str(image.file_path), str(thumbnail_path))
             item_name = QtWidgets.QTreeWidgetItem([file_name])
             item_name.setText(0, file_name)
             item_name.setIcon(0, icon)
@@ -390,6 +390,7 @@ class ImageMediaItem(MediaManagerItem):
         :param files: A List of strings containing the filenames of the files to be loaded
         :param target_group: The QTreeWidgetItem of the group that will be the parent of the added files
         """
+        file_paths = [Path(file) for file in file_paths]
         self.application.set_normal_cursor()
         self.load_list(file_paths, target_group)
         last_dir = file_paths[0].parent

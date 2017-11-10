@@ -64,8 +64,8 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         Set up anything necessary for all tests
         """
         mocked_init_url.return_value = 'sqlite:///{}'.format(TEST_DB)
-        self.build_settings()
         self.setup_application()
+        self.build_settings()
         Registry.create()
         # Do not try to recreate if we've already been created from a previous test
         if not hasattr(self, 'projectordb'):

@@ -258,6 +258,12 @@ class Settings(QtCore.QSettings):
         ('media/last directory', 'media/last directory', [(str_to_path, None)])
     ]
 
+    __setting_upgrade_3__ = [
+        ('songuasge/db password', 'songusage/db password', []),
+        ('songuasge/db hostname', 'songusage/db hostname', []),
+        ('songuasge/db database', 'songusage/db database', [])
+    ]
+
     @staticmethod
     def extend_default_settings(default_values):
         """

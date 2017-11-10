@@ -113,8 +113,7 @@ class BookNameForm(QDialog, Ui_BookNameDialog):
             cor_book = self.corresponding_combo_box.currentText()
             for character in '\\.^$*+?{}[]()':
                 cor_book = cor_book.replace(character, '\\' + character)
-            books = [key for key in list(self.book_names.keys()) if re.match(cor_book, str(self.book_names[key]),
-                                                                             re.UNICODE)]
+            books = [key for key in list(self.book_names.keys()) if re.match(cor_book, str(self.book_names[key]))]
             books = [_f for _f in map(BiblesResourcesDB.get_book, books) if _f]
             if books:
                 self.book_id = books[0]['id']

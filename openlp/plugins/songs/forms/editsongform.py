@@ -105,9 +105,9 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         self.topics_list_view.setSortingEnabled(False)
         self.topics_list_view.setAlternatingRowColors(True)
         self.audio_list_widget.setAlternatingRowColors(True)
-        self.find_verse_split = re.compile('---\[\]---\n', re.UNICODE)
-        self.whitespace = re.compile(r'\W+', re.UNICODE)
-        self.find_tags = re.compile(u'\{/?\w+\}', re.UNICODE)
+        self.find_verse_split = re.compile('---\[\]---\n')
+        self.whitespace = re.compile(r'\W+')
+        self.find_tags = re.compile(r'\{/?\w+\}')
 
     def _load_objects(self, cls, combo, cache):
         """

@@ -194,7 +194,6 @@ class SongsOfFellowshipImport(OpenOfficeImport):
         :param text_portion: A Piece of text
         """
         text = text_portion.getString()
-        text = self.tidy_text(text)
         if text.strip() == '':
             return text
         if text_portion.CharWeight == BOLD:

@@ -25,6 +25,7 @@ import re
 from lxml import objectify
 from lxml.etree import Error, LxmlError
 
+from openlp.core.common import normalize_str
 from openlp.core.common.i18n import translate
 from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib import VerseType
@@ -262,7 +263,7 @@ class OpenSongImport(SongImport):
                                                               post=this_line[offset + column:])
                     offset += len(chord) + 2
             # Tidy text and remove the ____s from extended words
-            this_line = self.tidy_text(this_line)
+            this_line = normalize_str(this_line)
             this_line = this_line.replace('_', '')
             this_line = this_line.replace('||', '\n[---]\n')
             this_line = this_line.strip()
