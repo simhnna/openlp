@@ -101,6 +101,7 @@ class JenkinsTrigger(object):
         for job_name in OpenLPJobs.Jobs:
             job_info = self.server.get_job_info(job_name)
             self.jobs[job_name] = job_info
+            self.jobs[job_name]['nextBuildUrl'] = '{url}{nextBuildNumber}/'.format(**job_info)
 
     def trigger_build(self):
         """
@@ -163,13 +164,13 @@ class JenkinsTrigger(object):
          variables from the :class:`OpenLPJobs` class.
         """
         job = self.jobs[job_name]
-        print('{:<70} [WAITING]'.format(job['url'] + '/' + job['nextBuildNumber']), end='', flush=True)
-        self.current_build = self._get_build_info(job_name, job[job_name]['nextBuildNumber'])
+        print('{:<70} [WAITING]'.format(job['nextBuildUrl']), end='', flush=True)
+        self.current_build = self._get_build_info(job_name, job['nextBuildNumber'])
         print('\b\b\b\b\b\b\b\b\b[RUNNING]', end='', flush=True)
         is_success = False
         while self.current_build['building'] is True:
             time.sleep(0.5)
-            self.current_build = self.server.get_build_info(job_name, self.build_number[job_name])
+            self.current_build = self.server.get_build_info(job_name, job['nextBuildNumber'])
         result_string = self.current_build['result']
         is_success = result_string == 'SUCCESS'
         if self.can_use_colour:
