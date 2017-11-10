@@ -119,7 +119,7 @@ class JenkinsTrigger(object):
         Print the status information of the build triggered.
         """
         print('Add this to your merge proposal:')
-        print('--------------------------------')
+        print('-' * 80)
         bzr = Popen(('bzr', 'revno'), stdout=PIPE, stderr=PIPE)
         raw_output, error = bzr.communicate()
         revno = raw_output.decode().strip()
