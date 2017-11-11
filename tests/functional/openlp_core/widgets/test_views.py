@@ -627,4 +627,3 @@ class TestTreeWidgetWithDnD(TestCase):
         assert widget.allow_internal_dnd is False
         assert widget.indentation() == 0
         assert widget.isAnimated() is True
-

@@ -53,7 +53,7 @@ def translate(context, text, comment=None, qt_translate=QtCore.QCoreApplication.
 
 Language = namedtuple('Language', ['id', 'name', 'code'])
 ICU_COLLATOR = None
-DIGITS_OR_NONDIGITS = re.compile(r'\d+|\D+', re.UNICODE)
+DIGITS_OR_NONDIGITS = re.compile(r'\d+|\D+')
 LANGUAGES = sorted([
     Language(1, translate('common.languages', '(Afan) Oromo', 'Language code: om'), 'om'),
     Language(2, translate('common.languages', 'Abkhazian', 'Language code: ab'), 'ab'),

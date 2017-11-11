@@ -155,7 +155,7 @@ class ExceptionForm(QtWidgets.QDialog, Ui_ExceptionDialog, RegistryProperties):
             try:
                 with file_path.open('w') as report_file:
                     report_file.write(report_text)
-            except IOError:
+            except OSError:
                 log.exception('Failed to write crash report')
 
     def on_send_report_button_clicked(self):

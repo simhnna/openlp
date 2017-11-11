@@ -24,7 +24,6 @@ The :mod:`~openlp.plugins.songs.lib` module contains a number of library functio
 """
 
 import logging
-import os
 import re
 
 from PyQt5 import QtWidgets
@@ -39,8 +38,8 @@ from openlp.plugins.songs.lib.ui import SongStrings
 
 log = logging.getLogger(__name__)
 
-WHITESPACE = re.compile(r'[\W_]+', re.UNICODE)
-APOSTROPHE = re.compile('[\'`’ʻ′]', re.UNICODE)
+WHITESPACE = re.compile(r'[\W_]+')
+APOSTROPHE = re.compile(r'[\'`’ʻ′]')
 # PATTERN will look for the next occurence of one of these symbols:
 #   \controlword - optionally preceded by \*, optionally followed by a number
 #   \'## - where ## is a pair of hex digits, representing a single character
