@@ -144,7 +144,7 @@ class TestPresentationController(TestCase):
         # GIVEN: A mocked open, get_thumbnail_folder and exists
         with patch('openlp.plugins.presentations.lib.presentationcontroller.Path.read_text') as mocked_read_text, \
                 patch(FOLDER_TO_PATCH) as mocked_get_thumbnail_folder:
-            mocked_read_text.side_effect = IOError()
+            mocked_read_text.side_effect = OSError()
             mocked_get_thumbnail_folder.return_value = Path('test')
 
             # WHEN: calling get_titles_and_notes

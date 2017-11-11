@@ -58,17 +58,21 @@ class TestPylint(TestCase):
         # GIVEN: Some checks to disable and enable, and the pylint script
         disabled_checks = 'import-error,no-member'
         enabled_checks = 'missing-format-argument-key,unused-format-string-argument,bad-format-string'
-        if is_win() or 'arch' in platform.dist()[0].lower():
-            pylint_script = 'pylint'
-        else:
-            pylint_script = 'pylint3'
+        pylint_kwargs = {
+            'return_std': True
+        }
+        if version < '1.7.0':
+            if is_win() or 'arch' in platform.dist()[0].lower():
+                pylint_kwargs.update({'script': 'pylint'})
+            else:
+                pylint_kwargs.update({'script': 'pylint3'})
 
         # WHEN: Running pylint
         (pylint_stdout, pylint_stderr) = \
             lint.py_run('openlp --errors-only --disable={disabled} --enable={enabled} '
                         '--reports=no --output-format=parseable'.format(disabled=disabled_checks,
                                                                         enabled=enabled_checks),
-                        return_std=True, script=pylint_script)
+                        **pylint_kwargs)
         stdout = pylint_stdout.read()
         stderr = pylint_stderr.read()
         filtered_stdout = self._filter_tolerated_errors(stdout)

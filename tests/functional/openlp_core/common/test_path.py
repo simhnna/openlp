@@ -371,13 +371,13 @@ class TestPath(TestCase):
     @patch('openlp.core.common.path.log')
     def test_create_paths_dir_io_error(self, mocked_logger):
         """
-        Test the create_paths() when an IOError is raised
+        Test the create_paths() when an OSError is raised
         """
         # GIVEN: A `Path` to check with patched out mkdir and exists methods
         mocked_path = MagicMock()
-        mocked_path.exists.side_effect = IOError('Cannot make directory')
+        mocked_path.exists.side_effect = OSError('Cannot make directory')
 
-        # WHEN: An IOError is raised when checking the if the path exists.
+        # WHEN: An OSError is raised when checking the if the path exists.
         create_paths(mocked_path)
 
         # THEN: The Error should have been logged
@@ -385,7 +385,7 @@ class TestPath(TestCase):
 
     def test_create_paths_dir_value_error(self):
         """
-        Test the create_paths() when an error other than IOError is raised
+        Test the create_paths() when an error other than OSError is raised
         """
         # GIVEN: A `Path` to check with patched out mkdir and exists methods
         mocked_path = MagicMock()
