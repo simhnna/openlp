@@ -362,7 +362,7 @@ class TestBibleImport(TestCase):
         instance.wizard = MagicMock()
 
         # WHEN: Calling parse_xml
-        result = instance.parse_xml('file.tst')
+        result = instance.parse_xml(Path('file.tst'))
 
         # THEN: The result returned should contain the correct data, and should be an instance of eetree_Element
         assert etree.tostring(result) == b'<root>\n    <data><div>Test<p>data</p><a>to</a>keep</div></data>\n' \
