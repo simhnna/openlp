@@ -236,6 +236,9 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.hide_menu.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
             self.hide_menu.setMenu(QtWidgets.QMenu(translate('OpenLP.SlideController', 'Hide'), self.toolbar))
             self.toolbar.add_toolbar_widget(self.hide_menu)
+            self.toolbar.add_toolbar_action('goPreview', icon=':/general/general_live.png',
+                                            tooltip=translate('OpenLP.SlideController', 'Move to preview.'),
+                                            triggers=self.on_go_preview)
             # The order of the blank to modes in Shortcuts list comes from here.
             self.desktop_screen_enable = create_action(self, 'desktopScreenEnable',
                                                        text=translate('OpenLP.SlideController', 'Show Desktop'),
@@ -1419,6 +1422,15 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             else:
                 self.live_controller.add_service_manager_item(self.service_item, row)
             self.live_controller.preview_widget.setFocus()
+
+    def on_go_preview(self, field=None):
+        """
+        If live copy slide item to preview controller from live Controller
+        """
+        row = self.preview_widget.current_slide_number()
+        if -1 < row < self.preview_widget.slide_count():
+            self.preview_controller.add_service_manager_item(self.service_item, row)
+            self.preview_controller.preview_widget.setFocus()
 
     def on_media_start(self, item):
         """
