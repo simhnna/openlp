@@ -281,7 +281,7 @@ class OpenLyrics(object):
         # Process the formatting tags.
         # Have we any tags in song lyrics?
         tags_element = None
-        match = re.search('\{/?\w+\}', song.lyrics, re.UNICODE)
+        match = re.search(r'\{/?\w+\}', song.lyrics)
         if match:
             # Named 'format_' - 'format' is built-in function in Python.
             format_ = etree.SubElement(song_xml, 'format')

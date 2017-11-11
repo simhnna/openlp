@@ -24,7 +24,7 @@ import time
 
 from PyQt5 import QtCore
 
-from openlp.core.common import is_win, get_uno_command, get_uno_instance
+from openlp.core.common import get_uno_command, get_uno_instance, is_win, normalize_str
 from openlp.core.common.i18n import translate
 from .songimport import SongImport
 
@@ -241,7 +241,7 @@ class OpenOfficeImport(SongImport):
 
         :param text: The text.
         """
-        song_texts = self.tidy_text(text).split('\f')
+        song_texts = normalize_str(text).split('\f')
         self.set_defaults()
         for song_text in song_texts:
             if song_text.strip():

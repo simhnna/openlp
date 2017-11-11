@@ -40,7 +40,7 @@ class TestFirstTimeWizard(TestMixin, TestCase):
         Test get_web_page will attempt CONNECTION_RETRIES+1 connections - bug 1409031
         """
         # GIVEN: Initial settings and mocks
-        mocked_requests.get.side_effect = IOError('Unable to connect')
+        mocked_requests.get.side_effect = OSError('Unable to connect')
 
         # WHEN: A webpage is requested
         try:

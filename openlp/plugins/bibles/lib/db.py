@@ -313,8 +313,7 @@ class BibleDB(Manager):
         book_escaped = book
         for character in RESERVED_CHARACTERS:
             book_escaped = book_escaped.replace(character, '\\' + character)
-        regex_book = re.compile('\\s*{book}\\s*'.format(book='\\s*'.join(book_escaped.split())),
-                                re.UNICODE | re.IGNORECASE)
+        regex_book = re.compile('\\s*{book}\\s*'.format(book='\\s*'.join(book_escaped.split())), re.IGNORECASE)
         if language_selection == LanguageSelection.Bible:
             db_book = self.get_book(book)
             if db_book:

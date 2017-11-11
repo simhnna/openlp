@@ -25,6 +25,7 @@ import re
 
 from lxml import etree, objectify
 
+from openlp.core.common import normalize_str
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 
@@ -225,7 +226,7 @@ class EasySlidesImport(SongImport):
                 verses[reg].setdefault(vt, {})
                 verses[reg][vt].setdefault(vn, {})
                 verses[reg][vt][vn].setdefault(inst, [])
-                verses[reg][vt][vn][inst].append(self.tidy_text(line))
+                verses[reg][vt][vn][inst].append(normalize_str(line))
         # done parsing
         versetags = []
         # we use our_verse_order to ensure, we insert lyrics in the same order

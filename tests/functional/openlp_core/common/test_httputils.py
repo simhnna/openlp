@@ -233,7 +233,7 @@ class TestHttpUtils(TestCase, TestMixin):
         Test socket timeout gets caught
         """
         # GIVEN: Mocked urlopen to fake a network disconnect in the middle of a download
-        mocked_requests.get.side_effect = IOError
+        mocked_requests.get.side_effect = OSError
 
         # WHEN: Attempt to retrieve a file
         url_get_file(MagicMock(), url='http://localhost/test', file_path=Path(self.tempfile))
