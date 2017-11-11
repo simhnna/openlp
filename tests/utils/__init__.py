@@ -36,7 +36,7 @@ def convert_file_service_item(test_path, name, row=0):
     try:
         items = json.load(open_file)
         first_line = items[row]
-    except IOError:
+    except OSError:
         first_line = ''
     finally:
         open_file.close()

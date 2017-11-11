@@ -70,7 +70,7 @@ class PptviewController(PresentationController):
             try:
                 self.start_process()
                 return self.process.CheckInstalled()
-            except WindowsError:
+            except OSError:
                 return False
 
         def start_process(self):

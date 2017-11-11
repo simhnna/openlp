@@ -54,8 +54,14 @@ class SongUsageDetailForm(QtWidgets.QDialog, Ui_SongUsageDetailDialog, RegistryP
         """
         We need to set up the screen
         """
-        self.from_date_calendar.setSelectedDate(Settings().value(self.plugin.settings_section + '/from date'))
-        self.to_date_calendar.setSelectedDate(Settings().value(self.plugin.settings_section + '/to date'))
+        to_date = Settings().value(self.plugin.settings_section + '/to date')
+        if not (isinstance(to_date, QtCore.QDate) and to_date.isValid()):
+            to_date = QtCore.QDate.currentDate()
+        from_date = Settings().value(self.plugin.settings_section + '/from date')
+        if not (isinstance(from_date, QtCore.QDate) and from_date.isValid()):
+            from_date = to_date.addYears(-1)
+        self.from_date_calendar.setSelectedDate(from_date)
+        self.to_date_calendar.setSelectedDate(to_date)
         self.report_path_edit.path = Settings().value(self.plugin.settings_section + '/last directory export')
 
     def on_report_path_edit_path_changed(self, file_path):
