@@ -216,7 +216,7 @@ class Ui_ServiceManager(object):
             text=translate('OpenLP.ServiceManager', 'Go Live'), icon=':/general/general_live.png',
             tooltip=translate('OpenLP.ServiceManager', 'Send the selected item to Live.'),
             category=UiStrings().Service,
-            triggers=self.make_live)
+            triggers=self.on_make_live_action_triggered)
         self.layout.addWidget(self.order_toolbar)
         # Connect up our signals and slots
         self.theme_combo_box.activated.connect(self.on_theme_combo_box_selected)
@@ -1729,6 +1729,15 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         item = self.find_service_item()[0]
         self.service_items[item]['service_item'].update_theme(theme)
         self.regenerate_service_items(True)
+
+    def on_make_live_action_triggered(self, checked):
+        """
+        Handle `make_live_action` when the action is triggered.
+
+        :param bool checked: Not Used.
+        :rtype: None
+        """
+        self.make_live()
 
     def get_drop_position(self):
         """
