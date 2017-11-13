@@ -26,7 +26,7 @@ the Custom plugin
 from sqlalchemy import Column, Table, types
 from sqlalchemy.orm import mapper
 
-from openlp.core.common.i18n import get_locale_key
+from openlp.core.common.i18n import get_natural_key
 from openlp.core.lib.db import BaseModel, init_db
 
 
@@ -36,10 +36,10 @@ class CustomSlide(BaseModel):
     """
     # By default sort the customs by its title considering language specific characters.
     def __lt__(self, other):
-        return get_locale_key(self.title) < get_locale_key(other.title)
+        return get_natural_key(self.title) < get_natural_key(other.title)
 
     def __eq__(self, other):
-        return get_locale_key(self.title) == get_locale_key(other.title)
+        return get_natural_key(self.title) == get_natural_key(other.title)
 
     def __hash__(self):
         """

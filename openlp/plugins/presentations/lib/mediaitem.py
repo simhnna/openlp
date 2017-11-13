@@ -23,7 +23,7 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.i18n import UiStrings, translate, get_natural_key
 from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -165,7 +165,7 @@ class PresentationMediaItem(MediaManagerItem):
         if not initial_load:
             self.main_window.display_progress_bar(len(file_paths))
         # Sort the presentations by its filename considering language specific characters.
-        file_paths.sort(key=lambda file_path: get_locale_key(file_path.name))
+        file_paths.sort(key=lambda file_path: get_natural_key(file_path.name))
         for file_path in file_paths:
             if not initial_load:
                 self.main_window.increment_progress_bar()
