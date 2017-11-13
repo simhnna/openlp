@@ -243,7 +243,7 @@ class PresentationMediaItem(MediaManagerItem):
         """
         Clean up the files created such as thumbnails
 
-        :param openlp.core.common.path.Path file_path: File path of the presention to clean up after
+        :param openlp.core.common.path.Path file_path: File path of the presentation to clean up after
         :param bool clean_for_update: Only clean thumbnails if update is needed
         :rtype: None
         """

@@ -133,3 +133,27 @@ class TestMediaItem(TestCase, TestMixin):
 
         # THEN: doc.presentation_deleted should have been called since the presentation file did not exists.
         mocked_doc.assert_has_calls([call.get_thumbnail_path(1, True), call.presentation_deleted()], True)
+
+    @patch('openlp.plugins.presentations.lib.mediaitem.MediaManagerItem._setup')
+    @patch('openlp.plugins.presentations.lib.mediaitem.PresentationMediaItem.setup_item')
+    @patch('openlp.plugins.presentations.lib.mediaitem.Settings')
+    def test_search(self, mocked_settings, *unreferenced_mocks):
+        """
+        Test that the search method finds the correct results
+        """
+        # GIVEN: A mocked Settings class which returns a list of Path objects,
+        #        and an instance of the PresentationMediaItem
+        path_1 = Path('some_dir', 'Impress_file_1')
+        path_2 = Path('some_other_dir', 'impress_file_2')
+        path_3 = Path('another_dir', 'ppt_file')
+        mocked_returned_settings = MagicMock()
+        mocked_returned_settings.value.return_value = [path_1, path_2, path_3]
+        mocked_settings.return_value = mocked_returned_settings
+        media_item = PresentationMediaItem(None, MagicMock(), None)
+        media_item.settings_section = ''
+
+        # WHEN: Calling search
+        results = media_item.search('IMPRE', False)
+
+        # THEN: The first two results should have been returned
+        assert results == [[str(path_1), 'Impress_file_1'], [str(path_2), 'impress_file_2']]
