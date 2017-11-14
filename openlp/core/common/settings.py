@@ -40,7 +40,7 @@ __version__ = 2
 
 # Fix for bug #1014422.
 X11_BYPASS_DEFAULT = True
-if is_linux():
+if is_linux():                                                                              # pragma: no cover
     # Default to False on Gnome.
     X11_BYPASS_DEFAULT = bool(not os.environ.get('GNOME_DESKTOP_SESSION_ID'))
     # Default to False on Xfce.
@@ -495,7 +495,7 @@ class Settings(QtCore.QSettings):
                 # system.
                 if not isinstance(old_keys, (tuple, list)):
                     old_keys = [old_keys]
-                if not any([self.contains(old_key) for old_key in old_keys]):
+                if any([not self.contains(old_key) for old_key in old_keys]):
                     log.warning('One of {} does not exist, skipping upgrade'.format(old_keys))
                     continue
                 if new_key:
@@ -521,7 +521,7 @@ class Settings(QtCore.QSettings):
                             break
                     self.setValue(new_key, new_value)
                 [self.remove(old_key) for old_key in old_keys if old_key != new_key]
-        self.setValue('settings/version', version)
+            self.setValue('settings/version', version)
 
     def value(self, key):
         """
