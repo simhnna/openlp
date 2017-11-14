@@ -81,8 +81,12 @@ class ImageMediaItem(MediaManagerItem):
         self.add_group_action.setToolTip(UiStrings().AddGroupDot)
         self.replace_action.setText(UiStrings().ReplaceBG)
         self.replace_action.setToolTip(UiStrings().ReplaceLiveBG)
+        self.replace_action_context.setText(UiStrings().ReplaceBG)
+        self.replace_action_context.setToolTip(UiStrings().ReplaceLiveBG)
         self.reset_action.setText(UiStrings().ResetBG)
         self.reset_action.setToolTip(UiStrings().ResetLiveBG)
+        self.reset_action_context.setText(UiStrings().ResetBG)
+        self.reset_action_context.setToolTip(UiStrings().ResetLiveBG)
 
     def required_icons(self):
         """
@@ -184,6 +188,13 @@ class ImageMediaItem(MediaManagerItem):
             self.list_view,
             text=translate('ImagePlugin', 'Add new image(s)'),
             icon=':/general/general_open.png', triggers=self.on_file_click)
+        create_widget_action(self.list_view, separator=True)
+        self.replace_action_context = create_widget_action(
+            self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
+            triggers=self.on_replace_click)
+        self.reset_action_context = create_widget_action(
+            self.list_view, text=UiStrings().ReplaceLiveBG, icon=':/system/system_close.png',
+            visible=False, triggers=self.on_reset_click)
 
     def add_start_header_bar(self):
         """
@@ -659,6 +670,7 @@ class ImageMediaItem(MediaManagerItem):
         Called to reset the Live background with the image selected.
         """
         self.reset_action.setVisible(False)
+        self.reset_action_context.setVisible(False)
         self.live_controller.display.reset_image()
 
     def live_theme_changed(self):
@@ -666,6 +678,7 @@ class ImageMediaItem(MediaManagerItem):
         Triggered by the change of theme in the slide controller.
         """
         self.reset_action.setVisible(False)
+        self.reset_action_context.setVisible(False)
 
     def on_replace_click(self):
         """
@@ -683,6 +696,7 @@ class ImageMediaItem(MediaManagerItem):
             if file_path.exists():
                 if self.live_controller.display.direct_image(str(file_path), background):
                     self.reset_action.setVisible(True)
+                    self.reset_action_context.setVisible(True)
                 else:
                     critical_error_message_box(
                         UiStrings().LiveBGError,

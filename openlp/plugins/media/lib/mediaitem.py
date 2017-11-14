@@ -176,7 +176,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
     def add_custom_context_actions(self):
         create_widget_action(self.list_view, separator=True)
         self.replace_action_context = create_widget_action(
-            self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_blank.png',
+            self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
             triggers=self.on_replace_click)
         self.reset_action_context = create_widget_action(
             self.list_view, text=UiStrings().ReplaceLiveBG, icon=':/system/system_close.png',
