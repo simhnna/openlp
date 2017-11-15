@@ -233,7 +233,7 @@ def create_paths(*paths, **kwargs):
         try:
             if not path.exists():
                 path.mkdir(parents=True)
-        except IOError:
+        except OSError:
             if not kwargs.get('do_not_log', False):
                 log.exception('failed to check if directory exists or create directory')
 

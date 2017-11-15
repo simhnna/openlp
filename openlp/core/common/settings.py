@@ -255,7 +255,10 @@ class Settings(QtCore.QSettings):
         ('core/logo file', 'core/logo file', [(str_to_path, None)]),
         ('presentations/last directory', 'presentations/last directory', [(str_to_path, None)]),
         ('images/last directory', 'images/last directory', [(str_to_path, None)]),
-        ('media/last directory', 'media/last directory', [(str_to_path, None)])
+        ('media/last directory', 'media/last directory', [(str_to_path, None)]),
+        ('songuasge/db password', 'songusage/db password', []),
+        ('songuasge/db hostname', 'songusage/db hostname', []),
+        ('songuasge/db database', 'songusage/db database', [])
     ]
 
     @staticmethod
