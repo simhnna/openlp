@@ -31,6 +31,7 @@ from openlp.core.ui.media.vendor.mediainfoWrapper import MediaInfoWrapper
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'resources', 'media'))
 TEST_MEDIA = [['avi_file.avi', 61495], ['mp3_file.mp3', 134426], ['mpg_file.mpg', 9404], ['mp4_file.mp4', 188336]]
 
+
 class TestMediainfoWrapper(TestCase):
 
     def test_media_length(self):
