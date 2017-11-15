@@ -27,7 +27,7 @@ from openlp.core.api.endpoint.core import TRANSLATED_STRINGS
 
 log = logging.getLogger(__name__)
 
-remote_endpoint = Endpoint('remote', template_dir='remotes', static_dir='remotes')
+remote_endpoint = Endpoint('remote', template_dir='remotes')
 
 
 @remote_endpoint.route('{view}')
