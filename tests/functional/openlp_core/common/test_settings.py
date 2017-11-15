@@ -115,13 +115,14 @@ class TestSettings(TestCase, TestMixin):
     def test_save_existing_setting(self):
         """Test that saving an existing setting returns the new value"""
         # GIVEN: An existing setting
+        Settings().extend_default_settings({'test/existing value': None})
         Settings().setValue('test/existing value', 'old value')
 
         # WHEN a new value is saved into config
-        Settings().setValue('test/extend', 'new value')
+        Settings().setValue('test/existing value', 'new value')
 
         # THEN the new value is returned when re-read
-        assert Settings().value('test/extend') == 'new value', 'The saved value should be returned'
+        assert Settings().value('test/existing value') == 'new value', 'The saved value should be returned'
 
     def test_settings_override_with_group(self):
         """Test the Settings creation and its override usage - with groups"""
