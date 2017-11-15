@@ -25,10 +25,10 @@ information related to the rwquested media.
 """
 import json
 import os
-from subprocess import Popen
+import re
+from subprocess import Popen, check_output
 from tempfile import mkstemp
 
-import six
 from bs4 import BeautifulSoup, NavigableString
 
 ENV_DICT = os.environ
@@ -80,7 +80,7 @@ class Track(object):
 
     def to_data(self):
         data = {}
-        for k, v in six.iteritems(self.__dict__):
+        for k, v in self.__dict__.items():
             if k != 'xml_dom_fragment':
                 data[k] = v
         return data
@@ -100,7 +100,11 @@ class MediaInfoWrapper(object):
 
     @staticmethod
     def parse(filename, environment=ENV_DICT):
-        command = ["mediainfo", "-f", "--Output=XML", filename]
+        if MediaInfoWrapper._version():
+            format = 'OLDXML'
+        else:
+            format = 'XML'
+        command = ["mediainfo", "-f", "--Output={format}".format(format=format), filename]
         fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
         fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
         fp_out = os.fdopen(fileno_out, 'r+b')
@@ -115,6 +119,14 @@ class MediaInfoWrapper(object):
         os.unlink(fname_out)
         os.unlink(fname_err)
         return MediaInfoWrapper(xml_dom)
+
+    @staticmethod
+    def _version():
+        # For now we're only intrested in knowing the new style version (yy.mm)
+        version_str = check_output(['mediainfo', '--version'])
+        return re.search(b'\d\d\.\d\d', version_str)
+
+
 
     def _populate_tracks(self):
         if self.xml_dom is None:
