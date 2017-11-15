@@ -336,7 +336,7 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
                     for file in listing:
                         files.append(os.path.join(local_file, file))
             Registry().execute('{mime_data}_dnd'.format(mime_data=self.mime_data_text),
-                               {'files': files, 'target': self.itemAt(event.pos())})
+                               {'files': files})
         else:
             event.ignore()
 

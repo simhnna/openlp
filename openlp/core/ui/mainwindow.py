@@ -180,7 +180,7 @@ class Ui_MainWindow(object):
                                             triggers=self.service_manager_contents.on_load_service_clicked)
         self.file_save_item = create_action(main_window, 'fileSaveItem', icon=':/general/general_save.png',
                                             can_shortcuts=True, category=UiStrings().File,
-                                            triggers=self.service_manager_contents.save_file)
+                                            triggers=self.service_manager_contents.decide_save_method)
         self.file_save_as_item = create_action(main_window, 'fileSaveAsItem', can_shortcuts=True,
                                                category=UiStrings().File,
                                                triggers=self.service_manager_contents.save_file_as)
@@ -1367,7 +1367,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                               '- Please wait for copy to finish').format(path=self.new_data_path))
                 dir_util.copy_tree(str(old_data_path), str(self.new_data_path))
                 log.info('Copy successful')
-            except (IOError, os.error, DistutilsFileError) as why:
+            except (OSError, DistutilsFileError) as why:
                 self.application.set_normal_cursor()
                 log.exception('Data copy failed {err}'.format(err=str(why)))
                 err_text = translate('OpenLP.MainWindow',

@@ -155,7 +155,7 @@ def test_check_same_instance():
     assert first_instance is second_instance, 'Two UiStrings objects should be the same instance'
 
 
-def test_translate(self):
+def test_translate():
     """
     Test the translate() function
     """

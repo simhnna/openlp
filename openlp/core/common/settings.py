@@ -230,11 +230,14 @@ class Settings(QtCore.QSettings):
         'projector/source dialog type': 0  # Source select dialog box type
     }
     __file_path__ = ''
+    # Settings upgrades prior to 3.0
     __setting_upgrade_1__ = [
-        # Changed during 2.2.x development.
         ('songs/search as type', 'advanced/search as type', []),
         ('media/players', 'media/players_temp', [(media_players_conv, None)]),  # Convert phonon to system
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
+    ]
+    # Settings upgrades for 3.0 (aka 2.6)
+    __setting_upgrade_2__ = [
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
         ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('remotes/https enabled', '', []),
@@ -255,9 +258,7 @@ class Settings(QtCore.QSettings):
         # Last search type was renamed to last used search type in 2.6 since Bible search value type changed in 2.6.
         ('songs/last search type', 'songs/last used search type', []),
         ('bibles/last search type', '', []),
-        ('custom/last search type', 'custom/last used search type', [])]
-
-    __setting_upgrade_2__ = [
+        ('custom/last search type', 'custom/last used search type', []),
         # The following changes are being made for the conversion to using Path objects made in 2.6 development
         ('advanced/data path', 'advanced/data path', [(str_to_path, None)]),
         ('crashreport/last directory', 'crashreport/last directory', [(str_to_path, None)]),
@@ -280,6 +281,9 @@ class Settings(QtCore.QSettings):
         ('presentations/last directory', 'presentations/last directory', [(str_to_path, None)]),
         ('images/last directory', 'images/last directory', [(str_to_path, None)]),
         ('media/last directory', 'media/last directory', [(str_to_path, None)]),
+        ('songuasge/db password', 'songusage/db password', []),
+        ('songuasge/db hostname', 'songusage/db hostname', []),
+        ('songuasge/db database', 'songusage/db database', []),
         (['core/monitor', 'core/x position', 'core/y position', 'core/height', 'core/width', 'core/override',
           'core/display on monitor'], 'core/monitors', [(upgrade_monitor, [1, 0, 0, None, None, False, False])])
     ]

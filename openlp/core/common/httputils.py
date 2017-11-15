@@ -97,8 +97,8 @@ def get_web_page(url, headers=None, update_openlp=False, proxies=None):
             response = requests.get(url, headers=headers, proxies=proxies, timeout=float(CONNECTION_TIMEOUT))
             log.debug('Downloaded page {url}'.format(url=response.url))
             break
-        except IOError:
-            # For now, catch IOError. All requests errors inherit from IOError
+        except OSError:
+            # For now, catch OSError. All requests errors inherit from OSError
             log.exception('Unable to connect to {url}'.format(url=url))
             response = None
             if retries >= CONNECTION_RETRIES:
@@ -127,7 +127,7 @@ def get_url_file_size(url):
         try:
             response = requests.head(url, timeout=float(CONNECTION_TIMEOUT), allow_redirects=True)
             return int(response.headers['Content-Length'])
-        except IOError:
+        except OSError:
             if retries > CONNECTION_RETRIES:
                 raise ConnectionError('Unable to download {url}'.format(url=url))
             else:
@@ -173,7 +173,7 @@ def url_get_file(callback, url, file_path, sha256=None):
                     file_path.unlink()
                 return False
             break
-        except IOError:
+        except OSError:
             trace_error_handler(log)
             if retries > CONNECTION_RETRIES:
                 if file_path.exists():

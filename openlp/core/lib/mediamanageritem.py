@@ -92,7 +92,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         Run some initial setup. This method is separate from __init__ in order to mock it out in tests.
         """
         self.hide()
-        self.whitespace = re.compile(r'[\W_]+', re.UNICODE)
+        self.whitespace = re.compile(r'[\W_]+')
         visible_title = self.plugin.get_string(StringContent.VisibleName)
         self.title = str(visible_title['title'])
         Registry().register(self.plugin.name, self)
@@ -344,7 +344,9 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
             else:
                 new_files.append(file_name)
         if new_files:
-            self.validate_and_load(new_files, data['target'])
+            if 'target' in data:
+                self.validate_and_load(new_files, data['target'])
+            self.validate_and_load(new_files)
 
     def dnd_move_internal(self, target):
         """

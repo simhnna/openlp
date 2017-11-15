@@ -59,21 +59,24 @@ class TestSettings(TestCase, TestMixin):
         # THEN: The list should have been converted correctly
         assert result == 'system,webkit,vlc'
 
-    def test_settings_basic(self):
-        """Test the Settings creation and its default usage"""
-        # GIVEN: A new Settings setup
+    def test_default_value(self):
+        """Test reading a setting that doesn't exist yet"""
+        # GIVEN: A setting that doesn't exist yet
 
         # WHEN reading a setting for the first time
         default_value = Settings().value('core/has run wizard')
 
         # THEN the default value is returned
-        self.assertFalse(default_value, 'The default value should be False')
+        assert default_value is False, 'The default value should be False'
 
+    def test_save_new_value(self):
+        """Test saving a new setting"""
+        # GIVEN: A setting that hasn't been saved yet
         # WHEN a new value is saved into config
         Settings().setValue('core/has run wizard', True)
 
         # THEN the new value is returned when re-read
-        self.assertTrue(Settings().value('core/has run wizard'), 'The saved value should have been returned')
+        assert Settings().value('core/has run wizard') is True, 'The saved value should have been returned'
 
     def test_set_up_default_values(self):
         """Test that the default values are updated"""
@@ -107,13 +110,18 @@ class TestSettings(TestCase, TestMixin):
         extend = Settings().value('test/extend')
 
         # THEN the default value is returned
-        self.assertEqual('very wide', extend, 'The default value of "very wide" should be returned')
+        assert extend == 'very wide', 'The default value of "very wide" should be returned'
+
+    def test_save_existing_setting(self):
+        """Test that saving an existing setting returns the new value"""
+        # GIVEN: An existing setting
+        Settings().setValue('test/existing value', 'old value')
 
         # WHEN a new value is saved into config
-        Settings().setValue('test/extend', 'very short')
+        Settings().setValue('test/extend', 'new value')
 
         # THEN the new value is returned when re-read
-        self.assertEqual('very short', Settings().value('test/extend'), 'The saved value should be returned')
+        assert Settings().value('test/extend') == 'new value', 'The saved value should be returned'
 
     def test_settings_override_with_group(self):
         """Test the Settings creation and its override usage - with groups"""
