@@ -25,9 +25,7 @@ information related to the rwquested media.
 """
 import json
 import os
-import re
-from subprocess import Popen, check_output
-from tempfile import mkstemp
+from subprocess import check_output
 
 from bs4 import BeautifulSoup, NavigableString
 
