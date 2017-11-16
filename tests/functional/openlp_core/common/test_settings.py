@@ -22,6 +22,7 @@
 """
 Package to test the openlp.core.lib.settings package.
 """
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import call, patch
 
@@ -200,6 +201,32 @@ class TestSettings(TestCase, TestMixin):
     @patch('openlp.core.common.settings.QtCore.QSettings.value')
     @patch('openlp.core.common.settings.QtCore.QSettings.setValue')
     @patch('openlp.core.common.settings.QtCore.QSettings.remove')
+    def test_upgrade_setting_value(self, mocked_remove, mocked_setValue, mocked_value, mocked_contains):
+        """Test that the upgrade mechanism for settings correctly uses the new value when it's not a function"""
+        # GIVEN: A settings object with an upgrade step to take (99, so that we don't interfere with real ones)
+        local_settings = Settings()
+        local_settings.__setting_upgrade_99__ = [
+            ('values/old value', 'values/new value', [(True, 1)])
+        ]
+        settings.__version__ = 99
+        mocked_value.side_effect = [98, 1]
+        mocked_contains.return_value = True
+
+        # WHEN: upgrade_settings() is called
+        local_settings.upgrade_settings()
+
+        # THEN: The correct calls should have been made with the correct values
+        assert mocked_value.call_count == 2, 'Settings().value() should have been called twice'
+        assert mocked_value.call_args_list == [call('settings/version', 0), call('values/old value')]
+        assert mocked_setValue.call_count == 2, 'Settings().setValue() should have been called twice'
+        assert mocked_setValue.call_args_list == [call('values/new value', True), call('settings/version', 99)]
+        mocked_contains.assert_called_once_with('values/old value')
+        mocked_remove.assert_called_once_with('values/old value')
+
+    @patch('openlp.core.common.settings.QtCore.QSettings.contains')
+    @patch('openlp.core.common.settings.QtCore.QSettings.value')
+    @patch('openlp.core.common.settings.QtCore.QSettings.setValue')
+    @patch('openlp.core.common.settings.QtCore.QSettings.remove')
     def test_upgrade_multiple_one_invalid(self, mocked_remove, mocked_setValue, mocked_value, mocked_contains):
         """Test that the upgrade mechanism for settings works correctly for multiple values where one is invalid"""
         # GIVEN: A settings object with an upgrade step to take
@@ -218,3 +245,50 @@ class TestSettings(TestCase, TestMixin):
         mocked_value.assert_called_once_with('settings/version', 0)
         mocked_setValue.assert_called_once_with('settings/version', 99)
         assert mocked_contains.call_args_list == [call('multiple/value 1'), call('multiple/value 2')]
+
+    def test_can_upgrade(self):
+        """Test the Settings.can_upgrade() method"""
+        # GIVEN: A Settings object
+        local_settings = Settings()
+
+        # WHEN: can_upgrade() is run
+        result = local_settings.can_upgrade()
+
+        # THEN: The result should be True
+        assert result is True, 'The settings should be upgradeable'
+
+    def test_convert_value_setting_none_str(self):
+        """Test the Settings._convert_value() method when a setting is None and the default value is a string"""
+        # GIVEN: A settings object
+        # WHEN: _convert_value() is run
+        result = Settings()._convert_value(None, 'string')
+
+        # THEN: The result should be an empty string
+        assert result == '', 'The result should be an empty string'
+
+    def test_convert_value_setting_none_list(self):
+        """Test the Settings._convert_value() method when a setting is None and the default value is a list"""
+        # GIVEN: A settings object
+        # WHEN: _convert_value() is run
+        result = Settings()._convert_value(None, [None])
+
+        # THEN: The result should be an empty list
+        assert result == [], 'The result should be an empty list'
+
+    def test_convert_value_setting_json_Path(self):
+        """Test the Settings._convert_value() method when a setting is JSON and represents a Path object"""
+        # GIVEN: A settings object
+        # WHEN: _convert_value() is run
+        result = Settings()._convert_value('{"__Path__": ["openlp", "core"]}', None)
+
+        # THEN: The result should be a Path object
+        assert isinstance(result, Path), 'The result should be a Path object'
+
+    def test_convert_value_setting_bool_str(self):
+        """Test the Settings._convert_value() method when a setting is supposed to be a boolean"""
+        # GIVEN: A settings object
+        # WHEN: _convert_value() is run
+        result = Settings()._convert_value('false', True)
+
+        # THEN: The result should be False
+        assert result is False, 'The result should be False'
