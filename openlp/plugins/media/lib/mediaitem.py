@@ -26,7 +26,7 @@ import os
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.i18n import UiStrings, translate, get_natural_key
 from openlp.core.common.path import Path, path_to_str, create_paths
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
@@ -176,7 +176,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
     def add_custom_context_actions(self):
         create_widget_action(self.list_view, separator=True)
         self.replace_action_context = create_widget_action(
-            self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_blank.png',
+            self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
             triggers=self.on_replace_click)
         self.reset_action_context = create_widget_action(
             self.list_view, text=UiStrings().ReplaceLiveBG, icon=':/system/system_close.png',
@@ -362,7 +362,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         :param media: The media
         :param target_group:
         """
-        media.sort(key=lambda file_name: get_locale_key(os.path.split(str(file_name))[1]))
+        media.sort(key=lambda file_name: get_natural_key(os.path.split(str(file_name))[1]))
         for track in media:
             track_info = QtCore.QFileInfo(track)
             item_name = None
@@ -404,7 +404,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         :return: The media list
         """
         media_file_paths = Settings().value(self.settings_section + '/media files')
-        media_file_paths.sort(key=lambda file_path: get_locale_key(file_path.name))
+        media_file_paths.sort(key=lambda file_path: get_natural_key(file_path.name))
         if media_type == MediaType.Audio:
             extension = self.media_controller.audio_extensions_list
         else:

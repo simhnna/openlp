@@ -139,7 +139,8 @@ class PresentationDocument(object):
         :return: The path to the thumbnail
         :rtype: openlp.core.common.path.Path
         """
-        # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
+        # TODO: Can be removed when the upgrade path to OpenLP 3.0 is no longer needed, also ensure code in
+        #       get_temp_folder and PresentationPluginapp_startup is removed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
             folder = md5_hash(bytes(self.file_path))
         else:
@@ -153,7 +154,8 @@ class PresentationDocument(object):
         :return: The path to the temporary file folder
         :rtype: openlp.core.common.path.Path
         """
-        # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
+        # TODO: Can be removed when the upgrade path to OpenLP 3.0 is no longer needed, also ensure code in
+        #       get_thumbnail_folder and PresentationPluginapp_startup is removed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
             folder = md5_hash(bytes(self.file_path))
         else:

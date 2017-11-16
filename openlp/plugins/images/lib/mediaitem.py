@@ -26,7 +26,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import delete_file, get_images_filter
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.i18n import UiStrings, translate, get_natural_key
 from openlp.core.common.path import Path, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -81,8 +81,12 @@ class ImageMediaItem(MediaManagerItem):
         self.add_group_action.setToolTip(UiStrings().AddGroupDot)
         self.replace_action.setText(UiStrings().ReplaceBG)
         self.replace_action.setToolTip(UiStrings().ReplaceLiveBG)
+        self.replace_action_context.setText(UiStrings().ReplaceBG)
+        self.replace_action_context.setToolTip(UiStrings().ReplaceLiveBG)
         self.reset_action.setText(UiStrings().ResetBG)
         self.reset_action.setToolTip(UiStrings().ResetLiveBG)
+        self.reset_action_context.setText(UiStrings().ResetBG)
+        self.reset_action_context.setToolTip(UiStrings().ResetLiveBG)
 
     def required_icons(self):
         """
@@ -184,6 +188,13 @@ class ImageMediaItem(MediaManagerItem):
             self.list_view,
             text=translate('ImagePlugin', 'Add new image(s)'),
             icon=':/general/general_open.png', triggers=self.on_file_click)
+        create_widget_action(self.list_view, separator=True)
+        self.replace_action_context = create_widget_action(
+            self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
+            triggers=self.on_replace_click)
+        self.reset_action_context = create_widget_action(
+            self.list_view, text=UiStrings().ReplaceLiveBG, icon=':/system/system_close.png',
+            visible=False, triggers=self.on_reset_click)
 
     def add_start_header_bar(self):
         """
@@ -271,7 +282,7 @@ class ImageMediaItem(MediaManagerItem):
         :param parent_group_id: The ID of the group that will be added recursively.
         """
         image_groups = self.manager.get_all_objects(ImageGroups, ImageGroups.parent_id == parent_group_id)
-        image_groups.sort(key=lambda group_object: get_locale_key(group_object.group_name))
+        image_groups.sort(key=lambda group_object: get_natural_key(group_object.group_name))
         folder_icon = build_icon(':/images/image_group.png')
         for image_group in image_groups:
             group = QtWidgets.QTreeWidgetItem()
@@ -298,7 +309,7 @@ class ImageMediaItem(MediaManagerItem):
             combobox.clear()
             combobox.top_level_group_added = False
         image_groups = self.manager.get_all_objects(ImageGroups, ImageGroups.parent_id == parent_group_id)
-        image_groups.sort(key=lambda group_object: get_locale_key(group_object.group_name))
+        image_groups.sort(key=lambda group_object: get_natural_key(group_object.group_name))
         for image_group in image_groups:
             combobox.addItem(prefix + image_group.group_name, image_group.id)
             self.fill_groups_combobox(combobox, image_group.id, prefix + '   ')
@@ -355,7 +366,7 @@ class ImageMediaItem(MediaManagerItem):
             self.expand_group(open_group.id)
         # Sort the images by its filename considering language specific.
         # characters.
-        images.sort(key=lambda image_object: get_locale_key(image_object.file_path.name))
+        images.sort(key=lambda image_object: get_natural_key(image_object.file_path.name))
         for image in images:
             log.debug('Loading image: {name}'.format(name=image.file_path))
             file_name = image.file_path.name
@@ -533,9 +544,9 @@ class ImageMediaItem(MediaManagerItem):
                 group_items.append(item)
             if isinstance(item.data(0, QtCore.Qt.UserRole), ImageFilenames):
                 image_items.append(item)
-        group_items.sort(key=lambda item: get_locale_key(item.text(0)))
+        group_items.sort(key=lambda item: get_natural_key(item.text(0)))
         target_group.addChildren(group_items)
-        image_items.sort(key=lambda item: get_locale_key(item.text(0)))
+        image_items.sort(key=lambda item: get_natural_key(item.text(0)))
         target_group.addChildren(image_items)
 
     def generate_slide_data(self, service_item, item=None, xml_version=False, remote=False,
@@ -659,6 +670,7 @@ class ImageMediaItem(MediaManagerItem):
         Called to reset the Live background with the image selected.
         """
         self.reset_action.setVisible(False)
+        self.reset_action_context.setVisible(False)
         self.live_controller.display.reset_image()
 
     def live_theme_changed(self):
@@ -666,6 +678,7 @@ class ImageMediaItem(MediaManagerItem):
         Triggered by the change of theme in the slide controller.
         """
         self.reset_action.setVisible(False)
+        self.reset_action_context.setVisible(False)
 
     def on_replace_click(self):
         """
@@ -683,6 +696,7 @@ class ImageMediaItem(MediaManagerItem):
             if file_path.exists():
                 if self.live_controller.display.direct_image(str(file_path), background):
                     self.reset_action.setVisible(True)
+                    self.reset_action_context.setVisible(True)
                 else:
                     critical_error_message_box(
                         UiStrings().LiveBGError,

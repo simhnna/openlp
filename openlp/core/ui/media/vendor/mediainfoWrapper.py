@@ -25,10 +25,8 @@ information related to the rwquested media.
 """
 import json
 import os
-from subprocess import Popen
-from tempfile import mkstemp
+from subprocess import check_output
 
-import six
 from bs4 import BeautifulSoup, NavigableString
 
 ENV_DICT = os.environ
@@ -80,7 +78,7 @@ class Track(object):
 
     def to_data(self):
         data = {}
-        for k, v in six.iteritems(self.__dict__):
+        for k, v in self.__dict__.items():
             if k != 'xml_dom_fragment':
                 data[k] = v
         return data
@@ -100,20 +98,10 @@ class MediaInfoWrapper(object):
 
     @staticmethod
     def parse(filename, environment=ENV_DICT):
-        command = ["mediainfo", "-f", "--Output=XML", filename]
-        fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
-        fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
-        fp_out = os.fdopen(fileno_out, 'r+b')
-        fp_err = os.fdopen(fileno_err, 'r+b')
-        p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
-        p.wait()
-        fp_out.seek(0)
-
-        xml_dom = MediaInfoWrapper.parse_xml_data_into_dom(fp_out.read())
-        fp_out.close()
-        fp_err.close()
-        os.unlink(fname_out)
-        os.unlink(fname_err)
+        xml = check_output(['mediainfo', '-f', '--Output=XML', '--Inform=OLDXML', filename])
+        if not xml.startswith(b'<?xml'):
+            xml = check_output(['mediainfo', '-f', '--Output=XML', filename])
+        xml_dom = MediaInfoWrapper.parse_xml_data_into_dom(xml)
         return MediaInfoWrapper(xml_dom)
 
     def _populate_tracks(self):

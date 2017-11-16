@@ -216,7 +216,7 @@ class Ui_ServiceManager(object):
             text=translate('OpenLP.ServiceManager', 'Go Live'), icon=':/general/general_live.png',
             tooltip=translate('OpenLP.ServiceManager', 'Send the selected item to Live.'),
             category=UiStrings().Service,
-            triggers=self.make_live)
+            triggers=self.on_make_live_action_triggered)
         self.layout.addWidget(self.order_toolbar)
         # Connect up our signals and slots
         self.theme_combo_box.activated.connect(self.on_theme_combo_box_selected)
@@ -704,15 +704,19 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         directory_path = Settings().value(self.main_window.service_manager_settings_section + '/last directory')
         if directory_path:
             default_file_path = directory_path / default_file_path
-        # SaveAs from osz to oszl is not valid as the files will be deleted on exit which is not sensible or usable in
-        # the long term.
         lite_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files - lite (*.oszl)')
         packaged_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz)')
-
+        if self._file_name.endswith('oszl'):
+            default_filter = lite_filter
+        else:
+            default_filter = packaged_filter
+        # SaveAs from osz to oszl is not valid as the files will be deleted on exit which is not sensible or usable in
+        # the long term.
         if self._file_name.endswith('oszl') or self.service_has_all_original_files:
             file_path, filter_used = FileDialog.getSaveFileName(
                 self.main_window, UiStrings().SaveService, default_file_path,
-                '{packaged};; {lite}'.format(packaged=packaged_filter, lite=lite_filter))
+                '{packaged};; {lite}'.format(packaged=packaged_filter, lite=lite_filter),
+                default_filter)
         else:
             file_path, filter_used = FileDialog.getSaveFileName(
                 self.main_window, UiStrings().SaveService, default_file_path,
@@ -1729,6 +1733,15 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         item = self.find_service_item()[0]
         self.service_items[item]['service_item'].update_theme(theme)
         self.regenerate_service_items(True)
+
+    def on_make_live_action_triggered(self, checked):
+        """
+        Handle `make_live_action` when the action is triggered.
+
+        :param bool checked: Not Used.
+        :rtype: None
+        """
+        self.make_live()
 
     def get_drop_position(self):
         """
