@@ -64,7 +64,7 @@ class TestSwordImport(TestCase):
         mocked_manager = MagicMock()
 
         # WHEN: An importer object is created
-        importer = SwordBible(mocked_manager, path='.', name='.', filename='', sword_key='', sword_path='')
+        importer = SwordBible(mocked_manager, path='.', name='.', file_path=None, sword_key='', sword_path='')
 
         # THEN: The importer should be an instance of BibleDB
         self.assertIsInstance(importer, BibleDB)
@@ -80,7 +80,7 @@ class TestSwordImport(TestCase):
         #       Also mocked pysword structures
         mocked_manager = MagicMock()
         mocked_import_wizard = MagicMock()
-        importer = SwordBible(mocked_manager, path='.', name='.', filename='', sword_key='', sword_path='')
+        importer = SwordBible(mocked_manager, path='.', name='.', file_path=None, sword_key='', sword_path='')
         result_file = open(os.path.join(TEST_PATH, 'dk1933.json'), 'rb')
         test_data = json.loads(result_file.read().decode())
         importer.wizard = mocked_import_wizard
