@@ -45,13 +45,13 @@ class ZefaniaBible(BibleImport):
         """
         Loads a Bible from file.
         """
-        log.debug('Starting Zefania import from "{name}"'.format(name=self.filename))
+        log.debug('Starting Zefania import from "{name}"'.format(name=self.file_path))
         success = True
         try:
-            xmlbible = self.parse_xml(self.filename, elements=REMOVABLE_ELEMENTS, tags=REMOVABLE_TAGS)
+            xmlbible = self.parse_xml(self.file_path, elements=REMOVABLE_ELEMENTS, tags=REMOVABLE_TAGS)
             # Find bible language
             language = xmlbible.xpath("/XMLBIBLE/INFORMATION/language/text()")
-            language_id = self.get_language_id(language[0] if language else None, bible_name=self.filename)
+            language_id = self.get_language_id(language[0] if language else None, bible_name=str(self.file_path))
             if not language_id:
                 return False
             no_of_books = int(xmlbible.xpath('count(//BIBLEBOOK)'))
@@ -69,7 +69,7 @@ class ZefaniaBible(BibleImport):
                     log.debug('Could not find a name, will use number, basically a guess.')
                     book_ref_id = int(bnumber)
                 if not book_ref_id:
-                    log.error('Importing books from "{name}" failed'.format(name=self.filename))
+                    log.error('Importing books from "{name}" failed'.format(name=self.file_path))
                     return False
                 book_details = BiblesResourcesDB.get_book_by_id(book_ref_id)
                 db_book = self.create_book(book_details['name'], book_ref_id, book_details['testament_id'])

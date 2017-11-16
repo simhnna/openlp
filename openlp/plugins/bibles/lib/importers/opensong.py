@@ -46,7 +46,8 @@ def parse_chapter_number(number, previous_number):
 
     :param number: The raw data from the xml
     :param previous_number: The previous chapter number
-    :return: Number of current chapter. (Int)
+    :return: Number of current chapter.
+    :rtype: int
     """
     if number:
         return int(number.split()[-1])
@@ -132,13 +133,13 @@ class OpenSongBible(BibleImport):
         :param bible_name: The name of the bible being imported
         :return: True if import completed, False if import was unsuccessful
         """
-        self.log_debug('Starting OpenSong import from "{name}"'.format(name=self.filename))
-        self.validate_xml_file(self.filename, 'bible')
-        bible = self.parse_xml(self.filename, use_objectify=True)
+        self.log_debug('Starting OpenSong import from "{name}"'.format(name=self.file_path))
+        self.validate_xml_file(self.file_path, 'bible')
+        bible = self.parse_xml(self.file_path, use_objectify=True)
         if bible is None:
             return False
         # No language info in the opensong format, so ask the user
-        self.language_id = self.get_language_id(bible_name=self.filename)
+        self.language_id = self.get_language_id(bible_name=str(self.file_path))
         if not self.language_id:
             return False
         self.process_books(bible.b)

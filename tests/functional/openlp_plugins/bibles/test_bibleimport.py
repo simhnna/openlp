@@ -30,6 +30,7 @@ from lxml import etree, objectify
 from PyQt5.QtWidgets import QDialog
 
 from openlp.core.common.i18n import Language
+from openlp.core.common.path import Path
 from openlp.core.lib.exceptions import ValidationError
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB
@@ -48,7 +49,7 @@ class TestBibleImport(TestCase):
             b'    <data><unsupported>Test<x>data</x><y>to</y>discard</unsupported></data>\n'
             b'</root>'
         )
-        self.open_patcher = patch('builtins.open')
+        self.open_patcher = patch.object(Path, 'open')
         self.addCleanup(self.open_patcher.stop)
         self.mocked_open = self.open_patcher.start()
         self.critical_error_message_box_patcher = \
@@ -74,8 +75,8 @@ class TestBibleImport(TestCase):
         # WHEN: Creating an instance of BibleImport with no key word arguments
         instance = BibleImport(MagicMock())
 
-        # THEN: The filename attribute should be None
-        assert instance.filename is None
+        # THEN: The file_path attribute should be None
+        assert instance.file_path is None
         assert isinstance(instance, BibleDB)
 
     def test_init_kwargs_set(self):
@@ -84,11 +85,11 @@ class TestBibleImport(TestCase):
         """
         # GIVEN: A patched BibleDB._setup, BibleImport class and mocked parent
         # WHEN: Creating an instance of BibleImport with selected key word arguments
-        kwargs = {'filename': 'bible.xml'}
+        kwargs = {'file_path': 'bible.xml'}
         instance = BibleImport(MagicMock(), **kwargs)
 
-        # THEN: The filename keyword should be set to bible.xml
-        assert instance.filename == 'bible.xml'
+        # THEN: The file_path keyword should be set to bible.xml
+        assert instance.file_path == 'bible.xml'
         assert isinstance(instance, BibleDB)
 
     @patch.object(BibleDB, '_setup')
@@ -361,7 +362,7 @@ class TestBibleImport(TestCase):
         instance.wizard = MagicMock()
 
         # WHEN: Calling parse_xml
-        result = instance.parse_xml('file.tst')
+        result = instance.parse_xml(Path('file.tst'))
 
         # THEN: The result returned should contain the correct data, and should be an instance of eetree_Element
         assert etree.tostring(result) == b'<root>\n    <data><div>Test<p>data</p><a>to</a>keep</div></data>\n' \
@@ -378,7 +379,7 @@ class TestBibleImport(TestCase):
         instance.wizard = MagicMock()
 
         # WHEN: Calling parse_xml
-        result = instance.parse_xml('file.tst', use_objectify=True)
+        result = instance.parse_xml(Path('file.tst'), use_objectify=True)
 
         # THEN: The result returned should contain the correct data, and should be an instance of ObjectifiedElement
         assert etree.tostring(result) == b'<root><data><div>Test<p>data</p><a>to</a>keep</div></data>' \
@@ -396,7 +397,7 @@ class TestBibleImport(TestCase):
         instance.wizard = MagicMock()
 
         # WHEN: Calling parse_xml, with a test file
-        result = instance.parse_xml('file.tst', elements=elements)
+        result = instance.parse_xml(Path('file.tst'), elements=elements)
 
         # THEN: The result returned should contain the correct data
         assert etree.tostring(result) == \
@@ -413,7 +414,7 @@ class TestBibleImport(TestCase):
         instance.wizard = MagicMock()
 
         # WHEN: Calling parse_xml, with a test file
-        result = instance.parse_xml('file.tst', tags=tags)
+        result = instance.parse_xml(Path('file.tst'), tags=tags)
 
         # THEN: The result returned should contain the correct data
         assert etree.tostring(result) == b'<root>\n    <data>Testdatatokeep</data>\n    <data><unsupported>Test' \
@@ -431,7 +432,7 @@ class TestBibleImport(TestCase):
         instance.wizard = MagicMock()
 
         # WHEN: Calling parse_xml, with a test file
-        result = instance.parse_xml('file.tst', elements=elements, tags=tags)
+        result = instance.parse_xml(Path('file.tst'), elements=elements, tags=tags)
 
         # THEN: The result returned should contain the correct data
         assert etree.tostring(result) == b'<root>\n    <data>Testdatatokeep</data>\n    <data/>\n</root>'
@@ -446,10 +447,10 @@ class TestBibleImport(TestCase):
         exception.filename = 'file.tst'
         exception.strerror = 'No such file or directory'
         self.mocked_open.side_effect = exception
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling parse_xml
-        result = importer.parse_xml('file.tst')
+        result = importer.parse_xml(Path('file.tst'))
 
         # THEN: parse_xml should have caught the error, informed the user and returned None
         mocked_log_exception.assert_called_once_with('Opening file.tst failed.')
@@ -468,10 +469,10 @@ class TestBibleImport(TestCase):
         exception.filename = 'file.tst'
         exception.strerror = 'Permission denied'
         self.mocked_open.side_effect = exception
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling parse_xml
-        result = importer.parse_xml('file.tst')
+        result = importer.parse_xml(Path('file.tst'))
 
         # THEN: parse_xml should have caught the error, informed the user and returned None
         mocked_log_exception.assert_called_once_with('Opening file.tst failed.')
@@ -485,7 +486,7 @@ class TestBibleImport(TestCase):
         Test set_current_chapter
         """
         # GIVEN: An instance of BibleImport and a mocked wizard
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
         importer.wizard = MagicMock()
 
         # WHEN: Calling set_current_chapter
@@ -500,7 +501,7 @@ class TestBibleImport(TestCase):
         Test that validate_xml_file raises a ValidationError when is_compressed returns True
         """
         # GIVEN: A mocked parse_xml which returns None
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling is_compressed
         # THEN: ValidationError should be raised, with the message 'Compressed file'
@@ -515,7 +516,7 @@ class TestBibleImport(TestCase):
         Test that validate_xml_file raises a ValidationError when parse_xml returns None
         """
         # GIVEN: A mocked parse_xml which returns None
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling validate_xml_file
         # THEN: ValidationError should be raised, with the message 'Error when opening file'
@@ -531,7 +532,7 @@ class TestBibleImport(TestCase):
         Test that validate_xml_file returns True with valid XML
         """
         # GIVEN: Some test data with an OpenSong Bible "bible" root tag
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling validate_xml_file
         result = importer.validate_xml_file('file.name', 'bible')
@@ -546,7 +547,7 @@ class TestBibleImport(TestCase):
         Test that validate_xml_file raises a ValidationError with an OpenSong root tag
         """
         # GIVEN: Some test data with an Zefania root tag and an instance of BibleImport
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling validate_xml_file
         # THEN: ValidationError should be raised, and the critical error message box should was called informing
@@ -566,7 +567,7 @@ class TestBibleImport(TestCase):
         # GIVEN: Some test data with an Zefania root tag and an instance of BibleImport
         mocked_parse_xml.return_value = objectify.fromstring(
             '<osis xmlns=\'http://www.bibletechnologies.net/2003/OSIS/namespace\'></osis>')
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling validate_xml_file
         # THEN: ValidationError should be raised, and the critical error message box should was called informing
@@ -584,7 +585,7 @@ class TestBibleImport(TestCase):
         Test that validate_xml_file raises a ValidationError with an Zefania root tag
         """
         # GIVEN: Some test data with an Zefania root tag and an instance of BibleImport
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling validate_xml_file
         # THEN: ValidationError should be raised, and the critical error message box should was called informing
@@ -602,7 +603,7 @@ class TestBibleImport(TestCase):
         Test that validate_xml_file raises a ValidationError with an unknown root tag
         """
         # GIVEN: Some test data with an unknown root tag and an instance of BibleImport
-        importer = BibleImport(MagicMock(), path='.', name='.', filename='')
+        importer = BibleImport(MagicMock(), path='.', name='.', file_path=None)
 
         # WHEN: Calling validate_xml_file
         # THEN: ValidationError should be raised, and the critical error message box should was called informing

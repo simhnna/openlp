@@ -60,7 +60,7 @@ class SwordBible(BibleImport):
             bible = pysword_modules.get_bible_from_module(self.sword_key)
             language = pysword_module_json['lang']
             language = language[language.find('.') + 1:]
-            language_id = self.get_language_id(language, bible_name=self.filename)
+            language_id = self.get_language_id(language, bible_name=str(self.file_path))
             if not language_id:
                 return False
             books = bible.get_structure().get_books()

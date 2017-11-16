@@ -19,15 +19,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import os
-import re
 import logging
-from codecs import open as copen
+import re
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
 from bs4 import BeautifulSoup, Tag, NavigableString
 
+from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 
 BOOK_NUMBER_PATTERN = re.compile(r'\[(\d+)\]')
@@ -51,9 +50,9 @@ class WordProjectBible(BibleImport):
         Unzip the file to a temporary directory
         """
         self.tmp = TemporaryDirectory()
-        zip_file = ZipFile(os.path.abspath(self.filename))
-        zip_file.extractall(self.tmp.name)
-        self.base_dir = os.path.join(self.tmp.name, os.path.splitext(os.path.basename(self.filename))[0])
+        with ZipFile(str(self.file_path)) as zip_file:
+            zip_file.extractall(self.tmp.name)
+        self.base_path = Path(self.tmp.name, self.file_path.stem)
 
     def process_books(self):
         """
@@ -62,8 +61,7 @@ class WordProjectBible(BibleImport):
         :param bible_data: parsed xml
         :return: None
         """
-        with copen(os.path.join(self.base_dir, 'index.htm'), encoding='utf-8', errors='ignore') as index_file:
-            page = index_file.read()
+        page = (self.base_path / 'index.htm').read_text(encoding='utf-8', errors='ignore')
         soup = BeautifulSoup(page, 'lxml')
         bible_books = soup.find('div', 'textOptions').find_all('li')
         book_count = len(bible_books)
@@ -93,9 +91,7 @@ class WordProjectBible(BibleImport):
         :return: None
         """
         log.debug(book_link)
-        book_file = os.path.join(self.base_dir, os.path.normpath(book_link))
-        with copen(book_file, encoding='utf-8', errors='ignore') as f:
-            page = f.read()
+        page = (self.base_path / book_link).read_text(encoding='utf-8', errors='ignore')
         soup = BeautifulSoup(page, 'lxml')
         header_div = soup.find('div', 'textHeader')
         chapters_p = header_div.find('p')
@@ -114,9 +110,8 @@ class WordProjectBible(BibleImport):
         """
         Get the verses for a particular book
         """
-        chapter_file_name = os.path.join(self.base_dir, '{:02d}'.format(book_number), '{}.htm'.format(chapter_number))
-        with copen(chapter_file_name, encoding='utf-8', errors='ignore') as chapter_file:
-            page = chapter_file.read()
+        chapter_file_path = self.base_path / '{:02d}'.format(book_number) / '{}.htm'.format(chapter_number)
+        page = chapter_file_path.read_text(encoding='utf-8', errors='ignore')
         soup = BeautifulSoup(page, 'lxml')
         text_body = soup.find('div', 'textBody')
         if text_body:
@@ -158,9 +153,9 @@ class WordProjectBible(BibleImport):
         """
         Loads a Bible from file.
         """
-        self.log_debug('Starting WordProject import from "{name}"'.format(name=self.filename))
+        self.log_debug('Starting WordProject import from "{name}"'.format(name=self.file_path))
         self._unzip_file()
-        self.language_id = self.get_language_id(None, bible_name=self.filename)
+        self.language_id = self.get_language_id(None, bible_name=str(self.file_path))
         result = False
         if self.language_id:
             self.process_books()

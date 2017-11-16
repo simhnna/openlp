@@ -26,6 +26,7 @@ import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
+from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.importers.wordproject import WordProjectBible
 
 
@@ -48,19 +49,17 @@ class TestWordProjectImport(TestCase):
         self.addCleanup(self.manager_patcher.stop)
         self.manager_patcher.start()
 
-    @patch('openlp.plugins.bibles.lib.importers.wordproject.os')
-    @patch('openlp.plugins.bibles.lib.importers.wordproject.copen')
-    def test_process_books(self, mocked_open, mocked_os):
+    @patch.object(Path, 'read_text')
+    def test_process_books(self, mocked_read_text):
         """
         Test the process_books() method
         """
         # GIVEN: A WordProject importer and a bunch of mocked things
-        importer = WordProjectBible(MagicMock(), path='.', name='.', filename='kj.zip')
-        importer.base_dir = ''
+        importer = WordProjectBible(MagicMock(), path='.', name='.', file_path=Path('kj.zip'))
+        importer.base_path = Path()
         importer.stop_import_flag = False
         importer.language_id = 'en'
-        mocked_open.return_value.__enter__.return_value.read.return_value = INDEX_PAGE
-        mocked_os.path.join.side_effect = lambda *x: ''.join(x)
+        mocked_read_text.return_value = INDEX_PAGE
 
         # WHEN: process_books() is called
         with patch.object(importer, 'find_and_create_book') as mocked_find_and_create_book, \
@@ -69,26 +68,22 @@ class TestWordProjectImport(TestCase):
             importer.process_books()
 
         # THEN: The right methods should have been called
-        mocked_os.path.join.assert_called_once_with('', 'index.htm')
-        mocked_open.assert_called_once_with('index.htm', encoding='utf-8', errors='ignore')
+        mocked_read_text.assert_called_once_with(encoding='utf-8', errors='ignore')
         assert mocked_find_and_create_book.call_count == 66, 'There should be 66 books'
         assert mocked_process_chapters.call_count == 66, 'There should be 66 books'
         assert mocked_session.commit.call_count == 66, 'There should be 66 books'
 
-    @patch('openlp.plugins.bibles.lib.importers.wordproject.os')
-    @patch('openlp.plugins.bibles.lib.importers.wordproject.copen')
-    def test_process_chapters(self, mocked_open, mocked_os):
+    @patch.object(Path, 'read_text')
+    def test_process_chapters(self, mocked_read_text):
         """
         Test the process_chapters() method
         """
         # GIVEN: A WordProject importer and a bunch of mocked things
-        importer = WordProjectBible(MagicMock(), path='.', name='.', filename='kj.zip')
-        importer.base_dir = ''
+        importer = WordProjectBible(MagicMock(), path='.', name='.', file_path=Path('kj.zip'))
+        importer.base_path = Path()
         importer.stop_import_flag = False
         importer.language_id = 'en'
-        mocked_open.return_value.__enter__.return_value.read.return_value = CHAPTER_PAGE
-        mocked_os.path.join.side_effect = lambda *x: ''.join(x)
-        mocked_os.path.normpath.side_effect = lambda x: x
+        mocked_read_text.return_value = CHAPTER_PAGE
         mocked_db_book = MagicMock()
         mocked_db_book.name = 'Genesis'
         book_id = 1
@@ -102,24 +97,21 @@ class TestWordProjectImport(TestCase):
         # THEN: The right methods should have been called
         expected_set_current_chapter_calls = [call('Genesis', ch) for ch in range(1, 51)]
         expected_process_verses_calls = [call(mocked_db_book, 1, ch) for ch in range(1, 51)]
-        mocked_os.path.join.assert_called_once_with('', '01/1.htm')
-        mocked_open.assert_called_once_with('01/1.htm', encoding='utf-8', errors='ignore')
+        mocked_read_text.assert_called_once_with(encoding='utf-8', errors='ignore')
         assert mocked_set_current_chapter.call_args_list == expected_set_current_chapter_calls
         assert mocked_process_verses.call_args_list == expected_process_verses_calls
 
-    @patch('openlp.plugins.bibles.lib.importers.wordproject.os')
-    @patch('openlp.plugins.bibles.lib.importers.wordproject.copen')
-    def test_process_verses(self, mocked_open, mocked_os):
+    @patch.object(Path, 'read_text')
+    def test_process_verses(self, mocked_read_text):
         """
         Test the process_verses() method
         """
         # GIVEN: A WordProject importer and a bunch of mocked things
-        importer = WordProjectBible(MagicMock(), path='.', name='.', filename='kj.zip')
-        importer.base_dir = ''
+        importer = WordProjectBible(MagicMock(), path='.', name='.', file_path=Path('kj.zip'))
+        importer.base_path = Path()
         importer.stop_import_flag = False
         importer.language_id = 'en'
-        mocked_open.return_value.__enter__.return_value.read.return_value = CHAPTER_PAGE
-        mocked_os.path.join.side_effect = lambda *x: '/'.join(x)
+        mocked_read_text.return_value = CHAPTER_PAGE
         mocked_db_book = MagicMock()
         mocked_db_book.name = 'Genesis'
         book_number = 1
@@ -130,8 +122,7 @@ class TestWordProjectImport(TestCase):
             importer.process_verses(mocked_db_book, book_number, chapter_number)
 
         # THEN: All the right methods should have been called
-        mocked_os.path.join.assert_called_once_with('', '01', '1.htm')
-        mocked_open.assert_called_once_with('/01/1.htm', encoding='utf-8', errors='ignore')
+        mocked_read_text.assert_called_once_with(encoding='utf-8', errors='ignore')
         assert mocked_process_verse.call_count == 31
 
     def test_process_verse(self):
@@ -139,7 +130,7 @@ class TestWordProjectImport(TestCase):
         Test the process_verse() method
         """
         # GIVEN: An importer and a mocked method
-        importer = WordProjectBible(MagicMock(), path='.', name='.', filename='kj.zip')
+        importer = WordProjectBible(MagicMock(), path='.', name='.', file_path=Path('kj.zip'))
         mocked_db_book = MagicMock()
         mocked_db_book.id = 1
         chapter_number = 1
@@ -158,7 +149,7 @@ class TestWordProjectImport(TestCase):
         Test the process_verse() method when there's no text
         """
         # GIVEN: An importer and a mocked method
-        importer = WordProjectBible(MagicMock(), path='.', name='.', filename='kj.zip')
+        importer = WordProjectBible(MagicMock(), path='.', name='.', file_path=Path('kj.zip'))
         mocked_db_book = MagicMock()
         mocked_db_book.id = 1
         chapter_number = 1
@@ -177,7 +168,7 @@ class TestWordProjectImport(TestCase):
         Test the do_import() method
         """
         # GIVEN: An importer and mocked methods
-        importer = WordProjectBible(MagicMock(), path='.', name='.', filename='kj.zip')
+        importer = WordProjectBible(MagicMock(), path='.', name='.', file_path='kj.zip')
 
         # WHEN: do_import() is called
         with patch.object(importer, '_unzip_file') as mocked_unzip_file, \
@@ -199,7 +190,7 @@ class TestWordProjectImport(TestCase):
         Test the do_import() method when the language is not available
         """
         # GIVEN: An importer and mocked methods
-        importer = WordProjectBible(MagicMock(), path='.', name='.', filename='kj.zip')
+        importer = WordProjectBible(MagicMock(), path='.', name='.', file_path='kj.zip')
 
         # WHEN: do_import() is called
         with patch.object(importer, '_unzip_file') as mocked_unzip_file, \
