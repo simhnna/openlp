@@ -48,6 +48,7 @@ from openlp.core.display.screens import ScreenList
 from openlp.core.display.renderer import Renderer
 from openlp.core.lib import PluginManager, ImageManager, PluginStatus, build_icon
 from openlp.core.lib.ui import create_action
+from openlp.core.projectors.manager import ProjectorManager
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
@@ -55,7 +56,6 @@ from openlp.core.widgets.dialogs import FileDialog
 from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.printserviceform import PrintServiceForm
-from openlp.core.projectors import ProjectorManager
 from openlp.core.ui.style import PROGRESSBAR_STYLE, get_library_stylesheet
 from openlp.core.version import get_version
 
@@ -375,7 +375,7 @@ class Ui_MainWindow(object):
         self.media_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Library'))
         self.service_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Service'))
         self.theme_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Themes'))
-        self.projector_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Projectors'))
+        self.projector_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Projector Controller'))
         self.file_new_item.setText(translate('OpenLP.MainWindow', '&New Service'))
         self.file_new_item.setToolTip(UiStrings().NewService)
         self.file_new_item.setStatusTip(UiStrings().CreateService)
@@ -407,7 +407,7 @@ class Ui_MainWindow(object):
             translate('OpenLP.MainWindow', 'Import settings from a *.config file previously exported from '
                                            'this or another machine.'))
         self.settings_import_item.setText(translate('OpenLP.MainWindow', 'Settings'))
-        self.view_projector_manager_item.setText(translate('OpenLP.MainWindow', '&Projectors'))
+        self.view_projector_manager_item.setText(translate('OpenLP.MainWindow', '&Projector Controller'))
         self.view_projector_manager_item.setToolTip(translate('OpenLP.MainWindow', 'Hide or show Projectors.'))
         self.view_projector_manager_item.setStatusTip(translate('OpenLP.MainWindow',
                                                                 'Toggle visibility of the Projectors.'))

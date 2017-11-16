@@ -25,8 +25,9 @@ Package to test the openlp.core.projectors.pjlink base package.
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
 
-from openlp.core.projectors import PJLink, Projector
 from openlp.core.projectors.constants import E_PARAMETER, ERROR_STRING, S_ON, S_CONNECTED
+from openlp.core.projectors.db import Projector
+from openlp.core.projectors.pjlink import PJLink
 
 from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_CONNECT_AUTHENTICATE, TEST_HASH, TEST1_DATA
 

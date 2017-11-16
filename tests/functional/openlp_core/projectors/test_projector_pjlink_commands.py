@@ -26,11 +26,12 @@ from unittest import TestCase
 from unittest.mock import patch
 
 import openlp.core.projectors.pjlink
-from openlp.core.projectors import PJLink, Projector
 from openlp.core.projectors.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
     PJLINK_POWR_STATUS, \
     E_ERROR, E_NOT_CONNECTED, E_SOCKET_ADDRESS_NOT_AVAILABLE, E_UNKNOWN_SOCKET_ERROR, E_WARN, \
     S_CONNECTED, S_OFF, S_ON, S_NOT_CONNECTED, S_CONNECTING, S_STANDBY
+from openlp.core.projectors.db import Projector
+from openlp.core.projectors.pjlink import PJLink
 
 from tests.resources.projector.data import TEST_PIN, TEST1_DATA
 

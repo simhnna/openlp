@@ -116,9 +116,9 @@ from .shortcutlistform import ShortcutListForm
 from .servicemanager import ServiceManager
 from .thememanager import ThemeManager
 
-from openlp.core.projectors import ProjectorManager
-from openlp.core.projectors import ProjectorTab
-from openlp.core.projectors import ProjectorEditForm
+from openlp.core.projectors.editform import ProjectorEditForm
+from openlp.core.projectors.manager import ProjectorManager
+from openlp.core.projectors.tab import ProjectorTab
 
 __all__ = ['SplashScreen', 'AboutForm', 'SettingsForm', 'MainDisplay', 'SlideController', 'ServiceManager', 'ThemeForm',
            'ThemeManager', 'ServiceItemEditForm', 'FirstTimeForm', 'FirstTimeLanguageForm', 'Display', 'AudioPlayer',

@@ -20,27 +20,17 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    :mod:`openlp.core.ui.projector`
+    :mod:`openlp.core.projectors`
 
-    Initialization for the openlp.core.ui.projector modules.
+    Initialization for the openlp.core.projectors modules.
 """
 
-__all__ = ['PJLINK_PORT', 'ERROR_MSG', 'ERROR_STRING', 'DialogSourceStyle', 'PJLink', 'Projector',
-           'ProjectorDB', 'ProjectorEditForm', 'ProjectorManager', 'ProjectorTab']
+from openlp.core.projectors.constants import PJLINK_PORT, ERROR_MSG, ERROR_STRING
 
 
-# Due to circular dependencies, put the imports after defines
 class DialogSourceStyle(object):
     """
     An enumeration for projector dialog box type.
     """
     Tabbed = 0
     Single = 1
-
-
-from .constants import PJLINK_PORT, ERROR_MSG, ERROR_STRING
-from .db import Projector, ProjectorDB
-from .editform import ProjectorEditForm
-from .manager import ProjectorManager
-from .pjlink import PJLink
-from .tab import ProjectorTab

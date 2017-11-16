@@ -30,9 +30,9 @@ from openlp.core.api import ApiTab
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
 from openlp.core.lib import build_icon
+from openlp.core.projectors.tab import ProjectorTab
 from openlp.core.ui import AdvancedTab, GeneralTab, ThemesTab
 from openlp.core.ui.media import PlayerTab
-from openlp.core.projectors import ProjectorTab
 from openlp.core.ui.settingsdialog import Ui_SettingsDialog
 
 log = logging.getLogger(__name__)
