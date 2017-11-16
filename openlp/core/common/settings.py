@@ -62,30 +62,6 @@ def media_players_conv(string):
     return string
 
 
-def upgrade_monitor(number, x_position, y_position, height, width, can_override, can_display_on_monitor):
-    """
-    Upgrade them monitor setting from a few single entries to a composite JSON entry
-
-    :param int number: The old monitor number
-    :param int x_position: The X position
-    :param int y_position: The Y position
-    :param bool can_override: Are the screen positions overridden
-    :param bool can_display_on_monitor: Can OpenLP display on the monitor
-    :returns dict: Dictionary with the new value
-    """
-    return {
-        number: {
-            'displayGeometry': {
-                'x': x_position,
-                'y': y_position,
-                'height': height,
-                'width': width
-            }
-        },
-        'canDisplayOnMonitor': can_display_on_monitor
-    }
-
-
 class Settings(QtCore.QSettings):
     """
     Class to wrap QSettings.
@@ -283,9 +259,7 @@ class Settings(QtCore.QSettings):
         ('media/last directory', 'media/last directory', [(str_to_path, None)]),
         ('songuasge/db password', 'songusage/db password', []),
         ('songuasge/db hostname', 'songusage/db hostname', []),
-        ('songuasge/db database', 'songusage/db database', []),
-        (['core/monitor', 'core/x position', 'core/y position', 'core/height', 'core/width', 'core/override',
-          'core/display on monitor'], 'core/monitors', [(upgrade_monitor, [1, 0, 0, None, None, False, False])])
+        ('songuasge/db database', 'songusage/db database', [])
     ]
 
     @staticmethod
