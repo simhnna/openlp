@@ -100,33 +100,11 @@ class MediaInfoWrapper(object):
 
     @staticmethod
     def parse(filename, environment=ENV_DICT):
-        if MediaInfoWrapper._version():
-            format = 'OLDXML'
-        else:
-            format = 'XML'
-        command = ["mediainfo", "-f", "--Output={format}".format(format=format), filename]
-        fileno_out, fname_out = mkstemp(suffix=".xml", prefix="media-")
-        fileno_err, fname_err = mkstemp(suffix=".err", prefix="media-")
-        fp_out = os.fdopen(fileno_out, 'r+b')
-        fp_err = os.fdopen(fileno_err, 'r+b')
-        p = Popen(command, stdout=fp_out, stderr=fp_err, env=environment)
-        p.wait()
-        fp_out.seek(0)
-
-        xml_dom = MediaInfoWrapper.parse_xml_data_into_dom(fp_out.read())
-        fp_out.close()
-        fp_err.close()
-        os.unlink(fname_out)
-        os.unlink(fname_err)
+        xml = check_output(['mediainfo', '-f', '--Output=XML', '--Inform=OLDXML', filename])
+        if not xml.startswith(b'<?xml'):
+            xml = check_output(['mediainfo', '-f', '--Output=XML', filename])
+        xml_dom = MediaInfoWrapper.parse_xml_data_into_dom(xml)
         return MediaInfoWrapper(xml_dom)
-
-    @staticmethod
-    def _version():
-        # For now we're only intrested in knowing the new style version (yy.mm)
-        version_str = check_output(['mediainfo', '--version'])
-        return re.search(b'\d\d\.\d\d', version_str)
-
-
 
     def _populate_tracks(self):
         if self.xml_dom is None:
