@@ -40,7 +40,7 @@ __version__ = 2
 
 # Fix for bug #1014422.
 X11_BYPASS_DEFAULT = True
-if is_linux():
+if is_linux():                                                                              # pragma: no cover
     # Default to False on Gnome.
     X11_BYPASS_DEFAULT = bool(not os.environ.get('GNOME_DESKTOP_SESSION_ID'))
     # Default to False on Xfce.
@@ -206,11 +206,14 @@ class Settings(QtCore.QSettings):
         'projector/source dialog type': 0  # Source select dialog box type
     }
     __file_path__ = ''
+    # Settings upgrades prior to 3.0
     __setting_upgrade_1__ = [
-        # Changed during 2.2.x development.
         ('songs/search as type', 'advanced/search as type', []),
         ('media/players', 'media/players_temp', [(media_players_conv, None)]),  # Convert phonon to system
         ('media/players_temp', 'media/players', []),  # Move temp setting from above to correct setting
+    ]
+    # Settings upgrades for 3.0 (aka 2.6)
+    __setting_upgrade_2__ = [
         ('advanced/default color', 'core/logo background color', []),  # Default image renamed + moved to general > 2.4.
         ('advanced/default image', 'core/logo file', []),  # Default image renamed + moved to general after 2.4.
         ('remotes/https enabled', '', []),
@@ -231,9 +234,7 @@ class Settings(QtCore.QSettings):
         # Last search type was renamed to last used search type in 2.6 since Bible search value type changed in 2.6.
         ('songs/last search type', 'songs/last used search type', []),
         ('bibles/last search type', '', []),
-        ('custom/last search type', 'custom/last used search type', [])]
-
-    __setting_upgrade_2__ = [
+        ('custom/last search type', 'custom/last used search type', []),
         # The following changes are being made for the conversion to using Path objects made in 2.6 development
         ('advanced/data path', 'advanced/data path', [(str_to_path, None)]),
         ('crashreport/last directory', 'crashreport/last directory', [(str_to_path, None)]),
@@ -467,32 +468,38 @@ class Settings(QtCore.QSettings):
         for version in range(current_version, __version__):
             version += 1
             upgrade_list = getattr(self, '__setting_upgrade_{version}__'.format(version=version))
-            for old_key, new_key, rules in upgrade_list:
+            for old_keys, new_key, rules in upgrade_list:
                 # Once removed we don't have to do this again. - Can be removed once fully switched to the versioning
                 # system.
-                if not self.contains(old_key):
+                if not isinstance(old_keys, (tuple, list)):
+                    old_keys = [old_keys]
+                if any([not self.contains(old_key) for old_key in old_keys]):
+                    log.warning('One of {} does not exist, skipping upgrade'.format(old_keys))
                     continue
                 if new_key:
                     # Get the value of the old_key.
-                    old_value = super(Settings, self).value(old_key)
+                    old_values = [super(Settings, self).value(old_key) for old_key in old_keys]
                     # When we want to convert the value, we have to figure out the default value (because we cannot get
                     # the default value from the central settings dict.
                     if rules:
-                        default_value = rules[0][1]
-                        old_value = self._convert_value(old_value, default_value)
+                        default_values = rules[0][1]
+                        if not isinstance(default_values, (list, tuple)):
+                            default_values = [default_values]
+                        old_values = [self._convert_value(old_value, default_value)
+                                      for old_value, default_value in zip(old_values, default_values)]
                     # Iterate over our rules and check what the old_value should be "converted" to.
-                    for new, old in rules:
+                    new_value = None
+                    for new_rule, old_rule in rules:
                         # If the value matches with the condition (rule), then use the provided value. This is used to
                         # convert values. E. g. an old value 1 results in True, and 0 in False.
-                        if callable(new):
-                            old_value = new(old_value)
-                        elif old == old_value:
-                            old_value = new
+                        if callable(new_rule):
+                            new_value = new_rule(*old_values)
+                        elif old_rule in old_values:
+                            new_value = new_rule
                             break
-                    self.setValue(new_key, old_value)
-                if new_key != old_key:
-                    self.remove(old_key)
-        self.setValue('settings/version', version)
+                    self.setValue(new_key, new_value)
+                [self.remove(old_key) for old_key in old_keys if old_key != new_key]
+            self.setValue('settings/version', version)
 
     def value(self, key):
         """
