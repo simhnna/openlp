@@ -23,7 +23,6 @@
 The :mod:`openlp.core.version` module downloads the version details for OpenLP.
 """
 import logging
-import os
 import platform
 import sys
 import time
@@ -176,18 +175,12 @@ def get_version():
             full_version = '{tag}-bzr{tree}'.format(tag=tag_version.strip(), tree=tree_revision.strip())
     else:
         # We're not running the development version, let's use the file.
-        file_path = str(AppLocation.get_directory(AppLocation.VersionDir))
-        file_path = os.path.join(file_path, '.version')
-        version_file = None
+        file_path = AppLocation.get_directory(AppLocation.VersionDir) / '.version'
         try:
-            version_file = open(file_path, 'r')
-            full_version = str(version_file.read()).rstrip()
+            full_version = file_path.read_text().rstrip()
         except OSError:
             log.exception('Error in version file.')
             full_version = '0.0.0-bzr000'
-        finally:
-            if version_file:
-                version_file.close()
     bits = full_version.split('-')
     APPLICATION_VERSION = {
         'full': full_version,

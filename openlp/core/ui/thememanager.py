@@ -497,12 +497,12 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
                     name = translate('OpenLP.ThemeManager', '{name} (default)').format(name=text_name)
                 else:
                     name = text_name
-                thumb = self.thumb_path / '{name}.png'.format(name=text_name)
+                thumb_path = self.thumb_path / '{name}.png'.format(name=text_name)
                 item_name = QtWidgets.QListWidgetItem(name)
-                if validate_thumb(theme_path, thumb):
-                    icon = build_icon(thumb)
+                if validate_thumb(theme_path, thumb_path):
+                    icon = build_icon(thumb_path)
                 else:
-                    icon = create_thumb(str(theme_path), str(thumb))
+                    icon = create_thumb(theme_path, thumb_path)
                 item_name.setIcon(icon)
                 item_name.setData(QtCore.Qt.UserRole, text_name)
                 self.theme_list_widget.addItem(item_name)
@@ -692,7 +692,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
             sample_path_name.unlink()
         frame.save(str(sample_path_name), 'png')
         thumb_path = self.thumb_path / '{name}.png'.format(name=theme_name)
-        create_thumb(str(sample_path_name), str(thumb_path), False)
+        create_thumb(sample_path_name, thumb_path, False)
 
     def update_preview_images(self):
         """
@@ -710,7 +710,8 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
         Call the renderer to build a Sample Image
 
         :param theme_data: The theme to generated a preview for.
-        :param force_page: Flag to tell message lines per page need to be generated.
+        :param force_page: Flag to tell message lines per page need to be generated.7
+        :rtype: QtGui.QPixmap
         """
         return self.renderer.generate_preview(theme_data, force_page)
 

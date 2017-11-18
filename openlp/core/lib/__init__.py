@@ -179,8 +179,9 @@ def create_thumb(image_path, thumb_path, return_icon=True, size=None):
      height of 88 is used.
     :return: The final icon.
     """
-    ext = os.path.splitext(thumb_path)[1].lower()
-    reader = QtGui.QImageReader(image_path)
+    # TODO: To path object
+    thumb_path = Path(thumb_path)
+    reader = QtGui.QImageReader(str(image_path))
     if size is None:
         # No size given; use default height of 88
         if reader.size().isEmpty():
@@ -207,10 +208,10 @@ def create_thumb(image_path, thumb_path, return_icon=True, size=None):
             # Invalid; use default height of 88
             reader.setScaledSize(QtCore.QSize(int(ratio * 88), 88))
     thumb = reader.read()
-    thumb.save(thumb_path, ext[1:])
+    thumb.save(str(thumb_path), thumb_path.suffix[1:].lower())
     if not return_icon:
         return
-    if os.path.exists(thumb_path):
+    if thumb_path.exists():
         return build_icon(thumb_path)
     # Fallback for files with animation support.
     return build_icon(image_path)

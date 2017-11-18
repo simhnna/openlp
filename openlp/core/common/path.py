@@ -69,6 +69,9 @@ class Path(PathVariant):
                 path = path.relative_to(base_path)
         return {'__Path__': path.parts}
 
+    def rmtree(self, *args, **kwargs):
+        shutil.rmtree(str(self), *args, **kwargs)
+
 
 def replace_params(args, kwargs, params):
     """

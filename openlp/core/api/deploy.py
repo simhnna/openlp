@@ -22,7 +22,6 @@
 """
 Download and "install" the remote web client
 """
-import os
 from zipfile import ZipFile
 
 from openlp.core.common.applocation import AppLocation
@@ -30,18 +29,18 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.httputils import url_get_file, get_web_page, get_url_file_size
 
 
-def deploy_zipfile(app_root, zip_name):
+def deploy_zipfile(app_root_path, zip_name):
     """
     Process the downloaded zip file and add to the correct directory
 
-    :param zip_name: the zip file to be processed
-    :param app_root: the directory where the zip get expanded to
+    :param str zip_name: the zip file name to be processed
+    :param openlp.core.common.path.Path app_root_path: The directory to expand the zip to
 
     :return: None
     """
-    zip_file = os.path.join(app_root, zip_name)
-    web_zip = ZipFile(zip_file)
-    web_zip.extractall(app_root)
+    zip_path = app_root_path / zip_name
+    web_zip = ZipFile(str(zip_path))
+    web_zip.extractall(str(app_root_path))
 
 
 def download_sha256():
@@ -67,4 +66,4 @@ def download_and_check(callback=None):
     if url_get_file(callback, 'https://get.openlp.org/webclient/site.zip',
                     AppLocation.get_section_data_path('remotes') / 'site.zip',
                     sha256=sha256):
-        deploy_zipfile(str(AppLocation.get_section_data_path('remotes')), 'site.zip')
+        deploy_zipfile(AppLocation.get_section_data_path('remotes'), 'site.zip')

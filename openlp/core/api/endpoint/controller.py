@@ -28,6 +28,7 @@ import json
 from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import requires_auth
 from openlp.core.common.applocation import AppLocation
+from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, create_thumb
@@ -66,12 +67,12 @@ def controller_text(request):
             elif current_item.is_image() and not frame.get('image', '') and Settings().value('api/thumbnails'):
                 item['tag'] = str(index + 1)
                 thumbnail_path = os.path.join('images', 'thumbnails', frame['title'])
-                full_thumbnail_path = str(AppLocation.get_data_path() / thumbnail_path)
+                full_thumbnail_path = AppLocation.get_data_path() / thumbnail_path
                 # Create thumbnail if it doesn't exists
-                if not os.path.exists(full_thumbnail_path):
-                    create_thumb(current_item.get_frame_path(index), full_thumbnail_path, False)
-                Registry().get('image_manager').add_image(full_thumbnail_path, frame['title'], None, 88, 88)
-                item['img'] = urllib.request.pathname2url(os.path.sep + thumbnail_path)
+                if not full_thumbnail_path.exists():
+                    create_thumb(Path(current_item.get_frame_path(index)), full_thumbnail_path, False)
+                Registry().get('image_manager').add_image(str(full_thumbnail_path), frame['title'], None, 88, 88)
+                item['img'] = urllib.request.pathname2url(os.path.sep + str(thumbnail_path))
                 item['text'] = str(frame['title'])
                 item['html'] = str(frame['title'])
             else:

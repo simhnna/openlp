@@ -267,7 +267,7 @@ class PresentationDocument(object):
             return
         if image_path.is_file():
             thumb_path = self.get_thumbnail_path(index, False)
-            create_thumb(str(image_path), str(thumb_path), False, QtCore.QSize(-1, 360))
+            create_thumb(image_path, thumb_path, False, QtCore.QSize(-1, 360))
 
     def get_thumbnail_path(self, slide_no, check_exists=False):
         """

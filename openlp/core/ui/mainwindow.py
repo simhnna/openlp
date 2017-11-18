@@ -296,10 +296,9 @@ class Ui_MainWindow(object):
         # Give QT Extra Hint that this is an About Menu Item
         self.about_item.setMenuRole(QtWidgets.QAction.AboutRole)
         if is_win():
-            self.local_help_file = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)), 'OpenLP.chm')
+            self.local_help_file = AppLocation.get_directory(AppLocation.AppDir) / 'OpenLP.chm'
         elif is_macosx():
-            self.local_help_file = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)),
-                                                '..', 'Resources', 'OpenLP.help')
+            self.local_help_file = AppLocation.get_directory(AppLocation.AppDir) / '..' / 'Resources' / 'OpenLP.help'
         self.user_manual_item = create_action(main_window, 'userManualItem', icon=':/system/system_help_contents.png',
                                               can_shortcuts=True, category=UiStrings().Help,
                                               triggers=self.on_help_clicked)
@@ -760,7 +759,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Use the Online manual in other cases. (Linux)
         """
         if is_macosx() or is_win():
-            QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(self.local_help_file))
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(str(self.local_help_file)))
         else:
             import webbrowser
             webbrowser.open_new('http://manual.openlp.org/')

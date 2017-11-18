@@ -398,6 +398,8 @@ class MainDisplay(Display, LogMixin, RegistryProperties):
     def preview(self):
         """
         Generates a preview of the image displayed.
+
+        :rtype: QtGui.QPixmap
         """
         was_visible = self.isVisible()
         self.application.process_events()
