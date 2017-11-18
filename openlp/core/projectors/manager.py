@@ -34,14 +34,14 @@ from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.registry import RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib.ui import create_widget_action
-from openlp.core.lib.projector import DialogSourceStyle
-from openlp.core.lib.projector.constants import ERROR_MSG, ERROR_STRING, E_AUTHENTICATION, E_ERROR, \
+from openlp.core.projectors import DialogSourceStyle
+from openlp.core.projectors.constants import ERROR_MSG, ERROR_STRING, E_AUTHENTICATION, E_ERROR, \
     E_NETWORK, E_NOT_CONNECTED, E_UNKNOWN_SOCKET_ERROR, STATUS_STRING, S_CONNECTED, S_CONNECTING, S_COOLDOWN, \
     S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
-from openlp.core.lib.projector.db import ProjectorDB
-from openlp.core.lib.projector.pjlink import PJLink, PJLinkUDP
-from openlp.core.ui.projector.editform import ProjectorEditForm
-from openlp.core.ui.projector.sourceselectform import SourceSelectTabs, SourceSelectSingle
+from openlp.core.projectors.db import ProjectorDB
+from openlp.core.projectors.pjlink import PJLink, PJLinkUDP
+from openlp.core.projectors.editform import ProjectorEditForm
+from openlp.core.projectors.sourceselectform import SourceSelectTabs, SourceSelectSingle
 from openlp.core.widgets.toolbar import OpenLPToolbar
 
 log = logging.getLogger(__name__)
@@ -518,7 +518,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         projector.thread.quit()
         new_list = []
         for item in self.projector_list:
-            if item.link.dbid == projector.link.dbid:
+            if item.link.db_item.id == projector.link.db_item.id:
                 continue
             new_list.append(item)
         self.projector_list = new_list
@@ -730,7 +730,6 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         thread.started.connect(item.link.thread_started)
         thread.finished.connect(item.link.thread_stopped)
         thread.finished.connect(thread.deleteLater)
-        item.link.projectorNetwork.connect(self.update_status)
         item.link.changeStatus.connect(self.update_status)
         item.link.projectorAuthentication.connect(self.authentication_error)
         item.link.projectorNoAuthentication.connect(self.no_authentication_error)

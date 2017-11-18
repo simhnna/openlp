@@ -261,8 +261,8 @@ class UiFirstTimeWizard(object):
         self.alert_check_box.setText(translate('OpenLP.FirstTimeWizard',
                                                'Alerts – Display informative messages while showing other slides'))
         self.projectors_check_box.setText(translate('OpenLP.FirstTimeWizard',
-                                                    'Projectors – Control PJLink compatible projects on your network'
-                                                    ' from OpenLP'))
+                                                    'Projector Controller – Control PJLink compatible projects on your'
+                                                    ' network from OpenLP'))
         self.no_internet_page.setTitle(translate('OpenLP.FirstTimeWizard', 'No Internet Connection'))
         self.no_internet_page.setSubTitle(
             translate('OpenLP.FirstTimeWizard', 'Unable to detect an Internet connection.'))

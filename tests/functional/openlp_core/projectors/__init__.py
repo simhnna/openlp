@@ -20,15 +20,5 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    :mod:`openlp.core.ui.projector`
-
-    Initialization for the openlp.core.ui.projector modules.
+Module-level functions for the functional test suite
 """
-
-
-class DialogSourceStyle(object):
-    """
-    An enumeration for projector dialog box type.
-    """
-    Tabbed = 0
-    Single = 1

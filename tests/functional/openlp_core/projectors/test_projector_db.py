@@ -20,7 +20,7 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.ui.projectordb  find, edit, delete
+Package to test the openlp.core.projectors.db module.
 record functions.
 
 PREREQUISITE: add_record() and get_all() functions validated.
@@ -32,10 +32,10 @@ from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import patch
 
-from openlp.core.lib.projector import upgrade
 from openlp.core.lib.db import upgrade_db
-from openlp.core.lib.projector.constants import PJLINK_PORT
-from openlp.core.lib.projector.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
+from openlp.core.projectors import upgrade
+from openlp.core.projectors.constants import PJLINK_PORT
+from openlp.core.projectors.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
 
 from tests.resources.projector.data import TEST_DB_PJLINK1, TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
 from tests.utils.constants import TEST_RESOURCES_PATH
@@ -129,7 +129,7 @@ class TestProjectorDB(TestCase):
     """
     Test case for ProjectorDB
     """
-    @patch('openlp.core.lib.projector.db.init_url')
+    @patch('openlp.core.projectors.db.init_url')
     def setUp(self, mocked_init_url):
         """
         Set up anything necessary for all tests
