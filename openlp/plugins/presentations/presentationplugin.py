@@ -31,6 +31,7 @@ from PyQt5 import QtCore
 from openlp.core.api.http import register_endpoint
 from openlp.core.common import extension_loader
 from openlp.core.common.i18n import translate
+from openlp.core.common.path import path_to_str
 from openlp.core.common.settings import Settings
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.presentations.endpoint import api_presentations_endpoint, presentations_endpoint
@@ -144,12 +145,12 @@ class PresentationPlugin(Plugin):
         # TODO: Can be removed when the upgrade path to OpenLP 3.0 is no longer needed, also ensure code in
         #       PresentationDocument.get_thumbnail_folder and PresentationDocument.get_temp_folder is removed
         super().app_startup()
-        files_from_config = Settings().value('presentations/presentations files')
-        for file in files_from_config:
-            self.media_item.clean_up_thumbnails(file, clean_for_update=True)
+        presentation_paths = Settings().value('presentations/presentations files')
+        for path in presentation_paths:
+            self.media_item.clean_up_thumbnails(path, clean_for_update=True)
         self.media_item.list_view.clear()
         Settings().setValue('presentations/thumbnail_scheme', 'md5')
-        self.media_item.validate_and_load(files_from_config)
+        self.media_item.validate_and_load(presentation_paths)
 
     @staticmethod
     def about():

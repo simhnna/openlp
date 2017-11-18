@@ -649,8 +649,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 self.application.process_events()
                 plugin.first_time()
         self.application.process_events()
-        temp_dir = os.path.join(str(gettempdir()), 'openlp')
-        shutil.rmtree(temp_dir, True)
+        temp_path = Path(gettempdir(), 'openlp')
+        temp_path.rmtree(True)
 
     def on_first_time_wizard_clicked(self):
         """
@@ -1219,7 +1219,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         settings.remove('custom slide')
         settings.remove('service')
         settings.beginGroup(self.general_settings_section)
-        self.recent_files = [path_to_str(file_path) for file_path in settings.value('recent files')]
+        self.recent_files = settings.value('recent files')
         settings.endGroup()
         settings.beginGroup(self.ui_settings_section)
         self.move(settings.value('main window position'))
@@ -1243,7 +1243,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         log.debug('Saving QSettings')
         settings = Settings()
         settings.beginGroup(self.general_settings_section)
-        settings.setValue('recent files', [str_to_path(file) for file in self.recent_files])
+        settings.setValue('recent files', self.recent_files)
         settings.endGroup()
         settings.beginGroup(self.ui_settings_section)
         settings.setValue('main window position', self.pos())
@@ -1259,26 +1259,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Updates the recent file menu with the latest list of service files accessed.
         """
         recent_file_count = Settings().value('advanced/recent file count')
-        existing_recent_files = [recentFile for recentFile in self.recent_files if os.path.isfile(str(recentFile))]
-        recent_files_to_display = existing_recent_files[0:recent_file_count]
         self.recent_files_menu.clear()
-        for file_id, filename in enumerate(recent_files_to_display):
-            log.debug('Recent file name: {name}'.format(name=filename))
+        count = 0
+        for recent_path in self.recent_files:
+            if not recent_path.is_file():
+                continue
+            count += 1
+            log.debug('Recent file name: {name}'.format(name=recent_path))
             action = create_action(self, '',
-                                   text='&{n} {name}'.format(n=file_id + 1,
-                                                             name=os.path.splitext(os.path.basename(str(filename)))[0]),
-                                   data=filename,
-                                   triggers=self.service_manager_contents.on_recent_service_clicked)
+                                   text='&{n} {name}'.format(n=count, name=recent_path.name),
+                                   data=recent_path, triggers=self.service_manager_contents.on_recent_service_clicked)
             self.recent_files_menu.addAction(action)
-        clear_recent_files_action = create_action(self, '',
-                                                  text=translate('OpenLP.MainWindow', 'Clear List', 'Clear List of '
-                                                                                                    'recent files'),
-                                                  statustip=translate('OpenLP.MainWindow', 'Clear the list of recent '
-                                                                                           'files.'),
-                                                  enabled=bool(self.recent_files),
-                                                  triggers=self.clear_recent_file_menu)
+            if count == recent_file_count:
+                break
+        clear_recent_files_action = \
+            create_action(self, '', text=translate('OpenLP.MainWindow', 'Clear List', 'Clear List of recent files'),
+                          statustip=translate('OpenLP.MainWindow', 'Clear the list of recent files.'),
+                          enabled=bool(self.recent_files), triggers=self.clear_recent_file_menu)
         add_actions(self.recent_files_menu, (None, clear_recent_files_action))
-        clear_recent_files_action.setEnabled(bool(self.recent_files))
 
     def add_recent_file(self, filename):
         """
@@ -1290,20 +1288,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # actually stored in the settings therefore the default value of 20 will
         # always be used.
         max_recent_files = Settings().value('advanced/max recent files')
-        if filename:
-            # Add some cleanup to reduce duplication in the recent file list
-            filename = os.path.abspath(filename)
-            # abspath() only capitalises the drive letter if it wasn't provided
-            # in the given filename which then causes duplication.
-            if filename[1:3] == ':\\':
-                filename = filename[0].upper() + filename[1:]
-            if filename in self.recent_files:
-                self.recent_files.remove(filename)
-            if not isinstance(self.recent_files, list):
-                self.recent_files = [self.recent_files]
-            self.recent_files.insert(0, filename)
-            while len(self.recent_files) > max_recent_files:
-                self.recent_files.pop()
+        file_path = Path(filename)
+        # Some cleanup to reduce duplication in the recent file list
+        file_path = file_path.resolve()
+        if file_path in self.recent_files:
+            self.recent_files.remove(file_path)
+        self.recent_files.insert(0, file_path)
+        self.recent_files = self.recent_files[:max_recent_files]
 
     def clear_recent_file_menu(self):
         """
