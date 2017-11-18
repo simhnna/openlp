@@ -27,8 +27,9 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from openlp.core.common.registry import Registry
-from openlp.core.ui import ProjectorManager, ProjectorEditForm
-from openlp.core.lib.projector.db import ProjectorDB
+from openlp.core.projectors.db import ProjectorDB
+from openlp.core.projectors.editform import ProjectorEditForm
+from openlp.core.projectors.manager import ProjectorManager
 
 from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB
@@ -45,7 +46,7 @@ class TestProjectorManager(TestCase, TestMixin):
         self.setup_application()
         self.build_settings()
         Registry.create()
-        with patch('openlp.core.lib.projector.db.init_url') as mocked_init_url:
+        with patch('openlp.core.projectors.db.init_url') as mocked_init_url:
             if os.path.exists(TEST_DB):
                 os.unlink(TEST_DB)
             mocked_init_url.return_value = 'sqlite:///%s' % TEST_DB

@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2015 OpenLP Developers                                   #
+# Copyright (c) 2008-2017 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -20,24 +20,17 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-Package to test the openlp.core.lib.projector.constants package.
+    :mod:`openlp.core.projectors`
+
+    Initialization for the openlp.core.projectors modules.
 """
-from unittest import TestCase
+
+from openlp.core.projectors.constants import PJLINK_PORT, ERROR_MSG, ERROR_STRING
 
 
-class TestProjectorConstants(TestCase):
+class DialogSourceStyle(object):
     """
-    Test specific functions in the projector constants module.
+    An enumeration for projector dialog box type.
     """
-    def test_build_pjlink_video_label(self):
-        """
-        Test building PJLINK_DEFAULT_CODES dictionary
-        """
-        # GIVEN: Test data
-        from tests.resources.projector.data import TEST_VIDEO_CODES
-
-        # WHEN: Import projector PJLINK_DEFAULT_CODES
-        from openlp.core.lib.projector.constants import PJLINK_DEFAULT_CODES
-
-        # THEN: Verify dictionary was build correctly
-        self.assertEqual(PJLINK_DEFAULT_CODES, TEST_VIDEO_CODES, 'PJLink video strings should match')
+    Tabbed = 0
+    Single = 1
