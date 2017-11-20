@@ -25,7 +25,7 @@ from PyQt5 import QtCore
 
 from openlp.core.common import md5_hash
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.path import Path, create_paths, rmtree
+from openlp.core.common.path import Path, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import create_thumb, validate_thumb
@@ -126,9 +126,9 @@ class PresentationDocument(object):
             thumbnail_folder_path = self.get_thumbnail_folder()
             temp_folder_path = self.get_temp_folder()
             if thumbnail_folder_path.exists():
-                rmtree(thumbnail_folder_path)
+                thumbnail_folder_path.rmtree()
             if temp_folder_path.exists():
-                rmtree(temp_folder_path)
+                temp_folder_path.rmtree()
         except OSError:
             log.exception('Failed to delete presentation controller files')
 

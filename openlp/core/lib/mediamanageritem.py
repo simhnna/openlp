@@ -333,7 +333,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         new_file_paths = []
         error_shown = False
         for file_name in data['files']:
-            file_path = str_to_path(file_name) # TODO:
+            file_path = str_to_path(file_name)
             if file_path.suffix[1:].lower() not in self.on_new_file_masks:
                 if not error_shown:
                     critical_error_message_box(
@@ -367,7 +367,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         """
         full_list = []
         for count in range(self.list_view.count()):
-            full_list.append(self.list_view.item(count).data(QtCore.Qt.UserRole)) # TODO: Path objects
+            full_list.append(self.list_view.item(count).data(QtCore.Qt.UserRole))
         duplicates_found = False
         files_added = False
         for file_path in file_paths:
