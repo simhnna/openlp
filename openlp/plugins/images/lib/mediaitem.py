@@ -377,7 +377,7 @@ class ImageMediaItem(MediaManagerItem):
                 if validate_thumb(image.file_path, thumbnail_path):
                     icon = build_icon(thumbnail_path)
                 else:
-                    icon = create_thumb(image.file_path,thumbnail_path)
+                    icon = create_thumb(image.file_path, thumbnail_path)
             item_name = QtWidgets.QTreeWidgetItem([file_name])
             item_name.setText(0, file_name)
             item_name.setIcon(0, icon)
