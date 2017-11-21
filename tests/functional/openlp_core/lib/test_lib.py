@@ -320,7 +320,7 @@ class TestLib(TestCase):
             pass
 
         # Only continue when the thumb does not exist.
-        self.assertFalse(os.path.exists(thumb_path), 'Test was not run, because the thumb already exists.')
+        self.assertFalse(thumb_path.exists(), 'Test was not run, because the thumb already exists.')
 
         # WHEN: Create the thumb.
         icon = create_thumb(image_path, thumb_path)
