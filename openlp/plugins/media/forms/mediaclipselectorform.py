@@ -110,7 +110,7 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         self.subtitle_tracks_combobox.clear()
         self.audio_tracks_combobox.clear()
         self.titles_combo_box.clear()
-        time = QtCore.QTime()
+        time = QtCore.QTime(0, 0, 0)
         self.start_position_edit.setTime(time)
         self.end_timeedit.setTime(time)
         self.position_timeedit.setTime(time)
@@ -295,7 +295,7 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         :param clicked: Given from signal, not used.
         """
         vlc_ms_pos = self.vlc_media_player.get_time()
-        time = QtCore.QTime()
+        time = QtCore.QTime(0, 0, 0)
         new_pos_time = time.addMSecs(vlc_ms_pos)
         self.start_position_edit.setTime(new_pos_time)
         # If start time is after end time, update end time.
@@ -311,7 +311,7 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         :param clicked: Given from signal, not used.
         """
         vlc_ms_pos = self.vlc_media_player.get_time()
-        time = QtCore.QTime()
+        time = QtCore.QTime(0, 0, 0)
         new_pos_time = time.addMSecs(vlc_ms_pos)
         self.end_timeedit.setTime(new_pos_time)
         # If start time is after end time, update start time.
@@ -448,7 +448,7 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         self.position_slider.setMaximum(self.playback_length)
         # setup start and end time
         rounded_vlc_ms_length = int(round(self.playback_length / 100.0) * 100.0)
-        time = QtCore.QTime()
+        time = QtCore.QTime(0, 0, 0)
         playback_length_time = time.addMSecs(rounded_vlc_ms_length)
         self.start_position_edit.setMaximumTime(playback_length_time)
         self.end_timeedit.setMaximumTime(playback_length_time)
@@ -506,7 +506,7 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         if self.vlc_media_player:
             vlc_ms_pos = self.vlc_media_player.get_time()
             rounded_vlc_ms_pos = int(round(vlc_ms_pos / 100.0) * 100.0)
-            time = QtCore.QTime()
+            time = QtCore.QTime(0, 0, 0)
             new_pos_time = time.addMSecs(rounded_vlc_ms_pos)
             self.position_timeedit.setTime(new_pos_time)
             self.position_slider.setSliderPosition(vlc_ms_pos)
