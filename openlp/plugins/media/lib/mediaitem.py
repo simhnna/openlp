@@ -455,5 +455,5 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
             return
         # Append the optical string to the media list
         file_paths.append(optical)
-        self.load_list([optical])
+        self.load_list([str(optical)])
         Settings().setValue(self.settings_section + '/media files', file_paths)

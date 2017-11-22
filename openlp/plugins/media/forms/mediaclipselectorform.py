@@ -28,6 +28,7 @@ from datetime import datetime
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_win, is_linux, is_macosx
+from openlp.core.common.path import Path
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
 from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
@@ -615,7 +616,7 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
                 break
         # Append the new name to the optical string and the path
         optical += new_optical_name + ':' + path
-        self.media_item.add_optical_clip(optical)
+        self.media_item.add_optical_clip(Path(optical))
 
     def media_state_wait(self, media_state):
         """
