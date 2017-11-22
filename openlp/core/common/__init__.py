@@ -318,17 +318,6 @@ def get_filesystem_encoding():
     return encoding
 
 
-def split_filename(path):
-    """
-    Return a list of the parts in a given path.
-    """
-    path = os.path.abspath(path)
-    if not os.path.isfile(path):
-        return path, ''
-    else:
-        return os.path.split(path)
-
-
 def delete_file(file_path):
     """
     Deletes a file from the system.

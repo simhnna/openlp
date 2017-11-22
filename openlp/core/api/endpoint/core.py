@@ -172,15 +172,3 @@ def main_image(request):
         'slide_image': 'data:image/png;base64,' + str(image_to_byte(live_controller.slide_image))
     }
     return {'results': result}
-
-
-def get_content_type(file_name):
-    """
-    Examines the extension of the file and determines what the content_type should be, defaults to text/plain
-    Returns the extension and the content_type
-
-    :param file_name: name of file
-    """
-    ext = os.path.splitext(file_name)[1]
-    content_type = FILE_TYPES.get(ext, 'text/plain')
-    return ext, content_type

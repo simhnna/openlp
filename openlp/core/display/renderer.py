@@ -198,6 +198,7 @@ class Renderer(RegistryBase, LogMixin, RegistryProperties):
 
         :param theme_data:  The theme to generated a preview for.
         :param force_page: Flag to tell message lines per page need to be generated.
+        :rtype: QtGui.QPixmap
         """
         # save value for use in format_slide
         self.force_page = force_page
@@ -222,8 +223,7 @@ class Renderer(RegistryBase, LogMixin, RegistryProperties):
             self.display.build_html(service_item)
             raw_html = service_item.get_rendered_frame(0)
             self.display.text(raw_html, False)
-            preview = self.display.preview()
-            return preview
+            return self.display.preview()
         self.force_page = False
 
     def format_slide(self, text, item):

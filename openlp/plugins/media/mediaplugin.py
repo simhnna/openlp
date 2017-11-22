@@ -78,10 +78,10 @@ class MediaPlugin(Plugin):
         """
         log.debug('check_installed Mediainfo')
         # Try to find mediainfo in the path
-        exists = process_check_binary('mediainfo')
+        exists = process_check_binary(Path('mediainfo'))
         # If mediainfo is not in the path, try to find it in the application folder
         if not exists:
-            exists = process_check_binary(os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)), 'mediainfo'))
+            exists = process_check_binary(AppLocation.get_directory(AppLocation.AppDir) / 'mediainfo')
         return exists
 
     def app_startup(self):
@@ -165,10 +165,11 @@ def process_check_binary(program_path):
     """
     Function that checks whether a binary MediaInfo is present
 
-    :param program_path:The full path to the binary to check.
+    :param openlp.core.common.path.Path program_path:The full path to the binary to check.
     :return: If exists or not
+    :rtype: bool
     """
-    runlog = check_binary_exists(Path(program_path))
+    runlog = check_binary_exists(program_path)
     # Analyse the output to see it the program is mediainfo
     for line in runlog.splitlines():
         decoded_line = line.decode()

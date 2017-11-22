@@ -199,16 +199,16 @@ class TestThemeManager(TestCase):
             theme_manager._create_theme_from_xml = MagicMock()
             theme_manager.generate_and_save_image = MagicMock()
             theme_manager.theme_path = None
-            folder = Path(mkdtemp())
+            folder_path = Path(mkdtemp())
             theme_file = Path(TEST_RESOURCES_PATH, 'themes', 'Moss_on_tree.otz')
 
             # WHEN: We try to unzip it
-            theme_manager.unzip_theme(theme_file, folder)
+            theme_manager.unzip_theme(theme_file, folder_path)
 
             # THEN: Files should be unpacked
-            self.assertTrue((folder / 'Moss on tree' / 'Moss on tree.xml').exists())
+            self.assertTrue((folder_path / 'Moss on tree' / 'Moss on tree.xml').exists())
             self.assertEqual(mocked_critical_error_message_box.call_count, 0, 'No errors should have happened')
-            shutil.rmtree(str(folder))
+            folder_path.rmtree()
 
     def test_unzip_theme_invalid_version(self):
         """

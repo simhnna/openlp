@@ -23,7 +23,6 @@
 Package to test the openlp.core.lib.pluginmanager package.
 """
 import sys
-import shutil
 import gc
 from tempfile import mkdtemp
 from unittest import TestCase
@@ -50,8 +49,8 @@ class TestPluginManager(TestCase, TestMixin):
         """
         self.setup_application()
         self.build_settings()
-        self.temp_dir = Path(mkdtemp('openlp'))
-        Settings().setValue('advanced/data path', self.temp_dir)
+        self.temp_dir_path = Path(mkdtemp('openlp'))
+        Settings().setValue('advanced/data path', self.temp_dir_path)
         Registry.create()
         Registry().register('service_list', MagicMock())
         self.main_window = QtWidgets.QMainWindow()
@@ -64,7 +63,7 @@ class TestPluginManager(TestCase, TestMixin):
         # On windows we need to manually garbage collect to close sqlalchemy files
         # to avoid errors when temporary files are deleted.
         gc.collect()
-        shutil.rmtree(str(self.temp_dir))
+        self.temp_dir_path.rmtree()
 
     @patch('openlp.plugins.songusage.lib.db.init_schema')
     @patch('openlp.plugins.songs.lib.db.init_schema')

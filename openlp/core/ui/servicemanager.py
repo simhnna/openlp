@@ -32,12 +32,12 @@ from tempfile import mkstemp
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import ThemeLevel, split_filename, delete_file
+from openlp.core.common import ThemeLevel, delete_file
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, format_time, translate
 from openlp.core.common.mixins import LogMixin, RegistryProperties
-from openlp.core.common.path import Path, create_paths, path_to_str, str_to_path
+from openlp.core.common.path import Path, create_paths, str_to_path
 from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem, ItemCapabilities, PluginStatus, build_icon
@@ -319,7 +319,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.service_id = 0
         # is a new service and has not been saved
         self._modified = False
-        self._file_name = ''
+        self._service_path = None
         self.service_has_all_original_files = True
         self.list_double_clicked = False
 
@@ -366,7 +366,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         :param openlp.core.common.path.Path file_path: The service file name
         :rtype: None
         """
-        self._file_name = path_to_str(file_path)
+        self._service_path = file_path
         self.main_window.set_service_modified(self.is_modified(), self.short_file_name())
         Settings().setValue('servicemanager/last file', file_path)
         if file_path and file_path.suffix == '.oszl':
@@ -377,14 +377,16 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def file_name(self):
         """
         Return the current file name including path.
+
+        :rtype: openlp.core.common.path.Path
         """
-        return self._file_name
+        return self._service_path
 
     def short_file_name(self):
         """
         Return the current file name, excluding the path.
         """
-        return split_filename(self._file_name)[1]
+        return self._service_path.name
 
     def reset_supported_suffixes(self):
         """
@@ -706,13 +708,13 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             default_file_path = directory_path / default_file_path
         lite_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files - lite (*.oszl)')
         packaged_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz)')
-        if self._file_name.endswith('oszl'):
+        if self._service_path and self._service_path.suffix == '.oszl':
             default_filter = lite_filter
         else:
             default_filter = packaged_filter
         # SaveAs from osz to oszl is not valid as the files will be deleted on exit which is not sensible or usable in
         # the long term.
-        if self._file_name.endswith('oszl') or self.service_has_all_original_files:
+        if self._service_path and self._service_path.suffix == '.oszl' or self.service_has_all_original_files:
             file_path, filter_used = FileDialog.getSaveFileName(
                 self.main_window, UiStrings().SaveService, default_file_path,
                 '{packaged};; {lite}'.format(packaged=packaged_filter, lite=lite_filter),

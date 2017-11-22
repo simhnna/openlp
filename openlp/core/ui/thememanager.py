@@ -32,7 +32,7 @@ from openlp.core.common import delete_file
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate, get_locale_key
 from openlp.core.common.mixins import LogMixin, RegistryProperties
-from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, rmtree
+from openlp.core.common.path import Path, copyfile, create_paths, path_to_str
 from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ImageSource, ValidationError, get_text_file_string, build_icon, \
@@ -376,7 +376,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
         delete_file(self.theme_path / thumb)
         delete_file(self.thumb_path / thumb)
         try:
-            rmtree(self.theme_path / theme)
+            (self.theme_path / theme).rmtree()
         except OSError:
             self.log_exception('Error deleting theme {name}'.format(name=theme))
 
@@ -431,7 +431,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
                                                  'The theme_name export failed because this error occurred: {err}')
                                        .format(err=ose.strerror))
             if theme_path.exists():
-                rmtree(theme_path, True)
+                theme_path.rmtree(ignore_errors=True)
             return False
 
     def on_import_theme(self, checked=None):
@@ -497,12 +497,12 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
                     name = translate('OpenLP.ThemeManager', '{name} (default)').format(name=text_name)
                 else:
                     name = text_name
-                thumb = self.thumb_path / '{name}.png'.format(name=text_name)
+                thumb_path = self.thumb_path / '{name}.png'.format(name=text_name)
                 item_name = QtWidgets.QListWidgetItem(name)
-                if validate_thumb(theme_path, thumb):
-                    icon = build_icon(thumb)
+                if validate_thumb(theme_path, thumb_path):
+                    icon = build_icon(thumb_path)
                 else:
-                    icon = create_thumb(str(theme_path), str(thumb))
+                    icon = create_thumb(theme_path, thumb_path)
                 item_name.setIcon(icon)
                 item_name.setData(QtCore.Qt.UserRole, text_name)
                 self.theme_list_widget.addItem(item_name)
@@ -692,7 +692,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
             sample_path_name.unlink()
         frame.save(str(sample_path_name), 'png')
         thumb_path = self.thumb_path / '{name}.png'.format(name=theme_name)
-        create_thumb(str(sample_path_name), str(thumb_path), False)
+        create_thumb(sample_path_name, thumb_path, False)
 
     def update_preview_images(self):
         """
@@ -711,6 +711,7 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
 
         :param theme_data: The theme to generated a preview for.
         :param force_page: Flag to tell message lines per page need to be generated.
+        :rtype: QtGui.QPixmap
         """
         return self.renderer.generate_preview(theme_data, force_page)
 

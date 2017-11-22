@@ -139,10 +139,6 @@ class Plugin(QtCore.QObject, RegistryProperties):
         self.text_strings = {}
         self.set_plugin_text_strings()
         self.name_strings = self.text_strings[StringContent.Name]
-        if version:
-            self.version = version
-        else:
-            self.version = get_version()['version']
         self.settings_section = self.name
         self.icon = None
         self.media_item_class = media_item_class
@@ -162,6 +158,19 @@ class Plugin(QtCore.QObject, RegistryProperties):
         Settings.extend_default_settings(default_settings)
         Registry().register_function('{name}_add_service_item'.format(name=self.name), self.process_add_service_event)
         Registry().register_function('{name}_config_updated'.format(name=self.name), self.config_update)
+        self._setup(version)
+
+    def _setup(self, version):
+        """
+        Run some initial setup. This method is separate from __init__ in order to mock it out in tests.
+
+        :param version: Defaults to *None*, which means that the same version number is used as OpenLP's version number.
+        :rtype: None
+        """
+        if version:
+            self.version = version
+        else:
+            self.version = get_version()['version']
 
     def check_pre_conditions(self):
         """

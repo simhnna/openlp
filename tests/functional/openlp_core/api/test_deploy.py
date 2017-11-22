@@ -19,15 +19,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-import os
-import shutil
 from tempfile import mkdtemp
 from unittest import TestCase
 
 from openlp.core.api.deploy import deploy_zipfile
+from openlp.core.common.path import Path, copyfile
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
+TEST_PATH = (Path(__file__).parent / '..' / '..' / '..' / 'resources').resolve()
 
 
 class TestRemoteDeploy(TestCase):
@@ -39,25 +37,25 @@ class TestRemoteDeploy(TestCase):
         """
         Setup for tests
         """
-        self.app_root = mkdtemp()
+        self.app_root_path = Path(mkdtemp())
 
     def tearDown(self):
         """
         Clean up after tests
         """
-        shutil.rmtree(self.app_root)
+        self.app_root_path.rmtree()
 
     def test_deploy_zipfile(self):
         """
         Remote Deploy tests - test the dummy zip file is processed correctly
         """
         # GIVEN: A new downloaded zip file
-        aa = TEST_PATH
-        zip_file = os.path.join(TEST_PATH, 'remotes', 'site.zip')
-        app_root = os.path.join(self.app_root, 'site.zip')
-        shutil.copyfile(zip_file, app_root)
-        # WHEN: I process the zipfile
-        deploy_zipfile(self.app_root, 'site.zip')
+        zip_path = TEST_PATH / 'remotes' / 'site.zip'
+        app_root_path = self.app_root_path / 'site.zip'
+        copyfile(zip_path, app_root_path)
 
-        # THEN test if www directory has been created
-        self.assertTrue(os.path.isdir(os.path.join(self.app_root, 'www')), 'We should have a www directory')
+        # WHEN: I process the zipfile
+        deploy_zipfile(self.app_root_path, 'site.zip')
+
+        # THEN: test if www directory has been created
+        self.assertTrue((self.app_root_path / 'www').is_dir(), 'We should have a www directory')
