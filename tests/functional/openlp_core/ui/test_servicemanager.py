@@ -637,7 +637,7 @@ class TestServiceManager(TestCase):
         Registry().register('main_window', mocked_main_window)
         Registry().register('application', MagicMock())
         service_manager = ServiceManager(None)
-        service_manager._file_name = os.path.join('temp', 'filename.osz')
+        service_manager._service_path = os.path.join('temp', 'filename.osz')
         service_manager._save_lite = False
         service_manager.service_items = []
         service_manager.service_theme = 'Default'
@@ -666,7 +666,7 @@ class TestServiceManager(TestCase):
         Registry().register('main_window', mocked_main_window)
         Registry().register('application', MagicMock())
         service_manager = ServiceManager(None)
-        service_manager._file_name = os.path.join('temp', 'filename.osz')
+        service_manager._service_path = os.path.join('temp', 'filename.osz')
         service_manager._save_lite = False
         service_manager.service_items = []
         service_manager.service_theme = 'Default'

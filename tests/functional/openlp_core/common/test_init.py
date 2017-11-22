@@ -28,7 +28,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, call, patch
 
 from openlp.core.common import add_actions, clean_filename, delete_file, get_file_encoding, get_filesystem_encoding,  \
-    get_uno_command, get_uno_instance, split_filename
+    get_uno_command, get_uno_instance
 from openlp.core.common.path import Path
 
 from tests.helpers.testmixin import TestMixin
@@ -235,47 +235,6 @@ class TestInit(TestCase, TestMixin):
             mocked_getfilesystemencoding.assert_called_with()
             mocked_getdefaultencoding.assert_called_with()
             self.assertEqual('utf-8', result, 'The result should be "utf-8"')
-
-    def test_split_filename_with_file_path(self):
-        """
-        Test the split_filename() function with a path to a file
-        """
-        # GIVEN: A path to a file.
-        if os.name == 'nt':
-            file_path = 'C:\\home\\user\\myfile.txt'
-            wanted_result = ('C:\\home\\user', 'myfile.txt')
-        else:
-            file_path = '/home/user/myfile.txt'
-            wanted_result = ('/home/user', 'myfile.txt')
-        with patch('openlp.core.common.os.path.isfile') as mocked_is_file:
-            mocked_is_file.return_value = True
-
-            # WHEN: Split the file name.
-            result = split_filename(file_path)
-
-            # THEN: A tuple should be returned.
-            self.assertEqual(wanted_result, result, 'A tuple with the dir and file name should have been returned')
-
-    def test_split_filename_with_dir_path(self):
-        """
-        Test the split_filename() function with a path to a directory
-        """
-        # GIVEN: A path to a dir.
-        if os.name == 'nt':
-            file_path = 'C:\\home\\user\\mydir'
-            wanted_result = ('C:\\home\\user\\mydir', '')
-        else:
-            file_path = '/home/user/mydir'
-            wanted_result = ('/home/user/mydir', '')
-        with patch('openlp.core.common.os.path.isfile') as mocked_is_file:
-            mocked_is_file.return_value = False
-
-            # WHEN: Split the file name.
-            result = split_filename(file_path)
-
-            # THEN: A tuple should be returned.
-            self.assertEqual(wanted_result, result,
-                             'A two-entry tuple with the directory and file name (empty) should have been returned.')
 
     def test_clean_filename(self):
         """

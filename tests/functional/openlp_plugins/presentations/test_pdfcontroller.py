@@ -67,10 +67,10 @@ class TestPdfController(TestCase, TestMixin):
         self.desktop.screenGeometry.return_value = SCREEN['size']
         self.screens = ScreenList.create(self.desktop)
         Settings().extend_default_settings(__default_settings__)
-        self.temp_folder = Path(mkdtemp())
-        self.thumbnail_folder = Path(mkdtemp())
+        self.temp_folder_path = Path(mkdtemp())
+        self.thumbnail_folder_path = Path(mkdtemp())
         self.mock_plugin = MagicMock()
-        self.mock_plugin.settings_section = self.temp_folder
+        self.mock_plugin.settings_section = self.temp_folder_path
 
     def tearDown(self):
         """
@@ -78,8 +78,8 @@ class TestPdfController(TestCase, TestMixin):
         """
         del self.screens
         self.destroy_settings()
-        shutil.rmtree(str(self.thumbnail_folder))
-        shutil.rmtree(str(self.temp_folder))
+        self.thumbnail_folder_path.rmtree()
+        self.temp_folder_path.rmtree()
 
     def test_constructor(self):
         """
@@ -105,8 +105,8 @@ class TestPdfController(TestCase, TestMixin):
         controller = PdfController(plugin=self.mock_plugin)
         if not controller.check_available():
             raise SkipTest('Could not detect mudraw or ghostscript, so skipping PDF test')
-        controller.temp_folder = self.temp_folder
-        controller.thumbnail_folder = self.thumbnail_folder
+        controller.temp_folder = self.temp_folder_path
+        controller.thumbnail_folder = self.thumbnail_folder_path
         document = PdfDocument(controller, test_file)
         loaded = document.load_presentation()
 
@@ -125,14 +125,14 @@ class TestPdfController(TestCase, TestMixin):
         controller = PdfController(plugin=self.mock_plugin)
         if not controller.check_available():
             raise SkipTest('Could not detect mudraw or ghostscript, so skipping PDF test')
-        controller.temp_folder = self.temp_folder
-        controller.thumbnail_folder = self.thumbnail_folder
+        controller.temp_folder = self.temp_folder_path
+        controller.thumbnail_folder = self.thumbnail_folder_path
         document = PdfDocument(controller, test_file)
         loaded = document.load_presentation()
 
         # THEN: The load should succeed and pictures should be created and have been scales to fit the screen
         self.assertTrue(loaded, 'The loading of the PDF should succeed.')
-        image = QtGui.QImage(os.path.join(str(self.temp_folder), 'pdf_test1.pdf', 'mainslide001.png'))
+        image = QtGui.QImage(os.path.join(str(self.temp_folder_path), 'pdf_test1.pdf', 'mainslide001.png'))
         # Based on the converter used the resolution will differ a bit
         if controller.gsbin:
             self.assertEqual(760, image.height(), 'The height should be 760')

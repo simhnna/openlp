@@ -318,10 +318,10 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
             self, self.on_new_prompt,
             Settings().value(self.settings_section + '/last directory'),
             self.on_new_file_masks)
-        log.info('New files(s) {file_paths}'.format(file_paths=file_paths))
+        log.info('New file(s) {file_paths}'.format(file_paths=file_paths))
         if file_paths:
             self.application.set_busy_cursor()
-            self.validate_and_load([path_to_str(path) for path in file_paths])
+            self.validate_and_load(file_paths)
         self.application.set_normal_cursor()
 
     def load_file(self, data):
@@ -330,23 +330,24 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
 
         :param data: A dictionary containing the list of files to be loaded and the target
         """
-        new_files = []
+        new_file_paths = []
         error_shown = False
         for file_name in data['files']:
-            file_type = file_name.split('.')[-1]
-            if file_type.lower() not in self.on_new_file_masks:
+            file_path = str_to_path(file_name)
+            if file_path.suffix[1:].lower() not in self.on_new_file_masks:
                 if not error_shown:
-                    critical_error_message_box(translate('OpenLP.MediaManagerItem', 'Invalid File Type'),
-                                               translate('OpenLP.MediaManagerItem',
-                                                         'Invalid File {name}.\n'
-                                                         'Suffix not supported').format(name=file_name))
+                    critical_error_message_box(
+                        translate('OpenLP.MediaManagerItem', 'Invalid File Type'),
+                        translate('OpenLP.MediaManagerItem',
+                                  'Invalid File {file_path}.\nFile extension not supported').format(
+                            file_path=file_path))
                     error_shown = True
             else:
-                new_files.append(file_name)
-        if new_files:
+                new_file_paths.append(file_path)
+        if new_file_paths:
             if 'target' in data:
-                self.validate_and_load(new_files, data['target'])
-            self.validate_and_load(new_files)
+                self.validate_and_load(new_file_paths, data['target'])
+            self.validate_and_load(new_file_paths)
 
     def dnd_move_internal(self, target):
         """
@@ -356,12 +357,12 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         """
         pass
 
-    def validate_and_load(self, files, target_group=None):
+    def validate_and_load(self, file_paths, target_group=None):
         """
         Process a list for files either from the File Dialog or from Drag and
         Drop
 
-        :param files: The files to be loaded.
+        :param list[openlp.core.common.path.Path] file_paths: The files to be loaded.
         :param target_group: The QTreeWidgetItem of the group that will be the parent of the added files
         """
         full_list = []
@@ -369,18 +370,17 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
             full_list.append(self.list_view.item(count).data(QtCore.Qt.UserRole))
         duplicates_found = False
         files_added = False
-        for file_path in files:
-            if file_path in full_list:
+        for file_path in file_paths:
+            if path_to_str(file_path) in full_list:
                 duplicates_found = True
             else:
                 files_added = True
-                full_list.append(file_path)
+                full_list.append(path_to_str(file_path))
         if full_list and files_added:
             if target_group is None:
                 self.list_view.clear()
             self.load_list(full_list, target_group)
-            last_dir = os.path.split(files[0])[0]
-            Settings().setValue(self.settings_section + '/last directory', Path(last_dir))
+            Settings().setValue(self.settings_section + '/last directory', file_paths[0].parent)
             Settings().setValue('{section}/{section} files'.format(section=self.settings_section), self.get_file_list())
         if duplicates_found:
             critical_error_message_box(UiStrings().Duplicate,

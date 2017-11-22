@@ -29,7 +29,6 @@ Some of the code for this form is based on the examples at:
 """
 import html
 import logging
-import os
 
 from PyQt5 import QtCore, QtWidgets, QtWebKit, QtWebKitWidgets, QtGui, QtMultimedia
 
@@ -398,6 +397,8 @@ class MainDisplay(Display, LogMixin, RegistryProperties):
     def preview(self):
         """
         Generates a preview of the image displayed.
+
+        :rtype: QtGui.QPixmap
         """
         was_visible = self.isVisible()
         self.application.process_events()
@@ -488,8 +489,7 @@ class MainDisplay(Display, LogMixin, RegistryProperties):
                 service_item = ServiceItem()
                 service_item.title = 'webkit'
                 service_item.processor = 'webkit'
-                path = os.path.join(str(AppLocation.get_section_data_path('themes')),
-                                    self.service_item.theme_data.theme_name)
+                path = str(AppLocation.get_section_data_path('themes') / self.service_item.theme_data.theme_name)
                 service_item.add_from_command(path,
                                               path_to_str(self.service_item.theme_data.background_filename),
                                               ':/media/slidecontroller_multimedia.png')
