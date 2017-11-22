@@ -498,8 +498,6 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
         :param controller: The media controller.
         :return: True if setup succeeded else False.
         """
-        if controller is None:
-            controller = self.display_controllers[DisplayControllerType.Plugin]
         # stop running videos
         self.media_reset(controller)
         # Setup media info
