@@ -673,15 +673,15 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             count = 1
             for item in projector.link.lamp:
                 if item['On'] is None:
-                    onoff = translate('OpenLP.ProjectorManager', 'Unavailable')
+                    status = translate('OpenLP.ProjectorManager', 'Unavailable')
                 elif item['On']:
-                    onoff = translate('OpenLP.ProjectorManager', 'ON')
+                    status = translate('OpenLP.ProjectorManager', 'ON')
                 else:
-                    onoff = translate('OpenLP.ProjectorManager', 'OFF')
+                    status = translate('OpenLP.ProjectorManager', 'OFF')
                 message += '<b>{title} {count}</b> {status} '.format(title=translate('OpenLP.ProjectorManager',
                                                                                      'Lamp'),
                                                                      count=count,
-                                                                     status=onoff)
+                                                                     status=status)
 
                 message += '<b>{title}</b>: {hours}<br />'.format(title=translate('OpenLP.ProjectorManager', 'Hours'),
                                                                   hours=item['Hours'])
