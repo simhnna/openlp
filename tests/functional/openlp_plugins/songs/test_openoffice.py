@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 
 from openlp.core.common import is_linux
 
-if not is_linux:
+if not is_linux():
     raise SkipTest('Could not import OpenOfficeImport probably due to unavailability of uno')
 
 from openlp.core.common.registry import Registry
