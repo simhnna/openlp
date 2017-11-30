@@ -22,20 +22,20 @@
 """
 This module contains tests for the OpenOffice/LibreOffice importer.
 """
-from unittest import TestCase, SkipTest
+from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common import is_linux
-
-if not is_linux():
-    raise SkipTest('Could not import OpenOfficeImport probably due to unavailability of uno')
-
 from openlp.core.common.registry import Registry
-from openlp.plugins.songs.lib.importers.openoffice import OpenOfficeImport
 
 from tests.helpers.testmixin import TestMixin
 
+try:
+    from openlp.plugins.songs.lib.importers.openoffice import OpenOfficeImport
+except ImportError:
+    OpenOfficeImport = None
 
+
+@skipIf(OpenOfficeImport is None, 'Could not import OpenOfficeImport probably due to unavailability of uno')
 class TestOpenOfficeImport(TestCase, TestMixin):
     """
     Test the :class:`~openlp.plugins.songs.lib.importer.openoffice.OpenOfficeImport` class
