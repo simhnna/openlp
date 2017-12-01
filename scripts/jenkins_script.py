@@ -63,9 +63,10 @@ class OpenLPJobs(object):
     Branch_Coverage = 'Branch-04b-Test_Coverage'
     Branch_Pylint = 'Branch-04c-Code_Analysis2'
     Branch_AppVeyor = 'Branch-05-AppVeyor-Tests'
+    Branch_macOS = 'Branch-07-macOS-Tests'
 
     Jobs = [Branch_Pull, Branch_Functional, Branch_Interface, Branch_PEP, Branch_Coverage, Branch_Pylint,
-            Branch_AppVeyor]
+            Branch_AppVeyor, Branch_macOS]
 
 
 class Colour(object):
