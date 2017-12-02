@@ -22,8 +22,10 @@
 """
 Package to test the openlp.core.lib.languages package.
 """
+from unittest import skipIf
 from unittest.mock import MagicMock, patch
 
+from openlp.core.common import is_macosx
 from openlp.core.common.i18n import LANGUAGES, Language, UiStrings, get_language, get_locale_key, get_natural_key, \
     translate
 
@@ -110,6 +112,7 @@ def test_get_language_invalid_with_none():
     assert language is None
 
 
+@skipIf(is_macosx(), 'This test doesn\'t work on macOS currently')
 def test_get_locale_key():
     """
     Test the get_locale_key(string) function
