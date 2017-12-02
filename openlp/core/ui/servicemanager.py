@@ -389,7 +389,8 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         """
         Return the current file name, excluding the path.
         """
-        return self._service_path.name
+        if self._service_path:
+            return self._service_path.name
 
     def reset_supported_suffixes(self):
         """

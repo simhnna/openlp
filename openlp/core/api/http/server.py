@@ -67,7 +67,10 @@ class HttpWorker(QtCore.QObject):
         address = Settings().value('api/ip address')
         port = Settings().value('api/port')
         Registry().execute('get_website_version')
-        serve(application, host=address, port=port)
+        try:
+            serve(application, host=address, port=port)
+        except OSError:
+            log.exception('An error occurred when serving the application.')
 
     def stop(self):
         pass
