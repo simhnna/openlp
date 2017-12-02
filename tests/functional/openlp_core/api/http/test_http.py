@@ -58,7 +58,7 @@ class TestHttpServer(TestCase):
 
     @patch('openlp.core.api.http.server.HttpWorker')
     @patch('openlp.core.api.http.server.QtCore.QThread')
-    def test_server_start(self, mock_qthread, mock_thread):
+    def test_server_start_not_required(self, mock_qthread, mock_thread):
         """
         Test the starting of the Waitress Server with the disable flag set off
         """
