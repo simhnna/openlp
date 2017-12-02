@@ -45,12 +45,28 @@ class TestHttpServer(TestCase):
     @patch('openlp.core.api.http.server.QtCore.QThread')
     def test_server_start(self, mock_qthread, mock_thread):
         """
-        Test the starting of the Waitress Server
+        Test the starting of the Waitress Server with the disable flag set off
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
+        Registry().set_flag('no_web_server', True)
         HttpServer()
 
         # THEN: the api environment should have been created
         self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
         self.assertEquals(1, mock_thread.call_count, 'The http thread should have been called once')
+
+    @patch('openlp.core.api.http.server.HttpWorker')
+    @patch('openlp.core.api.http.server.QtCore.QThread')
+    def test_server_start_not_required(self, mock_qthread, mock_thread):
+        """
+        Test the starting of the Waitress Server with the disable flag set off
+        """
+        # GIVEN: A new httpserver
+        # WHEN: I start the server
+        Registry().set_flag('no_web_server', False)
+        HttpServer()
+
+        # THEN: the api environment should have been created
+        self.assertEquals(0, mock_qthread.call_count, 'The qthread should not have have been called')
+        self.assertEquals(0, mock_thread.call_count, 'The http thread should not have been called')

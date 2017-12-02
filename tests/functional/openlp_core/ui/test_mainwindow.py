@@ -155,7 +155,7 @@ class TestMainWindow(TestCase, TestMixin):
         # WHEN: you check the started functions
 
         # THEN: the following registry functions should have been registered
-        assert len(self.registry.service_list) == 12, \
+        assert len(self.registry.service_list) == 13, \
             'The registry should have 12 services, got {}'.format(self.registry.service_list.keys())
         assert len(self.registry.functions_list) == 19, \
             'The registry should have 19 functions, got {}'.format(self.registry.functions_list.keys())

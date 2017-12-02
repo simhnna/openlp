@@ -63,9 +63,10 @@ class OpenLPJobs(object):
     Branch_Coverage = 'Branch-04b-Test_Coverage'
     Branch_Pylint = 'Branch-04c-Code_Analysis2'
     Branch_AppVeyor = 'Branch-05-AppVeyor-Tests'
+    Branch_macOS = 'Branch-07-macOS-Tests'
 
     Jobs = [Branch_Pull, Branch_Functional, Branch_Interface, Branch_PEP, Branch_Coverage, Branch_Pylint,
-            Branch_AppVeyor]
+            Branch_AppVeyor, Branch_macOS]
 
 
 class Colour(object):
@@ -115,7 +116,7 @@ class JenkinsTrigger(object):
         self.fetch_jobs()
         self.server.build_job(OpenLPJobs.Branch_Pull, {'BRANCH_NAME': self.repo_name, 'cause': cause})
 
-    def print_output(self):
+    def print_output(self, can_continue=False):
         """
         Print the status information of the build triggered.
         """
@@ -126,13 +127,21 @@ class JenkinsTrigger(object):
         revno = raw_output.decode().strip()
         print('%s (revision %s)' % (get_repo_name(), revno))
 
+        failed_builds = []
         for job in OpenLPJobs.Jobs:
             if not self.__print_build_info(job):
                 if self.current_build:
-                    print('Stopping after failure, see {}console for more details'.format(self.current_build['url']))
-                else:
+                    failed_builds.append((self.current_build['fullDisplayName'], self.current_build['url']))
+                if not can_continue:
                     print('Stopping after failure')
-                break
+                    break
+        print('')
+        if failed_builds:
+            print('Failed builds:')
+            for build_name, url in failed_builds:
+                print(' - {}: {}console'.format(build_name, url))
+        else:
+            print('All builds passed')
 
     def open_browser(self):
         """
@@ -227,6 +236,7 @@ def main():
                         help='Disable coloured output (always disabled on Windows)')
     parser.add_argument('-u', '--username', required=True, help='Your Jenkins username')
     parser.add_argument('-p', '--password', required=True, help='Your Jenkins password or personal token')
+    parser.add_argument('-c', '--always-continue', action='store_true', default=False, help='Continue despite failure')
     args = parser.parse_args()
 
     if not get_repo_name():
@@ -238,7 +248,7 @@ def main():
     if args.open_browser:
         jenkins_trigger.open_browser()
     if not args.disable_output:
-        jenkins_trigger.print_output()
+        jenkins_trigger.print_output(can_continue=args.always_continue)
 
 
 if __name__ == '__main__':

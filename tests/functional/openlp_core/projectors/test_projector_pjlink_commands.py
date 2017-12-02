@@ -570,35 +570,6 @@ class TestPJLinkCommands(TestCase):
         self.assertEqual(pjlink.pjlink_class, '2',
                          'Projector should have set class=2')
 
-    def test_projector_process_clss_nonstandard_reply_optoma(self):
-        """
-        Bugfix 1550891: CLSS request returns non-standard reply with Optoma projector
-        """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-
-        # WHEN: Process non-standard reply
-        pjlink.process_clss('Class 1')
-
-        # THEN: Projector class should be set with proper value
-        self.assertEqual(pjlink.pjlink_class, '1',
-                         'Non-standard class reply should have set class=1')
-
-    def test_projector_process_clss_nonstandard_reply_benq(self):
-        """
-        Bugfix 1550891: CLSS request returns non-standard reply with BenQ projector
-        """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-
-        # WHEN: Process non-standard reply
-        pjlink.process_clss('Version2')
-
-        # THEN: Projector class should be set with proper value
-        # NOTE: At this time BenQ is Class 1, but we're trying a different value to verify
-        self.assertEqual(pjlink.pjlink_class, '2',
-                         'Non-standard class reply should have set class=2')
-
     @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_projector_process_clss_invalid_nan(self, mock_log):
         """

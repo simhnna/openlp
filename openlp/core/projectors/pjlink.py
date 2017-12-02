@@ -402,17 +402,20 @@ class PJLinkCommands(object):
         :param data: Lamp(s) status.
         """
         lamps = []
-        data_dict = data.split()
-        while data_dict:
-            try:
-                fill = {'Hours': int(data_dict[0]), 'On': False if data_dict[1] == '0' else True}
-            except ValueError:
-                # In case of invalid entry
-                log.warning('({ip}) process_lamp(): Invalid data "{data}"'.format(ip=self.ip, data=data))
-                return
-            lamps.append(fill)
-            data_dict.pop(0)  # Remove lamp hours
-            data_dict.pop(0)  # Remove lamp on/off
+        lamp_list = data.split()
+        if len(lamp_list) < 2:
+            lamps.append({'Hours': int(lamp_list[0]), 'On': None})
+        else:
+            while lamp_list:
+                try:
+                    fill = {'Hours': int(lamp_list[0]), 'On': False if lamp_list[1] == '0' else True}
+                except ValueError:
+                    # In case of invalid entry
+                    log.warning('({ip}) process_lamp(): Invalid data "{data}"'.format(ip=self.ip, data=data))
+                    return
+                lamps.append(fill)
+                lamp_list.pop(0)  # Remove lamp hours
+                lamp_list.pop(0)  # Remove lamp on/off
         self.lamp = lamps
         return
 
