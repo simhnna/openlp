@@ -70,12 +70,13 @@ class WebSocketServer(RegistryProperties, LogMixin):
         Initialise and start the WebSockets server
         """
         super(WebSocketServer, self).__init__()
-        self.settings_section = 'api'
-        self.worker = WebSocketWorker(self)
-        self.thread = QtCore.QThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.thread.start()
+        if Registry().get_flag('no_web_server'):
+            self.settings_section = 'api'
+            self.worker = WebSocketWorker(self)
+            self.thread = QtCore.QThread()
+            self.worker.moveToThread(self.thread)
+            self.thread.started.connect(self.worker.run)
+            self.thread.start()
 
     def start_server(self):
         """
