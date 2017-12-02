@@ -504,9 +504,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Settings().set_up_default_values()
         self.about_form = AboutForm(self)
         MediaController()
-        if Registry().get_flag('no_web_server'):
-            websockets.WebSocketServer()
-            server.HttpServer()
+        websockets.WebSocketServer()
+        server.HttpServer()
         SettingsForm(self)
         self.formatting_tag_form = FormattingTagForm(self)
         self.shortcut_form = ShortcutListForm(self)

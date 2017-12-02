@@ -82,13 +82,14 @@ class HttpServer(RegistryBase, RegistryProperties, LogMixin):
         Initialise the http server, and start the http server
         """
         super(HttpServer, self).__init__(parent)
-        self.worker = HttpWorker()
-        self.thread = QtCore.QThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.thread.start()
-        Registry().register_function('download_website', self.first_time)
-        Registry().register_function('get_website_version', self.website_version)
+        if Registry().get_flag('no_web_server'):
+            self.worker = HttpWorker()
+            self.thread = QtCore.QThread()
+            self.worker.moveToThread(self.thread)
+            self.thread.started.connect(self.worker.run)
+            self.thread.start()
+            Registry().register_function('download_website', self.first_time)
+            Registry().register_function('get_website_version', self.website_version)
         Registry().set_flag('website_version', '0.0')
 
     def bootstrap_post_set_up(self):
