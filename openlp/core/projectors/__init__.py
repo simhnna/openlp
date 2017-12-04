@@ -25,8 +25,6 @@
     Initialization for the openlp.core.projectors modules.
 """
 
-from openlp.core.projectors.constants import PJLINK_PORT, ERROR_MSG, ERROR_STRING
-
 
 class DialogSourceStyle(object):
     """

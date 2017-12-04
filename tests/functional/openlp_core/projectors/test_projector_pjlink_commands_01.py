@@ -47,7 +47,7 @@ for pos in range(0, len(PJLINK_ERST_DATA)):
 
 class TestPJLinkCommands(TestCase):
     """
-    Tests for the PJLink module
+    Tests for the PJLinkCommands class part 1
     """
     @patch.object(pjlink_test, 'changeStatus')
     @patch.object(openlp.core.projectors.pjlink, 'log')

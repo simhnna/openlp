@@ -46,6 +46,18 @@ class TestPJLinkRouting(TestCase):
     """
     Tests for the PJLink module command routing
     """
+    def setUp(self):
+        '''
+        TestPJLinkCommands part 2 initialization
+        '''
+        self.pjlink_test = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+    def tearDown(self):
+        '''
+        TestPJLinkCommands part 2 cleanups
+        '''
+        self.pjlink_test = None
+
     @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_process_command_call_clss(self, mock_log):
         """
@@ -163,21 +175,20 @@ class TestPJLinkRouting(TestCase):
         mock_change_status.assert_called_once_with(E_AUTHENTICATION)
         mock_log.error.assert_called_with(log_text)
 
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_future(self, mock_log):
+    def test_process_command_future(self):
         """
         Test command valid but no method to process yet
         """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-        log_text = "(127.0.0.1) Unable to process command='CLSS' (Future option)"
-        mock_log.reset_mock()
-        # Remove a valid command so we can test valid command but not available yet
-        pjlink.pjlink_functions.pop('CLSS')
+        # GIVEN: Initial mocks and data
+        mock_log = patch.object(openlp.core.projectors.pjlink, 'log').start()
+        mock_functions = patch.object(self.pjlink_test, 'pjlink_functions').start()
+        mock_functions.return_value = []
+
+        pjlink = self.pjlink_test
+        log_text = "(111.111.111.111) Unable to process command='CLSS' (Future option?)"
 
         # WHEN: process_command called with an unknown command
-        with patch.object(pjlink, 'pjlink_functions') as mock_functions:
-            pjlink.process_command(cmd='CLSS', data='DONT CARE')
+        pjlink.process_command(cmd='CLSS', data='DONT CARE')
 
         # THEN: Error should be logged and no command called
         self.assertFalse(mock_functions.called, 'Should not have gotten to the end of the method')
@@ -202,23 +213,20 @@ class TestPJLinkRouting(TestCase):
         self.assertFalse(mock_functions.called, 'Should not have gotten to the end of the method')
         mock_log.error.assert_called_once_with(log_text)
 
-    @patch.object(pjlink_test, 'pjlink_functions')
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_ok(self, mock_log, mock_functions):
+    def test_process_command_ok(self):
         """
         Test command returned success
         """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-        mock_functions.reset_mock()
-        mock_log.reset_mock()
+        # GIVEN: Initial mocks and data
+        mock_log = patch.object(openlp.core.projectors.pjlink, 'log').start()
+        mock_send_command = patch.object(self.pjlink_test, 'send_command').start()
 
-        # WHEN: process_command called with an unknown command
-        pjlink.process_command(cmd='CLSS', data='OK')
-        log_text = '(127.0.0.1) Command "CLSS" returned OK'
+        pjlink = self.pjlink_test
+        log_text = "(111.111.111.111) Command 'POWR' returned OK"
 
-        # THEN: Error should be logged and no command called
-        self.assertFalse(mock_functions.called, 'Should not have gotten to the end of the method')
-        self.assertEqual(mock_log.debug.call_count, 2, 'log.debug() should have been called twice')
-        # Although we called it twice, only the last log entry is saved
+        # WHEN: process_command called with a command that returns OK
+        pjlink.process_command(cmd='POWR', data='OK')
+
+        # THEN: Appropriate calls should have been made
         mock_log.debug.assert_called_with(log_text)
+        mock_send_command.assert_called_once_with(cmd='POWR')
