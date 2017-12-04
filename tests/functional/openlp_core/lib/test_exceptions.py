@@ -38,7 +38,7 @@ class TestValidationError(TestCase):
         # GIVEN: The ValidationError class
 
         # WHEN: Creating an instance of ValidationError
-        error =  ValidationError('Test ValidationError')
+        error = ValidationError('Test ValidationError')
 
         # THEN: Then calling str on the error should return the correct text and it should be an instance of `Exception`
         assert str(error) == 'Test ValidationError'

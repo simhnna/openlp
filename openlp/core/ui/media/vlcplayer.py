@@ -281,7 +281,7 @@ class VlcPlayer(MediaPlayer):
         log.debug('mediatype: ' + str(controller.media_info.media_type))
         # Set tracks for the optical device
         if controller.media_info.media_type == MediaType.DVD and \
-                        self.get_live_state() != MediaState.Paused and self.get_preview_state() != MediaState.Paused:
+                self.get_live_state() != MediaState.Paused and self.get_preview_state() != MediaState.Paused:
             log.debug('vlc play, playing started')
             if controller.media_info.title_track > 0:
                 log.debug('vlc play, title_track set: ' + str(controller.media_info.title_track))
