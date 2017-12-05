@@ -350,7 +350,10 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         if modified:
             self.service_id += 1
         self._modified = modified
-        service_file = self.short_file_name() or translate('OpenLP.ServiceManager', 'Untitled Service')
+        if self._service_path:
+            service_file = self._service_path.name
+        else:
+            service_file = translate('OpenLP.ServiceManager', 'Untitled Service')
         self.main_window.set_service_modified(modified, service_file)
 
     def is_modified(self):
@@ -367,7 +370,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         :rtype: None
         """
         self._service_path = file_path
-        self.main_window.set_service_modified(self.is_modified(), self.short_file_name())
+        self.main_window.set_service_modified(self.is_modified(), file_path.name)
         Settings().setValue('servicemanager/last file', file_path)
         if file_path and file_path.suffix == '.oszl':
             self._save_lite = True
@@ -386,7 +389,8 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         """
         Return the current file name, excluding the path.
         """
-        return self._service_path.name
+        if self._service_path:
+            return self._service_path.name
 
     def reset_supported_suffixes(self):
         """

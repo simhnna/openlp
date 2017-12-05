@@ -236,7 +236,7 @@ class Settings(QtCore.QSettings):
         ('bibles/last search type', '', []),
         ('custom/last search type', 'custom/last used search type', []),
         # The following changes are being made for the conversion to using Path objects made in 2.6 development
-        ('advanced/data path', 'advanced/data path', [(str_to_path, None)]),
+        ('advanced/data path', 'advanced/data path', [(lambda p: Path(p) if p is not None else None, None)]),
         ('crashreport/last directory', 'crashreport/last directory', [(str_to_path, None)]),
         ('servicemanager/last directory', 'servicemanager/last directory', [(str_to_path, None)]),
         ('servicemanager/last file', 'servicemanager/last file', [(str_to_path, None)]),

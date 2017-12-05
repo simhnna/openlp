@@ -403,8 +403,8 @@ def main(args=None):
                      .format(back_up_path=back_up_path))
             QtWidgets.QMessageBox.information(
                 None, translate('OpenLP', 'Settings Upgrade'),
-                translate('OpenLP', 'Your settings are about to upgraded. A backup will be created at {back_up_path}')
-                     .format(back_up_path=back_up_path))
+                translate('OpenLP', 'Your settings are about to be upgraded. A backup will be created at '
+                                    '{back_up_path}').format(back_up_path=back_up_path))
             settings.export(back_up_path)
         settings.upgrade_settings()
     # First time checks in settings
