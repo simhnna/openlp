@@ -69,7 +69,7 @@ class TestPJLinkCommands(TestCase):
         # THEN: proper processing should have occured
         mock_log.debug.has_calls(log_check)
         mock_disconnect_from_host.assert_not_called()
-        mock_readyRead.connect.assert_called_once()
+        self.assertEqual(mock_readyRead.connect.call_count, 1, 'Should have only been called once')
         mock_change_status.assert_called_once_with(S_CONNECTED)
         mock_send_command.assert_called_with(cmd='CLSS', priority=True, salt=None)
 
@@ -93,7 +93,7 @@ class TestPJLinkCommands(TestCase):
         # THEN: proper processing should have occured
         mock_log.debug.has_calls(log_check)
         mock_disconnect_from_host.assert_not_called()
-        mock_readyRead.connect.assert_called_once()
+        self.assertEqual(mock_readyRead.connect.call_count, 1, 'Should have only been called once')
         mock_change_status.assert_called_once_with(S_CONNECTED)
         mock_send_command.assert_called_with(cmd='CLSS', priority=True, salt=TEST_HASH)
 
@@ -115,7 +115,7 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: Proper calls should be made
         mock_log.error.assert_has_calls(log_check)
-        mock_disconnect_from_host.assert_called_once()
+        self.assertEqual(mock_disconnect_from_host.call_count, 1, 'Should have only been called once')
         mock_send_command.assert_not_called()
 
     def test_process_pjlink_normal_with_salt_error(self):
@@ -136,7 +136,7 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: Proper calls should be made
         mock_log.error.assert_has_calls(log_check)
-        mock_disconnect_from_host.assert_called_once()
+        self.assertEqual(mock_disconnect_from_host.call_count, 1, 'Should have only been called once')
         mock_send_command.assert_not_called()
 
     def test_process_pjlink_invalid_authentication_scheme_length_error(self):
@@ -155,7 +155,7 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: socket should be closed and invalid data logged
         mock_log.error.assert_has_calls(log_check)
-        mock_disconnect_from_host.assert_called_once()
+        self.assertEqual(mock_disconnect_from_host.call_count, 1, 'Should have only been called once')
         mock_send_command.assert_not_called()
 
     def test_process_pjlink_invalid_authentication_data_length_error(self):
@@ -174,7 +174,7 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: socket should be closed and invalid data logged
         mock_log.error.assert_has_calls(log_check)
-        mock_disconnect_from_host.assert_called_once()
+        self.assertEqual(mock_disconnect_from_host.call_count, 1, 'Should have only been called once')
         mock_send_command.assert_not_called()
 
     def test_process_pjlink_authenticate_pin_not_set_error(self):
@@ -194,5 +194,5 @@ class TestPJLinkCommands(TestCase):
 
         # THEN: socket should be closed and invalid data logged
         mock_log.error.assert_has_calls(log_check)
-        mock_disconnect_from_host.assert_called_once()
+        self.assertEqual(mock_disconnect_from_host.call_count, 1, 'Should have only been called once')
         mock_send_command.assert_not_called()

@@ -657,7 +657,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         except TypeError:
             pass
         try:
-            self.readyRead.connect(self.get_socket)  # Set in process_pjlink
+            self.readyRead.disconnect(self.get_socket)  # Set in process_pjlink
         except TypeError:
             pass
 
