@@ -81,7 +81,7 @@ class TestApiTab(TestCase, TestMixin):
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(ZERO_URL)
         # THEN: the default ip address will be returned
-        assert re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}') == ip_address, \
+        assert (re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'), ip_address) is True, \
             'The return value should be a valid ip address'
 
     def test_get_ip_address_with_ip(self):
