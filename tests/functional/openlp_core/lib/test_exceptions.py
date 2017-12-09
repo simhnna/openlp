@@ -20,15 +20,26 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-    :mod:`openlp.core.projectors`
-
-    Initialization for the openlp.core.projectors modules.
+Package to test the openlp.core.lib.exceptions package.
 """
+from unittest import TestCase
+
+from openlp.core.lib.exceptions import ValidationError
 
 
-class DialogSourceStyle(object):
+class TestValidationError(TestCase):
     """
-    An enumeration for projector dialog box type.
+    Test the ValidationError Class
     """
-    Tabbed = 0
-    Single = 1
+    def test_validation_error(self):
+        """
+        Test the creation of a ValidationError
+        """
+        # GIVEN: The ValidationError class
+
+        # WHEN: Creating an instance of ValidationError
+        error = ValidationError('Test ValidationError')
+
+        # THEN: Then calling str on the error should return the correct text and it should be an instance of `Exception`
+        assert str(error) == 'Test ValidationError'
+        assert isinstance(error, Exception)

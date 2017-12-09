@@ -52,6 +52,8 @@ def download_sha256():
         web_config = get_web_page('https://get.openlp.org/webclient/download.cfg', headers={'User-Agent': user_agent})
     except ConnectionError:
         return False
+    if not web_config:
+        return None
     file_bits = web_config.split()
     return file_bits[0], file_bits[2]
 

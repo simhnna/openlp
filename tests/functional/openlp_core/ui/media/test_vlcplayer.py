@@ -693,9 +693,9 @@ class TestVLCPlayer(TestCase, TestMixin):
         vlc_player.set_state(MediaState.Paused, mocked_display)
 
         # WHEN: play() is called
-        with patch.object(vlc_player, 'media_state_wait') as mocked_media_state_wait, \
-                patch.object(vlc_player, 'volume') as mocked_volume:
-            mocked_media_state_wait.return_value = True
+        with patch.object(vlc_player, 'media_state_wait', return_value=True) as mocked_media_state_wait, \
+                patch.object(vlc_player, 'volume') as mocked_volume, \
+                patch.object(vlc_player, 'get_live_state', return_value=MediaState.Loaded):
             result = vlc_player.play(mocked_display)
 
         # THEN: A bunch of things should happen to play the media
@@ -872,7 +872,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         mocked_display = MagicMock()
         mocked_display.controller.media_info.media_type = MediaType.DVD
         mocked_display.vlc_media_player.is_seekable.return_value = True
-        mocked_display.controller.media_info.start_time = 3
+        mocked_display.controller.media_info.start_time = 3000
         vlc_player = VlcPlayer(None)
 
         # WHEN: seek() is called
@@ -976,7 +976,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         mocked_display = MagicMock()
         mocked_display.controller = mocked_controller
         mocked_display.vlc_media.get_state.return_value = 1
-        mocked_display.vlc_media_player.get_time.return_value = 400000
+        mocked_display.vlc_media_player.get_time.return_value = 400
         mocked_display.controller.media_info.media_type = MediaType.DVD
         vlc_player = VlcPlayer(None)
 
@@ -990,7 +990,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         self.assertEqual(2, mocked_stop.call_count)
         mocked_display.vlc_media_player.get_time.assert_called_with()
         mocked_set_visible.assert_called_with(mocked_display, False)
-        mocked_controller.seek_slider.setSliderPosition.assert_called_with(300000)
+        mocked_controller.seek_slider.setSliderPosition.assert_called_with(300)
         expected_calls = [call(True), call(False)]
         self.assertEqual(expected_calls, mocked_controller.seek_slider.blockSignals.call_args_list)
 

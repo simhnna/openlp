@@ -47,7 +47,7 @@ for pos in range(0, len(PJLINK_ERST_DATA)):
 
 class TestPJLinkCommands(TestCase):
     """
-    Tests for the PJLink module
+    Tests for the PJLinkCommands class part 1
     """
     @patch.object(pjlink_test, 'changeStatus')
     @patch.object(openlp.core.projectors.pjlink, 'log')
@@ -580,7 +580,7 @@ class TestPJLinkCommands(TestCase):
 
         # WHEN: Process invalid reply
         pjlink.process_clss('Z')
-        log_text = "(127.0.0.1) NAN clss version reply 'Z' - defaulting to class '1'"
+        log_text = '(127.0.0.1) NAN CLSS version reply "Z" - defaulting to class "1"'
 
         # THEN: Projector class should be set with default value
         self.assertEqual(pjlink.pjlink_class, '1',
@@ -597,7 +597,7 @@ class TestPJLinkCommands(TestCase):
 
         # WHEN: Process invalid reply
         pjlink.process_clss('Invalid')
-        log_text = "(127.0.0.1) No numbers found in class version reply 'Invalid' - defaulting to class '1'"
+        log_text = '(127.0.0.1) No numbers found in class version reply "Invalid" - defaulting to class "1"'
 
         # THEN: Projector class should be set with default value
         self.assertEqual(pjlink.pjlink_class, '1',
@@ -627,7 +627,7 @@ class TestPJLinkCommands(TestCase):
         # GIVEN: Test object
         pjlink = pjlink_test
         pjlink.projector_errors = None
-        log_text = "127.0.0.1) Invalid error status response '11111111': length != 6"
+        log_text = '127.0.0.1) Invalid error status response "11111111": length != 6'
 
         # WHEN: process_erst called with invalid data (too many values
         pjlink.process_erst('11111111')
@@ -645,7 +645,7 @@ class TestPJLinkCommands(TestCase):
         # GIVEN: Test object
         pjlink = pjlink_test
         pjlink.projector_errors = None
-        log_text = "(127.0.0.1) Invalid error status response '1111Z1'"
+        log_text = '(127.0.0.1) Invalid error status response "1111Z1"'
 
         # WHEN: process_erst called with invalid data (too many values
         pjlink.process_erst('1111Z1')
@@ -671,8 +671,8 @@ class TestPJLinkCommands(TestCase):
         # THEN: PJLink instance errors should match chk_value
         for chk in pjlink.projector_errors:
             self.assertEqual(pjlink.projector_errors[chk], chk_string,
-                             "projector_errors['{chk}'] should have been set to {err}".format(chk=chk,
-                                                                                              err=chk_string))
+                             'projector_errors["{chk}"] should have been set to "{err}"'.format(chk=chk,
+                                                                                                err=chk_string))
 
     def test_projector_process_erst_all_error(self):
         """
@@ -690,8 +690,8 @@ class TestPJLinkCommands(TestCase):
         # THEN: PJLink instance errors should match chk_value
         for chk in pjlink.projector_errors:
             self.assertEqual(pjlink.projector_errors[chk], chk_string,
-                             "projector_errors['{chk}'] should have been set to {err}".format(chk=chk,
-                                                                                              err=chk_string))
+                             'projector_errors["{chk}"] should have been set to "{err}"'.format(chk=chk,
+                                                                                                err=chk_string))
 
     def test_projector_process_erst_warn_cover_only(self):
         """
@@ -744,9 +744,9 @@ class TestPJLinkCommands(TestCase):
         pjlink = pjlink_test
         pjlink.source_available = []
         test_data = '21 10 30 31 11 20'
-        test_saved = ['10', '11', '20', '21', '30', '31']
-        log_data = '(127.0.0.1) Setting projector sources_available to ' \
-            '"[\'10\', \'11\', \'20\', \'21\', \'30\', \'31\']"'
+        test_saved = ["10", "11", "20", "21", "30", "31"]
+        log_data = "(127.0.0.1) Setting projector sources_available to " \
+                   "\"['10', '11', '20', '21', '30', '31']\""
         mock_UpdateIcons.reset_mock()
         mock_log.reset_mock()
 
@@ -1021,7 +1021,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.sw_version = None
         pjlink.sw_version_received = None
         test_data = 'Test 1 Subtest 1'
-        test_log = "(127.0.0.1) Setting projector software version to 'Test 1 Subtest 1'"
+        test_log = '(127.0.0.1) Setting projector software version to "Test 1 Subtest 1"'
         mock_log.reset_mock()
 
         # WHEN: process_sver called with invalid data

@@ -269,10 +269,9 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
             service_item.add_from_command(filename, name, CLAPPERBOARD)
             service_item.title = clip_name
             # Set the length
-            self.media_controller.media_setup_optical(name, title, audio_track, subtitle_track, start, end, None, None)
-            service_item.set_media_length((end - start) / 1000)
-            service_item.start_time = start / 1000
-            service_item.end_time = end / 1000
+            service_item.set_media_length(end - start)
+            service_item.start_time = start
+            service_item.end_time = end
             service_item.add_capability(ItemCapabilities.IsOptical)
         else:
             if not os.path.exists(filename):
@@ -455,5 +454,5 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
             return
         # Append the optical string to the media list
         file_paths.append(optical)
-        self.load_list([optical])
+        self.load_list([str(optical)])
         Settings().setValue(self.settings_section + '/media files', file_paths)

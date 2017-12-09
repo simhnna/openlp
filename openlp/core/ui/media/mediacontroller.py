@@ -498,8 +498,6 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
         :param controller: The media controller.
         :return: True if setup succeeded else False.
         """
-        if controller is None:
-            controller = self.display_controllers[DisplayControllerType.Plugin]
         # stop running videos
         self.media_reset(controller)
         # Setup media info
@@ -509,9 +507,9 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
             controller.media_info.media_type = MediaType.CD
         else:
             controller.media_info.media_type = MediaType.DVD
-        controller.media_info.start_time = start // 1000
-        controller.media_info.end_time = end // 1000
-        controller.media_info.length = (end - start) // 1000
+        controller.media_info.start_time = start
+        controller.media_info.end_time = end
+        controller.media_info.length = (end - start)
         controller.media_info.title_track = title
         controller.media_info.audio_track = audio_track
         controller.media_info.subtitle_track = subtitle_track

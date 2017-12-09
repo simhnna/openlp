@@ -144,6 +144,24 @@ PJLINK_VALID_CMD = {
              }
 }
 
+# QAbstractSocketState enums converted to string
+S_QSOCKET_STATE = {
+    0: 'QSocketState - UnconnectedState',
+    1: 'QSocketState - HostLookupState',
+    2: 'QSocketState - ConnectingState',
+    3: 'QSocketState - ConnectedState',
+    4: 'QSocketState - BoundState',
+    5: 'QSocketState - ListeningState (internal use only)',
+    6: 'QSocketState - ClosingState',
+    'UnconnectedState': 0,
+    'HostLookupState': 1,
+    'ConnectingState': 2,
+    'ConnectedState': 3,
+    'BoundState': 4,
+    'ListeningState': 5,
+    'ClosingState': 6
+}
+
 # Error and status codes
 S_OK = E_OK = 0  # E_OK included since I sometimes forget
 # Error codes. Start at 200 so we don't duplicate system error codes.
