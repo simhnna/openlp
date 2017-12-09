@@ -159,7 +159,7 @@ S_QSOCKET_STATE = {
     'ConnectedState': 3,
     'BoundState': 4,
     'ListeningState': 5,
-    'ClosingState': 6,
+    'ClosingState': 6
 }
 
 # Error and status codes

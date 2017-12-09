@@ -185,7 +185,7 @@ class TestPJLinkRouting(TestCase):
         mock_functions.return_value = []
 
         pjlink = self.pjlink_test
-        log_text = "(111.111.111.111) Unable to process command='CLSS' (Future option?)"
+        log_text = '(111.111.111.111) Unable to process command="CLSS" (Future option?)'
 
         # WHEN: process_command called with an unknown command
         pjlink.process_command(cmd='CLSS', data='DONT CARE')
@@ -207,7 +207,7 @@ class TestPJLinkRouting(TestCase):
 
         # WHEN: process_command called with an unknown command
         pjlink.process_command(cmd='Unknown', data='Dont Care')
-        log_text = "(127.0.0.1) Ignoring command='Unknown' (Invalid/Unknown)"
+        log_text = '(127.0.0.1) Ignoring command="Unknown" (Invalid/Unknown)'
 
         # THEN: Error should be logged and no command called
         self.assertFalse(mock_functions.called, 'Should not have gotten to the end of the method')
@@ -222,7 +222,7 @@ class TestPJLinkRouting(TestCase):
         mock_send_command = patch.object(self.pjlink_test, 'send_command').start()
 
         pjlink = self.pjlink_test
-        log_text = "(111.111.111.111) Command 'POWR' returned OK"
+        log_text = '(111.111.111.111) Command "POWR" returned OK'
 
         # WHEN: process_command called with a command that returns OK
         pjlink.process_command(cmd='POWR', data='OK')
