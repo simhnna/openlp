@@ -51,19 +51,19 @@ class TestRegistry(TestCase):
         # THEN  and I will get an exception
         with self.assertRaises(KeyError) as context:
             Registry().register('test1', mock_1)
-        self.assertEqual(context.exception.args[0], 'Duplicate service exception test1',
-                         'KeyError exception should have been thrown for duplicate service')
+        assert context.exception.args[0] == 'Duplicate service exception test1', \
+            'KeyError exception should have been thrown for duplicate service'
 
         # WHEN I try to get back a non existent component
         # THEN I will get an exception
         temp = Registry().get('test2')
-        self.assertEqual(temp, None, 'None should have been returned for missing service')
+        assert not temp, 'None should have been returned for missing service'
 
         # WHEN I try to replace a component I should be allowed
         Registry().remove('test1')
         # THEN I will get an exception
         temp = Registry().get('test1')
-        self.assertEqual(temp, None, 'None should have been returned for deleted service')
+        assert not temp, 'None should have been returned for deleted service'
 
     def test_registry_function(self):
         """
@@ -77,21 +77,21 @@ class TestRegistry(TestCase):
         return_value = Registry().execute('test1')
 
         # THEN: I expect then function to have been called and a return given
-        self.assertEqual(return_value[0], 'function_1', 'A return value is provided and matches')
+        assert return_value[0] == 'function_1', 'A return value is provided and matches'
 
         # WHEN: I execute the a function with the same reference and execute the function
         Registry().register_function('test1', self.dummy_function_1)
         return_value = Registry().execute('test1')
 
         # THEN: I expect then function to have been called and a return given
-        self.assertEqual(return_value, ['function_1', 'function_1'], 'A return value list is provided and matches')
+        assert return_value == ['function_1', 'function_1'], 'A return value list is provided and matches'
 
         # WHEN: I execute the a 2nd function with the different reference and execute the function
         Registry().register_function('test2', self.dummy_function_2)
         return_value = Registry().execute('test2')
 
         # THEN: I expect then function to have been called and a return given
-        self.assertEqual(return_value[0], 'function_2', 'A return value is provided and matches')
+        assert return_value[0] == 'function_2', 'A return value is provided and matches'
 
     def test_registry_working_flags(self):
         """
@@ -107,28 +107,28 @@ class TestRegistry(TestCase):
 
         # THEN: we should be able retrieve the saved component
         temp = Registry().get_flag('test1')
-        self.assertEquals(temp, my_data, 'The value should have been saved')
+        assert temp == my_data, 'The value should have been saved'
 
         # WHEN: I add a component for the second time I am not mad.
         # THEN  and I will not get an exception
         Registry().set_flag('test1', my_data2)
         temp = Registry().get_flag('test1')
-        self.assertEquals(temp, my_data2, 'The value should have been updated')
+        assert temp == my_data2, 'The value should have been updated'
 
         # WHEN I try to get back a non existent Working Flag
         # THEN I will get an exception
         with self.assertRaises(KeyError) as context1:
             temp = Registry().get_flag('test2')
-        self.assertEqual(context1.exception.args[0], 'Working Flag test2 not found in list',
-                         'KeyError exception should have been thrown for missing working flag')
+        assert context1.exception.args[0] == 'Working Flag test2 not found in list', \
+            'KeyError exception should have been thrown for missing working flag'
 
         # WHEN I try to replace a working flag I should be allowed
         Registry().remove_flag('test1')
         # THEN I will get an exception
         with self.assertRaises(KeyError) as context:
             temp = Registry().get_flag('test1')
-        self.assertEqual(context.exception.args[0], 'Working Flag test1 not found in list',
-                         'KeyError exception should have been thrown for duplicate working flag')
+        assert context.exception.args[0] == 'Working Flag test1 not found in list', \
+            'KeyError exception should have been thrown for duplicate working flag'
 
     def test_remove_function(self):
         """
@@ -174,7 +174,7 @@ class TestRegistryBase(TestCase):
         PlainStub()
 
         # THEN: Nothing is registered with the registry
-        self.assertEqual(len(Registry().functions_list), 0), 'The function should not be in the dict anymore.'
+        assert len(Registry().functions_list) == 0, 'The function should not be in the dict anymore.'
 
     def test_registry_mixin_present(self):
         """
@@ -187,4 +187,4 @@ class TestRegistryBase(TestCase):
         RegistryStub()
 
         # THEN: The bootstrap methods should be registered
-        self.assertEqual(len(Registry().functions_list), 2), 'The bootstrap functions should be in the dict.'
+        assert len(Registry().functions_list) == 2, 'The bootstrap functions should be in the dict.'

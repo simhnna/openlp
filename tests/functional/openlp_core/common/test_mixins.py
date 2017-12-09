@@ -46,7 +46,7 @@ class TestRegistryProperties(TestCase, RegistryProperties):
         # GIVEN an Empty Registry
         # WHEN there is no Application
         # THEN the application should be none
-        self.assertEqual(self.application, None, 'The application value should be None')
+        assert not self.application, 'The application value should be None'
 
     def test_application(self):
         """
@@ -59,7 +59,7 @@ class TestRegistryProperties(TestCase, RegistryProperties):
         Registry().register('application', application)
 
         # THEN the application should be none
-        self.assertEqual(self.application, application, 'The application value should match')
+        assert self.application == application, 'The application value should match'
 
     @patch('openlp.core.common.mixins.is_win')
     def test_application_on_windows(self, mocked_is_win):
@@ -74,7 +74,7 @@ class TestRegistryProperties(TestCase, RegistryProperties):
         Registry().register('application', application)
 
         # THEN the application should be none
-        self.assertEqual(self.application, application, 'The application value should match')
+        assert self.application == application, 'The application value should match'
 
     @patch('openlp.core.common.mixins.is_win')
     def test_get_application_on_windows(self, mocked_is_win):
@@ -93,6 +93,6 @@ class TestRegistryProperties(TestCase, RegistryProperties):
             actual_application = reg_props.application
 
         # THEN the application should be the mock object, and the correct function should have been called
-        self.assertEqual(mock_application, actual_application, 'The application value should match')
+        assert mock_application == actual_application, 'The application value should match'
         mocked_is_win.assert_called_with()
         mocked_get.assert_called_with('application')

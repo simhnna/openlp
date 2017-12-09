@@ -45,7 +45,7 @@ class TestOpenLPJsonDecoder(TestCase):
         result = instance.object_hook({'__Path__': ['test', 'path']})
 
         # THEN: A Path object should be returned
-        self.assertEqual(result, Path('test', 'path'))
+        assert result == Path('test', 'path')
 
     def test_object_hook_non_path_object(self):
         """
@@ -59,8 +59,8 @@ class TestOpenLPJsonDecoder(TestCase):
             result = instance.object_hook({'key': 'value'})
 
             # THEN: The object should be returned unchanged and a Path object should not have been initiated
-            self.assertEqual(result, {'key': 'value'})
-            self.assertFalse(mocked_path.called)
+            assert result == {'key': 'value'}
+            assert not mocked_path.called
 
     def test_json_decode(self):
         """
@@ -73,7 +73,7 @@ class TestOpenLPJsonDecoder(TestCase):
         obj = json.loads(json_string, cls=OpenLPJsonDecoder)
 
         # THEN: The object returned should be a python version of the JSON string
-        self.assertEqual(obj, [Path('test', 'path1'), Path('test', 'path2')])
+        assert obj == [Path('test', 'path1'), Path('test', 'path2')]
 
 
 class TestOpenLPJsonEncoder(TestCase):
@@ -91,7 +91,7 @@ class TestOpenLPJsonEncoder(TestCase):
         result = instance.default(Path('test', 'path'))
 
         # THEN: A dictionary object that can be JSON encoded should be returned
-        self.assertEqual(result, {'__Path__': ('test', 'path')})
+        assert result == {'__Path__': ('test', 'path')}
 
     def test_default_non_path_object(self):
         """
@@ -119,4 +119,4 @@ class TestOpenLPJsonEncoder(TestCase):
         json_string = json.dumps(obj, cls=OpenLPJsonEncoder)
 
         # THEN: The JSON string return should be a representation of the object encoded
-        self.assertEqual(json_string, '[{"__Path__": ["test", "path1"]}, {"__Path__": ["test", "path2"]}]')
+        assert json_string == '[{"__Path__": ["test", "path1"]}, {"__Path__": ["test", "path2"]}]'
