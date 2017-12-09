@@ -63,8 +63,8 @@ class TestInit(TestCase, TestMixin):
         add_actions(mocked_target, empty_list)
 
         # THEN: The add method on the mocked target is never called
-        self.assertEqual(0, mocked_target.addSeparator.call_count, 'addSeparator method should not have been called')
-        self.assertEqual(0, mocked_target.addAction.call_count, 'addAction method should not have been called')
+        assert mocked_target.addSeparator.call_count == 0, 'addSeparator method should not have been called'
+        assert mocked_target.addAction.call_count == 0, 'addAction method should not have been called'
 
     def test_add_actions_none_action(self):
         """
@@ -79,7 +79,7 @@ class TestInit(TestCase, TestMixin):
 
         # THEN: The addSeparator method is called, but the addAction method is never called
         mocked_target.addSeparator.assert_called_with()
-        self.assertEqual(0, mocked_target.addAction.call_count, 'addAction method should not have been called')
+        assert mocked_target.addAction.call_count == 0, 'addAction method should not have been called'
 
     def test_add_actions_add_action(self):
         """
@@ -93,7 +93,7 @@ class TestInit(TestCase, TestMixin):
         add_actions(mocked_target, action_list)
 
         # THEN: The addSeparator method is not called, and the addAction method is called
-        self.assertEqual(0, mocked_target.addSeparator.call_count, 'addSeparator method should not have been called')
+        assert mocked_target.addSeparator.call_count == 0, 'addSeparator method should not have been called'
         mocked_target.addAction.assert_called_with('action')
 
     def test_add_actions_action_and_none(self):
@@ -150,9 +150,8 @@ class TestInit(TestCase, TestMixin):
             result = get_uno_command()
 
             # THEN: The command 'libreoffice' should be called with the appropriate parameters
-            self.assertEquals(result,
-                              'libreoffice --nologo --norestore --minimized --nodefault --nofirststartwizard'
-                              ' "--accept=pipe,name=openlp_pipe;urp;"')
+            assert result == 'libreoffice --nologo --norestore --minimized --nodefault --nofirststartwizard' \
+                             ' "--accept=pipe,name=openlp_pipe;urp;"'
 
     def test_get_uno_command_only_soffice_command_exists(self):
         """
@@ -169,8 +168,8 @@ class TestInit(TestCase, TestMixin):
             result = get_uno_command()
 
             # THEN: The command 'soffice' should be called with the appropriate parameters
-            self.assertEquals(result, 'soffice --nologo --norestore --minimized --nodefault --nofirststartwizard'
-                                      ' "--accept=pipe,name=openlp_pipe;urp;"')
+            assert result == 'soffice --nologo --norestore --minimized --nodefault --nofirststartwizard' \
+                             ' "--accept=pipe,name=openlp_pipe;urp;"'
 
     def test_get_uno_command_when_no_command_exists(self):
         """
@@ -198,8 +197,8 @@ class TestInit(TestCase, TestMixin):
             result = get_uno_command('socket')
 
             # THEN: The connection parameters should be set for socket
-            self.assertEqual(result, 'libreoffice --nologo --norestore --minimized --nodefault --nofirststartwizard'
-                                     ' "--accept=socket,host=localhost,port=2002;urp;"')
+            assert result == 'libreoffice --nologo --norestore --minimized --nodefault --nofirststartwizard' \
+                             ' "--accept=socket,host=localhost,port=2002;urp;"'
 
     def test_get_filesystem_encoding_sys_function_not_called(self):
         """
@@ -215,8 +214,8 @@ class TestInit(TestCase, TestMixin):
 
             # THEN: getdefaultencoding should have been called
             mocked_getfilesystemencoding.assert_called_with()
-            self.assertEqual(0, mocked_getdefaultencoding.called, 'getdefaultencoding should not have been called')
-            self.assertEqual('cp1252', result, 'The result should be "cp1252"')
+            assert mocked_getdefaultencoding.called == 0, 'getdefaultencoding should not have been called'
+            assert 'cp1252' == result, 'The result should be "cp1252"'
 
     def test_get_filesystem_encoding_sys_function_is_called(self):
         """
@@ -234,7 +233,7 @@ class TestInit(TestCase, TestMixin):
             # THEN: getdefaultencoding should have been called
             mocked_getfilesystemencoding.assert_called_with()
             mocked_getdefaultencoding.assert_called_with()
-            self.assertEqual('utf-8', result, 'The result should be "utf-8"')
+            assert 'utf-8' == result, 'The result should be "utf-8"'
 
     def test_clean_filename(self):
         """
@@ -248,7 +247,7 @@ class TestInit(TestCase, TestMixin):
         result = clean_filename(invalid_name)
 
         # THEN: The file name should be cleaned.
-        self.assertEqual(wanted_name, result, 'The file name should not contain any special characters.')
+        assert wanted_name == result, 'The file name should not contain any special characters.'
 
     def test_delete_file_no_path(self):
         """
@@ -259,7 +258,7 @@ class TestInit(TestCase, TestMixin):
         result = delete_file(None)
 
         # THEN: delete_file should return False
-        self.assertFalse(result, "delete_file should return False when called with None")
+        assert not result, "delete_file should return False when called with None"
 
     def test_delete_file_path_success(self):
         """
@@ -272,7 +271,7 @@ class TestInit(TestCase, TestMixin):
             result = delete_file(Path('path', 'file.ext'))
 
             # THEN: delete_file should return True
-            self.assertTrue(result, 'delete_file should return True when it successfully deletes a file')
+            assert result, 'delete_file should return True when it successfully deletes a file'
 
     def test_delete_file_path_no_file_exists(self):
         """
@@ -286,8 +285,8 @@ class TestInit(TestCase, TestMixin):
             result = delete_file(Path('path', 'file.ext'))
 
             # THEN: The function should not attempt to delete the file and it should return True
-            self.assertFalse(mocked_unlink.called)
-            self.assertTrue(result, 'delete_file should return True when the file doesnt exist')
+            assert mocked_unlink.called is False
+            assert result, 'delete_file should return True when the file doesnt exist'
 
     def test_delete_file_path_exception(self):
         """
@@ -303,8 +302,8 @@ class TestInit(TestCase, TestMixin):
             result = delete_file(Path('path', 'file.ext'))
 
             # THEN: The exception should be logged and `delete_file` should return False
-            self.assertTrue(mocked_log.exception.called)
-            self.assertFalse(result, 'delete_file should return False when an OSError is raised')
+            assert mocked_log.exception.called
+            assert result is False, 'delete_file should return False when an OSError is raised'
 
     def test_get_file_encoding_done(self):
         """
@@ -323,9 +322,9 @@ class TestInit(TestCase, TestMixin):
 
             # THEN: The feed method of UniversalDetector should only br called once before returning a result
             mocked_open.assert_called_once_with('rb')
-            self.assertEqual(mocked_universal_detector_inst.feed.mock_calls, [call(b"data" * 256)])
+            assert mocked_universal_detector_inst.feed.mock_calls == [call(b"data" * 256)]
             mocked_universal_detector_inst.close.assert_called_once_with()
-            self.assertEqual(result, encoding_result)
+            assert result == encoding_result
 
     def test_get_file_encoding_eof(self):
         """
@@ -345,9 +344,9 @@ class TestInit(TestCase, TestMixin):
 
             # THEN: The feed method of UniversalDetector should have been called twice before returning a result
             mocked_open.assert_called_once_with('rb')
-            self.assertEqual(mocked_universal_detector_inst.feed.mock_calls, [call(b"data" * 256), call(b"data" * 4)])
+            assert mocked_universal_detector_inst.feed.mock_calls == [call(b"data" * 256), call(b"data" * 4)]
             mocked_universal_detector_inst.close.assert_called_once_with()
-            self.assertEqual(result, encoding_result)
+            assert result, encoding_result
 
     def test_get_file_encoding_oserror(self):
         """
@@ -364,4 +363,4 @@ class TestInit(TestCase, TestMixin):
 
             # THEN: log.exception should be called and get_file_encoding should return None
             mocked_log.exception.assert_called_once_with('Error detecting file encoding')
-            self.assertIsNone(result)
+            assert not result

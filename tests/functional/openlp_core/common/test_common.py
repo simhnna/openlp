@@ -48,7 +48,7 @@ class TestCommonFunctions(TestCase):
             extension_loader('glob', ['file2.py', 'file3.py'])
 
             # THEN: `extension_loader` should not try to import any files
-            self.assertFalse(mocked_import_module.called)
+            assert mocked_import_module.called is False
 
     def test_extension_loader_files_found(self):
         """
@@ -69,7 +69,8 @@ class TestCommonFunctions(TestCase):
 
             # THEN: `extension_loader` should only try to import the files that are matched by the blob, excluding the
             #       files listed in the `excluded_files` argument
-            mocked_import_module.assert_has_calls([call('openlp.import_dir.file1'), call('openlp.import_dir.file4')])
+            mocked_import_module.assert_has_calls([call('openlp.import_dir.file1'),
+                                                          call('openlp.import_dir.file4')])
 
     def test_extension_loader_import_error(self):
         """
@@ -87,7 +88,7 @@ class TestCommonFunctions(TestCase):
             extension_loader('glob')
 
             # THEN: The `ImportError` should be caught and logged
-            self.assertTrue(mocked_logger.warning.called)
+            assert mocked_logger.warning.called
 
     def test_extension_loader_os_error(self):
         """
@@ -105,7 +106,7 @@ class TestCommonFunctions(TestCase):
             extension_loader('glob')
 
             # THEN: The `OSError` should be caught and logged
-            self.assertTrue(mocked_logger.warning.called)
+            assert mocked_logger.warning.called
 
     def test_de_hump_conversion(self):
         """
@@ -118,7 +119,7 @@ class TestCommonFunctions(TestCase):
         new_string = de_hump(string)
 
         # THEN: the new string should be converted to python format
-        self.assertEqual(new_string, "my_class", 'The class name should have been converted')
+        assert new_string == "my_class", 'The class name should have been converted'
 
     def test_de_hump_static(self):
         """
@@ -131,7 +132,7 @@ class TestCommonFunctions(TestCase):
         new_string = de_hump(string)
 
         # THEN: the new string should be converted to python format
-        self.assertEqual(new_string, "my_class", 'The class name should have been preserved')
+        assert new_string == "my_class", 'The class name should have been preserved'
 
     def test_path_to_module(self):
         """
@@ -144,7 +145,7 @@ class TestCommonFunctions(TestCase):
         result = path_to_module(path)
 
         # THEN: path_to_module should return the module name
-        self.assertEqual(result, 'openlp.core.ui.media.webkitplayer')
+        assert result == 'openlp.core.ui.media.webkitplayer'
 
     def test_trace_error_handler(self):
         """
@@ -174,9 +175,9 @@ class TestCommonFunctions(TestCase):
             mocked_sys.platform = 'win32'
 
             # THEN: The three platform functions should perform properly
-            self.assertTrue(is_win(), 'is_win() should return True')
-            self.assertFalse(is_macosx(), 'is_macosx() should return False')
-            self.assertFalse(is_linux(), 'is_linux() should return False')
+            assert is_win(), 'is_win() should return True'
+            assert is_macosx() is False, 'is_macosx() should return False'
+            assert is_linux() is False, 'is_linux() should return False'
 
     def test_is_macosx(self):
         """
@@ -190,9 +191,9 @@ class TestCommonFunctions(TestCase):
             mocked_sys.platform = 'darwin'
 
             # THEN: The three platform functions should perform properly
-            self.assertTrue(is_macosx(), 'is_macosx() should return True')
-            self.assertFalse(is_win(), 'is_win() should return False')
-            self.assertFalse(is_linux(), 'is_linux() should return False')
+            assert is_macosx(), 'is_macosx() should return True'
+            assert is_win() is False, 'is_win() should return False'
+            assert is_linux() is False, 'is_linux() should return False'
 
     def test_is_linux(self):
         """
@@ -206,9 +207,9 @@ class TestCommonFunctions(TestCase):
             mocked_sys.platform = 'linux3'
 
             # THEN: The three platform functions should perform properly
-            self.assertTrue(is_linux(), 'is_linux() should return True')
-            self.assertFalse(is_win(), 'is_win() should return False')
-            self.assertFalse(is_macosx(), 'is_macosx() should return False')
+            assert is_linux(), 'is_linux() should return True'
+            assert is_win() is False, 'is_win() should return False'
+            assert is_macosx() is False, 'is_macosx() should return False'
 
     def test_clean_button_text(self):
         """
@@ -222,4 +223,4 @@ class TestCommonFunctions(TestCase):
         actual_text = clean_button_text(input_text)
 
         # THEN: The text should have been cleaned
-        self.assertEqual(expected_text, actual_text, 'The text should be clean')
+        assert expected_text == actual_text, 'The text should be clean'

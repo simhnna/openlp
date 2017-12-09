@@ -59,8 +59,8 @@ class TestCategoryActionList(TestCase):
         self.list.append(self.action1)
 
         # THEN: The actions should (not) be in the list.
-        self.assertTrue(self.action1 in self.list)
-        self.assertFalse(self.action2 in self.list)
+        assert self.action1 in self.list
+        assert self.action2 not in self.list
 
     def test_len(self):
         """
@@ -69,14 +69,14 @@ class TestCategoryActionList(TestCase):
         # GIVEN: The list.
         # WHEN: Do nothing.
         # THEN: Check the length.
-        self.assertEqual(len(self.list), 0, "The length should be 0.")
+        assert len(self.list) == 0, "The length should be 0."
 
         # GIVEN: The list.
         # WHEN: Append an action.
         self.list.append(self.action1)
 
         # THEN: Check the length.
-        self.assertEqual(len(self.list), 1, "The length should be 1.")
+        assert len(self.list) == 1, "The length should be 1."
 
     def test_append(self):
         """
@@ -88,10 +88,10 @@ class TestCategoryActionList(TestCase):
         self.list.append(self.action2)
 
         # THEN: Check if the actions are in the list and check if they have the correct weights.
-        self.assertTrue(self.action1 in self.list)
-        self.assertTrue(self.action2 in self.list)
-        self.assertEqual(self.list.actions[0], (0, self.action1))
-        self.assertEqual(self.list.actions[1], (1, self.action2))
+        assert self.action1 in self.list
+        assert self.action2 in self.list
+        assert self.list.actions[0] == (0, self.action1)
+        assert self.list.actions[1] == (1, self.action2)
 
     def test_add(self):
         """
@@ -106,11 +106,11 @@ class TestCategoryActionList(TestCase):
         self.list.add(self.action2, action2_weight)
 
         # THEN: Check if they were added and have the specified weights.
-        self.assertTrue(self.action1 in self.list)
-        self.assertTrue(self.action2 in self.list)
+        assert self.action1 in self.list
+        assert self.action2 in self.list
         # Now check if action1 is second and action2 is first (due to their weights).
-        self.assertEqual(self.list.actions[0], (41, self.action2))
-        self.assertEqual(self.list.actions[1], (42, self.action1))
+        assert self.list.actions[0] == (41, self.action2)
+        assert self.list.actions[1] == (42, self.action1)
 
     def test_iterator(self):
         """
@@ -121,11 +121,11 @@ class TestCategoryActionList(TestCase):
         self.list.add(self.action2)
 
         # WHEN: Iterating over the list
-        list = [a for a in self.list]
+        local_list = [a for a in self.list]
         # THEN: Make sure they are returned in correct order
-        self.assertEquals(len(self.list), 2)
-        self.assertIs(list[0], self.action1)
-        self.assertIs(list[1], self.action2)
+        assert len(self.list) == 2
+        assert local_list[0] == self.action1
+        assert local_list[1] == self.action2
 
     def test_remove(self):
         """
@@ -138,7 +138,7 @@ class TestCategoryActionList(TestCase):
         self.list.remove(self.action1)
 
         # THEN: Now the element should not be in the list anymore.
-        self.assertFalse(self.action1 in self.list)
+        assert self.action1 not in self.list
 
         # THEN: Check if an exception is raised when trying to remove a not present action.
         self.assertRaises(ValueError, self.list.remove, self.action2)
