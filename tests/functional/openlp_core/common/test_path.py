@@ -177,12 +177,11 @@ class TestShutil(TestCase):
             path = Path('test', 'path')
 
             # WHEN: Calling :func:`openlp.core.common.path.rmtree` with the path parameter as Path object type
-            result = path.rmtree()
+            path.rmtree()
 
             # THEN: :func:`shutil.rmtree` should have been called with the str equivalents of the Path object.
             mocked_shutil_rmtree.assert_called_once_with(
                 os.path.join('test', 'path'), False, None)
-            assert not result
 
     def test_rmtree_optional_params(self):
         """
@@ -268,7 +267,7 @@ class TestPath(TestCase):
         result = path_to_str(Path('test/path'))
 
         # THEN: `path_to_str` should return a string representation of the Path object
-        assert result ==  os.path.join('test', 'path')
+        assert result == os.path.join('test', 'path')
 
     def test_str_to_path_type_error(self):
         """

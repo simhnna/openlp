@@ -70,7 +70,7 @@ class TestCommonFunctions(TestCase):
             # THEN: `extension_loader` should only try to import the files that are matched by the blob, excluding the
             #       files listed in the `excluded_files` argument
             mocked_import_module.assert_has_calls([call('openlp.import_dir.file1'),
-                                                          call('openlp.import_dir.file4')])
+                                                   call('openlp.import_dir.file4')])
 
     def test_extension_loader_import_error(self):
         """
