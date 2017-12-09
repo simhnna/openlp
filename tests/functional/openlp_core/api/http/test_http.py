@@ -54,7 +54,7 @@ class TestHttpServer(TestCase):
 
         # THEN: the api environment should have been created
         assert mock_qthread.call_count == 1, 'The qthread should have been called once'
-        assert mock_thread.call_count == 0, 'The http thread should have been called once'
+        assert mock_thread.call_count == 1, 'The http thread should have been called once'
 
     @patch('openlp.core.api.http.server.HttpWorker')
     @patch('openlp.core.api.http.server.QtCore.QThread')
@@ -69,4 +69,4 @@ class TestHttpServer(TestCase):
 
         # THEN: the api environment should have been created
         assert mock_qthread.call_count == 0, 'The qthread should not have have been called'
-        assert mock_thread.call_count == 1, 'The http thread should not have been called'
+        assert mock_thread.call_count == 0, 'The http thread should not have been called'

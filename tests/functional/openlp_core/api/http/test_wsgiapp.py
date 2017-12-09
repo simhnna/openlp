@@ -61,7 +61,7 @@ class TestRouting(TestCase):
             application.dispatch(rqst)
 
         # THEN: the not found returned
-        self.assertEqual(context.exception.args[0], 'Not Found', 'URL not found in dispatcher')
+        assert context.exception.args[0] == 'Not Found', 'URL not found in dispatcher'
 
         # WHEN: when the URL is correct and dispatch called
         rqst = MagicMock()
@@ -69,8 +69,8 @@ class TestRouting(TestCase):
         rqst.method = 'GET'
         application.dispatch(rqst)
         # THEN: the not found id called
-        self.assertEqual(1, application.route_map['^\\/test\\/image$']['GET'].call_count,
-                         'main_index function should have been called')
+        assert 1 == application.route_map['^\\/test\\/image$']['GET'].call_count, \
+            'main_index function should have been called'
 
 
 @test_endpoint.route('image')

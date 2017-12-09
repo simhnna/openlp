@@ -74,8 +74,8 @@ class TestWSServer(TestCase, TestMixin):
         WebSocketServer()
 
         # THEN: the api environment should have been created
-        self.assertEquals(1, mock_qthread.call_count, 'The qthread should have been called once')
-        self.assertEquals(1, mock_worker.call_count, 'The http thread should have been called once')
+        assert mock_qthread.call_count == 1, 'The qthread should have been called once'
+        assert mock_worker.call_count == 1, 'The http thread should have been called once'
 
     @patch('openlp.core.api.websockets.WebSocketWorker')
     @patch('openlp.core.api.websockets.QtCore.QThread')
@@ -89,8 +89,8 @@ class TestWSServer(TestCase, TestMixin):
         WebSocketServer()
 
         # THEN: the api environment should have been created
-        self.assertEquals(0, mock_qthread.call_count, 'The qthread should not have been called')
-        self.assertEquals(0, mock_worker.call_count, 'The http thread should not have been called')
+        assert mock_qthread.call_count == 0, 'The qthread should not have been called'
+        assert mock_worker.call_count == 0, 'The http thread should not have been called'
 
     def test_main_poll(self):
         """
@@ -102,8 +102,7 @@ class TestWSServer(TestCase, TestMixin):
         Registry().register('live_controller', mocked_live_controller)
         # THEN: the live json should be generated
         main_json = self.poll.main_poll()
-        self.assertEquals(b'{"results": {"slide_count": 5}}', main_json,
-                          'The return value should match the defined json')
+        assert b'{"results": {"slide_count": 5}}' == main_json, 'The return value should match the defined json'
 
     def test_poll(self):
         """
@@ -130,13 +129,13 @@ class TestWSServer(TestCase, TestMixin):
             mocked_is_chords_active.return_value = True
             poll_json = self.poll.poll()
         # THEN: the live json should be generated and match expected results
-        self.assertTrue(poll_json['results']['blank'], 'The blank return value should be True')
-        self.assertFalse(poll_json['results']['theme'], 'The theme return value should be False')
-        self.assertFalse(poll_json['results']['display'], 'The display return value should be False')
-        self.assertFalse(poll_json['results']['isSecure'], 'The isSecure return value should be False')
-        self.assertFalse(poll_json['results']['isAuthorised'], 'The isAuthorised return value should be False')
-        self.assertTrue(poll_json['results']['twelve'], 'The twelve return value should be False')
-        self.assertEquals(poll_json['results']['version'], 3, 'The version return value should be 3')
-        self.assertEquals(poll_json['results']['slide'], 5, 'The slide return value should be 5')
-        self.assertEquals(poll_json['results']['service'], 21, 'The version return value should be 21')
-        self.assertEquals(poll_json['results']['item'], '23-34-45', 'The item return value should match 23-34-45')
+        assert poll_json['results']['blank'], 'The blank return value should be True'
+        assert poll_json['results']['theme'], 'The theme return value should be False'
+        assert poll_json['results']['display'], 'The display return value should be False'
+        assert poll_json['results']['isSecure'], 'The isSecure return value should be False'
+        assert poll_json['results']['isAuthorised'], 'The isAuthorised return value should be False'
+        assert poll_json['results']['twelve'], 'The twelve return value should be False'
+        assert poll_json['results']['version'] == 3, 'The version return value should be 3'
+        assert poll_json['results']['slide'] == 5, 'The slide return value should be 5'
+        assert poll_json['results']['service'] == 21, 'The version return value should be 21'
+        assert poll_json['results']['item'] == '23-34-45', 'The item return value should match 23-34-45'
