@@ -129,12 +129,12 @@ class TestWSServer(TestCase, TestMixin):
             mocked_is_chords_active.return_value = True
             poll_json = self.poll.poll()
         # THEN: the live json should be generated and match expected results
-        assert poll_json['results']['blank'] is False, 'The blank return value should be True'
+        assert poll_json['results']['blank'] is True, 'The blank return value should be True'
         assert poll_json['results']['theme'] is False, 'The theme return value should be False'
         assert poll_json['results']['display'] is False, 'The display return value should be False'
         assert poll_json['results']['isSecure'] is False, 'The isSecure return value should be False'
         assert poll_json['results']['isAuthorised'] is False, 'The isAuthorised return value should be False'
-        assert poll_json['results']['twelve'] is True, 'The twelve return value should be False'
+        assert poll_json['results']['twelve'] is False, 'The twelve return value should be False'
         assert poll_json['results']['version'] == 3, 'The version return value should be 3'
         assert poll_json['results']['slide'] == 5, 'The slide return value should be 5'
         assert poll_json['results']['service'] == 21, 'The version return value should be 21'
