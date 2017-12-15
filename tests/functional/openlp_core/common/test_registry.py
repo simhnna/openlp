@@ -57,13 +57,13 @@ class TestRegistry(TestCase):
         # WHEN I try to get back a non existent component
         # THEN I will get an exception
         temp = Registry().get('test2')
-        assert temp is False, 'None should have been returned for missing service'
+        assert temp is None, 'None should have been returned for missing service'
 
         # WHEN I try to replace a component I should be allowed
         Registry().remove('test1')
         # THEN I will get an exception
         temp = Registry().get('test1')
-        assert temp is False, 'None should have been returned for deleted service'
+        assert temp is None, 'None should have been returned for deleted service'
 
     def test_registry_function(self):
         """
@@ -142,7 +142,7 @@ class TestRegistry(TestCase):
         Registry().remove_function('test1', self.dummy_function_1)
 
         # THEN: The method should not be available.
-        assert Registry().functions_list['test1'] is None, 'The function should not be in the dict anymore.'
+        assert Registry().functions_list['test1'] == [], 'The function should not be in the dict anymore.'
 
     def dummy_function_1(self):
         return "function_1"
