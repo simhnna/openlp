@@ -124,8 +124,8 @@ class TestCategoryActionList(TestCase):
         local_list = [a for a in self.list]
         # THEN: Make sure they are returned in correct order
         assert len(self.list) == 2
-        assert local_list[0] == self.action1
-        assert local_list[1] == self.action2
+        assert local_list[0] is self.action1
+        assert local_list[1] is self.action2
 
     def test_remove(self):
         """

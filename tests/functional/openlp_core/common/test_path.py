@@ -213,7 +213,7 @@ class TestShutil(TestCase):
 
             # THEN: :func:`shutil.which` should have been called with the command, and :func:`which` should return None.
             mocked_shutil_which.assert_called_once_with('no_command')
-            assert not result
+        assert result is None
 
     def test_which_command(self):
         """
@@ -256,7 +256,7 @@ class TestPath(TestCase):
         result = path_to_str(None)
 
         # THEN: `path_to_str` should return an empty string
-        assert not result
+        assert result == ''
 
     def test_path_to_str_path_object(self):
         """
@@ -288,7 +288,7 @@ class TestPath(TestCase):
         result = str_to_path('')
 
         # THEN: `path_to_str` should return None
-        assert not result
+        assert result is None
 
     def test_path_encode_json(self):
         """

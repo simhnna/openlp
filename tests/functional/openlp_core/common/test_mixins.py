@@ -46,7 +46,7 @@ class TestRegistryProperties(TestCase, RegistryProperties):
         # GIVEN an Empty Registry
         # WHEN there is no Application
         # THEN the application should be none
-        assert not self.application, 'The application value should be None'
+        assert self.application is None, 'The application value should be None'
 
     def test_application(self):
         """

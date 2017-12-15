@@ -60,7 +60,7 @@ class TestOpenLPJsonDecoder(TestCase):
 
             # THEN: The object should be returned unchanged and a Path object should not have been initiated
             assert result == {'key': 'value'}
-            assert not mocked_path.called
+            assert mocked_path.called is False
 
     def test_json_decode(self):
         """

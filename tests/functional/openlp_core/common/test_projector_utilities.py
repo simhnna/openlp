@@ -45,7 +45,7 @@ ip6_link_local = 'fe80::223:14ff:fe99:d315'
 ip6_bad = 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'
 
 
-class testProjectorUtilities(TestCase):
+class TestProjectorUtilities(TestCase):
     """
     Validate functions in the projector utilities module
     """
@@ -87,7 +87,7 @@ class testProjectorUtilities(TestCase):
         valid = verify_ip_address(addr=ip4_bad)
 
         # THEN: Verify we received True
-        assert not valid, 'Bad IPv4 address should not have been valid'
+        assert valid is False, 'Bad IPv4 address should not have been valid'
 
     def test_ip6_loopback_valid(self):
         """
@@ -117,7 +117,7 @@ class testProjectorUtilities(TestCase):
         valid = verify_ip_address(addr=ip6_bad)
 
         # THEN: Validate bad return
-        assert not valid, 'IPv6 bad address should have been invalid'
+        assert valid is False, 'IPv6 bad address should have been invalid'
 
     def test_md5_hash(self):
         """

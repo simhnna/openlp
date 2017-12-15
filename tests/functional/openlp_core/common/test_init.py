@@ -258,7 +258,7 @@ class TestInit(TestCase, TestMixin):
         result = delete_file(None)
 
         # THEN: delete_file should return False
-        assert not result, "delete_file should return False when called with None"
+        assert result is False, "delete_file should return False when called with None"
 
     def test_delete_file_path_success(self):
         """
@@ -271,7 +271,7 @@ class TestInit(TestCase, TestMixin):
             result = delete_file(Path('path', 'file.ext'))
 
             # THEN: delete_file should return True
-            assert result, 'delete_file should return True when it successfully deletes a file'
+            assert result is True, 'delete_file should return True when it successfully deletes a file'
 
     def test_delete_file_path_no_file_exists(self):
         """
@@ -363,4 +363,4 @@ class TestInit(TestCase, TestMixin):
 
             # THEN: log.exception should be called and get_file_encoding should return None
             mocked_log.exception.assert_called_once_with('Error detecting file encoding')
-            assert not result
+            assert result is None

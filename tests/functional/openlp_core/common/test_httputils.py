@@ -240,4 +240,4 @@ class TestHttpUtils(TestCase, TestMixin):
 
         # THEN: socket.timeout should have been caught
         # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
-        assert not os.path.exists(self.tempfile), 'tempfile should have been deleted'
+        assert os.path.exists(self.tempfile) is False, 'tempfile should have been deleted'
