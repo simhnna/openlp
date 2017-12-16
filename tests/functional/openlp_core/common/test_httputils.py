@@ -59,7 +59,7 @@ class TestHttpUtils(TestCase, TestMixin):
 
             # THEN: The user agent is a Linux (or ChromeOS) user agent
             result = 'Linux' in user_agent or 'CrOS' in user_agent
-            assert result, 'The user agent should be a valid Linux user agent'
+            assert result is True, 'The user agent should be a valid Linux user agent'
 
     def test_get_user_agent_windows(self):
         """

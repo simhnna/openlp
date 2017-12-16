@@ -175,7 +175,7 @@ class TestCommonFunctions(TestCase):
             mocked_sys.platform = 'win32'
 
             # THEN: The three platform functions should perform properly
-            assert is_win(), 'is_win() should return True'
+            assert is_win() is True, 'is_win() should return True'
             assert is_macosx() is False, 'is_macosx() should return False'
             assert is_linux() is False, 'is_linux() should return False'
 
@@ -191,7 +191,7 @@ class TestCommonFunctions(TestCase):
             mocked_sys.platform = 'darwin'
 
             # THEN: The three platform functions should perform properly
-            assert is_macosx(), 'is_macosx() should return True'
+            assert is_macosx() is True, 'is_macosx() should return True'
             assert is_win() is False, 'is_win() should return False'
             assert is_linux() is False, 'is_linux() should return False'
 
@@ -207,7 +207,7 @@ class TestCommonFunctions(TestCase):
             mocked_sys.platform = 'linux3'
 
             # THEN: The three platform functions should perform properly
-            assert is_linux(), 'is_linux() should return True'
+            assert is_linux() is True, 'is_linux() should return True'
             assert is_win() is False, 'is_win() should return False'
             assert is_macosx() is False, 'is_macosx() should return False'
 

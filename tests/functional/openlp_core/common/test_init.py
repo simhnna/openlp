@@ -286,7 +286,7 @@ class TestInit(TestCase, TestMixin):
 
             # THEN: The function should not attempt to delete the file and it should return True
             assert mocked_unlink.called is False
-            assert result, 'delete_file should return True when the file doesnt exist'
+            assert result is True, 'delete_file should return True when the file doesnt exist'
 
     def test_delete_file_path_exception(self):
         """
@@ -346,7 +346,7 @@ class TestInit(TestCase, TestMixin):
             mocked_open.assert_called_once_with('rb')
             assert mocked_universal_detector_inst.feed.mock_calls == [call(b"data" * 256), call(b"data" * 4)]
             mocked_universal_detector_inst.close.assert_called_once_with()
-            assert result, encoding_result
+            assert result == encoding_result
 
     def test_get_file_encoding_oserror(self):
         """

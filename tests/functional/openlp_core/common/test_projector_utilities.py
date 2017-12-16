@@ -67,7 +67,7 @@ class TestProjectorUtilities(TestCase):
         valid = verify_ip_address(addr=ip4_local)
 
         # THEN: Verify we received True
-        assert valid, 'IPv4 local address should have been valid'
+        assert valid is True, 'IPv4 local address should have been valid'
 
     def test_ip4_broadcast_valid(self):
         """
@@ -77,7 +77,7 @@ class TestProjectorUtilities(TestCase):
         valid = verify_ip_address(addr=ip4_broadcast)
 
         # THEN: Verify we received True
-        assert valid, 'IPv4 broadcast address should have been valid'
+        assert valid is True, 'IPv4 broadcast address should have been valid'
 
     def test_ip4_address_invalid(self):
         """
@@ -97,7 +97,7 @@ class TestProjectorUtilities(TestCase):
         valid = verify_ip_address(addr=ip6_loopback)
 
         # THEN: Validate return
-        assert valid, 'IPv6 loopback address should have been valid'
+        assert valid is True, 'IPv6 loopback address should have been valid'
 
     def test_ip6_local_valid(self):
         """
@@ -107,7 +107,7 @@ class TestProjectorUtilities(TestCase):
         valid = verify_ip_address(addr=ip6_link_local)
 
         # THEN: Validate return
-        assert valid, 'IPv6 link-local address should have been valid'
+        assert valid is True, 'IPv6 link-local address should have been valid'
 
     def test_ip6_address_invalid(self):
         """
