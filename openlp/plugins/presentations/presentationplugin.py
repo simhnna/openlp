@@ -129,7 +129,8 @@ class PresentationPlugin(Plugin):
         """
         log.debug('check_pre_conditions')
         controller_dir = os.path.join('plugins', 'presentations', 'lib')
-        glob_pattern = os.path.join(controller_dir, '*controller.py')
+        # Find all files that do not begin with '.' (lp:#1738047) and end with controller.py
+        glob_pattern = os.path.join(controller_dir, '[!.]*controller.py')
         extension_loader(glob_pattern, ['presentationcontroller.py'])
         controller_classes = PresentationController.__subclasses__()
         for controller_class in controller_classes:
