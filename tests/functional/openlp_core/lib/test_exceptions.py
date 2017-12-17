@@ -42,4 +42,4 @@ class TestValidationError(TestCase):
 
         # THEN: Then calling str on the error should return the correct text and it should be an instance of `Exception`
         assert str(error) == 'Test ValidationError'
-        assert isinstance(error, Exception)
+        assert isinstance(error, Exception) is True

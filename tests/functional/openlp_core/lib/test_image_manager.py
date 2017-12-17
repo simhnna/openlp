@@ -84,7 +84,7 @@ class TestImageManager(TestCase, TestMixin):
         # THEN a KeyError is thrown
         with self.assertRaises(KeyError) as context:
             self.image_manager.get_image(TEST_PATH, 'church1.jpg')
-        self.assertNotEquals(context.exception, '', 'KeyError exception should have been thrown for missing image')
+        assert context.exception is not '', 'KeyError exception should have been thrown for missing image'
 
     def test_different_dimension_image(self):
         """
@@ -98,7 +98,7 @@ class TestImageManager(TestCase, TestMixin):
         image = self.image_manager.get_image(full_path, 'church.jpg', 80, 80)
 
         # THEN: The return should be of type image
-        self.assertEqual(isinstance(image, QtGui.QImage), True, 'The returned object should be a QImage')
+        assert isinstance(image, QtGui.QImage) is True, 'The returned object should be a QImage'
 
         # WHEN: adding the same image with different dimensions
         self.image_manager.add_image(full_path, 'church.jpg', None, 100, 100)
@@ -116,7 +116,7 @@ class TestImageManager(TestCase, TestMixin):
         # WHEN: calling with correct image, but wrong dimensions
         with self.assertRaises(KeyError) as context:
             self.image_manager.get_image(full_path, 'church.jpg', 120, 120)
-        self.assertNotEquals(context.exception, '', 'KeyError exception should have been thrown for missing dimension')
+        assert context.exception is not '', 'KeyError exception should have been thrown for missing dimension'
 
     def test_process_cache(self):
         """
@@ -141,10 +141,8 @@ class TestImageManager(TestCase, TestMixin):
             #  is being processed (see mocked methods/functions).
             # Note: Priority.Normal means, that the resize_image() was not completed yet (because afterwards the #
             # priority is adjusted to Priority.Lowest).
-            self.assertEqual(self.get_image_priority(image1), Priority.Normal,
-                             "image1's priority should be 'Priority.Normal'")
-            self.assertEqual(self.get_image_priority(image2), Priority.Normal,
-                             "image2's priority should be 'Priority.Normal'")
+            assert self.get_image_priority(image1) == Priority.Normal, "image1's priority should be 'Priority.Normal'"
+            assert self.get_image_priority(image2) == Priority.Normal, "image2's priority should be 'Priority.Normal'"
 
             # WHEN: Add more images.
             self.image_manager.add_image(TEST_PATH, image3, None)
@@ -162,15 +160,15 @@ class TestImageManager(TestCase, TestMixin):
             # Because empty() is not reliable, wait a litte; just to make sure.
             time.sleep(0.1)
             # THEN: The images' priority reflect how they were processed.
-            self.assertEqual(self.image_manager._conversion_queue.qsize(), 0, "The queue should be empty.")
-            self.assertEqual(self.get_image_priority(image1), Priority.Lowest,
-                             "The image should have not been requested (=Lowest)")
-            self.assertEqual(self.get_image_priority(image2), Priority.Lowest,
-                             "The image should have not been requested (=Lowest)")
-            self.assertEqual(self.get_image_priority(image3), Priority.Low,
-                             "Only the QImage should have been requested (=Low).")
-            self.assertEqual(self.get_image_priority(image4), Priority.Urgent,
-                             "The image bytes should have been requested (=Urgent).")
+            assert self.image_manager._conversion_queue.qsize() == 0, "The queue should be empty."
+            assert self.get_image_priority(image1) == Priority.Lowest, \
+                "The image should have not been requested (=Lowest)"
+            assert self.get_image_priority(image2) == Priority.Lowest, \
+                "The image should have not been requested (=Lowest)"
+            assert self.get_image_priority(image3) == Priority.Low, \
+                "Only the QImage should have been requested (=Low)."
+            assert self.get_image_priority(image4) == Priority.Urgent, \
+                "The image bytes should have been requested (=Urgent)."
 
     def get_image_priority(self, image):
         """
