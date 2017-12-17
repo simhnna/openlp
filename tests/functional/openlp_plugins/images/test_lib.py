@@ -173,12 +173,14 @@ class TestImageMediaItem(TestCase):
         """
         # GIVEN: A mocked version of reset_action
         self.media_item.reset_action = MagicMock()
+        self.media_item.reset_action_context = MagicMock()
 
         # WHEN: on_reset_click is called
         self.media_item.on_reset_click()
 
         # THEN: the reset_action should be set visible, and the image should be reset
         self.media_item.reset_action.setVisible.assert_called_with(False)
+        self.media_item.reset_action_context.setVisible.assert_called_with(False)
         self.media_item.live_controller.display.reset_image.assert_called_with()
 
     @patch('openlp.plugins.images.lib.mediaitem.delete_file')

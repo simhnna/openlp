@@ -208,6 +208,33 @@ class TestSlideController(TestCase):
         mocked_on_theme_display.assert_called_once_with(False)
         mocked_on_hide_display.assert_called_once_with(False)
 
+    def test_on_go_live_preview_controller(self):
+        """
+        Test that when the on_go_preview() method is called the message is sent to the preview controller and focus is
+        set correctly.
+        """
+        # GIVEN: A new SlideController instance and plugin preview then pressing go live should respond
+        mocked_display = MagicMock()
+        mocked_preview_controller = MagicMock()
+        mocked_preview_widget = MagicMock()
+        mocked_service_item = MagicMock()
+        mocked_service_item.from_service = False
+        mocked_preview_widget.current_slide_number.return_value = 1
+        mocked_preview_widget.slide_count = MagicMock(return_value=2)
+        mocked_preview_controller.preview_widget = MagicMock()
+        Registry.create()
+        Registry().register('preview_controller', mocked_preview_controller)
+        slide_controller = SlideController(None)
+        slide_controller.service_item = mocked_service_item
+        slide_controller.preview_widget = mocked_preview_widget
+        slide_controller.display = mocked_display
+
+        # WHEN: on_go_live() is called
+        slide_controller.on_go_preview()
+
+        # THEN: the preview controller should have the service item and the focus set to live
+        mocked_preview_controller.preview_widget.setFocus.assert_called_once_with()
+
     def test_on_go_live_live_controller(self):
         """
         Test that when the on_go_live() method is called the message is sent to the live controller and focus is
@@ -691,7 +718,7 @@ class TestSlideController(TestCase):
         ])
 
     @patch('openlp.core.ui.slidecontroller.Settings')
-    def on_preview_double_click_unblank_display_test(self, MockedSettings):
+    def test_on_preview_double_click_unblank_display(self, MockedSettings):
         # GIVEN: A slide controller, actions needed, settins set to True.
         slide_controller = SlideController(None)
         mocked_settings = MagicMock()
@@ -714,7 +741,7 @@ class TestSlideController(TestCase):
         self.assertEqual(0, slide_controller.on_preview_add_to_service.call_count, 'Should have not been called.')
 
     @patch('openlp.core.ui.slidecontroller.Settings')
-    def on_preview_double_click_add_to_service_test(self, MockedSettings):
+    def test_on_preview_double_click_add_to_service(self, MockedSettings):
         # GIVEN: A slide controller, actions needed, settins set to False.
         slide_controller = SlideController(None)
         mocked_settings = MagicMock()

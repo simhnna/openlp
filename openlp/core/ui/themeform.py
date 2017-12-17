@@ -28,7 +28,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import get_images_filter, is_not_image_file
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.lib.theme import BackgroundType, BackgroundGradientType
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui import ThemeLayoutForm

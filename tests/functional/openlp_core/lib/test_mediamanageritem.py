@@ -42,8 +42,8 @@ class TestMediaManagerItem(TestCase, TestMixin):
         self.mocked_setup = self.setup_patcher.start()
         self.addCleanup(self.setup_patcher.stop)
 
-    @patch(u'openlp.core.lib.mediamanageritem.Settings')
-    @patch(u'openlp.core.lib.mediamanageritem.MediaManagerItem.on_preview_click')
+    @patch('openlp.core.lib.mediamanageritem.Settings')
+    @patch('openlp.core.lib.mediamanageritem.MediaManagerItem.on_preview_click')
     def test_on_double_clicked(self, mocked_on_preview_click, MockedSettings):
         """
         Test that when an item is double-clicked then the item is previewed
@@ -75,8 +75,8 @@ class TestMediaManagerItem(TestCase, TestMixin):
         self.assertTrue(mmi.has_delete_icon, 'By default a delete icon should be present')
         self.assertFalse(mmi.add_to_service_item, 'There should be no add_to_service icon by default')
 
-    @patch(u'openlp.core.lib.mediamanageritem.Settings')
-    @patch(u'openlp.core.lib.mediamanageritem.MediaManagerItem.on_live_click')
+    @patch('openlp.core.lib.mediamanageritem.Settings')
+    @patch('openlp.core.lib.mediamanageritem.MediaManagerItem.on_live_click')
     def test_on_double_clicked_go_live(self, mocked_on_live_click, MockedSettings):
         """
         Test that when "Double-click to go live" is enabled that the item goes live
@@ -93,9 +93,9 @@ class TestMediaManagerItem(TestCase, TestMixin):
         # THEN: on_live_click() should have been called
         mocked_on_live_click.assert_called_with()
 
-    @patch(u'openlp.core.lib.mediamanageritem.Settings')
-    @patch(u'openlp.core.lib.mediamanageritem.MediaManagerItem.on_live_click')
-    @patch(u'openlp.core.lib.mediamanageritem.MediaManagerItem.on_preview_click')
+    @patch('openlp.core.lib.mediamanageritem.Settings')
+    @patch('openlp.core.lib.mediamanageritem.MediaManagerItem.on_live_click')
+    @patch('openlp.core.lib.mediamanageritem.MediaManagerItem.on_preview_click')
     def test_on_double_clicked_single_click_preview(self, mocked_on_preview_click, mocked_on_live_click,
                                                     MockedSettings):
         """
@@ -111,5 +111,5 @@ class TestMediaManagerItem(TestCase, TestMixin):
         mmi.on_double_clicked()
 
         # THEN: on_live_click() should have been called
-        self.assertEqual(0, mocked_on_live_click.call_count, u'on_live_click() should not have been called')
-        self.assertEqual(0, mocked_on_preview_click.call_count, u'on_preview_click() should not have been called')
+        self.assertEqual(0, mocked_on_live_click.call_count, 'on_live_click() should not have been called')
+        self.assertEqual(0, mocked_on_preview_click.call_count, 'on_preview_click() should not have been called')

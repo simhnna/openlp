@@ -350,6 +350,7 @@ class Manager(object):
             resulting in the plugin_name being used.
         :param upgrade_mod: The upgrade_schema function for this database
         """
+        super().__init__()
         self.is_dirty = False
         self.session = None
         self.db_url = None

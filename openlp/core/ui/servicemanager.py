@@ -32,19 +32,19 @@ from tempfile import mkstemp
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common import ThemeLevel, split_filename, delete_file
+from openlp.core.common import ThemeLevel, delete_file
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, format_time, translate
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
-from openlp.core.common.path import Path, create_paths, path_to_str, str_to_path
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.path import Path, create_paths, str_to_path
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem, ItemCapabilities, PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action, find_and_set_in_combo_box
 from openlp.core.ui import ServiceNoteForm, ServiceItemEditForm, StartTimeForm
-from openlp.core.ui.lib import OpenLPToolbar
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.toolbar import OpenLPToolbar
 
 
 class ServiceManagerList(QtWidgets.QTreeWidget):
@@ -56,7 +56,23 @@ class ServiceManagerList(QtWidgets.QTreeWidget):
         Constructor
         """
         super(ServiceManagerList, self).__init__(parent)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
+        self.setAlternatingRowColors(True)
+        self.setHeaderHidden(True)
+        self.setExpandsOnDoubleClick(False)
         self.service_manager = service_manager
+
+    def dragEnterEvent(self, event):
+        """
+        React to a drag enter event
+        """
+        event.accept()
+
+    def dragMoveEvent(self, event):
+        """
+        React to a drage move event
+        """
+        event.accept()
 
     def keyPressEvent(self, event):
         """
@@ -117,7 +133,7 @@ class Ui_ServiceManager(object):
         self.layout.setSpacing(0)
         self.layout.setContentsMargins(0, 0, 0, 0)
         # Create the top toolbar
-        self.toolbar = OpenLPToolbar(widget)
+        self.toolbar = OpenLPToolbar(self)
         self.toolbar.add_toolbar_action('newService', text=UiStrings().NewService, icon=':/general/general_new.png',
                                         tooltip=UiStrings().CreateService, triggers=self.on_new_service_clicked)
         self.toolbar.add_toolbar_action('openService', text=UiStrings().OpenService,
@@ -147,78 +163,60 @@ class Ui_ServiceManager(object):
             QtWidgets.QAbstractItemView.CurrentChanged |
             QtWidgets.QAbstractItemView.DoubleClicked |
             QtWidgets.QAbstractItemView.EditKeyPressed)
-        self.service_manager_list.setDragDropMode(QtWidgets.QAbstractItemView.DragDrop)
-        self.service_manager_list.setAlternatingRowColors(True)
-        self.service_manager_list.setHeaderHidden(True)
-        self.service_manager_list.setExpandsOnDoubleClick(False)
         self.service_manager_list.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.service_manager_list.customContextMenuRequested.connect(self.context_menu)
         self.service_manager_list.setObjectName('service_manager_list')
         # enable drop
-        self.service_manager_list.__class__.dragEnterEvent = lambda x, event: event.accept()
-        self.service_manager_list.__class__.dragMoveEvent = lambda x, event: event.accept()
-        self.service_manager_list.__class__.dropEvent = self.drop_event
+        self.service_manager_list.dropEvent = self.drop_event
         self.layout.addWidget(self.service_manager_list)
         # Add the bottom toolbar
         self.order_toolbar = OpenLPToolbar(widget)
         action_list = ActionList.get_instance()
         action_list.add_category(UiStrings().Service, CategoryOrder.standard_toolbar)
-        self.service_manager_list.move_top = self.order_toolbar.add_toolbar_action(
+        self.move_top_action = self.order_toolbar.add_toolbar_action(
             'moveTop',
             text=translate('OpenLP.ServiceManager', 'Move to &top'), icon=':/services/service_top.png',
             tooltip=translate('OpenLP.ServiceManager', 'Move item to the top of the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_top)
-        self.service_manager_list.move_up = self.order_toolbar.add_toolbar_action(
+        self.move_up_action = self.order_toolbar.add_toolbar_action(
             'moveUp',
             text=translate('OpenLP.ServiceManager', 'Move &up'), icon=':/services/service_up.png',
             tooltip=translate('OpenLP.ServiceManager', 'Move item up one position in the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_up)
-        self.service_manager_list.move_down = self.order_toolbar.add_toolbar_action(
+        self.move_down_action = self.order_toolbar.add_toolbar_action(
             'moveDown',
             text=translate('OpenLP.ServiceManager', 'Move &down'), icon=':/services/service_down.png',
             tooltip=translate('OpenLP.ServiceManager', 'Move item down one position in the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_down)
-        self.service_manager_list.move_bottom = self.order_toolbar.add_toolbar_action(
+        self.move_bottom_action = self.order_toolbar.add_toolbar_action(
             'moveBottom',
             text=translate('OpenLP.ServiceManager', 'Move to &bottom'), icon=':/services/service_bottom.png',
             tooltip=translate('OpenLP.ServiceManager', 'Move item to the end of the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_end)
-        self.service_manager_list.down = self.order_toolbar.add_toolbar_action(
-            'down',
-            text=translate('OpenLP.ServiceManager', 'Move &down'), can_shortcuts=True,
-            tooltip=translate('OpenLP.ServiceManager', 'Moves the selection down the window.'), visible=False,
-            triggers=self.on_move_selection_down)
-        action_list.add_action(self.service_manager_list.down)
-        self.service_manager_list.up = self.order_toolbar.add_toolbar_action(
-            'up',
-            text=translate('OpenLP.ServiceManager', 'Move up'), can_shortcuts=True,
-            tooltip=translate('OpenLP.ServiceManager', 'Moves the selection up the window.'), visible=False,
-            triggers=self.on_move_selection_up)
-        action_list.add_action(self.service_manager_list.up)
         self.order_toolbar.addSeparator()
-        self.service_manager_list.delete = self.order_toolbar.add_toolbar_action(
+        self.delete_action = self.order_toolbar.add_toolbar_action(
             'delete', can_shortcuts=True,
             text=translate('OpenLP.ServiceManager', '&Delete From Service'), icon=':/general/general_delete.png',
             tooltip=translate('OpenLP.ServiceManager', 'Delete the selected item from the service.'),
             triggers=self.on_delete_from_service)
         self.order_toolbar.addSeparator()
-        self.service_manager_list.expand = self.order_toolbar.add_toolbar_action(
+        self.expand_action = self.order_toolbar.add_toolbar_action(
             'expand', can_shortcuts=True,
             text=translate('OpenLP.ServiceManager', '&Expand all'), icon=':/services/service_expand_all.png',
             tooltip=translate('OpenLP.ServiceManager', 'Expand all the service items.'),
             category=UiStrings().Service, triggers=self.on_expand_all)
-        self.service_manager_list.collapse = self.order_toolbar.add_toolbar_action(
+        self.collapse_action = self.order_toolbar.add_toolbar_action(
             'collapse', can_shortcuts=True,
             text=translate('OpenLP.ServiceManager', '&Collapse all'), icon=':/services/service_collapse_all.png',
             tooltip=translate('OpenLP.ServiceManager', 'Collapse all the service items.'),
             category=UiStrings().Service, triggers=self.on_collapse_all)
         self.order_toolbar.addSeparator()
-        self.service_manager_list.make_live = self.order_toolbar.add_toolbar_action(
+        self.make_live_action = self.order_toolbar.add_toolbar_action(
             'make_live', can_shortcuts=True,
             text=translate('OpenLP.ServiceManager', 'Go Live'), icon=':/general/general_live.png',
             tooltip=translate('OpenLP.ServiceManager', 'Send the selected item to Live.'),
             category=UiStrings().Service,
-            triggers=self.make_live)
+            triggers=self.on_make_live_action_triggered)
         self.layout.addWidget(self.order_toolbar)
         # Connect up our signals and slots
         self.theme_combo_box.activated.connect(self.on_theme_combo_box_selected)
@@ -254,7 +252,7 @@ class Ui_ServiceManager(object):
                                                       icon=':/media/auto-start_active.png',
                                                       triggers=self.on_auto_start)
         # Add already existing delete action to the menu.
-        self.menu.addAction(self.service_manager_list.delete)
+        self.menu.addAction(self.delete_action)
         self.create_custom_action = create_widget_action(self.menu,
                                                          text=translate('OpenLP.ServiceManager', 'Create New &Custom '
                                                                                                  'Slide'),
@@ -285,28 +283,20 @@ class Ui_ServiceManager(object):
         self.preview_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', 'Show &Preview'),
                                                    icon=':/general/general_preview.png', triggers=self.make_preview)
         # Add already existing make live action to the menu.
-        self.menu.addAction(self.service_manager_list.make_live)
+        self.menu.addAction(self.make_live_action)
         self.menu.addSeparator()
         self.theme_menu = QtWidgets.QMenu(translate('OpenLP.ServiceManager', '&Change Item Theme'))
         self.menu.addMenu(self.theme_menu)
-        self.service_manager_list.addActions(
-            [self.service_manager_list.move_down,
-             self.service_manager_list.move_up,
-             self.service_manager_list.make_live,
-             self.service_manager_list.move_top,
-             self.service_manager_list.move_bottom,
-             self.service_manager_list.up,
-             self.service_manager_list.down,
-             self.service_manager_list.expand,
-             self.service_manager_list.collapse
-             ])
+        self.service_manager_list.addActions([self.move_down_action, self.move_up_action, self.make_live_action,
+                                              self.move_top_action, self.move_bottom_action, self.expand_action,
+                                              self.collapse_action])
         Registry().register_function('theme_update_list', self.update_theme_list)
         Registry().register_function('config_screen_changed', self.regenerate_service_items)
         Registry().register_function('theme_update_global', self.theme_change)
         Registry().register_function('mediaitem_suffix_reset', self.reset_supported_suffixes)
 
 
-class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceManager, RegistryProperties):
+class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixin, RegistryProperties):
     """
     Manages the services. This involves taking text strings from plugins and adding them to the service. This service
     can then be zipped up with all the resources used into one OSZ or oszl file for use on any OpenLP v2 installation.
@@ -320,7 +310,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         """
         Sets up the service manager, toolbars, list view, et al.
         """
-        super(ServiceManager, self).__init__(parent)
+        super().__init__(parent)
         self.active = build_icon(':/media/auto-start_active.png')
         self.inactive = build_icon(':/media/auto-start_inactive.png')
         self.service_items = []
@@ -329,7 +319,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         self.service_id = 0
         # is a new service and has not been saved
         self._modified = False
-        self._file_name = ''
+        self._service_path = None
         self.service_has_all_original_files = True
         self.list_double_clicked = False
 
@@ -360,7 +350,10 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         if modified:
             self.service_id += 1
         self._modified = modified
-        service_file = self.short_file_name() or translate('OpenLP.ServiceManager', 'Untitled Service')
+        if self._service_path:
+            service_file = self._service_path.name
+        else:
+            service_file = translate('OpenLP.ServiceManager', 'Untitled Service')
         self.main_window.set_service_modified(modified, service_file)
 
     def is_modified(self):
@@ -376,8 +369,8 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         :param openlp.core.common.path.Path file_path: The service file name
         :rtype: None
         """
-        self._file_name = path_to_str(file_path)
-        self.main_window.set_service_modified(self.is_modified(), self.short_file_name())
+        self._service_path = file_path
+        self.main_window.set_service_modified(self.is_modified(), file_path.name)
         Settings().setValue('servicemanager/last file', file_path)
         if file_path and file_path.suffix == '.oszl':
             self._save_lite = True
@@ -387,14 +380,17 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
     def file_name(self):
         """
         Return the current file name including path.
+
+        :rtype: openlp.core.common.path.Path
         """
-        return self._file_name
+        return self._service_path
 
     def short_file_name(self):
         """
         Return the current file name, excluding the path.
         """
-        return split_filename(self._file_name)[1]
+        if self._service_path:
+            return self._service_path.name
 
     def reset_supported_suffixes(self):
         """
@@ -472,6 +468,12 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         Load a recent file as the service triggered by mainwindow recent service list.
         :param field:
         """
+        if self.is_modified():
+            result = self.save_modified_service()
+            if result == QtWidgets.QMessageBox.Cancel:
+                return False
+            elif result == QtWidgets.QMessageBox.Save:
+                self.decide_save_method()
         sender = self.sender()
         self.load_file(sender.data())
 
@@ -601,7 +603,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 if not os.path.exists(save_file):
                     shutil.copy(audio_from, save_file)
                 zip_file.write(audio_from, audio_to)
-        except IOError:
+        except OSError:
             self.log_exception('Failed to save service to disk: {name}'.format(name=temp_file_name))
             self.main_window.error_message(translate('OpenLP.ServiceManager', 'Error Saving File'),
                                            translate('OpenLP.ServiceManager', 'There was an error saving your file.'))
@@ -662,7 +664,7 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
             zip_file = zipfile.ZipFile(temp_file_name, 'w', zipfile.ZIP_STORED, True)
             # First we add service contents.
             zip_file.writestr(service_file_name, service_content)
-        except IOError:
+        except OSError:
             self.log_exception('Failed to save service to disk: {name}'.format(name=temp_file_name))
             self.main_window.error_message(translate('OpenLP.ServiceManager', 'Error Saving File'),
                                            translate('OpenLP.ServiceManager', 'There was an error saving your file.'))
@@ -708,20 +710,29 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         directory_path = Settings().value(self.main_window.service_manager_settings_section + '/last directory')
         if directory_path:
             default_file_path = directory_path / default_file_path
+        lite_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files - lite (*.oszl)')
+        packaged_filter = translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz)')
+        if self._service_path and self._service_path.suffix == '.oszl':
+            default_filter = lite_filter
+        else:
+            default_filter = packaged_filter
         # SaveAs from osz to oszl is not valid as the files will be deleted on exit which is not sensible or usable in
         # the long term.
-        if self._file_name.endswith('oszl') or self.service_has_all_original_files:
+        if self._service_path and self._service_path.suffix == '.oszl' or self.service_has_all_original_files:
             file_path, filter_used = FileDialog.getSaveFileName(
                 self.main_window, UiStrings().SaveService, default_file_path,
-                translate('OpenLP.ServiceManager',
-                          'OpenLP Service Files (*.osz);; OpenLP Service Files - lite (*.oszl)'))
+                '{packaged};; {lite}'.format(packaged=packaged_filter, lite=lite_filter),
+                default_filter)
         else:
             file_path, filter_used = FileDialog.getSaveFileName(
-                self.main_window, UiStrings().SaveService, file_path,
-                translate('OpenLP.ServiceManager', 'OpenLP Service Files (*.osz);;'))
+                self.main_window, UiStrings().SaveService, default_file_path,
+                '{packaged};;'.format(packaged=packaged_filter))
         if not file_path:
             return False
-        file_path.with_suffix('.osz')
+        if filter_used == lite_filter:
+            file_path = file_path.with_suffix('.oszl')
+        else:
+            file_path = file_path.with_suffix('.osz')
         self.set_file_name(file_path)
         self.decide_save_method()
 
@@ -789,11 +800,11 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
             else:
                 critical_error_message_box(message=translate('OpenLP.ServiceManager', 'File is not a valid service.'))
                 self.log_error('File contains no service data')
-        except (IOError, NameError):
+        except (OSError, NameError):
             self.log_exception('Problem loading service file {name}'.format(name=file_name))
             critical_error_message_box(message=translate('OpenLP.ServiceManager',
                                        'File could not be opened because it is corrupt.'))
-        except zipfile.BadZipfile:
+        except zipfile.BadZipFile:
             if os.path.getsize(file_name) == 0:
                 self.log_exception('Service file is zero sized: {name}'.format(name=file_name))
                 QtWidgets.QMessageBox.information(self, translate('OpenLP.ServiceManager', 'Empty File'),
@@ -1655,14 +1666,15 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
                 if start_pos == -1:
                     return
                 if item is None:
-                    end_pos = len(self.service_items)
+                    end_pos = len(self.service_items) - 1
                 else:
                     end_pos = get_parent_item_data(item) - 1
                 service_item = self.service_items[start_pos]
-                self.service_items.remove(service_item)
-                self.service_items.insert(end_pos, service_item)
-                self.repaint_service_list(end_pos, child)
-                self.set_modified()
+                if start_pos != end_pos:
+                    self.service_items.remove(service_item)
+                    self.service_items.insert(end_pos, service_item)
+                    self.repaint_service_list(end_pos, child)
+                    self.set_modified()
             else:
                 # we are not over anything so drop
                 replace = False
@@ -1727,6 +1739,15 @@ class ServiceManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ServiceMa
         item = self.find_service_item()[0]
         self.service_items[item]['service_item'].update_theme(theme)
         self.regenerate_service_items(True)
+
+    def on_make_live_action_triggered(self, checked):
+        """
+        Handle `make_live_action` when the action is triggered.
+
+        :param bool checked: Not Used.
+        :rtype: None
+        """
+        self.make_live()
 
     def get_drop_position(self):
         """

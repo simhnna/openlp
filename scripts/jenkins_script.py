@@ -21,35 +21,35 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-This script helps to trigger builds of branches. To use it you have to install the jenkins-webapi package:
+This script helps to trigger builds of branches. To use it you have to install the python-jenkins module. On Fedora
+and Ubuntu/Debian, it is available as the ``python3-jenkins`` package::
 
-    pip3 install jenkins-webapi
+    $ sudo dnf/apt install python3-jenkins
 
-You probably want to create an alias. Add this to your ~/.bashrc file and then logout and login (to apply the alias):
+To make it easier to run you may want to create a shell script or an alias. To create an alias, add this to your
+``~/.bashrc`` (or ``~/.zshrc``) file and then log out and log back in again (to apply the alias)::
 
-    alias ci="python3 ./scripts/jenkins_script.py TOKEN"
+    alias ci="python3 /path/to/openlp_root/scripts/jenkins_script.py -u USERNAME -p PASSWORD"
 
-You can look up the token in the Branch-01-Pull job configuration or ask in IRC.
+To create a shell script, create the following file in a location in your ``$PATH`` (I called mine ``ci``)::
+
+    #!/bin/bash
+    python3 /path/to/openlp_root/scripts/jenkins_script.py -u USERNAME -p PASSWORD
+
+``USERNAME`` is your Jenkins username, and ``PASSWORD`` is your Jenkins password or personal token.
+
+An older version of this script used to use a shared TOKEN, but this has been replaced with the username and password.
 """
-
+import os
 import re
-import sys
 import time
-from optparse import OptionParser
+from argparse import ArgumentParser
 from subprocess import Popen, PIPE
-import warnings
 
-from requests.exceptions import HTTPError
 from jenkins import Jenkins
-
 
 JENKINS_URL = 'https://ci.openlp.io/'
 REPO_REGEX = r'(.*/+)(~.*)'
-# Allows us to black list token. So when we change the token, we can display a proper message to the user.
-OLD_TOKENS = []
-
-# Disable the InsecureRequestWarning we get from urllib3, because we're not verifying our own self-signed certificate
-warnings.simplefilter('ignore')
 
 
 class OpenLPJobs(object):
@@ -63,9 +63,10 @@ class OpenLPJobs(object):
     Branch_Coverage = 'Branch-04b-Test_Coverage'
     Branch_Pylint = 'Branch-04c-Code_Analysis2'
     Branch_AppVeyor = 'Branch-05-AppVeyor-Tests'
+    Branch_macOS = 'Branch-07-macOS-Tests'
 
     Jobs = [Branch_Pull, Branch_Functional, Branch_Interface, Branch_PEP, Branch_Coverage, Branch_Pylint,
-            Branch_AppVeyor]
+            Branch_AppVeyor, Branch_macOS]
 
 
 class Colour(object):
@@ -85,13 +86,23 @@ class JenkinsTrigger(object):
     :param token: The token we need to trigger the build. If you do not have this token, ask in IRC.
     """
 
-    def __init__(self, token):
+    def __init__(self, username, password, can_use_colour):
         """
         Create the JenkinsTrigger instance.
         """
-        self.token = token
+        self.jobs = {}
+        self.can_use_colour = can_use_colour and not os.name.startswith('nt')
         self.repo_name = get_repo_name()
-        self.jenkins_instance = Jenkins(JENKINS_URL)
+        self.server = Jenkins(JENKINS_URL, username=username, password=password)
+
+    def fetch_jobs(self):
+        """
+        Get the job info for all the jobs
+        """
+        for job_name in OpenLPJobs.Jobs:
+            job_info = self.server.get_job_info(job_name)
+            self.jobs[job_name] = job_info
+            self.jobs[job_name]['nextBuildUrl'] = '{url}{nextBuildNumber}/'.format(**job_info)
 
     def trigger_build(self):
         """
@@ -102,24 +113,35 @@ class JenkinsTrigger(object):
         # We just want the name (not the email).
         name = ' '.join(raw_output.decode().split()[:-1])
         cause = 'Build triggered by %s (%s)' % (name, self.repo_name)
-        self.jenkins_instance.job(OpenLPJobs.Branch_Pull).build({'BRANCH_NAME': self.repo_name, 'cause': cause},
-                                                                token=self.token)
+        self.fetch_jobs()
+        self.server.build_job(OpenLPJobs.Branch_Pull, {'BRANCH_NAME': self.repo_name, 'cause': cause})
 
-    def print_output(self):
+    def print_output(self, can_continue=False):
         """
         Print the status information of the build triggered.
         """
         print('Add this to your merge proposal:')
-        print('--------------------------------')
+        print('-' * 80)
         bzr = Popen(('bzr', 'revno'), stdout=PIPE, stderr=PIPE)
         raw_output, error = bzr.communicate()
         revno = raw_output.decode().strip()
         print('%s (revision %s)' % (get_repo_name(), revno))
 
+        failed_builds = []
         for job in OpenLPJobs.Jobs:
             if not self.__print_build_info(job):
-                print('Stopping after failure')
-                break
+                if self.current_build:
+                    failed_builds.append((self.current_build['fullDisplayName'], self.current_build['url']))
+                if not can_continue:
+                    print('Stopping after failure')
+                    break
+        print('')
+        if failed_builds:
+            print('Failed builds:')
+            for build_name, url in failed_builds:
+                print(' - {}: {}console'.format(build_name, url))
+        else:
+            print('All builds passed')
 
     def open_browser(self):
         """
@@ -129,6 +151,20 @@ class JenkinsTrigger(object):
         # Open the url
         Popen(('xdg-open', url), stderr=PIPE)
 
+    def _get_build_info(self, job_name, build_number):
+        """
+        Get the build info from the server. This method will check the queue and wait for the build.
+        """
+        queue_info = self.server.get_queue_info()
+        tries = 0
+        while queue_info and tries < 50:
+            tries += 1
+            time.sleep(0.5)
+            queue_info = self.server.get_queue_info()
+        if tries >= 50:
+            raise Exception('Build has not started yet, it may be stuck in the queue.')
+        return self.server.get_build_info(job_name, build_number)
+
     def __print_build_info(self, job_name):
         """
         This helper method prints the job information of the given ``job_name``
@@ -136,21 +172,24 @@ class JenkinsTrigger(object):
         :param job_name: The name of the job we want the information from. For example *Branch-01-Pull*. Use the class
          variables from the :class:`OpenLPJobs` class.
         """
+        job = self.jobs[job_name]
+        print('{:<70} [WAITING]'.format(job['nextBuildUrl']), end='', flush=True)
+        self.current_build = self._get_build_info(job_name, job['nextBuildNumber'])
+        print('\b\b\b\b\b\b\b\b\b[RUNNING]', end='', flush=True)
         is_success = False
-        job = self.jenkins_instance.job(job_name)
-        while job.info['inQueue']:
-            time.sleep(1)
-        build = job.last_build
-        build.wait()
-        if build.info['result'] == 'SUCCESS':
-            # Make 'SUCCESS' green.
-            result_string = '%s%s%s' % (Colour.GREEN_START, build.info['result'], Colour.GREEN_END)
-            is_success = True
-        else:
-            # Make 'FAILURE' red.
-            result_string = '%s%s%s' % (Colour.RED_START, build.info['result'], Colour.RED_END)
-        url = build.info['url']
-        print('[%s] %s' % (result_string, url))
+        while self.current_build['building'] is True:
+            time.sleep(0.5)
+            self.current_build = self.server.get_build_info(job_name, job['nextBuildNumber'])
+        result_string = self.current_build['result']
+        is_success = result_string == 'SUCCESS'
+        if self.can_use_colour:
+            if is_success:
+                # Make 'SUCCESS' green.
+                result_string = '{}{}{}'.format(Colour.GREEN_START, result_string, Colour.GREEN_END)
+            else:
+                # Make 'FAILURE' red.
+                result_string = '{}{}{}'.format(Colour.RED_START, result_string, Colour.RED_END)
+        print('\b\b\b\b\b\b\b\b\b[{:>7}]'.format(result_string))
         return is_success
 
 
@@ -186,36 +225,30 @@ def get_repo_name():
 
 
 def main():
-    usage = 'Usage: python %prog TOKEN [options]'
+    """
+    Run the script
+    """
+    parser = ArgumentParser()
+    parser.add_argument('-d', '--disable-output', action='store_true', default=False, help='Disable output')
+    parser.add_argument('-b', '--open-browser', action='store_true', default=False,
+                        help='Opens the jenkins page in your browser')
+    parser.add_argument('-n', '--no-colour', action='store_true', default=False,
+                        help='Disable coloured output (always disabled on Windows)')
+    parser.add_argument('-u', '--username', required=True, help='Your Jenkins username')
+    parser.add_argument('-p', '--password', required=True, help='Your Jenkins password or personal token')
+    parser.add_argument('-c', '--always-continue', action='store_true', default=False, help='Continue despite failure')
+    args = parser.parse_args()
 
-    parser = OptionParser(usage=usage)
-    parser.add_option('-d', '--disable-output', dest='enable_output', action='store_false', default=True,
-                      help='Disable output.')
-    parser.add_option('-b', '--open-browser', dest='open_browser', action='store_true', default=False,
-                      help='Opens the jenkins page in your browser.')
-    options, args = parser.parse_args(sys.argv)
-
-    if len(args) == 2:
-        if not get_repo_name():
-            print('Not a branch. Have you pushed it to launchpad? Did you cd to the branch?')
-            return
-        token = args[-1]
-        if token in OLD_TOKENS:
-            print('Your token is not valid anymore. Get the most recent one.')
-            return
-        jenkins_trigger = JenkinsTrigger(token)
-        try:
-            jenkins_trigger.trigger_build()
-        except HTTPError:
-            print('Wrong token.')
-            return
-        # Open the browser before printing the output.
-        if options.open_browser:
-            jenkins_trigger.open_browser()
-        if options.enable_output:
-            jenkins_trigger.print_output()
-    else:
-        parser.print_help()
+    if not get_repo_name():
+        print('Not a branch. Have you pushed it to launchpad? Did you cd to the branch?')
+        return
+    jenkins_trigger = JenkinsTrigger(args.username, args.password, not args.no_colour)
+    jenkins_trigger.trigger_build()
+    # Open the browser before printing the output.
+    if args.open_browser:
+        jenkins_trigger.open_browser()
+    if not args.disable_output:
+        jenkins_trigger.print_output(can_continue=args.always_continue)
 
 
 if __name__ == '__main__':

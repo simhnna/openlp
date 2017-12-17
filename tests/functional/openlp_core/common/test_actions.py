@@ -153,6 +153,7 @@ class TestActionList(TestCase, TestMixin):
         """
         Prepare the tests
         """
+        self.setup_application()
         self.action_list = ActionList.get_instance()
         self.build_settings()
         self.settings = Settings()

@@ -30,9 +30,6 @@ from openlp.plugins.songs.lib.importers.songimport import SongImport
 
 log = logging.getLogger(__name__)
 
-# Used to strip control chars (except 10=LF, 13=CR)
-CONTROL_CHARS_MAP = dict.fromkeys(list(range(10)) + [11, 12] + list(range(14, 32)) + [127])
-
 
 class ZionWorxImport(SongImport):
     """
@@ -95,12 +92,12 @@ class ZionWorxImport(SongImport):
                     return
                 self.set_defaults()
                 try:
-                    self.title = self._decode(record['Title1'])
+                    self.title = record['Title1']
                     if record['Title2']:
-                        self.alternate_title = self._decode(record['Title2'])
-                    self.parse_author(self._decode(record['Writer']))
-                    self.add_copyright(self._decode(record['Copyright']))
-                    lyrics = self._decode(record['Lyrics'])
+                        self.alternate_title = record['Title2']
+                    self.parse_author(record['Writer'])
+                    self.add_copyright(record['Copyright'])
+                    lyrics = record['Lyrics']
                 except UnicodeDecodeError as e:
                     self.log_error(translate('SongsPlugin.ZionWorxImport', 'Record {index}').format(index=index),
                                    translate('SongsPlugin.ZionWorxImport', 'Decoding error: {error}').format(error=e))
@@ -122,10 +119,3 @@ class ZionWorxImport(SongImport):
                 if not self.finish():
                     self.log_error(translate('SongsPlugin.ZionWorxImport', 'Record %d') % index +
                                    (': "' + title + '"' if title else ''))
-
-    def _decode(self, str):
-        """
-        Strips all control characters (except new lines).
-        """
-        # ZionWorx has no option for setting the encoding for its songs, so we assume encoding is always the same.
-        return str.translate(CONTROL_CHARS_MAP)

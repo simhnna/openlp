@@ -52,25 +52,24 @@ class TestThemeManager(TestCase):
         """
         shutil.rmtree(self.temp_folder)
 
-    def test_export_theme(self):
+    @patch('openlp.core.ui.thememanager.zipfile.ZipFile.__init__')
+    @patch('openlp.core.ui.thememanager.zipfile.ZipFile.write')
+    def test_export_theme(self, mocked_zipfile_write, mocked_zipfile_init):
         """
         Test exporting a theme .
         """
         # GIVEN: A new ThemeManager instance.
         theme_manager = ThemeManager()
         theme_manager.theme_path = Path(TEST_RESOURCES_PATH, 'themes')
-        with patch('zipfile.ZipFile.__init__') as mocked_zipfile_init, \
-                patch('zipfile.ZipFile.write') as mocked_zipfile_write:
-            mocked_zipfile_init.return_value = None
+        mocked_zipfile_init.return_value = None
 
-            # WHEN: The theme is exported
-            theme_manager._export_theme(Path('some', 'path', 'Default.otz'), 'Default')
+        # WHEN: The theme is exported
+        theme_manager._export_theme(Path('some', 'path', 'Default.otz'), 'Default')
 
-            # THEN: The zipfile should be created at the given path
-            mocked_zipfile_init.assert_called_with(os.path.join('some', 'path', 'Default.otz'), 'w')
-            mocked_zipfile_write.assert_called_with(os.path.join(TEST_RESOURCES_PATH, 'themes',
-                                                                 'Default', 'Default.xml'),
-                                                    os.path.join('Default', 'Default.xml'))
+        # THEN: The zipfile should be created at the given path
+        mocked_zipfile_init.assert_called_with(os.path.join('some', 'path', 'Default.otz'), 'w')
+        mocked_zipfile_write.assert_called_with(os.path.join(TEST_RESOURCES_PATH, 'themes', 'Default', 'Default.xml'),
+                                                os.path.join('Default', 'Default.xml'))
 
     def test_initial_theme_manager(self):
         """
@@ -83,53 +82,53 @@ class TestThemeManager(TestCase):
         # THEN: The the controller should be registered in the registry.
         self.assertIsNotNone(Registry().get('theme_manager'), 'The base theme manager should be registered')
 
-    def test_write_theme_same_image(self):
+    @patch('openlp.core.ui.thememanager.copyfile')
+    @patch('openlp.core.ui.thememanager.create_paths')
+    def test_write_theme_same_image(self, mocked_create_paths, mocked_copyfile):
         """
         Test that we don't try to overwrite a theme background image with itself
         """
         # GIVEN: A new theme manager instance, with mocked builtins.open, copyfile,
         #        theme, create_paths and thememanager-attributes.
-        with patch('openlp.core.ui.thememanager.copyfile') as mocked_copyfile, \
-                patch('openlp.core.ui.thememanager.create_paths'):
-            theme_manager = ThemeManager(None)
-            theme_manager.old_background_image = None
-            theme_manager.generate_and_save_image = MagicMock()
-            theme_manager.theme_path = MagicMock()
-            mocked_theme = MagicMock()
-            mocked_theme.theme_name = 'themename'
-            mocked_theme.extract_formatted_xml = MagicMock()
-            mocked_theme.extract_formatted_xml.return_value = 'fake_theme_xml'.encode()
+        theme_manager = ThemeManager(None)
+        theme_manager.old_background_image = None
+        theme_manager.generate_and_save_image = MagicMock()
+        theme_manager.theme_path = MagicMock()
+        mocked_theme = MagicMock()
+        mocked_theme.theme_name = 'themename'
+        mocked_theme.extract_formatted_xml = MagicMock()
+        mocked_theme.extract_formatted_xml.return_value = 'fake_theme_xml'.encode()
 
-            # WHEN: Calling _write_theme with path to the same image, but the path written slightly different
-            file_name1 = Path(TEST_RESOURCES_PATH, 'church.jpg')
-            theme_manager._write_theme(mocked_theme, file_name1, file_name1)
+        # WHEN: Calling _write_theme with path to the same image, but the path written slightly different
+        file_name1 = Path(TEST_RESOURCES_PATH, 'church.jpg')
+        theme_manager._write_theme(mocked_theme, file_name1, file_name1)
 
-            # THEN: The mocked_copyfile should not have been called
-            self.assertFalse(mocked_copyfile.called, 'copyfile should not be called')
+        # THEN: The mocked_copyfile should not have been called
+        assert mocked_copyfile.called is False, 'copyfile should not be called'
 
-    def test_write_theme_diff_images(self):
+    @patch('openlp.core.ui.thememanager.copyfile')
+    @patch('openlp.core.ui.thememanager.create_paths')
+    def test_write_theme_diff_images(self, mocked_create_paths, mocked_copyfile):
         """
         Test that we do overwrite a theme background image when a new is submitted
         """
         # GIVEN: A new theme manager instance, with mocked builtins.open, copyfile,
         #        theme, create_paths and thememanager-attributes.
-        with patch('openlp.core.ui.thememanager.copyfile') as mocked_copyfile, \
-                patch('openlp.core.ui.thememanager.create_paths'):
-            theme_manager = ThemeManager(None)
-            theme_manager.old_background_image = None
-            theme_manager.generate_and_save_image = MagicMock()
-            theme_manager.theme_path = MagicMock()
-            mocked_theme = MagicMock()
-            mocked_theme.theme_name = 'themename'
-            mocked_theme.filename = "filename"
+        theme_manager = ThemeManager(None)
+        theme_manager.old_background_image = None
+        theme_manager.generate_and_save_image = MagicMock()
+        theme_manager.theme_path = MagicMock()
+        mocked_theme = MagicMock()
+        mocked_theme.theme_name = 'themename'
+        mocked_theme.filename = "filename"
 
-            # WHEN: Calling _write_theme with path to different images
-            file_name1 = Path(TEST_RESOURCES_PATH, 'church.jpg')
-            file_name2 = Path(TEST_RESOURCES_PATH, 'church2.jpg')
-            theme_manager._write_theme(mocked_theme, file_name1, file_name2)
+        # WHEN: Calling _write_theme with path to different images
+        file_name1 = Path(TEST_RESOURCES_PATH, 'church.jpg')
+        file_name2 = Path(TEST_RESOURCES_PATH, 'church2.jpg')
+        theme_manager._write_theme(mocked_theme, file_name1, file_name2)
 
-            # THEN: The mocked_copyfile should not have been called
-            self.assertTrue(mocked_copyfile.called, 'copyfile should be called')
+        # THEN: The mocked_copyfile should not have been called
+        assert mocked_copyfile.called is True, 'copyfile should be called'
 
     def test_write_theme_special_char_name(self):
         """
@@ -151,45 +150,43 @@ class TestThemeManager(TestCase):
         self.assertTrue(os.path.exists(os.path.join(self.temp_folder, 'theme 愛 name', 'theme 愛 name.json')),
                         'Theme with special characters should have been created!')
 
-    def test_over_write_message_box_yes(self):
+    @patch('openlp.core.ui.thememanager.QtWidgets.QMessageBox.question', return_value=QtWidgets.QMessageBox.Yes)
+    @patch('openlp.core.ui.thememanager.translate')
+    def test_over_write_message_box_yes(self, mocked_translate, mocked_qmessagebox_question):
         """
         Test that theme_manager.over_write_message_box returns True when the user clicks yes.
         """
         # GIVEN: A patched QMessageBox.question and an instance of ThemeManager
-        with patch('openlp.core.ui.thememanager.QtWidgets.QMessageBox.question',
-                   return_value=QtWidgets.QMessageBox.Yes) as mocked_qmessagebox_question,\
-                patch('openlp.core.ui.thememanager.translate') as mocked_translate:
-            mocked_translate.side_effect = lambda context, text: text
-            theme_manager = ThemeManager(None)
+        mocked_translate.side_effect = lambda context, text: text
+        theme_manager = ThemeManager(None)
 
-            # WHEN: Calling over_write_message_box with 'Theme Name'
-            result = theme_manager.over_write_message_box('Theme Name')
+        # WHEN: Calling over_write_message_box with 'Theme Name'
+        result = theme_manager.over_write_message_box('Theme Name')
 
-            # THEN: over_write_message_box should return True and the message box should contain the theme name
-            self.assertTrue(result)
-            mocked_qmessagebox_question.assert_called_once_with(
-                theme_manager, 'Theme Already Exists', 'Theme Theme Name already exists. Do you want to replace it?',
-                defaultButton=ANY)
+        # THEN: over_write_message_box should return True and the message box should contain the theme name
+        assert result is True
+        mocked_qmessagebox_question.assert_called_once_with(
+            theme_manager, 'Theme Already Exists', 'Theme Theme Name already exists. Do you want to replace it?',
+            defaultButton=ANY)
 
-    def test_over_write_message_box_no(self):
+    @patch('openlp.core.ui.thememanager.QtWidgets.QMessageBox.question', return_value=QtWidgets.QMessageBox.No)
+    @patch('openlp.core.ui.thememanager.translate')
+    def test_over_write_message_box_no(self, mocked_translate, mocked_qmessagebox_question):
         """
         Test that theme_manager.over_write_message_box returns False when the user clicks no.
         """
         # GIVEN: A patched QMessageBox.question and an instance of ThemeManager
-        with patch('openlp.core.ui.thememanager.QtWidgets.QMessageBox.question', return_value=QtWidgets.QMessageBox.No)\
-                as mocked_qmessagebox_question,\
-                patch('openlp.core.ui.thememanager.translate') as mocked_translate:
-            mocked_translate.side_effect = lambda context, text: text
-            theme_manager = ThemeManager(None)
+        mocked_translate.side_effect = lambda context, text: text
+        theme_manager = ThemeManager(None)
 
-            # WHEN: Calling over_write_message_box with 'Theme Name'
-            result = theme_manager.over_write_message_box('Theme Name')
+        # WHEN: Calling over_write_message_box with 'Theme Name'
+        result = theme_manager.over_write_message_box('Theme Name')
 
-            # THEN: over_write_message_box should return False and the message box should contain the theme name
-            self.assertFalse(result)
-            mocked_qmessagebox_question.assert_called_once_with(
-                theme_manager, 'Theme Already Exists', 'Theme Theme Name already exists. Do you want to replace it?',
-                defaultButton=ANY)
+        # THEN: over_write_message_box should return False and the message box should contain the theme name
+        assert result is False
+        mocked_qmessagebox_question.assert_called_once_with(
+            theme_manager, 'Theme Already Exists', 'Theme Theme Name already exists. Do you want to replace it?',
+            defaultButton=ANY)
 
     def test_unzip_theme(self):
         """
@@ -202,16 +199,16 @@ class TestThemeManager(TestCase):
             theme_manager._create_theme_from_xml = MagicMock()
             theme_manager.generate_and_save_image = MagicMock()
             theme_manager.theme_path = None
-            folder = Path(mkdtemp())
+            folder_path = Path(mkdtemp())
             theme_file = Path(TEST_RESOURCES_PATH, 'themes', 'Moss_on_tree.otz')
 
             # WHEN: We try to unzip it
-            theme_manager.unzip_theme(theme_file, folder)
+            theme_manager.unzip_theme(theme_file, folder_path)
 
             # THEN: Files should be unpacked
-            self.assertTrue((folder / 'Moss on tree' / 'Moss on tree.xml').exists())
+            self.assertTrue((folder_path / 'Moss on tree' / 'Moss on tree.xml').exists())
             self.assertEqual(mocked_critical_error_message_box.call_count, 0, 'No errors should have happened')
-            shutil.rmtree(str(folder))
+            folder_path.rmtree()
 
     def test_unzip_theme_invalid_version(self):
         """

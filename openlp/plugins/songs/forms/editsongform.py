@@ -31,10 +31,11 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate, get_natural_key
 from openlp.core.common.path import create_paths, copyfile
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.lib import PluginStatus, MediaType, create_separated_list
 from openlp.core.lib.ui import set_case_insensitive_completer, critical_error_message_box, find_and_set_in_combo_box
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
 from openlp.plugins.songs.forms.editsongdialog import Ui_EditSongDialog
 from openlp.plugins.songs.forms.editverseform import EditVerseForm
 from openlp.plugins.songs.forms.mediafilesform import MediaFilesForm
@@ -104,9 +105,9 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         self.topics_list_view.setSortingEnabled(False)
         self.topics_list_view.setAlternatingRowColors(True)
         self.audio_list_widget.setAlternatingRowColors(True)
-        self.find_verse_split = re.compile('---\[\]---\n', re.UNICODE)
-        self.whitespace = re.compile(r'\W+', re.UNICODE)
-        self.find_tags = re.compile(u'\{/?\w+\}', re.UNICODE)
+        self.find_verse_split = re.compile('---\[\]---\n')
+        self.whitespace = re.compile(r'\W+')
+        self.find_tags = re.compile(r'\{/?\w+\}')
 
     def _load_objects(self, cls, combo, cache):
         """

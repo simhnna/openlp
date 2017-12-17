@@ -43,9 +43,13 @@ log = logging.getLogger(__name__ + '.__init__')
 
 FIRST_CAMEL_REGEX = re.compile('(.)([A-Z][a-z]+)')
 SECOND_CAMEL_REGEX = re.compile('([a-z0-9])([A-Z])')
-CONTROL_CHARS = re.compile(r'[\x00-\x1F\x7F-\x9F]', re.UNICODE)
-INVALID_FILE_CHARS = re.compile(r'[\\/:\*\?"<>\|\+\[\]%]', re.UNICODE)
+CONTROL_CHARS = re.compile(r'[\x00-\x1F\x7F-\x9F]')
+INVALID_FILE_CHARS = re.compile(r'[\\/:\*\?"<>\|\+\[\]%]')
 IMAGES_FILTER = None
+REPLACMENT_CHARS_MAP = str.maketrans({'\u2018': '\'', '\u2019': '\'', '\u201c': '"', '\u201d': '"', '\u2026': '...',
+                                      '\u2013': '-', '\u2014': '-', '\v': '\n\n', '\f': '\n\n'})
+NEW_LINE_REGEX = re.compile(r' ?(\r\n?|\n) ?')
+WHITESPACE_REGEX = re.compile(r'[ \t]+')
 
 
 def trace_error_handler(logger):
@@ -314,17 +318,6 @@ def get_filesystem_encoding():
     return encoding
 
 
-def split_filename(path):
-    """
-    Return a list of the parts in a given path.
-    """
-    path = os.path.abspath(path)
-    if not os.path.isfile(path):
-        return path, ''
-    else:
-        return os.path.split(path)
-
-
 def delete_file(file_path):
     """
     Deletes a file from the system.
@@ -339,7 +332,7 @@ def delete_file(file_path):
         if file_path.exists():
             file_path.unlink()
         return True
-    except (IOError, OSError):
+    except OSError:
         log.exception('Unable to delete file {file_path}'.format(file_path=file_path))
         return False
 
@@ -436,3 +429,17 @@ def get_file_encoding(file_path):
         return detector.result
     except OSError:
         log.exception('Error detecting file encoding')
+
+
+def normalize_str(irreg_str):
+    """
+    Normalize the supplied string. Remove unicode control chars and tidy up white space.
+
+    :param str irreg_str: The string to normalize.
+    :return: The normalized string
+    :rtype: str
+    """
+    irreg_str = irreg_str.translate(REPLACMENT_CHARS_MAP)
+    irreg_str = CONTROL_CHARS.sub('', irreg_str)
+    irreg_str = NEW_LINE_REGEX.sub('\n', irreg_str)
+    return WHITESPACE_REGEX.sub(' ', irreg_str)

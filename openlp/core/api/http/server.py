@@ -39,9 +39,9 @@ from openlp.core.api.http import application
 from openlp.core.api.poll import Poller
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import create_paths
-from openlp.core.common.registry import RegistryProperties, Registry
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.common.i18n import translate
 
@@ -67,13 +67,16 @@ class HttpWorker(QtCore.QObject):
         address = Settings().value('api/ip address')
         port = Settings().value('api/port')
         Registry().execute('get_website_version')
-        serve(application, host=address, port=port)
+        try:
+            serve(application, host=address, port=port)
+        except OSError:
+            log.exception('An error occurred when serving the application.')
 
     def stop(self):
         pass
 
 
-class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
+class HttpServer(RegistryBase, RegistryProperties, LogMixin):
     """
     Wrapper round a server instance
     """
@@ -82,13 +85,14 @@ class HttpServer(RegistryMixin, RegistryProperties, OpenLPMixin):
         Initialise the http server, and start the http server
         """
         super(HttpServer, self).__init__(parent)
-        self.worker = HttpWorker()
-        self.thread = QtCore.QThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.thread.start()
-        Registry().register_function('download_website', self.first_time)
-        Registry().register_function('get_website_version', self.website_version)
+        if Registry().get_flag('no_web_server'):
+            self.worker = HttpWorker()
+            self.thread = QtCore.QThread()
+            self.worker.moveToThread(self.thread)
+            self.thread.started.connect(self.worker.run)
+            self.thread.start()
+            Registry().register_function('download_website', self.first_time)
+            Registry().register_function('get_website_version', self.website_version)
         Registry().set_flag('website_version', '0.0')
 
     def bootstrap_post_set_up(self):

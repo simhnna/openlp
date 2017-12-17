@@ -25,25 +25,29 @@ Provide Error Handling and login Services
 import logging
 import inspect
 
-from openlp.core.common import trace_error_handler, de_hump
+from openlp.core.common import is_win, trace_error_handler
 from openlp.core.common.registry import Registry
 
 DO_NOT_TRACE_EVENTS = ['timerEvent', 'paintEvent', 'drag_enter_event', 'drop_event', 'on_controller_size_changed',
                        'preview_size_changed', 'resizeEvent']
 
 
-class OpenLPMixin(object):
+class LogMixin(object):
     """
     Base Calling object for OpenLP classes.
     """
-    def __init__(self, *args, **kwargs):
-        super(OpenLPMixin, self).__init__(*args, **kwargs)
-        self.logger = logging.getLogger("%s.%s" % (self.__module__, self.__class__.__name__))
-        if self.logger.getEffectiveLevel() == logging.DEBUG:
-            for name, m in inspect.getmembers(self, inspect.ismethod):
-                if name not in DO_NOT_TRACE_EVENTS:
-                    if not name.startswith("_") and not name.startswith("log"):
-                        setattr(self, name, self.logging_wrapper(m, self))
+    @property
+    def logger(self):
+        if hasattr(self, '_logger') and self._logger:
+            return self._logger
+        else:
+            self._logger = logging.getLogger("%s.%s" % (self.__module__, self.__class__.__name__))
+            if self._logger.getEffectiveLevel() == logging.DEBUG:
+                for name, m in inspect.getmembers(self, inspect.ismethod):
+                    if name not in DO_NOT_TRACE_EVENTS:
+                        if not name.startswith("_") and not name.startswith("log"):
+                            setattr(self, name, self.logging_wrapper(m, self))
+            return self._logger
 
     def logging_wrapper(self, func, parent):
         """
@@ -93,30 +97,141 @@ class OpenLPMixin(object):
         self.logger.exception(message)
 
 
-class RegistryMixin(object):
+class RegistryProperties(object):
     """
     This adds registry components to classes to use at run time.
     """
-    def __init__(self, parent):
-        """
-        Register the class and bootstrap hooks.
-        """
-        try:
-            super(RegistryMixin, self).__init__(parent)
-        except TypeError:
-            super(RegistryMixin, self).__init__()
-        Registry().register(de_hump(self.__class__.__name__), self)
-        Registry().register_function('bootstrap_initialise', self.bootstrap_initialise)
-        Registry().register_function('bootstrap_post_set_up', self.bootstrap_post_set_up)
+    _application = None
+    _plugin_manager = None
+    _image_manager = None
+    _media_controller = None
+    _service_manager = None
+    _preview_controller = None
+    _live_controller = None
+    _main_window = None
+    _renderer = None
+    _theme_manager = None
+    _settings_form = None
+    _alerts_manager = None
+    _projector_manager = None
 
-    def bootstrap_initialise(self):
+    @property
+    def application(self):
         """
-        Dummy method to be overridden
+        Adds the openlp to the class dynamically.
+        Windows needs to access the application in a dynamic manner.
         """
-        pass
+        if is_win():
+            return Registry().get('application')
+        else:
+            if not hasattr(self, '_application') or not self._application:
+                self._application = Registry().get('application')
+            return self._application
 
-    def bootstrap_post_set_up(self):
+    @property
+    def plugin_manager(self):
         """
-        Dummy method to be overridden
+        Adds the plugin manager to the class dynamically
         """
-        pass
+        if not hasattr(self, '_plugin_manager') or not self._plugin_manager:
+            self._plugin_manager = Registry().get('plugin_manager')
+        return self._plugin_manager
+
+    @property
+    def image_manager(self):
+        """
+        Adds the image manager to the class dynamically
+        """
+        if not hasattr(self, '_image_manager') or not self._image_manager:
+            self._image_manager = Registry().get('image_manager')
+        return self._image_manager
+
+    @property
+    def media_controller(self):
+        """
+        Adds the media controller to the class dynamically
+        """
+        if not hasattr(self, '_media_controller') or not self._media_controller:
+            self._media_controller = Registry().get('media_controller')
+        return self._media_controller
+
+    @property
+    def service_manager(self):
+        """
+        Adds the service manager to the class dynamically
+        """
+        if not hasattr(self, '_service_manager') or not self._service_manager:
+            self._service_manager = Registry().get('service_manager')
+        return self._service_manager
+
+    @property
+    def preview_controller(self):
+        """
+        Adds the preview controller to the class dynamically
+        """
+        if not hasattr(self, '_preview_controller') or not self._preview_controller:
+            self._preview_controller = Registry().get('preview_controller')
+        return self._preview_controller
+
+    @property
+    def live_controller(self):
+        """
+        Adds the live controller to the class dynamically
+        """
+        if not hasattr(self, '_live_controller') or not self._live_controller:
+            self._live_controller = Registry().get('live_controller')
+        return self._live_controller
+
+    @property
+    def main_window(self):
+        """
+        Adds the main window to the class dynamically
+        """
+        if not hasattr(self, '_main_window') or not self._main_window:
+            self._main_window = Registry().get('main_window')
+        return self._main_window
+
+    @property
+    def renderer(self):
+        """
+        Adds the Renderer to the class dynamically
+        """
+        if not hasattr(self, '_renderer') or not self._renderer:
+            self._renderer = Registry().get('renderer')
+        return self._renderer
+
+    @property
+    def theme_manager(self):
+        """
+        Adds the theme manager to the class dynamically
+        """
+        if not hasattr(self, '_theme_manager') or not self._theme_manager:
+            self._theme_manager = Registry().get('theme_manager')
+        return self._theme_manager
+
+    @property
+    def settings_form(self):
+        """
+        Adds the settings form to the class dynamically
+        """
+        if not hasattr(self, '_settings_form') or not self._settings_form:
+            self._settings_form = Registry().get('settings_form')
+        return self._settings_form
+
+    @property
+    def alerts_manager(self):
+        """
+        Adds the alerts manager to the class dynamically
+        """
+        if not hasattr(self, '_alerts_manager') or not self._alerts_manager:
+            self._alerts_manager = Registry().get('alerts_manager')
+        return self._alerts_manager
+
+    @property
+    def projector_manager(self):
+        """
+        Adds the projector manager to the class dynamically
+        """
+        if not hasattr(self, '_projector_manager') or not self._projector_manager:
+            self._projector_manager = Registry().get('projector_manager')
+        return self._projector_manager

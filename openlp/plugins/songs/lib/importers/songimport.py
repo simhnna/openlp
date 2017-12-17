@@ -25,11 +25,12 @@ import re
 
 from PyQt5 import QtCore
 
+from openlp.core.common import normalize_str
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import translate
 from openlp.core.common.path import copyfile, create_paths
 from openlp.core.common.registry import Registry
-from openlp.core.ui.lib.wizard import WizardStrings
+from openlp.core.widgets.wizard import WizardStrings
 from openlp.plugins.songs.lib import clean_song, VerseType
 from openlp.plugins.songs.lib.db import Song, Author, Topic, Book, MediaFile
 from openlp.plugins.songs.lib.ui import SongStrings
@@ -129,26 +130,6 @@ class SongImport(QtCore.QObject):
 
     def register(self, import_wizard):
         self.import_wizard = import_wizard
-
-    def tidy_text(self, text):
-        """
-        Get rid of some dodgy unicode and formatting characters we're not interested in. Some can be converted to ascii.
-        """
-        text = text.replace('\u2018', '\'')
-        text = text.replace('\u2019', '\'')
-        text = text.replace('\u201c', '"')
-        text = text.replace('\u201d', '"')
-        text = text.replace('\u2026', '...')
-        text = text.replace('\u2013', '-')
-        text = text.replace('\u2014', '-')
-        # Replace vertical tab with 2 linebreaks
-        text = text.replace('\v', '\n\n')
-        # Replace form feed (page break) with 2 linebreaks
-        text = text.replace('\f', '\n\n')
-        # Remove surplus blank lines, spaces, trailing/leading spaces
-        text = re.sub(r'[ \t]+', ' ', text)
-        text = re.sub(r' ?(\r\n?|\n) ?', '\n', text)
-        return text
 
     def process_song_text(self, text):
         """
@@ -368,7 +349,7 @@ class SongImport(QtCore.QObject):
                 verse_tag = VerseType.tags[VerseType.Other]
                 log.info('Versetype {old} changing to {new}'.format(old=verse_def, new=new_verse_def))
                 verse_def = new_verse_def
-            sxml.add_verse_to_lyrics(verse_tag, verse_def[1:], verse_text, lang)
+            sxml.add_verse_to_lyrics(verse_tag, verse_def[1:], normalize_str(verse_text), lang)
         song.lyrics = str(sxml.extract_xml(), 'utf-8')
         if not self.verse_order_list and self.verse_order_list_generated_useful:
             self.verse_order_list = self.verse_order_list_generated

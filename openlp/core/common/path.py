@@ -69,6 +69,16 @@ class Path(PathVariant):
                 path = path.relative_to(base_path)
         return {'__Path__': path.parts}
 
+    def rmtree(self, ignore_errors=False, onerror=None):
+        """
+        Provide an interface to :func:`shutil.rmtree`
+
+        :param bool ignore_errors: Ignore errors
+        :param onerror: Handler function to handle any errors
+        :rtype: None
+        """
+        shutil.rmtree(str(self), ignore_errors, onerror)
+
 
 def replace_params(args, kwargs, params):
     """
@@ -153,23 +163,6 @@ def copytree(*args, **kwargs):
     return str_to_path(shutil.copytree(*args, **kwargs))
 
 
-def rmtree(*args, **kwargs):
-    """
-    Wraps :func:shutil.rmtree` so that we can accept Path objects.
-
-    :param openlp.core.common.path.Path path: Takes a Path object which is then converted to a str object
-    :return: Passes the return from :func:`shutil.rmtree` back
-    :rtype: None
-
-    See the following link for more information on the other parameters:
-        https://docs.python.org/3/library/shutil.html#shutil.rmtree
-    """
-
-    args, kwargs = replace_params(args, kwargs, ((0, 'path', path_to_str),))
-
-    return shutil.rmtree(*args, **kwargs)
-
-
 def which(*args, **kwargs):
     """
     Wraps :func:shutil.which` so that it return a Path objects.
@@ -233,7 +226,7 @@ def create_paths(*paths, **kwargs):
         try:
             if not path.exists():
                 path.mkdir(parents=True)
-        except IOError:
+        except OSError:
             if not kwargs.get('do_not_log', False):
                 log.exception('failed to check if directory exists or create directory')
 

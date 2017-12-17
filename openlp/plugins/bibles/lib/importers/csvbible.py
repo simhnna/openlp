@@ -73,8 +73,8 @@ class CSVBible(BibleImport):
         """
         super().__init__(*args, **kwargs)
         self.log_info(self.__class__.__name__)
-        self.books_file = kwargs['booksfile']
-        self.verses_file = kwargs['versefile']
+        self.books_path = kwargs['books_path']
+        self.verses_path = kwargs['verse_path']
 
     @staticmethod
     def get_book_name(name, books):
@@ -92,21 +92,22 @@ class CSVBible(BibleImport):
         return book_name
 
     @staticmethod
-    def parse_csv_file(filename, results_tuple):
+    def parse_csv_file(file_path, results_tuple):
         """
         Parse the supplied CSV file.
 
-        :param filename: The name of the file to parse. Str
-        :param results_tuple: The namedtuple to use to store the results. namedtuple
-        :return: An iterable yielding namedtuples of type results_tuple
+        :param openlp.core.common.path.Path file_path: The name of the file to parse.
+        :param namedtuple results_tuple: The namedtuple to use to store the results.
+        :return: An list of namedtuples of type results_tuple
+        :rtype: list[namedtuple]
         """
         try:
-            encoding = get_file_encoding(Path(filename))['encoding']
-            with open(filename, 'r', encoding=encoding, newline='') as csv_file:
+            encoding = get_file_encoding(file_path)['encoding']
+            with file_path.open('r', encoding=encoding, newline='') as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=',', quotechar='"')
                 return [results_tuple(*line) for line in csv_reader]
         except (OSError, csv.Error):
-            raise ValidationError(msg='Parsing "{file}" failed'.format(file=filename))
+            raise ValidationError(msg='Parsing "{file}" failed'.format(file=file_path))
 
     def process_books(self, books):
         """
@@ -159,12 +160,12 @@ class CSVBible(BibleImport):
         self.language_id = self.get_language(bible_name)
         if not self.language_id:
             return False
-        books = self.parse_csv_file(self.books_file, Book)
+        books = self.parse_csv_file(self.books_path, Book)
         self.wizard.progress_bar.setValue(0)
         self.wizard.progress_bar.setMinimum(0)
         self.wizard.progress_bar.setMaximum(len(books))
         book_list = self.process_books(books)
-        verses = self.parse_csv_file(self.verses_file, Verse)
+        verses = self.parse_csv_file(self.verses_path, Verse)
         self.wizard.progress_bar.setValue(0)
         self.wizard.progress_bar.setMaximum(len(books) + 1)
         self.process_verses(verses, book_list)

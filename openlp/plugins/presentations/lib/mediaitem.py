@@ -23,7 +23,7 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.i18n import UiStrings, translate, get_natural_key
 from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -165,7 +165,7 @@ class PresentationMediaItem(MediaManagerItem):
         if not initial_load:
             self.main_window.display_progress_bar(len(file_paths))
         # Sort the presentations by its filename considering language specific characters.
-        file_paths.sort(key=lambda file_path: get_locale_key(file_path.name))
+        file_paths.sort(key=lambda file_path: get_natural_key(file_path.name))
         for file_path in file_paths:
             if not initial_load:
                 self.main_window.increment_progress_bar()
@@ -198,10 +198,10 @@ class PresentationMediaItem(MediaManagerItem):
                     if not (preview_path and preview_path.exists()):
                         icon = build_icon(':/general/general_delete.png')
                     else:
-                        if validate_thumb(Path(preview_path), Path(thumbnail_path)):
+                        if validate_thumb(preview_path, thumbnail_path):
                             icon = build_icon(thumbnail_path)
                         else:
-                            icon = create_thumb(str(preview_path), str(thumbnail_path))
+                            icon = create_thumb(preview_path, thumbnail_path)
                 else:
                     if initial_load:
                         icon = build_icon(':/general/general_delete.png')
@@ -243,7 +243,7 @@ class PresentationMediaItem(MediaManagerItem):
         """
         Clean up the files created such as thumbnails
 
-        :param openlp.core.common.path.Path file_path: File path of the presention to clean up after
+        :param openlp.core.common.path.Path file_path: File path of the presentation to clean up after
         :param bool clean_for_update: Only clean thumbnails if update is needed
         :rtype: None
         """

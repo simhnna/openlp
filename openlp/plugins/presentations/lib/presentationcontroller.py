@@ -25,7 +25,7 @@ from PyQt5 import QtCore
 
 from openlp.core.common import md5_hash
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.path import Path, create_paths, rmtree
+from openlp.core.common.path import Path, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import create_thumb, validate_thumb
@@ -126,9 +126,9 @@ class PresentationDocument(object):
             thumbnail_folder_path = self.get_thumbnail_folder()
             temp_folder_path = self.get_temp_folder()
             if thumbnail_folder_path.exists():
-                rmtree(thumbnail_folder_path)
+                thumbnail_folder_path.rmtree()
             if temp_folder_path.exists():
-                rmtree(temp_folder_path)
+                temp_folder_path.rmtree()
         except OSError:
             log.exception('Failed to delete presentation controller files')
 
@@ -139,7 +139,8 @@ class PresentationDocument(object):
         :return: The path to the thumbnail
         :rtype: openlp.core.common.path.Path
         """
-        # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
+        # TODO: Can be removed when the upgrade path to OpenLP 3.0 is no longer needed, also ensure code in
+        #       get_temp_folder and PresentationPluginapp_startup is removed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
             folder = md5_hash(bytes(self.file_path))
         else:
@@ -153,7 +154,8 @@ class PresentationDocument(object):
         :return: The path to the temporary file folder
         :rtype: openlp.core.common.path.Path
         """
-        # TODO: If statement can be removed when the upgrade path from 2.0.x to 2.2.x is no longer needed
+        # TODO: Can be removed when the upgrade path to OpenLP 3.0 is no longer needed, also ensure code in
+        #       get_thumbnail_folder and PresentationPluginapp_startup is removed
         if Settings().value('presentations/thumbnail_scheme') == 'md5':
             folder = md5_hash(bytes(self.file_path))
         else:
@@ -265,7 +267,7 @@ class PresentationDocument(object):
             return
         if image_path.is_file():
             thumb_path = self.get_thumbnail_path(index, False)
-            create_thumb(str(image_path), str(thumb_path), False, QtCore.QSize(-1, 360))
+            create_thumb(image_path, thumb_path, False, QtCore.QSize(-1, 360))
 
     def get_thumbnail_path(self, slide_no, check_exists=False):
         """

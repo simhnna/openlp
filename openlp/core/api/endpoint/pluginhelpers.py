@@ -19,7 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import os
 import json
 import re
 import urllib
@@ -103,7 +102,7 @@ def display_thumbnails(request, controller_name, log, dimensions, file_name, sli
     :param controller_name: which controller is requesting the image
     :param log: the logger object
     :param dimensions: the image size eg 88x88
-    :param file_name: the file name of the image
+    :param str file_name: the file name of the image
     :param slide: the individual image name
     :return:
     """
@@ -124,12 +123,10 @@ def display_thumbnails(request, controller_name, log, dimensions, file_name, sli
     if controller_name and file_name:
         file_name = urllib.parse.unquote(file_name)
         if '..' not in file_name:  # no hacking please
+            full_path = AppLocation.get_section_data_path(controller_name) / 'thumbnails' / file_name
             if slide:
-                full_path = str(AppLocation.get_section_data_path(controller_name) / 'thumbnails' / file_name / slide)
-            else:
-                full_path = str(AppLocation.get_section_data_path(controller_name) / 'thumbnails' / file_name)
-            if os.path.exists(full_path):
-                path, just_file_name = os.path.split(full_path)
-                Registry().get('image_manager').add_image(full_path, just_file_name, None, width, height)
-                image = Registry().get('image_manager').get_image(full_path, just_file_name, width, height)
+                full_path = full_path / slide
+            if full_path.exists():
+                Registry().get('image_manager').add_image(full_path, full_path.name, None, width, height)
+                image = Registry().get('image_manager').get_image(full_path, full_path.name, width, height)
     return Response(body=image_to_byte(image, False), status=200, content_type='image/png', charset='utf8')

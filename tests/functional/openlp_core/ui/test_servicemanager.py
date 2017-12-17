@@ -32,7 +32,7 @@ from openlp.core.common import ThemeLevel
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, ServiceItemType, ItemCapabilities
 from openlp.core.ui import ServiceManager
-from openlp.core.ui.lib.toolbar import OpenLPToolbar
+from openlp.core.widgets.toolbar import OpenLPToolbar
 
 
 class TestServiceManager(TestCase):
@@ -637,7 +637,7 @@ class TestServiceManager(TestCase):
         Registry().register('main_window', mocked_main_window)
         Registry().register('application', MagicMock())
         service_manager = ServiceManager(None)
-        service_manager._file_name = os.path.join('temp', 'filename.osz')
+        service_manager._service_path = os.path.join('temp', 'filename.osz')
         service_manager._save_lite = False
         service_manager.service_items = []
         service_manager.service_theme = 'Default'
@@ -666,7 +666,7 @@ class TestServiceManager(TestCase):
         Registry().register('main_window', mocked_main_window)
         Registry().register('application', MagicMock())
         service_manager = ServiceManager(None)
-        service_manager._file_name = os.path.join('temp', 'filename.osz')
+        service_manager._service_path = os.path.join('temp', 'filename.osz')
         service_manager._save_lite = False
         service_manager.service_items = []
         service_manager.service_theme = 'Default'

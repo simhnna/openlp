@@ -26,12 +26,12 @@ displaying of alerts.
 from PyQt5 import QtCore
 
 from openlp.core.common.i18n import translate
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 
 
-class AlertsManager(OpenLPMixin, RegistryMixin, QtCore.QObject, RegistryProperties):
+class AlertsManager(QtCore.QObject, RegistryBase, LogMixin, RegistryProperties):
     """
     AlertsManager manages the settings of Alerts.
     """

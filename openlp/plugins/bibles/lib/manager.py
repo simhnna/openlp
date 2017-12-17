@@ -19,15 +19,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
 import logging
 
 from openlp.core.common import delete_file
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.common.mixins import OpenLPMixin
+from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path
-from openlp.core.common.registry import RegistryProperties
 from openlp.core.common.settings import Settings
 from openlp.plugins.bibles.lib import LanguageSelection, parse_reference
 from openlp.plugins.bibles.lib.db import BibleDB, BibleMeta
@@ -98,7 +96,7 @@ class BibleFormat(object):
         ]
 
 
-class BibleManager(OpenLPMixin, RegistryProperties):
+class BibleManager(LogMixin, RegistryProperties):
     """
     The Bible manager which holds and manages all the Bibles.
     """
@@ -116,7 +114,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         self.settings_section = 'bibles'
         self.web = 'Web'
         self.db_cache = None
-        self.path = str(AppLocation.get_section_data_path(self.settings_section))
+        self.path = AppLocation.get_section_data_path(self.settings_section)
         self.proxy_name = Settings().value(self.settings_section + '/proxy name')
         self.suffix = '.sqlite'
         self.import_wizard = None
@@ -129,20 +127,20 @@ class BibleManager(OpenLPMixin, RegistryProperties):
         of HTTPBible is loaded instead of the BibleDB class.
         """
         log.debug('Reload bibles')
-        files = [str(file) for file in AppLocation.get_files(self.settings_section, self.suffix)]
-        if 'alternative_book_names.sqlite' in files:
-            files.remove('alternative_book_names.sqlite')
-        log.debug('Bible Files {text}'.format(text=files))
+        file_paths = AppLocation.get_files(self.settings_section, self.suffix)
+        if Path('alternative_book_names.sqlite') in file_paths:
+            file_paths.remove(Path('alternative_book_names.sqlite'))
+        log.debug('Bible Files {text}'.format(text=file_paths))
         self.db_cache = {}
-        for filename in files:
-            bible = BibleDB(self.parent, path=self.path, file=filename)
+        for file_path in file_paths:
+            bible = BibleDB(self.parent, path=self.path, file=file_path)
             if not bible.session:
                 continue
             name = bible.get_name()
             # Remove corrupted files.
             if name is None:
                 bible.session.close_all()
-                delete_file(Path(self.path, filename))
+                delete_file(self.path / file_path)
                 continue
             log.debug('Bible Name: "{name}"'.format(name=name))
             self.db_cache[name] = bible
@@ -151,7 +149,7 @@ class BibleManager(OpenLPMixin, RegistryProperties):
                 source = self.db_cache[name].get_object(BibleMeta, 'download_source')
                 download_name = self.db_cache[name].get_object(BibleMeta, 'download_name').value
                 meta_proxy = self.db_cache[name].get_object(BibleMeta, 'proxy_server')
-                web_bible = HTTPBible(self.parent, path=self.path, file=filename, download_source=source.value,
+                web_bible = HTTPBible(self.parent, path=self.path, file=file_path, download_source=source.value,
                                       download_name=download_name)
                 if meta_proxy:
                     web_bible.proxy_server = meta_proxy.value

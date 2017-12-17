@@ -40,22 +40,22 @@ from openlp.core.common import is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import LanguageManager, UiStrings, translate
-from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, str_to_path
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.path import Path, copyfile, create_paths
+from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
 from openlp.core.display.renderer import Renderer
 from openlp.core.lib import PluginManager, ImageManager, PluginStatus, build_icon
 from openlp.core.lib.ui import create_action
+from openlp.core.projectors.manager import ProjectorManager
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
-from openlp.core.ui.lib.dockwidget import OpenLPDockWidget
-from openlp.core.ui.lib.filedialog import FileDialog
-from openlp.core.ui.lib.mediadockmanager import MediaDockManager
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.printserviceform import PrintServiceForm
-from openlp.core.ui.projector.manager import ProjectorManager
 from openlp.core.ui.style import PROGRESSBAR_STYLE, get_library_stylesheet
 from openlp.core.version import get_version
 
@@ -180,7 +180,7 @@ class Ui_MainWindow(object):
                                             triggers=self.service_manager_contents.on_load_service_clicked)
         self.file_save_item = create_action(main_window, 'fileSaveItem', icon=':/general/general_save.png',
                                             can_shortcuts=True, category=UiStrings().File,
-                                            triggers=self.service_manager_contents.save_file)
+                                            triggers=self.service_manager_contents.decide_save_method)
         self.file_save_as_item = create_action(main_window, 'fileSaveAsItem', can_shortcuts=True,
                                                category=UiStrings().File,
                                                triggers=self.service_manager_contents.save_file_as)
@@ -296,10 +296,9 @@ class Ui_MainWindow(object):
         # Give QT Extra Hint that this is an About Menu Item
         self.about_item.setMenuRole(QtWidgets.QAction.AboutRole)
         if is_win():
-            self.local_help_file = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)), 'OpenLP.chm')
+            self.local_help_file = AppLocation.get_directory(AppLocation.AppDir) / 'OpenLP.chm'
         elif is_macosx():
-            self.local_help_file = os.path.join(str(AppLocation.get_directory(AppLocation.AppDir)),
-                                                '..', 'Resources', 'OpenLP.help')
+            self.local_help_file = AppLocation.get_directory(AppLocation.AppDir) / '..' / 'Resources' / 'OpenLP.help'
         self.user_manual_item = create_action(main_window, 'userManualItem', icon=':/system/system_help_contents.png',
                                               can_shortcuts=True, category=UiStrings().Help,
                                               triggers=self.on_help_clicked)
@@ -375,7 +374,7 @@ class Ui_MainWindow(object):
         self.media_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Library'))
         self.service_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Service'))
         self.theme_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Themes'))
-        self.projector_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Projectors'))
+        self.projector_manager_dock.setWindowTitle(translate('OpenLP.MainWindow', 'Projector Controller'))
         self.file_new_item.setText(translate('OpenLP.MainWindow', '&New Service'))
         self.file_new_item.setToolTip(UiStrings().NewService)
         self.file_new_item.setStatusTip(UiStrings().CreateService)
@@ -407,7 +406,7 @@ class Ui_MainWindow(object):
             translate('OpenLP.MainWindow', 'Import settings from a *.config file previously exported from '
                                            'this or another machine.'))
         self.settings_import_item.setText(translate('OpenLP.MainWindow', 'Settings'))
-        self.view_projector_manager_item.setText(translate('OpenLP.MainWindow', '&Projectors'))
+        self.view_projector_manager_item.setText(translate('OpenLP.MainWindow', '&Projector Controller'))
         self.view_projector_manager_item.setToolTip(translate('OpenLP.MainWindow', 'Hide or show Projectors.'))
         self.view_projector_manager_item.setStatusTip(translate('OpenLP.MainWindow',
                                                                 'Toggle visibility of the Projectors.'))
@@ -504,9 +503,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Settings().set_up_default_values()
         self.about_form = AboutForm(self)
         MediaController()
-        if Registry().get_flag('no_web_server'):
-            websockets.WebSocketServer()
-            server.HttpServer()
+        websockets.WebSocketServer()
+        server.HttpServer()
         SettingsForm(self)
         self.formatting_tag_form = FormattingTagForm(self)
         self.shortcut_form = ShortcutListForm(self)
@@ -649,8 +647,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 self.application.process_events()
                 plugin.first_time()
         self.application.process_events()
-        temp_dir = os.path.join(str(gettempdir()), 'openlp')
-        shutil.rmtree(temp_dir, True)
+        temp_path = Path(gettempdir(), 'openlp')
+        temp_path.rmtree(True)
 
     def on_first_time_wizard_clicked(self):
         """
@@ -759,7 +757,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Use the Online manual in other cases. (Linux)
         """
         if is_macosx() or is_win():
-            QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(self.local_help_file))
+            QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(str(self.local_help_file)))
         else:
             import webbrowser
             webbrowser.open_new('http://manual.openlp.org/')
@@ -1225,7 +1223,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         settings.remove('custom slide')
         settings.remove('service')
         settings.beginGroup(self.general_settings_section)
-        self.recent_files = [path_to_str(file_path) for file_path in settings.value('recent files')]
+        self.recent_files = settings.value('recent files')
         settings.endGroup()
         settings.beginGroup(self.ui_settings_section)
         self.move(settings.value('main window position'))
@@ -1249,7 +1247,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         log.debug('Saving QSettings')
         settings = Settings()
         settings.beginGroup(self.general_settings_section)
-        settings.setValue('recent files', [str_to_path(file) for file in self.recent_files])
+        settings.setValue('recent files', self.recent_files)
         settings.endGroup()
         settings.beginGroup(self.ui_settings_section)
         settings.setValue('main window position', self.pos())
@@ -1265,26 +1263,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Updates the recent file menu with the latest list of service files accessed.
         """
         recent_file_count = Settings().value('advanced/recent file count')
-        existing_recent_files = [recentFile for recentFile in self.recent_files if os.path.isfile(str(recentFile))]
-        recent_files_to_display = existing_recent_files[0:recent_file_count]
         self.recent_files_menu.clear()
-        for file_id, filename in enumerate(recent_files_to_display):
-            log.debug('Recent file name: {name}'.format(name=filename))
+        count = 0
+        for recent_path in self.recent_files:
+            if not recent_path.is_file():
+                continue
+            count += 1
+            log.debug('Recent file name: {name}'.format(name=recent_path))
             action = create_action(self, '',
-                                   text='&{n} {name}'.format(n=file_id + 1,
-                                                             name=os.path.splitext(os.path.basename(str(filename)))[0]),
-                                   data=filename,
-                                   triggers=self.service_manager_contents.on_recent_service_clicked)
+                                   text='&{n} {name}'.format(n=count, name=recent_path.name),
+                                   data=recent_path, triggers=self.service_manager_contents.on_recent_service_clicked)
             self.recent_files_menu.addAction(action)
-        clear_recent_files_action = create_action(self, '',
-                                                  text=translate('OpenLP.MainWindow', 'Clear List', 'Clear List of '
-                                                                                                    'recent files'),
-                                                  statustip=translate('OpenLP.MainWindow', 'Clear the list of recent '
-                                                                                           'files.'),
-                                                  enabled=bool(self.recent_files),
-                                                  triggers=self.clear_recent_file_menu)
+            if count == recent_file_count:
+                break
+        clear_recent_files_action = \
+            create_action(self, '', text=translate('OpenLP.MainWindow', 'Clear List', 'Clear List of recent files'),
+                          statustip=translate('OpenLP.MainWindow', 'Clear the list of recent files.'),
+                          enabled=bool(self.recent_files), triggers=self.clear_recent_file_menu)
         add_actions(self.recent_files_menu, (None, clear_recent_files_action))
-        clear_recent_files_action.setEnabled(bool(self.recent_files))
 
     def add_recent_file(self, filename):
         """
@@ -1296,20 +1292,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # actually stored in the settings therefore the default value of 20 will
         # always be used.
         max_recent_files = Settings().value('advanced/max recent files')
-        if filename:
-            # Add some cleanup to reduce duplication in the recent file list
-            filename = os.path.abspath(filename)
-            # abspath() only capitalises the drive letter if it wasn't provided
-            # in the given filename which then causes duplication.
-            if filename[1:3] == ':\\':
-                filename = filename[0].upper() + filename[1:]
-            if filename in self.recent_files:
-                self.recent_files.remove(filename)
-            if not isinstance(self.recent_files, list):
-                self.recent_files = [self.recent_files]
-            self.recent_files.insert(0, filename)
-            while len(self.recent_files) > max_recent_files:
-                self.recent_files.pop()
+        file_path = Path(filename)
+        # Some cleanup to reduce duplication in the recent file list
+        file_path = file_path.resolve()
+        if file_path in self.recent_files:
+            self.recent_files.remove(file_path)
+        self.recent_files.insert(0, file_path)
+        self.recent_files = self.recent_files[:max_recent_files]
 
     def clear_recent_file_menu(self):
         """
@@ -1372,7 +1361,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                               '- Please wait for copy to finish').format(path=self.new_data_path))
                 dir_util.copy_tree(str(old_data_path), str(self.new_data_path))
                 log.info('Copy successful')
-            except (IOError, os.error, DistutilsFileError) as why:
+            except (OSError, DistutilsFileError) as why:
                 self.application.set_normal_cursor()
                 log.exception('Data copy failed {err}'.format(err=str(why)))
                 err_text = translate('OpenLP.MainWindow',

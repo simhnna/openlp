@@ -25,7 +25,6 @@ App stuff
 """
 import json
 import logging
-import os
 import re
 
 from webob import Request, Response
@@ -138,12 +137,11 @@ class WSGIApplication(object):
         Add a static directory as a route
         """
         if route not in self.static_routes:
-            root = str(AppLocation.get_section_data_path('remotes'))
-            static_path = os.path.abspath(os.path.join(root, static_dir))
-            if not os.path.exists(static_path):
+            static_path = AppLocation.get_section_data_path('remotes') / static_dir
+            if not static_path.exists():
                 log.error('Static path "%s" does not exist. Skipping creating static route/', static_path)
                 return
-            self.static_routes[route] = DirectoryApp(static_path)
+            self.static_routes[route] = DirectoryApp(str(static_path.resolve()))
 
     def dispatch(self, request):
         """

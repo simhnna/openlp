@@ -191,7 +191,7 @@ class Controller(object):
         """
         Based on the handler passed at startup triggers the previous slide event.
         """
-        log.debug('Live = {live}, previous'.formta(live=self.is_live))
+        log.debug('Live = {live}, previous'.format(live=self.is_live))
         if not self.doc:
             return
         if not self.is_live:

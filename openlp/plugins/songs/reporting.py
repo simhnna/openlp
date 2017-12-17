@@ -29,7 +29,7 @@ from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
 from openlp.plugins.songs.lib.db import Song
 
 log = logging.getLogger(__name__)

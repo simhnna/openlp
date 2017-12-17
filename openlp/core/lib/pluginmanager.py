@@ -26,12 +26,12 @@ import os
 
 from openlp.core.common import extension_loader
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.registry import RegistryProperties
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.registry import RegistryBase
 from openlp.core.lib import Plugin, PluginStatus
 
 
-class PluginManager(RegistryMixin, OpenLPMixin, RegistryProperties):
+class PluginManager(RegistryBase, LogMixin, RegistryProperties):
     """
     This is the Plugin manager, which loads all the plugins,
     and executes all the hooks, as and when necessary.
@@ -43,8 +43,7 @@ class PluginManager(RegistryMixin, OpenLPMixin, RegistryProperties):
         """
         super(PluginManager, self).__init__(parent)
         self.log_info('Plugin manager Initialising')
-        self.base_path = os.path.abspath(str(AppLocation.get_directory(AppLocation.PluginsDir)))
-        self.log_debug('Base path {path}'.format(path=self.base_path))
+        self.log_debug('Base path {path}'.format(path=AppLocation.get_directory(AppLocation.PluginsDir)))
         self.plugins = []
         self.log_info('Plugin manager Initialised')
 

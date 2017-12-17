@@ -31,17 +31,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import delete_file
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate, get_locale_key
-from openlp.core.common.mixins import OpenLPMixin, RegistryMixin
-from openlp.core.common.path import Path, copyfile, create_paths, path_to_str, rmtree
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.path import Path, copyfile, create_paths, path_to_str
+from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ImageSource, ValidationError, get_text_file_string, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.theme import Theme, BackgroundType
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action
 from openlp.core.ui import FileRenameForm, ThemeForm
-from openlp.core.ui.lib import OpenLPToolbar
-from openlp.core.ui.lib.filedialog import FileDialog
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.toolbar import OpenLPToolbar
 
 
 class Ui_ThemeManager(object):
@@ -125,7 +125,7 @@ class Ui_ThemeManager(object):
         self.theme_list_widget.currentItemChanged.connect(self.check_list_state)
 
 
-class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManager, RegistryProperties):
+class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, RegistryProperties):
     """
     Manages the orders of Theme.
     """
@@ -376,7 +376,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         delete_file(self.theme_path / thumb)
         delete_file(self.thumb_path / thumb)
         try:
-            rmtree(self.theme_path / theme)
+            (self.theme_path / theme).rmtree()
         except OSError:
             self.log_exception('Error deleting theme {name}'.format(name=theme))
 
@@ -431,7 +431,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                                                  'The theme_name export failed because this error occurred: {err}')
                                        .format(err=ose.strerror))
             if theme_path.exists():
-                rmtree(theme_path, True)
+                theme_path.rmtree(ignore_errors=True)
             return False
 
     def on_import_theme(self, checked=None):
@@ -497,12 +497,12 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     name = translate('OpenLP.ThemeManager', '{name} (default)').format(name=text_name)
                 else:
                     name = text_name
-                thumb = self.thumb_path / '{name}.png'.format(name=text_name)
+                thumb_path = self.thumb_path / '{name}.png'.format(name=text_name)
                 item_name = QtWidgets.QListWidgetItem(name)
-                if validate_thumb(theme_path, thumb):
-                    icon = build_icon(thumb)
+                if validate_thumb(theme_path, thumb_path):
+                    icon = build_icon(thumb_path)
                 else:
-                    icon = create_thumb(str(theme_path), str(thumb))
+                    icon = create_thumb(theme_path, thumb_path)
                 item_name.setIcon(icon)
                 item_name.setData(QtCore.Qt.UserRole, text_name)
                 self.theme_list_widget.addItem(item_name)
@@ -604,7 +604,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
                     else:
                         with full_name.open('wb') as out_file:
                             out_file.write(theme_zip.read(zipped_file))
-        except (IOError, zipfile.BadZipfile):
+        except (OSError, zipfile.BadZipFile):
             self.log_exception('Importing theme from zip failed {name}'.format(name=file_path))
             raise ValidationError
         except ValidationError:
@@ -667,7 +667,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
         theme_path = theme_dir / '{file_name}.json'.format(file_name=name)
         try:
                 theme_path.write_text(theme_pretty)
-        except IOError:
+        except OSError:
             self.log_exception('Saving theme to file failed')
         if image_source_path and image_destination_path:
             if self.old_background_image_path and image_destination_path != self.old_background_image_path:
@@ -675,7 +675,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             if image_source_path != image_destination_path:
                 try:
                     copyfile(image_source_path, image_destination_path)
-                except IOError:
+                except OSError:
                     self.log_exception('Failed to save theme image')
         self.generate_and_save_image(name, theme)
 
@@ -692,7 +692,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
             sample_path_name.unlink()
         frame.save(str(sample_path_name), 'png')
         thumb_path = self.thumb_path / '{name}.png'.format(name=theme_name)
-        create_thumb(str(sample_path_name), str(thumb_path), False)
+        create_thumb(sample_path_name, thumb_path, False)
 
     def update_preview_images(self):
         """
@@ -711,6 +711,7 @@ class ThemeManager(OpenLPMixin, RegistryMixin, QtWidgets.QWidget, Ui_ThemeManage
 
         :param theme_data: The theme to generated a preview for.
         :param force_page: Flag to tell message lines per page need to be generated.
+        :rtype: QtGui.QPixmap
         """
         return self.renderer.generate_preview(theme_data, force_page)
 

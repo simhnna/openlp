@@ -26,7 +26,7 @@ import os
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
-from openlp.core.common.path import Path, copy, copyfile, copytree, create_paths, path_to_str, replace_params, rmtree, \
+from openlp.core.common.path import Path, copy, copyfile, copytree, create_paths, path_to_str, replace_params, \
     str_to_path, which
 
 
@@ -172,31 +172,35 @@ class TestShutil(TestCase):
         """
         Test :func:`rmtree`
         """
-        # GIVEN: A mocked :func:`shutil.rmtree`
+        # GIVEN: A mocked :func:`shutil.rmtree` and a test Path object
         with patch('openlp.core.common.path.shutil.rmtree', return_value=None) as mocked_shutil_rmtree:
+            path = Path('test', 'path')
 
             # WHEN: Calling :func:`openlp.core.common.path.rmtree` with the path parameter as Path object type
-            result = rmtree(Path('test', 'path'))
+            result = path.rmtree()
 
             # THEN: :func:`shutil.rmtree` should have been called with the str equivalents of the Path object.
-            mocked_shutil_rmtree.assert_called_once_with(os.path.join('test', 'path'))
+            mocked_shutil_rmtree.assert_called_once_with(
+                os.path.join('test', 'path'), False, None)
             self.assertIsNone(result)
 
     def test_rmtree_optional_params(self):
         """
         Test :func:`openlp.core.common.path.rmtree` when optional parameters are passed
         """
-        # GIVEN: A mocked :func:`shutil.rmtree`
-        with patch('openlp.core.common.path.shutil.rmtree', return_value='') as mocked_shutil_rmtree:
+        # GIVEN: A mocked :func:`shutil.rmtree` and a test Path object.
+        with patch('openlp.core.common.path.shutil.rmtree', return_value=None) as mocked_shutil_rmtree:
+            path = Path('test', 'path')
             mocked_on_error = MagicMock()
 
             # WHEN: Calling :func:`openlp.core.common.path.rmtree` with :param:`ignore_errors` set to True and
             #       :param:`onerror` set to a mocked object
-            rmtree(Path('test', 'path'), ignore_errors=True, onerror=mocked_on_error)
+            path.rmtree(ignore_errors=True, onerror=mocked_on_error)
 
             # THEN: :func:`shutil.rmtree` should have been called with the optional parameters, with out any of the
             #       values being modified
-            mocked_shutil_rmtree.assert_called_once_with(ANY, ignore_errors=True, onerror=mocked_on_error)
+            mocked_shutil_rmtree.assert_called_once_with(
+                os.path.join('test', 'path'), True, mocked_on_error)
 
     def test_which_no_command(self):
         """
@@ -371,13 +375,13 @@ class TestPath(TestCase):
     @patch('openlp.core.common.path.log')
     def test_create_paths_dir_io_error(self, mocked_logger):
         """
-        Test the create_paths() when an IOError is raised
+        Test the create_paths() when an OSError is raised
         """
         # GIVEN: A `Path` to check with patched out mkdir and exists methods
         mocked_path = MagicMock()
-        mocked_path.exists.side_effect = IOError('Cannot make directory')
+        mocked_path.exists.side_effect = OSError('Cannot make directory')
 
-        # WHEN: An IOError is raised when checking the if the path exists.
+        # WHEN: An OSError is raised when checking the if the path exists.
         create_paths(mocked_path)
 
         # THEN: The Error should have been logged
@@ -385,7 +389,7 @@ class TestPath(TestCase):
 
     def test_create_paths_dir_value_error(self):
         """
-        Test the create_paths() when an error other than IOError is raised
+        Test the create_paths() when an error other than OSError is raised
         """
         # GIVEN: A `Path` to check with patched out mkdir and exists methods
         mocked_path = MagicMock()

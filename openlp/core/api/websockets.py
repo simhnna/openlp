@@ -31,8 +31,8 @@ import time
 
 from PyQt5 import QtCore
 
-from openlp.core.common.mixins import OpenLPMixin
-from openlp.core.common.registry import Registry, RegistryProperties
+from openlp.core.common.mixins import LogMixin, RegistryProperties
+from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 
 log = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ class WebSocketWorker(QtCore.QObject):
         self.ws_server.stop = True
 
 
-class WebSocketServer(RegistryProperties, OpenLPMixin):
+class WebSocketServer(RegistryProperties, LogMixin):
     """
     Wrapper round a server instance
     """
@@ -70,12 +70,13 @@ class WebSocketServer(RegistryProperties, OpenLPMixin):
         Initialise and start the WebSockets server
         """
         super(WebSocketServer, self).__init__()
-        self.settings_section = 'api'
-        self.worker = WebSocketWorker(self)
-        self.thread = QtCore.QThread()
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.run)
-        self.thread.start()
+        if Registry().get_flag('no_web_server'):
+            self.settings_section = 'api'
+            self.worker = WebSocketWorker(self)
+            self.thread = QtCore.QThread()
+            self.worker.moveToThread(self.thread)
+            self.thread.started.connect(self.worker.run)
+            self.thread.start()
 
     def start_server(self):
         """
