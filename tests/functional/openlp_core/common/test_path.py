@@ -47,8 +47,8 @@ class TestShutil(TestCase):
         result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
 
         # THEN: The positional and keyword args should not have changed
-        self.assertEqual(test_args, result_args)
-        self.assertEqual(test_kwargs, result_kwargs)
+        assert test_args == result_args
+        assert test_kwargs == result_kwargs
 
     def test_replace_params_params(self):
         """
@@ -63,8 +63,8 @@ class TestShutil(TestCase):
         result_args, result_kwargs = replace_params(test_args, test_kwargs, test_params)
 
         # THEN: The positional and keyword args should have have changed
-        self.assertEqual(result_args, (1, '2'))
-        self.assertEqual(result_kwargs, {'arg3': '3', 'arg4': 4})
+        assert result_args == (1, '2')
+        assert result_kwargs == {'arg3': '3', 'arg4': 4}
 
     def test_copy(self):
         """
@@ -82,7 +82,7 @@ class TestShutil(TestCase):
             #       :func:`shutil.copy` as a Path object.
             mocked_shutil_copy.assert_called_once_with(os.path.join('source', 'test', 'path'),
                                                        os.path.join('destination', 'test', 'path'))
-            self.assertEqual(result, Path('destination', 'test', 'path'))
+            assert result == Path('destination', 'test', 'path')
 
     def test_copy_follow_optional_params(self):
         """
@@ -114,7 +114,7 @@ class TestShutil(TestCase):
             #       :func:`shutil.copyfile` as a Path object.
             mocked_shutil_copyfile.assert_called_once_with(os.path.join('source', 'test', 'path'),
                                                            os.path.join('destination', 'test', 'path'))
-            self.assertEqual(result, Path('destination', 'test', 'path'))
+            assert result == Path('destination', 'test', 'path')
 
     def test_copyfile_optional_params(self):
         """
@@ -147,7 +147,7 @@ class TestShutil(TestCase):
             #       :func:`shutil.copytree` as a Path object.
             mocked_shutil_copytree.assert_called_once_with(os.path.join('source', 'test', 'path'),
                                                            os.path.join('destination', 'test', 'path'))
-            self.assertEqual(result, Path('destination', 'test', 'path'))
+            assert result == Path('destination', 'test', 'path')
 
     def test_copytree_optional_params(self):
         """
@@ -177,12 +177,11 @@ class TestShutil(TestCase):
             path = Path('test', 'path')
 
             # WHEN: Calling :func:`openlp.core.common.path.rmtree` with the path parameter as Path object type
-            result = path.rmtree()
+            path.rmtree()
 
             # THEN: :func:`shutil.rmtree` should have been called with the str equivalents of the Path object.
             mocked_shutil_rmtree.assert_called_once_with(
                 os.path.join('test', 'path'), False, None)
-            self.assertIsNone(result)
 
     def test_rmtree_optional_params(self):
         """
@@ -214,7 +213,7 @@ class TestShutil(TestCase):
 
             # THEN: :func:`shutil.which` should have been called with the command, and :func:`which` should return None.
             mocked_shutil_which.assert_called_once_with('no_command')
-            self.assertIsNone(result)
+        assert result is None
 
     def test_which_command(self):
         """
@@ -230,7 +229,7 @@ class TestShutil(TestCase):
             # THEN: :func:`shutil.which` should have been called with the command, and :func:`which` should return a
             #       Path object equivalent of the command path.
             mocked_shutil_which.assert_called_once_with('command')
-            self.assertEqual(result, Path('path', 'to', 'command'))
+            assert result == Path('path', 'to', 'command')
 
 
 class TestPath(TestCase):
@@ -257,7 +256,7 @@ class TestPath(TestCase):
         result = path_to_str(None)
 
         # THEN: `path_to_str` should return an empty string
-        self.assertEqual(result, '')
+        assert result == ''
 
     def test_path_to_str_path_object(self):
         """
@@ -268,7 +267,7 @@ class TestPath(TestCase):
         result = path_to_str(Path('test/path'))
 
         # THEN: `path_to_str` should return a string representation of the Path object
-        self.assertEqual(result, os.path.join('test', 'path'))
+        assert result == os.path.join('test', 'path')
 
     def test_str_to_path_type_error(self):
         """
@@ -289,7 +288,7 @@ class TestPath(TestCase):
         result = str_to_path('')
 
         # THEN: `path_to_str` should return None
-        self.assertEqual(result, None)
+        assert result is None
 
     def test_path_encode_json(self):
         """
@@ -301,7 +300,7 @@ class TestPath(TestCase):
         path = Path.encode_json({'__Path__': ['path', 'to', 'fi.le']}, extra=1, args=2)
 
         # THEN: A Path object should have been returned
-        self.assertEqual(path, Path('path', 'to', 'fi.le'))
+        assert path == Path('path', 'to', 'fi.le')
 
     def test_path_encode_json_base_path(self):
         """
@@ -313,7 +312,7 @@ class TestPath(TestCase):
         path = Path.encode_json({'__Path__': ['path', 'to', 'fi.le']}, base_path=Path('/base'))
 
         # THEN: A Path object should have been returned with an absolute path
-        self.assertEqual(path, Path('/', 'base', 'path', 'to', 'fi.le'))
+        assert path == Path('/', 'base', 'path', 'to', 'fi.le')
 
     def test_path_json_object(self):
         """
@@ -326,7 +325,7 @@ class TestPath(TestCase):
         obj = path.json_object(extra=1, args=2)
 
         # THEN: A JSON decodable object should have been returned.
-        self.assertEqual(obj, {'__Path__': ('/', 'base', 'path', 'to', 'fi.le')})
+        assert obj == {'__Path__': ('/', 'base', 'path', 'to', 'fi.le')}
 
     def test_path_json_object_base_path(self):
         """
@@ -340,7 +339,7 @@ class TestPath(TestCase):
         obj = path.json_object(base_path=Path('/', 'base'))
 
         # THEN: A JSON decodable object should have been returned.
-        self.assertEqual(obj, {'__Path__': ('path', 'to', 'fi.le')})
+        assert obj == {'__Path__': ('path', 'to', 'fi.le')}
 
     def test_create_paths_dir_exists(self):
         """

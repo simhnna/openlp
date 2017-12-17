@@ -106,7 +106,7 @@ class TestMainWindow(TestCase, TestMixin):
             self.main_window.open_cmd_line_files("")
 
             # THEN the file should not be opened
-            assert not mocked_load_file.called, 'load_file should not have been called'
+            assert mocked_load_file.called is False, 'load_file should not have been called'
 
     def test_main_window_title(self):
         """
