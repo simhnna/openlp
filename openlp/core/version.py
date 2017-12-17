@@ -127,7 +127,7 @@ def check_for_update(parent):
     worker.quit.connect(update_check_date)
     # TODO: Use this to figure out if there's an Internet connection?
     # worker.no_internet.connect(parent.on_no_internet)
-    run_thread(parent, worker, 'version')
+    run_thread(worker, 'version')
 
 
 def get_version():
