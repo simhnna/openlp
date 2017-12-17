@@ -24,26 +24,28 @@ The :mod:`openlp.core.threading` module contains some common threading code
 """
 from PyQt5 import QtCore
 
+from openlp.core.common.registry import Registry
 
-def run_thread(parent, worker, prefix='', auto_start=True):
+
+def run_thread(worker, thread_name, can_start=True):
     """
     Create a thread and assign a worker to it. This removes a lot of boilerplate code from the codebase.
 
-    :param object parent: The parent object so that the thread and worker are not orphaned.
     :param QObject worker: A QObject-based worker object which does the actual work.
-    :param str prefix: A prefix to be applied to the attribute names.
-    :param bool auto_start: Automatically start the thread. Defaults to True.
+    :param str thread_name: The name of the thread, used to keep track of the thread.
+    :param bool can_start: Start the thread. Defaults to True.
     """
-    # Set up attribute names
-    thread_name = 'thread'
-    worker_name = 'worker'
-    if prefix:
-        thread_name = '_'.join([prefix, thread_name])
-        worker_name = '_'.join([prefix, worker_name])
+    if not thread_name:
+        raise ValueError('A thread_name is required when calling the "run_thread" function')
+    main_window = Registry().get('main_window')
+    if thread_name in main_window.threads:
+        raise KeyError('A thread with the name "{}" has already been created, please use another'.format(thread_name))
     # Create the thread and add the thread and the worker to the parent
     thread = QtCore.QThread()
-    setattr(parent, thread_name, thread)
-    setattr(parent, worker_name, worker)
+    main_window.threads[thread_name] = {
+        'thread': thread,
+        'worker': worker
+    }
     # Move the worker into the thread's context
     worker.moveToThread(thread)
     # Connect slots and signals
@@ -51,5 +53,25 @@ def run_thread(parent, worker, prefix='', auto_start=True):
     worker.quit.connect(thread.quit)
     worker.quit.connect(worker.deleteLater)
     thread.finished.connect(thread.deleteLater)
-    if auto_start:
+    thread.finished.connect(make_remove_thread(thread_name))
+    if can_start:
         thread.start()
+
+
+def make_remove_thread(thread_name):
+    """
+    Create a function to remove the thread once the thread is finished.
+
+    :param str thread_name: The name of the thread which should be removed from the thread registry.
+    :returns function: A function which will remove the thread from the thread registry.
+    """
+    def remove_thread():
+        """
+        Stop and remove a registered thread
+
+        :param str thread_name: The name of the thread to stop and remove
+        """
+        main_window = Registry().get('main_window')
+        if thread_name in main_window.threads:
+            del main_window.threads[thread_name]
+    return remove_thread
