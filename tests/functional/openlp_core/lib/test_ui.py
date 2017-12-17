@@ -49,8 +49,8 @@ class TestUi(TestCase):
         add_welcome_page(wizard, ':/wizards/wizard_firsttime.bmp')
 
         # THEN: The wizard should have one page with a pixmap.
-        self.assertEqual(1, len(wizard.pageIds()), 'The wizard should have one page.')
-        self.assertIsInstance(wizard.page(0).pixmap(QtWidgets.QWizard.WatermarkPixmap), QtGui.QPixmap)
+        assert 1 == len(wizard.pageIds()), 'The wizard should have one page.'
+        assert isinstance(wizard.page(0).pixmap(QtWidgets.QWizard.WatermarkPixmap), QtGui.QPixmap)
 
     def test_create_button_box(self):
         """
@@ -63,22 +63,22 @@ class TestUi(TestCase):
         btnbox = create_button_box(dialog, 'my_btns', ['ok', 'save', 'cancel', 'close', 'defaults'])
 
         # THEN: We should get a QDialogButtonBox with five buttons
-        self.assertIsInstance(btnbox, QtWidgets.QDialogButtonBox)
-        self.assertEqual(5, len(btnbox.buttons()))
+        assert isinstance(btnbox, QtWidgets.QDialogButtonBox)
+        assert 5 == len(btnbox.buttons())
 
         # WHEN: We create the button box with a custom button
         btnbox = create_button_box(dialog, 'my_btns', None, [QtWidgets.QPushButton('Custom')])
         # THEN: We should get a QDialogButtonBox with one button
-        self.assertIsInstance(btnbox, QtWidgets.QDialogButtonBox)
-        self.assertEqual(1, len(btnbox.buttons()))
+        assert isinstance(btnbox, QtWidgets.QDialogButtonBox)
+        assert 1 == len(btnbox.buttons())
 
         # WHEN: We create the button box with a custom button and a custom role
         btnbox = create_button_box(dialog, 'my_btns', None,
                                    [(QtWidgets.QPushButton('Help'), QtWidgets.QDialogButtonBox.HelpRole)])
         # THEN: We should get a QDialogButtonBox with one button with a certain role
-        self.assertIsInstance(btnbox, QtWidgets.QDialogButtonBox)
-        self.assertEqual(1, len(btnbox.buttons()))
-        self.assertEqual(QtWidgets.QDialogButtonBox.HelpRole, btnbox.buttonRole(btnbox.buttons()[0]))
+        assert isinstance(btnbox, QtWidgets.QDialogButtonBox)
+        assert 1 == len(btnbox.buttons())
+        assert QtWidgets.QDialogButtonBox.HelpRole, btnbox.buttonRole(btnbox.buttons()[0])
 
     def test_create_horizontal_adjusting_combo_box(self):
         """
@@ -91,9 +91,9 @@ class TestUi(TestCase):
         combo = create_horizontal_adjusting_combo_box(dialog, 'combo1')
 
         # THEN: We should get a ComboBox
-        self.assertIsInstance(combo, QtWidgets.QComboBox)
-        self.assertEqual('combo1', combo.objectName())
-        self.assertEqual(QtWidgets.QComboBox.AdjustToMinimumContentsLength, combo.sizeAdjustPolicy())
+        assert isinstance(combo, QtWidgets.QComboBox)
+        assert 'combo1' == combo.objectName()
+        assert QtWidgets.QComboBox.AdjustToMinimumContentsLength == combo.sizeAdjustPolicy()
 
     def test_create_button(self):
         """
@@ -106,26 +106,26 @@ class TestUi(TestCase):
         btn = create_button(dialog, 'my_btn')
 
         # THEN: We should get a button with a name
-        self.assertIsInstance(btn, QtWidgets.QPushButton)
-        self.assertEqual('my_btn', btn.objectName())
-        self.assertTrue(btn.isEnabled())
+        assert isinstance(btn, QtWidgets.QPushButton)
+        assert 'my_btn' == btn.objectName()
+        assert btn.isEnabled() is True
 
         # WHEN: We create a button with some attributes
         btn = create_button(dialog, 'my_btn', text='Hello', tooltip='How are you?', enabled=False)
 
         # THEN: We should get a button with those attributes
-        self.assertIsInstance(btn, QtWidgets.QPushButton)
-        self.assertEqual('Hello', btn.text())
-        self.assertEqual('How are you?', btn.toolTip())
-        self.assertFalse(btn.isEnabled())
+        assert isinstance(btn, QtWidgets.QPushButton)
+        assert 'Hello' == btn.text()
+        assert 'How are you?' == btn.toolTip()
+        assert btn.isEnabled() is False
 
         # WHEN: We create a toolbutton
         btn = create_button(dialog, 'my_btn', btn_class='toolbutton')
 
         # THEN: We should get a toolbutton
-        self.assertIsInstance(btn, QtWidgets.QToolButton)
-        self.assertEqual('my_btn', btn.objectName())
-        self.assertTrue(btn.isEnabled())
+        assert isinstance(btn, QtWidgets.QToolButton)
+        assert 'my_btn' == btn.objectName()
+        assert btn.isEnabled() is True
 
     def test_create_action(self):
         """
@@ -138,19 +138,19 @@ class TestUi(TestCase):
         action = create_action(dialog, 'my_action')
 
         # THEN: We should get a QAction
-        self.assertIsInstance(action, QtWidgets.QAction)
-        self.assertEqual('my_action', action.objectName())
+        assert isinstance(action, QtWidgets.QAction)
+        assert 'my_action' == action.objectName()
 
         # WHEN: We create an action with some properties
         action = create_action(dialog, 'my_action', text='my text', icon=':/wizards/wizard_firsttime.bmp',
                                tooltip='my tooltip', statustip='my statustip')
 
         # THEN: These properties should be set
-        self.assertIsInstance(action, QtWidgets.QAction)
-        self.assertEqual('my text', action.text())
-        self.assertIsInstance(action.icon(), QtGui.QIcon)
-        self.assertEqual('my tooltip', action.toolTip())
-        self.assertEqual('my statustip', action.statusTip())
+        assert isinstance(action, QtWidgets.QAction)
+        assert 'my text' == action.text()
+        assert isinstance(action.icon(), QtGui.QIcon)
+        assert 'my tooltip' == action.toolTip() 
+        assert 'my statustip' == action.statusTip()
 
     def test_create_action_on_mac_osx(self):
         """
@@ -186,8 +186,8 @@ class TestUi(TestCase):
             create_action(dialog, 'my_action')
 
             # THEN: setIconVisibleInMenu should not be called
-            self.assertEqual(0, mocked_action.setIconVisibleInMenu.call_count,
-                             'setIconVisibleInMenu should not have been called')
+            assert 0 == mocked_action.setIconVisibleInMenu.call_count, \
+                             'setIconVisibleInMenu should not have been called'
 
     def test_create_checked_disabled_invisible_action(self):
         """
@@ -200,9 +200,9 @@ class TestUi(TestCase):
         action = create_action(dialog, 'my_action', checked=True, enabled=False, visible=False)
 
         # THEN: These properties should be set
-        self.assertTrue(action.isChecked(), 'The action should be checked')
-        self.assertFalse(action.isEnabled(), 'The action should be disabled')
-        self.assertFalse(action.isVisible(), 'The action should be invisble')
+        assert action.isChecked() is True, 'The action should be checked'
+        assert action.isEnabled() is False, 'The action should be disabled'
+        assert action.isVisible() is False, 'The action should be invisble'
 
     def test_create_action_separator(self):
         """
@@ -215,7 +215,7 @@ class TestUi(TestCase):
         action = create_action(dialog, 'my_action', separator=True)
 
         # THEN: The action should be a separator
-        self.assertTrue(action.isSeparator(), 'The action should be a separator')
+        assert action.isSeparator() is True, 'The action should be a separator'
 
     def test_create_valign_selection_widgets(self):
         """
@@ -228,11 +228,11 @@ class TestUi(TestCase):
         label, combo = create_valign_selection_widgets(dialog)
 
         # THEN: We should get a label and a combobox.
-        self.assertEqual(translate('OpenLP.Ui', '&Vertical Align:'), label.text())
-        self.assertIsInstance(combo, QtWidgets.QComboBox)
-        self.assertEqual(combo, label.buddy())
+        assert translate('OpenLP.Ui', '&Vertical Align:') == label.text()
+        assert isinstance(combo, QtWidgets.QComboBox)
+        assert combo == label.buddy()
         for text in [UiStrings().Top, UiStrings().Middle, UiStrings().Bottom]:
-            self.assertTrue(combo.findText(text) >= 0)
+            assert combo.findText(text) >= 0
 
     def test_find_and_set_in_combo_box(self):
         """
@@ -247,19 +247,19 @@ class TestUi(TestCase):
         find_and_set_in_combo_box(combo, 'Four', set_missing=False)
 
         # THEN: The index should not have changed
-        self.assertEqual(1, combo.currentIndex())
+        assert 1 == combo.currentIndex() 
 
         # WHEN: We call the method with a non-existing value
         find_and_set_in_combo_box(combo, 'Four')
 
         # THEN: The index should have been reset
-        self.assertEqual(0, combo.currentIndex())
+        assert 0 == combo.currentIndex()
 
         # WHEN: We call the method with the default behavior
         find_and_set_in_combo_box(combo, 'Three')
 
         # THEN: The index should have changed
-        self.assertEqual(2, combo.currentIndex())
+        assert 2 == combo.currentIndex()
 
     def test_create_widget_action(self):
         """
@@ -272,8 +272,8 @@ class TestUi(TestCase):
         action = create_widget_action(button, 'some action')
 
         # THEN: The action should be returned
-        self.assertIsInstance(action, QtWidgets.QAction)
-        self.assertEqual(action.objectName(), 'some action')
+        assert isinstance(action, QtWidgets.QAction)
+        assert action.objectName() == 'some action'
 
     def test_set_case_insensitive_completer(self):
         """
@@ -288,5 +288,5 @@ class TestUi(TestCase):
 
         # THEN: The Combobox should have a completer which is case insensitive
         completer = line_edit.completer()
-        self.assertIsInstance(completer, QtWidgets.QCompleter)
-        self.assertEqual(completer.caseSensitivity(), QtCore.Qt.CaseInsensitive)
+        assert isinstance(completer, QtWidgets.QCompleter)
+        assert completer.caseSensitivity() == QtCore.Qt.CaseInsensitive

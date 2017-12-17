@@ -28,7 +28,9 @@ from unittest.mock import MagicMock, patch
 
 from openlp.core.common import md5_hash
 from openlp.core.common.registry import Registry
+from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, ServiceItem, ServiceItemType, FormattingTags
+from tests.helpers.testmixin import TestMixin
 
 from tests.utils import assert_length, convert_file_service_item
 
@@ -59,18 +61,30 @@ RENDERED_VERSE = 'The Lord said to <span style="-webkit-text-fill-color:red">Noa
 FOOTER = ['Arky Arky (Unknown)', 'Public Domain', 'CCLI 123456']
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'service'))
 
+__default_settings__ = {
+    'songs/enable chords': True,
+}
 
-class TestServiceItem(TestCase):
+
+class TestServiceItem(TestCase, TestMixin):
 
     def setUp(self):
         """
         Set up the Registry
         """
+        self.build_settings()
+        Settings().extend_default_settings(__default_settings__)
         Registry.create()
         mocked_renderer = MagicMock()
         mocked_renderer.format_slide.return_value = [VERSE]
         Registry().register('renderer', mocked_renderer)
         Registry().register('image_manager', MagicMock())
+
+    def tearDown(self):
+        """
+        Clean up
+        """
+        self.destroy_settings()
 
     def test_service_item_basic(self):
         """
@@ -82,8 +96,8 @@ class TestServiceItem(TestCase):
         service_item = ServiceItem(None)
 
         # THEN: We should get back a valid service item
-        self.assertTrue(service_item.is_valid, 'The new service item should be valid')
-        self.assertTrue(service_item.missing_frames(), 'There should not be any frames in the service item')
+        assert service_item.is_valid is True, 'The new service item should be valid'
+        assert service_item.missing_frames() is True, 'There should not be any frames in the service item'
 
     def test_service_item_load_custom_from_service(self):
         """
@@ -99,7 +113,7 @@ class TestServiceItem(TestCase):
         service_item.set_from_service(line)
 
         # THEN: We should get back a valid service item
-        self.assertTrue(service_item.is_valid, 'The new service item should be valid')
+        assert service_item.is_valid, 'The new service item should be valid'
         assert_length(0, service_item._display_frames, 'The service item should have no display frames')
         assert_length(5, service_item.capabilities, 'There should be 5 default custom item capabilities')
 
@@ -107,14 +121,14 @@ class TestServiceItem(TestCase):
         service_item.render(True)
 
         # THEN: The frames should also be valid
-        self.assertEqual('Test Custom', service_item.get_display_title(), 'The title should be "Test Custom"')
-        self.assertEqual(CLEANED_VERSE[:-1], service_item.get_frames()[0]['text'],
-                         'The returned text matches the input, except the last line feed')
-        self.assertEqual(RENDERED_VERSE.split('\n', 1)[0], service_item.get_rendered_frame(1),
-                         'The first line has been returned')
-        self.assertEqual('Slide 1', service_item.get_frame_title(0), '"Slide 1" has been returned as the title')
-        self.assertEqual('Slide 2', service_item.get_frame_title(1), '"Slide 2" has been returned as the title')
-        self.assertEqual('', service_item.get_frame_title(2), 'Blank has been returned as the title of slide 3')
+        assert 'Test Custom' == service_item.get_display_title(), 'The title should be "Test Custom"'
+        assert CLEANED_VERSE[:-1] == service_item.get_frames()[0]['text'], \
+            'The returned text matches the input, except the last line feed'
+        assert RENDERED_VERSE.split('\n', 1)[0] == service_item.get_rendered_frame(1), \
+            'The first line has been returned'
+        assert 'Slide 1' == service_item.get_frame_title(0), '"Slide 1" has been returned as the title'
+        assert 'Slide 2' == service_item.get_frame_title(1), '"Slide 2" has been returned as the title'
+        assert '' == service_item.get_frame_title(2), 'Blank has been returned as the title of slide 3'
 
     def test_service_item_load_image_from_service(self):
         """
@@ -138,26 +152,22 @@ class TestServiceItem(TestCase):
             service_item.set_from_service(line, TEST_PATH)
 
         # THEN: We should get back a valid service item
-        self.assertTrue(service_item.is_valid, 'The new service item should be valid')
-        self.assertEqual(os.path.normpath(test_file), os.path.normpath(service_item.get_rendered_frame(0)),
-                         'The first frame should match the path to the image')
-        self.assertEqual(frame_array, service_item.get_frames()[0],
-                         'The return should match frame array1')
-        self.assertEqual(test_file, service_item.get_frame_path(0),
-                         'The frame path should match the full path to the image')
-        self.assertEqual(image_name, service_item.get_frame_title(0),
-                         'The frame title should match the image name')
-        self.assertEqual(image_name, service_item.get_display_title(),
-                         'The display title should match the first image name')
-        self.assertTrue(service_item.is_image(), 'This service item should be of an "image" type')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanMaintain),
-                        'This service item should be able to be Maintained')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanPreview),
-                        'This service item should be able to be be Previewed')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanLoop),
-                        'This service item should be able to be run in a can be made to Loop')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanAppend),
-                        'This service item should be able to have new items added to it')
+        assert service_item.is_valid is True, 'The new service item should be valid'
+        assert os.path.normpath(test_file) == os.path.normpath(service_item.get_rendered_frame(0)), \
+            'The first frame should match the path to the image'
+        assert frame_array == service_item.get_frames()[0], 'The return should match frame array1'
+        assert test_file == service_item.get_frame_path(0), 'The frame path should match the full path to the image'
+        assert image_name == service_item.get_frame_title(0), 'The frame title should match the image name'
+        assert image_name == service_item.get_display_title(), 'The display title should match the first image name'
+        assert service_item.is_image() is True, 'This service item should be of an "image" type'
+        assert service_item.is_capable(ItemCapabilities.CanMaintain) is True, \
+            'This service item should be able to be Maintained'
+        assert service_item.is_capable(ItemCapabilities.CanPreview) is True, \
+            'This service item should be able to be be Previewed'
+        assert service_item.is_capable(ItemCapabilities.CanLoop) is True, \
+            'This service item should be able to be run in a can be made to Loop'
+        assert service_item.is_capable(ItemCapabilities.CanAppend) is True, \
+            'This service item should be able to have new items added to it'
 
     def test_service_item_load_image_from_local_service(self):
         """
@@ -193,35 +203,33 @@ class TestServiceItem(TestCase):
 
         # This test is copied from service_item.py, but is changed since to conform to
         # new layout of service item. The layout use in serviceitem_image_2.osd is actually invalid now.
-        self.assertTrue(service_item.is_valid, 'The first service item should be valid')
-        self.assertTrue(service_item2.is_valid, 'The second service item should be valid')
+        assert service_item.is_valid is True, 'The first service item should be valid'
+        assert service_item2.is_valid is True, 'The second service item should be valid'
         # These test will fail on windows due to the difference in folder seperators
         if os.name != 'nt':
-            self.assertEqual(test_file1, service_item.get_rendered_frame(0),
-                             'The first frame should match the path to the image')
-            self.assertEqual(test_file2, service_item2.get_rendered_frame(0),
-                             'The Second frame should match the path to the image')
-            self.assertEqual(frame_array1, service_item.get_frames()[0], 'The return should match the frame array1')
-            self.assertEqual(frame_array2, service_item2.get_frames()[0], 'The return should match the frame array2')
-            self.assertEqual(test_file1, service_item.get_frame_path(0),
-                             'The frame path should match the full path to the image')
-            self.assertEqual(test_file2, service_item2.get_frame_path(0),
-                             'The frame path should match the full path to the image')
-        self.assertEqual(image_name1, service_item.get_frame_title(0),
-                         'The 1st frame title should match the image name')
-        self.assertEqual(image_name2, service_item2.get_frame_title(0),
-                         'The 2nd frame title should match the image name')
-        self.assertEqual(service_item.name, service_item.title.lower(),
-                         'The plugin name should match the display title, as there are > 1 Images')
-        self.assertTrue(service_item.is_image(), 'This service item should be of an "image" type')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanMaintain),
-                        'This service item should be able to be Maintained')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanPreview),
-                        'This service item should be able to be be Previewed')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanLoop),
-                        'This service item should be able to be run in a can be made to Loop')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.CanAppend),
-                        'This service item should be able to have new items added to it')
+            assert test_file1 == service_item.get_rendered_frame(0), \
+                'The first frame should match the path to the image'
+            assert test_file2 == service_item2.get_rendered_frame(0), \
+                'The Second frame should match the path to the image'
+            assert frame_array1 == service_item.get_frames()[0], 'The return should match the frame array1'
+            assert frame_array2 == service_item2.get_frames()[0], 'The return should match the frame array2'
+            assert test_file1 == service_item.get_frame_path(0), \
+                'The frame path should match the full path to the image'
+            assert test_file2 == service_item2.get_frame_path(0), \
+                'The frame path should match the full path to the image'
+        assert image_name1 == service_item.get_frame_title(0), 'The 1st frame title should match the image name'
+        assert image_name2 == service_item2.get_frame_title(0), 'The 2nd frame title should match the image name'
+        assert service_item.name == service_item.title.lower(), \
+            'The plugin name should match the display title, as there are > 1 Images'
+        assert service_item.is_image() is True, 'This service item should be of an "image" type'
+        assert service_item.is_capable(ItemCapabilities.CanMaintain) is True, \
+            'This service item should be able to be Maintained'
+        assert service_item.is_capable(ItemCapabilities.CanPreview) is True, \
+            'This service item should be able to be be Previewed'
+        assert service_item.is_capable(ItemCapabilities.CanLoop) is True, \
+            'This service item should be able to be run in a can be made to Loop'
+        assert service_item.is_capable(ItemCapabilities.CanAppend) is True, \
+            'This service item should be able to have new items added to it'
 
     def test_add_from_command_for_a_presentation(self):
         """
@@ -240,8 +248,8 @@ class TestServiceItem(TestCase):
         service_item.add_from_command(TEST_PATH, presentation_name, image, display_title, notes)
 
         # THEN: verify that it is setup as a Command and that the frame data matches
-        self.assertEqual(service_item.service_item_type, ServiceItemType.Command, 'It should be a Command')
-        self.assertEqual(service_item.get_frames()[0], frame, 'Frames should match')
+        assert service_item.service_item_type == ServiceItemType.Command, 'It should be a Command'
+        assert service_item.get_frames()[0] == frame, 'Frames should match'
 
     def test_add_from_comamnd_without_display_title_and_notes(self):
         """
@@ -258,8 +266,8 @@ class TestServiceItem(TestCase):
         service_item.add_from_command(TEST_PATH, image_name, image)
 
         # THEN: verify that it is setup as a Command and that the frame data matches
-        self.assertEqual(service_item.service_item_type, ServiceItemType.Command, 'It should be a Command')
-        self.assertEqual(service_item.get_frames()[0], frame, 'Frames should match')
+        assert service_item.service_item_type == ServiceItemType.Command, 'It should be a Command'
+        assert service_item.get_frames()[0] == frame, 'Frames should match'
 
     @patch(u'openlp.core.lib.serviceitem.ServiceItem.image_manager')
     @patch('openlp.core.lib.serviceitem.AppLocation.get_section_data_path')
@@ -287,9 +295,9 @@ class TestServiceItem(TestCase):
         service_item.add_from_command(TEST_PATH, presentation_name, thumb, display_title, notes)
 
         # THEN: verify that it is setup as a Command and that the frame data matches
-        self.assertEqual(service_item.service_item_type, ServiceItemType.Command, 'It should be a Command')
-        self.assertEqual(service_item.get_frames()[0], frame, 'Frames should match')
-        self.assertEqual(1, mocked_image_manager.add_image.call_count, 'image_manager should be used')
+        assert service_item.service_item_type == ServiceItemType.Command, 'It should be a Command'
+        assert service_item.get_frames()[0] == frame, 'Frames should match'
+        assert 1 == mocked_image_manager.add_image.call_count, 'image_manager should be used'
 
     def test_service_item_load_optical_media_from_service(self):
         """
@@ -306,11 +314,11 @@ class TestServiceItem(TestCase):
             service_item.set_from_service(line)
 
         # THEN: We should get back a valid service item with optical media info
-        self.assertTrue(service_item.is_valid, 'The service item should be valid')
-        self.assertTrue(service_item.is_capable(ItemCapabilities.IsOptical), 'The item should be Optical')
-        self.assertEqual(service_item.start_time, 654.375, 'Start time should be 654.375')
-        self.assertEqual(service_item.end_time, 672.069, 'End time should be 672.069')
-        self.assertEqual(service_item.media_length, 17.694, 'Media length should be 17.694')
+        assert service_item.is_valid is True, 'The service item should be valid'
+        assert service_item.is_capable(ItemCapabilities.IsOptical) is True, 'The item should be Optical' 
+        assert service_item.start_time == 654.375, 'Start time should be 654.375' 
+        assert service_item.end_time == 672.069, 'End time should be 672.069' 
+        assert service_item.media_length == 17.694, 'Media length should be 17.694'
 
     def test_service_item_load_song_and_audio_from_service(self):
         """
@@ -326,22 +334,22 @@ class TestServiceItem(TestCase):
         service_item.set_from_service(line, '/test/')
 
         # THEN: We should get back a valid service item
-        self.assertTrue(service_item.is_valid, 'The new service item should be valid')
-        assert_length(0, service_item._display_frames, 'The service item should have no display frames')
-        assert_length(7, service_item.capabilities, 'There should be 7 default custom item capabilities')
+        assert service_item.is_valid, 'The new service item should be valid'
+        assert 0 == len(service_item._display_frames), 'The service item should have no display frames'
+        assert 7 == len(service_item.capabilities), 'There should be 7 default custom item capabilities'
 
         # WHEN: We render the frames of the service item
         service_item.render(True)
 
         # THEN: The frames should also be valid
-        self.assertEqual('Amazing Grace', service_item.get_display_title(), 'The title should be "Amazing Grace"')
-        self.assertEqual(CLEANED_VERSE[:-1], service_item.get_frames()[0]['text'],
-                         'The returned text matches the input, except the last line feed')
-        self.assertEqual(RENDERED_VERSE.split('\n', 1)[0], service_item.get_rendered_frame(1),
-                         'The first line has been returned')
-        self.assertEqual('Amazing Grace! how sweet the s', service_item.get_frame_title(0),
-                         '"Amazing Grace! how sweet the s" has been returned as the title')
-        self.assertEqual('’Twas grace that taught my hea', service_item.get_frame_title(1),
-                         '"’Twas grace that taught my hea" has been returned as the title')
-        self.assertEqual('/test/amazing_grace.mp3', service_item.background_audio[0],
-                         '"/test/amazing_grace.mp3" should be in the background_audio list')
+        assert 'Amazing Grace' == service_item.get_display_title(), 'The title should be "Amazing Grace"'
+        assert CLEANED_VERSE[:-1] == service_item.get_frames()[0]['text'], \
+            'The returned text matches the input, except the last line feed'
+        assert RENDERED_VERSE.split('\n', 1)[0] == service_item.get_rendered_frame(1), \
+            'The first line has been returned'
+        assert 'Amazing Grace! how sweet the s' == service_item.get_frame_title(0), \
+            '"Amazing Grace! how sweet the s" has been returned as the title'
+        assert '’Twas grace that taught my hea' == service_item.get_frame_title(1), \
+            '"’Twas grace that taught my hea" has been returned as the title'
+        assert '/test/amazing_grace.mp3' == service_item.background_audio[0], \
+            '"/test/amazing_grace.mp3" should be in the background_audio list'
