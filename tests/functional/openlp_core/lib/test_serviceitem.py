@@ -315,9 +315,9 @@ class TestServiceItem(TestCase, TestMixin):
 
         # THEN: We should get back a valid service item with optical media info
         assert service_item.is_valid is True, 'The service item should be valid'
-        assert service_item.is_capable(ItemCapabilities.IsOptical) is True, 'The item should be Optical' 
-        assert service_item.start_time == 654.375, 'Start time should be 654.375' 
-        assert service_item.end_time == 672.069, 'End time should be 672.069' 
+        assert service_item.is_capable(ItemCapabilities.IsOptical) is True, 'The item should be Optical'
+        assert service_item.start_time == 654.375, 'Start time should be 654.375'
+        assert service_item.end_time == 672.069, 'End time should be 672.069'
         assert service_item.media_length == 17.694, 'Media length should be 17.694'
 
     def test_service_item_load_song_and_audio_from_service(self):

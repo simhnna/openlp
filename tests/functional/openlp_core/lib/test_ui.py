@@ -149,7 +149,7 @@ class TestUi(TestCase):
         assert isinstance(action, QtWidgets.QAction)
         assert 'my text' == action.text()
         assert isinstance(action.icon(), QtGui.QIcon)
-        assert 'my tooltip' == action.toolTip() 
+        assert 'my tooltip' == action.toolTip()
         assert 'my statustip' == action.statusTip()
 
     def test_create_action_on_mac_osx(self):
@@ -187,7 +187,7 @@ class TestUi(TestCase):
 
             # THEN: setIconVisibleInMenu should not be called
             assert 0 == mocked_action.setIconVisibleInMenu.call_count, \
-                             'setIconVisibleInMenu should not have been called'
+                'setIconVisibleInMenu should not have been called'
 
     def test_create_checked_disabled_invisible_action(self):
         """
@@ -247,7 +247,7 @@ class TestUi(TestCase):
         find_and_set_in_combo_box(combo, 'Four', set_missing=False)
 
         # THEN: The index should not have changed
-        assert 1 == combo.currentIndex() 
+        assert 1 == combo.currentIndex()
 
         # WHEN: We call the method with a non-existing value
         find_and_set_in_combo_box(combo, 'Four')
