@@ -773,9 +773,9 @@ class TestSongSelectForm(TestCase, TestMixin):
         self.assertTrue(ssform.search_combobox.isEnabled())
 
     @patch('openlp.plugins.songs.forms.songselectform.Settings')
-    @patch('openlp.plugins.songs.forms.songselectform.QtCore.QThread')
+    @patch('openlp.plugins.songs.forms.songselectform.run_thread')
     @patch('openlp.plugins.songs.forms.songselectform.SearchWorker')
-    def test_on_search_button_clicked(self, MockedSearchWorker, MockedQtThread, MockedSettings):
+    def test_on_search_button_clicked(self, MockedSearchWorker, mocked_run_thread, MockedSettings):
         """
         Test that search fields are disabled when search button is clicked.
         """
