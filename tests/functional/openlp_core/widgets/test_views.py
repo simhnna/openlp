@@ -22,6 +22,7 @@
 """
 Package to test the openlp.core.widgets.views package.
 """
+import os
 from types import GeneratorType
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
@@ -30,8 +31,26 @@ from PyQt5 import QtGui
 
 from openlp.core.common.i18n import UiStrings
 from openlp.core.lib import ImageSource
-from openlp.core.widgets.views import ListPreviewWidget, ListWidgetWithDnD, TreeWidgetWithDnD
+from openlp.core.widgets.views import ListPreviewWidget, ListWidgetWithDnD, TreeWidgetWithDnD, handle_mime_data_urls
 
+
+class TestHandleMimeDataUrls(TestCase):
+    """
+    Test the :func:`openlp.core.widgets.views.handle_mime_data_urls` function.
+    """
+    # TODO: Finish tests here!!!!!
+    mocked_path_instance_1 = MagicMock(**{'is_file.return_value': True})
+    mocked_path_instance_2 = MagicMock(**{'is_file.return_value': True})
+    with patch('openlp.core.widgets.views.Path',
+               side_effect=[mocked_path_instance_1, mocked_path_instance_2]) as mocked_path:
+        mocked_q_url_1 = MagicMock(**{'toLocalFile.return_value': os.path.join('file', 'test', 'path', '1.ext')})
+        mocked_q_url_2 = MagicMock(**{'toLocalFile.return_value': os.path.join('file', 'test', 'path', '2.ext')})
+        mocked_q_mime_data = MagicMock(**{'urls.return_value': [mocked_q_url_1, mocked_q_url_2]})
+
+        result = handle_mime_data_urls(mocked_q_mime_data)
+        mocked_path.assert_has_calls([call(os.path.join('file', 'test', 'path', '1.ext')),
+                                     call(os.path.join('file', 'test', 'path', '2.ext'))])
+        assert result == [mocked_path_instance_1, mocked_path_instance_2]
 
 class TestListPreviewWidget(TestCase):
 
