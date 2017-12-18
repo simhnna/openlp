@@ -113,7 +113,7 @@ class TestServiceItem(TestCase, TestMixin):
         service_item.set_from_service(line)
 
         # THEN: We should get back a valid service item
-        assert service_item.is_valid, 'The new service item should be valid'
+        assert service_item.is_valid is True, 'The new service item should be valid'
         assert_length(0, service_item._display_frames, 'The service item should have no display frames')
         assert_length(5, service_item.capabilities, 'There should be 5 default custom item capabilities')
 
@@ -334,7 +334,7 @@ class TestServiceItem(TestCase, TestMixin):
         service_item.set_from_service(line, '/test/')
 
         # THEN: We should get back a valid service item
-        assert service_item.is_valid, 'The new service item should be valid'
+        assert service_item.is_valid is True, 'The new service item should be valid'
         assert 0 == len(service_item._display_frames), 'The service item should have no display frames'
         assert 7 == len(service_item.capabilities), 'There should be 7 default custom item capabilities'
 

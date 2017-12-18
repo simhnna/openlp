@@ -293,7 +293,7 @@ class TestLib(TestCase):
         # THEN: Check if the thumb was created and scaled to the given size.
         self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
-        assert icon.isNull()is False, 'The icon should not be null'
+        assert icon.isNull() is False, 'The icon should not be null'
         assert thumb_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # Remove the thumb so that the test actually tests if the thumb will be created.

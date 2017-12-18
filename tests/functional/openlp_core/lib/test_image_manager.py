@@ -98,7 +98,7 @@ class TestImageManager(TestCase, TestMixin):
         image = self.image_manager.get_image(full_path, 'church.jpg', 80, 80)
 
         # THEN: The return should be of type image
-        assert isinstance(image, QtGui.QImage) is True, 'The returned object should be a QImage'
+        assert isinstance(image, QtGui.QImage), 'The returned object should be a QImage'
 
         # WHEN: adding the same image with different dimensions
         self.image_manager.add_image(full_path, 'church.jpg', None, 100, 100)
