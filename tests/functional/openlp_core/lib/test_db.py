@@ -80,8 +80,8 @@ class TestDB(TestCase):
             MockedMetaData.assert_called_with(bind=mocked_engine)
             mocked_sessionmaker.assert_called_with(autoflush=True, autocommit=False, bind=mocked_engine)
             mocked_scoped_session.assert_called_with(mocked_sessionmaker_object)
-            self.assertIs(session, mocked_scoped_session_object, 'The ``session`` object should be the mock')
-            self.assertIs(metadata, mocked_metadata, 'The ``metadata`` object should be the mock')
+            assert session is mocked_scoped_session_object, 'The ``session`` object should be the mock'
+            assert metadata is mocked_metadata, 'The ``metadata`` object should be the mock'
 
     def test_init_db_defaults(self):
         """
@@ -94,8 +94,8 @@ class TestDB(TestCase):
         session, metadata = init_db(db_url)
 
         # THEN: Valid session and metadata objects should be returned
-        self.assertIsInstance(session, ScopedSession, 'The ``session`` object should be a ``ScopedSession`` instance')
-        self.assertIsInstance(metadata, MetaData, 'The ``metadata`` object should be a ``MetaData`` instance')
+        assert isinstance(session, ScopedSession), 'The ``session`` object should be a ``ScopedSession`` instance'
+        assert isinstance(metadata, MetaData), 'The ``metadata`` object should be a ``MetaData`` instance'
 
     def test_get_upgrade_op(self):
         """
@@ -116,7 +116,7 @@ class TestDB(TestCase):
             op = get_upgrade_op(mocked_session)
 
             # THEN: The op object should be mocked_op, and the correction function calls should have been made
-            self.assertIs(op, mocked_op, 'The return value should be the mocked object')
+            assert op is mocked_op, 'The return value should be the mocked object'
             mocked_session.bind.connect.assert_called_with()
             MockedMigrationContext.configure.assert_called_with(mocked_connection)
             MockedOperations.assert_called_with(mocked_context)
@@ -139,7 +139,7 @@ class TestDB(TestCase):
             # THEN: The AppLocation.get_section_data_path and delete_file methods should have been called
             MockedAppLocation.get_section_data_path.assert_called_with(test_plugin)
             mocked_delete_file.assert_called_with(test_location)
-            self.assertTrue(result, 'The result of delete_file should be True (was rigged that way)')
+            assert result is True, 'The result of delete_file should be True (was rigged that way)'
 
     def test_delete_database_with_db_file_name(self):
         """
@@ -160,7 +160,7 @@ class TestDB(TestCase):
             # THEN: The AppLocation.get_section_data_path and delete_file methods should have been called
             MockedAppLocation.get_section_data_path.assert_called_with(test_plugin)
             mocked_delete_file.assert_called_with(test_location)
-            self.assertFalse(result, 'The result of delete_file should be False (was rigged that way)')
+            assert result is False, 'The result of delete_file should be False (was rigged that way)'
 
     def test_skip_db_upgrade_with_no_database(self):
         """
@@ -174,4 +174,4 @@ class TestDB(TestCase):
         upgrade_db(url, mocked_upgrade)
 
         # THEN: upgrade should NOT have been called
-        self.assertFalse(mocked_upgrade.called, 'Database upgrade function should NOT have been called')
+        assert mocked_upgrade.called is False, 'Database upgrade function should NOT have been called'

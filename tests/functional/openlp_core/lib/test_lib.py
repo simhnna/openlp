@@ -49,8 +49,8 @@ class TestLib(TestCase):
         true_result = str_to_bool(true_boolean)
 
         # THEN: We should get back a True bool
-        self.assertIsInstance(true_result, bool, 'The result should be a boolean')
-        self.assertTrue(true_result, 'The result should be True')
+        assert isinstance(true_result, bool), 'The result should be a boolean'
+        assert true_result is True, 'The result should be True'
 
     def test_str_to_bool_with_bool_false(self):
         """
@@ -63,8 +63,8 @@ class TestLib(TestCase):
         false_result = str_to_bool(false_boolean)
 
         # THEN: We should get back a True bool
-        self.assertIsInstance(false_result, bool, 'The result should be a boolean')
-        self.assertFalse(false_result, 'The result should be True')
+        assert isinstance(false_result, bool), 'The result should be a boolean'
+        assert false_result is False, 'The result should be True'
 
     def test_str_to_bool_with_integer(self):
         """
@@ -77,7 +77,7 @@ class TestLib(TestCase):
         int_result = str_to_bool(int_string)
 
         # THEN: we should get back a false
-        self.assertFalse(int_result, 'The result should be False')
+        assert int_result is False, 'The result should be False'
 
     def test_str_to_bool_with_invalid_string(self):
         """
@@ -90,7 +90,7 @@ class TestLib(TestCase):
         str_result = str_to_bool(invalid_string)
 
         # THEN: we should get back a false
-        self.assertFalse(str_result, 'The result should be False')
+        assert str_result is False, 'The result should be False'
 
     def test_str_to_bool_with_string_false(self):
         """
@@ -103,7 +103,7 @@ class TestLib(TestCase):
         false_result = str_to_bool(false_string)
 
         # THEN: we should get back a false
-        self.assertFalse(false_result, 'The result should be False')
+        assert false_result is False, 'The result should be False'
 
     def test_str_to_bool_with_string_no(self):
         """
@@ -116,7 +116,7 @@ class TestLib(TestCase):
         str_result = str_to_bool(no_string)
 
         # THEN: we should get back a false
-        self.assertFalse(str_result, 'The result should be False')
+        assert str_result is False, 'The result should be False'
 
     def test_str_to_bool_with_true_string_value(self):
         """
@@ -129,7 +129,7 @@ class TestLib(TestCase):
         true_result = str_to_bool(true_string)
 
         # THEN: we should get back a true
-        self.assertTrue(true_result, 'The result should be True')
+        assert true_result is True, 'The result should be True'
 
     def test_str_to_bool_with_yes_string_value(self):
         """
@@ -142,7 +142,7 @@ class TestLib(TestCase):
         str_result = str_to_bool(yes_string)
 
         # THEN: we should get back a true
-        self.assertTrue(str_result, 'The result should be True')
+        assert str_result is True, 'The result should be True'
 
     def test_get_text_file_string_no_file(self):
         """
@@ -157,7 +157,7 @@ class TestLib(TestCase):
 
             # THEN: The result should be False
             file_path.is_file.assert_called_with()
-            self.assertFalse(result, 'False should be returned if no file exists')
+            assert result is False, 'False should be returned if no file exists'
 
     def test_get_text_file_string_read_error(self):
         """
@@ -176,7 +176,7 @@ class TestLib(TestCase):
             # THEN: None should be returned
             file_path.is_file.assert_called_once_with()
             file_path.open.assert_called_once_with('r', encoding='utf-8')
-            self.assertIsNone(result, 'None should be returned if the file cannot be opened')
+            assert result is None, 'None should be returned if the file cannot be opened'
 
     def test_get_text_file_string_decode_error(self):
         """
@@ -195,7 +195,7 @@ class TestLib(TestCase):
         result = build_icon(icon)
 
         # THEN: The result should be the same icon as we passed in
-        self.assertIs(icon, result, 'The result should be the same icon as we passed in')
+        assert icon is result, 'The result should be the same icon as we passed in'
 
     def test_build_icon_with_resource(self):
         """
@@ -217,7 +217,7 @@ class TestLib(TestCase):
             MockedQPixmap.assert_called_with(resource_uri)
             # There really should be more assert statements here but due to type checking and things they all break. The
             # best we can do is to assert that we get back a MagicMock object.
-            self.assertIsInstance(result, MagicMock, 'The result should be a MagicMock, because we mocked it out')
+            assert isinstance(result, MagicMock), 'The result should be a MagicMock, because we mocked it out'
 
     def test_image_to_byte(self):
         """
@@ -240,8 +240,8 @@ class TestLib(TestCase):
             MockedQtCore.QBuffer.assert_called_with(mocked_byte_array)
             mocked_buffer.open.assert_called_with('writeonly')
             mocked_image.save.assert_called_with(mocked_buffer, "PNG")
-            self.assertFalse(mocked_byte_array.toBase64.called)
-            self.assertEqual(mocked_byte_array, result, 'The mocked out byte array should be returned')
+            assert mocked_byte_array.toBase64.called is False
+            assert mocked_byte_array == result, 'The mocked out byte array should be returned'
 
     def test_image_to_byte_base_64(self):
         """
@@ -266,8 +266,7 @@ class TestLib(TestCase):
             mocked_buffer.open.assert_called_with('writeonly')
             mocked_image.save.assert_called_with(mocked_buffer, "PNG")
             mocked_byte_array.toBase64.assert_called_with()
-            self.assertEqual('base64mock', result, 'The result should be the return value of the mocked out '
-                                                   'base64 method')
+            assert 'base64mock' == result, 'The result should be the return value of the mocked out base64 method'
 
     def test_create_thumb_with_size(self):
         """
@@ -286,16 +285,16 @@ class TestLib(TestCase):
             pass
 
         # Only continue when the thumb does not exist.
-        self.assertFalse(thumb_path.exists(), 'Test was not run, because the thumb already exists.')
+        assert thumb_path.exists() is False, 'Test was not run, because the thumb already exists.'
 
         # WHEN: Create the thumb.
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created and scaled to the given size.
         self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
-        self.assertIsInstance(icon, QtGui.QIcon, 'The icon should be a QIcon')
-        self.assertFalse(icon.isNull(), 'The icon should not be null')
-        self.assertEqual(thumb_size, QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size')
+        assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
+        assert icon.isNull() is False, 'The icon should not be null'
+        assert thumb_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # Remove the thumb so that the test actually tests if the thumb will be created.
         try:
@@ -320,17 +319,16 @@ class TestLib(TestCase):
             pass
 
         # Only continue when the thumb does not exist.
-        self.assertFalse(thumb_path.exists(), 'Test was not run, because the thumb already exists.')
+        assert thumb_path.exists() is False, 'Test was not run, because the thumb already exists.'
 
         # WHEN: Create the thumb.
         icon = create_thumb(image_path, thumb_path)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
         self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
-        self.assertIsInstance(icon, QtGui.QIcon, 'The icon should be a QIcon')
-        self.assertFalse(icon.isNull(), 'The icon should not be null')
-        self.assertEqual(expected_size, QtGui.QImageReader(str(thumb_path)).size(),
-                         'The thumb should have the given size')
+        assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
+        assert icon.isNull() is False, 'The icon should not be null'
+        assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # Remove the thumb so that the test actually tests if the thumb will be created.
         try:
@@ -356,17 +354,16 @@ class TestLib(TestCase):
             pass
 
         # Only continue when the thumb does not exist.
-        self.assertFalse(thumb_path.exists(), 'Test was not run, because the thumb already exists.')
+        assert thumb_path.exists() is False, 'Test was not run, because the thumb already exists.'
 
         # WHEN: Create the thumb.
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
-        self.assertIsInstance(icon, QtGui.QIcon, 'The icon should be a QIcon')
-        self.assertFalse(icon.isNull(), 'The icon should not be null')
-        self.assertEqual(expected_size, QtGui.QImageReader(str(thumb_path)).size(),
-                         'The thumb should have the given size')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
+        assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
+        assert icon.isNull() is False, 'The icon should not be null'
+        assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # Remove the thumb so that the test actually tests if the thumb will be created.
         try:
@@ -392,17 +389,16 @@ class TestLib(TestCase):
             pass
 
         # Only continue when the thumb does not exist.
-        self.assertFalse(thumb_path.exists(), 'Test was not run, because the thumb already exists.')
+        assert thumb_path.exists() is False, 'Test was not run, because the thumb already exists.'
 
         # WHEN: Create the thumb.
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
-        self.assertIsInstance(icon, QtGui.QIcon, 'The icon should be a QIcon')
-        self.assertFalse(icon.isNull(), 'The icon should not be null')
-        self.assertEqual(
-            expected_size, QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
+        assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
+        assert icon.isNull() is False, 'The icon should not be null'
+        assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # Remove the thumb so that the test actually tests if the thumb will be created.
         try:
@@ -428,17 +424,16 @@ class TestLib(TestCase):
             pass
 
         # Only continue when the thumb does not exist.
-        self.assertFalse(thumb_path.exists(), 'Test was not run, because the thumb already exists.')
+        assert thumb_path.exists() is False, 'Test was not run, because the thumb already exists.'
 
         # WHEN: Create the thumb.
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
         self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
-        self.assertIsInstance(icon, QtGui.QIcon, 'The icon should be a QIcon')
-        self.assertFalse(icon.isNull(), 'The icon should not be null')
-        self.assertEqual(
-            expected_size, QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size')
+        assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
+        assert icon.isNull() is False, 'The icon should not be null'
+        assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # Remove the thumb so that the test actually tests if the thumb will be created.
         try:
@@ -465,7 +460,7 @@ class TestLib(TestCase):
             pass
 
         # Only continue when the thumb does not exist.
-        self.assertFalse(thumb_path.exists(), 'Test was not run, because the thumb already exists.')
+        assert thumb_path.exists() is False, 'Test was not run, because the thumb already exists.'
 
         # WHEN: Create the thumb.
         with patch('openlp.core.lib.QtGui.QImageReader.size') as mocked_size:
@@ -474,10 +469,9 @@ class TestLib(TestCase):
 
         # THEN: Check if the thumb was created with aspect ratio of 1.
         self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
-        self.assertIsInstance(icon, QtGui.QIcon, 'The icon should be a QIcon')
-        self.assertFalse(icon.isNull(), 'The icon should not be null')
-        self.assertEqual(
-            expected_size_1, QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size')
+        assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
+        assert icon.isNull() is False, 'The icon should not be null'
+        assert expected_size_1 == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # WHEN: Create the thumb.
         with patch('openlp.core.lib.QtGui.QImageReader.size') as mocked_size:
@@ -485,10 +479,9 @@ class TestLib(TestCase):
             icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created with aspect ratio of 1.
-        self.assertIsInstance(icon, QtGui.QIcon, 'The icon should be a QIcon')
-        self.assertFalse(icon.isNull(), 'The icon should not be null')
-        self.assertEqual(
-            expected_size_2, QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size')
+        assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
+        assert icon.isNull() is False, 'The icon should not be null'
+        assert expected_size_2 == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
 
         # Remove the thumb so that the test actually tests if the thumb will be created.
         try:
@@ -511,7 +504,7 @@ class TestLib(TestCase):
 
         # THEN: The selectedIndexes function should have been called and the result should be true
         mocked_list_widget.selectedIndexes.assert_called_with()
-        self.assertTrue(result, 'The result should be True')
+        assert result is True, 'The result should be True'
 
     def test_check_item_selected_false(self):
         """
@@ -532,7 +525,7 @@ class TestLib(TestCase):
             # THEN: The selectedIndexes function should have been called and the result should be true
             mocked_list_widget.selectedIndexes.assert_called_with()
             MockedQtWidgets.QMessageBox.information.assert_called_with('parent', 'mocked translate', 'message')
-            self.assertFalse(result, 'The result should be False')
+            assert result is False, 'The result should be False'
 
     def test_clean_tags(self):
         """
@@ -554,7 +547,7 @@ class TestLib(TestCase):
             result_string = clean_tags(string_to_pass)
 
             # THEN: The strings should be identical.
-            self.assertEqual(wanted_string, result_string, 'The strings should be identical')
+            assert wanted_string == result_string, 'The strings should be identical'
 
     def test_expand_tags(self):
         """
@@ -593,7 +586,7 @@ class TestLib(TestCase):
             result_string = expand_tags(string_to_pass)
 
             # THEN: The strings should be identical.
-            self.assertEqual(wanted_string, result_string, 'The strings should be identical.')
+            assert wanted_string == result_string, 'The strings should be identical.'
 
     def test_validate_thumb_file_does_not_exist(self):
         """
@@ -609,7 +602,7 @@ class TestLib(TestCase):
 
             # THEN: we should have called a few functions, and the result should be False
             thumb_path.exists.assert_called_once_with()
-            self.assertFalse(result, 'The result should be False')
+            assert result is False, 'The result should be False'
 
     def test_validate_thumb_file_exists_and_newer(self):
         """
@@ -624,7 +617,7 @@ class TestLib(TestCase):
             result = validate_thumb(file_path, thumb_path)
 
             # THEN: `validate_thumb` should return True
-            self.assertTrue(result)
+            assert result is True
 
     def test_validate_thumb_file_exists_and_older(self):
         """
@@ -639,7 +632,7 @@ class TestLib(TestCase):
 
         # THEN: `validate_thumb` should return False
         thumb_path.stat.assert_called_once_with()
-        self.assertFalse(result, 'The result should be False')
+        assert result is False, 'The result should be False'
 
     def test_resize_thumb(self):
         """
@@ -658,9 +651,9 @@ class TestLib(TestCase):
 
         # THEN: Check if the size is correct and the background was set.
         result_size = image.size()
-        self.assertEqual(wanted_height, result_size.height(), 'The image should have the requested height.')
-        self.assertEqual(wanted_width, result_size.width(), 'The image should have the requested width.')
-        self.assertEqual(image.pixel(0, 0), wanted_background_rgb, 'The background should be white.')
+        assert wanted_height == result_size.height(), 'The image should have the requested height.'
+        assert wanted_width == result_size.width(), 'The image should have the requested width.'
+        assert image.pixel(0, 0) == wanted_background_rgb, 'The background should be white.'
 
     def test_resize_thumb_ignoring_aspect_ratio(self):
         """
@@ -679,9 +672,9 @@ class TestLib(TestCase):
 
         # THEN: Check if the size is correct and the background was set.
         result_size = image.size()
-        self.assertEqual(wanted_height, result_size.height(), 'The image should have the requested height.')
-        self.assertEqual(wanted_width, result_size.width(), 'The image should have the requested width.')
-        self.assertEqual(image.pixel(0, 0), wanted_background_rgb, 'The background should be white.')
+        assert wanted_height == result_size.height(), 'The image should have the requested height.'
+        assert wanted_width == result_size.width(), 'The image should have the requested width.'
+        assert image.pixel(0, 0) == wanted_background_rgb, 'The background should be white.'
 
     @patch('openlp.core.lib.QtCore.QLocale.createSeparatedList')
     def test_create_separated_list_qlocate(self, mocked_createSeparatedList):
@@ -696,8 +689,8 @@ class TestLib(TestCase):
         string_result = create_separated_list(string_list)
 
         # THEN: We should have "Author 1, Author 2, and Author 3"
-        self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
-                         'Author 2, and Author 3".')
+        assert string_result == 'Author 1, Author 2 and Author 3', \
+            'The string should be "Author 1, Author 2, and Author 3".'
 
     def test_create_separated_list_empty_list(self):
         """
@@ -710,7 +703,7 @@ class TestLib(TestCase):
         string_result = create_separated_list(string_list)
 
         # THEN: We shoud have an emptry string.
-        self.assertEqual(string_result, '', 'The string sould be empty.')
+        assert string_result == '', 'The string sould be empty.'
 
     def test_create_separated_list_with_one_item(self):
         """
@@ -723,7 +716,7 @@ class TestLib(TestCase):
         string_result = create_separated_list(string_list)
 
         # THEN: We should have "Author 1"
-        self.assertEqual(string_result, 'Author 1', 'The string should be "Author 1".')
+        assert string_result == 'Author 1', 'The string should be "Author 1".'
 
     def test_create_separated_list_with_two_items(self):
         """
@@ -736,7 +729,7 @@ class TestLib(TestCase):
         string_result = create_separated_list(string_list)
 
         # THEN: We should have "Author 1 and Author 2"
-        self.assertEqual(string_result, 'Author 1 and Author 2', 'The string should be "Author 1 and Author 2".')
+        assert string_result == 'Author 1 and Author 2', 'The string should be "Author 1 and Author 2".'
 
     def test_create_separated_list_with_three_items(self):
         """
@@ -749,8 +742,8 @@ class TestLib(TestCase):
         string_result = create_separated_list(string_list)
 
         # THEN: We should have "Author 1, Author 2 and Author 3"
-        self.assertEqual(string_result, 'Author 1, Author 2 and Author 3', 'The string should be "Author 1, '
-                         'Author 2, and Author 3".')
+        assert string_result == 'Author 1, Author 2 and Author 3', \
+            'The string should be "Author 1, Author 2, and Author 3".'
 
     def test_expand_chords(self):
         """
@@ -766,7 +759,7 @@ class TestLib(TestCase):
         expected_html = '<span class="chordline firstchordline">H<span class="chord"><span><strong>C</strong></span>' \
                         '</span>alleluya.<span class="chord"><span><strong>F</strong></span></span><span class="ws">' \
                         '&nbsp;&nbsp;</span> <span class="chord"><span><strong>G</strong></span></span></span>'
-        self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')
+        assert expected_html == text_with_expanded_chords, 'The expanded chords should look as expected!'
 
     def test_expand_chords2(self):
         """
@@ -782,7 +775,7 @@ class TestLib(TestCase):
         expected_html = '<span class="chordline firstchordline">I<span class="chord"><span><strong>D</strong></span>' \
                         '</span>&#x27;M NOT MOVED BY WHAT I SEE HALLE<span class="chord"><span><strong>F</strong>' \
                         '</span></span>LUJA<span class="chord"><span><strong>C</strong></span></span>H</span>'
-        self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')
+        assert expected_html == text_with_expanded_chords, 'The expanded chords should look as expected!'
 
     def test_compare_chord_lyric_short_chord(self):
         """
@@ -810,7 +803,7 @@ class TestLib(TestCase):
         ret = compare_chord_lyric(chord, lyrics)
 
         # THEN: The returned value should 4 because the chord is longer than the lyric
-        self.assertEquals(4, ret, 'The returned value should 4 because the chord is longer than the lyric')
+        assert 4 == ret, 'The returned value should 4 because the chord is longer than the lyric'
 
     def test_find_formatting_tags(self):
         """
@@ -825,7 +818,7 @@ class TestLib(TestCase):
         active_tags = find_formatting_tags(lyrics, tags)
 
         # THEN: The list of active tags should contain only 'st'
-        self.assertListEqual(['st'], active_tags, 'The list of active tags should contain only "st"')
+        assert ['st'] == active_tags, 'The list of active tags should contain only "st"'
 
     def test_expand_chords_for_printing(self):
         """
@@ -862,4 +855,4 @@ class TestLib(TestCase):
                         '<table class="segment" cellpadding="0" cellspacing="0" border="0" align="left"><tr ' \
                         'class="chordrow"><td class="chord">F</td></tr><tr><td class="lyrics">{st}{/st}&nbsp;</td>' \
                         '</tr></table></td></tr></table>'
-        self.assertEqual(expected_html, text_with_expanded_chords, 'The expanded chords should look as expected!')
+        assert expected_html == text_with_expanded_chords, 'The expanded chords should look as expected!'

@@ -113,7 +113,7 @@ class TestRenderer(TestCase):
         result = get_start_tags(given_raw_text)
 
         # THEN: Check if the correct tuple is returned.
-        self.assertEqual(result, expected_tuple), 'A tuple should be returned containing the text with correct ' \
+        assert result == expected_tuple, 'A tuple should be returned containing the text with correct ' \
             'tags, the opening tags, and the opening html tags.'
 
     def test_word_split(self):
@@ -128,7 +128,7 @@ class TestRenderer(TestCase):
         result_words = words_split(given_line)
 
         # THEN: The word lists should be the same.
-        self.assertListEqual(result_words, expected_words)
+        assert result_words == expected_words
 
     def test_format_slide_logical_split(self):
         """
@@ -145,7 +145,7 @@ class TestRenderer(TestCase):
         result_words = renderer.format_slide(given_line, service_item)
 
         # THEN: The word lists should be the same.
-        self.assertListEqual(result_words, expected_words)
+        assert result_words == expected_words
 
     def test_format_slide_blank_before_split(self):
         """
@@ -162,7 +162,7 @@ class TestRenderer(TestCase):
         result_words = renderer.format_slide(given_line, service_item)
 
         # THEN: The blanks have been removed.
-        self.assertListEqual(result_words, expected_words)
+        assert result_words == expected_words
 
     def test_format_slide_blank_after_split(self):
         """
@@ -179,7 +179,7 @@ class TestRenderer(TestCase):
         result_words = renderer.format_slide(given_line, service_item)
 
         # THEN: The blanks have been removed.
-        self.assertListEqual(result_words, expected_words)
+        assert result_words == expected_words
 
     @patch('openlp.core.display.renderer.QtWebKitWidgets.QWebView')
     @patch('openlp.core.display.renderer.build_lyrics_format_css')

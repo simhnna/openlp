@@ -90,8 +90,8 @@ class TestTheme(TestCase):
 
         # THEN: The filename of the background should be correct
         expected_filename = path / 'MyBeautifulTheme' / 'video.mp4'
-        self.assertEqual(expected_filename, theme.background_filename)
-        self.assertEqual('MyBeautifulTheme', theme.theme_name)
+        assert expected_filename == theme.background_filename
+        assert 'MyBeautifulTheme' == theme.theme_name
 
     def test_save_retrieve(self):
         """
@@ -107,9 +107,9 @@ class TestTheme(TestCase):
         self.check_theme(lt)
 
     def check_theme(self, theme):
-        self.assertEqual('#000000', theme.background_border_color, 'background_border_color should be "#000000"')
-        self.assertEqual('solid', theme.background_type, 'background_type should be "solid"')
-        self.assertEqual(0, theme.display_vertical_align, 'display_vertical_align should be 0')
-        self.assertFalse(theme.font_footer_bold, 'font_footer_bold should be False')
-        self.assertEqual('Arial', theme.font_main_name, 'font_main_name should be "Arial"')
-        self.assertEqual(47, len(theme.__dict__), 'The theme should have 47 attributes')
+        assert '#000000' == theme.background_border_color, 'background_border_color should be "#000000"'
+        assert 'solid' == theme.background_type, 'background_type should be "solid"'
+        assert 0 == theme.display_vertical_align, 'display_vertical_align should be 0'
+        assert theme.font_footer_bold is False, 'font_footer_bold should be False'
+        assert 'Arial' == theme.font_main_name, 'font_main_name should be "Arial"'
+        assert 47 == len(theme.__dict__), 'The theme should have 47 attributes'

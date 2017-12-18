@@ -69,11 +69,11 @@ class TestMediaManagerItem(TestCase, TestMixin):
         # WHEN: Object is created
         mmi.required_icons()
         # THEN: Default icons should be populated
-        self.assertFalse(mmi.has_import_icon, 'There should be no import icon by default')
-        self.assertTrue(mmi.has_new_icon, 'By default a new icon should be present')
-        self.assertFalse(mmi.has_file_icon, 'There should be no file icon by default')
-        self.assertTrue(mmi.has_delete_icon, 'By default a delete icon should be present')
-        self.assertFalse(mmi.add_to_service_item, 'There should be no add_to_service icon by default')
+        assert mmi.has_import_icon is False, 'There should be no import icon by default'
+        assert mmi.has_new_icon is True, 'By default a new icon should be present'
+        assert mmi.has_file_icon is False, 'There should be no file icon by default'
+        assert mmi.has_delete_icon is True, 'By default a delete icon should be present'
+        assert mmi.add_to_service_item is False, 'There should be no add_to_service icon by default'
 
     @patch('openlp.core.lib.mediamanageritem.Settings')
     @patch('openlp.core.lib.mediamanageritem.MediaManagerItem.on_live_click')
@@ -111,5 +111,5 @@ class TestMediaManagerItem(TestCase, TestMixin):
         mmi.on_double_clicked()
 
         # THEN: on_live_click() should have been called
-        self.assertEqual(0, mocked_on_live_click.call_count, 'on_live_click() should not have been called')
-        self.assertEqual(0, mocked_on_preview_click.call_count, 'on_preview_click() should not have been called')
+        assert 0 == mocked_on_live_click.call_count, 'on_live_click() should not have been called'
+        assert 0 == mocked_on_preview_click.call_count, 'on_preview_click() should not have been called'
