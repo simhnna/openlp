@@ -25,11 +25,11 @@ Package to test the openlp.core.projectors.pjlink base package.
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
 
-from openlp.core.projectors.constants import E_PARAMETER, ERROR_STRING, S_ON, S_CONNECTED
+from openlp.core.projectors.constants import E_PARAMETER, ERROR_STRING, S_ON, S_CONNECTED, S_QSOCKET_STATE
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
 
-from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_CONNECT_AUTHENTICATE, TEST1_DATA
+from tests.resources.projector.data import TEST1_DATA
 
 pjlink_test = PJLink(Projector(**TEST1_DATA), no_poll=True)
 
@@ -38,29 +38,17 @@ class TestPJLinkBase(TestCase):
     """
     Tests for the PJLink module
     """
-    @patch.object(pjlink_test, 'readyRead')
-    @patch.object(pjlink_test, 'send_command')
-    @patch.object(pjlink_test, 'waitForReadyRead')
-    @patch('openlp.core.common.qmd5_hash')
-    def test_authenticated_connection_call(self,
-                                           mock_qmd5_hash,
-                                           mock_waitForReadyRead,
-                                           mock_send_command,
-                                           mock_readyRead):
-        """
-        Ticket 92187: Fix for projector connect with PJLink authentication exception.
-        """
-        # GIVEN: Test object
-        pjlink = pjlink_test
+    def setUp(self):
+        '''
+        TestPJLinkCommands part 2 initialization
+        '''
+        self.pjlink_test = PJLink(Projector(**TEST1_DATA), no_poll=True)
 
-        # WHEN: Calling check_login with authentication request:
-        pjlink.check_login(data=TEST_CONNECT_AUTHENTICATE)
-
-        # THEN: Should have called qmd5_hash
-        self.assertTrue(mock_qmd5_hash.called_with(TEST_SALT,
-                                                   "Connection request should have been called with TEST_SALT"))
-        self.assertTrue(mock_qmd5_hash.called_with(TEST_PIN,
-                                                   "Connection request should have been called with TEST_PIN"))
+    def tearDown(self):
+        '''
+        TestPJLinkCommands part 2 cleanups
+        '''
+        self.pjlink_test = None
 
     @patch.object(pjlink_test, 'change_status')
     def test_status_change(self, mock_change_status):
@@ -110,18 +98,18 @@ class TestPJLinkBase(TestCase):
         # THEN: poll_loop should exit without calling any other method
         self.assertFalse(pjlink.timer.called, 'Should have returned without calling any other method')
 
-    @patch.object(pjlink_test, 'send_command')
-    def test_poll_loop_start(self, mock_send_command):
+    def test_poll_loop_start(self):
         """
         Test PJLink.poll_loop makes correct calls
         """
-        # GIVEN: test object and test data
-        pjlink = pjlink_test
-        pjlink.state = MagicMock()
-        pjlink.timer = MagicMock()
-        pjlink.timer.interval = MagicMock()
-        pjlink.timer.setInterval = MagicMock()
-        pjlink.timer.start = MagicMock()
+        # GIVEN: Mocks and test data
+        mock_state = patch.object(self.pjlink_test, 'state').start()
+        mock_state.return_value = S_QSOCKET_STATE['ConnectedState']
+        mock_timer = patch.object(self.pjlink_test, 'timer').start()
+        mock_timer.interval.return_value = 10
+        mock_send_command = patch.object(self.pjlink_test, 'send_command').start()
+
+        pjlink = self.pjlink_test
         pjlink.poll_time = 20
         pjlink.power = S_ON
         pjlink.source_available = None
@@ -130,19 +118,17 @@ class TestPJLinkBase(TestCase):
         pjlink.model = None
         pjlink.pjlink_name = None
         pjlink.ConnectedState = S_CONNECTED
-        pjlink.timer.interval.return_value = 10
-        pjlink.state.return_value = S_CONNECTED
         call_list = [
-            call('POWR', queue=True),
-            call('ERST', queue=True),
-            call('LAMP', queue=True),
-            call('AVMT', queue=True),
-            call('INPT', queue=True),
-            call('INST', queue=True),
-            call('INFO', queue=True),
-            call('INF1', queue=True),
-            call('INF2', queue=True),
-            call('NAME', queue=True),
+            call('POWR'),
+            call('ERST'),
+            call('LAMP'),
+            call('AVMT'),
+            call('INPT'),
+            call('INST'),
+            call('INFO'),
+            call('INF1'),
+            call('INF2'),
+            call('NAME'),
         ]
 
         # WHEN: PJLink.poll_loop is called
@@ -150,8 +136,8 @@ class TestPJLinkBase(TestCase):
 
         # THEN: proper calls were made to retrieve projector data
         # First, call to update the timer with the next interval
-        self.assertTrue(pjlink.timer.setInterval.called, 'Should have updated the timer')
+        self.assertTrue(mock_timer.setInterval.called)
         # Next, should have called the timer to start
-        self.assertTrue(pjlink.timer.start.called, 'Should have started the timer')
+        self.assertTrue(mock_timer.start.called, 'Should have started the timer')
         # Finally, should have called send_command with a list of projetctor status checks
         mock_send_command.assert_has_calls(call_list, 'Should have queued projector queries')

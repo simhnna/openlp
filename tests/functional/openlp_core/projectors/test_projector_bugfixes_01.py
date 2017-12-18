@@ -23,12 +23,11 @@
 Package to test the openlp.core.projectors.pjlink base package.
 """
 from unittest import TestCase
-from unittest.mock import patch
 
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
 
-from tests.resources.projector.data import TEST_PIN, TEST_CONNECT_AUTHENTICATE, TEST_HASH, TEST1_DATA
+from tests.resources.projector.data import TEST1_DATA
 
 
 class TestPJLinkBugs(TestCase):
@@ -80,43 +79,17 @@ class TestPJLinkBugs(TestCase):
         """
         Test bug 1593882 no pin and authenticated request exception
         """
-        # GIVEN: Test object and mocks
-        mock_socket_timer = patch.object(self.pjlink_test, 'socket_timer').start()
-        mock_timer = patch.object(self.pjlink_test, 'timer').start()
-        mock_authentication = patch.object(self.pjlink_test, 'projectorAuthentication').start()
-        mock_ready_read = patch.object(self.pjlink_test, 'waitForReadyRead').start()
-        mock_send_command = patch.object(self.pjlink_test, 'send_command').start()
-        pjlink = self.pjlink_test
-        pjlink.pin = None
-        mock_ready_read.return_value = True
-
-        # WHEN: call with authentication request and pin not set
-        pjlink.check_login(data=TEST_CONNECT_AUTHENTICATE)
-
-        # THEN: 'No Authentication' signal should have been sent
-        mock_authentication.emit.assert_called_with(pjlink.ip)
+        # Test now part of test_projector_pjlink_commands_02
+        # Keeping here for bug reference
+        pass
 
     def test_bug_1593883_pjlink_authentication(self):
         """
-        Test bugfix 1593883 pjlink authentication
+        Test bugfix 1593883 pjlink authentication and ticket 92187
         """
-        # GIVEN: Test object and data
-        mock_socket_timer = patch.object(self.pjlink_test, 'socket_timer').start()
-        mock_timer = patch.object(self.pjlink_test, 'timer').start()
-        mock_send_command = patch.object(self.pjlink_test, 'write').start()
-        mock_state = patch.object(self.pjlink_test, 'state').start()
-        mock_waitForReadyRead = patch.object(self.pjlink_test, 'waitForReadyRead').start()
-        pjlink = self.pjlink_test
-        pjlink.pin = TEST_PIN
-        mock_state.return_value = pjlink.ConnectedState
-        mock_waitForReadyRead.return_value = True
-
-        # WHEN: Athenticated connection is called
-        pjlink.check_login(data=TEST_CONNECT_AUTHENTICATE)
-
-        # THEN: send_command should have the proper authentication
-        self.assertEqual("{test}".format(test=mock_send_command.call_args),
-                         "call(b'{hash}%1CLSS ?\\r')".format(hash=TEST_HASH))
+        # Test now part of test_projector_pjlink_commands_02
+        # Keeping here for bug reference
+        pass
 
     def test_bug_1734275_process_lamp_nonstandard_reply(self):
         """

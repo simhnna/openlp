@@ -58,4 +58,4 @@ class TestRemoteDeploy(TestCase):
         deploy_zipfile(self.app_root_path, 'site.zip')
 
         # THEN: test if www directory has been created
-        self.assertTrue((self.app_root_path / 'www').is_dir(), 'We should have a www directory')
+        assert (self.app_root_path / 'www').is_dir(), 'We should have a www directory'

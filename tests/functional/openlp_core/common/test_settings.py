@@ -139,13 +139,13 @@ class TestSettings(TestCase, TestMixin):
         extend = settings.value('extend')
 
         # THEN the default value is returned
-        self.assertEqual('very wide', extend, 'The default value defined should be returned')
+        assert 'very wide' == extend, 'The default value defined should be returned'
 
         # WHEN a new value is saved into config
         Settings().setValue('test/extend', 'very short')
 
         # THEN the new value is returned when re-read
-        self.assertEqual('very short', Settings().value('test/extend'), 'The saved value should be returned')
+        assert 'very short' == Settings().value('test/extend'), 'The saved value should be returned'
 
     def test_settings_nonexisting(self):
         """Test the Settings on query for non-existing value"""
@@ -155,7 +155,7 @@ class TestSettings(TestCase, TestMixin):
             Settings().value('core/does not exists')
 
         # THEN: An exception with the non-existing key should be thrown
-        self.assertEqual(str(cm.exception), "'core/does not exists'", 'We should get an exception')
+        assert str(cm.exception) == "'core/does not exists'", 'We should get an exception'
 
     def test_extend_default_settings(self):
         """Test that the extend_default_settings method extends the default settings"""
@@ -167,9 +167,8 @@ class TestSettings(TestCase, TestMixin):
             Settings.extend_default_settings({'test/setting 3': 4, 'test/extended 1': 1, 'test/extended 2': 2})
 
             # THEN: The _default_settings__ dictionary_ should have the new keys
-            self.assertEqual(
-                Settings.__default_settings__, {'test/setting 1': 1, 'test/setting 2': 2, 'test/setting 3': 4,
-                                                'test/extended 1': 1, 'test/extended 2': 2})
+            assert Settings.__default_settings__ == {'test/setting 1': 1, 'test/setting 2': 2, 'test/setting 3': 4,
+                                                     'test/extended 1': 1, 'test/extended 2': 2}
 
     @patch('openlp.core.common.settings.QtCore.QSettings.contains')
     @patch('openlp.core.common.settings.QtCore.QSettings.value')

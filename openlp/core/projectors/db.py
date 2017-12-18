@@ -415,7 +415,7 @@ class ProjectorDB(Manager):
         for key in projector.source_available:
             item = self.get_object_filtered(ProjectorSource,
                                             and_(ProjectorSource.code == key,
-                                                 ProjectorSource.projector_id == projector.dbid))
+                                                 ProjectorSource.projector_id == projector.id))
             if item is None:
                 source_dict[key] = PJLINK_DEFAULT_CODES[key]
             else:
