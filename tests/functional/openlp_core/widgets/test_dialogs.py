@@ -22,7 +22,7 @@ class TestFileDialogPatches(TestCase):
         instance = FileDialog()
 
         # THEN: The instance should be an instance of QFileDialog
-        self.assertIsInstance(instance, QtWidgets.QFileDialog)
+        assert isinstance(instance, QtWidgets.QFileDialog)
 
     def test_get_existing_directory_user_abort(self):
         """
@@ -34,7 +34,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getExistingDirectory()
 
             # THEN: The result should be None
-            self.assertEqual(result, None)
+            assert result is None
 
     def test_get_existing_directory_user_accepts(self):
         """
@@ -47,7 +47,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getExistingDirectory()
 
             # THEN: getExistingDirectory() should return a Path object pointing to the chosen file
-            self.assertEqual(result, Path('test', 'dir'))
+            assert result == Path('test', 'dir')
 
     def test_get_existing_directory_param_order(self):
         """
@@ -77,7 +77,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getOpenFileName()
 
             # THEN: First value should be None
-            self.assertEqual(result[0], None)
+            assert result[0] is None
 
     def test_get_open_file_name_user_accepts(self):
         """
@@ -92,7 +92,7 @@ class TestFileDialogPatches(TestCase):
 
             # THEN: getOpenFileName() should return a tuple with the first value set to a Path object pointing to the
             #       chosen file
-            self.assertEqual(result[0], Path('test', 'chosen.file'))
+            assert result[0] == Path('test', 'chosen.file')
 
     def test_get_open_file_name_selected_filter(self):
         """
@@ -104,7 +104,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getOpenFileName()
 
             # THEN: getOpenFileName() should return a tuple with the second value set to a the selected filter
-            self.assertEqual(result[1], 'selected filter')
+            assert result[1] == 'selected filter' 
 
     def test_get_open_file_names_user_abort(self):
         """
@@ -117,7 +117,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getOpenFileNames()
 
             # THEN: First value should be an empty list
-            self.assertEqual(result[0], [])
+            assert result[0] == []
 
     def test_get_open_file_names_user_accepts(self):
         """
@@ -132,7 +132,7 @@ class TestFileDialogPatches(TestCase):
 
             # THEN: getOpenFileNames() should return a tuple with the first value set to a list of Path objects pointing
             #       to the chosen file
-            self.assertEqual(result[0], [Path('test', 'chosen.file1'), Path('test', 'chosen.file2')])
+            assert result[0] == [Path('test', 'chosen.file1'), Path('test', 'chosen.file2')]
 
     def test_get_open_file_names_selected_filter(self):
         """
@@ -145,7 +145,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getOpenFileNames()
 
             # THEN: getOpenFileNames() should return a tuple with the second value set to a the selected filter
-            self.assertEqual(result[1], 'selected filter')
+            assert result[1] == 'selected filter'
 
     def test_get_save_file_name_user_abort(self):
         """
@@ -158,7 +158,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getSaveFileName()
 
             # THEN: First value should be None
-            self.assertEqual(result[0], None)
+            assert result[0] is None
 
     def test_get_save_file_name_user_accepts(self):
         """
@@ -173,7 +173,7 @@ class TestFileDialogPatches(TestCase):
 
             # THEN: getSaveFileName() should return a tuple with the first value set to a Path object pointing to the
             #       chosen file
-            self.assertEqual(result[0], Path('test', 'chosen.file'))
+            assert result[0] == Path('test', 'chosen.file')
 
     def test_get_save_file_name_selected_filter(self):
         """
@@ -185,4 +185,4 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getSaveFileName()
 
             # THEN: getSaveFileName() should return a tuple with the second value set to a the selected filter
-            self.assertEqual(result[1], 'selected filter')
+            assert result[1] == 'selected filter'

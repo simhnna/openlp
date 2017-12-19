@@ -49,7 +49,7 @@ class TestPathEdit(TestCase):
 
         # WHEN: Reading the `path` property
         # THEN: The value that we set should be returned
-        self.assertEqual(self.widget.path, Path('getter', 'test', 'pat.h'))
+        assert self.widget.path == Path('getter', 'test', 'pat.h')
 
     def test_path_setter(self):
         """
@@ -63,7 +63,7 @@ class TestPathEdit(TestCase):
 
         # THEN: The `_path` instance variable should be set with the test data. The `line_edit` text and tooltip
         #       should have also been set.
-        self.assertEqual(self.widget._path, Path('setter', 'test', 'pat.h'))
+        assert self.widget._path == Path('setter', 'test', 'pat.h')
         self.widget.line_edit.setToolTip.assert_called_once_with(os.path.join('setter', 'test', 'pat.h'))
         self.widget.line_edit.setText.assert_called_once_with(os.path.join('setter', 'test', 'pat.h'))
 
@@ -74,7 +74,7 @@ class TestPathEdit(TestCase):
         # GIVEN: An instance of PathEdit
         # WHEN: Reading the `path` property
         # THEN: The default value should be returned
-        self.assertEqual(self.widget.path_type, PathEditType.Files)
+        assert self.widget.path_type == PathEditType.Files
 
     def test_path_type_setter(self):
         """
@@ -88,7 +88,7 @@ class TestPathEdit(TestCase):
 
             # THEN: The `_path_type` instance variable should be set with the test data and not the default. The
             #       update_button_tool_tips should have been called.
-            self.assertEqual(self.widget._path_type, PathEditType.Directories)
+            assert self.widget._path_type == PathEditType.Directories
             mocked_update_button_tool_tips.assert_called_once_with()
 
     def test_update_button_tool_tips_directories(self):
@@ -139,7 +139,7 @@ class TestPathEdit(TestCase):
         mocked_get_existing_directory.assert_called_once_with(self.widget, 'Select Directory',
                                                               Path('test', 'path'),
                                                               FileDialog.ShowDirsOnly)
-        self.assertFalse(mocked_get_open_file_name.called)
+        assert mocked_get_open_file_name.called is False
 
     def test_on_browse_button_clicked_directory_custom_caption(self):
         """
@@ -162,7 +162,7 @@ class TestPathEdit(TestCase):
             mocked_get_existing_directory.assert_called_once_with(self.widget, 'Directory Caption',
                                                                   Path('test', 'path'),
                                                                   FileDialog.ShowDirsOnly)
-            self.assertFalse(mocked_get_open_file_name.called)
+            assert mocked_get_open_file_name.called is False
 
     def test_on_browse_button_clicked_file(self):
         """
@@ -181,7 +181,7 @@ class TestPathEdit(TestCase):
             # THEN: The FileDialog.getOpenFileName should have been called with the default caption
             mocked_get_open_file_name.assert_called_once_with(self.widget, 'Select File', Path('test', 'pat.h'),
                                                               self.widget.filters)
-            self.assertFalse(mocked_get_existing_directory.called)
+            assert mocked_get_existing_directory.called is False
 
     def test_on_browse_button_clicked_file_custom_caption(self):
         """
@@ -203,7 +203,7 @@ class TestPathEdit(TestCase):
             # THEN: The FileDialog.getOpenFileName should have been called with the custom caption
             mocked_get_open_file_name.assert_called_once_with(self.widget, 'File Caption', Path('test', 'pat.h'),
                                                               self.widget.filters)
-            self.assertFalse(mocked_get_existing_directory.called)
+            assert mocked_get_existing_directory.called is False
 
     def test_on_browse_button_clicked_user_cancels(self):
         """
@@ -219,7 +219,7 @@ class TestPathEdit(TestCase):
             self.widget.on_browse_button_clicked()
 
             # THEN: normpath should not have been called
-            self.assertTrue(mocked_get_open_file_name.called)
+            assert mocked_get_open_file_name.called is True
 
     def test_on_browse_button_clicked_user_accepts(self):
         """
@@ -236,8 +236,8 @@ class TestPathEdit(TestCase):
             self.widget.on_browse_button_clicked()
 
             # THEN: normpath and `on_new_path` should have been called
-            self.assertTrue(mocked_get_open_file_name.called)
-            self.assertTrue(self.widget.on_new_path.called)
+            assert mocked_get_open_file_name.called is True
+            assert self.widget.on_new_path.called is True
 
     def test_on_revert_button_clicked(self):
         """
@@ -280,7 +280,7 @@ class TestPathEdit(TestCase):
             self.widget.on_new_path(Path('/old', 'test', 'pat.h'))
 
             # THEN: The `pathChanged` signal should not be emitted
-            self.assertFalse(self.widget.pathChanged.emit.called)
+            assert self.widget.pathChanged.emit.called is False
 
     def test_on_new_path_change(self):
         """
