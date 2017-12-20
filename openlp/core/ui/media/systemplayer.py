@@ -31,6 +31,7 @@ from PyQt5 import QtCore, QtMultimedia, QtMultimediaWidgets
 from openlp.core.common.i18n import translate
 from openlp.core.ui.media import MediaState
 from openlp.core.ui.media.mediaplayer import MediaPlayer
+from openlp.core.threading import ThreadWorker, run_thread, is_thread_finished
 
 
 log = logging.getLogger(__name__)
@@ -294,39 +295,38 @@ class SystemPlayer(MediaPlayer):
         :param path: Path to file to be checked
         :return: True if file can be played otherwise False
         """
-        thread = QtCore.QThread()
         check_media_worker = CheckMediaWorker(path)
         check_media_worker.setVolume(0)
-        check_media_worker.moveToThread(thread)
-        check_media_worker.finished.connect(thread.quit)
-        thread.started.connect(check_media_worker.play)
-        thread.start()
-        while thread.isRunning():
+        run_thread(check_media_worker, 'check_media')
+        while not is_thread_finished('check_media'):
             self.application.processEvents()
         return check_media_worker.result
 
 
-class CheckMediaWorker(QtMultimedia.QMediaPlayer):
+class CheckMediaWorker(QtMultimedia.QMediaPlayer, ThreadWorker):
     """
     Class used to check if a media file is playable
     """
-    finished = QtCore.pyqtSignal()
-
     def __init__(self, path):
         super(CheckMediaWorker, self).__init__(None, QtMultimedia.QMediaPlayer.VideoSurface)
-        self.result = None
+        self.path = path
 
+    def start(self):
+        """
+        Start the thread worker
+        """
+        self.result = None
         self.error.connect(functools.partial(self.signals, 'error'))
         self.mediaStatusChanged.connect(functools.partial(self.signals, 'media'))
-
-        self.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(path)))
+        self.setMedia(QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(self.path)))
+        self.play()
 
     def signals(self, origin, status):
         if origin == 'media' and status == self.BufferedMedia:
             self.result = True
             self.stop()
-            self.finished.emit()
+            self.quit.emit()
         elif origin == 'error' and status != self.NoError:
             self.result = False
             self.stop()
-            self.finished.emit()
+            self.quit.emit()

@@ -35,13 +35,14 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
 from openlp.core.lib import resize_image, image_to_byte
+from openlp.core.threading import ThreadWorker, run_thread
 
 log = logging.getLogger(__name__)
 
 
-class ImageThread(QtCore.QThread):
+class ImageWorker(ThreadWorker):
     """
-    A special Qt thread class to speed up the display of images. This is threaded so it loads the frames and generates
+    A thread worker class to speed up the display of images. This is threaded so it loads the frames and generates
     byte stream in background.
     """
     def __init__(self, manager):
@@ -51,14 +52,15 @@ class ImageThread(QtCore.QThread):
         ``manager``
             The image manager.
         """
-        super(ImageThread, self).__init__(None)
+        super().__init__()
         self.image_manager = manager
 
-    def run(self):
+    def start(self):
         """
         Run the thread.
         """
         self.image_manager.process()
+        self.quit.emit()
 
 
 class Priority(object):
@@ -179,7 +181,6 @@ class ImageManager(QtCore.QObject):
         self.width = current_screen['size'].width()
         self.height = current_screen['size'].height()
         self._cache = {}
-        self.image_thread = ImageThread(self)
         self._conversion_queue = PriorityQueue()
         self.stop_manager = False
         Registry().register_function('images_regenerate', self.process_updates)
@@ -230,9 +231,13 @@ class ImageManager(QtCore.QObject):
         """
         Flush the queue to updated any data to update
         """
-        # We want only one thread.
-        if not self.image_thread.isRunning():
-            self.image_thread.start()
+        try:
+            worker = ImageWorker(self)
+            run_thread(worker, 'image_manager')
+        except KeyError:
+            # run_thread() will throw a KeyError if this thread already exists, so ignore it so that we don't
+            # try to start another thread when one is already running
+            pass
 
     def get_image(self, path, source, width=-1, height=-1):
         """

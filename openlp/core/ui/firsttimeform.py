@@ -36,20 +36,21 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import clean_button_text, trace_error_handler
 from openlp.core.common.applocation import AppLocation
+from openlp.core.common.httputils import get_web_page, get_url_file_size, url_get_file, CONNECTION_TIMEOUT
 from openlp.core.common.i18n import translate
-from openlp.core.common.path import Path, create_paths
 from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.path import Path, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import PluginStatus, build_icon
 from openlp.core.lib.ui import critical_error_message_box
-from openlp.core.common.httputils import get_web_page, get_url_file_size, url_get_file, CONNECTION_TIMEOUT
-from .firsttimewizard import UiFirstTimeWizard, FirstTimePage
+from openlp.core.threading import ThreadWorker, run_thread, get_thread_worker, is_thread_finished
+from openlp.core.ui.firsttimewizard import UiFirstTimeWizard, FirstTimePage
 
 log = logging.getLogger(__name__)
 
 
-class ThemeScreenshotWorker(QtCore.QObject):
+class ThemeScreenshotWorker(ThreadWorker):
     """
     This thread downloads a theme's screenshot
     """
@@ -67,11 +68,11 @@ class ThemeScreenshotWorker(QtCore.QObject):
         self.sha256 = sha256
         self.screenshot = screenshot
         socket.setdefaulttimeout(CONNECTION_TIMEOUT)
-        super(ThemeScreenshotWorker, self).__init__()
+        super().__init__()
 
-    def run(self):
+    def start(self):
         """
-        Overridden method to run the thread.
+        Run the worker
         """
         if self.was_download_cancelled:
             return
@@ -80,9 +81,10 @@ class ThemeScreenshotWorker(QtCore.QObject):
                                        os.path.join(gettempdir(), 'openlp', self.screenshot))
             # Signal that the screenshot has been downloaded
             self.screenshot_downloaded.emit(self.title, self.filename, self.sha256)
-        except:
+        except:                                                                 # noqa
             log.exception('Unable to download screenshot')
         finally:
+            self.quit.emit()
             self.finished.emit()
 
     @QtCore.pyqtSlot(bool)
@@ -145,12 +147,13 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
             return FirstTimePage.Progress
         elif self.currentId() == FirstTimePage.Themes:
             self.application.set_busy_cursor()
-            while not all([thread.isFinished() for thread in self.theme_screenshot_threads]):
+            while not all([is_thread_finished(thread_name) for thread_name in self.theme_screenshot_threads]):
                 time.sleep(0.1)
                 self.application.process_events()
             # Build the screenshot icons, as this can not be done in the thread.
             self._build_theme_screenshots()
             self.application.set_normal_cursor()
+            self.theme_screenshot_threads = []
             return FirstTimePage.Defaults
         else:
             return self.get_next_page_id()
@@ -171,7 +174,6 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         self.screens = screens
         self.was_cancelled = False
         self.theme_screenshot_threads = []
-        self.theme_screenshot_workers = []
         self.has_run_wizard = False
 
     def _download_index(self):
@@ -256,14 +258,10 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 sha256 = self.config.get('theme_{theme}'.format(theme=theme), 'sha256', fallback='')
                 screenshot = self.config.get('theme_{theme}'.format(theme=theme), 'screenshot')
                 worker = ThemeScreenshotWorker(self.themes_url, title, filename, sha256, screenshot)
-                self.theme_screenshot_workers.append(worker)
                 worker.screenshot_downloaded.connect(self.on_screenshot_downloaded)
-                thread = QtCore.QThread(self)
-                self.theme_screenshot_threads.append(thread)
-                thread.started.connect(worker.run)
-                worker.finished.connect(thread.quit)
-                worker.moveToThread(thread)
-                thread.start()
+                thread_name = 'theme_screenshot_{title}'.format(title=title)
+                run_thread(worker, thread_name)
+                self.theme_screenshot_threads.append(thread_name)
             self.application.process_events()
 
     def set_defaults(self):
@@ -353,9 +351,11 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         Process the triggering of the cancel button.
         """
         self.was_cancelled = True
-        if self.theme_screenshot_workers:
-            for worker in self.theme_screenshot_workers:
-                worker.set_download_canceled(True)
+        if self.theme_screenshot_threads:
+            for thread_name in self.theme_screenshot_threads:
+                worker = get_thread_worker(thread_name)
+                if worker:
+                    worker.set_download_canceled(True)
         # Was the thread created.
         if self.theme_screenshot_threads:
             while any([thread.isRunning() for thread in self.theme_screenshot_threads]):

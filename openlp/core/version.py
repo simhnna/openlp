@@ -35,7 +35,7 @@ from PyQt5 import QtCore
 
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.settings import Settings
-from openlp.core.threading import run_thread
+from openlp.core.threading import ThreadWorker, run_thread
 
 log = logging.getLogger(__name__)
 
@@ -44,14 +44,13 @@ CONNECTION_TIMEOUT = 30
 CONNECTION_RETRIES = 2
 
 
-class VersionWorker(QtCore.QObject):
+class VersionWorker(ThreadWorker):
     """
     A worker class to fetch the version of OpenLP from the website. This is run from within a thread so that it
     doesn't affect the loading time of OpenLP.
     """
     new_version = QtCore.pyqtSignal(dict)
     no_internet = QtCore.pyqtSignal()
-    quit = QtCore.pyqtSignal()
 
     def __init__(self, last_check_date, current_version):
         """
@@ -112,18 +111,18 @@ def update_check_date():
     Settings().setValue('core/last version test', date.today().strftime('%Y-%m-%d'))
 
 
-def check_for_update(parent):
+def check_for_update(main_window):
     """
     Run a thread to download and check the version of OpenLP
 
-    :param MainWindow parent: The parent object for the thread. Usually the OpenLP main window.
+    :param MainWindow main_window: The OpenLP main window.
     """
     last_check_date = Settings().value('core/last version test')
     if date.today().strftime('%Y-%m-%d') <= last_check_date:
         log.debug('Version check skipped, last checked today')
         return
     worker = VersionWorker(last_check_date, get_version())
-    worker.new_version.connect(parent.on_new_version)
+    worker.new_version.connect(main_window.on_new_version)
     worker.quit.connect(update_check_date)
     # TODO: Use this to figure out if there's an Internet connection?
     # worker.no_internet.connect(parent.on_no_internet)

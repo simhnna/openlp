@@ -462,8 +462,8 @@ class TestSystemPlayer(TestCase):
         self.assertEqual(expected_info, result)
 
     @patch('openlp.core.ui.media.systemplayer.CheckMediaWorker')
-    @patch('openlp.core.ui.media.systemplayer.QtCore.QThread')
-    def test_check_media(self, MockQThread, MockCheckMediaWorker):
+    @patch('openlp.core.ui.media.systemplayer.run_thread')
+    def test_check_media(self, mocked_run_thread, MockCheckMediaWorker):
         """
         Test the check_media() method of the SystemPlayer
         """
@@ -473,29 +473,12 @@ class TestSystemPlayer(TestCase):
         Registry().create()
         Registry().register('application', mocked_application)
         player = SystemPlayer(self)
-        mocked_thread = MagicMock()
-        mocked_thread.isRunning.side_effect = [True, False]
-        mocked_thread.quit = 'quit'  # actually supposed to be a slot, but it's all mocked out anyway
-        MockQThread.return_value = mocked_thread
-        mocked_check_media_worker = MagicMock()
-        mocked_check_media_worker.play = 'play'
-        mocked_check_media_worker.result = True
-        MockCheckMediaWorker.return_value = mocked_check_media_worker
 
         # WHEN: check_media() is called with a valid media file
-        result = player.check_media(valid_file)
+        player.check_media(valid_file)
 
         # THEN: It should return True
-        MockQThread.assert_called_once_with()
-        MockCheckMediaWorker.assert_called_once_with(valid_file)
-        mocked_check_media_worker.setVolume.assert_called_once_with(0)
-        mocked_check_media_worker.moveToThread.assert_called_once_with(mocked_thread)
-        mocked_check_media_worker.finished.connect.assert_called_once_with('quit')
-        mocked_thread.started.connect.assert_called_once_with('play')
-        mocked_thread.start.assert_called_once_with()
-        self.assertEqual(2, mocked_thread.isRunning.call_count)
-        mocked_application.processEvents.assert_called_once_with()
-        self.assertTrue(result)
+        assert False, 'Fix this test'
 
 
 class TestCheckMediaWorker(TestCase):
@@ -524,12 +507,12 @@ class TestCheckMediaWorker(TestCase):
 
         # WHEN: signals() is called with media and BufferedMedia
         with patch.object(worker, 'stop') as mocked_stop, \
-                patch.object(worker, 'finished') as mocked_finished:
+                patch.object(worker, 'quit') as mocked_quit:
             worker.signals('media', worker.BufferedMedia)
 
         # THEN: The worker should exit and the result should be True
         mocked_stop.assert_called_once_with()
-        mocked_finished.emit.assert_called_once_with()
+        mocked_quit.emit.assert_called_once_with()
         self.assertTrue(worker.result)
 
     def test_signals_error(self):
@@ -541,10 +524,10 @@ class TestCheckMediaWorker(TestCase):
 
         # WHEN: signals() is called with error and BufferedMedia
         with patch.object(worker, 'stop') as mocked_stop, \
-                patch.object(worker, 'finished') as mocked_finished:
+                patch.object(worker, 'quit') as mocked_quit:
             worker.signals('error', None)
 
         # THEN: The worker should exit and the result should be True
         mocked_stop.assert_called_once_with()
-        mocked_finished.emit.assert_called_once_with()
+        mocked_quit.emit.assert_called_once_with()
         self.assertFalse(worker.result)

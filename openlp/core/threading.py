@@ -27,6 +27,19 @@ from PyQt5 import QtCore
 from openlp.core.common.registry import Registry
 
 
+class ThreadWorker(QtCore.QObject):
+    """
+    The :class:`~openlp.core.threading.ThreadWorker` class provides a base class for all worker objects
+    """
+    quit = QtCore.pyqtSignal()
+
+    def start(self):
+        """
+        The start method is how the worker runs. Basically, put your code here.
+        """
+        raise NotImplementedError('Your base class needs to override this method and run self.quit.emit() at the end.')
+
+
 def run_thread(worker, thread_name, can_start=True):
     """
     Create a thread and assign a worker to it. This removes a lot of boilerplate code from the codebase.
@@ -56,6 +69,27 @@ def run_thread(worker, thread_name, can_start=True):
     thread.finished.connect(make_remove_thread(thread_name))
     if can_start:
         thread.start()
+
+
+def get_thread_worker(thread_name):
+    """
+    Get the worker by the thread name
+
+    :param str thread_name: The name of the thread
+    :returns ThreadWorker: The worker for this thread name
+    """
+    return Registry().get('main_window').threads.get(thread_name)
+
+
+def is_thread_finished(thread_name):
+    """
+    Check if a thread is finished running.
+
+    :param str thread_name: The name of the thread
+    :returns bool: True if the thread is finished, False if it is still running
+    """
+    main_window = Registry().get('main_window')
+    return thread_name not in main_window.threads or main_window.threads[thread_name]['thread'].isFinished()
 
 
 def make_remove_thread(thread_name):

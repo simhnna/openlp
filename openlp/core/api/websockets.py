@@ -34,11 +34,12 @@ from PyQt5 import QtCore
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
+from openlp.core.threading import ThreadWorker, run_thread
 
 log = logging.getLogger(__name__)
 
 
-class WebSocketWorker(QtCore.QObject):
+class WebSocketWorker(ThreadWorker):
     """
     A special Qt thread class to allow the WebSockets server to run at the same time as the UI.
     """
@@ -49,15 +50,20 @@ class WebSocketWorker(QtCore.QObject):
         :param server: The http server class.
         """
         self.ws_server = server
-        super(WebSocketWorker, self).__init__()
+        super().__init__()
 
-    def run(self):
+    def start(self):
         """
-        Run the thread.
+        Run the worker.
         """
         self.ws_server.start_server()
+        self.quit.emit()
 
+    @QtCore.pyqtSlot()
     def stop(self):
+        """
+        Stop the websocket server
+        """
         self.ws_server.stop = True
 
 
@@ -72,11 +78,8 @@ class WebSocketServer(RegistryProperties, LogMixin):
         super(WebSocketServer, self).__init__()
         if Registry().get_flag('no_web_server'):
             self.settings_section = 'api'
-            self.worker = WebSocketWorker(self)
-            self.thread = QtCore.QThread()
-            self.worker.moveToThread(self.thread)
-            self.thread.started.connect(self.worker.run)
-            self.thread.start()
+            worker = WebSocketWorker(self)
+            run_thread(worker, 'websocket_server')
 
     def start_server(self):
         """

@@ -30,21 +30,20 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.settings import Settings
-from openlp.core.threading import run_thread
+from openlp.core.threading import ThreadWorker, run_thread
 from openlp.plugins.songs.forms.songselectdialog import Ui_SongSelectDialog
 from openlp.plugins.songs.lib.songselect import SongSelectImport
 
 log = logging.getLogger(__name__)
 
 
-class SearchWorker(QtCore.QObject):
+class SearchWorker(ThreadWorker):
     """
     Run the actual SongSelect search, and notify the GUI when we find each song.
     """
     show_info = QtCore.pyqtSignal(str, str)
     found_song = QtCore.pyqtSignal(dict)
     finished = QtCore.pyqtSignal()
-    quit = QtCore.pyqtSignal()
 
     def __init__(self, importer, search_text):
         super().__init__()

@@ -1071,8 +1071,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         :param save_settings: Switch to prevent saving settings. Defaults to **True**.
         """
         self.image_manager.stop_manager = True
-        while self.image_manager.image_thread.isRunning():
-            time.sleep(0.1)
+        # while self.image_manager.image_thread.isRunning():
+        #     time.sleep(0.1)
         if save_settings:
             if Settings().value('advanced/save current plugin'):
                 Settings().setValue('advanced/current media plugin', self.media_tool_box.currentIndex())
