@@ -150,7 +150,7 @@ class TestListPreviewWidget(TestCase):
 
         # THEN: setRowHeight() should not be called, while resizeRowsToContents() should be called twice
         #       (once each in __recalculate_layout and replace_service_item)
-        assert mocked_resizeRowsToContents.call_count == 2, 'Should be called' 
+        assert mocked_resizeRowsToContents.call_count == 2, 'Should be called'
         assert mocked_setRowHeight.call_count == 0, 'Should not be called'
 
     @patch(u'openlp.core.widgets.views.ListPreviewWidget.resizeRowsToContents')
@@ -439,7 +439,7 @@ class TestListPreviewWidget(TestCase):
         assert mocked_scrollToItem.call_count == 0, 'Should not be called'
         assert mocked_selectRow.call_count == 0, 'Should not be called'
         assert mocked_item.call_count == 0, 'Should not be called'
-        
+
     @patch(u'openlp.core.widgets.views.ListPreviewWidget.selectRow')
     @patch(u'openlp.core.widgets.views.ListPreviewWidget.scrollToItem')
     @patch(u'openlp.core.widgets.views.ListPreviewWidget.item')

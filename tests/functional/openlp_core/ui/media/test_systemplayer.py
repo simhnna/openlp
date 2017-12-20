@@ -425,8 +425,7 @@ class TestSystemPlayer(TestCase):
         assert expected_position_calls == mocked_display.media_player.position.call_args_list
         mocked_set_visible.assert_called_once_with(mocked_display, False)
         mocked_display.controller.seek_slider.isSliderDown.assert_called_once_with()
-        assert expected_block_signals_calls == \
-                         mocked_display.controller.seek_slider.blockSignals.call_args_list
+        assert expected_block_signals_calls == mocked_display.controller.seek_slider.blockSignals.call_args_list
         mocked_display.controller.seek_slider.setSliderPosition.assert_called_once_with(2)
 
     def test_get_media_display_css(self):

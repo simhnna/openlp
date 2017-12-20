@@ -104,7 +104,7 @@ class TestFileDialogPatches(TestCase):
             result = FileDialog.getOpenFileName()
 
             # THEN: getOpenFileName() should return a tuple with the second value set to a the selected filter
-            assert result[1] == 'selected filter' 
+            assert result[1] == 'selected filter'
 
     def test_get_open_file_names_user_abort(self):
         """
