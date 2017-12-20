@@ -29,11 +29,17 @@ from PyQt5 import QtCore, QtGui
 
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItemAction
-from openlp.core.ui import SlideController, LiveController, PreviewController
+from openlp.core.ui.slidecontroller import SlideController, LiveController, PreviewController
 from openlp.core.ui.slidecontroller import InfoLabel, WIDE_MENU, NON_TEXT_MENU
 
 
 class TestSlideController(TestCase):
+
+    def setUp(self):
+        """
+        Set up the components need for all tests.
+        """
+        Registry.create()
 
     def test_initial_slide_controller(self):
         """
@@ -44,7 +50,7 @@ class TestSlideController(TestCase):
 
         # WHEN: the default controller is built.
         # THEN: The controller should not be a live controller.
-        self.assertEqual(slide_controller.is_live, False, 'The base slide controller should not be a live controller')
+        assert slide_controller.is_live is False, 'The base slide controller should not be a live controller'
 
     def test_text_service_item_blank(self):
         """
@@ -121,8 +127,8 @@ class TestSlideController(TestCase):
 
         # THEN: Only on_blank_display() should have been called with an argument of True
         mocked_on_blank_display.assert_called_once_with(True)
-        self.assertEqual(0, mocked_on_theme_display.call_count, 'on_theme_display should not have been called')
-        self.assertEqual(0, mocked_on_hide_display.call_count, 'on_hide_display should not have been called')
+        assert 0 == mocked_on_theme_display.call_count, 'on_theme_display should not have been called'
+        assert 0 == mocked_on_hide_display.call_count, 'on_hide_display should not have been called'
 
     def test_toggle_display_hide(self):
         """
@@ -142,8 +148,8 @@ class TestSlideController(TestCase):
 
         # THEN: Only on_blank_display() should have been called with an argument of True
         mocked_on_blank_display.assert_called_once_with(True)
-        self.assertEqual(0, mocked_on_theme_display.call_count, 'on_theme_display should not have been called')
-        self.assertEqual(0, mocked_on_hide_display.call_count, 'on_hide_display should not have been called')
+        assert 0 == mocked_on_theme_display.call_count, 'on_theme_display should not have been called'
+        assert 0 == mocked_on_hide_display.call_count, 'on_hide_display should not have been called'
 
     def test_toggle_display_theme(self):
         """
@@ -163,8 +169,8 @@ class TestSlideController(TestCase):
 
         # THEN: Only on_theme_display() should have been called with an argument of True
         mocked_on_theme_display.assert_called_once_with(True)
-        self.assertEqual(0, mocked_on_blank_display.call_count, 'on_blank_display should not have been called')
-        self.assertEqual(0, mocked_on_hide_display.call_count, 'on_hide_display should not have been called')
+        assert 0 == mocked_on_blank_display.call_count, 'on_blank_display should not have been called'
+        assert 0 == mocked_on_hide_display.call_count, 'on_hide_display should not have been called'
 
     def test_toggle_display_desktop(self):
         """
@@ -184,8 +190,8 @@ class TestSlideController(TestCase):
 
         # THEN: Only on_hide_display() should have been called with an argument of True
         mocked_on_hide_display.assert_called_once_with(True)
-        self.assertEqual(0, mocked_on_blank_display.call_count, 'on_blank_display should not have been called')
-        self.assertEqual(0, mocked_on_theme_display.call_count, 'on_theme_display should not have been called')
+        assert 0 == mocked_on_blank_display.call_count, 'on_blank_display should not have been called'
+        assert 0 == mocked_on_theme_display.call_count, 'on_theme_display should not have been called'
 
     def test_toggle_display_show(self):
         """
@@ -348,7 +354,7 @@ class TestSlideController(TestCase):
 
         # THEN: The value of slide_limits should be 10
         mocked_value.assert_called_once_with('advanced/slide limits')
-        self.assertEqual(10, slide_controller.slide_limits, 'Slide limits should have been updated to 10')
+        assert 10 == slide_controller.slide_limits, 'Slide limits should have been updated to 10'
 
     def test_enable_tool_bar_live(self):
         """
@@ -368,7 +374,7 @@ class TestSlideController(TestCase):
 
         # THEN: The enable_live_tool_bar() method is called, not enable_preview_tool_bar()
         mocked_enable_live_tool_bar.assert_called_once_with(mocked_service_item)
-        self.assertEqual(0, mocked_enable_preview_tool_bar.call_count, 'The preview method should not have been called')
+        assert 0 == mocked_enable_preview_tool_bar.call_count, 'The preview method should not have been called'
 
     def test_enable_tool_bar_preview(self):
         """
@@ -388,7 +394,7 @@ class TestSlideController(TestCase):
 
         # THEN: The enable_preview_tool_bar() method is called, not enable_live_tool_bar()
         mocked_enable_preview_tool_bar.assert_called_once_with(mocked_service_item)
-        self.assertEqual(0, mocked_enable_live_tool_bar.call_count, 'The live method should not have been called')
+        assert 0 == mocked_enable_live_tool_bar.call_count, 'The live method should not have been called'
 
     def test_refresh_service_item_text(self):
         """
@@ -409,7 +415,7 @@ class TestSlideController(TestCase):
 
         # THEN: The item should be re-processed
         mocked_service_item.is_text.assert_called_once_with()
-        self.assertEqual(0, mocked_service_item.is_image.call_count, 'is_image should not have been called')
+        assert 0 == mocked_service_item.is_image.call_count, 'is_image should not have been called'
         mocked_service_item.render.assert_called_once_with()
         mocked_process_item.assert_called_once_with(mocked_service_item, 5)
 
@@ -456,9 +462,8 @@ class TestSlideController(TestCase):
         # THEN: The item should be re-processed
         mocked_service_item.is_text.assert_called_once_with()
         mocked_service_item.is_image.assert_called_once_with()
-        self.assertEqual(0, mocked_service_item.render.call_count, 'The render() method should not have been called')
-        self.assertEqual(0, mocked_process_item.call_count,
-                         'The mocked_process_item() method should not have been called')
+        assert 0 == mocked_service_item.render.call_count, 'The render() method should not have been called'
+        assert 0 == mocked_process_item.call_count, 'The mocked_process_item() method should not have been called'
 
     def test_add_service_item_with_song_edit(self):
         """
@@ -477,7 +482,7 @@ class TestSlideController(TestCase):
 
         # THEN: The item is processed, the slide number is correct, and the song is not editable (or something)
         mocked_item.render.assert_called_once_with()
-        self.assertFalse(slide_controller.song_edit, 'song_edit should be False')
+        assert slide_controller.song_edit is False, 'song_edit should be False'
         mocked_process_item.assert_called_once_with(mocked_item, 2)
 
     def test_add_service_item_without_song_edit(self):
@@ -497,7 +502,7 @@ class TestSlideController(TestCase):
 
         # THEN: The item is processed, the slide number is correct, and the song is not editable (or something)
         mocked_item.render.assert_called_once_with()
-        self.assertFalse(slide_controller.song_edit, 'song_edit should be False')
+        assert slide_controller.song_edit is False, 'song_edit should be False'
         mocked_process_item.assert_called_once_with(mocked_item, 0)
 
     def test_replace_service_manager_item_different_items(self):
@@ -517,9 +522,9 @@ class TestSlideController(TestCase):
         slide_controller.replace_service_manager_item(mocked_item)
 
         # THEN: The service item should not be processed
-        self.assertEqual(0, mocked_process_item.call_count, 'The _process_item() method should not have been called')
-        self.assertEqual(0, mocked_preview_widget.current_slide_number.call_count,
-                         'The preview_widgetcurrent_slide_number.() method should not have been called')
+        assert 0 == mocked_process_item.call_count, 'The _process_item() method should not have been called'
+        assert 0 == mocked_preview_widget.current_slide_number.call_count, \
+            'The preview_widget current_slide_number.() method should not have been called'
 
     def test_replace_service_manager_item_same_item(self):
         """
@@ -583,7 +588,7 @@ class TestSlideController(TestCase):
         slide_controller.on_slide_selected_index([10])
 
         # THEN: It should have exited early
-        self.assertEqual(0, mocked_item.is_command.call_count, 'The service item should have not been called')
+        assert 0 == mocked_item.is_command.call_count, 'The service item should have not been called'
 
     @patch.object(Registry, 'execute')
     def test_on_slide_selected_index_service_item_command(self, mocked_execute):
@@ -612,8 +617,8 @@ class TestSlideController(TestCase):
         mocked_item.is_command.assert_called_once_with()
         mocked_execute.assert_called_once_with('mocked item_slide', [mocked_item, True, 9])
         mocked_update_preview.assert_called_once_with()
-        self.assertEqual(0, mocked_preview_widget.change_slide.call_count, 'Change slide should not have been called')
-        self.assertEqual(0, mocked_slide_selected.call_count, 'slide_selected should not have been called')
+        assert 0 == mocked_preview_widget.change_slide.call_count, 'Change slide should not have been called'
+        assert 0 == mocked_slide_selected.call_count, 'slide_selected should not have been called'
 
     @patch.object(Registry, 'execute')
     def test_on_slide_selected_index_service_item_not_command(self, mocked_execute):
@@ -639,8 +644,8 @@ class TestSlideController(TestCase):
 
         # THEN: It should have sent a notification
         mocked_item.is_command.assert_called_once_with()
-        self.assertEqual(0, mocked_execute.call_count, 'Execute should not have been called')
-        self.assertEqual(0, mocked_update_preview.call_count, 'Update preview should not have been called')
+        assert 0 == mocked_execute.call_count, 'Execute should not have been called'
+        assert 0 == mocked_update_preview.call_count, 'Update preview should not have been called'
         mocked_preview_widget.change_slide.assert_called_once_with(7)
         mocked_slide_selected.assert_called_once_with()
 
@@ -685,9 +690,9 @@ class TestSlideController(TestCase):
         slide_controller._process_item(mocked_media_item, 0)
 
         # THEN: Registry.execute should have been called to stop the presentation
-        self.assertEqual(2, mocked_execute.call_count, 'Execute should have been called 2 times')
-        self.assertEqual('mocked_presentation_item_stop', mocked_execute.call_args_list[1][0][0],
-                         'The presentation should have been stopped.')
+        assert 2 == mocked_execute.call_count, 'Execute should have been called 2 times'
+        assert 'mocked_presentation_item_stop' == mocked_execute.call_args_list[1][0][0], \
+            'The presentation should have been stopped.'
 
     def test_live_stolen_focus_shortcuts(self):
         """
@@ -737,8 +742,8 @@ class TestSlideController(TestCase):
         slide_controller.on_preview_double_click()
 
         # THEN: The call to addActions should be correct
-        self.assertEqual(1, slide_controller.on_go_live.call_count, 'on_go_live should have been called once.')
-        self.assertEqual(0, slide_controller.on_preview_add_to_service.call_count, 'Should have not been called.')
+        assert 1 == slide_controller.on_go_live.call_count, 'on_go_live should have been called once.'
+        assert 0 == slide_controller.on_preview_add_to_service.call_count, 'Should have not been called.'
 
     @patch('openlp.core.ui.slidecontroller.Settings')
     def test_on_preview_double_click_add_to_service(self, MockedSettings):
@@ -760,8 +765,8 @@ class TestSlideController(TestCase):
         slide_controller.on_preview_double_click()
 
         # THEN: The call to addActions should be correct
-        self.assertEqual(0, slide_controller.on_go_live.call_count, 'on_go_live Should have not been called.')
-        self.assertEqual(1, slide_controller.on_preview_add_to_service.call_count, 'Should have been called once.')
+        assert 0 == slide_controller.on_go_live.call_count, 'on_go_live Should have not been called.'
+        assert 1 == slide_controller.on_preview_add_to_service.call_count, 'Should have been called once.'
 
     @patch(u'openlp.core.ui.slidecontroller.SlideController.image_manager')
     @patch(u'PyQt5.QtCore.QTimer.singleShot')
@@ -800,11 +805,10 @@ class TestSlideController(TestCase):
         slide_controller.update_preview()
 
         # THEN: A screen_grab should have been called
-        self.assertEqual(0, slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should not be called')
-        self.assertEqual(0, slide_controller.display.preview.call_count, 'display.preview() should not be called')
-        self.assertEqual(2, mocked_singleShot.call_count,
-                         'Timer to grab_maindisplay should have been called 2 times')
-        self.assertEqual(0, mocked_image_manager.get_image.call_count, 'image_manager not be called')
+        assert 0 == slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should not be called'
+        assert 0 == slide_controller.display.preview.call_count, 'display.preview() should not be called'
+        assert 2 == mocked_singleShot.call_count, 'Timer to grab_maindisplay should have been called 2 times'
+        assert 0 == mocked_image_manager.get_image.call_count, 'image_manager not be called'
 
     @patch(u'openlp.core.ui.slidecontroller.SlideController.image_manager')
     @patch(u'PyQt5.QtCore.QTimer.singleShot')
@@ -843,10 +847,10 @@ class TestSlideController(TestCase):
         slide_controller.update_preview()
 
         # THEN: setPixmap and the image_manager should have been called
-        self.assertEqual(1, slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should be called')
-        self.assertEqual(0, slide_controller.display.preview.call_count, 'display.preview() should not be called')
-        self.assertEqual(0, mocked_singleShot.call_count, 'Timer to grab_maindisplay should not be called')
-        self.assertEqual(1, mocked_image_manager.get_image.call_count, 'image_manager should be called')
+        assert 1 == slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should be called'
+        assert 0 == slide_controller.display.preview.call_count, 'display.preview() should not be called'
+        assert 0 == mocked_singleShot.call_count, 'Timer to grab_maindisplay should not be called'
+        assert 1 == mocked_image_manager.get_image.call_count, 'image_manager should be called'
 
     @patch(u'openlp.core.ui.slidecontroller.SlideController.image_manager')
     @patch(u'PyQt5.QtCore.QTimer.singleShot')
@@ -885,10 +889,10 @@ class TestSlideController(TestCase):
         slide_controller.update_preview()
 
         # THEN: setPixmap should have been called
-        self.assertEqual(1, slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should be called')
-        self.assertEqual(0, slide_controller.display.preview.call_count, 'display.preview() should not be called')
-        self.assertEqual(0, mocked_singleShot.call_count, 'Timer to grab_maindisplay should not be called')
-        self.assertEqual(0, mocked_image_manager.get_image.call_count, 'image_manager should not be called')
+        assert 1 == slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should be called'
+        assert 0 == slide_controller.display.preview.call_count, 'display.preview() should not be called'
+        assert 0 == mocked_singleShot.call_count, 'Timer to grab_maindisplay should not be called'
+        assert 0 == mocked_image_manager.get_image.call_count, 'image_manager should not be called'
 
     @patch(u'openlp.core.ui.slidecontroller.SlideController.image_manager')
     @patch(u'PyQt5.QtCore.QTimer.singleShot')
@@ -927,10 +931,10 @@ class TestSlideController(TestCase):
         slide_controller.update_preview()
 
         # THEN: setPixmap and display.preview should have been called
-        self.assertEqual(1, slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should be called')
-        self.assertEqual(1, slide_controller.display.preview.call_count, 'display.preview() should be called')
-        self.assertEqual(0, mocked_singleShot.call_count, 'Timer to grab_maindisplay should not be called')
-        self.assertEqual(0, mocked_image_manager.get_image.call_count, 'image_manager should not be called')
+        assert 1 == slide_controller.slide_preview.setPixmap.call_count, 'setPixmap should be called'
+        assert 1 == slide_controller.display.preview.call_count, 'display.preview() should be called'
+        assert 0 == mocked_singleShot.call_count, 'Timer to grab_maindisplay should not be called'
+        assert 0 == mocked_image_manager.get_image.call_count, 'image_manager should not be called'
 
 
 class TestInfoLabel(TestCase):
@@ -1023,7 +1027,7 @@ class TestLiveController(TestCase):
 
         # WHEN: the default controller is built.
         # THEN: The controller should not be a live controller.
-        self.assertEqual(live_controller.is_live, True, 'The slide controller should be a live controller')
+        assert live_controller.is_live is True, 'The slide controller should be a live controller'
 
 
 class TestPreviewLiveController(TestCase):
@@ -1038,4 +1042,4 @@ class TestPreviewLiveController(TestCase):
 
         # WHEN: the default controller is built.
         # THEN: The controller should not be a live controller.
-        self.assertEqual(preview_controller.is_live, False, 'The slide controller should be a Preview controller')
+        assert preview_controller.is_live is False, 'The slide controller should be a Preview controller'
