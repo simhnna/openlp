@@ -83,8 +83,8 @@ class TestFormattingTagForm(TestCase):
                 call(row_count, 2, mocked_table_widget),
                 call(row_count, 3, mocked_table_widget)
             ]
-            self.assertEqual(expected_set_item_calls, form.tag_table_widget.setItem.call_args_list,
-                             'setItem should have been called correctly')
+            assert expected_set_item_calls == form.tag_table_widget.setItem.call_args_list, \
+                'setItem should have been called correctly'
             form.tag_table_widget.resizeRowsToContents.assert_called_with()
             form.tag_table_widget.scrollToBottom.assert_called_with()
             form.tag_table_widget.selectRow.assert_called_with(row_count)
