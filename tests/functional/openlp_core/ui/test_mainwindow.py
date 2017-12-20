@@ -130,8 +130,8 @@ class TestMainWindow(TestCase, TestMixin):
         self.main_window.set_service_modified(True, 'test.osz')
 
         # THEN the main window's title should be set to the
-        self.assertEqual(self.main_window.windowTitle(), '%s - %s*' % (UiStrings().OpenLP, 'test.osz'),
-                         'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz*"')
+        assert self.main_window.windowTitle(), '%s - %s*' % (UiStrings().OpenLP, 'test.osz') == \
+            'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz*"'
 
     def test_set_service_unmodified(self):
         """
@@ -143,8 +143,8 @@ class TestMainWindow(TestCase, TestMixin):
         self.main_window.set_service_modified(False, 'test.osz')
 
         # THEN the main window's title should be set to the
-        self.assertEqual(self.main_window.windowTitle(), '%s - %s' % (UiStrings().OpenLP, 'test.osz'),
-                         'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz"')
+        assert self.main_window.windowTitle(), '%s - %s' % (UiStrings().OpenLP, 'test.osz') == \
+            'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz"'
 
     def test_mainwindow_configuration(self):
         """

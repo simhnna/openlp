@@ -83,7 +83,7 @@ class TestMainDisplay(TestCase, TestMixin):
         main_display = MainDisplay(display)
 
         # THEN: The controller should be a live controller.
-        self.assertEqual(main_display.is_live, True, 'The main display should be a live controller')
+        assert main_display.is_live is True, 'The main display should be a live controller'
 
     def test_set_transparency_enabled(self):
         """
@@ -97,12 +97,12 @@ class TestMainDisplay(TestCase, TestMixin):
         main_display.set_transparency(True)
 
         # THEN: The transparent stylesheet should be used
-        self.assertEqual(TRANSPARENT_STYLESHEET, main_display.styleSheet(),
-                         'The MainDisplay should use the transparent stylesheet')
-        self.assertFalse(main_display.autoFillBackground(),
-                         'The MainDisplay should not have autoFillBackground set')
-        self.assertTrue(main_display.testAttribute(QtCore.Qt.WA_TranslucentBackground),
-                        'The MainDisplay should have a translucent background')
+        assert TRANSPARENT_STYLESHEET == main_display.styleSheet(), \
+            'The MainDisplay should use the transparent stylesheet'
+        assert main_display.autoFillBackground() is False, \
+            'The MainDisplay should not have autoFillBackground set'
+        assert main_display.testAttribute(QtCore.Qt.WA_TranslucentBackground) is True, \
+            'The MainDisplay should have a translucent background'
 
     def test_set_transparency_disabled(self):
         """
@@ -116,10 +116,10 @@ class TestMainDisplay(TestCase, TestMixin):
         main_display.set_transparency(False)
 
         # THEN: The opaque stylesheet should be used
-        self.assertEqual(OPAQUE_STYLESHEET, main_display.styleSheet(),
-                         'The MainDisplay should use the opaque stylesheet')
-        self.assertFalse(main_display.testAttribute(QtCore.Qt.WA_TranslucentBackground),
-                         'The MainDisplay should not have a translucent background')
+        assert OPAQUE_STYLESHEET == main_display.styleSheet(), \
+            'The MainDisplay should use the opaque stylesheet'
+        assert main_display.testAttribute(QtCore.Qt.WA_TranslucentBackground) is False, \
+            'The MainDisplay should not have a translucent background'
 
     def test_css_changed(self):
         """
@@ -156,9 +156,9 @@ class TestMainDisplay(TestCase, TestMixin):
         main_display = MainDisplay(display)
 
         # THEN: The window flags should be the same as those needed on Mac OS X.
-        self.assertEqual(QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint,
-                         main_display.windowFlags(),
-                         'The window flags should be Qt.Window, Qt.FramelessWindowHint, and Qt.NoDropShadowWindowHint.')
+        assert QtCore.Qt.Window | QtCore.Qt.FramelessWindowHint | QtCore.Qt.NoDropShadowWindowHint == \
+            main_display.windowFlags(), \
+            'The window flags should be Qt.Window, Qt.FramelessWindowHint, and Qt.NoDropShadowWindowHint.'
 
     @skipUnless(is_macosx(), 'Can only run test on Mac OS X due to pyobjc dependency.')
     def test_macosx_display(self):
@@ -181,10 +181,10 @@ class TestMainDisplay(TestCase, TestMixin):
         pyobjc_nsview = objc_object(cobject=nsview_pointer)
 
         # THEN: The window level and collection behavior should be the same as those needed for Mac OS X.
-        self.assertEqual(pyobjc_nsview.window().level(), NSMainMenuWindowLevel + 2,
-                         'Window level should be NSMainMenuWindowLevel + 2')
-        self.assertEqual(pyobjc_nsview.window().collectionBehavior(), NSWindowCollectionBehaviorManaged,
-                         'Window collection behavior should be NSWindowCollectionBehaviorManaged')
+        assert pyobjc_nsview.window().level() == NSMainMenuWindowLevel + 2, \
+            'Window level should be NSMainMenuWindowLevel + 2'
+        assert pyobjc_nsview.window().collectionBehavior() == NSWindowCollectionBehaviorManaged, \
+            'Window collection behavior should be NSWindowCollectionBehaviorManaged'
 
     @patch('openlp.core.ui.maindisplay.Settings')
     def test_show_display_startup_logo(self, MockedSettings):
@@ -250,9 +250,9 @@ class TestMainDisplay(TestCase, TestMixin):
         main_display.build_html(service_item)
 
         # THEN: the following should had not been called
-        self.assertEquals(main_display.web_view.setHtml.call_count, 1, 'setHTML should be called once')
-        self.assertEquals(main_display.media_controller.video.call_count, 0,
-                          'Media Controller video should not have been called')
+        assert main_display.web_view.setHtml.call_count == 1, 'setHTML should be called once'
+        assert main_display.media_controller.video.call_count == 0, \
+            'Media Controller video should not have been called'
 
     @patch('openlp.core.ui.maindisplay.Settings')
     @patch('openlp.core.ui.maindisplay.build_html')
@@ -282,9 +282,9 @@ class TestMainDisplay(TestCase, TestMixin):
         main_display.build_html(service_item)
 
         # THEN: the following should had not been called
-        self.assertEquals(main_display.web_view.setHtml.call_count, 1, 'setHTML should be called once')
-        self.assertEquals(main_display.media_controller.video.call_count, 1,
-                          'Media Controller video should have been called once')
+        assert main_display.web_view.setHtml.call_count == 1, 'setHTML should be called once'
+        assert main_display.media_controller.video.call_count == 1, \
+            'Media Controller video should have been called once'
 
 
 def test_calling_next_item_in_playlist():
