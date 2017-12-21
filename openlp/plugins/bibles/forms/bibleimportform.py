@@ -336,6 +336,7 @@ class BibleImportForm(OpenLPWizard):
         self.sword_layout.addWidget(self.sword_tab_widget)
         self.sword_disabled_label = QtWidgets.QLabel(self.sword_widget)
         self.sword_disabled_label.setObjectName('SwordDisabledLabel')
+        self.sword_disabled_label.setWordWrap(True)
         self.sword_layout.addWidget(self.sword_disabled_label)
         self.select_stack.addWidget(self.sword_widget)
         self.wordproject_widget = QtWidgets.QWidget(self.select_page)

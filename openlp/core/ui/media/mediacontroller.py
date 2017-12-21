@@ -181,7 +181,8 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
         """
         log.debug('_check_available_media_players')
         controller_dir = os.path.join('core', 'ui', 'media')
-        glob_pattern = os.path.join(controller_dir, '*player.py')
+        # Find all files that do not begin with '.' (lp:#1738047) and end with player.py
+        glob_pattern = os.path.join(controller_dir, '[!.]*player.py')
         extension_loader(glob_pattern, ['mediaplayer.py'])
         player_classes = MediaPlayer.__subclasses__()
         for player_class in player_classes:
