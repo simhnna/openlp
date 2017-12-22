@@ -58,8 +58,8 @@ class TestPresentationController(TestCase):
         # WHEN: The PresentationController is created
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('PresentationController', self.presentation.name,
-                         'The name of the presentation controller should be correct')
+        assert 'PresentationController' == self.presentation.name, \
+            'The name of the presentation controller should be correct'
 
     def test_save_titles_and_notes(self):
         """
@@ -132,9 +132,9 @@ class TestPresentationController(TestCase):
             result_titles, result_notes = self.document.get_titles_and_notes()
 
             # THEN: it should return two empty lists
-            assert isinstance(result_titles, list, 'result_titles should be of type list')
+            assert isinstance(result_titles, list), 'result_titles should be of type list'
             self.assertEqual(len(result_titles), 0, 'there be no titles')
-            assert isinstance(result_notes, list, 'result_notes should be a list')
+            assert isinstance(result_notes, list), 'result_notes should be a list'
             self.assertEqual(len(result_notes), 0, 'but the list should be empty')
 
     def test_get_titles_and_notes_with_file_error(self):

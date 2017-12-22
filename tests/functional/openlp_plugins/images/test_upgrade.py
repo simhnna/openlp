@@ -80,6 +80,6 @@ class TestImageDBUpgrade(TestCase, TestMixin):
                                     2: Path('/', 'test', 'dir', 'image2.jpg'),
                                     3: Path('/', 'test', 'dir', 'subdir', 'image3.jpg')}
 
-            self.assertEqual(len(upgraded_results), 3)
+            assert len(upgraded_results) == 3
             for result in upgraded_results:
-                self.assertEqual(expected_result_data[result.id], result.file_path)
+                assert expected_result_data[result.id] == result.file_path
