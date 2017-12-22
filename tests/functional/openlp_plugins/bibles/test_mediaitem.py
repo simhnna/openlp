@@ -53,9 +53,9 @@ class TestBibleMediaItemModulefunctions(TestCase):
 
             # THEN: The expected result should be returned
             if expected_result is None:
-                self.assertIsNone(result, expected_result)
+                assert result is None, expected_result
             else:
-                self.assertEqual(result.regs, expected_result)
+                assert result.regs == expected_result
 
     def test_get_reference_separators(self):
         """
@@ -69,7 +69,7 @@ class TestBibleMediaItemModulefunctions(TestCase):
 
             # THEN: The result should contain the 'verse', 'range', 'list' keys and get_reference_separator should have
             #       been called with the expected values.
-            self.assertTrue(all(key in result for key in ('verse', 'range', 'list')))
+            assert all(key in result for key in ('verse', 'range', 'list')) is True
             mocked_get_reference_separator.assert_has_calls(
                 [call('sep_v_display'), call('sep_r_display'), call('sep_l_display')])
 
@@ -80,9 +80,9 @@ class TestBibleMediaItemModulefunctions(TestCase):
         # GIVEN: The BibleSearch class
         # WHEN: Testing its attributes
         # THEN: The BibleSearch class should have the following enumrations
-        self.assertTrue(hasattr(BibleSearch, 'Combined'))
-        self.assertTrue(hasattr(BibleSearch, 'Reference'))
-        self.assertTrue(hasattr(BibleSearch, 'Text'))
+        assert hasattr(BibleSearch, 'Combined')
+        assert hasattr(BibleSearch, 'Reference')
+        assert hasattr(BibleSearch, 'Text')
 
     def test_bible_media_item_subclass(self):
         """
@@ -91,7 +91,7 @@ class TestBibleMediaItemModulefunctions(TestCase):
         # GIVEN: The :class:`BibleMediaItem`
         # WHEN: Checking if it is a subclass of MediaManagerItem
         # THEN: BibleMediaItem should be a subclass of MediaManagerItem
-        self.assertTrue(issubclass(BibleMediaItem, MediaManagerItem))
+        assert issubclass(BibleMediaItem, MediaManagerItem)
 
     def test_bible_media_item_signals(self):
         """
@@ -99,10 +99,10 @@ class TestBibleMediaItemModulefunctions(TestCase):
         """
         # GIVEN: The :class:`BibleMediaItem`
         # THEN:  The :class:`BibleMediaItem` should contain the following pyqtSignal's
-        self.assertTrue(hasattr(BibleMediaItem, 'bibles_go_live'))
-        self.assertTrue(hasattr(BibleMediaItem, 'bibles_add_to_service'))
-        self.assertTrue(isinstance(BibleMediaItem.bibles_go_live, QtCore.pyqtSignal))
-        self.assertTrue(isinstance(BibleMediaItem.bibles_add_to_service, QtCore.pyqtSignal))
+        assert hasattr(BibleMediaItem, 'bibles_go_live')
+        assert hasattr(BibleMediaItem, 'bibles_add_to_service')
+        assert isinstance(BibleMediaItem.bibles_go_live, QtCore.pyqtSignal)
+        assert isinstance(BibleMediaItem.bibles_add_to_service, QtCore.pyqtSignal)
 
 
 class TestMediaItem(TestCase, TestMixin):
@@ -166,7 +166,7 @@ class TestMediaItem(TestCase, TestMixin):
         # GIVEN: An instance of :class:`BibleMediaItem`
         # WEHN: Checking its class
         # THEN: It should be a subclass of :class:`MediaManagerItem`
-        self.assertTrue(isinstance(self.media_item, MediaManagerItem))
+        assert isinstance(self.media_item, MediaManagerItem)
 
     def test_steup_item(self):
         """
@@ -193,11 +193,11 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.required_icons()
 
         # THEN: The correct icons should be set
-        self.assertTrue(self.media_item.has_import_icon, 'Check that the icon is as True.')
-        self.assertFalse(self.media_item.has_new_icon, 'Check that the icon is called as False.')
-        self.assertTrue(self.media_item.has_edit_icon, 'Check that the icon is called as True.')
-        self.assertTrue(self.media_item.has_delete_icon, 'Check that the icon is called as True.')
-        self.assertFalse(self.media_item.add_to_service_item, 'Check that the icon is called as False')
+        assert self.media_item.has_import_icon is True, 'Check that the icon is as True.'
+        assert self.media_item.has_new_icon is False, 'Check that the icon is called as False.'
+        assert self.media_item.has_edit_icon is True, 'Check that the icon is called as True.'
+        assert self.media_item.has_delete_icon is True, 'Check that the icon is called as True.'
+        assert self.media_item.add_to_service_item is False, 'Check that the icon is called as False'
 
     def test_on_focus_search_tab_visible(self):
         """
@@ -305,8 +305,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.initialise()
 
             # THEN: The search_edit search types should have been set.
-            self.assertTrue(self.media_item.search_edit.set_search_types.called)
-            self.assertFalse(self.media_item.search_edit.set_current_search_type.called)
+            assert self.media_item.search_edit.set_search_types.called is True
+            assert self.media_item.search_edit.set_current_search_type.called is False
 
     def test_initalise_reset_search_type(self):
         """
@@ -323,7 +323,7 @@ class TestMediaItem(TestCase, TestMixin):
 
             # THEN: The search_edit search types should have been set and that the current search type should be set to
             #       'Combined'
-            self.assertTrue(self.media_item.search_edit.set_search_types.called)
+            assert self.media_item.search_edit.set_search_types.called is True
             self.media_item.search_edit.set_current_search_type.assert_called_once_with(BibleSearch.Combined)
 
     def test_populate_bible_combo_boxes(self):
@@ -373,7 +373,7 @@ class TestMediaItem(TestCase, TestMixin):
         result = self.media_item.get_common_books(self.mocked_bible_1)
 
         # THEN: The book of the bible should be returned
-        self.assertEqual(result, self.book_list_1)
+        assert result == self.book_list_1
 
     def test_get_common_books_second_book(self):
         """
@@ -384,7 +384,7 @@ class TestMediaItem(TestCase, TestMixin):
         result = self.media_item.get_common_books(self.mocked_bible_1, self.mocked_bible_2)
 
         # THEN: Only the books contained in both bibles should be returned
-        self.assertEqual(result, [self.mocked_book_2, self.mocked_book_3])
+        assert result == [self.mocked_book_2, self.mocked_book_3]
 
     def test_initialise_advanced_bible_no_bible(self):
         """
@@ -399,7 +399,7 @@ class TestMediaItem(TestCase, TestMixin):
             result = self.media_item.initialise_advanced_bible()
 
             # THEN: initialise_advanced_bible should return with put calling get_common_books
-            self.assertIsNone(result)
+            assert result is None
             mocked_get_common_books.assert_not_called()
 
     def test_initialise_advanced_bible_add_books_with_last_id_found(self):
@@ -515,8 +515,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_import_click()
 
             # THEN: BibleImport wizard should have been instianted and reload_bibles should not have been called
-            self.assertTrue(mocked_bible_import_form.called)
-            self.assertFalse(mocked_reload_bibles.called)
+            assert mocked_bible_import_form.called is True
+            assert mocked_reload_bibles.called is False
 
     def test_on_import_click_wizard_not_canceled(self):
         """
@@ -532,8 +532,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_import_click()
 
             # THEN: BibleImport wizard should have been instianted and reload_bibles should not have been called
-            self.assertFalse(mocked_import_wizard.called)
-            self.assertTrue(mocked_reload_bibles.called)
+            assert mocked_import_wizard.called is False
+            assert mocked_reload_bibles.called is True
 
     def test_on_edit_click_no_bible(self):
         """
@@ -547,7 +547,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_edit_click()
 
             # THEN: EditBibleForm should not have been instianted
-            self.assertFalse(mocked_edit_bible_form.called)
+            assert mocked_edit_bible_form.called is False
 
     def test_on_edit_click_user_cancel_edit_form(self):
         """
@@ -565,8 +565,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_edit_click()
 
             # THEN: EditBibleForm should have been been instianted but reload_bibles should not have been called
-            self.assertTrue(mocked_edit_bible_form.called)
-            self.assertFalse(mocked_reload_bibles.called)
+            assert mocked_edit_bible_form.called is True
+            assert mocked_reload_bibles.called is False
 
     def test_on_edit_click_user_accepts_edit_form(self):
         """
@@ -585,8 +585,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_edit_click()
 
             # THEN: EditBibleForm should have been been instianted and reload_bibles should have been called
-            self.assertTrue(mocked_edit_bible_form.called)
-            self.assertTrue(mocked_reload_bibles.called)
+            assert mocked_edit_bible_form.called is True
+            assert mocked_reload_bibles.called is True
 
     def test_on_delete_click_no_bible(self):
         """
@@ -600,7 +600,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_delete_click()
 
             # THEN: QMessageBox.question should not have been called
-            self.assertFalse(mocked_qmessage_box.question.called)
+            assert mocked_qmessage_box.question.called is False
 
     def test_on_delete_click_response_no(self):
         """
@@ -615,8 +615,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_delete_click()
 
             # THEN: QMessageBox.question should have been called, but the delete_bible should not have been called
-            self.assertTrue(mocked_qmessage_box.called)
-            self.assertFalse(self.mocked_plugin.manager.delete_bible.called)
+            assert mocked_qmessage_box.called is True
+            assert self.mocked_plugin.manager.delete_bible.called is False
 
     def test_on_delete_click_response_yes(self):
         """
@@ -632,8 +632,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_delete_click()
 
             # THEN: QMessageBox.question should and delete_bible should not have been called
-            self.assertTrue(mocked_qmessage_box.called)
-            self.assertTrue(self.mocked_plugin.manager.delete_bible.called)
+            assert mocked_qmessage_box.called is True
+            assert self.mocked_plugin.manager.delete_bible.called is True
 
     def test_on_search_tab_bar_current_changed_search_tab_selected(self):
         """
@@ -711,8 +711,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_clear_button_clicked()
 
             # THEN: The list_view and the search_edit should be cleared
-            self.assertEqual(self.media_item.current_results, [])
-            self.assertEqual(self.media_item.list_view.takeItem.call_count, 2)
+            assert self.media_item.current_results == []
+            assert self.media_item.list_view.takeItem.call_count == 2
             self.media_item.list_view.row.assert_has_calls([call('Some'), call('Results')])
 
     def test_on_save_results_button_clicked(self):
@@ -733,7 +733,7 @@ class TestMediaItem(TestCase, TestMixin):
 
             # THEN: The selected results in the list_view should be added to the 'saved_results' list. And the saved_tab
             #       total should be updated.
-            self.assertEqual(self.media_item.saved_results, ['R1', 'R2', 'R3'])
+            assert self.media_item.saved_results == ['R1', 'R2', 'R3']
             mocked_on_results_view_tab_total_update.assert_called_once_with(ResultsTab.Saved)
 
     def test_on_style_combo_box_changed(self):
@@ -746,8 +746,8 @@ class TestMediaItem(TestCase, TestMixin):
         # WHEN: Calling on_style_combo_box_index_changed
         self.media_item.on_style_combo_box_index_changed(2)
 
-        # THEN: The layput_style settimg should have been set
-        self.assertEqual(self.media_item.settings.layout_style, 2)
+        # THEN: The layout_style setting should have been set
+        assert self.media_item.settings.layout_style, 2
         self.media_item.settings.layout_style_combo_box.setCurrentIndex.assert_called_once_with(2)
         self.mocked_settings_instance.setValue.assert_called_once_with('bibles/verse layout style', 2)
 
@@ -763,9 +763,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling on_version_combo_box_index_changed
             self.media_item.on_version_combo_box_index_changed()
 
-            # THEN: The vesion should be saved to settings and the 'select tab' should be initialised
-            self.assertFalse(self.mocked_settings_instance.setValue.called)
-            self.assertTrue(self.media_item.initialise_advanced_bible.called)
+            # THEN: The version should be saved to settings and the 'select tab' should be initialised
+            assert self.mocked_settings_instance.setValue.called is False
+            assert self.media_item.initialise_advanced_bible.called is True
 
     def test_on_version_combo_box_index_changed_bible_selected(self):
         """
@@ -781,9 +781,9 @@ class TestMediaItem(TestCase, TestMixin):
             # WHEN: Calling on_version_combo_box_index_changed
             self.media_item.on_version_combo_box_index_changed()
 
-            # THEN: The vesion should be saved to settings and the 'select tab' should be initialised
+            # THEN: The version should be saved to settings and the 'select tab' should be initialised
             self.mocked_settings_instance.setValue.assert_called_once_with('bibles/primary bible', 'ABC')
-            self.assertTrue(self.media_item.initialise_advanced_bible.called)
+            assert self.media_item.initialise_advanced_bible.called is True
 
     def test_on_second_combo_box_index_changed_mode_not_changed(self):
         """
@@ -798,15 +798,15 @@ class TestMediaItem(TestCase, TestMixin):
                 patch('openlp.plugins.bibles.lib.mediaitem.critical_error_message_box') \
                 as mocked_critical_error_message_box:
 
-            # WHEN: The previously selected bible is one bible and the new selection is annother bible
+            # WHEN: The previously selected bible is one bible and the new selection is another bible
             self.media_item.second_bible = self.mocked_bible_1
             self.media_item.second_combo_box = MagicMock(**{'currentData.return_value': self.mocked_bible_2})
             self.media_item.on_second_combo_box_index_changed(5)
 
             # THEN: The new bible should now be the current bible
-            self.assertFalse(mocked_critical_error_message_box.called)
+            assert mocked_critical_error_message_box.called is False
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(False)
-            self.assertEqual(self.media_item.second_bible, self.mocked_bible_2)
+            assert self.media_item.second_bible == self.mocked_bible_2
 
     def test_on_second_combo_box_index_changed_single_to_dual_user_abort(self):
         """
@@ -828,11 +828,11 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.saved_results = ['saved_results']
             self.media_item.on_second_combo_box_index_changed(5)
 
-            # THEN: The list_view should be cleared and the currently selected bible should not be channged
-            self.assertTrue(mocked_critical_error_message_box.called)
-            self.assertTrue(self.media_item.second_combo_box.setCurrentIndex.called)
-            self.assertFalse(self.media_item.style_combo_box.setEnabled.called)
-            self.assertEqual(self.media_item.second_bible, None)
+            # THEN: The list_view should be cleared and the currently selected bible should not be changed
+            assert mocked_critical_error_message_box.called is True
+            assert self.media_item.second_combo_box.setCurrentIndex.called is True
+            assert self.media_item.style_combo_box.setEnabled.called is False
+            assert self.media_item.second_bible is None
 
     def test_on_second_combo_box_index_changed_single_to_dual(self):
         """
@@ -857,10 +857,10 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_second_combo_box_index_changed(5)
 
             # THEN: The selected bible should be set as the current bible
-            self.assertTrue(mocked_critical_error_message_box.called)
+            assert mocked_critical_error_message_box.called is True
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(False)
-            self.assertTrue(mocked_initialise_advanced_bible.called)
-            self.assertEqual(self.media_item.second_bible, self.mocked_bible_1)
+            assert mocked_initialise_advanced_bible.called is True
+            assert self.media_item.second_bible == self.mocked_bible_1
 
     def test_on_second_combo_box_index_changed_dual_to_single(self):
         """
@@ -884,10 +884,10 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_second_combo_box_index_changed(0)
 
             # THEN: The selected bible should be set as the current bible
-            self.assertTrue(mocked_critical_error_message_box.called)
+            assert mocked_critical_error_message_box.called is True
             self.media_item.style_combo_box.setEnabled.assert_called_once_with(True)
-            self.assertFalse(mocked_initialise_advanced_bible.called)
-            self.assertEqual(self.media_item.second_bible, None)
+            assert mocked_initialise_advanced_bible.called is False
+            assert self.media_item.second_bible is None
 
     def test_on_advanced_book_combo_box(self):
         """
@@ -907,7 +907,7 @@ class TestMediaItem(TestCase, TestMixin):
             # THEN: The user should be informed  that the bible cannot be used and the search button should be disabled
             self.mocked_plugin.manager.get_book_by_id.assert_called_once_with('Bible 1', 2)
             self.media_item.search_button.setEnabled.assert_called_once_with(False)
-            self.assertTrue(mocked_critical_error_message_box.called)
+            assert mocked_critical_error_message_box.called is True
 
     def test_on_advanced_book_combo_box_set_up_comboboxes(self):
         """
@@ -930,7 +930,7 @@ class TestMediaItem(TestCase, TestMixin):
             # THEN: The verse selection combobox's should be set up
             self.mocked_plugin.manager.get_book_by_id.assert_called_once_with('Bible 1', 2)
             self.media_item.search_button.setEnabled.assert_called_once_with(True)
-            self.assertEqual(mocked_adjust_combo_box.call_count, 4)
+            assert mocked_adjust_combo_box.call_count == 4
 
     def test_on_from_chapter_activated_invalid_to_chapter(self):
         """
@@ -951,9 +951,9 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_from_chapter_activated()
 
             # THEN: The to_verse and to_chapter comboboxes should be updated appropriately
-            self.assertEqual(mocked_adjust_combo_box.call_args_list, [
+            assert mocked_adjust_combo_box.call_args_list == [
                 call(1, 20, self.media_item.from_verse), call(1, 20, self.media_item.to_verse, False),
-                call(10, 25, self.media_item.to_chapter, False)])
+                call(10, 25, self.media_item.to_chapter, False)]
 
     def test_on_from_chapter_activated_same_chapter(self):
         """
@@ -974,9 +974,9 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_from_chapter_activated()
 
             # THEN: The to_verse and to_chapter comboboxes should be updated appropriately
-            self.assertEqual(mocked_adjust_combo_box.call_args_list, [
+            assert mocked_adjust_combo_box.call_args_list == [
                 call(1, 20, self.media_item.from_verse), call(1, 20, self.media_item.to_verse, True),
-                call(5, 25, self.media_item.to_chapter, False)])
+                call(5, 25, self.media_item.to_chapter, False)]
 
     def test_on_from_chapter_activated_lower_chapter(self):
         """
@@ -996,8 +996,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_from_chapter_activated()
 
             # THEN: The to_verse and to_chapter comboboxes should be updated appropriately
-            self.assertEqual(mocked_adjust_combo_box.call_args_list, [
-                call(1, 20, self.media_item.from_verse), call(5, 25, self.media_item.to_chapter, True)])
+            assert mocked_adjust_combo_box.call_args_list == [
+                call(1, 20, self.media_item.from_verse), call(5, 25, self.media_item.to_chapter, True)]
 
     def test_on_from_verse(self):
         """
@@ -1012,7 +1012,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.on_from_verse()
 
         # THEN: select_book_combo_box.currentData should nto be called
-        self.assertFalse(self.media_item.select_book_combo_box.currentData.called)
+        assert self.media_item.select_book_combo_box.currentData.called is False
 
     def test_on_from_verse_equal(self):
         """
@@ -1107,8 +1107,8 @@ class TestMediaItem(TestCase, TestMixin):
 
         # THEN: The combo_box should be cleared, and new items added
         mocked_combo_box.clear.assert_called_once_with()
-        self.assertEqual(mocked_combo_box.addItem.call_args_list,
-                         [call('10', 10), call('11', 11), call('12', 12), call('13', 13)])
+        assert mocked_combo_box.addItem.call_args_list == \
+            [call('10', 10), call('11', 11), call('12', 12), call('13', 13)]
 
     def test_adjust_combo_box_restore_found(self):
         """
@@ -1123,8 +1123,8 @@ class TestMediaItem(TestCase, TestMixin):
         # THEN: The combo_box should be cleared, and new items added. Finally the previously selected item should be
         #       reselected
         mocked_combo_box.clear.assert_called_once_with()
-        self.assertEqual(mocked_combo_box.addItem.call_args_list,
-                         [call('10', 10), call('11', 11), call('12', 12), call('13', 13)])
+        assert mocked_combo_box.addItem.call_args_list == \
+               [call('10', 10), call('11', 11), call('12', 12), call('13', 13)]
         mocked_combo_box.setCurrentIndex.assert_called_once_with(2)
 
     def test_adjust_combo_box_restore_not_found(self):
@@ -1140,8 +1140,8 @@ class TestMediaItem(TestCase, TestMixin):
 
         # THEN: The combo_box should be cleared, and new items added. Finally the first item should be selected
         mocked_combo_box.clear.assert_called_once_with()
-        self.assertEqual(mocked_combo_box.addItem.call_args_list,
-                         [call('10', 10), call('11', 11), call('12', 12), call('13', 13)])
+        assert mocked_combo_box.addItem.call_args_list == \
+            [call('10', 10), call('11', 11), call('12', 12), call('13', 13)]
         mocked_combo_box.setCurrentIndex.assert_called_once_with(0)
 
     def test_on_search_button_no_bible(self):
@@ -1154,7 +1154,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.on_search_button_clicked()
 
         # THEN: The user should be informed that there are no bibles selected
-        self.assertEqual(self.mocked_main_window.information_message.call_count, 1)
+        assert self.mocked_main_window.information_message.call_count == 1
 
     def test_on_search_button_search_tab(self):
         """
@@ -1207,7 +1207,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.select_search()
 
             # THEN: reference_search should only be called once
-            self.assertEqual(self.mocked_plugin.manager.get_verses.call_count, 1)
+            assert self.mocked_plugin.manager.get_verses.call_count == 1
             mocked_display_results.assert_called_once_with()
 
     def test_select_search_dual_bibles(self):
@@ -1228,7 +1228,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.select_search()
 
             # THEN: reference_search should be called twice
-            self.assertEqual(self.mocked_plugin.manager.get_verses.call_count, 2)
+            assert self.mocked_plugin.manager.get_verses.call_count == 2
             mocked_display_results.assert_called_once_with()
 
     def test_text_reference_search_single_bible(self):
@@ -1244,7 +1244,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.text_reference_search('Search Text')
 
             # THEN: reference_search should only be called once
-            self.assertEqual(self.mocked_plugin.manager.get_verses.call_count, 1)
+            assert self.mocked_plugin.manager.get_verses.call_count == 1
             mocked_display_results.assert_called_once_with()
 
             def text_reference_search(self, search_text, search_while_type=False):
@@ -1272,7 +1272,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.text_reference_search('Search Text')
 
             # THEN: reference_search should only be called once
-            self.assertEqual(self.mocked_plugin.manager.get_verses.call_count, 1)
+            assert self.mocked_plugin.manager.get_verses.call_count == 1
             mocked_display_results.assert_called_once_with()
 
     def test_text_reference_search_dual_bible(self):
@@ -1288,7 +1288,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.text_reference_search('Search Text')
 
             # THEN: reference_search should be called twice
-            self.assertEqual(self.mocked_plugin.manager.get_verses.call_count, 2)
+            assert self.mocked_plugin.manager.get_verses.call_count == 2
             mocked_display_results.assert_called_once_with()
 
     def test_on_text_search_single_bible(self):
@@ -1305,7 +1305,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_text_search('Search Text')
 
             # THEN: The search results should be the same as those returned by plugin.manager.verse_search
-            self.assertEqual(self.media_item.search_results, ['results', 'list'])
+            assert self.media_item.search_results == ['results', 'list']
             mocked_display_results.assert_called_once_with()
 
     def test_on_text_search_no_results(self):
@@ -1322,7 +1322,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_text_search('Search Text')
 
             # THEN: The search results should be an empty list
-            self.assertEqual(self.media_item.search_results, [])
+            assert self.media_item.search_results == []
             mocked_display_results.assert_called_once_with()
 
     def test_on_text_search_all_results_in_both_books(self):
@@ -1345,10 +1345,10 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_text_search('Search Text')
 
             # THEN: The search results for both bibles should be returned
-            self.assertEqual(self.media_item.search_results, [mocked_verse_1, mocked_verse_2])
-            self.assertEqual(self.media_item.second_search_results, [mocked_verse_1a, mocked_verse_2a])
-            self.assertFalse(self.mocked_log.debug.called)
-            self.assertFalse(self.mocked_main_window.information_message.called)
+            assert self.media_item.search_results == [mocked_verse_1, mocked_verse_2]
+            assert self.media_item.second_search_results == [mocked_verse_1a, mocked_verse_2a]
+            assert self.mocked_log.debug.called is False
+            assert self.mocked_main_window.information_message.called is False
             mocked_display_results.assert_called_once_with()
 
     def test_on_text_search_not_all_results_in_both_books(self):
@@ -1372,10 +1372,10 @@ class TestMediaItem(TestCase, TestMixin):
 
             # THEN: The search results included in  both bibles should be returned and the user should be notified of
             #       the missing verses
-            self.assertEqual(self.media_item.search_results, [mocked_verse_1])
-            self.assertEqual(self.media_item.second_search_results, [mocked_verse_1a])
-            self.assertEqual(self.mocked_log.debug.call_count, 2)
-            self.assertTrue(self.mocked_main_window.information_message.called)
+            assert self.media_item.search_results == [mocked_verse_1]
+            assert self.media_item.second_search_results == [mocked_verse_1a]
+            assert self.mocked_log.debug.call_count == 2
+            assertTrue(self.mocked_main_window.information_message.called)
             mocked_display_results.assert_called_once_with()
 
     def test_on_search_edit_text_changed_search_while_typing_disabled(self):
@@ -1391,7 +1391,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.on_search_edit_text_changed()
 
         # THEN: The method should not have checked if the timer is active
-        self.assertFalse(self.media_item.search_timer.isActive.called)
+        assertFalse(self.media_item.search_timer.isActive.called)
 
     def test_on_search_edit_text_changed_search_while_typing_enabled(self):
         """
@@ -1422,7 +1422,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.on_search_timer_timeout()
 
             # THEN: The search_status should be set to SearchAsYouType and text_search should have been called
-            self.assertEqual(self.media_item.search_status, SearchStatus.SearchAsYouType)
+            assert self.media_item.search_status == SearchStatus.SearchAsYouType
             mocked_text_search.assert_called_once_with()
 
     def test_display_results_no_results(self):
@@ -1441,7 +1441,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.display_results()
 
             # THEN: No items should be added to the list
-            self.assertFalse(self.media_item.list_view.addItem.called)
+            assertFalse(self.media_item.list_view.addItem.called)
 
     def test_display_results_results(self):
         """

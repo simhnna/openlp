@@ -67,8 +67,7 @@ class TestPptviewController(TestCase, TestMixin):
         controller = PptviewController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('Powerpoint Viewer', controller.name,
-                         'The name of the presentation controller should be correct')
+        assert'Powerpoint Viewer' == controller.name, 'The name of the presentation controller should be correct'
 
     def test_check_available(self):
         """
@@ -86,9 +85,9 @@ class TestPptviewController(TestCase, TestMixin):
 
             # THEN: On windows it should return True, on other platforms False
             if is_win():
-                self.assertTrue(available, 'check_available should return True on windows.')
+                assert available is True, 'check_available should return True on windows.'
             else:
-                self.assertFalse(available, 'check_available should return False when not on windows.')
+                assert available is False, 'check_available should return False when not on windows.'
 
 
 class TestPptviewDocument(TestCase):
@@ -205,7 +204,7 @@ class TestPptviewDocument(TestCase):
             # THEN: File existens should have been checked, and not have been opened.
             doc.save_titles_and_notes.assert_called_once_with(None, None)
             mocked_path_exists.assert_called_with()
-            self.assertEqual(mocked_open.call_count, 0, 'There should be no calls to open a file.')
+            assert mocked_open.call_count == 0, 'There should be no calls to open a file.'
 
     def test_create_titles_and_notes_invalid_file(self):
         """
@@ -225,4 +224,4 @@ class TestPptviewDocument(TestCase):
 
             # THEN:
             doc.save_titles_and_notes.assert_called_once_with(None, None)
-            self.assertEqual(mocked_is_zf.call_count, 1, 'is_zipfile should have been called once')
+            assert mocked_is_zf.call_count == 1, 'is_zipfile should have been called once'

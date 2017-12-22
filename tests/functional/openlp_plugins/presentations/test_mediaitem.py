@@ -81,11 +81,11 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.build_file_mask_string()
 
         # THEN: The file mask should be generated correctly
-        self.assertIn('*.odp', self.media_item.on_new_file_masks, 'The file mask should contain the odp extension')
-        self.assertIn('*.ppt', self.media_item.on_new_file_masks, 'The file mask should contain the ppt extension')
-        self.assertIn('*.pdf', self.media_item.on_new_file_masks, 'The file mask should contain the pdf extension')
-        self.assertIn('*.xps', self.media_item.on_new_file_masks, 'The file mask should contain the xps extension')
-        self.assertIn('*.oxps', self.media_item.on_new_file_masks, 'The file mask should contain the oxps extension')
+        assertIn('*.odp', self.media_item.on_new_file_masks, 'The file mask should contain the odp extension')
+        assertIn('*.ppt', self.media_item.on_new_file_masks, 'The file mask should contain the ppt extension')
+        assertIn('*.pdf', self.media_item.on_new_file_masks, 'The file mask should contain the pdf extension')
+        assertIn('*.xps', self.media_item.on_new_file_masks, 'The file mask should contain the xps extension')
+        assertIn('*.oxps', self.media_item.on_new_file_masks, 'The file mask should contain the oxps extension')
 
     def test_clean_up_thumbnails(self):
         """

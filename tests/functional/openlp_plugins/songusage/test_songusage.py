@@ -62,8 +62,8 @@ class TestSongUsage(TestCase):
 
         # THEN: It should be initialised correctly
         MockedManager.assert_called_with('songusage', init_schema, upgrade_mod=upgrade)
-        self.assertEqual(mocked_manager, song_usage.manager)
-        self.assertFalse(song_usage.song_usage_active)
+        assert mocked_manager == song_usage.manager
+        assert song_usage.song_usage_active is False
 
     @patch('openlp.plugins.songusage.songusageplugin.Manager')
     def test_check_pre_conditions(self, MockedManager):

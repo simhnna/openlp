@@ -106,9 +106,9 @@ class TestOpenSongImport(TestCase):
                 importer.import_source = source
 
                 # THEN: do_import should return none and the progress bar maximum should not be set.
-                self.assertIsNone(importer.do_import(), 'do_import should return None when import_source is not a list')
-                self.assertEqual(mocked_import_wizard.progress_bar.setMaximum.called, False,
-                                 'setMaximum on import_wizard.progress_bar should not have been called')
+                assert importer.do_import() is None, 'do_import should return None when import_source is not a list'
+                assert mocked_import_wizard.progress_bar.setMaximum.called is False, \
+                    'setMaximum on import_wizard.progress_bar should not have been called'
 
     def test_valid_import_source(self):
         """
@@ -127,6 +127,6 @@ class TestOpenSongImport(TestCase):
 
             # THEN: do_import should return none and the progress bar setMaximum should be called with the length of
             #       import_source.
-            self.assertIsNone(importer.do_import(), 'do_import should return None when import_source is a list '
-                                                    'and stop_import_flag is True')
+            assert importer.do_import() is None, \
+                'do_import should return None when import_source is a list and stop_import_flag is True'
             mocked_import_wizard.progress_bar.setMaximum.assert_called_with(len(importer.import_source))

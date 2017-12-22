@@ -148,4 +148,4 @@ class TestController(TestCase, TestMixin):
         controller.add_handler(mocked_doc_controller, MagicMock(), True, 0)
 
         # THEN: slidenumber should be 0
-        self.assertEqual(controller.doc.slidenumber, 0, 'doc.slidenumber should be 0')
+        assert controller.doc.slidenumber == 0, 'doc.slidenumber should be 0'

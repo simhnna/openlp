@@ -92,7 +92,7 @@ class TestPdfController(TestCase, TestMixin):
         controller = PdfController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('Pdf', controller.name, 'The name of the presentation controller should be correct')
+        assert'Pdf' == controller.name, 'The name of the presentation controller should be correct'
 
     def test_load_pdf(self):
         """
@@ -111,8 +111,8 @@ class TestPdfController(TestCase, TestMixin):
         loaded = document.load_presentation()
 
         # THEN: The load should succeed and we should be able to get a pagecount
-        self.assertTrue(loaded, 'The loading of the PDF should succeed.')
-        self.assertEqual(3, document.get_slide_count(), 'The pagecount of the PDF should be 3.')
+        assert loaded is True, 'The loading of the PDF should succeed.'
+        assert 3 == document.get_slide_count(), 'The pagecount of the PDF should be 3.'
 
     def test_load_pdf_pictures(self):
         """
@@ -135,11 +135,11 @@ class TestPdfController(TestCase, TestMixin):
         image = QtGui.QImage(os.path.join(str(self.temp_folder_path), 'pdf_test1.pdf', 'mainslide001.png'))
         # Based on the converter used the resolution will differ a bit
         if controller.gsbin:
-            self.assertEqual(760, image.height(), 'The height should be 760')
-            self.assertEqual(537, image.width(), 'The width should be 537')
+            assert 760 == image.height(), 'The height should be 760'
+            assert 537 == image.width(), 'The width should be 537'
         else:
-            self.assertEqual(768, image.height(), 'The height should be 768')
-            self.assertEqual(543, image.width(), 'The width should be 543')
+            assert 768 == image.height(), 'The height should be 768'
+            assert 543 == image.width(), 'The width should be 543'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_mudraw(self, mocked_check_binary_exists):
@@ -157,7 +157,7 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mudraw should be detected
-        self.assertEqual('mudraw', ret, 'mudraw should have been detected')
+        assert 'mudraw' == ret, 'mudraw should have been detected'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_new_motool(self, mocked_check_binary_exists):
@@ -177,7 +177,7 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mutool should be detected
-        self.assertEqual('mutool', ret, 'mutool should have been detected')
+        assert 'mutool' == ret, 'mutool should have been detected'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_old_motool(self, mocked_check_binary_exists):
@@ -194,7 +194,7 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mutool should be detected
-        self.assertIsNone(ret, 'old mutool should not be accepted!')
+        assert ret is None, 'old mutool should not be accepted!'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_gs(self, mocked_check_binary_exists):
@@ -210,4 +210,4 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mutool should be detected
-        self.assertEqual('gs', ret, 'mutool should have been detected')
+        assert 'gs' == ret, 'mutool should have been detected'
