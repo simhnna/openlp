@@ -22,7 +22,6 @@
 """
 This module contains tests for the SWORD Bible importer.
 """
-import json
 from unittest import TestCase, skipUnless
 from unittest.mock import MagicMock, patch
 
@@ -34,6 +33,7 @@ except ImportError:
 
 from openlp.plugins.bibles.lib.db import BibleDB
 
+from tests.utils import load_external_result_data
 from tests.utils.constants import TEST_RESOURCES_PATH
 
 TEST_PATH = TEST_RESOURCES_PATH / 'bibles'
@@ -80,8 +80,7 @@ class TestSwordImport(TestCase):
         mocked_manager = MagicMock()
         mocked_import_wizard = MagicMock()
         importer = SwordBible(mocked_manager, path='.', name='.', file_path=None, sword_key='', sword_path='')
-        file_data = (TEST_PATH / 'dk1933.json').read_text()
-        test_data = json.loads(file_data)
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         importer.wizard = mocked_import_wizard
         importer.get_book_ref_id_by_name = MagicMock()
         importer.create_verse = MagicMock()

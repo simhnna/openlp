@@ -23,7 +23,6 @@
 This module contains tests for the CSV Bible importer.
 """
 import csv
-import json
 from collections import namedtuple
 from unittest import TestCase
 from unittest.mock import ANY, MagicMock, PropertyMock, call, patch
@@ -32,6 +31,8 @@ from openlp.core.common.path import Path
 from openlp.core.lib.exceptions import ValidationError
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.importers.csvbible import Book, CSVBible, Verse
+
+from tests.utils import load_external_result_data
 from tests.utils.constants import RESOURCE_PATH
 
 TEST_PATH = RESOURCE_PATH / 'bibles'
@@ -330,8 +331,7 @@ class TestCSVImport(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        file_data = (TEST_PATH / 'dk1933.json').read_text()
-        test_data = json.loads(file_data)
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         books_file = TEST_PATH / 'dk1933-books.csv'
         verses_file = TEST_PATH / 'dk1933-verses.csv'
         with patch('openlp.plugins.bibles.lib.importers.csvbible.CSVBible.application'):

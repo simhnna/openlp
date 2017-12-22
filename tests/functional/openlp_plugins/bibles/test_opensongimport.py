@@ -22,7 +22,6 @@
 """
 This module contains tests for the OpenSong Bible importer.
 """
-import json
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
@@ -33,6 +32,7 @@ from openlp.plugins.bibles.lib.importers.opensong import OpenSongBible, get_text
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 
 from tests.helpers.testmixin import TestMixin
+from tests.utils import load_external_result_data
 from tests.utils.constants import RESOURCE_PATH
 
 TEST_PATH = RESOURCE_PATH / 'bibles'
@@ -399,8 +399,7 @@ class TestOpenSongImportFileImports(TestCase, TestMixin):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #       get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        file_data = (TEST_PATH / 'dk1933.json').read_text()
-        test_data = json.loads(file_data)
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         bible_file = 'opensong-dk1933.xml'
         with patch('openlp.plugins.bibles.lib.importers.opensong.OpenSongBible.application'):
             mocked_manager = MagicMock()

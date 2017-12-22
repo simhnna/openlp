@@ -23,14 +23,10 @@
 The :mod:`songproimport` module provides the functionality for importing
 SongPro song files into the current installation database.
 """
-import os
-
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'songprosongs'))
+TEST_PATH = RESOURCE_PATH / 'songprosongs'
 
 
 class TestSongProFileImport(SongImportTestHelper):
@@ -44,5 +40,5 @@ class TestSongProFileImport(SongImportTestHelper):
         """
         Test that loading an SongPro file works correctly
         """
-        self.file_import(Path(TEST_PATH, 'amazing-grace.txt'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+        self.file_import(TEST_PATH / 'amazing-grace.txt',
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))

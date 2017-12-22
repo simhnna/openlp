@@ -22,15 +22,13 @@
 """
 This module contains tests for the Zefania Bible importer.
 """
-import os
-import json
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.path import Path
-from openlp.plugins.bibles.lib.importers.zefania import ZefaniaBible
 from openlp.plugins.bibles.lib.db import BibleDB
+from openlp.plugins.bibles.lib.importers.zefania import ZefaniaBible
 
+from tests.utils import load_external_result_data
 from tests.utils.constants import RESOURCE_PATH
 
 TEST_PATH = RESOURCE_PATH / 'bibles'
@@ -68,8 +66,7 @@ class TestZefaniaImport(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        file_data = (TEST_PATH / 'dk1933.json').read_text()
-        test_data = json.loads(file_data)
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         bible_file = 'zefania-dk1933.xml'
         with patch('openlp.plugins.bibles.lib.importers.zefania.ZefaniaBible.application'):
             mocked_manager = MagicMock()
@@ -98,8 +95,7 @@ class TestZefaniaImport(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        file_data = (TEST_PATH / 'rst.json').read_text()
-        test_data = json.loads(file_data)
+        test_data = load_external_result_data(TEST_PATH / 'rst.json')
         bible_file = 'zefania-rst.xml'
         with patch('openlp.plugins.bibles.lib.importers.zefania.ZefaniaBible.application'):
             mocked_manager = MagicMock()

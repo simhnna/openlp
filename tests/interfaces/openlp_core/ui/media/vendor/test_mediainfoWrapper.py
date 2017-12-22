@@ -22,13 +22,13 @@
 """
 Package to test the openlp.core.ui.media package.
 """
-
-import os
 from unittest import TestCase
 
 from openlp.core.ui.media.vendor.mediainfoWrapper import MediaInfoWrapper
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..', '..', 'resources', 'media'))
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'media'
 TEST_MEDIA = [['avi_file.avi', 61495], ['mp3_file.mp3', 134426], ['mpg_file.mpg', 9404], ['mp4_file.mp4', 188336]]
 
 
@@ -40,7 +40,7 @@ class TestMediainfoWrapper(TestCase):
         """
         for test_data in TEST_MEDIA:
             # GIVEN: a media file
-            full_path = os.path.normpath(os.path.join(TEST_PATH, test_data[0]))
+            full_path = str(TEST_PATH / test_data[0])
 
             # WHEN the media data is retrieved
             results = MediaInfoWrapper.parse(full_path)

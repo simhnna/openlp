@@ -22,18 +22,16 @@
 """
 This module contains tests for the SongShow Plus song importer.
 """
-import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from openlp.core.common.path import Path
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songshowplus import SongShowPlusImport
 
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'songshowplussongs'))
+TEST_PATH = RESOURCE_PATH / 'songshowplussongs'
 
 
 class TestSongShowPlusFileImport(SongImportTestHelper):
@@ -47,14 +45,14 @@ class TestSongShowPlusFileImport(SongImportTestHelper):
         """
         Test that loading a SongShow Plus file works correctly on various files
         """
-        self.file_import([Path(TEST_PATH, 'Amazing Grace.sbsong')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([Path(TEST_PATH, 'Beautiful Garden Of Prayer.sbsong')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Beautiful Garden Of Prayer.json')))
-        self.file_import([Path(TEST_PATH, 'a mighty fortress is our god.sbsong')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'a mighty fortress is our god.json')))
-        self.file_import([Path(TEST_PATH, 'cleanse-me.sbsong')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'cleanse-me.json')))
+        self.file_import([TEST_PATH / 'Amazing Grace.sbsong'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))
+        self.file_import([TEST_PATH / 'Beautiful Garden Of Prayer.sbsong'],
+                         self.load_external_result_data(TEST_PATH / 'Beautiful Garden Of Prayer.json'))
+        self.file_import([TEST_PATH / 'a mighty fortress is our god.sbsong'],
+                         self.load_external_result_data(TEST_PATH / 'a mighty fortress is our god.json'))
+        self.file_import([TEST_PATH / 'cleanse-me.sbsong'],
+                         self.load_external_result_data(TEST_PATH / 'cleanse-me.json'))
 
 
 class TestSongShowPlusImport(TestCase):

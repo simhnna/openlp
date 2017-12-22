@@ -23,14 +23,10 @@
 The :mod:`worshipassistantimport` module provides the functionality for importing
 WorshipAssistant song files into the current installation database.
 """
-import os
-
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'worshipassistantsongs'))
+TEST_PATH = RESOURCE_PATH / 'worshipassistantsongs'
 
 
 class TestWorshipAssistantFileImport(SongImportTestHelper):
@@ -44,9 +40,8 @@ class TestWorshipAssistantFileImport(SongImportTestHelper):
         """
         Test that loading an Worship Assistant file works correctly
         """
-        self.file_import(Path(TEST_PATH, 'du_herr.csv'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'du_herr.json')))
-        self.file_import(Path(TEST_PATH, 'would_you_be_free.csv'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'would_you_be_free.json')))
-        self.file_import(Path(TEST_PATH, 'would_you_be_free2.csv'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'would_you_be_free.json')))
+        self.file_import(TEST_PATH / 'du_herr.csv', self.load_external_result_data(TEST_PATH / 'du_herr.json'))
+        self.file_import(TEST_PATH / 'would_you_be_free.csv',
+                         self.load_external_result_data(TEST_PATH / 'would_you_be_free.json'))
+        self.file_import(TEST_PATH / 'would_you_be_free2.csv',
+                         self.load_external_result_data(TEST_PATH/ 'would_you_be_free.json'))

@@ -41,3 +41,12 @@ def convert_file_service_item(test_path, name, row=0):
     finally:
         open_file.close()
     return first_line
+
+
+def load_external_result_data(file_path):
+    """
+    A method to load and return an object containing the song data from an external file.
+
+    :param openlp.core.common.path.Path file_path: The path of the file to load
+    """
+    return json.loads(file_path.read_text())
