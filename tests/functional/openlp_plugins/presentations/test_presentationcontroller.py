@@ -133,9 +133,9 @@ class TestPresentationController(TestCase):
 
             # THEN: it should return two empty lists
             assert isinstance(result_titles, list), 'result_titles should be of type list'
-            self.assertEqual(len(result_titles), 0, 'there be no titles')
+            assert len(result_titles) == 0, 'there be no titles'
             assert isinstance(result_notes, list), 'result_notes should be a list'
-            self.assertEqual(len(result_notes), 0, 'but the list should be empty')
+            assert len(result_notes) == 0, 'but the list should be empty'
 
     def test_get_titles_and_notes_with_file_error(self):
         """

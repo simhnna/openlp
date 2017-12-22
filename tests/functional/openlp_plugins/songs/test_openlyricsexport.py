@@ -72,9 +72,7 @@ class TestOpenLyricsExport(TestCase, TestMixin):
             ol_export.do_export()
 
             # THEN: The exporter should have created 2 files
-            self.assertTrue((self.temp_folder /
-                             '{title} ({display_name}).xml'.format(
-                                 title=song.title, display_name=author.display_name)).exists())
-            self.assertTrue((self.temp_folder /
-                             '{title} ({display_name})-1.xml'.format(
-                                 title=song.title, display_name=author.display_name)).exists())
+            assert (self.temp_folder / '{title} ({display_name}).xml'.format(
+                title=song.title, display_name=author.display_name)).exists() is True
+            assert (self.temp_folder / '{title} ({display_name})-1.xml'.format(
+                title=song.title, display_name=author.display_name)).exists() is True
