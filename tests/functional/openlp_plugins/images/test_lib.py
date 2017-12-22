@@ -276,9 +276,9 @@ class TestImageMediaItem(TestCase):
         item = self.media_item.create_item_from_id('1')
 
         # THEN: A QTreeWidgetItem should be created with the above model object as it's data
-        self.assertIsInstance(item, QtWidgets.QTreeWidgetItem)
+        assert isinstance(item, QtWidgets.QTreeWidgetItem)
         self.assertEqual('test_file_1.jpg', item.text(0))
         item_data = item.data(0, QtCore.Qt.UserRole)
-        self.assertIsInstance(item_data, ImageFilenames)
+        assert isinstance(item_data, ImageFilenames)
         self.assertEqual(1, item_data.id)
         self.assertEqual(Path('/', 'tmp', 'test_file_1.jpg'), item_data.file_path)

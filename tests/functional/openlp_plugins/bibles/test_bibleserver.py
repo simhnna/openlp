@@ -75,9 +75,8 @@ class TestBSExtract(TestCase):
         self.mock_urllib.parse.quote.assert_called_once_with(b'NIV')
         self.mock_get_soup_for_bible_ref.assert_called_once_with(
             'http://m.bibleserver.com/overlay/selectBook?translation=NIV')
-        self.assertIsNone(result,
-                          'BSExtract.get_books_from_http should return None when get_soup_for_bible_ref returns a '
-                          'false value')
+        assert result is None, \
+            'BSExtract.get_books_from_http should return None when get_soup_for_bible_ref returns a false value'
 
     def test_get_books_from_http_no_content(self):
         """
@@ -106,9 +105,8 @@ class TestBSExtract(TestCase):
         self.mock_soup.find.assert_called_once_with('ul')
         self.mock_log.error.assert_called_once_with('No books found in the Bibleserver response.')
         self.mock_send_error_message.assert_called_once_with('parse')
-        self.assertIsNone(result,
-                          'BSExtract.get_books_from_http should return None when get_soup_for_bible_ref returns a '
-                          'false value')
+        assert result is None, \
+            'BSExtract.get_books_from_http should return None when get_soup_for_bible_ref returns a false value'
 
     def test_get_books_from_http_content(self):
         """
@@ -138,6 +136,6 @@ class TestBSExtract(TestCase):
         self.mock_urllib.parse.quote.assert_called_once_with(b'NIV')
         self.mock_get_soup_for_bible_ref.assert_called_once_with(
             'http://m.bibleserver.com/overlay/selectBook?translation=NIV')
-        self.assertFalse(self.mock_log.error.called, 'log.error should not have been called')
-        self.assertFalse(self.mock_send_error_message.called, 'send_error_message should not have been called')
-        self.assertEqual(result, ['Genesis', 'Leviticus'])
+        assert self.mock_log.error.called is False, 'log.error should not have been called'
+        assert self.mock_send_error_message.called is False, 'send_error_message should not have been called'
+        assert result == ['Genesis', 'Leviticus']

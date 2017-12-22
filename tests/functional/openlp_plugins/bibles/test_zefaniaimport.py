@@ -59,7 +59,7 @@ class TestZefaniaImport(TestCase):
         importer = ZefaniaBible(mocked_manager, path='.', name='.', file_path=None)
 
         # THEN: The importer should be an instance of BibleDB
-        self.assertIsInstance(importer, BibleDB)
+        assert isinstance(importer, BibleDB)
 
     def test_file_import(self):
         """
@@ -86,7 +86,7 @@ class TestZefaniaImport(TestCase):
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
-            self.assertTrue(importer.create_verse.called)
+            assert importer.create_verse.called is True
             for verse_tag, verse_text in test_data['verses']:
                 importer.create_verse.assert_any_call(importer.create_book().id, 1, verse_tag, verse_text)
             importer.create_book.assert_any_call('Genesis', 1, 1)
@@ -116,7 +116,7 @@ class TestZefaniaImport(TestCase):
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
-            self.assertTrue(importer.create_verse.called)
+            assert importer.create_verse.called is True
             for verse_tag, verse_text in test_data['verses']:
                 importer.create_verse.assert_any_call(importer.create_book().id, 1, verse_tag, verse_text)
             importer.create_book.assert_any_call('Exodus', 2, 1)

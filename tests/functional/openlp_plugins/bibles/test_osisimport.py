@@ -207,7 +207,7 @@ class TestOsisImport(TestCase):
 
             # THEN: set_current_chapter should have been called with the test data
             mocked_set_current_chapter.assert_called_once_with(test_book.name, 2)
-            self.assertFalse(mocked_process_verse.called)
+            assert mocked_process_verse.called is False
 
     def test_process_chapters_milestones_verse_tag(self):
         """

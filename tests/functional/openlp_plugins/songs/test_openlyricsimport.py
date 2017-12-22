@@ -114,7 +114,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             importer = OpenLyricsImport(mocked_manager, file_paths=[])
 
             # THEN: The importer should be an instance of SongImport
-            self.assertIsInstance(importer, SongImport)
+            assert isinstance(importer, SongImport)
 
     def test_file_import(self):
         """

@@ -43,7 +43,7 @@ class TestSongUsage(TestCase):
         # GIVEN: The SongUsagePlugin
         # WHEN: Retrieving the about text
         # THEN: about() should return a string object
-        self.assertIsInstance(SongUsagePlugin.about(), str)
+        assert isinstance(SongUsagePlugin.about(), str)
         # THEN: about() should return a non-empty string
         self.assertNotEquals(len(SongUsagePlugin.about()), 0)
         self.assertNotEquals(len(SongUsagePlugin.about()), 0)

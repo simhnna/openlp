@@ -56,7 +56,7 @@ class MediaPluginTest(TestCase, TestMixin):
         # GIVEN: The MediaPlugin
         # WHEN: Retrieving the about text
         # THEN: about() should return a string object
-        self.assertIsInstance(MediaPlugin.about(), str)
+        assert isinstance(MediaPlugin.about(), str)
         # THEN: about() should return a non-empty string
         self.assertNotEquals(len(MediaPlugin.about()), 0)
 

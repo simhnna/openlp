@@ -427,7 +427,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.save_song(song_dict)
 
         # THEN: The return value should be a Song class and the mocked_db_manager should have been called
-        self.assertIsInstance(result, Song, 'The returned value should be a Song object')
+        assert isinstance(result, Song, 'The returned value should be a Song object')
         mocked_clean_song.assert_called_with(mocked_db_manager, result)
         self.assertEqual(2, mocked_db_manager.save_object.call_count,
                          'The save_object() method should have been called twice')
@@ -463,7 +463,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.save_song(song_dict)
 
         # THEN: The return value should be a Song class and the mocked_db_manager should have been called
-        self.assertIsInstance(result, Song, 'The returned value should be a Song object')
+        assert isinstance(result, Song, 'The returned value should be a Song object')
         mocked_clean_song.assert_called_with(mocked_db_manager, result)
         self.assertEqual(2, mocked_db_manager.save_object.call_count,
                          'The save_object() method should have been called twice')
@@ -498,7 +498,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.save_song(song_dict)
 
         # THEN: The return value should be a Song class and the mocked_db_manager should have been called
-        self.assertIsInstance(result, Song, 'The returned value should be a Song object')
+        assert isinstance(result, Song, 'The returned value should be a Song object')
         mocked_clean_song.assert_called_with(mocked_db_manager, result)
         self.assertEqual(2, mocked_db_manager.save_object.call_count,
                          'The save_object() method should have been called twice')
