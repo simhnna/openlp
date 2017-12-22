@@ -94,7 +94,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         get_vlc()
 
         # THEN: The extra environment variable should NOT be there
-        assert 'VLC_PLUGIN_PATH'not in os.environ, 'The plugin path should NOT be in the environment variables'
+        assert 'VLC_PLUGIN_PATH' not in os.environ, 'The plugin path should NOT be in the environment variables'
 
     def test_init(self):
         """
@@ -951,7 +951,7 @@ class TestVLCPlayer(TestCase, TestMixin):
 
         # THEN: Certain methods should be called
         mocked_stop.assert_called_with(mocked_display)
-        assert 2, mocked_stop.call_count
+        assert 2 == mocked_stop.call_count
         mocked_display.vlc_media_player.get_time.assert_called_with()
         mocked_set_visible.assert_called_with(mocked_display, False)
         mocked_controller.seek_slider.setSliderPosition.assert_called_with(400000)
@@ -985,7 +985,7 @@ class TestVLCPlayer(TestCase, TestMixin):
 
         # THEN: Certain methods should be called
         mocked_stop.assert_called_with(mocked_display)
-        assert 2, mocked_stop.call_count
+        assert 2 == mocked_stop.call_count
         mocked_display.vlc_media_player.get_time.assert_called_with()
         mocked_set_visible.assert_called_with(mocked_display, False)
         mocked_controller.seek_slider.setSliderPosition.assert_called_with(300)

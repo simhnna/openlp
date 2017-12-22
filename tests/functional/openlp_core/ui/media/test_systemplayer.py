@@ -96,11 +96,11 @@ class TestSystemPlayer(TestCase):
 
         # THEN: The player should have a display widget
         MockQVideoWidget.assert_called_once_with(mocked_display)
-        assert mocked_video_widget, mocked_display.video_widget is True
+        assert mocked_video_widget == mocked_display.video_widget
         mocked_display.size.assert_called_once_with()
         mocked_video_widget.resize.assert_called_once_with([1, 2, 3, 4])
         MockQMediaPlayer.assert_called_with(mocked_display)
-        assert mocked_media_player, mocked_display.media_player is True
+        assert mocked_media_player == mocked_display.media_player
         mocked_media_player.setVideoOutput.assert_called_once_with(mocked_video_widget)
         mocked_video_widget.raise_.assert_called_once_with()
         mocked_video_widget.hide.assert_called_once_with()

@@ -29,8 +29,8 @@ from PyQt5 import QtCore, QtGui
 
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItemAction
-from openlp.core.ui.slidecontroller import SlideController, LiveController, PreviewController
-from openlp.core.ui.slidecontroller import InfoLabel, WIDE_MENU, NON_TEXT_MENU
+from openlp.core.ui.slidecontroller import InfoLabel, SlideController, LiveController, PreviewController, \
+    NON_TEXT_MENU, WIDE_MENU
 
 
 class TestSlideController(TestCase):
