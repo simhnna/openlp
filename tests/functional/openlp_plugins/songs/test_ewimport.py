@@ -29,8 +29,9 @@ from unittest.mock import MagicMock, patch
 from openlp.core.common.registry import Registry
 from openlp.plugins.songs.lib.importers.easyworship import EasyWorshipSongImport, FieldDescEntry, FieldType
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'easyworshipsongs'))
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'easyworshipsongs'
 SONG_TEST_DATA = [
     {'title': 'Amazing Grace',
      'authors': ['John Newton'],
@@ -387,10 +388,10 @@ class TestEasyWorshipSongImport(TestCase):
             mocked_retrieve_windows_encoding.assert_any_call(encoding)
 
     def test_db_file_import(self):
-        return self._run_db_file_import(os.path.join(TEST_PATH, 'Songs.DB'))
+        return self._run_db_file_import(TEST_PATH / 'Songs.DB')
 
     def test_sqlite_db_file_import(self):
-        return self._run_db_file_import(os.path.join(TEST_PATH, 'ew6'))
+        return self._run_db_file_import(TEST_PATH / 'ew6')
 
     def _run_db_file_import(self, source_path):
         """
@@ -420,7 +421,8 @@ class TestEasyWorshipSongImport(TestCase):
             importer.topics = []
 
             # WHEN: Importing each file
-            importer.import_source = source_path
+            # TODO: To Path object
+            importer.import_source = str(source_path)
             import_result = importer.do_import()
 
             # THEN: do_import should return none, the song data should be as expected, and finish should have been
@@ -475,7 +477,7 @@ class TestEasyWorshipSongImport(TestCase):
         importer.topics = []
 
         # WHEN: Importing ews file
-        importer.import_source = os.path.join(TEST_PATH, 'test1.ews')
+        importer.import_source = str(TEST_PATH / 'test1.ews')
         import_result = importer.do_import()
 
         # THEN: do_import should return none, the song data should be as expected, and finish should have been

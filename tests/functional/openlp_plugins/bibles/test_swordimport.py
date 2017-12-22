@@ -22,8 +22,6 @@
 """
 This module contains tests for the SWORD Bible importer.
 """
-
-import os
 import json
 from unittest import TestCase, skipUnless
 from unittest.mock import MagicMock, patch
@@ -36,8 +34,9 @@ except ImportError:
 
 from openlp.plugins.bibles.lib.db import BibleDB
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'bibles'))
+from tests.utils.constants import TEST_RESOURCES_PATH
+
+TEST_PATH = TEST_RESOURCES_PATH / 'bibles'
 
 
 @skipUnless(HAS_PYSWORD, 'pysword not installed')
@@ -81,8 +80,8 @@ class TestSwordImport(TestCase):
         mocked_manager = MagicMock()
         mocked_import_wizard = MagicMock()
         importer = SwordBible(mocked_manager, path='.', name='.', file_path=None, sword_key='', sword_path='')
-        result_file = open(os.path.join(TEST_PATH, 'dk1933.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        file_data = (TEST_PATH / 'dk1933.json').read_text()
+        test_data = json.loads(file_data)
         importer.wizard = mocked_import_wizard
         importer.get_book_ref_id_by_name = MagicMock()
         importer.create_verse = MagicMock()

@@ -23,13 +23,12 @@
 Provides the generic functions for interfacing plugins with the Media Manager.
 """
 import logging
-import os
 import re
 
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings

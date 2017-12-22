@@ -22,7 +22,6 @@
 """
 This module contains tests for the WorshipCenter Pro song importer.
 """
-import os
 import json
 from unittest import TestCase, skipUnless
 from unittest.mock import patch, MagicMock
@@ -34,7 +33,9 @@ try:
 except ImportError:
     CAN_RUN_TESTS = False
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'opsprosongs'))
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'opsprosongs'
 
 
 def _get_item(data, key):
@@ -59,8 +60,7 @@ def _build_data(test_file, dual_language):
     song.Version = '1'
     song.Origin = '...'
     lyrics = MagicMock()
-    test_file = open(os.path.join(TEST_PATH, test_file), 'rb')
-    lyrics.Lyrics = test_file.read().decode()
+    lyrics.Lyrics = (TEST_PATH / test_file).read_text()
     lyrics.Type = 1
     lyrics.IsDualLanguage = dual_language
     return song, lyrics
@@ -106,8 +106,8 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'You are so faithful.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
+        file_data = (TEST_PATH / 'You are so faithful.json').read_text()
+        result_data = json.loads(file_data)
         self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
         self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))
 
@@ -126,8 +126,8 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'Amazing Grace.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
+        file_data = (TEST_PATH / 'Amazing Grace.json').read_text()
+        result_data = json.loads(file_data)
         self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
         self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))
 
@@ -146,8 +146,8 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'Amazing Grace.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
+        file_data = (TEST_PATH / 'Amazing Grace.json').read_text()
+        result_data = json.loads(file_data)
         self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
         self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))
 
@@ -166,7 +166,7 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'Amazing Grace3.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
+        file_data = (TEST_PATH / 'Amazing Grace3.json').read_text()
+        result_data = json.loads(file_data)
         self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
         self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))

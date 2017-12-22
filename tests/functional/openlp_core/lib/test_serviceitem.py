@@ -31,7 +31,6 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, ServiceItem, ServiceItemType, FormattingTags
 from tests.helpers.testmixin import TestMixin
-
 from tests.utils import assert_length, convert_file_service_item
 
 VERSE = 'The Lord said to {r}Noah{/r}: \n'\

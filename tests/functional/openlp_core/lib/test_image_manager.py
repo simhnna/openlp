@@ -35,8 +35,9 @@ from openlp.core.display.screens import ScreenList
 from openlp.core.lib.imagemanager import ImageManager, Priority
 
 from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
+TEST_PATH = str(RESOURCE_PATH)
 
 
 class TestImageManager(TestCase, TestMixin):

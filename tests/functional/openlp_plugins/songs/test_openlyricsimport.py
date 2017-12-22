@@ -22,14 +22,12 @@
 """
 This module contains tests for the OpenLyrics song importer.
 """
-import os
 import json
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from lxml import etree, objectify
 
-from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib.importers.openlyrics import OpenLyricsImport
@@ -37,9 +35,9 @@ from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
 
 from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'openlyricssongs'))
+TEST_PATH = RESOURCE_PATH / 'openlyricssongs'
 SONG_TEST_DATA = {
     'What a friend we have in Jesus.xml': {
         'title': 'What A Friend We Have In Jesus',
@@ -130,7 +128,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             importer.open_lyrics.xml_to_song = MagicMock()
 
             # WHEN: Importing each file
-            importer.import_source = [Path(TEST_PATH, song_file)]
+            importer.import_source = [TEST_PATH / song_file]
             importer.do_import()
 
             # THEN: The xml_to_song() method should have been called
@@ -145,7 +143,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
         Settings().setValue('formattingTags/html_tags', json.dumps(start_tags))
         ol = OpenLyrics(mocked_manager)
         parser = etree.XMLParser(remove_blank_text=True)
-        parsed_file = etree.parse(open(os.path.join(TEST_PATH, 'duchu-tags.xml'), 'rb'), parser)
+        parsed_file = etree.parse((TEST_PATH / 'duchu-tags.xml').open('rb'), parser)
         xml = etree.tostring(parsed_file).decode()
         song_xml = objectify.fromstring(xml)
 

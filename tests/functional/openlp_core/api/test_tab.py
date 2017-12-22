@@ -22,7 +22,6 @@
 """
 This module contains tests for the lib submodule of the Remotes plugin.
 """
-import os
 import re
 from unittest import TestCase
 from unittest.mock import patch
@@ -45,7 +44,6 @@ __default_settings__ = {
     'remotes/download version': '0000_00_00'
 }
 ZERO_URL = '0.0.0.0'
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
 
 
 class TestApiTab(TestCase, TestMixin):

@@ -22,14 +22,10 @@
 """
 This module contains tests for the SongShow Plus song importer.
 """
-import os
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
 from openlp.plugins.songs.lib.importers.foilpresenter import FoilPresenter
-
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', '/resources/foilpresentersongs'))
 
 
 class TestFoilPresenter(TestCase):

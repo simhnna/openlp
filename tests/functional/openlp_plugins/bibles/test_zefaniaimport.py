@@ -31,8 +31,9 @@ from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.importers.zefania import ZefaniaBible
 from openlp.plugins.bibles.lib.db import BibleDB
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'bibles'))
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'bibles'
 
 
 class TestZefaniaImport(TestCase):
@@ -67,8 +68,8 @@ class TestZefaniaImport(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        result_file = open(os.path.join(TEST_PATH, 'dk1933.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        file_data = (TEST_PATH / 'dk1933.json').read_text()
+        test_data = json.loads(file_data)
         bible_file = 'zefania-dk1933.xml'
         with patch('openlp.plugins.bibles.lib.importers.zefania.ZefaniaBible.application'):
             mocked_manager = MagicMock()
@@ -82,7 +83,7 @@ class TestZefaniaImport(TestCase):
             importer.get_language.return_value = 'Danish'
 
             # WHEN: Importing bible file
-            importer.file_path = Path(TEST_PATH, bible_file)
+            importer.file_path = TEST_PATH / bible_file
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -97,8 +98,8 @@ class TestZefaniaImport(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        result_file = open(os.path.join(TEST_PATH, 'rst.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        file_data = (TEST_PATH / 'rst.json').read_text()
+        test_data = json.loads(file_data)
         bible_file = 'zefania-rst.xml'
         with patch('openlp.plugins.bibles.lib.importers.zefania.ZefaniaBible.application'):
             mocked_manager = MagicMock()
@@ -112,7 +113,7 @@ class TestZefaniaImport(TestCase):
             importer.get_language.return_value = 'Russian'
 
             # WHEN: Importing bible file
-            importer.file_path = Path(TEST_PATH, bible_file)
+            importer.file_path = TEST_PATH / bible_file
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
