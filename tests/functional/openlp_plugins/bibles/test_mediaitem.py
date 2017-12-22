@@ -1375,7 +1375,7 @@ class TestMediaItem(TestCase, TestMixin):
             assert self.media_item.search_results == [mocked_verse_1]
             assert self.media_item.second_search_results == [mocked_verse_1a]
             assert self.mocked_log.debug.call_count == 2
-            assertTrue(self.mocked_main_window.information_message.called)
+            assert self.mocked_main_window.information_message.called is True
             mocked_display_results.assert_called_once_with()
 
     def test_on_search_edit_text_changed_search_while_typing_disabled(self):
@@ -1391,7 +1391,7 @@ class TestMediaItem(TestCase, TestMixin):
         self.media_item.on_search_edit_text_changed()
 
         # THEN: The method should not have checked if the timer is active
-        assertFalse(self.media_item.search_timer.isActive.called)
+        assert self.media_item.search_timer.isActive.called is False
 
     def test_on_search_edit_text_changed_search_while_typing_enabled(self):
         """
@@ -1441,7 +1441,7 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.display_results()
 
             # THEN: No items should be added to the list
-            assertFalse(self.media_item.list_view.addItem.called)
+            assert self.media_item.list_view.addItem.called is False
 
     def test_display_results_results(self):
         """

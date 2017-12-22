@@ -164,8 +164,7 @@ class TestImageMediaItem(TestCase):
         self.media_item.save_new_images_list(image_list, reload_list=False)
 
         # THEN: load_full_list() should not have been called
-        self.assertEquals(self.media_item.manager.save_object.call_count, 2,
-                          'load_full_list() should have been called only once')
+        assert self.media_item.manager.save_object.call_count == 2, 'load_full_list() should have been called only once'
 
     def test_on_reset_click(self):
         """
@@ -277,7 +276,7 @@ class TestImageMediaItem(TestCase):
 
         # THEN: A QTreeWidgetItem should be created with the above model object as it's data
         assert isinstance(item, QtWidgets.QTreeWidgetItem)
-        self.assertEqual('test_file_1.jpg', item.text(0))
+        assert 'test_file_1.jpg' == item.text(0)
         item_data = item.data(0, QtCore.Qt.UserRole)
         assert isinstance(item_data, ImageFilenames)
         assert 1 == item_data.id

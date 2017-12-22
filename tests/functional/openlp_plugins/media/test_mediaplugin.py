@@ -71,7 +71,7 @@ class MediaPluginTest(TestCase, TestMixin):
         result = process_check_binary('MediaInfo')
 
         # THEN: The the result should be True
-        self.assertTrue(result, 'Mediainfo should have been found')
+        assert result is True, 'Mediainfo should have been found'
 
     @patch('openlp.plugins.media.mediaplugin.check_binary_exists')
     def test_process_check_binary_fail(self, mocked_checked_binary_exists):
@@ -84,4 +84,4 @@ class MediaPluginTest(TestCase, TestMixin):
         result = process_check_binary("MediaInfo1")
 
         # THEN: The the result should be True
-        self.assertFalse(result, "Mediainfo should not have been found")
+        assert result is False, "Mediainfo should not have been found"

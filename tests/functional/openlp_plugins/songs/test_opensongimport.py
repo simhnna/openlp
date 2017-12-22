@@ -87,7 +87,7 @@ class TestOpenSongImport(TestCase):
             importer = OpenSongImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
-            self.assertIsNotNone(importer, 'Import should not be none')
+            assert importer is not None, 'Import should not be none'
 
     def test_invalid_import_source(self):
         """

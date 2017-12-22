@@ -249,7 +249,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
         doc.goto_slide(1)
 
         # THEN: next_step() should be call to try to advance to the next effect.
-        assertTrue(doc.next_step.called, 'next_step() should have been called!')
+        assert doc.next_step.called, 'next_step() should have been called!' is True
 
     def test_blank_screen(self):
         """

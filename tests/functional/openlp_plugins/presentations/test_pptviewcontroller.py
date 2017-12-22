@@ -164,7 +164,7 @@ class TestPptviewDocument(TestCase):
             result = instance.load_presentation()
 
         # THEN: The temp folder should be created and PptviewDocument.load_presentation should return False
-        self.assertFalse(result)
+        assert result is False
 
     def test_create_titles_and_notes(self):
         """

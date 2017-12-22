@@ -73,7 +73,7 @@ class TestSongShowPlusImport(TestCase):
             importer = SongShowPlusImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
-            self.assertIsNotNone(importer, 'Import should not be none')
+            assert importer is not None, 'Import should not be none'
 
     def test_invalid_import_source(self):
         """
@@ -92,9 +92,9 @@ class TestSongShowPlusImport(TestCase):
                 importer.import_source = source
 
                 # THEN: do_import should return none and the progress bar maximum should not be set.
-                self.assertIsNone(importer.do_import(), 'do_import should return None when import_source is not a list')
-                self.assertEqual(mocked_import_wizard.progress_bar.setMaximum.called, False,
-                                 'setMaximum on import_wizard.progress_bar should not have been called')
+                assert importer.do_import() is None, 'do_import should return None when import_source is not a list'
+                assert mocked_import_wizard.progress_bar.setMaximum.called is False, \
+                    'setMaximum on import_wizard.progress_bar should not have been called'
 
     def test_valid_import_source(self):
         """
@@ -113,8 +113,8 @@ class TestSongShowPlusImport(TestCase):
 
             # THEN: do_import should return none and the progress bar setMaximum should be called with the length of
             #       import_source.
-            self.assertIsNone(importer.do_import(), 'do_import should return None when import_source is a list '
-                              'and stop_import_flag is True')
+            assert importer.do_import() is None, \
+                'do_import should return None when import_source is a list and stop_import_flag is True'
             mocked_import_wizard.progress_bar.setMaximum.assert_called_with(len(importer.import_source))
 
     def test_to_openlp_verse_tag(self):
@@ -141,9 +141,9 @@ class TestSongShowPlusImport(TestCase):
 
             # THEN: The returned value should should correlate with the input arguments
             for original_tag, openlp_tag in test_values:
-                self.assertEqual(importer.to_openlp_verse_tag(original_tag), openlp_tag,
-                                 'SongShowPlusImport.to_openlp_verse_tag should return "%s" when called with "%s"' %
-                                 (openlp_tag, original_tag))
+                assert importer.to_openlp_verse_tag(original_tag) == openlp_tag, \
+                    'SongShowPlusImport.to_openlp_verse_tag should return "%s" when called with "%s"' % \
+                    (openlp_tag, original_tag)
 
     def test_to_openlp_verse_tag_verse_order(self):
         """
@@ -170,6 +170,6 @@ class TestSongShowPlusImport(TestCase):
 
             # THEN: The returned value should should correlate with the input arguments
             for original_tag, openlp_tag in test_values:
-                self.assertEqual(importer.to_openlp_verse_tag(original_tag, ignore_unique=True), openlp_tag,
-                                 'SongShowPlusImport.to_openlp_verse_tag should return "%s" when called with "%s"' %
-                                 (openlp_tag, original_tag))
+                assert importer.to_openlp_verse_tag(original_tag, ignore_unique=True) == openlp_tag, \
+                    'SongShowPlusImport.to_openlp_verse_tag should return "%s" when called with "%s"' % \
+                    (openlp_tag, original_tag)

@@ -131,7 +131,7 @@ class TestPdfController(TestCase, TestMixin):
         loaded = document.load_presentation()
 
         # THEN: The load should succeed and pictures should be created and have been scales to fit the screen
-        self.assertTrue(loaded, 'The loading of the PDF should succeed.')
+        assert loaded is True, 'The loading of the PDF should succeed.'
         image = QtGui.QImage(os.path.join(str(self.temp_folder_path), 'pdf_test1.pdf', 'mainslide001.png'))
         # Based on the converter used the resolution will differ a bit
         if controller.gsbin:

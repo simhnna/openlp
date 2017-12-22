@@ -106,7 +106,7 @@ class TestFoilPresenter(TestCase):
         foil_presenter_instance = FoilPresenter(mocked_manager, mocked_song_import)
 
         # THEN: The instance should not be None
-        self.assertIsNotNone(foil_presenter_instance, 'foil_presenter instance should not be none')
+        assert foil_presenter_instance is not None, 'foil_presenter instance should not be none'
 
     def test_no_xml(self):
         """
@@ -122,7 +122,7 @@ class TestFoilPresenter(TestCase):
             result = foil_presenter_instance.xml_to_song(arg)
 
             # Then: xml_to_song should return False
-            self.assertEqual(result, None, 'xml_to_song should return None when called with %s' % arg)
+            assert result is None, 'xml_to_song should return None when called with %s' % arg
 
     def test_encoding_declaration_removal(self):
         """
@@ -169,6 +169,6 @@ class TestFoilPresenter(TestCase):
         result = foil_presenter_instance._process_lyrics(mock_foilpresenterfolie, mocked_song)
 
         # THEN: _process_lyrics should return None and the song_import log_error method should have been called once
-        self.assertIsNone(result)
+        assert result is None
         self.mocked_song_import.log_error.assert_called_once_with('Element Text', 'Translated String')
         self.process_lyrics_patcher.start()

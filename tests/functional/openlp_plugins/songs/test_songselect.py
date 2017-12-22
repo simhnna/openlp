@@ -610,7 +610,7 @@ class TestSongSelectForm(TestCase, TestMixin):
                                            'Your song has been imported, would you like to import more songs?',
                                            defaultButton=QtWidgets.QMessageBox.Yes)
         mocked_on_back_button_clicked.assert_called_with()
-        self.assertIsNone(ssform.song)
+        assert ssform.song is None
 
     @patch('openlp.plugins.songs.forms.songselectform.QtWidgets.QMessageBox.question')
     @patch('openlp.plugins.songs.forms.songselectform.translate')
@@ -636,7 +636,7 @@ class TestSongSelectForm(TestCase, TestMixin):
                                            'Your song has been imported, would you like to import more songs?',
                                            defaultButton=QtWidgets.QMessageBox.Yes)
         mocked_done.assert_called_with(QtWidgets.QDialog.Accepted)
-        self.assertIsNone(ssform.song)
+        assert ssform.song is None
 
     def test_on_back_button_clicked(self):
         """
@@ -764,8 +764,8 @@ class TestSongSelectForm(TestCase, TestMixin):
 
         # THEN: The view button, search box and search button should be enabled
         mocked_song_select_importer.stop.assert_called_with()
-        self.assertTrue(ssform.search_button.isEnabled())
-        self.assertTrue(ssform.search_combobox.isEnabled())
+        assert ssform.search_button.isEnabled() is True
+        assert ssform.search_combobox.isEnabled() is True
 
     @patch('openlp.plugins.songs.forms.songselectform.Settings')
     @patch('openlp.plugins.songs.forms.songselectform.QtCore.QThread')
@@ -782,8 +782,8 @@ class TestSongSelectForm(TestCase, TestMixin):
         ssform.on_search_button_clicked()
 
         # THEN: The search box and search button should be disabled
-        self.assertFalse(ssform.search_button.isEnabled())
-        self.assertFalse(ssform.search_combobox.isEnabled())
+        assert ssform.search_button.isEnabled() is False
+        assert ssform.search_combobox.isEnabled() is False
 
     def test_on_search_finished(self):
         """
@@ -797,8 +797,8 @@ class TestSongSelectForm(TestCase, TestMixin):
         ssform.on_search_finished()
 
         # THEN: The search box and search button should be enabled
-        self.assertTrue(ssform.search_button.isEnabled())
-        self.assertTrue(ssform.search_combobox.isEnabled())
+        assert ssform.search_button.isEnabled() is True
+        assert ssform.search_combobox.isEnabled() is True
 
 
 class TestSongSelectFileImport(SongImportTestHelper):
@@ -834,8 +834,8 @@ class TestSearchWorker(TestCase, TestMixin):
         worker = SearchWorker(importer, search_text)
 
         # THEN: The correct values should be set
-        self.assertIs(importer, worker.importer, 'The importer should be the right object')
-        self.assertEqual(search_text, worker.search_text, 'The search text should be correct')
+        assert importer is worker.importer, 'The importer should be the right object'
+        assert search_text == worker.search_text, 'The search text should be correct'
 
     def test_start(self):
         """

@@ -39,8 +39,8 @@ class TestSongFormat(TestCase):
         # GIVEN: The SongFormat class
         # WHEN: Retrieving the format list
         # THEN: All SongFormats should be returned
-        self.assertEquals(len(SongFormat.get_format_list()), len(SongFormat.__attributes__),
-                          "The returned SongFormats don't match the stored ones")
+        assert len(SongFormat.get_format_list()) == len(SongFormat.__attributes__), \
+            "The returned SongFormats don't match the stored ones"
 
     def test_get_attributed_no_attributes(self):
         """
@@ -50,8 +50,8 @@ class TestSongFormat(TestCase):
         # WHEN: Retrieving all attributes of a SongFormat
         for song_format in SongFormat.get_format_list():
             # THEN: All attributes associated with the SongFormat should be returned
-            self.assertEquals(SongFormat.get(song_format), SongFormat.__attributes__[song_format],
-                              "The returned attributes don't match the stored ones")
+            assert SongFormat.get(song_format) == SongFormat.__attributes__[song_format], \
+                "The returned attributes don't match the stored ones"
 
     def test_get_attributed_single_attribute(self):
         """
@@ -62,14 +62,14 @@ class TestSongFormat(TestCase):
             # WHEN: Retrieving an attribute that overrides the default values
             for attribute in SongFormat.get(song_format).keys():
                 # THEN: Return the attribute
-                self.assertEquals(SongFormat.get(song_format, attribute), SongFormat.get(song_format)[attribute],
-                                  "The returned attribute doesn't match the stored one")
+                assert SongFormat.get(song_format, attribute) == SongFormat.get(song_format)[attribute], \
+                    "The returned attribute doesn't match the stored one"
             # WHEN: Retrieving an attribute that was not overridden
             for attribute in SongFormat.__defaults__.keys():
                 if attribute not in SongFormat.get(song_format).keys():
                     # THEN: Return the default value
-                    self.assertEquals(SongFormat.get(song_format, attribute), SongFormat.__defaults__[attribute],
-                                      "The returned attribute does not match the default values stored")
+                    assert SongFormat.get(song_format, attribute) == SongFormat.__defaults__[attribute], \
+                        "The returned attribute does not match the default values stored"
 
     def test_get_attributed_multiple_attributes(self):
         """
@@ -79,9 +79,8 @@ class TestSongFormat(TestCase):
         # WHEN: Retrieving multiple attributes at the same time
         for song_format in SongFormat.get_format_list():
             # THEN: Return all attributes that were specified
-            self.assertEquals(len(SongFormat.get(song_format, 'canDisable', 'availability')), 2,
-                              "Did not return the correct number of attributes"
-                              " when retrieving multiple attributes at once")
+            assert len(SongFormat.get(song_format, 'canDisable', 'availability')) == 2, \
+                "Did not return the correct number of attributes when retrieving multiple attributes at once"
 
     def test_get_format_list_returns_ordered_list(self):
         """
@@ -91,5 +90,5 @@ class TestSongFormat(TestCase):
         # GIVEN: The SongFormat class
         # WHEN: Retrieving all formats
         # THEN: The returned list should be sorted according to the ordering defined in SongFormat
-        self.assertEquals(sorted(SongFormat.get_format_list()), SongFormat.get_format_list(),
-                          "The list returned should be sorted according to the ordering in SongFormat")
+        assert sorted(SongFormat.get_format_list()) == SongFormat.get_format_list(), \
+            "The list returned should be sorted according to the ordering in SongFormat"

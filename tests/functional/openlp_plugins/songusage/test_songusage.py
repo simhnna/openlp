@@ -80,7 +80,7 @@ class TestSongUsage(TestCase):
         ret = song_usage.check_pre_conditions()
 
         # THEN: It should return True
-        self.assertTrue(ret)
+        assert ret is True
 
     @patch('openlp.plugins.songusage.songusageplugin.Manager')
     def test_toggle_song_usage_state(self, MockedManager):
@@ -96,4 +96,4 @@ class TestSongUsage(TestCase):
         song_usage.toggle_song_usage_state()
 
         # THEN: song_usage_state should have been toogled
-        self.assertFalse(song_usage.song_usage_active)
+        assert song_usage.song_usage_active is False

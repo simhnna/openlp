@@ -134,7 +134,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             importer.do_import()
 
             # THEN: The xml_to_song() method should have been called
-            self.assertTrue(importer.open_lyrics.xml_to_song.called)
+            assert importer.open_lyrics.xml_to_song.called is True
 
     def test_process_formatting_tags(self):
         """
@@ -173,8 +173,8 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             ol._process_authors(properties_xml, mocked_song)
 
             # THEN: add_author should have been called twice
-            self.assertEquals(mocked_song.method_calls[0][1][1], 'words+music')
-            self.assertEquals(mocked_song.method_calls[1][1][1], 'words')
+            assert mocked_song.method_calls[0][1][1] == 'words+music'
+            assert mocked_song.method_calls[1][1][1] == 'words'
 
     def test_process_songbooks(self):
         """
@@ -192,5 +192,5 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             ol._process_songbooks(properties_xml, mocked_song)
 
             # THEN: add_songbook_entry should have been called twice
-            self.assertEquals(mocked_song.method_calls[0][1][1], '48')
-            self.assertEquals(mocked_song.method_calls[1][1][1], '445 A')
+            assert mocked_song.method_calls[0][1][1] == '48'
+            assert mocked_song.method_calls[1][1][1] == '445 A'

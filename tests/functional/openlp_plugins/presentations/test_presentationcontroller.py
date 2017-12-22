@@ -151,7 +151,7 @@ class TestPresentationController(TestCase):
             result_titles, result_notes = self.document.get_titles_and_notes()
 
             # THEN: it should return two empty lists
-            assertIs(type(result_titles), list, 'result_titles should be a list')
+            assert type(result_titles) is list, 'result_titles should be a list'
 
 
 class TestPresentationDocument(TestCase):
@@ -226,4 +226,4 @@ class TestPresentationDocument(TestCase):
         result = instance.load_presentation()
 
         # THEN: load_presentation should return false
-        assertFalse(result, "PresentationDocument.load_presentation should return false.")
+        assert result is False, "PresentationDocument.load_presentation should return false."

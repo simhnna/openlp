@@ -73,7 +73,7 @@ class TestMessageListener(TestCase, TestMixin):
         ml.startup([mock_item, False, False, False])
 
         # THEN: The controllers will be setup.
-        self.assertTrue(len(controllers), 'We have loaded a controller')
+        assert len(controllers) > 0, 'We have loaded a controller'
 
     @patch('openlp.plugins.presentations.lib.mediaitem.MessageListener._setup')
     def test_start_presentation_with_no_player(self, media_mock):
@@ -105,7 +105,7 @@ class TestMessageListener(TestCase, TestMixin):
         ml.startup([mock_item, False, False, False])
 
         # THEN: The controllers will be setup.
-        self.assertTrue(len(controllers), 'We have loaded a controller')
+        assert len(controllers) > 0, 'We have loaded a controller'
 
     @patch('openlp.plugins.presentations.lib.mediaitem.MessageListener._setup')
     def test_start_pdf_presentation(self, media_mock):
@@ -125,7 +125,7 @@ class TestMessageListener(TestCase, TestMixin):
         ml.startup([mock_item, False, False, False])
 
         # THEN: The handler should be set to None
-        self.assertIsNone(ml.handler, 'The handler should be None')
+        assert ml.handler is None, 'The handler should be None'
 
 
 class TestController(TestCase, TestMixin):
