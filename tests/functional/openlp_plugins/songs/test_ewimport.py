@@ -109,7 +109,7 @@ class EasyWorshipSongImportLogger(EasyWorshipSongImport):
         self._title_assignment_list.append(title)
 
 
-class TestFieldDesc:
+class DataTestFieldDesc:
     def __init__(self, name, field_type, size):
         self.name = name
         self.field_type = field_type
@@ -121,11 +121,11 @@ CODE_PAGE_MAPPINGS = [
     (852, 'cp1250'), (737, 'cp1253'), (775, 'cp1257'), (855, 'cp1251'), (857, 'cp1254'),
     (866, 'cp1251'), (869, 'cp1253'), (862, 'cp1255'), (874, 'cp874')]
 TEST_FIELD_DESCS = [
-    TestFieldDesc('Title', FieldType.String, 50),
-    TestFieldDesc('Text Percentage Bottom', FieldType.Int16, 2), TestFieldDesc('RecID', FieldType.Int32, 4),
-    TestFieldDesc('Default Background', FieldType.Logical, 1), TestFieldDesc('Words', FieldType.Memo, 250),
-    TestFieldDesc('Words', FieldType.Memo, 250), TestFieldDesc('BK Bitmap', FieldType.Blob, 10),
-    TestFieldDesc('Last Modified', FieldType.Timestamp, 10)]
+    DataTestFieldDesc('Title', FieldType.String, 50),
+    DataTestFieldDesc('Text Percentage Bottom', FieldType.Int16, 2), DataTestFieldDesc('RecID', FieldType.Int32, 4),
+    DataTestFieldDesc('Default Background', FieldType.Logical, 1), DataTestFieldDesc('Words', FieldType.Memo, 250),
+    DataTestFieldDesc('Words', FieldType.Memo, 250), DataTestFieldDesc('BK Bitmap', FieldType.Blob, 10),
+    DataTestFieldDesc('Last Modified', FieldType.Timestamp, 10)]
 TEST_FIELDS = [
     b'A Heart Like Thine\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0', 32868, 2147483750,
     129, b'{\\rtf1\\ansi\\deff0\\deftab254{\\fonttbl{\\f0\\fnil\\fcharset0 Arial;}{\\f1\\fnil\\fcharset0 Verdana;}}'

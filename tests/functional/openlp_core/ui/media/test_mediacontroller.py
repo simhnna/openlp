@@ -54,10 +54,10 @@ class TestMediaController(TestCase, TestMixin):
         media_controller._generate_extensions_lists()
 
         # THEN: extensions list should have been copied from the player to the mediacontroller
-        self.assertListEqual(media_player.video_extensions_list, media_controller.video_extensions_list,
-                             'Video extensions should be the same')
-        self.assertListEqual(media_player.audio_extensions_list, media_controller.audio_extensions_list,
-                             'Audio extensions should be the same')
+        assert media_player.video_extensions_list == media_controller.video_extensions_list, \
+            'Video extensions should be the same'
+        assert media_player.audio_extensions_list == media_controller.audio_extensions_list, \
+            'Audio extensions should be the same'
 
     def test_resize(self):
         """
@@ -96,7 +96,7 @@ class TestMediaController(TestCase, TestMixin):
             ret = media_controller._check_file_type(mocked_controller, mocked_display, mocked_service_item)
 
             # THEN: it should return False
-            self.assertFalse(ret, '_check_file_type should return False when no mediaplayers are available.')
+            assert ret is False, '_check_file_type should return False when no mediaplayers are available.'
 
     @patch('openlp.core.ui.media.mediacontroller.MediaController._get_used_players')
     @patch('openlp.core.ui.media.mediacontroller.UiStrings')
@@ -119,7 +119,7 @@ class TestMediaController(TestCase, TestMixin):
         ret = media_controller._check_file_type(mocked_controller, mocked_display, mocked_service_item)
 
         # THEN: it should return False
-        self.assertFalse(ret, '_check_file_type should return False when the processor for service_item is None.')
+        assert ret is False, '_check_file_type should return False when the processor for service_item is None.'
 
     @patch('openlp.core.ui.media.mediacontroller.MediaController._get_used_players')
     @patch('openlp.core.ui.media.mediacontroller.UiStrings')
@@ -148,8 +148,8 @@ class TestMediaController(TestCase, TestMixin):
         ret = media_controller._check_file_type(mocked_controller, mocked_display, mocked_service_item)
 
         # THEN: it should return True
-        self.assertTrue(ret, '_check_file_type should return True when mediaplayers are available and '
-                             'the service item has an automatic processor.')
+        assert ret is True, '_check_file_type should return True when mediaplayers are available and ' \
+            'the service item has an automatic processor.'
 
     @patch('openlp.core.ui.media.mediacontroller.MediaController._get_used_players')
     @patch('openlp.core.ui.media.mediacontroller.UiStrings')
@@ -178,8 +178,8 @@ class TestMediaController(TestCase, TestMixin):
         ret = media_controller._check_file_type(mocked_controller, mocked_display, mocked_service_item)
 
         # THEN: it should return True
-        self.assertTrue(ret, '_check_file_type should return True when the players available are different'
-                             'from the processor from the service item.')
+        assert ret is True, '_check_file_type should return True when the players available are different' \
+            'from the processor from the service item.'
 
     def test_media_play_msg(self):
         """

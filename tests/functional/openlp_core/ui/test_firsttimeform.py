@@ -90,12 +90,12 @@ class TestFirstTimeForm(TestCase, TestMixin):
         frw.initialize(expected_screens)
 
         # THEN: The screens should be set up, and the default values initialised
-        self.assertEqual(expected_screens, frw.screens, 'The screens should be correct')
-        self.assertTrue(frw.web_access, 'The default value of self.web_access should be True')
-        self.assertFalse(frw.was_cancelled, 'The default value of self.was_cancelled should be False')
-        self.assertListEqual([], frw.theme_screenshot_threads, 'The list of threads should be empty')
-        self.assertListEqual([], frw.theme_screenshot_workers, 'The list of workers should be empty')
-        self.assertFalse(frw.has_run_wizard, 'has_run_wizard should be False')
+        assert expected_screens == frw.screens, 'The screens should be correct'
+        assert frw.web_access is True, 'The default value of self.web_access should be True'
+        assert frw.was_cancelled is False, 'The default value of self.was_cancelled should be False'
+        assert [] == frw.theme_screenshot_threads, 'The list of threads should be empty'
+        assert [] == frw.theme_screenshot_workers, 'The list of workers should be empty'
+        assert frw.has_run_wizard is False, 'has_run_wizard should be False'
 
     def test_set_defaults(self):
         """
@@ -124,7 +124,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
 
             # THEN: The default values should have been set
             mocked_restart.assert_called_with()
-            self.assertEqual('http://openlp.org/files/frw/', frw.web, 'The default URL should be set')
+            assert 'http://openlp.org/files/frw/' == frw.web, 'The default URL should be set'
             mocked_cancel_button.clicked.connect.assert_called_with(frw.on_cancel_button_clicked)
             mocked_no_internet_finish_btn.clicked.connect.assert_called_with(frw.on_no_internet_finish_button_clicked)
             mocked_currentIdChanged.connect.assert_called_with(frw.on_current_id_changed)
@@ -176,12 +176,12 @@ class TestFirstTimeForm(TestCase, TestMixin):
             frw.on_cancel_button_clicked()
 
             # THEN: The right things should be called in the right order
-            self.assertTrue(frw.was_cancelled, 'The was_cancelled property should have been set to True')
+            assert frw.was_cancelled is True, 'The was_cancelled property should have been set to True'
             mocked_worker.set_download_canceled.assert_called_with(True)
             mocked_thread.isRunning.assert_called_with()
-            self.assertEqual(2, mocked_thread.isRunning.call_count, 'isRunning() should have been called twice')
+            assert 2 == mocked_thread.isRunning.call_count, 'isRunning() should have been called twice'
             mocked_time.sleep.assert_called_with(0.1)
-            self.assertEqual(1, mocked_time.sleep.call_count, 'sleep() should have only been called once')
+            assert 1 == mocked_time.sleep.call_count, 'sleep() should have only been called once'
             mocked_set_normal_cursor.assert_called_with()
 
     def test_broken_config(self):
@@ -198,7 +198,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
             first_time_form._download_index()
 
             # THEN: The First Time Form should not have web access
-            self.assertFalse(first_time_form.web_access, 'There should not be web access with a broken config file')
+            assert first_time_form.web_access is False, 'There should not be web access with a broken config file'
 
     def test_invalid_config(self):
         """
@@ -214,7 +214,7 @@ class TestFirstTimeForm(TestCase, TestMixin):
             first_time_form._download_index()
 
             # THEN: The First Time Form should not have web access
-            self.assertFalse(first_time_form.web_access, 'There should not be web access with an invalid config file')
+            assert first_time_form.web_access is False, 'There should not be web access with an invalid config file'
 
     @patch('openlp.core.ui.firsttimeform.get_web_page')
     @patch('openlp.core.ui.firsttimeform.QtWidgets.QMessageBox')

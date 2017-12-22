@@ -23,7 +23,7 @@
 Functional tests to test the Impress class and related methods.
 """
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 import shutil
 from tempfile import mkdtemp
 
@@ -71,6 +71,60 @@ class TestImpressController(TestCase, TestMixin):
         # THEN: The name of the presentation controller should be correct
         self.assertEqual('Impress', controller.name,
                          'The name of the presentation controller should be correct')
+
+    @patch('openlp.plugins.presentations.lib.impresscontroller.log')
+    def test_check_available(self, mocked_log):
+        """
+        Test `ImpressController.check_available` on Windows
+        """
+        # GIVEN: An instance of :class:`ImpressController`
+        controller = ImpressController(plugin=self.mock_plugin)
+
+        # WHEN: `check_available` is called on Windows and `get_com_servicemanager` returns None
+        with patch('openlp.plugins.presentations.lib.impresscontroller.is_win', return_value=True), \
+                patch.object(controller, 'get_com_servicemanager', return_value=None) as mocked_get_com_servicemanager:
+            result = controller.check_available()
+
+            # THEN: `check_available` should return False
+            assert mocked_get_com_servicemanager.called is True
+            assert result is False
+
+    @patch('openlp.plugins.presentations.lib.impresscontroller.log')
+    def test_check_available1(self, mocked_log):
+        """
+        Test `ImpressController.check_available` on Windows
+        """
+        # GIVEN: An instance of :class:`ImpressController`
+        controller = ImpressController(plugin=self.mock_plugin)
+
+        # WHEN: `check_available` is called on Windows and `get_com_servicemanager` returns an object
+        mocked_com_object = MagicMock()
+        with patch('openlp.plugins.presentations.lib.impresscontroller.is_win', return_value=True), \
+                patch.object(controller, 'get_com_servicemanager', return_value=mocked_com_object) \
+                as mocked_get_com_servicemanager:
+            result = controller.check_available()
+
+            # THEN: `check_available` should return True
+            assert mocked_get_com_servicemanager.called is True
+            assert result is True
+
+    @patch('openlp.plugins.presentations.lib.impresscontroller.log')
+    @patch('openlp.plugins.presentations.lib.impresscontroller.is_win', return_value=False)
+    def test_check_available2(self, mocked_is_win, mocked_log):
+        """
+        Test `ImpressController.check_available` when not on Windows
+        """
+        # GIVEN: An instance of :class:`ImpressController`
+        controller = ImpressController(plugin=self.mock_plugin)
+
+        # WHEN: `check_available` is called on Windows and `uno_available` is True
+        with patch('openlp.plugins.presentations.lib.impresscontroller.uno_available', True), \
+                patch.object(controller, 'get_com_servicemanager') as mocked_get_com_servicemanager:
+            result = controller.check_available()
+
+            # THEN: `check_available` should return True
+            assert mocked_get_com_servicemanager.called is False
+            assert result is True
 
 
 class TestImpressDocument(TestCase):
