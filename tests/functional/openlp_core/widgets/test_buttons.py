@@ -60,8 +60,7 @@ class TestColorDialog(TestCase):
         widget = ColorButton()
 
         # THEN: The widget __init__ method should have the correct properties and methods called
-        self.assertEqual(widget.parent, None,
-                         'The parent should be the same as the one that the class was instianted with')
+        assert widget.parent is None, 'The parent should be the same as the one that the class was instianted with'
         self.mocked_change_color.assert_called_once_with('#ffffff')
         mocked_set_tool_tip.assert_called_once_with('Tool Tip Text')
         self.mocked_clicked.connect.assert_called_once_with(widget.on_clicked)
@@ -80,7 +79,7 @@ class TestColorDialog(TestCase):
         widget.change_color('#000000')
 
         # THEN: The _color attribute should be set to #000000 and setStyleSheet should have been called twice
-        self.assertEqual(widget._color, '#000000', '_color should have been set to #000000')
+        assert widget._color == '#000000', '_color should have been set to #000000'
         mocked_set_style_sheet.assert_has_calls(
             [call('background-color: #ffffff'), call('background-color: #000000')])
 
@@ -98,7 +97,7 @@ class TestColorDialog(TestCase):
         value = widget.color
 
         # THEN: The value set in _color should be returned
-        self.assertEqual(value, '#000000', 'The value returned should be equal to the one we set')
+        assert value == '#000000', 'The value returned should be equal to the one we set'
 
     # @patch('openlp.core.widgets.buttons.ColorButton.__init__', **{'return_value': None})
     def test_color_setter(self):
@@ -130,10 +129,10 @@ class TestColorDialog(TestCase):
         widget.on_clicked()
 
         # THEN: change_color should not have been called and the colorChanged signal should not have been emitted
-        self.assertFalse(self.mocked_change_color.called,
-                         'change_color should not have been called with an invalid color')
-        self.assertFalse(self.mocked_color_changed.emit.called,
-                         'colorChange signal should not have been emitted with an invalid color')
+        assert self.mocked_change_color.called is False, \
+            'change_color should not have been called with an invalid color'
+        assert self.mocked_color_changed.emit.called is False, \
+            'colorChange signal should not have been emitted with an invalid color'
 
     def test_on_clicked_same_color(self):
         """
@@ -152,10 +151,10 @@ class TestColorDialog(TestCase):
         widget.on_clicked()
 
         # THEN: change_color should not have been called and the colorChanged signal should not have been emitted
-        self.assertFalse(self.mocked_change_color.called,
-                         'change_color should not have been called when the color has not changed')
-        self.assertFalse(self.mocked_color_changed.emit.called,
-                         'colorChange signal should not have been emitted when the color has not changed')
+        assert self.mocked_change_color.called is False, \
+            'change_color should not have been called when the color has not changed'
+        assert self.mocked_color_changed.emit.called is False, \
+            'colorChange signal should not have been emitted when the color has not changed'
 
     def test_on_clicked_new_color(self):
         """

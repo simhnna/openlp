@@ -54,7 +54,7 @@ class TestServiceManager(TestCase):
         ServiceManager(None)
         # WHEN: the default service manager is built.
         # THEN: The the controller should be registered in the registry.
-        self.assertNotEqual(Registry().get('service_manager'), None, 'The base service manager should be registered')
+        assert Registry().get('service_manager') is not None, 'The base service manager should be registered'
 
     def test_create_basic_service(self):
         """
@@ -67,9 +67,9 @@ class TestServiceManager(TestCase):
         service_manager.service_theme = 'test_theme'
         service = service_manager.create_basic_service()[0]
         # THEN: The controller should be registered in the registry.
-        self.assertNotEqual(service, None, 'The base service should be created')
-        self.assertEqual(service['openlp_core']['service-theme'], 'test_theme', 'The test theme should be saved')
-        self.assertEqual(service['openlp_core']['lite-service'], False, 'The lite service should be saved')
+        assert service is not None, 'The base service should be created'
+        assert service['openlp_core']['service-theme'] == 'test_theme', 'The test theme should be saved'
+        assert service['openlp_core']['lite-service'] is False, 'The lite service should be saved'
 
     def test_supported_suffixes(self):
         """
@@ -81,9 +81,9 @@ class TestServiceManager(TestCase):
         service_manager.supported_suffixes('txt')
         service_manager.supported_suffixes(['pptx', 'ppt'])
         # THEN: The suffixes should be available to test.
-        self.assertEqual('txt' in service_manager.suffixes, True, 'The suffix txt should be in the list')
-        self.assertEqual('ppt' in service_manager.suffixes, True, 'The suffix ppt should be in the list')
-        self.assertEqual('pptx' in service_manager.suffixes, True, 'The suffix pptx should be in the list')
+        assert 'txt' in service_manager.suffixes, 'The suffix txt should be in the list'
+        assert 'ppt' in service_manager.suffixes, 'The suffix ppt should be in the list'
+        assert 'pptx' in service_manager.suffixes, 'The suffix pptx should be in the list'
 
     def test_build_context_menu(self):
         """
@@ -114,20 +114,20 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 1, 'Should have been called once')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 1, 'Should have been called once')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have been called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 1, 'Should have been called once')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have been called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have been called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 1, 'Should have been called once')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have been called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 1,
-                         'Should have been called once')
+        assert service_manager.edit_action.setVisible.call_count == 1, 'Should have been called once'
+        assert service_manager.rename_action.setVisible.call_count == 1, 'Should have been called once'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have been called once'
+        assert service_manager.maintain_action.setVisible.call_count == 1, 'Should have been called once'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have been called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have been called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 1, 'Should have been called once'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have been called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 1, \
+            'Should have been called once'
 
     def test_build_song_context_menu(self):
         """
@@ -169,29 +169,29 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 2,
-                         'Should have be called twice')
+        assert service_manager.edit_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.rename_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.maintain_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 2, \
+            'Should have be called twice'
         # THEN we add a 2nd display frame
         service_item._display_frames.append(MagicMock())
         service_manager.context_menu(1)
         # THEN the following additional calls should have occurred.
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 2,
-                         'Should have be called twice')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 1, 'Should have be called once')
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 2, \
+            'Should have be called twice'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 1, 'Should have be called once'
 
     def test_build_bible_context_menu(self):
         """
@@ -233,29 +233,29 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 2,
-                         'Should have be called twice')
+        assert service_manager.edit_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.rename_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.maintain_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 2, \
+            'Should have be called twice'
         # THEN we add a 2nd display frame
         service_item._display_frames.append(MagicMock())
         service_manager.context_menu(1)
         # THEN the following additional calls should have occurred.
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 2,
-                         'Should have be called twice')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 1, 'Should have be called once')
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 2, \
+            'Should have be called twice'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 1, 'Should have be called once'
 
     def test_build_custom_context_menu(self):
         """
@@ -298,29 +298,29 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 2,
-                         'Should have be called twice')
+        assert service_manager.edit_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.rename_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.maintain_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 2, \
+            'Should have be called twice'
         # THEN we add a 2nd display frame
         service_item._display_frames.append(MagicMock())
         service_manager.context_menu(1)
         # THEN the following additional calls should have occurred.
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 2,
-                         'Should have be called twice')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 1, 'Should have be called once')
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 2, \
+            'Should have be called twice'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 1, 'Should have be called once'
 
     def test_build_image_context_menu(self):
         """
@@ -361,29 +361,29 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
+        assert service_manager.edit_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.rename_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.maintain_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
         # THEN we add a 2nd display frame and regenerate the menu.
         service_item._raw_frames.append(MagicMock())
         service_manager.context_menu(1)
         # THEN the following additional calls should have occurred.
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 2,
-                         'Should have be called twice')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 1, 'Should have be called once')
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 2, \
+            'Should have be called twice'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 1, 'Should have be called once'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 1, 'Should have be called once'
 
     def test_build_media_context_menu(self):
         """
@@ -422,25 +422,25 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
+        assert service_manager.edit_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.rename_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.maintain_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
         # THEN I change the length of the media and regenerate the menu.
         service_item.set_media_length(5)
         service_manager.context_menu(1)
         # THEN the following additional calls should have occurred.
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 3, 'Should have be called three times')
+        assert service_manager.time_action.setVisible.call_count == 3, 'Should have be called three times'
 
     def test_build_presentation_pdf_context_menu(self):
         """
@@ -480,20 +480,20 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 2, 'Should have be called twice')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
+        assert service_manager.edit_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.rename_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.maintain_action.setVisible.call_count == 2, 'Should have be called twice'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
 
     def test_build_presentation_non_pdf_context_menu(self):
         """
@@ -530,20 +530,20 @@ class TestServiceManager(TestCase):
         # WHEN I define a context menu
         service_manager.context_menu(1)
         # THEN the following calls should have occurred.
-        self.assertEqual(service_manager.edit_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.rename_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.create_custom_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.maintain_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.notes_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.time_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_start_action.setVisible.call_count, 1, 'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
-        self.assertEqual(service_manager.auto_play_slides_once.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.auto_play_slides_loop.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.timed_slide_interval.setChecked.call_count, 0, 'Should not be called')
-        self.assertEqual(service_manager.theme_menu.menuAction().setVisible.call_count, 1,
-                         'Should have be called once')
+        assert service_manager.edit_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.rename_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.create_custom_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.maintain_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.notes_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.time_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_start_action.setVisible.call_count == 1, 'Should have be called once'
+        assert service_manager.auto_play_slides_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
+        assert service_manager.auto_play_slides_once.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.auto_play_slides_loop.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.timed_slide_interval.setChecked.call_count == 0, 'Should not be called'
+        assert service_manager.theme_menu.menuAction().setVisible.call_count == 1, \
+            'Should have be called once'
 
     @patch('openlp.core.ui.servicemanager.Settings')
     @patch('PyQt5.QtCore.QTimer.singleShot')
@@ -576,7 +576,7 @@ class TestServiceManager(TestCase):
         # WHEN: on_single_click_preview() is called
         service_manager.on_single_click_preview()
         # THEN: timer should not be started
-        self.assertEqual(mocked_singleShot.call_count, 0, 'Should not be called')
+        assert mocked_singleShot.call_count == 0, 'Should not be called'
 
     @patch('openlp.core.ui.servicemanager.Settings')
     @patch('PyQt5.QtCore.QTimer.singleShot')
@@ -595,7 +595,7 @@ class TestServiceManager(TestCase):
         service_manager.on_single_click_preview()
         # THEN: timer should not be started
         mocked_make_live.assert_called_with()
-        self.assertEqual(mocked_singleShot.call_count, 0, 'Should not be called')
+        assert mocked_singleShot.call_count == 0, 'Should not be called'
 
     @patch('openlp.core.ui.servicemanager.ServiceManager.make_preview')
     def test_single_click_timeout_single(self, mocked_make_preview):
@@ -607,8 +607,7 @@ class TestServiceManager(TestCase):
         # WHEN: on_single_click_preview() is called
         service_manager.on_single_click_preview_timeout()
         # THEN: make_preview() should have been called
-        self.assertEqual(mocked_make_preview.call_count, 1,
-                         'ServiceManager.make_preview() should have been called once')
+        assert mocked_make_preview.call_count == 1, 'ServiceManager.make_preview() should have been called once'
 
     @patch('openlp.core.ui.servicemanager.ServiceManager.make_preview')
     @patch('openlp.core.ui.servicemanager.ServiceManager.make_live')
@@ -622,7 +621,7 @@ class TestServiceManager(TestCase):
         service_manager.on_double_click_live()
         service_manager.on_single_click_preview_timeout()
         # THEN: make_preview() should not have been called
-        self.assertEqual(mocked_make_preview.call_count, 0, 'ServiceManager.make_preview() should not be called')
+        assert mocked_make_preview.call_count == 0, 'ServiceManager.make_preview() should not be called'
 
     @patch('openlp.core.ui.servicemanager.shutil.copy')
     @patch('openlp.core.ui.servicemanager.zipfile')
@@ -650,7 +649,7 @@ class TestServiceManager(TestCase):
         result = service_manager.save_file()
 
         # THEN: The "save_as" method is called to save the service
-        self.assertTrue(result)
+        assert result is True
         mocked_save_file_as.assert_called_with()
 
     @patch('openlp.core.ui.servicemanager.shutil.copy')
@@ -678,7 +677,7 @@ class TestServiceManager(TestCase):
         result = service_manager.save_local_file()
 
         # THEN: The "save_as" method is called to save the service
-        self.assertTrue(result)
+        assert result is True
         mocked_save_file_as.assert_called_with()
 
     @patch('openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
@@ -699,8 +698,8 @@ class TestServiceManager(TestCase):
         service_manager.theme_change()
 
         # THEN: The the theme toolbar should not be visible
-        self.assertFalse(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
-                         'The visibility should be False')
+        assert service_manager.toolbar.actions['theme_combo_box'].isVisible() is False, \
+            'The visibility should be False'
 
     @patch('openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
     def test_theme_change_service(self, mocked_regenerate_service_items):
@@ -720,8 +719,8 @@ class TestServiceManager(TestCase):
         service_manager.theme_change()
 
         # THEN: The the theme toolbar should be visible
-        self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
-                        'The visibility should be True')
+        assert service_manager.toolbar.actions['theme_combo_box'].isVisible() is True, \
+            'The visibility should be True'
 
     @patch('openlp.core.ui.servicemanager.ServiceManager.regenerate_service_items')
     def test_theme_change_song(self, mocked_regenerate_service_items):
@@ -741,5 +740,5 @@ class TestServiceManager(TestCase):
         service_manager.theme_change()
 
         # THEN: The the theme toolbar should  be visible
-        self.assertTrue(service_manager.toolbar.actions['theme_combo_box'].isVisible(),
-                        'The visibility should be True')
+        assert service_manager.toolbar.actions['theme_combo_box'].isVisible() is True, \
+            'The visibility should be True'

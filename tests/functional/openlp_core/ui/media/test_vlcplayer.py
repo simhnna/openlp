@@ -24,7 +24,7 @@ Package to test the openlp.core.ui.media.vlcplayer package.
 """
 import os
 import sys
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest import TestCase, skip
 from unittest.mock import MagicMock, patch, call
 
@@ -64,7 +64,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         get_vlc()
 
         # THEN: The extra environment variable should be there
-        self.assertNotIn('openlp.core.ui.media.vendor.vlc', sys.modules)
+        assert 'openlp.core.ui.media.vendor.vlc' not in sys.modules
 
     @patch('openlp.core.ui.media.vlcplayer.is_macosx')
     def test_fix_vlc_22_plugin_path(self, mocked_is_macosx):
@@ -78,9 +78,8 @@ class TestVLCPlayer(TestCase, TestMixin):
         get_vlc()
 
         # THEN: The extra environment variable should be there
-        self.assertIn('VLC_PLUGIN_PATH', os.environ,
-                      'The plugin path should be in the environment variables')
-        self.assertEqual('/Applications/VLC.app/Contents/MacOS/plugins', os.environ['VLC_PLUGIN_PATH'])
+        assert 'VLC_PLUGIN_PATH' in os.environ, 'The plugin path should be in the environment variables'
+        assert '/Applications/VLC.app/Contents/MacOS/plugins' == os.environ['VLC_PLUGIN_PATH']
 
     @patch.dict(os.environ)
     @patch('openlp.core.ui.media.vlcplayer.is_macosx')
@@ -95,8 +94,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         get_vlc()
 
         # THEN: The extra environment variable should NOT be there
-        self.assertNotIn('VLC_PLUGIN_PATH', os.environ,
-                         'The plugin path should NOT be in the environment variables')
+        assert 'VLC_PLUGIN_PATH' not in os.environ, 'The plugin path should NOT be in the environment variables'
 
     def test_init(self):
         """
@@ -109,12 +107,12 @@ class TestVLCPlayer(TestCase, TestMixin):
         vlc_player = VlcPlayer(None)
 
         # THEN: The correct variables are set
-        self.assertEqual('VLC', vlc_player.original_name)
-        self.assertEqual('&VLC', vlc_player.display_name)
-        self.assertIsNone(vlc_player.parent)
-        self.assertTrue(vlc_player.can_folder)
-        self.assertListEqual(AUDIO_EXT, vlc_player.audio_extensions_list)
-        self.assertListEqual(VIDEO_EXT, vlc_player.video_extensions_list)
+        assert 'VLC' == vlc_player.original_name
+        assert '&VLC' == vlc_player.display_name
+        assert vlc_player.parent is None
+        assert vlc_player.can_folder is True
+        assert AUDIO_EXT == vlc_player.audio_extensions_list
+        assert VIDEO_EXT == vlc_player.video_extensions_list
 
     @patch('openlp.core.ui.media.vlcplayer.is_win')
     @patch('openlp.core.ui.media.vlcplayer.is_macosx')
@@ -151,20 +149,20 @@ class TestVLCPlayer(TestCase, TestMixin):
         vlc_player.setup(mocked_display)
 
         # THEN: The VLC widget should be set up correctly
-        self.assertEqual(mocked_display.vlc_widget, mocked_qframe)
+        assert mocked_display.vlc_widget == mocked_qframe
         mocked_qframe.setFrameStyle.assert_called_with(1)
         mocked_settings.value.assert_called_with('advanced/hide mouse')
         mocked_vlc.Instance.assert_called_with('--no-video-title-show --no-audio --no-video-title-show '
                                                '--mouse-hide-timeout=0')
-        self.assertEqual(mocked_display.vlc_instance, mocked_instance)
+        assert mocked_display.vlc_instance == mocked_instance
         mocked_instance.media_player_new.assert_called_with()
-        self.assertEqual(mocked_display.vlc_media_player, mocked_media_player_new)
+        assert mocked_display.vlc_media_player == mocked_media_player_new
         mocked_display.size.assert_called_with()
         mocked_qframe.resize.assert_called_with((10, 10))
         mocked_qframe.raise_.assert_called_with()
         mocked_qframe.hide.assert_called_with()
         mocked_media_player_new.set_xwindow.assert_called_with(2)
-        self.assertTrue(vlc_player.has_own_widget)
+        assert vlc_player.has_own_widget is True
 
     @patch('openlp.core.ui.media.vlcplayer.is_win')
     @patch('openlp.core.ui.media.vlcplayer.is_macosx')
@@ -328,7 +326,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         is_available = vlc_player.check_available()
 
         # THEN: VLC should be available
-        self.assertTrue(is_available)
+        assert is_available is True
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     def test_check_not_available(self, mocked_get_vlc):
@@ -343,7 +341,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         is_available = vlc_player.check_available()
 
         # THEN: VLC should NOT be available
-        self.assertFalse(is_available)
+        assert is_available is False
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     @patch('openlp.core.ui.media.vlcplayer.os.path.normcase')
@@ -376,11 +374,11 @@ class TestVLCPlayer(TestCase, TestMixin):
         # THEN: The video should be loaded
         mocked_normcase.assert_called_with(media_path)
         mocked_display.vlc_instance.media_new_path.assert_called_with(media_path)
-        self.assertEqual(mocked_vlc_media, mocked_display.vlc_media)
+        assert mocked_vlc_media == mocked_display.vlc_media
         mocked_display.vlc_media_player.set_media.assert_called_with(mocked_vlc_media)
         mocked_vlc_media.parse.assert_called_with()
         mocked_volume.assert_called_with(mocked_display, 100)
-        self.assertTrue(result)
+        assert result is True
 
     @patch('openlp.core.ui.media.vlcplayer.is_win')
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
@@ -421,11 +419,11 @@ class TestVLCPlayer(TestCase, TestMixin):
         # THEN: The video should be loaded
         mocked_normcase.assert_called_with(media_path)
         mocked_display.vlc_instance.media_new_location.assert_called_with('cdda://' + media_path)
-        self.assertEqual(mocked_vlc_media, mocked_display.vlc_media)
+        assert mocked_vlc_media == mocked_display.vlc_media
         mocked_display.vlc_media_player.set_media.assert_called_with(mocked_vlc_media)
         mocked_vlc_media.parse.assert_called_with()
         mocked_volume.assert_called_with(mocked_display, 100)
-        self.assertTrue(result)
+        assert result is True
 
     @patch('openlp.core.ui.media.vlcplayer.is_win')
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
@@ -466,11 +464,11 @@ class TestVLCPlayer(TestCase, TestMixin):
         # THEN: The video should be loaded
         mocked_normcase.assert_called_with(media_path)
         mocked_display.vlc_instance.media_new_location.assert_called_with('cdda:///' + media_path)
-        self.assertEqual(mocked_vlc_media, mocked_display.vlc_media)
+        assert mocked_vlc_media == mocked_display.vlc_media
         mocked_display.vlc_media_player.set_media.assert_called_with(mocked_vlc_media)
         mocked_vlc_media.parse.assert_called_with()
         mocked_volume.assert_called_with(mocked_display, 100)
-        self.assertTrue(result)
+        assert result is True
 
     @patch('openlp.core.ui.media.vlcplayer.is_win')
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
@@ -511,11 +509,11 @@ class TestVLCPlayer(TestCase, TestMixin):
         # THEN: The video should be loaded
         mocked_normcase.assert_called_with(media_path)
         mocked_display.vlc_instance.media_new_location.assert_called_with('cdda://' + media_path)
-        self.assertEqual(mocked_vlc_media, mocked_display.vlc_media)
-        self.assertEqual(0, mocked_subitems.item_at_index.call_count)
+        assert mocked_vlc_media == mocked_display.vlc_media
+        assert 0 == mocked_subitems.item_at_index.call_count
         mocked_display.vlc_media_player.set_media.assert_called_with(mocked_vlc_media)
-        self.assertEqual(0, mocked_vlc_media.parse.call_count)
-        self.assertFalse(result)
+        assert 0 == mocked_vlc_media.parse.call_count
+        assert result is False
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     @patch('openlp.core.ui.media.vlcplayer.datetime', MockDateTime)
@@ -538,7 +536,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         result = vlc_player.media_state_wait(mocked_display, 2)
 
         # THEN: The results should be True
-        self.assertTrue(result)
+        assert result is True
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     @patch('openlp.core.ui.media.vlcplayer.datetime', MockDateTime)
@@ -561,7 +559,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         result = vlc_player.media_state_wait(mocked_display, 2)
 
         # THEN: The results should be True
-        self.assertFalse(result)
+        assert result is False
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     @patch('openlp.core.ui.media.vlcplayer.datetime', MockDateTime)
@@ -586,7 +584,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         result = vlc_player.media_state_wait(mocked_display, 3)
 
         # THEN: The results should be True
-        self.assertFalse(result)
+        assert result is False
 
     def test_resize(self):
         """
@@ -636,9 +634,9 @@ class TestVLCPlayer(TestCase, TestMixin):
         # THEN: A bunch of things should happen to play the media
         mocked_thread.start.assert_called_with()
         mocked_volume.assert_called_with(mocked_display, 100)
-        self.assertEqual(MediaState.Playing, vlc_player.get_live_state())
+        assert MediaState.Playing == vlc_player.get_live_state()
         mocked_display.vlc_widget.raise_.assert_called_with()
-        self.assertTrue(result, 'The value returned from play() should be True')
+        assert result is True, 'The value returned from play() should be True'
 
     @patch('openlp.core.ui.media.vlcplayer.threading')
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
@@ -666,7 +664,7 @@ class TestVLCPlayer(TestCase, TestMixin):
 
         # THEN: A thread should be started, but the method should return False
         mocked_thread.start.assert_called_with()
-        self.assertFalse(result)
+        assert result is False
 
     @patch('openlp.core.ui.media.vlcplayer.threading')
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
@@ -705,9 +703,9 @@ class TestVLCPlayer(TestCase, TestMixin):
         mocked_display.vlc_media_player.audio_set_track.assert_called_with(1)
         mocked_display.vlc_media_player.video_set_spu.assert_called_with(1)
         mocked_volume.assert_called_with(mocked_display, 100)
-        self.assertEqual(MediaState.Playing, vlc_player.get_live_state())
+        assert MediaState.Playing == vlc_player.get_live_state()
         mocked_display.vlc_widget.raise_.assert_called_with()
-        self.assertTrue(result, 'The value returned from play() should be True')
+        assert result is True, 'The value returned from play() should be True'
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     def test_pause(self, mocked_get_vlc):
@@ -732,7 +730,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         mocked_display.vlc_media.get_state.assert_called_with()
         mocked_display.vlc_media_player.pause.assert_called_with()
         mocked_media_state_wait.assert_called_with(mocked_display, 2)
-        self.assertEqual(MediaState.Paused, vlc_player.get_live_state())
+        assert MediaState.Paused == vlc_player.get_live_state()
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     def test_pause_not_playing(self, mocked_get_vlc):
@@ -752,7 +750,7 @@ class TestVLCPlayer(TestCase, TestMixin):
 
         # THEN: The pause method should exit early
         mocked_display.vlc_media.get_state.assert_called_with()
-        self.assertEqual(0, mocked_display.vlc_media_player.pause.call_count)
+        assert 0 == mocked_display.vlc_media_player.pause.call_count
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     def test_pause_fail(self, mocked_get_vlc):
@@ -777,7 +775,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         mocked_display.vlc_media.get_state.assert_called_with()
         mocked_display.vlc_media_player.pause.assert_called_with()
         mocked_media_state_wait.assert_called_with(mocked_display, 2)
-        self.assertNotEqual(MediaState.Paused, vlc_player.state)
+        assert MediaState.Paused is not vlc_player.state
 
     @patch('openlp.core.ui.media.vlcplayer.threading')
     def test_stop(self, mocked_threading):
@@ -798,7 +796,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         # THEN: A thread should have been started to stop VLC
         mocked_threading.Thread.assert_called_with(target=mocked_stop)
         mocked_thread.start.assert_called_with()
-        self.assertEqual(MediaState.Stopped, vlc_player.get_live_state())
+        assert MediaState.Stopped == vlc_player.get_live_state()
 
     def test_volume(self):
         """
@@ -828,7 +826,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         vlc_player.volume(mocked_display, 10)
 
         # THEN: The volume should NOT have been set
-        self.assertEqual(0, mocked_display.vlc_media_player.audio_set_volume.call_count)
+        assert 0 == mocked_display.vlc_media_player.audio_set_volume.call_count
 
     def test_seek_unseekable_media(self):
         """
@@ -845,7 +843,7 @@ class TestVLCPlayer(TestCase, TestMixin):
 
         # THEN: nothing should happen
         mocked_display.vlc_media_player.is_seekable.assert_called_with()
-        self.assertEqual(0, mocked_display.vlc_media_player.set_time.call_count)
+        assert 0 == mocked_display.vlc_media_player.set_time.call_count
 
     def test_seek_seekable_media(self):
         """
@@ -896,7 +894,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         # THEN: The media should be stopped and invisible
         mocked_display.vlc_media_player.stop.assert_called_with()
         mocked_display.vlc_widget.setVisible.assert_called_with(False)
-        self.assertEqual(MediaState.Off, vlc_player.get_live_state())
+        assert MediaState.Off == vlc_player.get_live_state()
 
     def test_set_visible_has_own_widget(self):
         """
@@ -926,7 +924,7 @@ class TestVLCPlayer(TestCase, TestMixin):
         vlc_player.set_visible(mocked_display, True)
 
         # THEN: The media should be stopped and invsibile
-        self.assertEqual(0, mocked_display.vlc_widget.setVisible.call_count)
+        assert 0 == mocked_display.vlc_widget.setVisible.call_count
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     def test_update_ui(self, mocked_get_vlc):
@@ -953,12 +951,12 @@ class TestVLCPlayer(TestCase, TestMixin):
 
         # THEN: Certain methods should be called
         mocked_stop.assert_called_with(mocked_display)
-        self.assertEqual(2, mocked_stop.call_count)
+        assert 2 == mocked_stop.call_count
         mocked_display.vlc_media_player.get_time.assert_called_with()
         mocked_set_visible.assert_called_with(mocked_display, False)
         mocked_controller.seek_slider.setSliderPosition.assert_called_with(400000)
         expected_calls = [call(True), call(False)]
-        self.assertEqual(expected_calls, mocked_controller.seek_slider.blockSignals.call_args_list)
+        assert expected_calls == mocked_controller.seek_slider.blockSignals.call_args_list
 
     @patch('openlp.core.ui.media.vlcplayer.get_vlc')
     def test_update_ui_dvd(self, mocked_get_vlc):
@@ -987,12 +985,12 @@ class TestVLCPlayer(TestCase, TestMixin):
 
         # THEN: Certain methods should be called
         mocked_stop.assert_called_with(mocked_display)
-        self.assertEqual(2, mocked_stop.call_count)
+        assert 2 == mocked_stop.call_count
         mocked_display.vlc_media_player.get_time.assert_called_with()
         mocked_set_visible.assert_called_with(mocked_display, False)
         mocked_controller.seek_slider.setSliderPosition.assert_called_with(300)
         expected_calls = [call(True), call(False)]
-        self.assertEqual(expected_calls, mocked_controller.seek_slider.blockSignals.call_args_list)
+        assert expected_calls == mocked_controller.seek_slider.blockSignals.call_args_list
 
     @patch('openlp.core.ui.media.vlcplayer.translate')
     def test_get_info(self, mocked_translate):
@@ -1007,6 +1005,6 @@ class TestVLCPlayer(TestCase, TestMixin):
         info = vlc_player.get_info()
 
         # THEN: The information should be correct
-        self.assertEqual('VLC is an external player which supports a number of different formats.<br/> '
-                         '<strong>Audio</strong><br/>' + str(AUDIO_EXT) + '<br/><strong>Video</strong><br/>' +
-                         str(VIDEO_EXT) + '<br/>', info)
+        assert 'VLC is an external player which supports a number of different formats.<br/> ' \
+            '<strong>Audio</strong><br/>' + str(AUDIO_EXT) + '<br/><strong>Video</strong><br/>' + \
+               str(VIDEO_EXT) + '<br/>' == info

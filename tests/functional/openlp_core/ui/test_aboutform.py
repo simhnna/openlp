@@ -59,8 +59,8 @@ class TestFirstTimeForm(TestCase, TestMixin):
         about_form = AboutForm(None)
 
         # THEN: The build number should be in the text
-        self.assertTrue('OpenLP 3.1.5 build 3000' in about_form.about_text_edit.toPlainText(),
-                        "The build number should be set correctly")
+        assert 'OpenLP 3.1.5 build 3000' in about_form.about_text_edit.toPlainText(), \
+            "The build number should be set correctly"
 
     def test_about_form_date(self):
         """
@@ -74,5 +74,4 @@ class TestFirstTimeForm(TestCase, TestMixin):
         license_text = about_form.license_text_edit.toPlainText()
 
         # THEN: The date should be in the text twice.
-        self.assertTrue(license_text.count(date_string, 0) == 2,
-                        "The text string should be added twice to the license string")
+        assert license_text.count(date_string, 0) == 2, "The text string should be added twice to the license string"

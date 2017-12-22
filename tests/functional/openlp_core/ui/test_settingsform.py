@@ -57,7 +57,7 @@ class TestSettingsForm(TestCase):
 
             # THEN: The general tab should have been inserted into the stacked layout and an item inserted into the list
             mocked_add_widget.assert_called_with(general_tab)
-            self.assertEqual(1, mocked_add_item.call_count, 'addItem should have been called')
+            assert 1 == mocked_add_item.call_count, 'addItem should have been called'
 
     def test_insert_tab_not_visible(self):
         """
@@ -75,7 +75,7 @@ class TestSettingsForm(TestCase):
 
             # THEN: The general tab should have been inserted, but no list item should have been inserted into the list
             mocked_add_widget.assert_called_with(general_tab)
-            self.assertEqual(0, mocked_add_item.call_count, 'addItem should not have been called')
+            assert 0 == mocked_add_item.call_count, 'addItem should not have been called'
 
     def test_accept_with_inactive_plugins(self):
         """
@@ -107,7 +107,7 @@ class TestSettingsForm(TestCase):
 
         # THEN: The general tab's save() method should have been called, but not the themes tab
         mocked_general_save.assert_called_with()
-        self.assertEqual(0, mocked_theme_save.call_count, 'The Themes tab\'s save() should not have been called')
+        assert 0 == mocked_theme_save.call_count, 'The Themes tab\'s save() should not have been called'
 
     def test_list_item_changed_invalid_item(self):
         """
@@ -128,7 +128,7 @@ class TestSettingsForm(TestCase):
             settings_form.list_item_changed(100)
 
             # THEN: The rest of the method should not have been called
-            self.assertEqual(0, mocked_count.call_count, 'The count method of the stacked layout should not be called')
+            assert 0 == mocked_count.call_count, 'The count method of the stacked layout should not be called'
 
     def test_reject_with_inactive_items(self):
         """
@@ -158,7 +158,7 @@ class TestSettingsForm(TestCase):
 
         # THEN: The general tab's cancel() method should have been called, but not the themes tab
         mocked_general_cancel.assert_called_with()
-        self.assertEqual(0, mocked_theme_cancel.call_count, 'The Themes tab\'s cancel() should not have been called')
+        assert 0 == mocked_theme_cancel.call_count, 'The Themes tab\'s cancel() should not have been called'
 
     def test_register_post_process(self):
         """
