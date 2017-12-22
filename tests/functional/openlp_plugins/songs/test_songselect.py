@@ -311,7 +311,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         importer.stop()
 
         # THEN: Searching should have stopped
-        assertFalse(importer.run_search, 'Searching should have been stopped')
+        assert importer.run_search is False, 'Searching should have been stopped'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     def test_get_song_page_raises_exception(self, mocked_build_opener):
@@ -330,7 +330,7 @@ class TestSongSelectImport(TestCase, TestMixin):
 
         # THEN: The callback should have been called once and None should be returned
         mocked_callback.assert_called_with()
-        assertIsNone(result, 'The get_song() method should have returned None')
+        assert result is None, 'The get_song() method should have returned None'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -531,8 +531,8 @@ class TestSongSelectForm(TestCase, TestMixin):
         ssform = SongSelectForm(None, mocked_plugin, mocked_db_manager)
 
         # THEN: The correct properties should have been assigned
-        assertEqual(mocked_plugin, ssform.plugin, 'The correct plugin should have been assigned')
-        assertEqual(mocked_db_manager, ssform.db_manager, 'The correct db_manager should have been assigned')
+        assert mocked_plugin == ssform.plugin, 'The correct plugin should have been assigned'
+        assert mocked_db_manager == ssform.db_manager, 'The correct db_manager should have been assigned'
 
     @patch('openlp.plugins.songs.forms.songselectform.SongSelectImport')
     @patch('openlp.plugins.songs.forms.songselectform.QtWidgets.QMessageBox.critical')
@@ -567,23 +567,21 @@ class TestSongSelectForm(TestCase, TestMixin):
             expected_login_spacer_calls = [call(False), call(True)]
             expected_login_progress_visible_calls = [call(True), call(False)]
             expected_login_progress_value_calls = [call(0), call(0)]
-            assertEqual(expected_username_calls, mocked_username_edit.setEnabled.call_args_list,
-                             'The username edit should be disabled then enabled')
-            assertEqual(expected_password_calls, mocked_password_edit.setEnabled.call_args_list,
-                             'The password edit should be disabled then enabled')
-            self.assertEqual(expected_save_password_calls, mocked_save_password_checkbox.setEnabled.call_args_list,
-                             'The save password checkbox should be disabled then enabled')
-            self.assertEqual(expected_login_btn_calls, mocked_login_button.setEnabled.call_args_list,
-                             'The login button should be disabled then enabled')
-            self.assertEqual(expected_login_spacer_calls, mocked_login_spacer.setVisible.call_args_list,
-                             'Thee login spacer should be make invisible, then visible')
-            self.assertEqual(expected_login_progress_visible_calls,
-                             mocked_login_progress_bar.setVisible.call_args_list,
-                             'Thee login progress bar should be make visible, then invisible')
-            self.assertEqual(expected_login_progress_value_calls, mocked_login_progress_bar.setValue.call_args_list,
-                             'Thee login progress bar should have the right values set')
-            self.assertEqual(2, mocked_process_events.call_count,
-                             'The process_events() method should be called twice')
+            assert expected_username_calls == mocked_username_edit.setEnabled.call_args_list, \
+                'The username edit should be disabled then enabled'
+            assert expected_password_calls == mocked_password_edit.setEnabled.call_args_list, \
+                'The password edit should be disabled then enabled'
+            assert expected_save_password_calls == mocked_save_password_checkbox.setEnabled.call_args_list, \
+                'The save password checkbox should be disabled then enabled'
+            assert expected_login_btn_calls == mocked_login_button.setEnabled.call_args_list, \
+                'The login button should be disabled then enabled'
+            assert expected_login_spacer_calls == mocked_login_spacer.setVisible.call_args_list, \
+                'Thee login spacer should be make invisible, then visible'
+            assert expected_login_progress_visible_calls == mocked_login_progress_bar.setVisible.call_args_list, \
+                'Thee login progress bar should be make visible, then invisible'
+            assert expected_login_progress_value_calls == mocked_login_progress_bar.setValue.call_args_list, \
+                'Thee login progress bar should have the right values set'
+            assert 2 == mocked_process_events.call_count, 'The process_events() method should be called twice'
             mocked_critical.assert_called_with(ssform, 'Error Logging In', 'There was a problem logging in, '
                                                                            'perhaps your username or password is '
                                                                            'incorrect?')
