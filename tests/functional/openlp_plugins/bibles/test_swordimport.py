@@ -34,9 +34,9 @@ except ImportError:
 from openlp.plugins.bibles.lib.db import BibleDB
 
 from tests.utils import load_external_result_data
-from tests.utils.constants import TEST_RESOURCES_PATH
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = TEST_RESOURCES_PATH / 'bibles'
+TEST_PATH = RESOURCE_PATH / 'bibles'
 
 
 @skipUnless(HAS_PYSWORD, 'pysword not installed')

@@ -60,21 +60,24 @@ class SundayPlusImport(SongImport):
         for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            with file_path.open('rb') as song_file:
-                self.do_import_file(song_file)
+            self.do_import_file(file_path)
 
     def do_import_file(self, file_path):
         """
-        Process the Sunday Plus file object.
+        Process the Sunday Plus song file
+
+        :param openlp.core.common.path.Path file_path: The song file to import
+        :rtype: None
         """
-        self.set_defaults()
-        if not self.parse(file_path.read()):
-            self.log_error(file_path.name)
-            return
-        if self.title == '':
-            self.title = self.title_from_file_path(file_path)
-        if not self.finish():
-            self.log_error(file_path.name)
+        with file_path.open('rb') as song_file:
+            self.set_defaults()
+            if not self.parse(song_file.read()):
+                self.log_error(file_path.name)
+                return
+            if self.title == '':
+                self.title = self.title_from_file_path(file_path)
+            if not self.finish():
+                self.log_error(file_path.name)
 
     def parse(self, data, cell=False):
         """
