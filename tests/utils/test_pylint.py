@@ -80,7 +80,7 @@ class TestPylint(TestCase):
         print(stderr)
 
         # THEN: The output should be empty
-        self.assertTrue(filtered_stdout == '', 'PyLint should find no errors')
+        assert filtered_stdout == '', 'PyLint should find no errors'
 
     def _filter_tolerated_errors(self, pylint_output):
         """

@@ -79,8 +79,8 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.setup_ui(self.service_manager)
 
         # THEN the count of items should be zero
-        self.assertEqual(self.service_manager.service_manager_list.topLevelItemCount(), 0,
-                         'The service manager list should be empty ')
+        assert self.service_manager.service_manager_list.topLevelItemCount() == 0, \
+            'The service manager list should be empty '
 
     @patch('openlp.core.ui.servicemanager.QtWidgets.QTreeWidget.itemAt')
     @patch('openlp.core.ui.servicemanager.QtWidgets.QWidget.mapToGlobal')
@@ -447,8 +447,8 @@ class TestServiceManager(TestCase, TestMixin):
         # THEN selection should be expanded
         selected_index = self.service_manager.service_manager_list.currentIndex()
         above_selected_index = self.service_manager.service_manager_list.indexAbove(selected_index)
-        self.assertTrue(self.service_manager.service_manager_list.isExpanded(above_selected_index),
-                        'Item should have been expanded')
+        assert self.service_manager.service_manager_list.isExpanded(above_selected_index is True, \
+            'Item should have been expanded'
         self.service_manager.expanded.assert_called_once_with(song_item)
 
     def test_on_collapse_selection_with_parent_selected(self):
@@ -468,10 +468,10 @@ class TestServiceManager(TestCase, TestMixin):
 
         # THEN selection should be expanded
         selected_index = self.service_manager.service_manager_list.currentIndex()
-        self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
-                         'Item should have been collapsed')
-        self.assertTrue(self.service_manager.service_manager_list.currentItem() == song_item,
-                        'Top item should have been selected')
+        assert self.service_manager.service_manager_list.isExpanded(selected_index) is False, \
+            'Item should have been collapsed'
+        assert self.service_manager.service_manager_list.currentItem() == song_item is True, \
+            'Top item should have been selected'
         self.service_manager.collapsed.assert_called_once_with(song_item)
 
     def test_on_collapse_selection_with_child_selected(self):
@@ -491,8 +491,8 @@ class TestServiceManager(TestCase, TestMixin):
 
         # THEN selection should be expanded
         selected_index = self.service_manager.service_manager_list.currentIndex()
-        self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
-                         'Item should have been collapsed')
-        self.assertTrue(self.service_manager.service_manager_list.currentItem() == song_item,
-                        'Top item should have been selected')
+        assert self.service_manager.service_manager_list.isExpanded(selected_index) is False, \
+            'Item should have been collapsed'
+        assert self.service_manager.service_manager_list.currentItem() == song_item is True, \
+            'Top item should have been selected'
         self.service_manager.collapsed.assert_called_once_with(song_item)

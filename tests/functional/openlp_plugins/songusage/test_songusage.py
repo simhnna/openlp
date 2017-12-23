@@ -45,8 +45,8 @@ class TestSongUsage(TestCase):
         # THEN: about() should return a string object
         assert isinstance(SongUsagePlugin.about(), str)
         # THEN: about() should return a non-empty string
-        self.assertNotEquals(len(SongUsagePlugin.about()), 0)
-        self.assertNotEquals(len(SongUsagePlugin.about()), 0)
+        assertNotEquals(len(SongUsagePlugin.about()), 0)
+        assertNotEquals(len(SongUsagePlugin.about()), 0)
 
     @patch('openlp.plugins.songusage.songusageplugin.Manager')
     def test_song_usage_init(self, MockedManager):

@@ -79,5 +79,5 @@ class TestAlertManager(TestCase):
         alert_manager.alert_text(['This is \n a string'])
 
         # THEN: the display should have been triggered
-        self.assertTrue(alert_manager.display_alert.called, 'The Alert should have been called')
+        assert alert_manager.display_alert.called is True, 'The Alert should have been called'
         alert_manager.display_alert.assert_called_once_with('This is   a string')

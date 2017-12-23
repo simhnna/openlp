@@ -57,7 +57,7 @@ class TestTopicsForm(TestCase, TestMixin):
         """
         Test the TopicsForm defaults are correct
         """
-        self.assertEqual(self.form.name_edit.text(), '', 'The first name edit should be empty')
+        assert self.form.name_edit.text() == '', 'The first name edit should be empty'
 
     def test_get_name_property(self):
         """
@@ -70,7 +70,7 @@ class TestTopicsForm(TestCase, TestMixin):
         self.form.name_edit.setText(topic_name)
 
         # THEN: The name property should have the correct value
-        self.assertEqual(self.form.name, topic_name, 'The name property should be correct')
+        assert self.form.name == topic_name, 'The name property should be correct'
 
     def test_set_name_property(self):
         """
@@ -83,4 +83,4 @@ class TestTopicsForm(TestCase, TestMixin):
         self.form.name = topic_name
 
         # THEN: The name_edit should have the correct value
-        self.assertEqual(self.form.name_edit.text(), topic_name, 'The topic name should be set correctly')
+        assert self.form.name_edit.text() == topic_name, 'The topic name should be set correctly'

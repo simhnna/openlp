@@ -78,8 +78,8 @@ class TestEditCustomForm(TestCase, TestMixin):
         self.form.load_custom(0)
 
         # THEN: The line edits should not contain any text.
-        self.assertEqual(self.form.title_edit.text(), '', 'The title edit should be empty')
-        self.assertEqual(self.form.credit_edit.text(), '', 'The credit edit should be empty')
+        assert self.form.title_edit.text() == '', 'The title edit should be empty'
+        assert self.form.credit_edit.text() == '', 'The credit edit should be empty'
 
     def test_on_add_button_clicked(self):
         """

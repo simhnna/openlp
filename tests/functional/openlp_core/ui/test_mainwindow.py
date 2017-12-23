@@ -117,8 +117,8 @@ class TestMainWindow(TestCase, TestMixin):
         # WHEN no changes are made to the service
 
         # THEN the main window's title shoud be the same as the OpenLP string in the UiStrings class
-        self.assertEqual(self.main_window.windowTitle(), UiStrings().OpenLP,
-                         'The main window\'s title should be the same as the OpenLP string in UiStrings class')
+        assert self.main_window.windowTitle() == UiStrings().OpenLP, \
+            'The main window\'s title should be the same as the OpenLP string in UiStrings class'
 
     def test_set_service_modifed(self):
         """
@@ -204,7 +204,7 @@ class TestMainWindow(TestCase, TestMixin):
             self.main_window.on_search_shortcut_triggered()
 
             # THEN: The media manager dock is made visible
-            self.assertEqual(0, mocked_media_manager_dock.setVisible.call_count)
+            assert 0 == mocked_media_manager_dock.setVisible.call_count
             mocked_widget.on_focus.assert_called_with()
 
     @patch('openlp.core.ui.mainwindow.FirstTimeForm')

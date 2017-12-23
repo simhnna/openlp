@@ -402,7 +402,7 @@ class TestListPreviewWidget(TestCase):
         list_preview_widget.row_resized(0, 100, 150)
 
         # THEN: self.cellWidget(row, 0).children()[1].setMaximumWidth() should fail
-        self.assertRaises(Exception)
+        assertRaises(Exception)
 
     @patch(u'openlp.core.widgets.views.ListPreviewWidget.selectRow')
     @patch(u'openlp.core.widgets.views.ListPreviewWidget.scrollToItem')

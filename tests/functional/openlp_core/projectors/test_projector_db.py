@@ -159,7 +159,7 @@ class TestProjectorDB(TestCase):
         record = self.projector.get_projector_by_ip(TEST2_DATA['ip'])
 
         # THEN: Verify proper record returned
-        self.assertTrue(compare_data(Projector(**TEST2_DATA), record),
+        assertTrue(compare_data(Projector(**TEST2_DATA), record),
                         'Record found should have been test_2 data')
 
     def test_find_record_by_name(self):
@@ -173,7 +173,7 @@ class TestProjectorDB(TestCase):
         record = self.projector.get_projector_by_name(TEST2_DATA['name'])
 
         # THEN: Verify proper record returned
-        self.assertTrue(compare_data(Projector(**TEST2_DATA), record),
+        assertTrue(compare_data(Projector(**TEST2_DATA), record),
                         'Record found should have been test_2 data')
 
     def test_record_delete(self):
@@ -189,7 +189,7 @@ class TestProjectorDB(TestCase):
 
         # THEN: Verify record not retrievable
         found = self.projector.get_projector_by_ip(TEST3_DATA['ip'])
-        self.assertFalse(found, 'test_3 record should have been deleted')
+        assertFalse(found, 'test_3 record should have been deleted')
 
     def test_record_edit(self):
         """
@@ -214,7 +214,7 @@ class TestProjectorDB(TestCase):
         record.model_filter = TEST3_DATA['model_filter']
         record.model_lamp = TEST3_DATA['model_lamp']
         updated = self.projector.update_projector(record)
-        self.assertTrue(updated, 'Save updated record should have returned True')
+        assertTrue(updated, 'Save updated record should have returned True')
         record = self.projector.get_projector_by_ip(TEST3_DATA['ip'])
 
         # THEN: Record ID should remain the same, but data should be changed

@@ -86,8 +86,8 @@ class TestSearchEdit(TestCase, TestMixin):
 
         # THEN: The first search type should be the first one in the list. The selected type should be saved in the
         #       settings
-        self.assertEqual(self.search_edit.current_search_type(), SearchTypes.First,
-                         "The first search type should be selected.")
+        assert self.search_edit.current_search_type() == SearchTypes.First, \
+            "The first search type should be selected."
         self.mocked_settings().setValue.assert_called_once_with('settings_section/last used search type', 0)
 
     def test_set_current_search_type(self):
@@ -99,11 +99,11 @@ class TestSearchEdit(TestCase, TestMixin):
         result = self.search_edit.set_current_search_type(SearchTypes.Second)
 
         # THEN:
-        self.assertTrue(result, "The call should return success (True).")
-        self.assertEqual(self.search_edit.current_search_type(), SearchTypes.Second,
-                         "The search type should be SearchTypes.Second")
-        self.assertEqual(self.search_edit.placeholderText(), SECOND_PLACEHOLDER_TEXT,
-                         "The correct placeholder text should be 'Second Placeholder Text'.")
+        assert result is True, "The call should return success (True)."
+        assert self.search_edit.current_search_type() == SearchTypes.Second, \
+            "The search type should be SearchTypes.Second"
+        assert self.search_edit.placeholderText() == SECOND_PLACEHOLDER_TEXT, \
+            "The correct placeholder text should be 'Second Placeholder Text'."
         self.mocked_settings().setValue.assert_has_calls(
             [call('settings_section/last used search type', 0), call('settings_section/last used search type', 1)])
 
@@ -166,4 +166,4 @@ class TestHistoryComboBox(TestCase, TestMixin):
         self.combo.addItem('test2')
 
         # THEN: The list of items should contain both strings.
-        self.assertEqual(self.combo.getItems(), ['test1', 'test2'])
+        assert self.combo.getItems() == ['test1', 'test2']

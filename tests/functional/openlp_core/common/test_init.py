@@ -183,7 +183,7 @@ class TestInit(TestCase, TestMixin):
             # WHEN: Calling get_uno_command
 
             # THEN: a FileNotFoundError exception should be raised
-            self.assertRaises(FileNotFoundError, get_uno_command)
+            assertRaises(FileNotFoundError, get_uno_command)
 
     def test_get_uno_command_connection_type(self):
         """
