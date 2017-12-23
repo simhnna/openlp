@@ -75,6 +75,6 @@ class TestScreenList(TestCase):
 
         # THEN: The screen should have been added and the screens should be identical
         new_screen_count = len(self.screens.screen_list)
-        self.assertEqual(old_screen_count + 1, new_screen_count, 'The new_screens list should be bigger')
-        self.assertEqual(SCREEN, self.screens.screen_list.pop(),
-                         'The 2nd screen should be identical to the first screen')
+        assert old_screen_count + 1 == new_screen_count, 'The new_screens list should be bigger'
+        assert SCREEN == self.screens.screen_list.pop(), \
+            'The 2nd screen should be identical to the first screen'

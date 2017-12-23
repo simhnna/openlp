@@ -81,8 +81,8 @@ class TestApiTab(TestCase, TestMixin):
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(ZERO_URL)
         # THEN: the default ip address will be returned
-        self.assertTrue(re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', ip_address),
-                        'The return value should be a valid ip address')
+        assert re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', ip_address), \
+            'The return value should be a valid ip address'
 
     def test_get_ip_address_with_ip(self):
         """
@@ -93,7 +93,7 @@ class TestApiTab(TestCase, TestMixin):
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(given_ip)
         # THEN: the default ip address will be returned
-        self.assertEqual(ip_address, given_ip, 'The return value should be %s' % given_ip)
+        assert ip_address == given_ip, 'The return value should be %s' % given_ip
 
     def test_set_urls(self):
         """
@@ -104,12 +104,11 @@ class TestApiTab(TestCase, TestMixin):
         # WHEN: the urls are generated
         self.form.set_urls()
         # THEN: the following links are returned
-        self.assertEqual(self.form.remote_url.text(),
-                         "<a href=\"http://192.168.1.1:4316/\">http://192.168.1.1:4316/</a>",
-                         'The return value should be a fully formed link')
-        self.assertEqual(self.form.stage_url.text(),
-                         "<a href=\"http://192.168.1.1:4316/stage\">http://192.168.1.1:4316/stage</a>",
-                         'The return value should be a fully formed stage link')
-        self.assertEqual(self.form.live_url.text(),
-                         "<a href=\"http://192.168.1.1:4316/main\">http://192.168.1.1:4316/main</a>",
-                         'The return value should be a fully formed main link')
+        assert self.form.remote_url.text() == "<a href=\"http://192.168.1.1:4316/\">http://192.168.1.1:4316/</a>", \
+            'The return value should be a fully formed link'
+        assert self.form.stage_url.text() == \
+            "<a href=\"http://192.168.1.1:4316/stage\">http://192.168.1.1:4316/stage</a>", \
+            'The return value should be a fully formed stage link'
+        assert self.form.live_url.text() == \
+            "<a href=\"http://192.168.1.1:4316/main\">http://192.168.1.1:4316/main</a>", \
+            'The return value should be a fully formed main link'

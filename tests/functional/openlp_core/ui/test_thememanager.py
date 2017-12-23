@@ -80,7 +80,7 @@ class TestThemeManager(TestCase):
 
         # WHEN: the default theme manager is built.
         # THEN: The the controller should be registered in the registry.
-        self.assertIsNotNone(Registry().get('theme_manager'), 'The base theme manager should be registered')
+        assert Registry().get('theme_manager') is not None, 'The base theme manager should be registered'
 
     @patch('openlp.core.ui.thememanager.copyfile')
     @patch('openlp.core.ui.thememanager.create_paths')
@@ -147,8 +147,8 @@ class TestThemeManager(TestCase):
         theme_manager._write_theme(mocked_theme, None, None)
 
         # THEN: It should have been created
-        self.assertTrue(os.path.exists(os.path.join(self.temp_folder, 'theme 愛 name', 'theme 愛 name.json')),
-                        'Theme with special characters should have been created!')
+        assert os.path.exists(os.path.join(self.temp_folder, 'theme 愛 name', 'theme 愛 name.json')) is True, \
+            'Theme with special characters should have been created!'
 
     @patch('openlp.core.ui.thememanager.QtWidgets.QMessageBox.question', return_value=QtWidgets.QMessageBox.Yes)
     @patch('openlp.core.ui.thememanager.translate')
@@ -206,8 +206,8 @@ class TestThemeManager(TestCase):
             theme_manager.unzip_theme(theme_file, folder_path)
 
             # THEN: Files should be unpacked
-            self.assertTrue((folder_path / 'Moss on tree' / 'Moss on tree.xml').exists())
-            self.assertEqual(mocked_critical_error_message_box.call_count, 0, 'No errors should have happened')
+            assert (folder_path / 'Moss on tree' / 'Moss on tree.xml').exists() is True
+            assert mocked_critical_error_message_box.call_count == 0, 'No errors should have happened'
             folder_path.rmtree()
 
     def test_unzip_theme_invalid_version(self):
@@ -228,4 +228,4 @@ class TestThemeManager(TestCase):
             theme_manager.unzip_theme('theme.file', 'folder')
 
             # THEN: The critical_error_message_box should have been called
-            self.assertEqual(mocked_critical_error_message_box.call_count, 1, 'Should have been called once')
+            assert mocked_critical_error_message_box.call_count == 1, 'Should have been called once'

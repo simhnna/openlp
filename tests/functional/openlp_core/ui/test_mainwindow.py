@@ -106,7 +106,7 @@ class TestMainWindow(TestCase, TestMixin):
             self.main_window.open_cmd_line_files("")
 
             # THEN the file should not be opened
-            assert not mocked_load_file.called, 'load_file should not have been called'
+            assert mocked_load_file.called is False, 'load_file should not have been called'
 
     def test_main_window_title(self):
         """
@@ -130,8 +130,8 @@ class TestMainWindow(TestCase, TestMixin):
         self.main_window.set_service_modified(True, 'test.osz')
 
         # THEN the main window's title should be set to the
-        self.assertEqual(self.main_window.windowTitle(), '%s - %s*' % (UiStrings().OpenLP, 'test.osz'),
-                         'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz*"')
+        assert self.main_window.windowTitle(), '%s - %s*' % (UiStrings().OpenLP, 'test.osz') == \
+            'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz*"'
 
     def test_set_service_unmodified(self):
         """
@@ -143,8 +143,8 @@ class TestMainWindow(TestCase, TestMixin):
         self.main_window.set_service_modified(False, 'test.osz')
 
         # THEN the main window's title should be set to the
-        self.assertEqual(self.main_window.windowTitle(), '%s - %s' % (UiStrings().OpenLP, 'test.osz'),
-                         'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz"')
+        assert self.main_window.windowTitle(), '%s - %s' % (UiStrings().OpenLP, 'test.osz') == \
+            'The main window\'s title should be set to "<the contents of UiStrings().OpenLP> - test.osz"'
 
     def test_mainwindow_configuration(self):
         """

@@ -370,7 +370,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         :rtype: None
         """
         self._service_path = file_path
-        self.main_window.set_service_modified(self.is_modified(), file_path.name)
+        self.set_modified(self.is_modified())
         Settings().setValue('servicemanager/last file', file_path)
         if file_path and file_path.suffix == '.oszl':
             self._save_lite = True

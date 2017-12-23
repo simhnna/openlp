@@ -289,9 +289,9 @@ class TestOpenLP(TestCase):
         result = self.openlp.event(event)
 
         # THEN: The path should be inserted.
-        self.assertTrue(result, "The method should have returned True.")
+        assert result is True, "The method should have returned True."
         mocked_file_method.assert_called_once_with()
-        self.assertEqual(self.openlp.args[0], file_path, "The path should be in args.")
+        assert self.openlp.args[0] == file_path, "The path should be in args."
 
     @patch('openlp.core.app.is_macosx')
     def test_application_activate_event(self, mocked_is_macosx):
@@ -309,7 +309,7 @@ class TestOpenLP(TestCase):
         result = self.openlp.event(event)
 
         # THEN:
-        self.assertTrue(result, "The method should have returned True.")
+        assert result is True, "The method should have returned True."
         # self.assertFalse(self.openlp.main_window.isMinimized())
 
     @patch('openlp.core.app.get_version')
@@ -321,11 +321,11 @@ class TestOpenLP(TestCase):
         # GIVEN: Mocked data version and OpenLP version which are the same
         old_install = False
         MOCKED_VERSION = {
-            'full': '2.2.0-bzr000',
-            'version': '2.2.0',
+            'full': '2.4.0-bzr000',
+            'version': '2.4.0',
             'build': 'bzr000'
         }
-        Settings().setValue('core/application version', '2.2.0')
+        Settings().setValue('core/application version', '2.4.0')
         mocked_get_version.return_value = MOCKED_VERSION
         mocked_question.return_value = QtWidgets.QMessageBox.No
 
@@ -333,8 +333,8 @@ class TestOpenLP(TestCase):
         self.openlp.backup_on_upgrade(old_install, False)
 
         # THEN: It should not ask if we want to create a backup
-        self.assertEqual(Settings().value('core/application version'), '2.2.0', 'Version should be the same!')
-        self.assertEqual(mocked_question.call_count, 0, 'No question should have been asked!')
+        assert Settings().value('core/application version') == '2.4.0', 'Version should be the same!'
+        assert mocked_question.call_count == 0, 'No question should have been asked!'
 
     @patch('openlp.core.app.get_version')
     @patch('openlp.core.app.QtWidgets.QMessageBox.question')
@@ -345,8 +345,8 @@ class TestOpenLP(TestCase):
         # GIVEN: Mocked data version and OpenLP version which are different
         old_install = True
         MOCKED_VERSION = {
-            'full': '2.2.0-bzr000',
-            'version': '2.2.0',
+            'full': '2.4.0-bzr000',
+            'version': '2.4.0',
             'build': 'bzr000'
         }
         Settings().setValue('core/application version', '2.0.5')
@@ -359,7 +359,7 @@ class TestOpenLP(TestCase):
         self.openlp.backup_on_upgrade(old_install, True)
 
         # THEN: It should ask if we want to create a backup
-        self.assertEqual(Settings().value('core/application version'), '2.2.0', 'Version should be upgraded!')
-        self.assertEqual(mocked_question.call_count, 1, 'A question should have been asked!')
+        assert Settings().value('core/application version') == '2.4.0', 'Version should be upgraded!'
+        assert mocked_question.call_count == 1, 'A question should have been asked!'
         self.openlp.splash.hide.assert_called_once_with()
         self.openlp.splash.show.assert_called_once_with()

@@ -25,7 +25,6 @@ OpenLP work.
 """
 import html
 import logging
-import os
 import re
 import math
 

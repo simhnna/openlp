@@ -51,7 +51,7 @@ class TestThemeTab(TestCase, TestMixin):
         themes_tab = ThemesTab(settings_form)
 
         # THEN:
-        self.assertEqual("Themes", themes_tab.tab_title, 'The tab title should be Theme')
+        assert "Themes" == themes_tab.tab_title, 'The tab title should be Theme'
 
     def test_save_triggers_processes_true(self):
         """
@@ -66,7 +66,7 @@ class TestThemeTab(TestCase, TestMixin):
         themes_tab.save()
 
         # THEN: we should have two post save processed to run
-        self.assertEqual(1, len(settings_form.processes), 'One post save processes should be created')
+        assert 1 == len(settings_form.processes), 'One post save processes should be created'
 
     def test_save_triggers_processes_false(self):
         """
@@ -81,4 +81,4 @@ class TestThemeTab(TestCase, TestMixin):
         themes_tab.save()
 
         # THEN: we should have two post save processed to run
-        self.assertEqual(0, len(settings_form.processes), 'No post save processes should be created')
+        assert 0 == len(settings_form.processes), 'No post save processes should be created'
