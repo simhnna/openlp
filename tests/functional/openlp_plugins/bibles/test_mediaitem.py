@@ -1124,7 +1124,7 @@ class TestMediaItem(TestCase, TestMixin):
         #       reselected
         mocked_combo_box.clear.assert_called_once_with()
         assert mocked_combo_box.addItem.call_args_list == \
-               [call('10', 10), call('11', 11), call('12', 12), call('13', 13)]
+            [call('10', 10), call('11', 11), call('12', 12), call('13', 13)]
         mocked_combo_box.setCurrentIndex.assert_called_once_with(2)
 
     def test_adjust_combo_box_restore_not_found(self):

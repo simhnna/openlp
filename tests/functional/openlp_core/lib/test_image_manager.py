@@ -78,7 +78,7 @@ class TestImageManager(TestCase, TestMixin):
         byte_array = self.image_manager.get_image_bytes(full_path, 'church.jpg')
 
         # THEN: Type should be a str.
-        assert isinstance(byte_array, str),  'The returned object should be a str'
+        assert isinstance(byte_array, str), 'The returned object should be a str'
 
         # WHEN the image is retrieved has not been loaded
         # THEN a KeyError is thrown

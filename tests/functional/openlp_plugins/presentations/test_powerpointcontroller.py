@@ -156,7 +156,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
             result = doc.is_loaded()
 
             # THEN: result should be true
-            assert result == True, 'The result should be True'
+            assert result is True, 'The result should be True'
         else:
             self.skipTest('Powerpoint not available, skipping test.')
 

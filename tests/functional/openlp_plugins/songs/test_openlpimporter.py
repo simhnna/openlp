@@ -71,5 +71,5 @@ class TestOpenLPImport(TestCase):
 
                 # THEN: do_import should return none and the progress bar maximum should not be set.
                 assert importer.do_import() is None, 'do_import should return None when import_source is not a list'
-                assert mocked_import_wizard.progress_bar.setMaximum.called == False, \
+                assert mocked_import_wizard.progress_bar.setMaximum.called is False, \
                     'setMaximum on import_wizard.progress_bar should not have been called'

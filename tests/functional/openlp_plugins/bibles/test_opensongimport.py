@@ -228,7 +228,7 @@ class TestOpenSongImport(TestCase, TestMixin):
             # THEN: find_and_create_book and process_books should be called with the details from the mocked books
             assert self.mocked_find_and_create_book.call_args_list == [call('Name1', 2, 10), call('Name2', 2, 10)]
             assert mocked_process_chapters.call_args_list == \
-                   [call('db_book1', 'Chapter1'), call('db_book2', 'Chapter2')]
+                [call('db_book1', 'Chapter1'), call('db_book2', 'Chapter2')]
             assert importer.session.commit.call_count == 2
 
     def test_process_chapters_stop_import(self):
@@ -274,7 +274,7 @@ class TestOpenSongImport(TestCase, TestMixin):
         # THEN: parse_chapter_number, process_verses and increment_process_bar should have been called
         assert mocked_parse_chapter_number.call_args_list == [call('1', 0), call('2', 1)]
         assert importer.process_verses.call_args_list == \
-               [call(book, 1, ['Chapter1 Verses']), call(book, 2, ['Chapter2 Verses'])]
+            [call(book, 1, ['Chapter1 Verses']), call(book, 2, ['Chapter2 Verses'])]
         assert importer.wizard.increment_progress_bar.call_args_list == [call('Importing Book 1...'),
                                                                          call('Importing Book 2...')]
 
@@ -325,7 +325,7 @@ class TestOpenSongImport(TestCase, TestMixin):
             assert mocked_parse_verse_number.call_args_list == [call('1', 0), call('2', 1)]
             assert mocked_get_text.call_args_list == [call(verse1), call(verse2)]
             assert importer.create_verse.call_args_list == \
-                   [call(1, 1, 1, 'Verse1 Text'), call(1, 1, 2, 'Verse2 Text')]
+                [call(1, 1, 1, 'Verse1 Text'), call(1, 1, 2, 'Verse2 Text')]
 
     def test_do_import_parse_xml_fails(self):
         """
