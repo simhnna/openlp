@@ -86,11 +86,11 @@ class TestPluginManager(TestCase, TestMixin):
 
         # THEN: We should find the "Songs", "Bibles", etc in the plugins list
         plugin_names = [plugin.name for plugin in plugin_manager.plugins]
-        assertIn('songs', plugin_names, 'There should be a "songs" plugin')
-        assertIn('bibles', plugin_names, 'There should be a "bibles" plugin')
-        assertIn('presentations', plugin_names, 'There should be a "presentations" plugin')
-        assertIn('images', plugin_names, 'There should be a "images" plugin')
-        assertIn('media', plugin_names, 'There should be a "media" plugin')
-        assertIn('custom', plugin_names, 'There should be a "custom" plugin')
-        assertIn('songusage', plugin_names, 'There should be a "songusage" plugin')
-        assertIn('alerts', plugin_names, 'There should be a "alerts" plugin')
+        assert 'songs' in plugin_names, 'There should be a "songs" plugin'
+        assert 'bibles' in plugin_names, 'There should be a "bibles" plugin'
+        assert 'presentations' in plugin_names, 'There should be a "presentations" plugin'
+        assert 'images' in plugin_names, 'There should be a "images" plugin'
+        assert 'media' in plugin_names, 'There should be a "media" plugin'
+        assert 'custom' in plugin_names, 'There should be a "custom" plugin'
+        assert 'songusage'in plugin_names, 'There should be a "songusage" plugin'
+        assert 'alerts' in plugin_names, 'There should be a "alerts" plugin'

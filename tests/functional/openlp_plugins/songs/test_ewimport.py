@@ -217,7 +217,7 @@ class TestEasyWorshipSongImport(TestCase):
             for field_name in non_existing_fields:
 
                 # THEN: The importer object should not be None
-                assertRaises(IndexError, importer.db_find_field, field_name)
+                self.assertRaises(IndexError, importer.db_find_field, field_name)
 
     def test_set_record_struct(self):
         """

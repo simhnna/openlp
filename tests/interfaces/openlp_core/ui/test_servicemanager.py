@@ -470,7 +470,7 @@ class TestServiceManager(TestCase, TestMixin):
         selected_index = self.service_manager.service_manager_list.currentIndex()
         assert self.service_manager.service_manager_list.isExpanded(selected_index) is False, \
             'Item should have been collapsed'
-        assert self.service_manager.service_manager_list.currentItem() == song_item is True, \
+        assert self.service_manager.service_manager_list.currentItem() == song_item, \
             'Top item should have been selected'
         self.service_manager.collapsed.assert_called_once_with(song_item)
 
@@ -493,6 +493,6 @@ class TestServiceManager(TestCase, TestMixin):
         selected_index = self.service_manager.service_manager_list.currentIndex()
         assert self.service_manager.service_manager_list.isExpanded(selected_index) is False, \
             'Item should have been collapsed'
-        assert self.service_manager.service_manager_list.currentItem() == song_item is True, \
+        assert self.service_manager.service_manager_list.currentItem() == song_item, \
             'Top item should have been selected'
         self.service_manager.collapsed.assert_called_once_with(song_item)

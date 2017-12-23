@@ -141,7 +141,7 @@ class TestCategoryActionList(TestCase):
         assert self.action1 not in self.list
 
         # THEN: Check if an exception is raised when trying to remove a not present action.
-        assertRaises(ValueError, self.list.remove, self.action2)
+        self.assertRaises(ValueError, self.list.remove, self.action2)
 
 
 class TestActionList(TestCase, TestMixin):

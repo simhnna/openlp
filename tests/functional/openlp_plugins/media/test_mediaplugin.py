@@ -58,7 +58,7 @@ class MediaPluginTest(TestCase, TestMixin):
         # THEN: about() should return a string object
         assert isinstance(MediaPlugin.about(), str)
         # THEN: about() should return a non-empty string
-        self.assertNotEquals(len(MediaPlugin.about()), 0)
+        assert len(MediaPlugin.about()) is not 0
 
     @patch('openlp.plugins.media.mediaplugin.check_binary_exists')
     def test_process_check_binary_pass(self, mocked_checked_binary_exists):

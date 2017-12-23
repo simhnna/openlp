@@ -153,9 +153,8 @@ class TestOpenLyricsImport(TestCase, TestMixin):
         ol._process_formatting_tags(song_xml, False)
 
         # THEN: New tags should have been saved
-        assertListEqual(json.loads(json.dumps(result_tags)),
-                             json.loads(str(Settings().value('formattingTags/html_tags'))),
-                             'The formatting tags should contain both the old and the new')
+        assert json.loads(json.dumps(result_tags)) == json.loads(str(Settings().value('formattingTags/html_tags'))), \
+            'The formatting tags should contain both the old and the new'
 
     def test_process_author(self):
         """
