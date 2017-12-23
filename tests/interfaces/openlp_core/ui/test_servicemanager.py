@@ -447,7 +447,7 @@ class TestServiceManager(TestCase, TestMixin):
         # THEN selection should be expanded
         selected_index = self.service_manager.service_manager_list.currentIndex()
         above_selected_index = self.service_manager.service_manager_list.indexAbove(selected_index)
-        assert self.service_manager.service_manager_list.isExpanded(above_selected_index is True, \
+        assert self.service_manager.service_manager_list.isExpanded(above_selected_index) is True, \
             'Item should have been expanded'
         self.service_manager.expanded.assert_called_once_with(song_item)
 
