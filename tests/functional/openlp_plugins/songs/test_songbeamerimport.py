@@ -149,7 +149,7 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back true and c as self.importer.current_verse_type
-        .assert result is True, 'Versemark for <Refrain> should be found, value true'
+        assert result is True, 'Versemark for <Refrain> should be found, value true'
         assert self.importer.current_verse_type == 'c', '<Refrain> should be interpreted as <c>'
 
         # GIVEN: line with unnumbered verse-type and trailing space
