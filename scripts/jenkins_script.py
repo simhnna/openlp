@@ -57,16 +57,17 @@ class OpenLPJobs(object):
     This class holds any jobs we have on jenkins and we actually need in this script.
     """
     Branch_Pull = 'Branch-01-Pull'
-    Branch_Functional = 'Branch-02-Functional-Tests'
-    Branch_Interface = 'Branch-03-Interface-Tests'
-    Branch_PEP = 'Branch-04a-Code_Analysis'
-    Branch_Coverage = 'Branch-04b-Test_Coverage'
-    Branch_Pylint = 'Branch-04c-Code_Analysis2'
-    Branch_AppVeyor = 'Branch-05-AppVeyor-Tests'
-    Branch_macOS = 'Branch-07-macOS-Tests'
+    Branch_Linux_Tests = 'Branch-02a-Linux-Tests'
+    Branch_macOS_Tests = 'Branch-02b-macOS-Tests'
+    Branch_Build_Source = 'Branch-03a-Build-Source'
+    Branch_Build_macOS = 'Branch-03b-Build-macOS'
+    Branch_Code_Analysis = 'Branch-04a-Code-Analysis'
+    Branch_Test_Coverage = 'Branch-04b-Test-Coverage'
+    Branch_Lint_Check = 'Branch-04c-Lint-Check'
+    Branch_AppVeyor_Tests = 'Branch-05-AppVeyor-Tests'
 
-    Jobs = [Branch_Pull, Branch_Functional, Branch_Interface, Branch_PEP, Branch_Coverage, Branch_Pylint,
-            Branch_AppVeyor, Branch_macOS]
+    Jobs = [Branch_Pull, Branch_Linux_Tests, Branch_macOS_Tests, Branch_Build_Source, Branch_Build_macOS,
+            Branch_Code_Analysis, Branch_Test_Coverage, Branch_AppVeyor_Tests]
 
 
 class Colour(object):
