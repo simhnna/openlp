@@ -49,4 +49,4 @@ def load_external_result_data(file_path):
 
     :param openlp.core.common.path.Path file_path: The path of the file to load
     """
-    return json.loads(file_path.read_text())
+    return json.loads(file_path.read_bytes().decode())

@@ -83,7 +83,7 @@ class SongImportTestHelper(TestCase):
 
         :param openlp.core.common.path.Path file_path: The path of the file to load
         """
-        return json.loads(file_path.read_text())
+        return json.loads(file_path.read_bytes().decode())
 
     def file_import(self, source_file_name, result_data):
         """
