@@ -32,7 +32,7 @@ from openlp.core.common.path import Path
 from openlp.plugins.presentations.lib.impresscontroller import ImpressController, ImpressDocument, TextType
 from openlp.plugins.presentations.presentationplugin import __default_settings__
 
-from tests.utils.constants import TEST_RESOURCES_PATH
+from tests.utils.constants import RESOURCE_PATH
 from tests.helpers.testmixin import TestMixin
 
 
@@ -134,7 +134,7 @@ class TestImpressDocument(TestCase):
         mocked_plugin = MagicMock()
         mocked_plugin.settings_section = 'presentations'
         Settings().extend_default_settings(__default_settings__)
-        self.file_name = Path(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
+        self.file_name = RESOURCE_PATH / 'presentations' / 'test.pptx'
         self.ppc = ImpressController(mocked_plugin)
         self.doc = ImpressDocument(self.ppc, self.file_name)
 

@@ -32,7 +32,7 @@ from openlp.core.common import is_win
 from openlp.core.common.path import Path
 
 from tests.helpers.testmixin import TestMixin
-from tests.utils.constants import TEST_RESOURCES_PATH
+from tests.utils.constants import RESOURCE_PATH
 
 
 class TestPptviewController(TestCase, TestMixin):
@@ -172,7 +172,7 @@ class TestPptviewDocument(TestCase):
         """
         # GIVEN: mocked PresentationController.save_titles_and_notes and a pptx file
         doc = PptviewDocument(self.mock_controller, self.mock_presentation)
-        doc.file_path = Path(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
+        doc.file_path = RESOURCE_PATH / 'presentations' / 'test.pptx'
         doc.save_titles_and_notes = MagicMock()
 
         # WHEN reading the titles and notes
@@ -216,7 +216,7 @@ class TestPptviewDocument(TestCase):
             mocked_is_zf.return_value = False
             mocked_open.filesize = 10
             doc = PptviewDocument(self.mock_controller, self.mock_presentation)
-            doc.file_path = Path(TEST_RESOURCES_PATH, 'presentations', 'test.ppt')
+            doc.file_path = RESOURCE_PATH / 'presentations' / 'test.ppt'
             doc.save_titles_and_notes = MagicMock()
 
             # WHEN: reading the titles and notes

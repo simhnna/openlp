@@ -35,7 +35,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
 from openlp.core.display.screens import ScreenList
 
-from tests.utils.constants import TEST_RESOURCES_PATH
+from tests.utils.constants import RESOURCE_PATH
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
@@ -99,7 +99,7 @@ class TestPdfController(TestCase, TestMixin):
         Test loading of a Pdf using the PdfController
         """
         # GIVEN: A Pdf-file
-        test_file = Path(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
+        test_file_path = RESOURCE_PATH / 'presentations' / 'pdf_test1.pdf'
 
         # WHEN: The Pdf is loaded
         controller = PdfController(plugin=self.mock_plugin)
@@ -107,7 +107,7 @@ class TestPdfController(TestCase, TestMixin):
             raise SkipTest('Could not detect mudraw or ghostscript, so skipping PDF test')
         controller.temp_folder = self.temp_folder_path
         controller.thumbnail_folder = self.thumbnail_folder_path
-        document = PdfDocument(controller, test_file)
+        document = PdfDocument(controller, test_file_path)
         loaded = document.load_presentation()
 
         # THEN: The load should succeed and we should be able to get a pagecount
@@ -119,7 +119,7 @@ class TestPdfController(TestCase, TestMixin):
         Test loading of a Pdf and check size of generate pictures
         """
         # GIVEN: A Pdf-file
-        test_file = Path(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
+        test_file_path = RESOURCE_PATH / 'presentations' / 'pdf_test1.pdf'
 
         # WHEN: The Pdf is loaded
         controller = PdfController(plugin=self.mock_plugin)
@@ -127,7 +127,7 @@ class TestPdfController(TestCase, TestMixin):
             raise SkipTest('Could not detect mudraw or ghostscript, so skipping PDF test')
         controller.temp_folder = self.temp_folder_path
         controller.thumbnail_folder = self.thumbnail_folder_path
-        document = PdfDocument(controller, test_file)
+        document = PdfDocument(controller, test_file_path)
         loaded = document.load_presentation()
 
         # THEN: The load should succeed and pictures should be created and have been scales to fit the screen

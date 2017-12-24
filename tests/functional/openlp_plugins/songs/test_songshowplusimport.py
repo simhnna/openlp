@@ -31,7 +31,7 @@ from openlp.plugins.songs.lib.importers.songshowplus import SongShowPlusImport
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'songshowplussongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'songshowplus'
 
 
 class TestSongShowPlusFileImport(SongImportTestHelper):

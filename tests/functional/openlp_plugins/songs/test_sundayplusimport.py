@@ -26,7 +26,7 @@ from unittest.mock import patch
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'sundayplussongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'sundayplus'
 
 
 class TestSundayPlusFileImport(SongImportTestHelper):

@@ -35,7 +35,7 @@ except ImportError:
 from tests.utils import load_external_result_data
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'opsprosongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'opspro'
 
 
 def _get_item(data, key):

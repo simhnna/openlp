@@ -25,7 +25,7 @@ This module contains tests for the Words of Worship song importer.
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'wordsofworshipsongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'wordsofworship'
 
 
 class TestWordsOfWorshipFileImport(SongImportTestHelper):

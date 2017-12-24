@@ -25,7 +25,7 @@ This module contains tests for the PresentationManager song importer.
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'presentationmanagersongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'presentationmanager'
 
 
 class TestPresentationManagerFileImport(SongImportTestHelper):
