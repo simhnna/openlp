@@ -31,7 +31,7 @@ from openlp.plugins.songs.lib.importers.easyworship import EasyWorshipSongImport
 
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'easyworshipsongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'easyworship'
 SONG_TEST_DATA = [
     {'title': 'Amazing Grace',
      'authors': ['John Newton'],

@@ -38,7 +38,7 @@ from tests.helpers.songfileimport import SongImportTestHelper
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'songselect'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'songselect'
 
 
 class TestSongSelectImport(TestCase, TestMixin):
