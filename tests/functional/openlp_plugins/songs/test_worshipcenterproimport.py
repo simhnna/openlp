@@ -156,7 +156,7 @@ class TestWorshipCenterProSongImport(TestCase):
             importer = WorshipCenterProImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
-            self.assertIsNotNone(importer, 'Import should not be none')
+            assert importer is not None, 'Import should not be none'
 
     def test_pyodbc_exception(self):
         """
@@ -181,7 +181,7 @@ class TestWorshipCenterProSongImport(TestCase):
                 return_value = importer.do_import()
 
                 # THEN: do_import should return None, and pyodbc, translate & log_error are called with known calls
-                self.assertIsNone(return_value, 'do_import should return None when pyodbc raises an exception.')
+                assert return_value is None, 'do_import should return None when pyodbc raises an exception.'
                 mocked_pyodbc_connect.assert_called_with('DRIVER={Microsoft Access Driver (*.mdb)};DBQ=import_source')
                 mocked_translate.assert_called_with('SongsPlugin.WorshipCenterProImport',
                                                     'Unable to connect the WorshipCenter Pro database.')
@@ -220,7 +220,7 @@ class TestWorshipCenterProSongImport(TestCase):
 
             # THEN: do_import should return None, and pyodbc, import_wizard, importer.title and add_verse are called
             # with known calls
-            self.assertIsNone(return_value, 'do_import should return None when pyodbc raises an exception.')
+            assert return_value is None, 'do_import should return None when pyodbc raises an exception.'
             mocked_pyodbc.connect.assert_called_with('DRIVER={Microsoft Access Driver (*.mdb)};DBQ=import_source')
             mocked_pyodbc.connect().cursor.assert_any_call()
             mocked_pyodbc.connect().cursor().execute.assert_called_with('SELECT ID, Field, Value FROM __SONGDATA')
@@ -229,8 +229,7 @@ class TestWorshipCenterProSongImport(TestCase):
             add_verse_call_count = 0
             for song_data in SONG_TEST_DATA:
                 title_value = song_data['title']
-                self.assertIn(title_value, importer._title_assignment_list,
-                              'title should have been set to %s' % title_value)
+                assert title_value in importer._title_assignment_list, 'title should have been set to %s' % title_value
                 verse_calls = song_data['verses']
                 add_verse_call_count += len(verse_calls)
                 for call in verse_calls:
@@ -241,5 +240,4 @@ class TestWorshipCenterProSongImport(TestCase):
                     mocked_add_comment.assert_any_call(song_data['comments'])
                 if 'copyright' in song_data:
                     mocked_add_copyright.assert_any_call(song_data['copyright'])
-            self.assertEqual(mocked_add_verse.call_count, add_verse_call_count,
-                             'Incorrect number of calls made to add_verse')
+            assert mocked_add_verse.call_count == add_verse_call_count, 'Incorrect number of calls made to add_verse'

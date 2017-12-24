@@ -64,9 +64,9 @@ class TestCSVImport(TestCase):
             CSVBible(mocked_manager, path='.', name='.', books_path=Path('books.csv'), verse_path=Path('verse.csv'))
 
         # THEN: The importer should be an instance of BibleImport
-        self.assertIsInstance(importer, BibleImport)
-        self.assertEqual(importer.books_path, Path('books.csv'))
-        self.assertEqual(importer.verses_path, Path('verse.csv'))
+        assert isinstance(importer, BibleImport)
+        assert importer.books_path == Path('books.csv')
+        assert importer.verses_path == Path('verse.csv')
 
     def test_book_namedtuple(self):
         """
@@ -77,10 +77,10 @@ class TestCSVImport(TestCase):
         result = Book('id', 'testament_id', 'name', 'abbreviation')
 
         # THEN: The attributes should match up with the data we used
-        self.assertEqual(result.id, 'id')
-        self.assertEqual(result.testament_id, 'testament_id')
-        self.assertEqual(result.name, 'name')
-        self.assertEqual(result.abbreviation, 'abbreviation')
+        assert result.id == 'id'
+        assert result.testament_id == 'testament_id'
+        assert result.name == 'name'
+        assert result.abbreviation == 'abbreviation'
 
     def test_verse_namedtuple(self):
         """
@@ -91,10 +91,10 @@ class TestCSVImport(TestCase):
         result = Verse('book_id_name', 'chapter_number', 'number', 'text')
 
         # THEN: The attributes should match up with the data we used
-        self.assertEqual(result.book_id_name, 'book_id_name')
-        self.assertEqual(result.chapter_number, 'chapter_number')
-        self.assertEqual(result.number, 'number')
-        self.assertEqual(result.text, 'text')
+        assert result.book_id_name == 'book_id_name'
+        assert result.chapter_number == 'chapter_number'
+        assert result.number == 'number'
+        assert result.text == 'text'
 
     def test_get_book_name_id(self):
         """
@@ -109,7 +109,7 @@ class TestCSVImport(TestCase):
             actual_result = CSVBible.get_book_name(name, books)
 
             # THEN: get_book_name() should return the book name associated with that id from the books dictionary
-            self.assertEqual(actual_result, expected_result)
+            assert actual_result == expected_result
 
     def test_get_book_name(self):
         """
@@ -124,7 +124,7 @@ class TestCSVImport(TestCase):
             actual_result = CSVBible.get_book_name(name, books)
 
             # THEN: get_book_name() should return the input
-            self.assertEqual(actual_result, expected_result)
+            assert actual_result == expected_result
 
     def test_parse_csv_file(self):
         """
@@ -144,8 +144,8 @@ class TestCSVImport(TestCase):
             result = CSVBible.parse_csv_file(Path('file.csv'), TestTuple)
 
             # THEN: A list of TestTuple instances with the parsed data should be returned
-            self.assertEqual(result, [TestTuple('1', 'Line 1', 'Data 1'), TestTuple('2', 'Line 2', 'Data 2'),
-                                      TestTuple('3', 'Line 3', 'Data 3')])
+            assert result == [TestTuple('1', 'Line 1', 'Data 1'), TestTuple('2', 'Line 2', 'Data 2'),
+                              TestTuple('3', 'Line 3', 'Data 3')]
             mocked_open.assert_called_once_with('r', encoding='utf-8', newline='')
             mocked_reader.assert_called_once_with(ANY, delimiter=',', quotechar='"')
 
@@ -162,7 +162,7 @@ class TestCSVImport(TestCase):
             # THEN: A ValidationError should be raised
             with self.assertRaises(ValidationError) as context:
                 CSVBible.parse_csv_file(Path('file.csv'), None)
-            self.assertEqual(context.exception.msg, 'Parsing "file.csv" failed')
+            assert context.exception.msg == 'Parsing "file.csv" failed'
 
     def test_parse_csv_file_csverror(self):
         """
@@ -178,7 +178,7 @@ class TestCSVImport(TestCase):
             # THEN: A ValidationError should be raised
             with self.assertRaises(ValidationError) as context:
                 CSVBible.parse_csv_file(Path('file.csv'), None)
-            self.assertEqual(context.exception.msg, 'Parsing "file.csv" failed')
+            assert context.exception.msg == 'Parsing "file.csv" failed'
 
     def test_process_books_stopped_import(self):
         """
@@ -197,8 +197,8 @@ class TestCSVImport(TestCase):
             result = importer.process_books(['Book 1'])
 
             # THEN: increment_progress_bar should not be called and the return value should be an empty dictionary
-            self.assertFalse(importer.wizard.increment_progress_bar.called)
-            self.assertEqual(result, {})
+            assert importer.wizard.increment_progress_bar.called is False
+            assert result == {}
 
     def test_process_books(self):
         """
@@ -222,9 +222,9 @@ class TestCSVImport(TestCase):
 
             # THEN: translate and find_and_create_book should have been called with both book names.
             # 		The returned data should be a dictionary with both song's id and names.
-            self.assertEqual(importer.find_and_create_book.mock_calls,
-                             [call('1. Mosebog', 2, 10), call('2. Mosebog', 2, 10)])
-            self.assertDictEqual(result, {1: '1. Mosebog', 2: '2. Mosebog'})
+            assert importer.find_and_create_book.mock_calls == \
+                [call('1. Mosebog', 2, 10), call('2. Mosebog', 2, 10)]
+            assert result == {1: '1. Mosebog', 2: '2. Mosebog'}
 
     def test_process_verses_stopped_import(self):
         """
@@ -244,8 +244,8 @@ class TestCSVImport(TestCase):
             result = importer.process_verses(['Dummy Verse'], [])
 
             # THEN: get_book_name should not be called and the return value should be None
-            self.assertFalse(importer.get_book_name.called)
-            self.assertIsNone(result)
+            assert importer.get_book_name.called is False
+            assert result is None
 
     def test_process_verses_successful(self):
         """
@@ -272,13 +272,13 @@ class TestCSVImport(TestCase):
             importer.process_verses(verses, books)
 
             # THEN: create_verse is called with the test data
-            self.assertEqual(importer.get_book_name.mock_calls, [call(1, books), call(1, books)])
+            assert importer.get_book_name.mock_calls == [call(1, books), call(1, books)]
             importer.get_book.assert_called_once_with('1. Mosebog')
-            self.assertEqual(importer.session.commit.call_count, 2)
-            self.assertEqual(importer.create_verse.mock_calls,
-                             [call('1', 1, 1, 'I Begyndelsen skabte Gud Himmelen og Jorden.'),
-                              call('1', 1, 2, 'Og Jorden var øde og tom, og der var Mørke over Verdensdybet. '
-                                              'Men Guds Ånd svævede over Vandene.')])
+            assert importer.session.commit.call_count == 2
+            assert importer.create_verse.mock_calls == \
+                [call('1', 1, 1, 'I Begyndelsen skabte Gud Himmelen og Jorden.'),
+                 call('1', 1, 2, 'Og Jorden var øde og tom, og der var Mørke over Verdensdybet. '
+                                 'Men Guds Ånd svævede over Vandene.')]
 
     def test_do_import_invalid_language_id(self):
         """
@@ -296,7 +296,7 @@ class TestCSVImport(TestCase):
 
             # THEN: The False should be returned.
             importer.get_language.assert_called_once_with('Bible Name')
-            self.assertFalse(result)
+            assert result is False
 
     def test_do_import_success(self):
         """
@@ -320,11 +320,11 @@ class TestCSVImport(TestCase):
 
             # THEN: parse_csv_file should be called twice,
             # and True should be returned.
-            self.assertEqual(importer.parse_csv_file.mock_calls,
-                             [call(Path('books.csv'), Book), call(Path('verses.csv'), Verse)])
+            assert importer.parse_csv_file.mock_calls == \
+                [call(Path('books.csv'), Book), call(Path('verses.csv'), Verse)]
             importer.process_books.assert_called_once_with(['Book 1'])
             importer.process_verses.assert_called_once_with(['Verse 1'], ['Book 1'])
-            self.assertTrue(result)
+            assert result is True
 
     def test_file_import(self):
         """
@@ -353,7 +353,7 @@ class TestCSVImport(TestCase):
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
-            self.assertTrue(importer.create_verse.called)
+            assert importer.create_verse.called is True
             for verse_tag, verse_text in test_data['verses']:
                 importer.create_verse.assert_any_call(importer.get_book().id, 1, verse_tag, verse_text)
             importer.create_book.assert_any_call('1. Mosebog', importer.get_book_ref_id_by_name(), 1)

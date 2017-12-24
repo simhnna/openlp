@@ -64,7 +64,7 @@ class TestListPreviewWidget(TestCase, TestMixin):
         # GIVEN: A new ListPreviewWidget instance.
         # WHEN: No SlideItem has been added yet.
         # THEN: The count of items should be zero.
-        self.assertEqual(self.preview_widget.slide_count(), 0, 'The slide list should be empty.')
+        assert self.preview_widget.slide_count() == 0, 'The slide list should be empty.'
 
     def test_initial_slide_number(self):
         """
@@ -73,7 +73,7 @@ class TestListPreviewWidget(TestCase, TestMixin):
         # GIVEN: A new ListPreviewWidget instance.
         # WHEN: No SlideItem has been added yet.
         # THEN: The number of the current item should be -1.
-        self.assertEqual(self.preview_widget.current_slide_number(), -1, 'The slide number should be -1.')
+        assert self.preview_widget.current_slide_number() == -1, 'The slide number should be -1.'
 
     def test_replace_service_item(self):
         """
@@ -87,8 +87,8 @@ class TestListPreviewWidget(TestCase, TestMixin):
         # WHEN: Added to the preview widget.
         self.preview_widget.replace_service_item(service_item, 1, 1)
         # THEN: The slide count and number should fit.
-        self.assertEqual(self.preview_widget.slide_count(), 2, 'The slide count should be 2.')
-        self.assertEqual(self.preview_widget.current_slide_number(), 1, 'The current slide number should  be 1.')
+        assert self.preview_widget.slide_count() == 2, 'The slide count should be 2.'
+        assert self.preview_widget.current_slide_number() == 1, 'The current slide number should  be 1.'
 
     def test_change_slide(self):
         """
@@ -103,4 +103,4 @@ class TestListPreviewWidget(TestCase, TestMixin):
         self.preview_widget.replace_service_item(service_item, 1, 0)
         self.preview_widget.change_slide(1)
         # THEN: The current_slide_number should reflect the change.
-        self.assertEqual(self.preview_widget.current_slide_number(), 1, 'The current slide number should  be 1.')
+        assert self.preview_widget.current_slide_number() == 1, 'The current slide number should  be 1.'

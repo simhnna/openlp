@@ -63,7 +63,7 @@ class TestManager(TestCase):
 
             # THEN: The session should have been closed and set to None, the bible should be deleted, and the result of
             #       the deletion returned.
-            self.assertTrue(result)
+            assert result is True
             mocked_close_all.assert_called_once_with()
-            self.assertIsNone(mocked_bible.session)
+            assert mocked_bible.session is None
             mocked_delete_file.assert_called_once_with(Path('bibles', 'KJV.sqlite'))

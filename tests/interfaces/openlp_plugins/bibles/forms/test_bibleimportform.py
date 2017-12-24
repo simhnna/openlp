@@ -78,7 +78,7 @@ class TestBibleImportForm(TestCase, TestMixin):
         self.form.on_web_update_button_clicked()
 
         # THEN: The webbible list should still be empty
-        self.assertEqual(self.form.web_bible_list, {}, 'The webbible list should be empty')
+        assert self.form.web_bible_list == {}, 'The webbible list should be empty'
 
     def test_custom_init(self):
         """

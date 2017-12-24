@@ -70,8 +70,8 @@ class TestProjectorManager(TestCase, TestMixin):
         # WHEN: we call bootstrap_initialise
         self.projector_manager.bootstrap_initialise()
         # THEN: ProjectorDB is setup
-        self.assertEqual(type(self.projector_manager.projectordb), ProjectorDB,
-                         'Initialization should have created a ProjectorDB() instance')
+        assert type(self.projector_manager.projectordb) == ProjectorDB, \
+            'Initialization should have created a ProjectorDB() instance'
 
     def test_bootstrap_post_set_up(self):
         """
@@ -85,10 +85,9 @@ class TestProjectorManager(TestCase, TestMixin):
         self.projector_manager.bootstrap_post_set_up()
 
         # THEN: verify calls to retrieve saved projectors and edit page initialized
-        self.assertEqual(1, self.projector_manager._load_projectors.call_count,
-                         'Initialization should have called load_projectors()')
-        self.assertEqual(type(self.projector_manager.projector_form), ProjectorEditForm,
-                         'Initialization should have created a Projector Edit Form')
-        self.assertIs(self.projector_manager.projectordb,
-                      self.projector_manager.projector_form.projectordb,
-                      'ProjectorEditForm should be using same ProjectorDB() instance as ProjectorManager')
+        assert 1 == self.projector_manager._load_projectors.call_count, \
+            'Initialization should have called load_projectors()'
+        assert type(self.projector_manager.projector_form) == ProjectorEditForm, \
+            'Initialization should have created a Projector Edit Form'
+        assert self.projector_manager.projectordb is self.projector_manager.projector_form.projectordb, \
+            'ProjectorEditForm should be using same ProjectorDB() instance as ProjectorManager'

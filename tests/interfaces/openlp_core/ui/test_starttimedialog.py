@@ -56,28 +56,24 @@ class TestStartTimeDialog(TestCase, TestMixin):
         """
         Test StartTimeDialog are defaults correct
         """
-        self.assertEqual(self.form.hour_spin_box.minimum(), 0, 'The minimum hour should stay the same as the dialog')
-        self.assertEqual(self.form.hour_spin_box.maximum(), 4, 'The maximum hour should stay the same as the dialog')
-        self.assertEqual(self.form.minute_spin_box.minimum(), 0,
-                         'The minimum minute should stay the same as the dialog')
-        self.assertEqual(self.form.minute_spin_box.maximum(), 59,
-                         'The maximum minute should stay the same as the dialog')
-        self.assertEqual(self.form.second_spin_box.minimum(), 0,
-                         'The minimum second should stay the same as the dialog')
-        self.assertEqual(self.form.second_spin_box.maximum(), 59,
-                         'The maximum second should stay the same as the dialog')
-        self.assertEqual(self.form.hour_finish_spin_box.minimum(), 0,
-                         'The minimum finish hour should stay the same as the dialog')
-        self.assertEqual(self.form.hour_finish_spin_box.maximum(), 4,
-                         'The maximum finish hour should stay the same as the dialog')
-        self.assertEqual(self.form.minute_finish_spin_box.minimum(), 0,
-                         'The minimum finish minute should stay the same as the dialog')
-        self.assertEqual(self.form.minute_finish_spin_box.maximum(), 59,
-                         'The maximum finish minute should stay the same as the dialog')
-        self.assertEqual(self.form.second_finish_spin_box.minimum(), 0,
-                         'The minimum finish second should stay the same as the dialog')
-        self.assertEqual(self.form.second_finish_spin_box.maximum(), 59,
-                         'The maximum finish second should stay the same as the dialog')
+        assert self.form.hour_spin_box.minimum() == 0, 'The minimum hour should stay the same as the dialog'
+        assert self.form.hour_spin_box.maximum() == 4, 'The maximum hour should stay the same as the dialog'
+        assert self.form.minute_spin_box.minimum() == 0, 'The minimum minute should stay the same as the dialog'
+        assert self.form.minute_spin_box.maximum() == 59, 'The maximum minute should stay the same as the dialog'
+        assert self.form.second_spin_box.minimum() == 0, 'The minimum second should stay the same as the dialog'
+        assert self.form.second_spin_box.maximum() == 59, 'The maximum second should stay the same as the dialog'
+        assert self.form.hour_finish_spin_box.minimum() == 0, \
+            'The minimum finish hour should stay the same as the dialog'
+        assert self.form.hour_finish_spin_box.maximum() == 4, \
+            'The maximum finish hour should stay the same as the dialog'
+        assert self.form.minute_finish_spin_box.minimum() == 0, \
+            'The minimum finish minute should stay the same as the dialog'
+        assert self.form.minute_finish_spin_box.maximum() == 59, \
+            'The maximum finish minute should stay the same as the dialog'
+        assert self.form.second_finish_spin_box.minimum() == 0, \
+            'The minimum finish second should stay the same as the dialog'
+        assert self.form.second_finish_spin_box.maximum() == 59, \
+            'The maximum finish second should stay the same as the dialog'
 
     def test_time_display(self):
         """
@@ -97,10 +93,10 @@ class TestStartTimeDialog(TestCase, TestMixin):
         QtTest.QTest.mouseClick(ok_widget, QtCore.Qt.LeftButton)
 
         # THEN the following input values are returned
-        self.assertEqual(self.form.hour_spin_box.value(), 0)
-        self.assertEqual(self.form.minute_spin_box.value(), 1)
-        self.assertEqual(self.form.second_spin_box.value(), 1)
-        self.assertEqual(self.form.item['service_item'].start_time, 61, 'The start time should stay the same')
+        assert self.form.hour_spin_box.value() == 0
+        assert self.form.minute_spin_box.value() == 1
+        assert self.form.second_spin_box.value() == 1
+        assert self.form.item['service_item'].start_time == 61, 'The start time should stay the same'
 
         # WHEN displaying the UI, changing the time to 2min 3secs and pressing enter
         self.form.item = {'service_item': mocked_serviceitem}
@@ -112,7 +108,7 @@ class TestStartTimeDialog(TestCase, TestMixin):
         QtTest.QTest.mouseClick(ok_widget, QtCore.Qt.LeftButton)
 
         # THEN the following values are returned
-        self.assertEqual(self.form.hour_spin_box.value(), 0)
-        self.assertEqual(self.form.minute_spin_box.value(), 2)
-        self.assertEqual(self.form.second_spin_box.value(), 3)
-        self.assertEqual(self.form.item['service_item'].start_time, 123, 'The start time should have changed')
+        assert self.form.hour_spin_box.value() == 0
+        assert self.form.minute_spin_box.value() == 2
+        assert self.form.second_spin_box.value() == 3
+        assert self.form.item['service_item'].start_time == 123, 'The start time should have changed'

@@ -67,7 +67,7 @@ class TestSwordImport(TestCase):
         importer = SwordBible(mocked_manager, path='.', name='.', file_path=None, sword_key='', sword_path='')
 
         # THEN: The importer should be an instance of BibleDB
-        self.assertIsInstance(importer, BibleDB)
+        assert isinstance(importer, BibleDB)
 
     @patch('openlp.plugins.bibles.lib.importers.sword.SwordBible.application')
     @patch('openlp.plugins.bibles.lib.importers.sword.modules')
@@ -106,6 +106,6 @@ class TestSwordImport(TestCase):
         importer.do_import()
 
         # THEN: The create_verse() method should have been called with each verse in the file.
-        self.assertTrue(importer.create_verse.called)
+        assert importer.create_verse.called is True
         for verse_tag, verse_text in test_data['verses']:
             importer.create_verse.assert_any_call(importer.create_book().id, 1, int(verse_tag), verse_text)

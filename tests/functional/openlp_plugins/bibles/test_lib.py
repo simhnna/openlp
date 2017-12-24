@@ -59,7 +59,7 @@ class TestLib(TestCase, TestMixin):
             _ = lib.get_reference_separator(key)
 
             # THEN: get_reference_separator should return the correct separator
-            self.assertEqual(separators[key], value)
+            assert separators[key] == value
         mocked_update_reference_separators.assert_called_once_with()
 
     def test_reference_matched_full(self):
@@ -116,13 +116,13 @@ class TestLib(TestCase, TestMixin):
 
                                 # THEN: A match should be returned, and the book and reference should match the
                                 #       expected result
-                                self.assertIsNotNone(match, '{text} should provide a match'.format(text=reference_text))
-                                self.assertEqual(book_result, match.group('book'),
-                                                 '{text} does not provide the expected result for the book group.'
-                                                 .format(text=reference_text))
-                                self.assertEqual(ranges_result, match.group('ranges'),
-                                                 '{text} does not provide the expected result for the ranges group.'
-                                                 .format(text=reference_text))
+                                assert match is not None, '{text} should provide a match'.format(text=reference_text)
+                                assert book_result == match.group('book'), \
+                                    '{text} does not provide the expected result for the book group.'\
+                                    .format(text=reference_text)
+                                assert ranges_result == match.group('ranges'), \
+                                    '{text} does not provide the expected result for the ranges group.' \
+                                    .format(text=reference_text)
 
     def test_reference_matched_range(self):
         """
@@ -158,12 +158,12 @@ class TestLib(TestCase, TestMixin):
 
                                 # THEN: A match should be returned, and the to/from chapter/verses should match as
                                 #       expected
-                                self.assertIsNotNone(match, '{text} should provide a match'.format(text=reference_text))
-                                self.assertEqual(match.group('from_chapter'), from_chapter)
-                                self.assertEqual(match.group('from_verse'), from_verse)
-                                self.assertEqual(match.group('range_to'), range_to)
-                                self.assertEqual(match.group('to_chapter'), to_chapter)
-                                self.assertEqual(match.group('to_verse'), to_verse)
+                                assert match is not None, '{text} should provide a match'.format(text=reference_text)
+                                assert match.group('from_chapter') == from_chapter
+                                assert match.group('from_verse') == from_verse
+                                assert match.group('range_to') == range_to
+                                assert match.group('to_chapter') == to_chapter
+                                assert match.group('to_verse') == to_verse
 
     def test_reference_matched_range_separator(self):
         # GIVEN: Some test data which contains different references to parse, with the expected results.
@@ -199,7 +199,7 @@ class TestLib(TestCase, TestMixin):
                                 references = full_reference_match.split(reference_text)
 
                                 # THEN: The list of references should be as the expected results
-                                self.assertEqual(references, ranges)
+                                assert references == ranges
 
     def test_search_results_creation(self):
         """
@@ -218,10 +218,10 @@ class TestLib(TestCase, TestMixin):
         search_results = SearchResults(book, chapter, verse_list)
 
         # THEN: It should have a book, a chapter and a verse list
-        self.assertIsNotNone(search_results, 'The search_results object should not be None')
-        self.assertEqual(search_results.book, book, 'The book should be "Genesis"')
-        self.assertEqual(search_results.chapter, chapter, 'The chapter should be 1')
-        self.assertDictEqual(search_results.verse_list, verse_list, 'The verse lists should be identical')
+        assert search_results is not None, 'The search_results object should not be None'
+        assert search_results.book == book, 'The book should be "Genesis"'
+        assert search_results.chapter == chapter, 'The chapter should be 1'
+        assert search_results.verse_list == verse_list, 'The verse lists should be identical'
 
     def test_search_results_has_verse_list(self):
         """
@@ -234,7 +234,7 @@ class TestLib(TestCase, TestMixin):
         has_verse_list = search_results.has_verse_list()
 
         # THEN: It should be True
-        self.assertTrue(has_verse_list, 'The SearchResults object should have a verse list')
+        assert has_verse_list is True, 'The SearchResults object should have a verse list'
 
     def test_search_results_has_no_verse_list(self):
         """
@@ -247,4 +247,4 @@ class TestLib(TestCase, TestMixin):
         has_verse_list = search_results.has_verse_list()
 
         # THEN: It should be False
-        self.assertFalse(has_verse_list, 'The SearchResults object should have a verse list')
+        assert has_verse_list is False, 'The SearchResults object should have a verse list'

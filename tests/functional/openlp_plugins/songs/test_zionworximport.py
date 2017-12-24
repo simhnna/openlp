@@ -59,7 +59,7 @@ class TestZionWorxImport(TestCase):
             importer = ZionWorxImport(mocked_manager, file_paths=[])
 
             # THEN: The importer should be an instance of SongImport
-            self.assertIsInstance(importer, SongImport)
+            assert isinstance(importer, SongImport)
 
 
 class TestZionWorxFileImport(SongImportTestHelper):

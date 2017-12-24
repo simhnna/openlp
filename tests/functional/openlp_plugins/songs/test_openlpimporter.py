@@ -51,7 +51,7 @@ class TestOpenLPImport(TestCase):
             importer = OpenLPSongImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
-            self.assertIsNotNone(importer, 'Import should not be none')
+            assert importer is not None, 'Import should not be none'
 
     def test_invalid_import_source(self):
         """
@@ -70,6 +70,6 @@ class TestOpenLPImport(TestCase):
                 importer.import_source = source
 
                 # THEN: do_import should return none and the progress bar maximum should not be set.
-                self.assertIsNone(importer.do_import(), 'do_import should return None when import_source is not a list')
-                self.assertEqual(mocked_import_wizard.progress_bar.setMaximum.called, False,
-                                 'setMaximum on import_wizard.progress_bar should not have been called')
+                assert importer.do_import() is None, 'do_import should return None when import_source is not a list'
+                assert mocked_import_wizard.progress_bar.setMaximum.called is False, \
+                    'setMaximum on import_wizard.progress_bar should not have been called'
