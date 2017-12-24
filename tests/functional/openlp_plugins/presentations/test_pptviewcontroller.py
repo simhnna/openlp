@@ -67,7 +67,7 @@ class TestPptviewController(TestCase, TestMixin):
         controller = PptviewController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        assert'Powerpoint Viewer' == controller.name, 'The name of the presentation controller should be correct'
+        assert 'Powerpoint Viewer' == controller.name, 'The name of the presentation controller should be correct'
 
     def test_check_available(self):
         """

@@ -92,7 +92,7 @@ class TestPdfController(TestCase, TestMixin):
         controller = PdfController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        assert'Pdf' == controller.name, 'The name of the presentation controller should be correct'
+        assert 'Pdf' == controller.name, 'The name of the presentation controller should be correct'
 
     def test_load_pdf(self):
         """

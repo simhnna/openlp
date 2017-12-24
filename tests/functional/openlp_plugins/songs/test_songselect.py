@@ -390,7 +390,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         assert 2 == mocked_find_all.call_count, 'The find_all() method should have been called twice'
         assert [call('div', 'song-viewer lyrics'), call('div', 'song-viewer lyrics')] == \
             mocked_lyrics_page.find.call_args_list, 'The find() method should have been called with the right arguments'
-        assert [call('p'), call('h3')], mocked_find_all.call_args_list == \
+        assert [call('p'), call('h3')] == mocked_find_all.call_args_list, \
             'The find_all() method should have been called with the right arguments'
         assert 'copyright' in result, 'The returned song should have a copyright'
         assert 'ccli_number' in result, 'The returned song should have a CCLI number'

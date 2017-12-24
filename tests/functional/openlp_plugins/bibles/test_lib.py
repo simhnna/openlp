@@ -117,10 +117,10 @@ class TestLib(TestCase, TestMixin):
                                 # THEN: A match should be returned, and the book and reference should match the
                                 #       expected result
                                 assert match is not None, '{text} should provide a match'.format(text=reference_text)
-                                assert book_result, match.group('book') == \
+                                assert book_result == match.group('book'), \
                                     '{text} does not provide the expected result for the book group.'\
                                     .format(text=reference_text)
-                                assert ranges_result, match.group('ranges') == \
+                                assert ranges_result == match.group('ranges'), \
                                     '{text} does not provide the expected result for the ranges group.' \
                                     .format(text=reference_text)
 

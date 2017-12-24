@@ -166,7 +166,7 @@ class TestEasyWorshipSongImport(TestCase):
 
         # THEN:
         assert field_desc_entry is not None, 'Import should not be none'
-        assert field_desc_entry.name, name == 'FieldDescEntry.name should be the same as the name argument'
+        assert field_desc_entry.name == name, 'FieldDescEntry.name should be the same as the name argument'
         assert field_desc_entry.field_type == field_type, 'FieldDescEntry.type should be the same as the type argument'
         assert field_desc_entry.size == size, 'FieldDescEntry.size should be the same as the size argument'
 
