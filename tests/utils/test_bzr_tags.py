@@ -52,4 +52,4 @@ class TestBzrTags(TestCase):
                 count1 += 1
 
         # THEN the tags should match the accepted tags
-        self.assertEqual(count, count1, 'List of tags should match')
+        assert count == count1, 'List of tags should match'

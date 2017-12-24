@@ -55,10 +55,10 @@ class TestSongSelectImport(TestCase, TestMixin):
         importer = SongSelectImport(None)
 
         # THEN: The object should have the correct properties
-        self.assertIsNone(importer.db_manager, 'The db_manager should be None')
-        self.assertIsNotNone(importer.html_parser, 'There should be a valid html_parser object')
-        self.assertIsNotNone(importer.opener, 'There should be a valid opener object')
-        self.assertEqual(1, mocked_build_opener.call_count, 'The build_opener method should have been called once')
+        assert importer.db_manager is None, 'The db_manager should be None'
+        assert importer.html_parser is not None, 'There should be a valid html_parser object'
+        assert importer.opener is not None, 'There should be a valid opener object'
+        assert 1 == mocked_build_opener.call_count, 'The build_opener method should have been called once'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -81,11 +81,11 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.login('username', 'password', mock_callback)
 
         # THEN: callback was called 3 times, open was called twice, find was called twice, and False was returned
-        self.assertEqual(3, mock_callback.call_count, 'callback should have been called 3 times')
-        self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice')
-        self.assertEqual(1, mocked_posted_page.find.call_count, 'find should have been called once')
-        self.assertEqual(2, mocked_opener.open.call_count, 'opener should have been called twice')
-        self.assertFalse(result, 'The login method should have returned False')
+        assert 3 == mock_callback.call_count, 'callback should have been called 3 times'
+        assert 2 == mocked_login_page.find.call_count, 'find should have been called twice'
+        assert 1 == mocked_posted_page.find.call_count, 'find should have been called once'
+        assert 2 == mocked_opener.open.call_count, 'opener should have been called twice'
+        assert result is False, 'The login method should have returned False'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     def test_login_except(self, mocked_build_opener):
@@ -101,8 +101,8 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.login('username', 'password', mock_callback)
 
         # THEN: callback was called 1 time and False was returned
-        self.assertEqual(1, mock_callback.call_count, 'callback should have been called 1 times')
-        self.assertFalse(result, 'The login method should have returned False')
+        assert 1 == mock_callback.call_count, 'callback should have been called 1 times'
+        assert result is False, 'The login method should have returned False'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -125,11 +125,11 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.login('username', 'password', mock_callback)
 
         # THEN: callback was called 3 times, open was called twice, find was called twice, and True was returned
-        self.assertEqual(3, mock_callback.call_count, 'callback should have been called 3 times')
-        self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice on the login page')
-        self.assertEqual(1, mocked_posted_page.find.call_count, 'find should have been called once on the posted page')
-        self.assertEqual(2, mocked_opener.open.call_count, 'opener should have been called twice')
-        self.assertTrue(result, 'The login method should have returned True')
+        assert 3 == mock_callback.call_count, 'callback should have been called 3 times'
+        assert 2 == mocked_login_page.find.call_count, 'find should have been called twice on the login page'
+        assert 1 == mocked_posted_page.find.call_count, 'find should have been called once on the posted page'
+        assert 2 == mocked_opener.open.call_count, 'opener should have been called twice'
+        assert result is True, 'The login method should have returned True'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -154,11 +154,11 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.login('username', 'password', mock_callback)
 
         # THEN: callback was called 3 times, open was called twice, find was called twice, and True was returned
-        self.assertEqual(3, mock_callback.call_count, 'callback should have been called 3 times')
-        self.assertEqual(2, mocked_login_page.find.call_count, 'find should have been called twice on the login page')
-        self.assertEqual(1, mocked_posted_page.find.call_count, 'find should have been called once on the posted page')
-        self.assertEqual('https://profile.ccli.com/do/login', mocked_opener.open.call_args_list[1][0][0])
-        self.assertTrue(result, 'The login method should have returned True')
+        assert 3 == mock_callback.call_count, 'callback should have been called 3 times'
+        assert 2 == mocked_login_page.find.call_count, 'find should have been called twice on the login page'
+        assert 1 == mocked_posted_page.find.call_count, 'find should have been called once on the posted page'
+        assert 'https://profile.ccli.com/do/login', mocked_opener.open.call_args_list[1][0][0]
+        assert result is True, 'The login method should have returned True'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     def test_logout(self, mocked_build_opener):
@@ -174,7 +174,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         importer.logout()
 
         # THEN: The opener is called once with the logout url
-        self.assertEqual(1, mocked_opener.open.call_count, 'opener should have been called once')
+        assert 1 == mocked_opener.open.call_count, 'opener should have been called once'
         mocked_opener.open.assert_called_with(LOGOUT_URL)
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
@@ -196,11 +196,11 @@ class TestSongSelectImport(TestCase, TestMixin):
         results = importer.search('text', 1000, mock_callback)
 
         # THEN: callback was never called, open was called once, find_all was called once, an empty list returned
-        self.assertEqual(0, mock_callback.call_count, 'callback should not have been called')
-        self.assertEqual(1, mocked_opener.open.call_count, 'open should have been called once')
-        self.assertEqual(1, mocked_results_page.find_all.call_count, 'find_all should have been called once')
+        assert 0 == mock_callback.call_count, 'callback should not have been called'
+        assert 1 == mocked_opener.open.call_count, 'open should have been called once'
+        assert 1 == mocked_results_page.find_all.call_count, 'find_all should have been called once'
         mocked_results_page.find_all.assert_called_with('div', 'song-result')
-        self.assertEqual([], results, 'The search method should have returned an empty list')
+        assert [] == results, 'The search method should have returned an empty list'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -236,15 +236,15 @@ class TestSongSelectImport(TestCase, TestMixin):
         results = importer.search('text', 1000, mock_callback)
 
         # THEN: callback was never called, open was called once, find_all was called once, an empty list returned
-        self.assertEqual(2, mock_callback.call_count, 'callback should have been called twice')
-        self.assertEqual(2, mocked_opener.open.call_count, 'open should have been called twice')
-        self.assertEqual(2, mocked_results_page.find_all.call_count, 'find_all should have been called twice')
+        assert 2 == mock_callback.call_count, 'callback should have been called twice'
+        assert 2 == mocked_opener.open.call_count, 'open should have been called twice'
+        assert 2 == mocked_results_page.find_all.call_count, 'find_all should have been called twice'
         mocked_results_page.find_all.assert_called_with('div', 'song-result')
         expected_list = [
             {'title': 'Title 1', 'authors': ['James', 'John'], 'link': BASE_URL + '/url1'},
             {'title': 'Title 2', 'authors': ['Philip'], 'link': BASE_URL + '/url2'}
         ]
-        self.assertListEqual(expected_list, results, 'The search method should have returned two songs')
+        assert expected_list == results, 'The search method should have returned two songs'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -287,13 +287,13 @@ class TestSongSelectImport(TestCase, TestMixin):
         results = importer.search('text', 2, mock_callback)
 
         # THEN: callback was called twice, open was called twice, find_all was called twice, max results returned
-        self.assertEqual(2, mock_callback.call_count, 'callback should have been called twice')
-        self.assertEqual(2, mocked_opener.open.call_count, 'open should have been called twice')
-        self.assertEqual(2, mocked_results_page.find_all.call_count, 'find_all should have been called twice')
+        assert 2 == mock_callback.call_count, 'callback should have been called twice'
+        assert 2 == mocked_opener.open.call_count, 'open should have been called twice'
+        assert 2 == mocked_results_page.find_all.call_count, 'find_all should have been called twice'
         mocked_results_page.find_all.assert_called_with('div', 'song-result')
         expected_list = [{'title': 'Title 1', 'authors': ['James', 'John'], 'link': BASE_URL + '/url1'},
                          {'title': 'Title 2', 'authors': ['Philip'], 'link': BASE_URL + '/url2'}]
-        self.assertListEqual(expected_list, results, 'The search method should have returned two songs')
+        assert expected_list == results, 'The search method should have returned two songs'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -309,7 +309,7 @@ class TestSongSelectImport(TestCase, TestMixin):
         importer.stop()
 
         # THEN: Searching should have stopped
-        self.assertFalse(importer.run_search, 'Searching should have been stopped')
+        assert importer.run_search is False, 'Searching should have been stopped'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     def test_get_song_page_raises_exception(self, mocked_build_opener):
@@ -328,7 +328,7 @@ class TestSongSelectImport(TestCase, TestMixin):
 
         # THEN: The callback should have been called once and None should be returned
         mocked_callback.assert_called_with()
-        self.assertIsNone(result, 'The get_song() method should have returned None')
+        assert result is None, 'The get_song() method should have returned None'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -345,8 +345,8 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.get_song({'link': 'link'}, callback=mocked_callback)
 
         # THEN: The callback should have been called twice and None should be returned
-        self.assertEqual(2, mocked_callback.call_count, 'The callback should have been called twice')
-        self.assertIsNone(result, 'The get_song() method should have returned None')
+        assert 2 == mocked_callback.call_count, 'The callback should have been called twice'
+        assert result is None, 'The get_song() method should have returned None'
 
     @patch('openlp.plugins.songs.lib.songselect.build_opener')
     @patch('openlp.plugins.songs.lib.songselect.BeautifulSoup')
@@ -382,19 +382,18 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.get_song(fake_song, callback=mocked_callback)
 
         # THEN: The callback should have been called three times and the song should be returned
-        self.assertEqual(3, mocked_callback.call_count, 'The callback should have been called twice')
-        self.assertIsNotNone(result, 'The get_song() method should have returned a song dictionary')
-        self.assertEqual(2, mocked_lyrics_page.find.call_count, 'The find() method should have been called twice')
-        self.assertEqual(2, mocked_find_all.call_count, 'The find_all() method should have been called twice')
-        self.assertEqual([call('div', 'song-viewer lyrics'), call('div', 'song-viewer lyrics')],
-                         mocked_lyrics_page.find.call_args_list,
-                         'The find() method should have been called with the right arguments')
-        self.assertEqual([call('p'), call('h3')], mocked_find_all.call_args_list,
-                         'The find_all() method should have been called with the right arguments')
-        self.assertIn('copyright', result, 'The returned song should have a copyright')
-        self.assertIn('ccli_number', result, 'The returned song should have a CCLI number')
-        self.assertIn('verses', result, 'The returned song should have verses')
-        self.assertEqual(3, len(result['verses']), 'Three verses should have been returned')
+        assert 3 == mocked_callback.call_count, 'The callback should have been called twice'
+        assert result is not None, 'The get_song() method should have returned a song dictionary'
+        assert 2 == mocked_lyrics_page.find.call_count, 'The find() method should have been called twice'
+        assert 2 == mocked_find_all.call_count, 'The find_all() method should have been called twice'
+        assert [call('div', 'song-viewer lyrics'), call('div', 'song-viewer lyrics')] == \
+            mocked_lyrics_page.find.call_args_list, 'The find() method should have been called with the right arguments'
+        assert [call('p'), call('h3')] == mocked_find_all.call_args_list, \
+            'The find_all() method should have been called with the right arguments'
+        assert 'copyright' in result, 'The returned song should have a copyright'
+        assert 'ccli_number' in result, 'The returned song should have a CCLI number'
+        assert 'verses' in result, 'The returned song should have verses'
+        assert 3 == len(result['verses']), 'Three verses should have been returned'
 
     @patch('openlp.plugins.songs.lib.songselect.clean_song')
     @patch('openlp.plugins.songs.lib.songselect.Topic')
@@ -425,14 +424,13 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.save_song(song_dict)
 
         # THEN: The return value should be a Song class and the mocked_db_manager should have been called
-        self.assertIsInstance(result, Song, 'The returned value should be a Song object')
+        assert isinstance(result, Song), 'The returned value should be a Song object'
         mocked_clean_song.assert_called_with(mocked_db_manager, result)
-        self.assertEqual(2, mocked_db_manager.save_object.call_count,
-                         'The save_object() method should have been called twice')
+        assert 2 == mocked_db_manager.save_object.call_count, \
+            'The save_object() method should have been called twice'
         mocked_db_manager.get_object_filtered.assert_called_with(MockedAuthor, False)
-        MockedAuthor.populate.assert_called_with(first_name='Public', last_name='Domain',
-                                                 display_name='Public Domain')
-        self.assertEqual(1, len(result.authors_songs), 'There should only be one author')
+        MockedAuthor.populate.assert_called_with(first_name='Public', last_name='Domain', display_name='Public Domain')
+        assert 1 == len(result.authors_songs), 'There should only be one author'
 
     @patch('openlp.plugins.songs.lib.songselect.clean_song')
     @patch('openlp.plugins.songs.lib.songselect.Author')
@@ -461,13 +459,13 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.save_song(song_dict)
 
         # THEN: The return value should be a Song class and the mocked_db_manager should have been called
-        self.assertIsInstance(result, Song, 'The returned value should be a Song object')
+        assert isinstance(result, Song), 'The returned value should be a Song object'
         mocked_clean_song.assert_called_with(mocked_db_manager, result)
-        self.assertEqual(2, mocked_db_manager.save_object.call_count,
-                         'The save_object() method should have been called twice')
+        assert 2 == mocked_db_manager.save_object.call_count, \
+            'The save_object() method should have been called twice'
         mocked_db_manager.get_object_filtered.assert_called_with(MockedAuthor, False)
-        self.assertEqual(0, MockedAuthor.populate.call_count, 'A new author should not have been instantiated')
-        self.assertEqual(1, len(result.authors_songs), 'There should only be one author')
+        assert 0 == MockedAuthor.populate.call_count, 'A new author should not have been instantiated'
+        assert 1 == len(result.authors_songs), 'There should only be one author'
 
     @patch('openlp.plugins.songs.lib.songselect.clean_song')
     @patch('openlp.plugins.songs.lib.songselect.Author')
@@ -496,14 +494,13 @@ class TestSongSelectImport(TestCase, TestMixin):
         result = importer.save_song(song_dict)
 
         # THEN: The return value should be a Song class and the mocked_db_manager should have been called
-        self.assertIsInstance(result, Song, 'The returned value should be a Song object')
+        assert isinstance(result, Song), 'The returned value should be a Song object'
         mocked_clean_song.assert_called_with(mocked_db_manager, result)
-        self.assertEqual(2, mocked_db_manager.save_object.call_count,
-                         'The save_object() method should have been called twice')
+        assert 2 == mocked_db_manager.save_object.call_count, \
+            'The save_object() method should have been called twice'
         mocked_db_manager.get_object_filtered.assert_called_with(MockedAuthor, False)
-        MockedAuthor.populate.assert_called_with(first_name='Unknown', last_name='',
-                                                 display_name='Unknown')
-        self.assertEqual(1, len(result.authors_songs), 'There should only be one author')
+        MockedAuthor.populate.assert_called_with(first_name='Unknown', last_name='', display_name='Unknown')
+        assert 1 == len(result.authors_songs), 'There should only be one author'
 
 
 class TestSongSelectForm(TestCase, TestMixin):
@@ -532,8 +529,8 @@ class TestSongSelectForm(TestCase, TestMixin):
         ssform = SongSelectForm(None, mocked_plugin, mocked_db_manager)
 
         # THEN: The correct properties should have been assigned
-        self.assertEqual(mocked_plugin, ssform.plugin, 'The correct plugin should have been assigned')
-        self.assertEqual(mocked_db_manager, ssform.db_manager, 'The correct db_manager should have been assigned')
+        assert mocked_plugin == ssform.plugin, 'The correct plugin should have been assigned'
+        assert mocked_db_manager == ssform.db_manager, 'The correct db_manager should have been assigned'
 
     @patch('openlp.plugins.songs.forms.songselectform.SongSelectImport')
     @patch('openlp.plugins.songs.forms.songselectform.QtWidgets.QMessageBox.critical')
@@ -568,23 +565,21 @@ class TestSongSelectForm(TestCase, TestMixin):
             expected_login_spacer_calls = [call(False), call(True)]
             expected_login_progress_visible_calls = [call(True), call(False)]
             expected_login_progress_value_calls = [call(0), call(0)]
-            self.assertEqual(expected_username_calls, mocked_username_edit.setEnabled.call_args_list,
-                             'The username edit should be disabled then enabled')
-            self.assertEqual(expected_password_calls, mocked_password_edit.setEnabled.call_args_list,
-                             'The password edit should be disabled then enabled')
-            self.assertEqual(expected_save_password_calls, mocked_save_password_checkbox.setEnabled.call_args_list,
-                             'The save password checkbox should be disabled then enabled')
-            self.assertEqual(expected_login_btn_calls, mocked_login_button.setEnabled.call_args_list,
-                             'The login button should be disabled then enabled')
-            self.assertEqual(expected_login_spacer_calls, mocked_login_spacer.setVisible.call_args_list,
-                             'Thee login spacer should be make invisible, then visible')
-            self.assertEqual(expected_login_progress_visible_calls,
-                             mocked_login_progress_bar.setVisible.call_args_list,
-                             'Thee login progress bar should be make visible, then invisible')
-            self.assertEqual(expected_login_progress_value_calls, mocked_login_progress_bar.setValue.call_args_list,
-                             'Thee login progress bar should have the right values set')
-            self.assertEqual(2, mocked_process_events.call_count,
-                             'The process_events() method should be called twice')
+            assert expected_username_calls == mocked_username_edit.setEnabled.call_args_list, \
+                'The username edit should be disabled then enabled'
+            assert expected_password_calls == mocked_password_edit.setEnabled.call_args_list, \
+                'The password edit should be disabled then enabled'
+            assert expected_save_password_calls == mocked_save_password_checkbox.setEnabled.call_args_list, \
+                'The save password checkbox should be disabled then enabled'
+            assert expected_login_btn_calls == mocked_login_button.setEnabled.call_args_list, \
+                'The login button should be disabled then enabled'
+            assert expected_login_spacer_calls == mocked_login_spacer.setVisible.call_args_list, \
+                'Thee login spacer should be make invisible, then visible'
+            assert expected_login_progress_visible_calls == mocked_login_progress_bar.setVisible.call_args_list, \
+                'Thee login progress bar should be make visible, then invisible'
+            assert expected_login_progress_value_calls == mocked_login_progress_bar.setValue.call_args_list, \
+                'Thee login progress bar should have the right values set'
+            assert 2 == mocked_process_events.call_count, 'The process_events() method should be called twice'
             mocked_critical.assert_called_with(ssform, 'Error Logging In', 'There was a problem logging in, '
                                                                            'perhaps your username or password is '
                                                                            'incorrect?')
@@ -613,7 +608,7 @@ class TestSongSelectForm(TestCase, TestMixin):
                                            'Your song has been imported, would you like to import more songs?',
                                            defaultButton=QtWidgets.QMessageBox.Yes)
         mocked_on_back_button_clicked.assert_called_with()
-        self.assertIsNone(ssform.song)
+        assert ssform.song is None
 
     @patch('openlp.plugins.songs.forms.songselectform.QtWidgets.QMessageBox.question')
     @patch('openlp.plugins.songs.forms.songselectform.translate')
@@ -639,7 +634,7 @@ class TestSongSelectForm(TestCase, TestMixin):
                                            'Your song has been imported, would you like to import more songs?',
                                            defaultButton=QtWidgets.QMessageBox.Yes)
         mocked_done.assert_called_with(QtWidgets.QDialog.Accepted)
-        self.assertIsNone(ssform.song)
+        assert ssform.song is None
 
     def test_on_back_button_clicked(self):
         """
@@ -767,8 +762,8 @@ class TestSongSelectForm(TestCase, TestMixin):
 
         # THEN: The view button, search box and search button should be enabled
         mocked_song_select_importer.stop.assert_called_with()
-        self.assertTrue(ssform.search_button.isEnabled())
-        self.assertTrue(ssform.search_combobox.isEnabled())
+        assert ssform.search_button.isEnabled() is True
+        assert ssform.search_combobox.isEnabled() is True
 
     @patch('openlp.plugins.songs.forms.songselectform.Settings')
     @patch('openlp.plugins.songs.forms.songselectform.QtCore.QThread')
@@ -785,8 +780,8 @@ class TestSongSelectForm(TestCase, TestMixin):
         ssform.on_search_button_clicked()
 
         # THEN: The search box and search button should be disabled
-        self.assertFalse(ssform.search_button.isEnabled())
-        self.assertFalse(ssform.search_combobox.isEnabled())
+        assert ssform.search_button.isEnabled() is False
+        assert ssform.search_combobox.isEnabled() is False
 
     def test_on_search_finished(self):
         """
@@ -800,8 +795,8 @@ class TestSongSelectForm(TestCase, TestMixin):
         ssform.on_search_finished()
 
         # THEN: The search box and search button should be enabled
-        self.assertTrue(ssform.search_button.isEnabled())
-        self.assertTrue(ssform.search_combobox.isEnabled())
+        assert ssform.search_button.isEnabled() is True
+        assert ssform.search_combobox.isEnabled() is True
 
 
 class TestSongSelectFileImport(SongImportTestHelper):
@@ -835,8 +830,8 @@ class TestSearchWorker(TestCase, TestMixin):
         worker = SearchWorker(importer, search_text)
 
         # THEN: The correct values should be set
-        self.assertIs(importer, worker.importer, 'The importer should be the right object')
-        self.assertEqual(search_text, worker.search_text, 'The search text should be correct')
+        assert importer is worker.importer, 'The importer should be the right object'
+        assert search_text == worker.search_text, 'The search text should be correct'
 
     def test_start(self):
         """

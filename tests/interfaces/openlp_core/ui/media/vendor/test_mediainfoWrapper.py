@@ -46,5 +46,4 @@ class TestMediainfoWrapper(TestCase):
             results = MediaInfoWrapper.parse(full_path)
 
             # THEN you can determine the run time
-            self.assertEqual(results.tracks[0].duration, test_data[1], 'The correct duration is returned for ' +
-                                                                       test_data[0])
+            assert results.tracks[0].duration == test_data[1], 'The correct duration is returned for ' + test_data[0]

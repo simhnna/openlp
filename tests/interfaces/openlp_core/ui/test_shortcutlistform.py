@@ -67,9 +67,9 @@ class TestShortcutform(TestCase, TestMixin):
             self.form._adjust_button(button, checked, enabled, text)
 
             # THEN: The button should be changed.
-            self.assertEqual(button.text(), text, 'The text should match.')
+            assert button.text() == text, 'The text should match.'
             mocked_check_method.assert_called_once_with(True)
-            self.assertEqual(button.isEnabled(), enabled, 'The button should be disabled.')
+            assert button.isEnabled() == enabled, 'The button should be disabled.'
 
     def test_space_key_press_event(self):
         """
@@ -85,7 +85,7 @@ class TestShortcutform(TestCase, TestMixin):
 
             # THEN: The key should be released
             mocked_key_release_event.assert_called_with(mocked_event)
-            self.assertEqual(0, mocked_event.accept.call_count)
+            assert 0 == mocked_event.accept.call_count
 
     def test_primary_push_button_checked_key_press_event(self):
         """
@@ -102,7 +102,7 @@ class TestShortcutform(TestCase, TestMixin):
 
             # THEN: The key should be released
             mocked_key_release_event.assert_called_with(mocked_event)
-            self.assertEqual(0, mocked_event.accept.call_count)
+            assert 0 == mocked_event.accept.call_count
 
     def test_alternate_push_button_checked_key_press_event(self):
         """
@@ -119,7 +119,7 @@ class TestShortcutform(TestCase, TestMixin):
 
             # THEN: The key should be released
             mocked_key_release_event.assert_called_with(mocked_event)
-            self.assertEqual(0, mocked_event.accept.call_count)
+            assert 0 == mocked_event.accept.call_count
 
     def test_escape_key_press_event(self):
         """
@@ -148,7 +148,7 @@ class TestShortcutform(TestCase, TestMixin):
             self.form.on_default_radio_button_clicked(False)
 
             # THEN: The method should exit early (i.e. the rest of the methods are not called)
-            self.assertEqual(0, mocked_current_item_action.call_count)
+            assert 0 == mocked_current_item_action.call_count
 
     def test_on_default_radio_button_clicked_no_action(self):
         """
@@ -164,7 +164,7 @@ class TestShortcutform(TestCase, TestMixin):
 
             # THEN: The method should exit early (i.e. the rest of the methods are not called)
             mocked_current_item_action.assert_called_with()
-            self.assertEqual(0, mocked_action_shortcuts.call_count)
+            assert 0 == mocked_action_shortcuts.call_count
 
     def test_on_default_radio_button_clicked(self):
         """
@@ -202,7 +202,7 @@ class TestShortcutform(TestCase, TestMixin):
             self.form.on_custom_radio_button_clicked(False)
 
             # THEN: The method should exit early (i.e. the rest of the methods are not called)
-            self.assertEqual(0, mocked_current_item_action.call_count)
+            assert 0 == mocked_current_item_action.call_count
 
     def test_on_custom_radio_button_clicked(self):
         """

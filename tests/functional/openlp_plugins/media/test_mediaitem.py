@@ -71,7 +71,7 @@ class MediaItemTest(TestCase, TestMixin):
         # WHEN: Retrieving the test file
         result = self.media_item.search('test.mp4', False)
         # THEN: a file should be found
-        self.assertEqual(result, [['test.mp4', 'test.mp4']], 'The result file contain the file name')
+        assert result == [['test.mp4', 'test.mp4']], 'The result file contain the file name'
 
     def test_search_not_found(self):
         """
@@ -82,4 +82,4 @@ class MediaItemTest(TestCase, TestMixin):
         # WHEN: Retrieving the test file
         result = self.media_item.search('test.mpx', False)
         # THEN: a file should be found
-        self.assertEqual(result, [], 'The result file should be empty')
+        assert result == [], 'The result file should be empty'

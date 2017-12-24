@@ -289,7 +289,7 @@ class TestLib(TestCase):
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created and scaled to the given size.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert thumb_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -323,7 +323,7 @@ class TestLib(TestCase):
         icon = create_thumb(image_path, thumb_path)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -428,7 +428,7 @@ class TestLib(TestCase):
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -466,7 +466,7 @@ class TestLib(TestCase):
             icon = create_thumb(image_path, thumb_path, size=None)
 
         # THEN: Check if the thumb was created with aspect ratio of 1.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert expected_size_1 == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -787,7 +787,7 @@ class TestLib(TestCase):
         ret = compare_chord_lyric(chord, lyrics)
 
         # THEN: The returned value should 0 because the lyric is longer than the chord
-        self.assertEquals(0, ret, 'The returned value should 0 because the lyric is longer than the chord')
+        assert 0 == ret, 'The returned value should 0 because the lyric is longer than the chord'
 
     def test_compare_chord_lyric_long_chord(self):
         """

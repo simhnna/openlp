@@ -121,4 +121,4 @@ class TestThemeManager(TestCase, TestMixin):
         self.theme_manager.bootstrap_post_set_up()
 
         # THEN:
-        self.assertEqual(1, self.theme_manager.load_themes.call_count, "load_themes should have been called once")
+        assert 1 == self.theme_manager.load_themes.call_count, "load_themes should have been called once"

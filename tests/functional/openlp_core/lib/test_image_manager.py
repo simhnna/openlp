@@ -73,13 +73,13 @@ class TestImageManager(TestCase, TestMixin):
         image = self.image_manager.get_image(full_path, 'church.jpg')
 
         # THEN returned record is a type of image
-        self.assertEqual(isinstance(image, QtGui.QImage), True, 'The returned object should be a QImage')
+        assert isinstance(image, QtGui.QImage), 'The returned object should be a QImage'
 
         # WHEN: The image bytes are requested.
         byte_array = self.image_manager.get_image_bytes(full_path, 'church.jpg')
 
         # THEN: Type should be a str.
-        self.assertEqual(isinstance(byte_array, str), True, 'The returned object should be a str')
+        assert isinstance(byte_array, str), 'The returned object should be a str'
 
         # WHEN the image is retrieved has not been loaded
         # THEN a KeyError is thrown
@@ -105,14 +105,14 @@ class TestImageManager(TestCase, TestMixin):
         self.image_manager.add_image(full_path, 'church.jpg', None, 100, 100)
 
         # THEN: the cache should contain two pictures
-        self.assertEqual(len(self.image_manager._cache), 2,
-                         'Image manager should consider two dimensions of the same picture as different')
+        assert len(self.image_manager._cache) == 2, \
+            'Image manager should consider two dimensions of the same picture as different'
 
         # WHEN: adding the same image with first dimensions
         self.image_manager.add_image(full_path, 'church.jpg', None, 80, 80)
 
         # THEN: the cache should still contain only two pictures
-        self.assertEqual(len(self.image_manager._cache), 2, 'Same dimensions should not be added again')
+        assert len(self.image_manager._cache) == 2, 'Same dimensions should not be added again'
 
         # WHEN: calling with correct image, but wrong dimensions
         with self.assertRaises(KeyError) as context:

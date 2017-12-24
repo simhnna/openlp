@@ -74,8 +74,8 @@ class TestImageMediaItem(TestCase, TestMixin):
         # WHEN: the save is invoked
         self.form.save()
         # THEN: the post process should not be requested
-        self.assertEqual(0, self.form.settings_form.register_post_process.call_count,
-                         'Image Post processing should not have been requested')
+        assert 0 == self.form.settings_form.register_post_process.call_count, \
+            'Image Post processing should not have been requested'
 
     def test_save_tab_change(self):
         """
@@ -86,7 +86,7 @@ class TestImageMediaItem(TestCase, TestMixin):
         # WHEN: the save is invoked
         self.form.save()
         # THEN: the post process should be requested
-        self.assertEqual(1, self.form.settings_form.register_post_process.call_count,
-                         'Image Post processing should have been requested')
+        assert 1 == self.form.settings_form.register_post_process.call_count, \
+            'Image Post processing should have been requested'
         # THEN: The color should be set
-        self.assertEqual(self.form.background_color, '#999999', 'The updated color should have been saved')
+        assert self.form.background_color == '#999999', 'The updated color should have been saved'

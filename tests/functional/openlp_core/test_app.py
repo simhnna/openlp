@@ -310,7 +310,7 @@ class TestOpenLP(TestCase):
 
         # THEN:
         assert result is True, "The method should have returned True."
-        # self.assertFalse(self.openlp.main_window.isMinimized())
+        # assert self.openlp.main_window.isMinimized() is False
 
     @patch('openlp.core.app.get_version')
     @patch('openlp.core.app.QtWidgets.QMessageBox.question')

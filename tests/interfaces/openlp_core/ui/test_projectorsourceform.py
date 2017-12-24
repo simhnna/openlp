@@ -111,8 +111,7 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         check = source_group(codes, PJLINK_DEFAULT_CODES)
 
         # THEN: return dictionary should match test dictionary
-        self.assertEquals(check, build_source_dict(),
-                          "Source group dictionary should match test dictionary")
+        assert check == build_source_dict(), "Source group dictionary should match test dictionary"
 
     @patch.object(QDialog, 'exec')
     def test_source_select_edit_button(self, mocked_qdialog):
@@ -130,9 +129,8 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         projector = select_form.projector
 
         # THEN: Verify all 4 buttons are available
-        self.assertEquals(len(select_form.button_box.buttons()), 4,
-                          'SourceSelect dialog box should have "OK", "Cancel" '
-                          '"Rest", and "Revert" buttons available')
+        assert len(select_form.button_box.buttons()) == 4, \
+            'SourceSelect dialog box should have "OK", "Cancel", "Rest", and "Revert" buttons available'
 
     @patch.object(QDialog, 'exec')
     def test_source_select_noedit_button(self, mocked_qdialog):
@@ -150,6 +148,5 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         projector = select_form.projector
 
         # THEN: Verify only 2 buttons are available
-        self.assertEquals(len(select_form.button_box.buttons()), 2,
-                          'SourceSelect dialog box should only have "OK" '
-                          'and "Cancel" buttons available')
+        assert len(select_form.button_box.buttons()) == 2, \
+            'SourceSelect dialog box should only have "OK" and "Cancel" buttons available'

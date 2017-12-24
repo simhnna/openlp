@@ -77,8 +77,7 @@ class TestPowerpointController(TestCase, TestMixin):
         controller = PowerpointController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('Powerpoint', controller.name,
-                         'The name of the presentation controller should be correct')
+        assert 'Powerpoint' == controller.name, 'The name of the presentation controller should be correct'
 
 
 class TestPowerpointDocument(TestCase, TestMixin):
@@ -157,7 +156,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
             result = doc.is_loaded()
 
             # THEN: result should be true
-            self.assertEqual(result, True, 'The result should be True')
+            assert result is True, 'The result should be True'
         else:
             self.skipTest('Powerpoint not available, skipping test.')
 
@@ -217,7 +216,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
         result = _get_text_from_shapes(shapes)
 
         # THEN: it should return the text
-        self.assertEqual(result, 'slideText\nslideText\n', 'result should match \'slideText\nslideText\n\'')
+        assert result == 'slideText\nslideText\n', 'result should match \'slideText\nslideText\n\''
 
     def test_get_text_from_shapes_with_no_shapes(self):
         """
@@ -230,7 +229,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
         result = _get_text_from_shapes(shapes)
 
         # THEN: it should not fail but return empty string
-        self.assertEqual(result, '', 'result should be empty')
+        assert result == '', 'result should be empty'
 
     def test_goto_slide(self):
         """
@@ -250,7 +249,7 @@ class TestPowerpointDocument(TestCase, TestMixin):
         doc.goto_slide(1)
 
         # THEN: next_step() should be call to try to advance to the next effect.
-        self.assertTrue(doc.next_step.called, 'next_step() should have been called!')
+        assert doc.next_step.called is True, 'next_step() should have been called!'
 
     def test_blank_screen(self):
         """
@@ -268,9 +267,9 @@ class TestPowerpointDocument(TestCase, TestMixin):
         doc.blank_screen()
 
         # THEN: The view state, doc.blank_slide and doc.blank_click should have new values
-        self.assertEquals(doc.presentation.SlideShowWindow.View.State, 3, 'The View State should be 3')
-        self.assertEquals(doc.blank_slide, 2, 'doc.blank_slide should be 2 because of the PowerPoint version')
-        self.assertEquals(doc.blank_click, 3, 'doc.blank_click should be 3 because of the PowerPoint version')
+        assert doc.presentation.SlideShowWindow.View.State == 3, 'The View State should be 3'
+        assert doc.blank_slide == 2, 'doc.blank_slide should be 2 because of the PowerPoint version'
+        assert doc.blank_click == 3, 'doc.blank_click should be 3 because of the PowerPoint version'
 
     def test_unblank_screen(self):
         """
@@ -295,10 +294,10 @@ class TestPowerpointDocument(TestCase, TestMixin):
             doc.unblank_screen()
 
             # THEN: The view state have new value, and several function should have been called
-            self.assertEquals(doc.presentation.SlideShowWindow.View.State, 1, 'The View State should be 1')
-            self.assertEquals(doc.presentation.SlideShowWindow.Activate.called, True,
-                              'SlideShowWindow.Activate should have been called')
-            self.assertEquals(doc.presentation.SlideShowWindow.View.GotoSlide.called, True,
-                              'View.GotoSlide should have been called because of the PowerPoint version')
-            self.assertEquals(doc.presentation.SlideShowWindow.View.GotoClick.called, True,
-                              'View.GotoClick should have been called because of the PowerPoint version')
+            assert doc.presentation.SlideShowWindow.View.State == 1, 'The View State should be 1'
+            assert doc.presentation.SlideShowWindow.Activate.called is True, \
+                'SlideShowWindow.Activate should have been called'
+            assert doc.presentation.SlideShowWindow.View.GotoSlide.called is True, \
+                'View.GotoSlide should have been called because of the PowerPoint version'
+            assert doc.presentation.SlideShowWindow.View.GotoClick.called is True, \
+                'View.GotoClick should have been called because of the PowerPoint version'

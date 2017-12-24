@@ -67,7 +67,7 @@ class TestOsisImport(TestCase):
         importer = OSISBible(mocked_manager, path='.', name='.', file_path=None)
 
         # THEN: The importer should be an instance of BibleDB
-        self.assertIsInstance(importer, BibleDB)
+        assert isinstance(importer, BibleDB)
 
     def test_process_books_stop_import(self):
         """
@@ -82,7 +82,7 @@ class TestOsisImport(TestCase):
         importer.process_books(mocked_data)
 
         # THEN: find_and_create_book should not have been called
-        self.assertFalse(self.mocked_find_and_create_book.called)
+        assert self.mocked_find_and_create_book.called is False
 
     def test_process_books_completes(self):
         """
@@ -106,11 +106,9 @@ class TestOsisImport(TestCase):
             importer.process_books(mocked_data)
 
             # THEN: find_and_create_book and process_books should be called with the details from the mocked books
-            self.assertEqual(self.mocked_find_and_create_book.call_args_list,
-                             [call('Name1', 2, 10), call('Name2', 2, 10)])
-            self.assertEqual(mocked_process_chapters.call_args_list,
-                             [call('db_book1', book1), call('db_book2', book2)])
-            self.assertEqual(importer.session.commit.call_count, 2)
+            assert self.mocked_find_and_create_book.call_args_list == [call('Name1', 2, 10), call('Name2', 2, 10)]
+            assert mocked_process_chapters.call_args_list == [call('db_book1', book1), call('db_book2', book2)]
+            assert importer.session.commit.call_count == 2
 
     def test_process_chapters_verse_in_chapter_verse_text(self):
         """
@@ -185,8 +183,8 @@ class TestOsisImport(TestCase):
             importer.process_chapters(test_book, [test_chapter])
 
             # THEN: neither set_current_chapter or process_verse should have been called
-            self.assertFalse(mocked_set_current_chapter.called)
-            self.assertFalse(mocked_process_verse.called)
+            assert mocked_set_current_chapter.called is False
+            assert mocked_process_verse.called is False
 
     def test_process_chapters_milestones_chapter_sid(self):
         """
@@ -209,7 +207,7 @@ class TestOsisImport(TestCase):
 
             # THEN: set_current_chapter should have been called with the test data
             mocked_set_current_chapter.assert_called_once_with(test_book.name, 2)
-            self.assertFalse(mocked_process_verse.called)
+            assert mocked_process_verse.called is False
 
     def test_process_chapters_milestones_verse_tag(self):
         """
@@ -233,7 +231,7 @@ class TestOsisImport(TestCase):
             importer.process_chapters(test_book, [test_verse])
 
             # THEN: process_verse should have been called with the test data
-            self.assertFalse(mocked_set_current_chapter.called)
+            assert mocked_set_current_chapter.called is False
             mocked_process_verse.assert_called_once_with(test_book, 0, test_verse, use_milestones=True)
 
     def test_process_verse_no_osis_id(self):
@@ -252,7 +250,7 @@ class TestOsisImport(TestCase):
         importer.process_verse(test_book, 2, test_verse)
 
         # THEN: create_verse should not have been called
-        self.assertFalse(self.mocked_create_verse.called)
+        assert self.mocked_create_verse.called is False
 
     def test_process_verse_use_milestones_no_s_id(self):
         """
@@ -271,7 +269,7 @@ class TestOsisImport(TestCase):
         importer.process_verse(test_book, 2, test_verse)
 
         # THEN: create_verse should not have been called
-        self.assertFalse(self.mocked_create_verse.called)
+        assert self.mocked_create_verse.called is False
 
     def test_process_verse_use_milestones_no_tail(self):
         """
@@ -289,7 +287,7 @@ class TestOsisImport(TestCase):
         importer.process_verse(test_book, 2, test_verse, use_milestones=True)
 
         # THEN: create_verse should not have been called
-        self.assertFalse(self.mocked_create_verse.called)
+        assert self.mocked_create_verse.called is False
 
     def test_process_verse_use_milestones_success(self):
         """
@@ -327,7 +325,7 @@ class TestOsisImport(TestCase):
         importer.process_verse(test_book, 2, test_verse)
 
         # THEN: create_verse should not have been called
-        self.assertFalse(self.mocked_create_verse.called)
+        assert self.mocked_create_verse.called is False
 
     def test_process_verse_success(self):
         """
@@ -363,8 +361,8 @@ class TestOsisImport(TestCase):
             result = importer.do_import()
 
             # THEN: do_import should return False and get_language_id should have not been called
-            self.assertFalse(result)
-            self.assertFalse(mocked_language_id.called)
+            assert result is False
+            assert mocked_language_id.called is False
 
     def test_do_import_no_language(self):
         """
@@ -382,8 +380,8 @@ class TestOsisImport(TestCase):
             result = importer.do_import()
 
             # THEN: do_import should return False and process_books should have not been called
-            self.assertFalse(result)
-            self.assertFalse(mocked_process_books.called)
+            assert result is False
+            assert mocked_process_books.called is False
 
     def test_do_import_completes(self):
         """
@@ -401,7 +399,7 @@ class TestOsisImport(TestCase):
             result = importer.do_import()
 
             # THEN: do_import should return True
-            self.assertTrue(result)
+            assert result is True
 
 
 class TestOsisImportFileImports(TestCase):
@@ -441,7 +439,7 @@ class TestOsisImportFileImports(TestCase):
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
-            self.assertTrue(importer.create_verse.called)
+            assert importer.create_verse.called is True
             for verse_tag, verse_text in test_data['verses']:
                 importer.create_verse.assert_any_call(importer.create_book().id, 1, verse_tag, verse_text)
 
@@ -470,7 +468,7 @@ class TestOsisImportFileImports(TestCase):
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
-            self.assertTrue(importer.create_verse.called)
+            assert importer.create_verse.called is True
             for verse_tag, verse_text in test_data['verses']:
                     importer.create_verse.assert_any_call(importer.create_book().id, 1, verse_tag, verse_text)
 
@@ -499,7 +497,7 @@ class TestOsisImportFileImports(TestCase):
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
-            self.assertTrue(importer.create_verse.called)
+            assert importer.create_verse.called
             for verse_tag, verse_text in test_data['verses']:
                 importer.create_verse.assert_any_call(importer.create_book().id, 1, verse_tag, verse_text)
 
@@ -528,6 +526,6 @@ class TestOsisImportFileImports(TestCase):
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
-            self.assertTrue(importer.create_verse.called)
+            assert importer.create_verse.called is True
             for verse_tag, verse_text in test_data['verses']:
                 importer.create_verse.assert_any_call(importer.create_book().id, 1, verse_tag, verse_text)
