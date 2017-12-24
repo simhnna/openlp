@@ -60,7 +60,7 @@ def _build_data(test_file, dual_language):
     song.Version = '1'
     song.Origin = '...'
     lyrics = MagicMock()
-    lyrics.Lyrics = (TEST_PATH / test_file).read_text()
+    lyrics.Lyrics = (TEST_PATH / test_file).read_bytes().decode()
     lyrics.Type = 1
     lyrics.IsDualLanguage = dual_language
     return song, lyrics

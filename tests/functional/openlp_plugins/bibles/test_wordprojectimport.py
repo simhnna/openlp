@@ -31,8 +31,8 @@ from openlp.plugins.bibles.lib.importers.wordproject import WordProjectBible
 from tests.utils.constants import RESOURCE_PATH
 
 TEST_PATH = RESOURCE_PATH / 'bibles'
-INDEX_PAGE = (TEST_PATH / 'wordproject_index.htm').read_text()
-CHAPTER_PAGE = (TEST_PATH / 'wordproject_chapter.htm').read_text()
+INDEX_PAGE = (TEST_PATH / 'wordproject_index.htm').read_bytes().decode()
+CHAPTER_PAGE = (TEST_PATH / 'wordproject_chapter.htm').read_bytes().decode()
 
 
 class TestWordProjectImport(TestCase):
