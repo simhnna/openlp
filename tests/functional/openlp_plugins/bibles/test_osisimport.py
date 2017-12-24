@@ -22,17 +22,17 @@
 """
 This module contains tests for the OSIS Bible importer.
 """
-import os
-import json
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
-from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB
 from openlp.plugins.bibles.lib.importers.osis import OSISBible
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'bibles'))
+from tests.utils import load_external_result_data
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'bibles'
 
 
 class TestOsisImport(TestCase):
@@ -420,8 +420,7 @@ class TestOsisImportFileImports(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        result_file = open(os.path.join(TEST_PATH, 'dk1933.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         bible_file = 'osis-dk1933.xml'
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
@@ -436,7 +435,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'Danish'
 
             # WHEN: Importing bible file
-            importer.file_path = Path(TEST_PATH, bible_file)
+            importer.file_path = TEST_PATH / bible_file
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -450,8 +449,7 @@ class TestOsisImportFileImports(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        result_file = open(os.path.join(TEST_PATH, 'kjv.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        test_data = load_external_result_data(TEST_PATH / 'kjv.json')
         bible_file = 'osis-kjv.xml'
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
@@ -466,7 +464,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'English'
 
             # WHEN: Importing bible file
-            importer.file_path = Path(TEST_PATH, bible_file)
+            importer.file_path = TEST_PATH / bible_file
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -480,8 +478,7 @@ class TestOsisImportFileImports(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        result_file = open(os.path.join(TEST_PATH, 'web.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        test_data = load_external_result_data(TEST_PATH / 'web.json')
         bible_file = 'osis-web.xml'
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
@@ -496,7 +493,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'English'
 
             # WHEN: Importing bible file
-            importer.file_path = Path(TEST_PATH, bible_file)
+            importer.file_path = TEST_PATH / bible_file
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.
@@ -510,8 +507,7 @@ class TestOsisImportFileImports(TestCase):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #        get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        result_file = open(os.path.join(TEST_PATH, 'dk1933.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         bible_file = 'osis-dk1933-empty-verse.xml'
         with patch('openlp.plugins.bibles.lib.importers.osis.OSISBible.application'):
             mocked_manager = MagicMock()
@@ -526,7 +522,7 @@ class TestOsisImportFileImports(TestCase):
             importer.get_language.return_value = 'Danish'
 
             # WHEN: Importing bible file
-            importer.file_path = Path(TEST_PATH, bible_file)
+            importer.file_path = TEST_PATH / bible_file
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.

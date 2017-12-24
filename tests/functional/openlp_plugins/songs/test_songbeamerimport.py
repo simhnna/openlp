@@ -22,18 +22,16 @@
 """
 This module contains tests for the Songbeamer song importer.
 """
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
-from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.songbeamer import SongBeamerImport, SongBeamerTypes
 
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'songbeamersongs'))
+TEST_PATH = RESOURCE_PATH / 'songbeamersongs'
 
 
 class TestSongBeamerFileImport(SongImportTestHelper):
@@ -52,19 +50,19 @@ class TestSongBeamerFileImport(SongImportTestHelper):
         mocked_returned_settings = MagicMock()
         mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
-        self.file_import([Path(TEST_PATH, 'Amazing Grace.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([Path(TEST_PATH, 'Lobsinget dem Herrn.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Lobsinget dem Herrn.json')))
-        self.file_import([Path(TEST_PATH, 'When I Call On You.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'When I Call On You.json')))
+        self.file_import([TEST_PATH / 'Amazing Grace.sng'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))
+        self.file_import([TEST_PATH / 'Lobsinget dem Herrn.sng'],
+                         self.load_external_result_data(TEST_PATH / 'Lobsinget dem Herrn.json'))
+        self.file_import([TEST_PATH / 'When I Call On You.sng'],
+                         self.load_external_result_data(TEST_PATH / 'When I Call On You.json'))
 
     def test_cp1252_encoded_file(self):
         """
         Test that a CP1252 encoded file get's decoded properly.
         """
-        self.file_import([Path(TEST_PATH, 'cp1252song.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'cp1252song.json')))
+        self.file_import([TEST_PATH / 'cp1252song.sng'],
+                         self.load_external_result_data(TEST_PATH / 'cp1252song.json'))
 
 
 class TestSongBeamerImport(TestCase):

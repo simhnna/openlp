@@ -29,7 +29,6 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
 from openlp.core.common.registry import Registry
-from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
 
 log = logging.getLogger(__name__)
 
@@ -78,12 +77,13 @@ class SongImportTestHelper(TestCase):
         self.add_author_patcher.stop()
         self.song_import_patcher.stop()
 
-    def load_external_result_data(self, file_name):
+    def load_external_result_data(self, file_path):
         """
         A method to load and return an object containing the song data from an external file.
+
+        :param openlp.core.common.path.Path file_path: The path of the file to load
         """
-        result_file = open(file_name, 'rb')
-        return json.loads(result_file.read().decode())
+        return json.loads(file_path.read_bytes().decode())
 
     def file_import(self, source_file_name, result_data):
         """

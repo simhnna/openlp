@@ -22,14 +22,10 @@
 """
 This module contains tests for the PresentationManager song importer.
 """
-import os
-
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'presentationmanagersongs'))
+TEST_PATH = RESOURCE_PATH / 'presentationmanagersongs'
 
 
 class TestPresentationManagerFileImport(SongImportTestHelper):
@@ -43,7 +39,7 @@ class TestPresentationManagerFileImport(SongImportTestHelper):
         """
         Test that loading a PresentationManager file works correctly
         """
-        self.file_import([Path(TEST_PATH, 'Great Is Thy Faithfulness.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Great Is Thy Faithfulness.json')))
-        self.file_import([Path(TEST_PATH, 'Amazing Grace.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+        self.file_import([TEST_PATH / 'Great Is Thy Faithfulness.sng'],
+                         self.load_external_result_data(TEST_PATH / 'Great Is Thy Faithfulness.json'))
+        self.file_import([TEST_PATH / 'Amazing Grace.sng'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))

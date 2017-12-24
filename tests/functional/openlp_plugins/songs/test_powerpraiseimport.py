@@ -23,14 +23,10 @@
 The :mod:`powerpraiseimport` module provides the functionality for importing
 ProPresenter song files into the current installation database.
 """
-import os
-
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'powerpraisesongs'))
+TEST_PATH = RESOURCE_PATH / 'powerpraisesongs'
 
 
 class TestPowerPraiseFileImport(SongImportTestHelper):
@@ -44,7 +40,7 @@ class TestPowerPraiseFileImport(SongImportTestHelper):
         """
         Test that loading a PowerPraise file works correctly
         """
-        self.file_import([Path(TEST_PATH, 'Naher, mein Gott zu Dir.ppl')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Naher, mein Gott zu Dir.json')))
-        self.file_import([Path(TEST_PATH, 'You are so faithful.ppl')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'You are so faithful.json')))
+        self.file_import([TEST_PATH / 'Naher, mein Gott zu Dir.ppl'],
+                         self.load_external_result_data(TEST_PATH / 'Naher, mein Gott zu Dir.json'))
+        self.file_import([TEST_PATH / 'You are so faithful.ppl'],
+                         self.load_external_result_data(TEST_PATH / 'You are so faithful.json'))

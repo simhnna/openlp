@@ -60,21 +60,24 @@ class SundayPlusImport(SongImport):
         for file_path in self.import_source:
             if self.stop_import_flag:
                 return
-            with file_path.open('rb') as song_file:
-                self.do_import_file(song_file)
+            self.do_import_file(file_path)
 
-    def do_import_file(self, file):
+    def do_import_file(self, file_path):
         """
-        Process the Sunday Plus file object.
+        Process the Sunday Plus song file
+
+        :param openlp.core.common.path.Path file_path: The song file to import
+        :rtype: None
         """
-        self.set_defaults()
-        if not self.parse(file.read()):
-            self.log_error(file.name)
-            return
-        if self.title == '':
-            self.title = self.title_from_filename(file.name)
-        if not self.finish():
-            self.log_error(file.name)
+        with file_path.open('rb') as song_file:
+            self.set_defaults()
+            if not self.parse(song_file.read()):
+                self.log_error(file_path.name)
+                return
+            if self.title == '':
+                self.title = self.title_from_file_path(file_path)
+            if not self.finish():
+                self.log_error(file_path.name)
 
     def parse(self, data, cell=False):
         """
@@ -174,16 +177,15 @@ class SundayPlusImport(SongImport):
             i += 1
         return True
 
-    def title_from_filename(self, filename):
+    def title_from_file_path(self, file_path):
         """
         Extract the title from the filename
 
-        :param filename: File name
-        :return:
+        :param openlp.core.common.path.Path file_path: File being imported
+        :return: The song title
+        :rtype: str
         """
-        title = os.path.split(filename)[1]
-        if title.endswith('.ptf'):
-            title = title[:-4]
+        title = file_path.stem
         # For some strange reason all example files names ended with 1-7.
         if title.endswith('1-7'):
             title = title[:-3]

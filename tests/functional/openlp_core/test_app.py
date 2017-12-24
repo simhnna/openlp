@@ -29,7 +29,7 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.app import OpenLP, parse_options
 from openlp.core.common.settings import Settings
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
+from tests.utils.constants import RESOURCE_PATH
 
 
 def test_parse_options_basic():
@@ -280,7 +280,7 @@ class TestOpenLP(TestCase):
         Test the reimplemented event method
         """
         # GIVEN: A file path and a QEvent.
-        file_path = os.path.join(TEST_PATH, 'church.jpg')
+        file_path = str(RESOURCE_PATH / 'church.jpg')
         mocked_file_method = MagicMock(return_value=file_path)
         event = QtCore.QEvent(QtCore.QEvent.FileOpen)
         event.file = mocked_file_method

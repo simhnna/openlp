@@ -302,7 +302,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         Initialize media item.
         """
         self.list_view.clear()
-        self.service_path = os.path.join(str(AppLocation.get_section_data_path(self.settings_section)), 'thumbnails')
+        self.service_path = str(AppLocation.get_section_data_path(self.settings_section) / 'thumbnails')
         create_paths(Path(self.service_path))
         self.load_list([path_to_str(file) for file in Settings().value(self.settings_section + '/media files')])
         self.rebuild_players()

@@ -331,8 +331,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         """
         new_file_paths = []
         error_shown = False
-        for file_name in data['files']:
-            file_path = str_to_path(file_name)
+        for file_path in data['file_paths']:
             if file_path.suffix[1:].lower() not in self.on_new_file_masks:
                 if not error_shown:
                     critical_error_message_box(

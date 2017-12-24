@@ -21,14 +21,10 @@
 """
 This module contains tests for the LyriX song importer.
 """
-import os
-
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'lyrixsongs'))
+TEST_PATH = RESOURCE_PATH / 'lyrixsongs'
 
 
 class TestLyrixFileImport(SongImportTestHelper):
@@ -42,9 +38,9 @@ class TestLyrixFileImport(SongImportTestHelper):
         """
         Test that loading an LyriX file works correctly on various files
         """
-        self.file_import([Path(TEST_PATH, 'A06.TXT')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([Path(TEST_PATH, 'A002.TXT')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace2.json')))
-        self.file_import([Path(TEST_PATH, 'AO05.TXT')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'in die regterhand.json')))
+        self.file_import([TEST_PATH / 'A06.TXT'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))
+        self.file_import([TEST_PATH / 'A002.TXT'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace2.json'))
+        self.file_import([TEST_PATH / 'AO05.TXT'],
+                         self.load_external_result_data(TEST_PATH / 'in die regterhand.json'))

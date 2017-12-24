@@ -30,9 +30,10 @@ from openlp.core.common import md5_hash
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, ServiceItem, ServiceItemType, FormattingTags
-from tests.helpers.testmixin import TestMixin
 
+from tests.helpers.testmixin import TestMixin
 from tests.utils import assert_length, convert_file_service_item
+from tests.utils.constants import RESOURCE_PATH
 
 VERSE = 'The Lord said to {r}Noah{/r}: \n'\
         'There\'s gonna be a {su}floody{/su}, {sb}floody{/sb}\n'\
@@ -59,7 +60,7 @@ RENDERED_VERSE = 'The Lord said to <span style="-webkit-text-fill-color:red">Noa
                  '<span style="-webkit-text-fill-color:#FFA500">e</span><span style="-webkit-text-fill-color:#800080">'\
                  'n</span> of the Lord\n'
 FOOTER = ['Arky Arky (Unknown)', 'Public Domain', 'CCLI 123456']
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'service'))
+TEST_PATH = str(RESOURCE_PATH / 'service')
 
 __default_settings__ = {
     'songs/enable chords': True,

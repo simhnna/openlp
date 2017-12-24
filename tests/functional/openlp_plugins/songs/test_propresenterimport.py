@@ -23,14 +23,10 @@
 The :mod:`propresenterimport` module provides the functionality for importing
 ProPresenter song files into the current installation database.
 """
-import os
-
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'propresentersongs'))
+TEST_PATH = RESOURCE_PATH / 'propresentersongs'
 
 
 class TestProPresenterFileImport(SongImportTestHelper):
@@ -44,19 +40,19 @@ class TestProPresenterFileImport(SongImportTestHelper):
         """
         Test that loading a ProPresenter 4 file works correctly
         """
-        self.file_import([Path(TEST_PATH, 'Amazing Grace.pro4')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+        self.file_import([TEST_PATH / 'Amazing Grace.pro4'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))
 
     def test_pro5_song_import(self):
         """
         Test that loading a ProPresenter 5 file works correctly
         """
-        self.file_import([Path(TEST_PATH, 'Amazing Grace.pro5')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+        self.file_import([TEST_PATH / 'Amazing Grace.pro5'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))
 
     def test_pro6_song_import(self):
         """
         Test that loading a ProPresenter 6 file works correctly
         """
-        self.file_import([Path(TEST_PATH, 'Amazing Grace.pro6')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+        self.file_import([TEST_PATH / 'Amazing Grace.pro6'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))

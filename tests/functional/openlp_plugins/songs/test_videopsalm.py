@@ -21,15 +21,12 @@
 """
 This module contains tests for the VideoPsalm song importer.
 """
-import os
-
-from openlp.core.common.path import Path
-
-from tests.helpers.songfileimport import SongImportTestHelper
 from unittest.mock import patch, MagicMock
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'videopsalmsongs'))
+from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'videopsalmsongs'
 
 
 class TestVideoPsalmFileImport(SongImportTestHelper):
@@ -49,7 +46,7 @@ class TestVideoPsalmFileImport(SongImportTestHelper):
         mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
         # Do the test import
-        self.file_import(Path(TEST_PATH, 'videopsalm-as-safe-a-stronghold.json'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'as-safe-a-stronghold.json')))
-        self.file_import(Path(TEST_PATH, 'videopsalm-as-safe-a-stronghold2.json'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'as-safe-a-stronghold2.json')))
+        self.file_import(TEST_PATH / 'videopsalm-as-safe-a-stronghold.json',
+                         self.load_external_result_data(TEST_PATH / 'as-safe-a-stronghold.json'))
+        self.file_import(TEST_PATH / 'videopsalm-as-safe-a-stronghold2.json',
+                         self.load_external_result_data(TEST_PATH / 'as-safe-a-stronghold2.json'))

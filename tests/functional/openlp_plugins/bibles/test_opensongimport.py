@@ -22,22 +22,20 @@
 """
 This module contains tests for the OpenSong Bible importer.
 """
-import json
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
 from lxml import objectify
 
-from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.plugins.bibles.lib.importers.opensong import OpenSongBible, get_text, parse_chapter_number
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 
 from tests.helpers.testmixin import TestMixin
+from tests.utils import load_external_result_data
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'bibles'))
+TEST_PATH = RESOURCE_PATH / 'bibles'
 
 
 class TestOpenSongImport(TestCase, TestMixin):
@@ -398,8 +396,7 @@ class TestOpenSongImportFileImports(TestCase, TestMixin):
         """
         # GIVEN: Test files with a mocked out "manager", "import_wizard", and mocked functions
         #       get_book_ref_id_by_name, create_verse, create_book, session and get_language.
-        result_file = open(os.path.join(TEST_PATH, 'dk1933.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         bible_file = 'opensong-dk1933.xml'
         with patch('openlp.plugins.bibles.lib.importers.opensong.OpenSongBible.application'):
             mocked_manager = MagicMock()
@@ -414,7 +411,7 @@ class TestOpenSongImportFileImports(TestCase, TestMixin):
             importer.get_language.return_value = 'Danish'
 
             # WHEN: Importing bible file
-            importer.file_path = Path(TEST_PATH, bible_file)
+            importer.file_path = TEST_PATH / bible_file
             importer.do_import()
 
             # THEN: The create_verse() method should have been called with each verse in the file.

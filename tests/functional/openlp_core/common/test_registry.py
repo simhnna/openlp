@@ -22,13 +22,10 @@
 """
 Package to test the openlp.core.lib package.
 """
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock
 
 from openlp.core.common.registry import Registry, RegistryBase
-
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '../', '..', 'resources'))
 
 
 class TestRegistry(TestCase):

@@ -23,7 +23,6 @@
 """
 This module contains tests for the CCLI SongSelect importer.
 """
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 from urllib.error import URLError
@@ -31,16 +30,15 @@ from urllib.error import URLError
 from PyQt5 import QtWidgets
 
 from openlp.core.common.registry import Registry
-from openlp.core.common.path import Path
 from openlp.plugins.songs.forms.songselectform import SongSelectForm, SearchWorker
 from openlp.plugins.songs.lib import Song
 from openlp.plugins.songs.lib.songselect import SongSelectImport, LOGOUT_URL, BASE_URL
 
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'songselect'))
+TEST_PATH = RESOURCE_PATH / 'songselect'
 
 
 class TestSongSelectImport(TestCase, TestMixin):
@@ -812,10 +810,8 @@ class TestSongSelectFileImport(SongImportTestHelper):
         """
         Test that loading an OpenSong file works correctly on various files
         """
-        self.file_import([Path(TEST_PATH, 'TestSong.bin')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'TestSong-bin.json')))
-        self.file_import([Path(TEST_PATH, 'TestSong.txt')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'TestSong-txt.json')))
+        self.file_import([TEST_PATH / 'TestSong.bin'], self.load_external_result_data(TEST_PATH / 'TestSong-bin.json'))
+        self.file_import([TEST_PATH / 'TestSong.txt'], self.load_external_result_data(TEST_PATH / 'TestSong-txt.json'))
 
 
 class TestSearchWorker(TestCase, TestMixin):
