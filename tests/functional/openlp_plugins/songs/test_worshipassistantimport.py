@@ -44,4 +44,4 @@ class TestWorshipAssistantFileImport(SongImportTestHelper):
         self.file_import(TEST_PATH / 'would_you_be_free.csv',
                          self.load_external_result_data(TEST_PATH / 'would_you_be_free.json'))
         self.file_import(TEST_PATH / 'would_you_be_free2.csv',
-                         self.load_external_result_data(TEST_PATH/ 'would_you_be_free.json'))
+                         self.load_external_result_data(TEST_PATH / 'would_you_be_free.json'))
