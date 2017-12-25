@@ -25,7 +25,7 @@ Package to test the openlp.core.projectors.pjlink base package.
 from unittest import TestCase
 from unittest.mock import call, patch, MagicMock
 
-from openlp.core.projectors.constants import E_PARAMETER, ERROR_STRING, S_ON, S_CONNECTED, S_QSOCKET_STATE
+from openlp.core.projectors.constants import E_PARAMETER, STATUS_CODE, S_ON, S_CONNECTED, QSOCKET_STATE
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
 
@@ -65,7 +65,7 @@ class TestPJLinkBase(TestCase):
         #       as first parameter
         mock_change_status.called_with(E_PARAMETER,
                                        'change_status should have been called with "{}"'.format(
-                                           ERROR_STRING[E_PARAMETER]))
+                                           STATUS_CODE[E_PARAMETER]))
 
     @patch.object(pjlink_test, 'disconnect_from_host')
     def test_socket_abort(self, mock_disconnect):
@@ -104,7 +104,7 @@ class TestPJLinkBase(TestCase):
         """
         # GIVEN: Mocks and test data
         mock_state = patch.object(self.pjlink_test, 'state').start()
-        mock_state.return_value = S_QSOCKET_STATE['ConnectedState']
+        mock_state.return_value = QSOCKET_STATE[S_CONNECTED]
         mock_timer = patch.object(self.pjlink_test, 'timer').start()
         mock_timer.interval.return_value = 10
         mock_send_command = patch.object(self.pjlink_test, 'send_command').start()
@@ -117,7 +117,6 @@ class TestPJLinkBase(TestCase):
         pjlink.manufacturer = None
         pjlink.model = None
         pjlink.pjlink_name = None
-        pjlink.ConnectedState = S_CONNECTED
         call_list = [
             call('POWR'),
             call('ERST'),

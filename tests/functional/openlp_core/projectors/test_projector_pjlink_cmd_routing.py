@@ -24,209 +24,222 @@ Package to test the openlp.core.projectors.pjlink command routing.
 """
 
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, call, patch
 
 import openlp.core.projectors.pjlink
-from openlp.core.projectors.constants import PJLINK_ERRORS, \
+from openlp.core.projectors.constants import PJLINK_ERRORS, PJLINK_PREFIX, STATUS_MSG, \
     E_AUTHENTICATION, E_PARAMETER, E_PROJECTOR, E_UNAVAILABLE, E_UNDEFINED
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
 
-'''
-from openlp.core.projectors.constants import ERROR_STRING, PJLINK_ERST_DATA, PJLINK_ERST_STATUS, \
-    PJLINK_POWR_STATUS, PJLINK_VALID_CMD, E_WARN, E_ERROR, S_OFF, S_STANDBY, S_ON
-'''
-from tests.resources.projector.data import TEST_PIN, TEST1_DATA
-
-pjlink_test = PJLink(Projector(**TEST1_DATA), pin=TEST_PIN, no_poll=True)
-pjlink_test.ip = '127.0.0.1'
+from tests.resources.projector.data import TEST1_DATA
 
 
 class TestPJLinkRouting(TestCase):
     """
     Tests for the PJLink module command routing
     """
-    def setUp(self):
-        '''
-        TestPJLinkCommands part 2 initialization
-        '''
-        self.pjlink_test = PJLink(Projector(**TEST1_DATA), no_poll=True)
+    def test_get_data_unknown_command(self):
+        """
+        Test not a valid command
+        """
+        # GIVEN: Test object
+        log_warning_text = [call('(111.111.111.111) get_data(): Invalid packet - unknown command "UNK"')]
+        log_debug_text = [call('(111.111.111.111) get_data(ip="111.111.111.111" buffer="b\'%1UNK=Huh?\'"'),
+                          call('(111.111.111.111) get_data(): Checking new data "%1UNK=Huh?"')]
 
-    def tearDown(self):
-        '''
-        TestPJLinkCommands part 2 cleanups
-        '''
-        self.pjlink_test = None
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, '_trash_buffer') as mock_buffer:
 
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_call_clss(self, mock_log):
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            pjlink.pjlink_functions = MagicMock()
+
+            # WHEN: get_data called with an unknown command
+            pjlink.get_data(buff='{prefix}1UNK=Huh?'.format(prefix=PJLINK_PREFIX).encode('utf-8'))
+
+            # THEN: Appropriate log entries should have been made and methods called/not called
+            mock_log.debug.assert_has_calls(log_debug_text)
+            mock_log.warning.assert_has_calls(log_warning_text)
+            self.assertFalse(pjlink.pjlink_functions.called, 'Should not have accessed pjlink_functions')
+            self.assertTrue(mock_buffer.called, 'Should have called _trash_buffer')
+
+    def test_process_command_call_clss(self):
         """
         Test process_command calls proper function
         """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-        log_text = '(127.0.0.1) Calling function for CLSS'
-        mock_log.reset_mock()
-        mock_process_clss = MagicMock()
-        pjlink.pjlink_functions['CLSS'] = mock_process_clss
+        # GIVEN: Test object and mocks
+        log_debug_calls = [call('(111.111.111.111) Processing command "CLSS" with data "1"'),
+                           call('(111.111.111.111) Calling function for CLSS')]
 
-        # WHEN: process_command is called with valid function and data
-        pjlink.process_command(cmd='CLSS', data='1')
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
-        # THEN: Process method should have been called properly
-        mock_log.debug.assert_called_with(log_text)
-        mock_process_clss.assert_called_with('1')
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
 
-    @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_err1(self, mock_log, mock_change_status):
-        """
-        Test ERR1 - Undefined projector function
-        """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-        log_text = '(127.0.0.1) Projector returned error "ERR1"'
-        mock_change_status.reset_mock()
-        mock_log.reset_mock()
+            # WHEN: process_command is called with valid function and data
+            pjlink.process_command(cmd='CLSS', data='1')
 
-        # WHEN: process_command called with ERR1
-        pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_UNDEFINED])
+            # THEN: Appropriate log entries should have been made and methods called
+            mock_log.debug.assert_has_calls(log_debug_calls)
+            mock_process_clss.assert_called_once_with(data='1')
 
-        # THEN: Error should be logged and status_change should be called
-        mock_change_status.assert_called_once_with(E_UNDEFINED, 'Undefined Command: "CLSS"')
-        mock_log.error.assert_called_with(log_text)
-
-    @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_err2(self, mock_log, mock_change_status):
-        """
-        Test ERR2 - Parameter Error
-        """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-        log_text = '(127.0.0.1) Projector returned error "ERR2"'
-        mock_change_status.reset_mock()
-        mock_log.reset_mock()
-
-        # WHEN: process_command called with ERR2
-        pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_PARAMETER])
-
-        # THEN: Error should be logged and status_change should be called
-        mock_change_status.assert_called_once_with(E_PARAMETER)
-        mock_log.error.assert_called_with(log_text)
-
-    @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_err3(self, mock_log, mock_change_status):
-        """
-        Test ERR3 - Unavailable error
-        """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-        log_text = '(127.0.0.1) Projector returned error "ERR3"'
-        mock_change_status.reset_mock()
-        mock_log.reset_mock()
-
-        # WHEN: process_command called with ERR3
-        pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_UNAVAILABLE])
-
-        # THEN: Error should be logged and status_change should be called
-        mock_change_status.assert_called_once_with(E_UNAVAILABLE)
-        mock_log.error.assert_called_with(log_text)
-
-    @patch.object(pjlink_test, 'change_status')
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_err4(self, mock_log, mock_change_status):
-        """
-        Test ERR3 - Unavailable error
-        """
-        # GIVEN: Test object
-        pjlink = pjlink_test
-        log_text = '(127.0.0.1) Projector returned error "ERR4"'
-        mock_change_status.reset_mock()
-        mock_log.reset_mock()
-
-        # WHEN: process_command called with ERR3
-        pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_PROJECTOR])
-
-        # THEN: Error should be logged and status_change should be called
-        mock_change_status.assert_called_once_with(E_PROJECTOR)
-        mock_log.error.assert_called_with(log_text)
-
-    @patch.object(pjlink_test, 'projectorAuthentication')
-    @patch.object(pjlink_test, 'change_status')
-    @patch.object(pjlink_test, 'disconnect_from_host')
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_erra(self, mock_log, mock_disconnect, mock_change_status, mock_err_authenticate):
+    def test_process_command_erra(self):
         """
         Test ERRA - Authentication Error
         """
         # GIVEN: Test object
-        pjlink = pjlink_test
-        log_text = '(127.0.0.1) Projector returned error "ERRA"'
-        mock_change_status.reset_mock()
-        mock_log.reset_mock()
+        log_error_calls = [call('(111.111.111.111) PJLINK: {msg}'.format(msg=STATUS_MSG[E_AUTHENTICATION]))]
+        log_debug_calls = [call('(111.111.111.111) Processing command "PJLINK" with data "ERRA"')]
 
-        # WHEN: process_command called with ERRA
-        pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_AUTHENTICATION])
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_pjlink') as mock_process_pjlink, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'change_status') as mock_change_status, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'disconnect_from_host') as mock_disconnect, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'projectorAuthentication') as mock_authentication:
 
-        # THEN: Error should be logged and several methods should be called
-        self.assertTrue(mock_disconnect.called, 'disconnect_from_host should have been called')
-        mock_change_status.assert_called_once_with(E_AUTHENTICATION)
-        mock_log.error.assert_called_with(log_text)
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+            # WHEN: process_command called with ERRA
+            pjlink.process_command(cmd='PJLINK', data=PJLINK_ERRORS[E_AUTHENTICATION])
+
+            # THEN: Appropriate log entries should have been made and methods called/not called
+            mock_log.error.assert_has_calls(log_error_calls)
+            mock_log.debug.assert_has_calls(log_debug_calls)
+            self.assertTrue(mock_disconnect.called, 'disconnect_from_host should have been called')
+            mock_change_status.assert_called_once_with(status=E_AUTHENTICATION)
+            mock_authentication.emit.assert_called_once_with(pjlink.name)
+            mock_process_pjlink.assert_not_called()
+
+    def test_process_command_err1(self):
+        """
+        Test ERR1 - Undefined projector function
+        """
+        # GIVEN: Test object
+        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_UNDEFINED]))]
+        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR1"'),
+                          call('(111.111.111.111) Calling function for CLSS')]
+
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
+
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+            # WHEN: process_command called with ERR1
+            pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_UNDEFINED])
+
+            # THEN: Appropriate log entries should have been made and methods called
+            mock_log.error.assert_has_calls(log_error_text)
+            mock_log.debug.assert_has_calls(log_debug_text)
+            mock_process_clss.assert_called_once_with(data=PJLINK_ERRORS[E_UNDEFINED])
+
+    def test_process_command_err2(self):
+        """
+        Test ERR2 - Parameter Error
+        """
+        # GIVEN: Test object
+        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_PARAMETER]))]
+        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR2"'),
+                          call('(111.111.111.111) Calling function for CLSS')]
+
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
+
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+            # WHEN: process_command called with ERR2
+            pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_PARAMETER])
+
+            # THEN: Appropriate log entries should have been made and methods called/not called
+            mock_log.error.assert_has_calls(log_error_text)
+            mock_log.debug.assert_has_calls(log_debug_text)
+            mock_process_clss.assert_called_once_with(data=PJLINK_ERRORS[E_PARAMETER])
+
+    def test_process_command_err3(self):
+        """
+        Test ERR3 - Unavailable error
+        """
+        # GIVEN: Test object
+        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_UNAVAILABLE]))]
+        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR3"'),
+                          call('(111.111.111.111) Calling function for CLSS')]
+
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
+
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+            # WHEN: process_command called with ERR3
+            pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_UNAVAILABLE])
+
+            # THEN: Appropriate log entries should have been made and methods called
+            mock_log.error.assert_has_calls(log_error_text)
+            mock_log.debug.assert_has_calls(log_debug_text)
+            mock_process_clss.assert_called_once_with(data=PJLINK_ERRORS[E_UNAVAILABLE])
+
+    def test_process_command_err4(self):
+        """
+        Test ERR3 - Unavailable error
+        """
+        # GIVEN: Test object
+        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_PROJECTOR]))]
+        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR4"'),
+                          call('(111.111.111.111) Calling function for CLSS')]
+
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
+
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+            # WHEN: process_command called with ERR4
+            pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_PROJECTOR])
+
+            # THEN: Appropriate log entries should have been made and methods called
+            mock_log.error.assert_has_calls(log_error_text)
+            mock_log.debug.assert_has_calls(log_debug_text)
+            mock_process_clss.assert_called_once_with(data=PJLINK_ERRORS[E_PROJECTOR])
 
     def test_process_command_future(self):
         """
         Test command valid but no method to process yet
         """
-        # GIVEN: Initial mocks and data
-        mock_log = patch.object(openlp.core.projectors.pjlink, 'log').start()
-        mock_functions = patch.object(self.pjlink_test, 'pjlink_functions').start()
-        mock_functions.return_value = []
-
-        pjlink = self.pjlink_test
-        log_text = '(111.111.111.111) Unable to process command="CLSS" (Future option?)'
-
-        # WHEN: process_command called with an unknown command
-        pjlink.process_command(cmd='CLSS', data='DONT CARE')
-
-        # THEN: Error should be logged and no command called
-        self.assertFalse(mock_functions.called, 'Should not have gotten to the end of the method')
-        mock_log.warning.assert_called_once_with(log_text)
-
-    @patch.object(pjlink_test, 'pjlink_functions')
-    @patch.object(openlp.core.projectors.pjlink, 'log')
-    def test_process_command_invalid(self, mock_log, mock_functions):
-        """
-        Test not a valid command
-        """
         # GIVEN: Test object
-        pjlink = pjlink_test
-        mock_functions.reset_mock()
-        mock_log.reset_mock()
+        log_warning_text = [call('(111.111.111.111) Unable to process command="CLSS" (Future option?)')]
+        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "Huh?"')]
 
-        # WHEN: process_command called with an unknown command
-        pjlink.process_command(cmd='Unknown', data='Dont Care')
-        log_text = '(127.0.0.1) Ignoring command="Unknown" (Invalid/Unknown)'
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
-        # THEN: Error should be logged and no command called
-        self.assertFalse(mock_functions.called, 'Should not have gotten to the end of the method')
-        mock_log.error.assert_called_once_with(log_text)
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            pjlink.pjlink_functions = MagicMock()
+
+            # WHEN: Processing a possible future command
+            pjlink.process_command(cmd='CLSS', data="Huh?")
+
+            # THEN: Appropriate log entries should have been made and methods called/not called
+            mock_log.debug.assert_has_calls(log_debug_text)
+            mock_log.warning.assert_has_calls(log_warning_text)
+            self.assertFalse(pjlink.pjlink_functions.called, 'Should not have accessed pjlink_functions')
+            self.assertFalse(mock_process_clss.called, 'Should not have called process_clss')
 
     def test_process_command_ok(self):
         """
         Test command returned success
         """
         # GIVEN: Initial mocks and data
-        mock_log = patch.object(openlp.core.projectors.pjlink, 'log').start()
-        mock_send_command = patch.object(self.pjlink_test, 'send_command').start()
+        # GIVEN: Test object and mocks
+        log_debug_calls = [call('(111.111.111.111) Processing command "CLSS" with data "OK"'),
+                           call('(111.111.111.111) Command "CLSS" returned OK')]
 
-        pjlink = self.pjlink_test
-        log_text = '(111.111.111.111) Command "POWR" returned OK'
+        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command, \
+                patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
-        # WHEN: process_command called with a command that returns OK
-        pjlink.process_command(cmd='POWR', data='OK')
+            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
 
-        # THEN: Appropriate calls should have been made
-        mock_log.debug.assert_called_with(log_text)
-        mock_send_command.assert_called_once_with(cmd='POWR')
+            # WHEN: process_command is called with valid function and data
+            pjlink.process_command(cmd='CLSS', data='OK')
+
+            # THEN: Appropriate log entries should have been made and methods called
+            mock_log.debug.assert_has_calls(log_debug_calls)
+            mock_send_command.assert_called_once_with(cmd='CLSS')
+            mock_process_clss.assert_not_called()
