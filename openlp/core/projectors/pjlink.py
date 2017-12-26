@@ -801,7 +801,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
             data = decode(read, 'utf-8')
             # Possibility of extraneous data on input when reading.
             # Clean out extraneous characters in buffer.
-            self.read(2048)
+            self.read(1024)
             log.debug('({ip}) check_login() read "{data}"'.format(ip=self.ip, data=data.strip()))
         # At this point, we should only have the initial login prompt with
         # possible authentication

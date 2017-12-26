@@ -71,10 +71,9 @@ class TestPJLinkCommands(TestCase):
 
             # THEN: Proper settings should change and signals sent
             mock_log.debug.assert_has_calls(log_debug_calls)
-            self.assertEqual(pjlink.projector_status, S_OK, 'Projector status should not have changed')
-            self.assertEqual(pjlink.status_connect, E_NOT_CONNECTED,
-                             'Status connect should be NOT CONNECTED')
-            self.assertTrue(mock_UpdateIcons.emit.called, 'Should have called UpdateIcons')
+            assert pjlink.projector_status == S_OK, 'Projector status should not have changed'
+            assert pjlink.status_connect == E_NOT_CONNECTED, 'Status connect should be NOT CONNECTED'
+            assert mock_UpdateIcons.emit.called is True, 'Should have called UpdateIcons'
             mock_changeStatus.emit.assert_called_once_with(pjlink.ip, E_UNKNOWN_SOCKET_ERROR,
                                                            STATUS_MSG[E_UNKNOWN_SOCKET_ERROR])
 
@@ -110,10 +109,10 @@ class TestPJLinkCommands(TestCase):
 
             # THEN: Proper settings should change and signals sent
             mock_log.debug.assert_has_calls(log_debug_calls)
-            self.assertEqual(pjlink.projector_status, S_OK, 'Projector status should not have changed')
-            self.assertEqual(pjlink.status_connect, S_CONNECTING, 'Status connect should be CONNECTING')
-            self.assertTrue(mock_UpdateIcons.emit.called, 'Should have called UpdateIcons')
             mock_changeStatus.emit.assert_called_once_with(pjlink.ip, S_CONNECTING, STATUS_MSG[S_CONNECTING])
+            assert pjlink.projector_status == S_OK, 'Projector status should not have changed'
+            assert pjlink.status_connect == S_CONNECTING, 'Status connect should be CONNECTING'
+            assert mock_UpdateIcons.emit.called is True, 'Should have called UpdateIcons'
 
     def test_projector_change_status_connection_status_connected(self):
         """
@@ -146,9 +145,9 @@ class TestPJLinkCommands(TestCase):
 
             # THEN: Proper settings should change and signals sent
             mock_log.debug.assert_has_calls(log_debug_calls)
-            self.assertEqual(pjlink.projector_status, S_OK, 'Projector status should not have changed')
-            self.assertEqual(pjlink.status_connect, S_CONNECTED, 'Status connect should be CONNECTED')
             mock_changeStatus.emit.assert_called_once_with(pjlink.ip, S_CONNECTED, 'Connected')
+            assert pjlink.projector_status == S_OK, 'Projector status should not have changed'
+            assert pjlink.status_connect == S_CONNECTED, 'Status connect should be CONNECTED'
 
     def test_projector_change_status_connection_status_with_message(self):
         """
@@ -178,9 +177,9 @@ class TestPJLinkCommands(TestCase):
 
             # THEN: Proper settings should change and signals sent
             mock_log.debug.assert_has_calls(log_debug_calls)
-            self.assertEqual(pjlink.projector_status, S_ON, 'Projector status should be ON')
-            self.assertEqual(pjlink.status_connect, S_OK, 'Status connect should not have changed')
             mock_changeStatus.emit.assert_called_once_with(pjlink.ip, S_ON, test_message)
+            assert pjlink.projector_status == S_ON, 'Projector status should be ON'
+            assert pjlink.status_connect == S_OK, 'Status connect should not have changed'
 
     def test_projector_get_av_mute_status(self):
         """
@@ -403,8 +402,8 @@ class TestPJLinkCommands(TestCase):
         code, message = pjlink._get_status(status=test_string)
 
         # THEN: Proper data should have been returned
-        self.assertEqual(code, -1, 'Should have returned -1 as a bad status check')
-        self.assertIsNone(message, 'Invalid code type should have returned None for message')
+        assert code == -1, 'Should have returned -1 as a bad status check'
+        assert message is None, 'Invalid code type should have returned None for message'
 
     def test_projector_get_status_valid(self):
         """
@@ -418,8 +417,8 @@ class TestPJLinkCommands(TestCase):
         code, message = pjlink._get_status(status=S_NOT_CONNECTED)
 
         # THEN: Proper strings should have been returned
-        self.assertEqual(code, 'S_NOT_CONNECTED', 'Code returned should have been the same code that was sent')
-        self.assertEqual(message, test_message, 'Description of code should have been returned')
+        assert code == 'S_NOT_CONNECTED', 'Code returned should have been the same code that was sent'
+        assert message == test_message, 'Description of code should have been returned'
 
     def test_projector_get_status_unknown(self):
         """
@@ -432,8 +431,8 @@ class TestPJLinkCommands(TestCase):
         code, message = pjlink._get_status(status=9999)
 
         # THEN: Proper strings should have been returned
-        self.assertIsNone(code, 'Code returned should have been the same code that was sent')
-        self.assertIsNone(message, 'Should have returned None as message')
+        assert code is None, 'Code returned should have been the same code that was sent'
+        assert message is None, 'Should have returned None as message'
 
     def test_projector_process_inf1(self):
         """
@@ -449,7 +448,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_inf1(data=test_data)
 
         # THEN: Data should be saved
-        self.assertEqual(pjlink.manufacturer, test_data, 'Test data should have been saved')
+        assert pjlink.manufacturer == test_data, 'Test data should have been saved'
 
     def test_projector_process_inf2(self):
         """
@@ -465,7 +464,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_inf2(data=test_data)
 
         # THEN: Data should be saved
-        self.assertEqual(pjlink.model, test_data, 'Test data should have been saved')
+        assert pjlink.model == test_data, 'Test data should have been saved'
 
     def test_projector_process_info(self):
         """
@@ -481,7 +480,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_info(data=test_data)
 
         # THEN: Data should be saved
-        self.assertEqual(pjlink.other_info, test_data, 'Test data should have been saved')
+        assert pjlink.other_info == test_data, 'Test data should have been saved'
 
     def test_projector_process_avmt_bad_data(self):
         """
@@ -497,9 +496,9 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_avmt('36')
 
             # THEN: Shutter should be closed and mute should be True
-            self.assertTrue(pjlink.shutter, 'Shutter should changed')
-            self.assertTrue(pjlink.mute, 'Audio should not have changed')
-            self.assertFalse(mock_UpdateIcons.emit.called, 'Update icons should NOT have been called')
+            assert pjlink.shutter is True, 'Shutter should changed'
+            assert pjlink.mute is True, 'Audio should not have changed'
+            assert mock_UpdateIcons.emit.called is False, 'Update icons should NOT have been called'
 
     def test_projector_process_avmt_closed_muted(self):
         """
@@ -515,9 +514,9 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_avmt('31')
 
             # THEN: Shutter should be closed and mute should be True
-            self.assertTrue(pjlink.shutter, 'Shutter should have been set to closed')
-            self.assertTrue(pjlink.mute, 'Audio should be muted')
-            self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
+            assert pjlink.shutter is True, 'Shutter should have been set to closed'
+            assert pjlink.mute is True, 'Audio should be muted'
+            assert mock_UpdateIcons.emit.called is True, 'Update icons should have been called'
 
     def test_projector_process_avmt_shutter_closed(self):
         """
@@ -533,9 +532,9 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_avmt('11')
 
             # THEN: Shutter should be True and mute should be False
-            self.assertTrue(pjlink.shutter, 'Shutter should have been set to closed')
-            self.assertTrue(pjlink.mute, 'Audio should not have changed')
-            self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
+            assert pjlink.shutter is True, 'Shutter should have been set to closed'
+            assert pjlink.mute is True, 'Audio should not have changed'
+            assert mock_UpdateIcons.emit.called is True, 'Update icons should have been called'
 
     def test_projector_process_avmt_audio_muted(self):
         """
@@ -551,9 +550,9 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_avmt('21')
 
             # THEN: Shutter should be closed and mute should be True
-            self.assertTrue(pjlink.shutter, 'Shutter should not have changed')
-            self.assertTrue(pjlink.mute, 'Audio should be off')
-            self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
+            assert pjlink.shutter is True, 'Shutter should not have changed'
+            assert pjlink.mute is True, 'Audio should be off'
+            assert mock_UpdateIcons.emit.called is True, 'Update icons should have been called'
 
     def test_projector_process_avmt_open_unmuted(self):
         """
@@ -569,9 +568,9 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_avmt('30')
 
             # THEN: Shutter should be closed and mute should be True
-            self.assertFalse(pjlink.shutter, 'Shutter should have been set to open')
-            self.assertFalse(pjlink.mute, 'Audio should be on')
-            self.assertTrue(mock_UpdateIcons.emit.called, 'Update icons should have been called')
+            assert pjlink.shutter is False, 'Shutter should have been set to open'
+            assert pjlink.mute is False, 'Audio should be on'
+            assert mock_UpdateIcons.emit.called is True, 'Update icons should have been called'
 
     def test_projector_process_clss_one(self):
         """
@@ -584,7 +583,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_clss('1')
 
         # THEN: Projector class should be set to 1
-        self.assertEqual(pjlink.pjlink_class, '1', 'Projector should have set class=1')
+        assert pjlink.pjlink_class == '1', 'Projector should have set class=1'
 
     def test_projector_process_clss_two(self):
         """
@@ -597,7 +596,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_clss('2')
 
         # THEN: Projector class should be set to 1
-        self.assertEqual(pjlink.pjlink_class, '2', 'Projector should have set class=2')
+        assert pjlink.pjlink_class == '2', 'Projector should have set class=2'
 
     def test_projector_process_clss_invalid_nan(self):
         """
@@ -616,7 +615,7 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_clss('Z')
 
             # THEN: Projector class should be set with default value
-            self.assertEqual(pjlink.pjlink_class, '1', 'Invalid NaN class reply should have set class=1')
+            assert pjlink.pjlink_class == '1', 'Invalid NaN class reply should have set class=1'
             mock_log.error.assert_has_calls(log_error_calls)
             mock_log.debug.assert_has_calls(log_debug_calls)
 
@@ -638,7 +637,7 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_clss('Invalid')
 
             # THEN: Projector class should be set with default value
-            self.assertEqual(pjlink.pjlink_class, '1', 'Invalid class reply should have set class=1')
+            assert pjlink.pjlink_class == '1', 'Invalid class reply should have set class=1'
             mock_log.error.assert_has_calls(log_error_calls)
             mock_log.debug.assert_has_calls(log_debug_calls)
 
@@ -655,7 +654,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_erst(chk_data)
 
         # THEN: PJLink instance errors should be None
-        self.assertIsNone(pjlink.projector_errors, 'projector_errors should have been set to None')
+        assert pjlink.projector_errors is None, 'projector_errors should have been set to None'
 
     def test_projector_process_erst_data_invalid_length(self):
         """
@@ -676,7 +675,7 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_erst(chk_data)
 
             # THEN: pjlink.projector_errors should be empty and warning logged
-            self.assertIsNone(pjlink.projector_errors, 'There should be no errors')
+            assert pjlink.projector_errors is None, 'There should be no errors'
             mock_log.debug.assert_has_calls(log_debug_calls)
             mock_log.warning.assert_has_calls(log_warn_calls)
 
@@ -698,7 +697,7 @@ class TestPJLinkCommands(TestCase):
             pjlink.process_erst(chk_data)
 
             # THEN: pjlink.projector_errors should be empty and warning logged
-            self.assertIsNone(pjlink.projector_errors, 'There should be no errors')
+            assert pjlink.projector_errors is None, 'There should be no errors'
             mock_log.debug.assert_has_calls(log_debug_calls)
             mock_log.warning.assert_has_calls(log_warn_calls)
 
@@ -727,7 +726,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_erst(chk_data)
 
         # THEN: PJLink instance errors should match chk_value
-        self.assertEqual(pjlink.projector_errors, chk_test, 'Projector errors should be all E_WARN')
+        assert pjlink.projector_errors == chk_test, 'Projector errors should be all E_WARN'
 
     def test_projector_process_erst_all_error(self):
         """
@@ -754,7 +753,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_erst(chk_data)
 
         # THEN: PJLink instance errors should match chk_value
-        self.assertEqual(pjlink.projector_errors, chk_test, 'Projector errors should be all E_ERROR')
+        assert pjlink.projector_errors == chk_test, 'Projector errors should be all E_ERROR'
 
     def test_projector_process_erst_warn_cover_only(self):
         """
@@ -1042,7 +1041,7 @@ class TestPJLinkCommands(TestCase):
         pjlink.process_rlmp(data=lamp_model)
 
         # THEN: Filter model number should be saved
-        self.assertEqual(pjlink.model_lamp, lamp_model, 'Lamp type should have been saved')
+        assert pjlink.model_lamp == lamp_model, 'Lamp type should have been saved'
 
     def test_projector_process_rlmp_nosave(self):
         """

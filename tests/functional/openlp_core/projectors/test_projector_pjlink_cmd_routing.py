@@ -60,8 +60,8 @@ class TestPJLinkRouting(TestCase):
             # THEN: Appropriate log entries should have been made and methods called/not called
             mock_log.debug.assert_has_calls(log_debug_text)
             mock_log.warning.assert_has_calls(log_warning_text)
-            self.assertFalse(pjlink.pjlink_functions.called, 'Should not have accessed pjlink_functions')
-            self.assertTrue(mock_buffer.called, 'Should have called _trash_buffer')
+            assert pjlink.pjlink_functions.called is False, 'Should not have accessed pjlink_functions'
+            assert mock_buffer.called is True, 'Should have called _trash_buffer'
 
     def test_process_command_call_clss(self):
         """
@@ -103,9 +103,9 @@ class TestPJLinkRouting(TestCase):
             pjlink.process_command(cmd='PJLINK', data=PJLINK_ERRORS[E_AUTHENTICATION])
 
             # THEN: Appropriate log entries should have been made and methods called/not called
+            assert mock_disconnect.called is True, 'disconnect_from_host should have been called'
             mock_log.error.assert_has_calls(log_error_calls)
             mock_log.debug.assert_has_calls(log_debug_calls)
-            self.assertTrue(mock_disconnect.called, 'disconnect_from_host should have been called')
             mock_change_status.assert_called_once_with(status=E_AUTHENTICATION)
             mock_authentication.emit.assert_called_once_with(pjlink.name)
             mock_process_pjlink.assert_not_called()
@@ -218,8 +218,8 @@ class TestPJLinkRouting(TestCase):
             # THEN: Appropriate log entries should have been made and methods called/not called
             mock_log.debug.assert_has_calls(log_debug_text)
             mock_log.warning.assert_has_calls(log_warning_text)
-            self.assertFalse(pjlink.pjlink_functions.called, 'Should not have accessed pjlink_functions')
-            self.assertFalse(mock_process_clss.called, 'Should not have called process_clss')
+            assert pjlink.pjlink_functions.called is False, 'Should not have accessed pjlink_functions'
+            assert mock_process_clss.called is False, 'Should not have called process_clss'
 
     def test_process_command_ok(self):
         """

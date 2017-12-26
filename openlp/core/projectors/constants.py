@@ -557,7 +557,3 @@ for source in PJLINK_DEFAULT_SOURCES:
         label = "{source}{item}".format(source=source, item=item)
         PJLINK_DEFAULT_CODES[label] = "{source} {item}".format(source=PJLINK_DEFAULT_SOURCES[source],
                                                                item=PJLINK_DEFAULT_ITEMS[item])
-# Remove temp variables so they don't become part of the module dict
-del(source)
-del(item)
-del(label)
