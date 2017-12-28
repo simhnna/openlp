@@ -30,7 +30,6 @@ from PyQt5 import QtCore
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, PluginStatus
 from openlp.plugins.custom.lib import CustomMediaItem
-
 from tests.helpers.testmixin import TestMixin
 
 FOOTER = ['Arky Arky (Unknown)', 'Public Domain', 'CCLI 123456']

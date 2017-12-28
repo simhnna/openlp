@@ -27,10 +27,9 @@ from tempfile import mkdtemp
 from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, patch
 
-from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from openlp.core.common import is_win
 from openlp.core.common.path import Path
-
+from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH
 

@@ -28,8 +28,7 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtWidgets
 
 from openlp.core.common.registry import Registry
-from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm, PYSWORD_AVAILABLE
-
+from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm
 from tests.helpers.testmixin import TestMixin
 
 

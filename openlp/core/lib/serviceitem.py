@@ -26,9 +26,9 @@ type and capability of an item.
 import datetime
 import html
 import logging
+import ntpath
 import os
 import uuid
-import ntpath
 
 from PyQt5 import QtGui
 

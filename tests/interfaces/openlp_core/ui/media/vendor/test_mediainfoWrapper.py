@@ -25,7 +25,6 @@ Package to test the openlp.core.ui.media package.
 from unittest import TestCase
 
 from openlp.core.ui.media.vendor.mediainfoWrapper import MediaInfoWrapper
-
 from tests.utils.constants import RESOURCE_PATH
 
 TEST_PATH = RESOURCE_PATH / 'media'

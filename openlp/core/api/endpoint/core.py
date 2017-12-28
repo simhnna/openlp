@@ -27,10 +27,9 @@ import os
 
 from openlp.core.api.http import requires_auth
 from openlp.core.api.http.endpoint import Endpoint
-from openlp.core.common.registry import Registry
 from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.registry import Registry
 from openlp.core.lib import PluginStatus, StringContent, image_to_byte
-
 
 template_dir = 'templates'
 static_dir = 'static'

@@ -407,8 +407,8 @@ is the function which has to be called from outside. The generated and returned 
         </html>
 """
 import logging
-
 from string import Template
+
 from PyQt5 import QtWebKit
 
 from openlp.core.common.settings import Settings

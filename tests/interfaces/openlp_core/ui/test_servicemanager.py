@@ -30,7 +30,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, ItemCapabilities
 from openlp.core.ui.servicemanager import ServiceManager
-
 from tests.helpers.testmixin import TestMixin
 
 

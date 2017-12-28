@@ -23,8 +23,8 @@
 This class contains the core default settings.
 """
 import datetime
-import logging
 import json
+import logging
 import os
 from tempfile import gettempdir
 

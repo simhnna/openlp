@@ -21,9 +21,8 @@
 ###############################################################################
 import logging
 
-from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.endpoint.core import TRANSLATED_STRINGS
-
+from openlp.core.api.http.endpoint import Endpoint
 
 log = logging.getLogger(__name__)
 

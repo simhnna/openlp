@@ -26,8 +26,8 @@ wait for the conversion to happen.
 """
 import logging
 import os
-import time
 import queue
+import time
 
 from PyQt5 import QtCore
 

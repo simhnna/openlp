@@ -32,7 +32,6 @@ from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.registry import Registry
 from openlp.core.lib import build_icon
 
-
 log = logging.getLogger(__name__)
 
 

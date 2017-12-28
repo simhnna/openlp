@@ -42,7 +42,6 @@ from openlp.core.ui import HideMode, MainDisplay, Display, DisplayControllerType
 from openlp.core.widgets.toolbar import OpenLPToolbar
 from openlp.core.widgets.views import ListPreviewWidget
 
-
 # Threshold which has to be trespassed to toggle.
 HIDE_MENU_THRESHOLD = 27
 AUDIO_TIME_LABEL_STYLESHEET = 'background-color: palette(background); ' \

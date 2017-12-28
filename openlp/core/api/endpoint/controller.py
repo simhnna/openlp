@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
+import json
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
@@ -21,12 +22,11 @@
 ###############################################################################
 import logging
 import os
-import urllib.request
 import urllib.error
-import json
+import urllib.request
 
-from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import requires_auth
+from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry

@@ -28,9 +28,7 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtTest, QtCore, QtWidgets
 
 from openlp.core.common.registry import Registry
-from openlp.plugins.custom.lib.mediaitem import CustomMediaItem
 from openlp.plugins.custom.forms.editcustomform import EditCustomForm
-
 from tests.helpers.testmixin import TestMixin
 
 

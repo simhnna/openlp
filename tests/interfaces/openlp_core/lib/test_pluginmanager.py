@@ -22,19 +22,18 @@
 """
 Package to test the openlp.core.lib.pluginmanager package.
 """
-import sys
 import gc
+import sys
 from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
+from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.common.path import Path
 from openlp.core.lib.pluginmanager import PluginManager
-
 from tests.helpers.testmixin import TestMixin
 
 

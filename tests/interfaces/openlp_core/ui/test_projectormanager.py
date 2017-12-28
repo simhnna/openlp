@@ -30,7 +30,6 @@ from openlp.core.common.registry import Registry
 from openlp.core.projectors.db import ProjectorDB
 from openlp.core.projectors.editform import ProjectorEditForm
 from openlp.core.projectors.manager import ProjectorManager
-
 from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB
 

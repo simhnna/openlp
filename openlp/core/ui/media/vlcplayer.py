@@ -22,13 +22,14 @@
 """
 The :mod:`~openlp.core.ui.media.vlcplayer` module contains our VLC component wrapper
 """
-from datetime import datetime
-from distutils.version import LooseVersion
+import ctypes
 import logging
 import os
-import threading
 import sys
-import ctypes
+import threading
+from datetime import datetime
+from distutils.version import LooseVersion
+
 from PyQt5 import QtWidgets
 
 from openlp.core.common import is_win, is_macosx, is_linux

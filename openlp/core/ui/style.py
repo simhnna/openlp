@@ -24,7 +24,7 @@ The :mod:`~openlp.core.ui.dark` module looks for and loads a dark theme
 """
 from PyQt5 import QtGui
 
-from openlp.core.common import is_macosx, is_win
+from openlp.core.common import is_win
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 

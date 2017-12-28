@@ -39,8 +39,8 @@ from openlp.core.projectors.constants import ERROR_MSG, ERROR_STRING, E_AUTHENTI
     E_NETWORK, E_NOT_CONNECTED, E_UNKNOWN_SOCKET_ERROR, STATUS_STRING, S_CONNECTED, S_CONNECTING, S_COOLDOWN, \
     S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
 from openlp.core.projectors.db import ProjectorDB
-from openlp.core.projectors.pjlink import PJLink, PJLinkUDP
 from openlp.core.projectors.editform import ProjectorEditForm
+from openlp.core.projectors.pjlink import PJLink, PJLinkUDP
 from openlp.core.projectors.sourceselectform import SourceSelectTabs, SourceSelectSingle
 from openlp.core.widgets.toolbar import OpenLPToolbar
 

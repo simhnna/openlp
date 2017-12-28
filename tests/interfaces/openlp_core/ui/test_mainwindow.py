@@ -27,7 +27,6 @@ from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
 from openlp.core.ui.mainwindow import MainWindow
-
 from tests.helpers.testmixin import TestMixin
 
 

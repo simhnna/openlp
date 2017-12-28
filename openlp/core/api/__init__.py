@@ -20,9 +20,9 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint, requires_auth
-from openlp.core.api.tab import ApiTab
+from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.poll import Poller
+from openlp.core.api.tab import ApiTab
 
 __all__ = ['Endpoint', 'ApiTab', 'register_endpoint', 'requires_auth']

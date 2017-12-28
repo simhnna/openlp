@@ -28,9 +28,8 @@ from unittest.mock import MagicMock, patch, call
 from lxml import objectify
 
 from openlp.core.common.registry import Registry
-from openlp.plugins.bibles.lib.importers.opensong import OpenSongBible, get_text, parse_chapter_number
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
-
+from openlp.plugins.bibles.lib.importers.opensong import OpenSongBible, get_text, parse_chapter_number
 from tests.helpers.testmixin import TestMixin
 from tests.utils import load_external_result_data
 from tests.utils.constants import RESOURCE_PATH

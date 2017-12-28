@@ -24,11 +24,11 @@ The :mod:`http` module contains the API web server. This is a lightweight web se
 with OpenLP. It uses JSON to communicate with the remotes.
 """
 import asyncio
-import websockets
 import json
 import logging
 import time
 
+import websockets
 from PyQt5 import QtCore
 
 from openlp.core.common.mixins import LogMixin, RegistryProperties

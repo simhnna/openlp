@@ -22,18 +22,17 @@
 """
 Functional tests to test the Impress class and related methods.
 """
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
 import shutil
 from tempfile import mkdtemp
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.plugins.presentations.lib.impresscontroller import ImpressController, ImpressDocument, TextType
 from openlp.plugins.presentations.presentationplugin import __default_settings__
-
-from tests.utils.constants import TEST_RESOURCES_PATH
 from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import TEST_RESOURCES_PATH
 
 
 class TestImpressController(TestCase, TestMixin):

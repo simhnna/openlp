@@ -29,7 +29,6 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.registry import Registry
 from openlp.core.ui.shortcutlistform import ShortcutListForm
-
 from tests.helpers.testmixin import TestMixin
 
 

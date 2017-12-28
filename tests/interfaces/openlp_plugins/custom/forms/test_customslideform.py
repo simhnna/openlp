@@ -29,7 +29,6 @@ from PyQt5 import QtWidgets
 
 from openlp.core.common.registry import Registry
 from openlp.plugins.custom.forms.editcustomslideform import EditCustomSlideForm
-
 from tests.helpers.testmixin import TestMixin
 
 

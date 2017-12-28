@@ -32,18 +32,18 @@ from waitress import serve
 from openlp.core.api.deploy import download_and_check, download_sha256
 from openlp.core.api.endpoint.controller import controller_endpoint, api_controller_endpoint
 from openlp.core.api.endpoint.core import chords_endpoint, stage_endpoint, blank_endpoint, main_endpoint
-from openlp.core.api.endpoint.service import service_endpoint, api_service_endpoint
 from openlp.core.api.endpoint.remote import remote_endpoint
-from openlp.core.api.http import register_endpoint
+from openlp.core.api.endpoint.service import service_endpoint, api_service_endpoint
 from openlp.core.api.http import application
+from openlp.core.api.http import register_endpoint
 from openlp.core.api.poll import Poller
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings
+from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import create_paths
 from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
-from openlp.core.common.i18n import translate
 
 log = logging.getLogger(__name__)
 

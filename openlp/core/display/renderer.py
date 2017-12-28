@@ -21,10 +21,11 @@
 ###############################################################################
 
 import re
-
 from string import Template
+
 from PyQt5 import QtGui, QtCore, QtWebKitWidgets
 
+from openlp.core.common import ThemeLevel
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import path_to_str
 from openlp.core.common.registry import Registry, RegistryBase
@@ -32,7 +33,6 @@ from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
 from openlp.core.lib import FormattingTags, ImageSource, ItemCapabilities, ServiceItem, expand_tags, build_chords_css, \
     build_lyrics_format_css, build_lyrics_outline_css
-from openlp.core.common import ThemeLevel
 from openlp.core.ui.maindisplay import MainDisplay
 
 VERSE = 'The Lord said to {r}Noah{/r}: \n' \

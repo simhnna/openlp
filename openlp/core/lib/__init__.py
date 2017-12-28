@@ -25,8 +25,8 @@ OpenLP work.
 """
 import html
 import logging
-import re
 import math
+import re
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 

@@ -29,7 +29,6 @@ from PyQt5 import QtTest, QtWidgets
 
 from openlp.core.common.registry import Registry
 from openlp.core.ui import filerenameform
-
 from tests.helpers.testmixin import TestMixin
 
 

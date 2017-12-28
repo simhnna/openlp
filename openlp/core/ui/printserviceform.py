@@ -24,8 +24,8 @@ The actual print service dialog
 """
 import datetime
 import html
-import lxml.html
 
+import lxml.html
 from PyQt5 import QtCore, QtGui, QtWidgets, QtPrintSupport
 
 from openlp.core.common.applocation import AppLocation

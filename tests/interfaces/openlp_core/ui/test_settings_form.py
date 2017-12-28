@@ -28,9 +28,8 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtCore, QtTest
 
 from openlp.core.common.registry import Registry
-from openlp.core.ui import settingsform
 from openlp.core.display.screens import ScreenList
-
+from openlp.core.ui import settingsform
 from tests.helpers.testmixin import TestMixin
 
 SCREEN = {

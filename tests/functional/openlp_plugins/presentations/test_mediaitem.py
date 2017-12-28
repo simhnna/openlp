@@ -25,10 +25,9 @@ This module contains tests for the lib submodule of the Presentations plugin.
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, call
 
-from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
 from openlp.plugins.presentations.lib.mediaitem import PresentationMediaItem
-
 from tests.helpers.testmixin import TestMixin
 
 

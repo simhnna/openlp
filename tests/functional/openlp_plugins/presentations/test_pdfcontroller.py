@@ -23,20 +23,18 @@
 This module contains tests for the PdfController
 """
 import os
-import shutil
 from tempfile import mkdtemp
 from unittest import TestCase, SkipTest
 from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtGui
 
-from openlp.plugins.presentations.lib.pdfcontroller import PdfController, PdfDocument
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
-
-from tests.utils.constants import TEST_RESOURCES_PATH
+from openlp.plugins.presentations.lib.pdfcontroller import PdfController, PdfDocument
 from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import TEST_RESOURCES_PATH
 
 __default_settings__ = {
     'presentations/enable_pdf_program': False,

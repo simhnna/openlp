@@ -25,8 +25,8 @@ Functional tests to test the Http Server Class.
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.registry import Registry
 from openlp.core.api.http.server import HttpServer
+from openlp.core.common.registry import Registry
 
 
 class TestHttpServer(TestCase):

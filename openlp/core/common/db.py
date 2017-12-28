@@ -27,7 +27,6 @@ from copy import deepcopy
 
 import sqlalchemy
 
-
 log = logging.getLogger(__name__)
 
 

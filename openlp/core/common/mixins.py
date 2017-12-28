@@ -22,8 +22,8 @@
 """
 Provide Error Handling and login Services
 """
-import logging
 import inspect
+import logging
 
 from openlp.core.common import is_win, trace_error_handler
 from openlp.core.common.registry import Registry
