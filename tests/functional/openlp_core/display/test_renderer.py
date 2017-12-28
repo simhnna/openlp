@@ -28,11 +28,10 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtCore
 
 from openlp.core.common.registry import Registry
-from openlp.core.display.screens import ScreenList
 from openlp.core.display.renderer import Renderer, words_split, get_start_tags
+from openlp.core.display.screens import ScreenList
 from openlp.core.lib import ServiceItem
 from openlp.core.lib.theme import Theme
-
 
 SCREEN = {
     'primary': False,

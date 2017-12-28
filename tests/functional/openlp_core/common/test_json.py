@@ -26,8 +26,8 @@ import json
 from unittest import TestCase
 from unittest.mock import patch
 
-from openlp.core.common.path import Path
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
+from openlp.core.common.path import Path
 
 
 class TestOpenLPJsonDecoder(TestCase):

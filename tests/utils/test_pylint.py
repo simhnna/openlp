@@ -22,7 +22,6 @@
 """
 Package to test for proper bzr tags.
 """
-import os
 import platform
 import sys
 from unittest import TestCase, SkipTest

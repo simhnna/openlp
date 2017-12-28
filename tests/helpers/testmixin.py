@@ -26,6 +26,7 @@ import os
 from tempfile import mkstemp
 
 from PyQt5 import QtCore, QtWidgets
+
 from openlp.core.common.settings import Settings
 
 

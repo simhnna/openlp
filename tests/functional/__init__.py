@@ -22,7 +22,6 @@
 """
 Base directory for tests
 """
-import sys
 from PyQt5 import QtWidgets
 
 # Only one QApplication can be created. Use QtWidgets.QApplication.instance() when you need to "create" a  QApplication.

@@ -28,9 +28,9 @@ from unittest.mock import patch
 
 from PyQt5 import QtWidgets
 
+from openlp.core.api.tab import ApiTab
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.api.tab import ApiTab
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {

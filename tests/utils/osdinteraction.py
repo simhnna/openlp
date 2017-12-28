@@ -23,8 +23,8 @@
 The :mod:`osdinteraction` provides miscellaneous functions for interacting with
 OSD files.
 """
-import os
 import json
+import os
 
 from tests.utils.constants import TEST_RESOURCES_PATH
 

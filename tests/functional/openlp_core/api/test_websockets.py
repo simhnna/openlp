@@ -25,10 +25,10 @@ Functional tests to test the Http Server Class.
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
+from openlp.core.api.poll import Poller
+from openlp.core.api.websockets import WebSocketServer
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.api.websockets import WebSocketServer
-from openlp.core.api.poll import Poller
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {

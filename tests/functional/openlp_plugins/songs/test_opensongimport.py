@@ -27,7 +27,6 @@ from unittest.mock import patch, MagicMock
 
 from openlp.core.common.registry import Registry
 from openlp.plugins.songs.lib.importers.opensong import OpenSongImport
-
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 

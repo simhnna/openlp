@@ -19,7 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import os
 import sys
 from unittest import TestCase, skip
 from unittest.mock import MagicMock, patch
@@ -28,7 +27,6 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.app import OpenLP, parse_options
 from openlp.core.common.settings import Settings
-
 from tests.utils.constants import RESOURCE_PATH
 
 

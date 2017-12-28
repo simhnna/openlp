@@ -32,7 +32,6 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem
 from openlp.plugins.songs.lib.db import AuthorType, Song
 from openlp.plugins.songs.lib.mediaitem import SongMediaItem
-
 from tests.helpers.testmixin import TestMixin
 
 

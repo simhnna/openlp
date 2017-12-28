@@ -27,7 +27,6 @@ from unittest import TestCase
 from openlp.core.common.registry import Registry
 from openlp.core.ui.advancedtab import AdvancedTab
 from openlp.core.ui.settingsform import SettingsForm
-
 from tests.helpers.testmixin import TestMixin
 
 

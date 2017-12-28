@@ -26,7 +26,6 @@ from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
-
 from tests.helpers.testmixin import TestMixin
 
 try:

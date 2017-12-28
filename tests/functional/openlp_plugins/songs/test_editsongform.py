@@ -29,7 +29,6 @@ from PyQt5 import QtCore
 
 from openlp.core.common.registry import Registry
 from openlp.plugins.songs.forms.editsongform import EditSongForm
-
 from tests.helpers.testmixin import TestMixin
 
 

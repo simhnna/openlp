@@ -27,6 +27,7 @@ from unittest import TestCase, skipUnless
 from unittest.mock import MagicMock, patch, call
 
 from openlp.core.common.registry import Registry
+
 try:
     from openlp.plugins.songs.lib.importers.mediashout import MediaShoutImport
     CAN_RUN_TESTS = True

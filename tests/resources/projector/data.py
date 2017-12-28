@@ -23,9 +23,6 @@
 The :mod:`tests.resources.projector.data file contains test data
 """
 
-import os
-from tempfile import gettempdir
-
 # Test data
 TEST_DB_PJLINK1 = 'projector_pjlink1.sqlite'
 

@@ -27,7 +27,6 @@ from unittest.mock import MagicMock, patch
 
 from openlp.plugins.bibles import lib
 from openlp.plugins.bibles.lib import SearchResults, get_reference_match
-
 from tests.helpers.testmixin import TestMixin
 
 

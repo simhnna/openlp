@@ -22,15 +22,13 @@
 """
 Functional tests to test the AppLocation class and related methods.
 """
-import os
 from io import BytesIO
 from unittest import TestCase
 from unittest.mock import MagicMock, PropertyMock, call, patch
 
-from openlp.core.common import add_actions, clean_filename, delete_file, get_file_encoding, get_filesystem_encoding,  \
+from openlp.core.common import add_actions, clean_filename, delete_file, get_file_encoding, get_filesystem_encoding, \
     get_uno_command, get_uno_instance
 from openlp.core.common.path import Path
-
 from tests.helpers.testmixin import TestMixin
 
 

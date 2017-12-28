@@ -29,7 +29,6 @@ from unittest.mock import MagicMock, patch
 
 from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, url_get_file
 from openlp.core.common.path import Path
-
 from tests.helpers.testmixin import TestMixin
 
 

@@ -27,7 +27,6 @@ from unittest.mock import MagicMock, patch
 
 from openlp.plugins.bibles.lib.db import BibleDB
 from openlp.plugins.bibles.lib.importers.zefania import ZefaniaBible
-
 from tests.utils import load_external_result_data
 from tests.utils.constants import RESOURCE_PATH
 

@@ -30,10 +30,9 @@ from unittest.mock import ANY, MagicMock, patch
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
 from openlp.core.ui import ThemeManager
-
 from tests.utils.constants import TEST_RESOURCES_PATH
 
 

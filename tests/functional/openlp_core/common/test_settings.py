@@ -28,7 +28,6 @@ from unittest.mock import call, patch
 
 from openlp.core.common import settings
 from openlp.core.common.settings import Settings, media_players_conv
-
 from tests.helpers.testmixin import TestMixin
 
 

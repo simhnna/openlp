@@ -28,7 +28,6 @@ from unittest.mock import MagicMock, patch
 from openlp.core.common.registry import Registry
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.importers.zionworx import ZionWorxImport
-
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 

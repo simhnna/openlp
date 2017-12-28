@@ -28,7 +28,6 @@ from unittest.mock import MagicMock, call, patch
 from openlp.plugins.bibles.lib.bibleimport import BibleImport
 from openlp.plugins.bibles.lib.db import BibleDB
 from openlp.plugins.bibles.lib.importers.osis import OSISBible
-
 from tests.utils import load_external_result_data
 from tests.utils.constants import RESOURCE_PATH
 

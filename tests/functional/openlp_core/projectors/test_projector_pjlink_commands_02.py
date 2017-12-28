@@ -29,7 +29,6 @@ import openlp.core.projectors.pjlink
 from openlp.core.projectors.constants import S_CONNECTED
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
-
 from tests.resources.projector.data import TEST_HASH, TEST_PIN, TEST_SALT, TEST1_DATA
 
 
