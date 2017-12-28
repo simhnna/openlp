@@ -29,8 +29,8 @@ from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songs.forms.authorsform import AuthorsForm
-from openlp.plugins.songs.forms.topicsform import TopicsForm
 from openlp.plugins.songs.forms.songbookform import SongBookForm
+from openlp.plugins.songs.forms.topicsform import TopicsForm
 from openlp.plugins.songs.lib.db import Author, Book, Topic, Song
 from .songmaintenancedialog import Ui_SongMaintenanceDialog
 

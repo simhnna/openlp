@@ -27,8 +27,9 @@ a MediaShout database into the OpenLP database.
 # WARNING: See https://docs.python.org/3/library/sqlite3.html for value substitution
 #          in SQL statements
 
-import pyodbc
 import logging
+
+import pyodbc
 
 from openlp.core.common.i18n import translate
 from openlp.plugins.songs.lib.importers.songimport import SongImport

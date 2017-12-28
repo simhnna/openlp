@@ -25,10 +25,9 @@ The :mod:`easyworship` module provides the functionality for importing EasyWorsh
 import logging
 import os
 import re
+import sqlite3
 import struct
 import zlib
-
-import sqlite3
 
 from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path

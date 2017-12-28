@@ -22,15 +22,15 @@
 """
 The :mod:`songbeamer` module provides the functionality for importing SongBeamer songs into the OpenLP database.
 """
+import base64
 import logging
+import math
 import os
 import re
-import base64
-import math
 
 from openlp.core.common import is_win, is_macosx, get_file_encoding
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 

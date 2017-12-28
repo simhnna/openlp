@@ -21,9 +21,10 @@
 ###############################################################################
 
 import sys
-from PyQt5 import QtWidgets
 from ctypes import *
 from ctypes.wintypes import RECT
+
+from PyQt5 import QtWidgets
 
 
 class PPTViewer(QtWidgets.QWidget):

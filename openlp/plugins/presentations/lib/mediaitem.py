@@ -24,10 +24,10 @@ import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate, get_natural_key
-from openlp.core.common.path import Path, path_to_str, str_to_path
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext,\
+from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext, \
     build_icon, check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import critical_error_message_box, create_horizontal_adjusting_combo_box
 from openlp.plugins.presentations.lib import MessageListener

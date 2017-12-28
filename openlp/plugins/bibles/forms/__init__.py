@@ -24,9 +24,9 @@
 The :mod:`forms` module contains all the ui functionality for the bibles
 plugin.
 """
-from .booknameform import BookNameForm
-from .languageform import LanguageForm
 from .bibleimportform import BibleImportForm
+from .booknameform import BookNameForm
 from .editbibleform import EditBibleForm
+from .languageform import LanguageForm
 
 __all__ = ['BookNameForm', 'LanguageForm', 'BibleImportForm', 'EditBibleForm']

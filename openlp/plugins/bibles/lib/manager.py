@@ -33,8 +33,9 @@ from .importers.csvbible import CSVBible
 from .importers.http import HTTPBible
 from .importers.opensong import OpenSongBible
 from .importers.osis import OSISBible
-from .importers.zefania import ZefaniaBible
 from .importers.wordproject import WordProjectBible
+from .importers.zefania import ZefaniaBible
+
 try:
     from .importers.sword import SwordBible
 except:

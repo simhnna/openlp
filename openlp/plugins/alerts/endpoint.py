@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
+import json
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
@@ -20,15 +21,13 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
-import json
 import urllib
 from urllib.parse import urlparse
 
-from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import requires_auth
+from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.common.registry import Registry
 from openlp.core.lib import PluginStatus
-
 
 log = logging.getLogger(__name__)
 

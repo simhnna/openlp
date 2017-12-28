@@ -27,8 +27,8 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate, get_natural_key
-from openlp.core.common.path import Path, path_to_str, create_paths
 from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.path import Path, path_to_str, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, MediaManagerItem, MediaType, ServiceItem, ServiceItemContext, \

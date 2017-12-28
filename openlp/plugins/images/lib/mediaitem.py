@@ -37,7 +37,6 @@ from openlp.core.widgets.views import TreeWidgetWithDnD
 from openlp.plugins.images.forms import AddGroupForm, ChooseGroupForm
 from openlp.plugins.images.lib.db import ImageFilenames, ImageGroups
 
-
 log = logging.getLogger(__name__)
 
 

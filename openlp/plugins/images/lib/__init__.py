@@ -20,5 +20,5 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from .mediaitem import ImageMediaItem
 from .imagetab import ImageTab
+from .mediaitem import ImageMediaItem

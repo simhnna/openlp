@@ -24,9 +24,10 @@ The bible import functions for OpenLP
 """
 import logging
 import urllib.error
-from lxml import etree
 
 from PyQt5 import QtWidgets
+from lxml import etree
+
 try:
     from pysword import modules
     PYSWORD_AVAILABLE = True

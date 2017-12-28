@@ -20,8 +20,8 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import logging
-import zipfile
 import re
+import zipfile
 from xml.etree import ElementTree
 
 from openlp.core.common import is_win

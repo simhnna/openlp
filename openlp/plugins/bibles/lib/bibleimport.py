@@ -20,12 +20,13 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from lxml import etree, objectify
 from zipfile import is_zipfile
 
+from lxml import etree, objectify
+
+from openlp.core.common.i18n import get_language, translate
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.registry import Registry
-from openlp.core.common.i18n import get_language, translate
 from openlp.core.lib import ValidationError
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.bibles.lib.db import AlternativeBookNamesDB, BibleDB, BiblesResourcesDB

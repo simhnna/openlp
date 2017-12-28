@@ -25,6 +25,7 @@ ProPresenter song files into the current installation database.
 """
 import base64
 import logging
+
 from lxml import objectify
 
 from openlp.core.widgets.wizard import WizardStrings

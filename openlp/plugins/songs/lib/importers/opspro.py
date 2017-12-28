@@ -29,8 +29,9 @@ a OPS Pro database into the OpenLP database.
 
 import logging
 import re
-import pyodbc
 import struct
+
+import pyodbc
 
 from openlp.core.common.i18n import translate
 from openlp.plugins.songs.lib.importers.songimport import SongImport

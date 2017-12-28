@@ -26,8 +26,8 @@ Module implementing BookNameForm.
 import logging
 import re
 
-from PyQt5.QtWidgets import QDialog
 from PyQt5 import QtCore
+from PyQt5.QtWidgets import QDialog
 
 from openlp.core.common.i18n import translate
 from openlp.core.lib.ui import critical_error_message_box

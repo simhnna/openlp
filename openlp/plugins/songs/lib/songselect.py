@@ -25,11 +25,11 @@ The :mod:`~openlp.plugins.songs.lib.songselect` module contains the SongSelect i
 import logging
 import random
 import re
+from html import unescape
+from html.parser import HTMLParser
 from http.cookiejar import CookieJar
 from urllib.parse import urlencode
 from urllib.request import HTTPCookieProcessor, URLError, build_opener
-from html.parser import HTMLParser
-from html import unescape
 
 from bs4 import BeautifulSoup, NavigableString
 

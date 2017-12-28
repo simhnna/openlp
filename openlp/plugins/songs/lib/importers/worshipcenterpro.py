@@ -25,6 +25,7 @@ a WorshipCenter Pro database into the OpenLP database.
 """
 import logging
 import re
+
 import pyodbc
 
 from openlp.core.common.i18n import translate

@@ -20,9 +20,9 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from PyQt5 import QtGui
-
 import logging
+
+from PyQt5 import QtGui
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.common.i18n import translate

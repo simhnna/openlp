@@ -23,8 +23,8 @@
 The :mod:`openlp.plugins.presentations.presentationplugin` module provides the ability for OpenLP to display
 presentations from a variety of document formats.
 """
-import os
 import logging
+import os
 
 from PyQt5 import QtCore
 

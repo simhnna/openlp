@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
+import logging
+import re
+import sqlite3
+import time
+
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
@@ -20,12 +25,6 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import chardet
-import logging
-import os
-import re
-import sqlite3
-import time
-
 from PyQt5 import QtCore
 from sqlalchemy import Column, ForeignKey, Table, or_, types, func
 from sqlalchemy.exc import OperationalError

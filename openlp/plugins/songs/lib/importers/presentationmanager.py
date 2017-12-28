@@ -27,8 +27,8 @@ import re
 
 from lxml import objectify, etree
 
-from openlp.core.common.i18n import translate
 from openlp.core.common import get_file_encoding
+from openlp.core.common.i18n import translate
 from openlp.core.widgets.wizard import WizardStrings
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 

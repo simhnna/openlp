@@ -27,10 +27,10 @@ import logging
 import re
 
 from openlp.core.common.i18n import translate
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
-from openlp.plugins.songs.lib.importers.songimport import SongImport
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib.db import AuthorType
+from openlp.plugins.songs.lib.importers.songimport import SongImport
 
 log = logging.getLogger(__name__)
 

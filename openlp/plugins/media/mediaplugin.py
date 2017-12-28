@@ -23,7 +23,6 @@
 The Media plugin
 """
 import logging
-import os
 import re
 
 from PyQt5 import QtCore
@@ -36,7 +35,6 @@ from openlp.core.common.path import Path
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.media.endpoint import api_media_endpoint, media_endpoint
 from openlp.plugins.media.lib import MediaMediaItem, MediaTab
-
 
 log = logging.getLogger(__name__)
 

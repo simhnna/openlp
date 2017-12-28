@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
+import logging
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
@@ -20,20 +21,19 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 import os
-import logging
 import re
-from time import sleep
 from datetime import datetime
+from time import sleep
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_win, is_linux, is_macosx
-from openlp.core.common.path import Path
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
-from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
+from openlp.core.common.path import Path
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.media.vlcplayer import get_vlc
+from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
 
 if is_win():
     from win32com.client import Dispatch

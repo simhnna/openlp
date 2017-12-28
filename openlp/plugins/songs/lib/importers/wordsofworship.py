@@ -23,9 +23,8 @@
 The :mod:`wordsofworship` module provides the functionality for importing Words of
 Worship songs into the OpenLP database.
 """
-import os
 import logging
-from openlp.core.common.path import Path
+import os
 
 from openlp.core.common.i18n import translate
 from openlp.plugins.songs.lib.importers.songimport import SongImport

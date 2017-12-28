@@ -25,7 +25,6 @@ for the Songs plugin.
 """
 
 import logging
-import os
 import sqlite3
 from pathlib import Path
 from tempfile import gettempdir
