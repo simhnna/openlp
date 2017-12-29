@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
 # vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
-import logging
-import re
-import sqlite3
-import time
-
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,7 +19,13 @@ import time
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+
 import chardet
+import logging
+import re
+import sqlite3
+import time
+
 from PyQt5 import QtCore
 from sqlalchemy import Column, ForeignKey, Table, or_, types, func
 from sqlalchemy.exc import OperationalError
