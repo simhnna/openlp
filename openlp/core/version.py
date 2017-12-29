@@ -75,8 +75,6 @@ class VersionWorker(QtCore.QObject):
         * If a version number's minor version is an even number, it is a stable release.
         """
         log.debug('VersionWorker - Start')
-        # I'm not entirely sure why this was here, I'm commenting it out until I hit the same scenario
-        # time.sleep(1)
         download_url = 'https://www.openlp.org/files/version.txt'
         if self.current_version['build']:
             download_url = 'https://www.openlp.org/files/nightly_version.txt'
