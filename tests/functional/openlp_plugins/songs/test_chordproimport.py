@@ -27,7 +27,7 @@ from unittest.mock import patch, MagicMock
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'chordprosongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'chordpro'
 
 
 class TestChordProFileImport(SongImportTestHelper):

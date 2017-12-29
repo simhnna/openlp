@@ -26,7 +26,7 @@ from unittest.mock import patch, MagicMock
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'videopsalmsongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'videopsalm'
 
 
 class TestVideoPsalmFileImport(SongImportTestHelper):

@@ -30,7 +30,7 @@ from openlp.plugins.songs.lib.importers.songbeamer import SongBeamerImport, Song
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'songbeamersongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'songbeamer'
 
 
 class TestSongBeamerFileImport(SongImportTestHelper):

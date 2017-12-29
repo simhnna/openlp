@@ -24,7 +24,7 @@ This module contains tests for the EasySlides song importer.
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'easyslidessongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'easyslides'
 
 
 class TestEasySlidesFileImport(SongImportTestHelper):

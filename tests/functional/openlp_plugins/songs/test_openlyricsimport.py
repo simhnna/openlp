@@ -36,7 +36,7 @@ from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'openlyricssongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'openlyrics'
 SONG_TEST_DATA = {
     'What a friend we have in Jesus.xml': {
         'title': 'What A Friend We Have In Jesus',

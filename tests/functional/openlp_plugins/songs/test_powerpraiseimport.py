@@ -26,7 +26,7 @@ ProPresenter song files into the current installation database.
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = RESOURCE_PATH / 'powerpraisesongs'
+TEST_PATH = RESOURCE_PATH / 'songs' / 'powerpraise'
 
 
 class TestPowerPraiseFileImport(SongImportTestHelper):
