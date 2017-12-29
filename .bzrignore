@@ -45,3 +45,4 @@ tags
 output
 htmlcov
 openlp-test-projectordb.sqlite
+.cache
