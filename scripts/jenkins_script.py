@@ -160,7 +160,7 @@ class JenkinsTrigger(object):
         tries = 0
         while queue_info and tries < 50:
             tries += 1
-            time.sleep(0.5)
+            time.sleep(0.75)
             queue_info = self.server.get_queue_info()
         if tries >= 50:
             raise Exception('Build has not started yet, it may be stuck in the queue.')
