@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,13 +22,14 @@
 """
 The :mod:`~openlp.core.ui.media.vlcplayer` module contains our VLC component wrapper
 """
-from datetime import datetime
-from distutils.version import LooseVersion
+import ctypes
 import logging
 import os
-import threading
 import sys
-import ctypes
+import threading
+from datetime import datetime
+from distutils.version import LooseVersion
+
 from PyQt5 import QtWidgets
 
 from openlp.core.common import is_win, is_macosx, is_linux

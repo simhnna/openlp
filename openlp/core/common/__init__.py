@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -30,13 +30,13 @@ import os
 import re
 import sys
 import traceback
-from chardet.universaldetector import UniversalDetector
 from ipaddress import IPv4Address, IPv6Address, AddressValueError
 from shutil import which
 from subprocess import check_output, CalledProcessError, STDOUT
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import QCryptographicHash as QHash
+from chardet.universaldetector import UniversalDetector
 
 log = logging.getLogger(__name__ + '.__init__')
 

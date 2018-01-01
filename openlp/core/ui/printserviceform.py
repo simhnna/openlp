@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,8 +24,8 @@ The actual print service dialog
 """
 import datetime
 import html
-import lxml.html
 
+import lxml.html
 from PyQt5 import QtCore, QtGui, QtWidgets, QtPrintSupport
 
 from openlp.core.common.applocation import AppLocation

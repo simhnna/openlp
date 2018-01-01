@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,9 +24,9 @@
 The :mod:`forms` module contains all the ui functionality for the bibles
 plugin.
 """
-from .booknameform import BookNameForm
-from .languageform import LanguageForm
 from .bibleimportform import BibleImportForm
+from .booknameform import BookNameForm
 from .editbibleform import EditBibleForm
+from .languageform import LanguageForm
 
 __all__ = ['BookNameForm', 'LanguageForm', 'BibleImportForm', 'EditBibleForm']

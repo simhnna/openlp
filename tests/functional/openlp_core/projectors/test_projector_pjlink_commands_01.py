@@ -32,7 +32,6 @@ from openlp.core.projectors.constants import ERROR_STRING, PJLINK_ERST_DATA, PJL
     S_CONNECTED, S_OFF, S_ON, S_NOT_CONNECTED, S_CONNECTING, S_STANDBY
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
-
 from tests.resources.projector.data import TEST_PIN, TEST1_DATA
 
 pjlink_test = PJLink(Projector(**TEST1_DATA), pin=TEST_PIN, no_poll=True)

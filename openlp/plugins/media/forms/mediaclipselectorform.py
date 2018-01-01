@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -19,21 +19,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import os
 import logging
+import os
 import re
-from time import sleep
 from datetime import datetime
+from time import sleep
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_win, is_linux, is_macosx
-from openlp.core.common.path import Path
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
-from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
+from openlp.core.common.path import Path
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui.media.vlcplayer import get_vlc
+from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
 
 if is_win():
     from win32com.client import Dispatch

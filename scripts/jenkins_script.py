@@ -5,7 +5,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -158,11 +158,12 @@ class JenkinsTrigger(object):
         """
         queue_info = self.server.get_queue_info()
         tries = 0
-        while queue_info and tries < 50:
+        loop_count = 100
+        while queue_info and tries < loop_count:
             tries += 1
-            time.sleep(0.5)
+            time.sleep(1)
             queue_info = self.server.get_queue_info()
-        if tries >= 50:
+        if tries >= loop_count:
             raise Exception('Build has not started yet, it may be stuck in the queue.')
         return self.server.get_build_info(job_name, build_number)
 

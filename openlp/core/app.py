@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -42,7 +42,6 @@ from openlp.core.common.mixins import LogMixin
 from openlp.core.common.path import create_paths, copytree
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.version import check_for_update, get_version
 from openlp.core.display.screens import ScreenList
 from openlp.core.resources import qInitResources
 from openlp.core.ui import SplashScreen
@@ -51,7 +50,7 @@ from openlp.core.ui.firsttimeform import FirstTimeForm
 from openlp.core.ui.firsttimelanguageform import FirstTimeLanguageForm
 from openlp.core.ui.mainwindow import MainWindow
 from openlp.core.ui.style import get_application_stylesheet
-
+from openlp.core.version import check_for_update, get_version
 
 __all__ = ['OpenLP', 'main']
 

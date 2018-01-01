@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -27,10 +27,9 @@ from tempfile import mkdtemp
 from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, patch
 
-from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from openlp.core.common import is_win
 from openlp.core.common.path import Path
-
+from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import RESOURCE_PATH
 

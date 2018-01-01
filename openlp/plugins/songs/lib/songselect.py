@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -25,11 +25,11 @@ The :mod:`~openlp.plugins.songs.lib.songselect` module contains the SongSelect i
 import logging
 import random
 import re
+from html import unescape
+from html.parser import HTMLParser
 from http.cookiejar import CookieJar
 from urllib.parse import urlencode
 from urllib.request import HTTPCookieProcessor, URLError, build_opener
-from html.parser import HTMLParser
-from html import unescape
 
 from bs4 import BeautifulSoup, NavigableString
 

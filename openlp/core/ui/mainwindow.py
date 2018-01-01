@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -23,8 +23,6 @@
 This is the main window, where all the action happens.
 """
 import logging
-import os
-import shutil
 import sys
 import time
 from datetime import datetime
@@ -40,25 +38,24 @@ from openlp.core.common import is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import LanguageManager, UiStrings, translate
-from openlp.core.common.path import Path, copyfile, create_paths
 from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.path import Path, copyfile, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.display.screens import ScreenList
 from openlp.core.display.renderer import Renderer
+from openlp.core.display.screens import ScreenList
 from openlp.core.lib import PluginManager, ImageManager, PluginStatus, build_icon
 from openlp.core.lib.ui import create_action
 from openlp.core.projectors.manager import ProjectorManager
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
     ShortcutListForm, FormattingTagForm, PreviewController
 from openlp.core.ui.firsttimeform import FirstTimeForm
-from openlp.core.widgets.dialogs import FileDialog
-from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 from openlp.core.ui.media import MediaController
 from openlp.core.ui.printserviceform import PrintServiceForm
 from openlp.core.ui.style import PROGRESSBAR_STYLE, get_library_stylesheet
 from openlp.core.version import get_version
-
+from openlp.core.widgets.dialogs import FileDialog
+from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 
 log = logging.getLogger(__name__)
 

@@ -26,8 +26,8 @@ from io import BytesIO
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from lxml import etree, objectify
 from PyQt5.QtWidgets import QDialog
+from lxml import etree, objectify
 
 from openlp.core.common.i18n import Language
 from openlp.core.common.path import Path
