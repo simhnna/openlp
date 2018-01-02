@@ -75,13 +75,11 @@ class VersionWorker(QtCore.QObject):
         * If a version number's minor version is an even number, it is a stable release.
         """
         log.debug('VersionWorker - Start')
-        # I'm not entirely sure why this was here, I'm commenting it out until I hit the same scenario
-        time.sleep(1)
-        download_url = 'http://www.openlp.org/files/version.txt'
+        download_url = 'https://www.openlp.org/files/version.txt'
         if self.current_version['build']:
-            download_url = 'http://www.openlp.org/files/nightly_version.txt'
+            download_url = 'https://www.openlp.org/files/nightly_version.txt'
         elif int(self.current_version['version'].split('.')[1]) % 2 != 0:
-            download_url = 'http://www.openlp.org/files/dev_version.txt'
+            download_url = 'https://www.openlp.org/files/dev_version.txt'
         headers = {
             'User-Agent': 'OpenLP/{version} {system}/{release}; '.format(version=self.current_version['full'],
                                                                          system=platform.system(),
@@ -92,7 +90,7 @@ class VersionWorker(QtCore.QObject):
         while retries < 3:
             try:
                 response = requests.get(download_url, headers=headers)
-                remote_version = response.text
+                remote_version = response.text.strip()
                 log.debug('New version found: %s', remote_version)
                 break
             except OSError:
