@@ -32,9 +32,128 @@ log.debug('projector_constants loaded')
 # Set common constants.
 CR = chr(0x0D)  # \r
 LF = chr(0x0A)  # \n
-PJLINK_PORT = 4352
-TIMEOUT = 30.0
+PJLINK_CLASS = '1'  # Default to class 1 until we query the projector
 PJLINK_MAX_PACKET = 136
+PJLINK_PREFIX = '%'
+PJLINK_PORT = 4352
+PJLINK_SUFFIX = CR
+PJLINK_TIMEOUT = 30.0
+
+# Error and status codes
+S_OK = E_OK = 0  # E_OK included since I sometimes forget
+
+# Error codes. Start at 200 so we don't duplicate system error codes.
+E_GENERAL = 200  # Unknown error
+E_NOT_CONNECTED = 201
+E_UNDEFINED = 202           # PJLink ERR1
+E_PARAMETER = 203           # PJLink ERR2
+E_UNAVAILABLE = 204         # PJLink ERR3
+E_PROJECTOR = 205           # PJLink ERR4
+E_AUTHENTICATION = 206      # PJLink ERRA
+E_NO_AUTHENTICATION = 207   # PJLink authentication mismatch between projector and program
+E_PREFIX = 208              # PJLink invalid prefix for packet
+E_CLASS = 209               # PJLink class version mismatch
+E_INVALID_DATA = 210
+E_WARN = 211
+E_ERROR = 212
+E_FAN = 213
+E_LAMP = 214
+E_TEMP = 215
+E_COVER = 216
+E_FILTER = 217
+E_UNKNOWN = 218
+
+# Remap Qt socket error codes to local error codes
+E_CONNECTION_REFUSED = 230
+E_REMOTE_HOST_CLOSED_CONNECTION = 231
+E_HOST_NOT_FOUND = 232
+E_SOCKET_ACCESS = 233
+E_SOCKET_RESOURCE = 234
+E_SOCKET_TIMEOUT = 235
+E_DATAGRAM_TOO_LARGE = 236
+E_NETWORK = 237
+E_ADDRESS_IN_USE = 238
+E_SOCKET_ADDRESS_NOT_AVAILABLE = 239
+E_UNSUPPORTED_SOCKET_OPERATION = 240
+E_PROXY_AUTHENTICATION_REQUIRED = 241
+E_SLS_HANDSHAKE_FAILED = 242
+E_UNFINISHED_SOCKET_OPERATION = 243
+E_PROXY_CONNECTION_REFUSED = 244
+E_PROXY_CONNECTION_CLOSED = 245
+E_PROXY_CONNECTION_TIMEOUT = 246
+E_PROXY_NOT_FOUND = 247
+E_PROXY_PROTOCOL = 248
+E_UNKNOWN_SOCKET_ERROR = 249
+
+# Status codes start at 300
+
+# Remap Qt socket states to local status codes
+S_NOT_CONNECTED = 300
+S_HOST_LOOKUP = 301
+S_CONNECTING = 302
+S_CONNECTED = 303
+S_BOUND = 304
+S_LISTENING = 305  # Listed as internal use only in QAbstractSocket
+S_CLOSING = 306
+
+# Projector states
+S_INITIALIZE = 310
+S_STATUS = 311
+S_OFF = 312
+S_STANDBY = 313
+S_WARMUP = 314
+S_ON = 315
+S_COOLDOWN = 316
+S_INFO = 317
+
+# Information that does not affect status
+S_NETWORK_IDLE = 400
+S_NETWORK_SENDING = 401
+S_NETWORK_RECEIVING = 402
+
+# Map PJlink errors to local status
+PJLINK_ERRORS = {
+    'ERRA': E_AUTHENTICATION,   # Authentication error
+    'ERR1': E_UNDEFINED,        # Undefined command error
+    'ERR2': E_PARAMETER,        # Invalid parameter error
+    'ERR3': E_UNAVAILABLE,      # Projector busy
+    'ERR4': E_PROJECTOR,        # Projector or display failure
+    E_AUTHENTICATION: 'ERRA',
+    E_UNDEFINED: 'ERR1',
+    E_PARAMETER: 'ERR2',
+    E_UNAVAILABLE: 'ERR3',
+    E_PROJECTOR: 'ERR4'
+}
+
+# Map QAbstractSocketState enums to local status
+QSOCKET_STATE = {
+    0: S_NOT_CONNECTED,     # 'UnconnectedState',
+    1: S_HOST_LOOKUP,       # 'HostLookupState',
+    2: S_CONNECTING,        # 'ConnectingState',
+    3: S_CONNECTED,         # 'ConnectedState',
+    4: S_BOUND,             # 'BoundState',
+    5: S_LISTENING,         # 'ListeningState' -  Noted as "Internal Use Only" on Qt website
+    6: S_CLOSING,           # 'ClosingState',
+    S_NOT_CONNECTED: 0,
+    S_HOST_LOOKUP: 1,
+    S_CONNECTING: 2,
+    S_CONNECTED: 3,
+    S_BOUND: 4,
+    S_LISTENING: 5,
+    S_CLOSING: 6
+}
+
+PROJECTOR_STATE = [
+    S_INITIALIZE,
+    S_STATUS,
+    S_OFF,
+    S_STANDBY,
+    S_WARMUP,
+    S_ON,
+    S_COOLDOWN,
+    S_INFO
+]
+
 # NOTE: Changed format to account for some commands are both class 1 and 2
 PJLINK_VALID_CMD = {
     'ACKN': {'version': ['2', ],
@@ -144,227 +263,140 @@ PJLINK_VALID_CMD = {
              }
 }
 
-# QAbstractSocketState enums converted to string
-S_QSOCKET_STATE = {
-    0: 'QSocketState - UnconnectedState',
-    1: 'QSocketState - HostLookupState',
-    2: 'QSocketState - ConnectingState',
-    3: 'QSocketState - ConnectedState',
-    4: 'QSocketState - BoundState',
-    5: 'QSocketState - ListeningState (internal use only)',
-    6: 'QSocketState - ClosingState',
-    'UnconnectedState': 0,
-    'HostLookupState': 1,
-    'ConnectingState': 2,
-    'ConnectedState': 3,
-    'BoundState': 4,
-    'ListeningState': 5,
-    'ClosingState': 6
-}
+CONNECTION_ERRORS = [
+    E_ADDRESS_IN_USE,
+    E_CONNECTION_REFUSED,
+    E_DATAGRAM_TOO_LARGE,
+    E_HOST_NOT_FOUND,
+    E_NETWORK,
+    E_NOT_CONNECTED,
+    E_PROXY_AUTHENTICATION_REQUIRED,
+    E_PROXY_CONNECTION_CLOSED,
+    E_PROXY_CONNECTION_REFUSED,
+    E_PROXY_CONNECTION_TIMEOUT,
+    E_PROXY_NOT_FOUND,
+    E_PROXY_PROTOCOL,
+    E_REMOTE_HOST_CLOSED_CONNECTION,
+    E_SLS_HANDSHAKE_FAILED,
+    E_SOCKET_ACCESS,
+    E_SOCKET_ADDRESS_NOT_AVAILABLE,
+    E_SOCKET_RESOURCE,
+    E_SOCKET_TIMEOUT,
+    E_UNFINISHED_SOCKET_OPERATION,
+    E_UNKNOWN_SOCKET_ERROR,
+    E_UNSUPPORTED_SOCKET_OPERATION
+]
 
-# Error and status codes
-S_OK = E_OK = 0  # E_OK included since I sometimes forget
-# Error codes. Start at 200 so we don't duplicate system error codes.
-E_GENERAL = 200  # Unknown error
-E_NOT_CONNECTED = 201
-E_FAN = 202
-E_LAMP = 203
-E_TEMP = 204
-E_COVER = 205
-E_FILTER = 206
-E_NO_AUTHENTICATION = 207  # PIN set and no authentication set on projector
-E_UNDEFINED = 208       # ERR1
-E_PARAMETER = 209       # ERR2
-E_UNAVAILABLE = 210     # ERR3
-E_PROJECTOR = 211       # ERR4
-E_INVALID_DATA = 212
-E_WARN = 213
-E_ERROR = 214
-E_AUTHENTICATION = 215  # ERRA
-E_CLASS = 216
-E_PREFIX = 217
+PROJECTOR_ERRORS = [
+    E_AUTHENTICATION,
+    E_CLASS,
+    E_INVALID_DATA,
+    E_NO_AUTHENTICATION,
+    E_PARAMETER,
+    E_PREFIX,
+    E_PROJECTOR,
+    E_UNAVAILABLE,
+    E_UNDEFINED,
+    E_UNKNOWN
+]
 
-# Remap Qt socket error codes to projector error codes
-E_CONNECTION_REFUSED = 230
-E_REMOTE_HOST_CLOSED_CONNECTION = 231
-E_HOST_NOT_FOUND = 232
-E_SOCKET_ACCESS = 233
-E_SOCKET_RESOURCE = 234
-E_SOCKET_TIMEOUT = 235
-E_DATAGRAM_TOO_LARGE = 236
-E_NETWORK = 237
-E_ADDRESS_IN_USE = 238
-E_SOCKET_ADDRESS_NOT_AVAILABLE = 239
-E_UNSUPPORTED_SOCKET_OPERATION = 240
-E_PROXY_AUTHENTICATION_REQUIRED = 241
-E_SLS_HANDSHAKE_FAILED = 242
-E_UNFINISHED_SOCKET_OPERATION = 243
-E_PROXY_CONNECTION_REFUSED = 244
-E_PROXY_CONNECTION_CLOSED = 245
-E_PROXY_CONNECTION_TIMEOUT = 246
-E_PROXY_NOT_FOUND = 247
-E_PROXY_PROTOCOL = 248
-E_UNKNOWN_SOCKET_ERROR = -1
-
-# Status codes start at 300
-S_NOT_CONNECTED = 300
-S_CONNECTING = 301
-S_CONNECTED = 302
-S_INITIALIZE = 303
-S_STATUS = 304
-S_OFF = 305
-S_STANDBY = 306
-S_WARMUP = 307
-S_ON = 308
-S_COOLDOWN = 309
-S_INFO = 310
-
-# Information that does not affect status
-S_NETWORK_SENDING = 400
-S_NETWORK_RECEIVED = 401
-
-CONNECTION_ERRORS = {
-    E_NOT_CONNECTED, E_NO_AUTHENTICATION, E_AUTHENTICATION, E_CLASS,
-    E_PREFIX, E_CONNECTION_REFUSED, E_REMOTE_HOST_CLOSED_CONNECTION,
-    E_HOST_NOT_FOUND, E_SOCKET_ACCESS, E_SOCKET_RESOURCE, E_SOCKET_TIMEOUT,
-    E_DATAGRAM_TOO_LARGE, E_NETWORK, E_ADDRESS_IN_USE, E_SOCKET_ADDRESS_NOT_AVAILABLE,
-    E_UNSUPPORTED_SOCKET_OPERATION, E_PROXY_AUTHENTICATION_REQUIRED,
-    E_SLS_HANDSHAKE_FAILED, E_UNFINISHED_SOCKET_OPERATION, E_PROXY_CONNECTION_REFUSED,
-    E_PROXY_CONNECTION_CLOSED, E_PROXY_CONNECTION_TIMEOUT, E_PROXY_NOT_FOUND,
-    E_PROXY_PROTOCOL, E_UNKNOWN_SOCKET_ERROR
-}
-
-PJLINK_ERRORS = {
-    'ERRA': E_AUTHENTICATION,   # Authentication error
-    'ERR1': E_UNDEFINED,        # Undefined command error
-    'ERR2': E_PARAMETER,        # Invalid parameter error
-    'ERR3': E_UNAVAILABLE,      # Projector busy
-    'ERR4': E_PROJECTOR,        # Projector or display failure
-    E_AUTHENTICATION: 'ERRA',
-    E_UNDEFINED: 'ERR1',
-    E_PARAMETER: 'ERR2',
-    E_UNAVAILABLE: 'ERR3',
-    E_PROJECTOR: 'ERR4'
-}
-
-# Map error/status codes to string
-ERROR_STRING = {
-    0: 'S_OK',
-    E_GENERAL: 'E_GENERAL',
-    E_NOT_CONNECTED: 'E_NOT_CONNECTED',
-    E_FAN: 'E_FAN',
-    E_LAMP: 'E_LAMP',
-    E_TEMP: 'E_TEMP',
-    E_COVER: 'E_COVER',
-    E_FILTER: 'E_FILTER',
-    E_AUTHENTICATION: 'E_AUTHENTICATION',
-    E_NO_AUTHENTICATION: 'E_NO_AUTHENTICATION',
-    E_UNDEFINED: 'E_UNDEFINED',
-    E_PARAMETER: 'E_PARAMETER',
-    E_UNAVAILABLE: 'E_UNAVAILABLE',
-    E_PROJECTOR: 'E_PROJECTOR',
-    E_INVALID_DATA: 'E_INVALID_DATA',
-    E_WARN: 'E_WARN',
-    E_ERROR: 'E_ERROR',
-    E_CLASS: 'E_CLASS',
-    E_PREFIX: 'E_PREFIX',  # Last projector error
-    E_CONNECTION_REFUSED: 'E_CONNECTION_REFUSED',  # First QtSocket error
-    E_REMOTE_HOST_CLOSED_CONNECTION: 'E_REMOTE_HOST_CLOSED_CONNECTION',
-    E_HOST_NOT_FOUND: 'E_HOST_NOT_FOUND',
-    E_SOCKET_ACCESS: 'E_SOCKET_ACCESS',
-    E_SOCKET_RESOURCE: 'E_SOCKET_RESOURCE',
-    E_SOCKET_TIMEOUT: 'E_SOCKET_TIMEOUT',
-    E_DATAGRAM_TOO_LARGE: 'E_DATAGRAM_TOO_LARGE',
-    E_NETWORK: 'E_NETWORK',
+# Show status code as string
+STATUS_CODE = {
     E_ADDRESS_IN_USE: 'E_ADDRESS_IN_USE',
-    E_SOCKET_ADDRESS_NOT_AVAILABLE: 'E_SOCKET_ADDRESS_NOT_AVAILABLE',
-    E_UNSUPPORTED_SOCKET_OPERATION: 'E_UNSUPPORTED_SOCKET_OPERATION',
+    E_AUTHENTICATION: 'E_AUTHENTICATION',
+    E_CLASS: 'E_CLASS',
+    E_CONNECTION_REFUSED: 'E_CONNECTION_REFUSED',
+    E_COVER: 'E_COVER',
+    E_DATAGRAM_TOO_LARGE: 'E_DATAGRAM_TOO_LARGE',
+    E_ERROR: 'E_ERROR',
+    E_FAN: 'E_FAN',
+    E_FILTER: 'E_FILTER',
+    E_GENERAL: 'E_GENERAL',
+    E_HOST_NOT_FOUND: 'E_HOST_NOT_FOUND',
+    E_INVALID_DATA: 'E_INVALID_DATA',
+    E_LAMP: 'E_LAMP',
+    E_NETWORK: 'E_NETWORK',
+    E_NO_AUTHENTICATION: 'E_NO_AUTHENTICATION',
+    E_NOT_CONNECTED: 'E_NOT_CONNECTED',
+    E_PARAMETER: 'E_PARAMETER',
+    E_PREFIX: 'E_PREFIX',
+    E_PROJECTOR: 'E_PROJECTOR',
     E_PROXY_AUTHENTICATION_REQUIRED: 'E_PROXY_AUTHENTICATION_REQUIRED',
-    E_SLS_HANDSHAKE_FAILED: 'E_SLS_HANDSHAKE_FAILED',
-    E_UNFINISHED_SOCKET_OPERATION: 'E_UNFINISHED_SOCKET_OPERATION',
-    E_PROXY_CONNECTION_REFUSED: 'E_PROXY_CONNECTION_REFUSED',
     E_PROXY_CONNECTION_CLOSED: 'E_PROXY_CONNECTION_CLOSED',
+    E_PROXY_CONNECTION_REFUSED: 'E_PROXY_CONNECTION_REFUSED',
     E_PROXY_CONNECTION_TIMEOUT: 'E_PROXY_CONNECTION_TIMEOUT',
     E_PROXY_NOT_FOUND: 'E_PROXY_NOT_FOUND',
     E_PROXY_PROTOCOL: 'E_PROXY_PROTOCOL',
-    E_UNKNOWN_SOCKET_ERROR: 'E_UNKNOWN_SOCKET_ERROR'
-}
-
-STATUS_STRING = {
-    S_NOT_CONNECTED: 'S_NOT_CONNECTED',
-    S_CONNECTING: 'S_CONNECTING',
-    S_CONNECTED: 'S_CONNECTED',
-    S_STATUS: 'S_STATUS',
-    S_OFF: 'S_OFF',
-    S_INITIALIZE: 'S_INITIALIZE',
-    S_STANDBY: 'S_STANDBY',
-    S_WARMUP: 'S_WARMUP',
-    S_ON: 'S_ON',
+    E_REMOTE_HOST_CLOSED_CONNECTION: 'E_REMOTE_HOST_CLOSED_CONNECTION',
+    E_SLS_HANDSHAKE_FAILED: 'E_SLS_HANDSHAKE_FAILED',
+    E_SOCKET_ACCESS: 'E_SOCKET_ACCESS',
+    E_SOCKET_ADDRESS_NOT_AVAILABLE: 'E_SOCKET_ADDRESS_NOT_AVAILABLE',
+    E_SOCKET_RESOURCE: 'E_SOCKET_RESOURCE',
+    E_SOCKET_TIMEOUT: 'E_SOCKET_TIMEOUT',
+    E_TEMP: 'E_TEMP',
+    E_UNAVAILABLE: 'E_UNAVAILABLE',
+    E_UNDEFINED: 'E_UNDEFINED',
+    E_UNFINISHED_SOCKET_OPERATION: 'E_UNFINISHED_SOCKET_OPERATION',
+    E_UNKNOWN: 'E_UNKNOWN',
+    E_UNKNOWN_SOCKET_ERROR: 'E_UNKNOWN_SOCKET_ERROR',
+    E_UNSUPPORTED_SOCKET_OPERATION: 'E_UNSUPPORTED_SOCKET_OPERATION',
+    E_WARN: 'E_WARN',
+    S_BOUND: 'S_BOUND',
     S_COOLDOWN: 'S_COOLDOWN',
+    S_CLOSING: 'S_CLOSING',
+    S_CONNECTED: 'S_CONNECTED',
+    S_CONNECTING: 'S_CONNECTING',
+    S_HOST_LOOKUP: 'S_HOST_LOOKUP',
     S_INFO: 'S_INFO',
+    S_INITIALIZE: 'S_INITIALIZE',
+    S_LISTENING: 'S_LISTENING',
+    S_NETWORK_RECEIVING: 'S_NETWORK_RECEIVING',
     S_NETWORK_SENDING: 'S_NETWORK_SENDING',
-    S_NETWORK_RECEIVED: 'S_NETWORK_RECEIVED'
+    S_NETWORK_IDLE: 'S_NETWORK_IDLE',
+    S_NOT_CONNECTED: 'S_NOT_CONNECTED',
+    S_OFF: 'S_OFF',
+    S_OK: 'S_OK',  # S_OK or E_OK
+    S_ON: 'S_ON',
+    S_STANDBY: 'S_STANDBY',
+    S_STATUS: 'S_STATUS',
+    S_WARMUP: 'S_WARMUP',
 }
 
-# Map error/status codes to message strings
-ERROR_MSG = {
-    E_OK: translate('OpenLP.ProjectorConstants', 'OK'),  # E_OK | S_OK
-    E_GENERAL: translate('OpenLP.ProjectorConstants', 'General projector error'),
-    E_NOT_CONNECTED: translate('OpenLP.ProjectorConstants', 'Not connected error'),
-    E_LAMP: translate('OpenLP.ProjectorConstants', 'Lamp error'),
-    E_FAN: translate('OpenLP.ProjectorConstants', 'Fan error'),
-    E_TEMP: translate('OpenLP.ProjectorConstants', 'High temperature detected'),
-    E_COVER: translate('OpenLP.ProjectorConstants', 'Cover open detected'),
-    E_FILTER: translate('OpenLP.ProjectorConstants', 'Check filter'),
-    E_AUTHENTICATION: translate('OpenLP.ProjectorConstants', 'Authentication Error'),
-    E_UNDEFINED: translate('OpenLP.ProjectorConstants', 'Undefined Command'),
-    E_PARAMETER: translate('OpenLP.ProjectorConstants', 'Invalid Parameter'),
-    E_UNAVAILABLE: translate('OpenLP.ProjectorConstants', 'Projector Busy'),
-    E_PROJECTOR: translate('OpenLP.ProjectorConstants', 'Projector/Display Error'),
-    E_INVALID_DATA: translate('OpenLP.ProjectorConstants', 'Invalid packet received'),
-    E_WARN: translate('OpenLP.ProjectorConstants', 'Warning condition detected'),
-    E_ERROR: translate('OpenLP.ProjectorConstants', 'Error condition detected'),
-    E_CLASS: translate('OpenLP.ProjectorConstants', 'PJLink class not supported'),
-    E_PREFIX: translate('OpenLP.ProjectorConstants', 'Invalid prefix character'),
-    E_CONNECTION_REFUSED: translate('OpenLP.ProjectorConstants',
-                                    'The connection was refused by the peer (or timed out)'),
-    E_REMOTE_HOST_CLOSED_CONNECTION: translate('OpenLP.ProjectorConstants',
-                                               'The remote host closed the connection'),
-    E_HOST_NOT_FOUND: translate('OpenLP.ProjectorConstants', 'The host address was not found'),
-    E_SOCKET_ACCESS: translate('OpenLP.ProjectorConstants',
-                               'The socket operation failed because the application '
-                               'lacked the required privileges'),
-    E_SOCKET_RESOURCE: translate('OpenLP.ProjectorConstants',
-                                 'The local system ran out of resources (e.g., too many sockets)'),
-    E_SOCKET_TIMEOUT: translate('OpenLP.ProjectorConstants',
-                                'The socket operation timed out'),
-    E_DATAGRAM_TOO_LARGE: translate('OpenLP.ProjectorConstants',
-                                    'The datagram was larger than the operating system\'s limit'),
-    E_NETWORK: translate('OpenLP.ProjectorConstants',
-                         'An error occurred with the network (Possibly someone pulled the plug?)'),
+# Map status codes to message strings
+STATUS_MSG = {
     E_ADDRESS_IN_USE: translate('OpenLP.ProjectorConstants',
                                 'The address specified with socket.bind() '
                                 'is already in use and was set to be exclusive'),
-    E_SOCKET_ADDRESS_NOT_AVAILABLE: translate('OpenLP.ProjectorConstants',
-                                              'The address specified to socket.bind() '
-                                              'does not belong to the host'),
-    E_UNSUPPORTED_SOCKET_OPERATION: translate('OpenLP.ProjectorConstants',
-                                              'The requested socket operation is not supported by the local '
-                                              'operating system (e.g., lack of IPv6 support)'),
+    E_AUTHENTICATION: translate('OpenLP.ProjectorConstants', 'PJLink returned "ERRA: Authentication Error"'),
+    E_CONNECTION_REFUSED: translate('OpenLP.ProjectorConstants',
+                                    'The connection was refused by the peer (or timed out)'),
+    E_COVER: translate('OpenLP.ProjectorConstants', 'Projector cover open detected'),
+    E_CLASS: translate('OpenLP.ProjectorConstants', 'PJLink class not supported'),
+    E_DATAGRAM_TOO_LARGE: translate('OpenLP.ProjectorConstants',
+                                    "The datagram was larger than the operating system's limit"),
+    E_ERROR: translate('OpenLP.ProjectorConstants', 'Error condition detected'),
+    E_FAN: translate('OpenLP.ProjectorConstants', 'Projector fan error'),
+    E_FILTER: translate('OpenLP.ProjectorConstants', 'Projector check filter'),
+    E_GENERAL: translate('OpenLP.ProjectorConstants', 'General projector error'),
+    E_HOST_NOT_FOUND: translate('OpenLP.ProjectorConstants', 'The host address was not found'),
+    E_INVALID_DATA: translate('OpenLP.ProjectorConstants', 'PJLink invalid packet received'),
+    E_LAMP: translate('OpenLP.ProjectorConstants', 'Projector lamp error'),
+    E_NETWORK: translate('OpenLP.ProjectorConstants',
+                         'An error occurred with the network (Possibly someone pulled the plug?)'),
+    E_NO_AUTHENTICATION: translate('OpenLP.ProjectorConstants', 'PJlink authentication Mismatch Error'),
+    E_NOT_CONNECTED: translate('OpenLP.ProjectorConstants', 'Projector not connected error'),
+    E_PARAMETER: translate('OpenLP.ProjectorConstants', 'PJLink returned "ERR2: Invalid Parameter"'),
+    E_PREFIX: translate('OpenLP.ProjectorConstants', 'PJLink Invalid prefix character'),
+    E_PROJECTOR: translate('OpenLP.ProjectorConstants', 'PJLink returned "ERR4: Projector/Display Error"'),
     E_PROXY_AUTHENTICATION_REQUIRED: translate('OpenLP.ProjectorConstants',
                                                'The socket is using a proxy, '
                                                'and the proxy requires authentication'),
-    E_SLS_HANDSHAKE_FAILED: translate('OpenLP.ProjectorConstants',
-                                      'The SSL/TLS handshake failed'),
-    E_UNFINISHED_SOCKET_OPERATION: translate('OpenLP.ProjectorConstants',
-                                             'The last operation attempted has not finished yet '
-                                             '(still in progress in the background)'),
-    E_PROXY_CONNECTION_REFUSED: translate('OpenLP.ProjectorConstants',
-                                          'Could not contact the proxy server because the connection '
-                                          'to that server was denied'),
     E_PROXY_CONNECTION_CLOSED: translate('OpenLP.ProjectorConstants',
                                          'The connection to the proxy server was closed unexpectedly '
                                          '(before the connection to the final peer was established)'),
+    E_PROXY_CONNECTION_REFUSED: translate('OpenLP.ProjectorConstants',
+                                          'Could not contact the proxy server because the connection '
+                                          'to that server was denied'),
     E_PROXY_CONNECTION_TIMEOUT: translate('OpenLP.ProjectorConstants',
                                           'The connection to the proxy server timed out or the proxy '
                                           'server stopped responding in the authentication phase.'),
@@ -373,51 +405,91 @@ ERROR_MSG = {
     E_PROXY_PROTOCOL: translate('OpenLP.ProjectorConstants',
                                 'The connection negotiation with the proxy server failed because the '
                                 'response from the proxy server could not be understood'),
-    E_UNKNOWN_SOCKET_ERROR: translate('OpenLP.ProjectorConstants', 'An unidentified error occurred'),
-    S_NOT_CONNECTED: translate('OpenLP.ProjectorConstants', 'Not connected'),
-    S_CONNECTING: translate('OpenLP.ProjectorConstants', 'Connecting'),
+    E_REMOTE_HOST_CLOSED_CONNECTION: translate('OpenLP.ProjectorConstants',
+                                               'The remote host closed the connection'),
+    E_SLS_HANDSHAKE_FAILED: translate('OpenLP.ProjectorConstants',
+                                      'The SSL/TLS handshake failed'),
+    E_SOCKET_ADDRESS_NOT_AVAILABLE: translate('OpenLP.ProjectorConstants',
+                                              'The address specified to socket.bind() '
+                                              'does not belong to the host'),
+    E_SOCKET_ACCESS: translate('OpenLP.ProjectorConstants',
+                               'The socket operation failed because the application '
+                               'lacked the required privileges'),
+    E_SOCKET_RESOURCE: translate('OpenLP.ProjectorConstants',
+                                 'The local system ran out of resources (e.g., too many sockets)'),
+    E_SOCKET_TIMEOUT: translate('OpenLP.ProjectorConstants',
+                                'The socket operation timed out'),
+    E_TEMP: translate('OpenLP.ProjectorConstants', 'Projector high temperature detected'),
+    E_UNAVAILABLE: translate('OpenLP.ProjectorConstants', 'PJLink returned "ERR3: Busy"'),
+    E_UNDEFINED: translate('OpenLP.ProjectorConstants', 'PJLink returned "ERR1: Undefined Command"'),
+    E_UNFINISHED_SOCKET_OPERATION: translate('OpenLP.ProjectorConstants',
+                                             'The last operation attempted has not finished yet '
+                                             '(still in progress in the background)'),
+    E_UNKNOWN: translate('OpenLP.ProjectorConstants', 'Unknown condiction detected'),
+    E_UNKNOWN_SOCKET_ERROR: translate('OpenLP.ProjectorConstants', 'An unidentified socket error occurred'),
+    E_UNSUPPORTED_SOCKET_OPERATION: translate('OpenLP.ProjectorConstants',
+                                              'The requested socket operation is not supported by the local '
+                                              'operating system (e.g., lack of IPv6 support)'),
+    E_WARN: translate('OpenLP.ProjectorConstants', 'Warning condition detected'),
+    S_BOUND: translate('OpenLP.ProjectorConstants', 'Socket is bount to an address or port'),
+    S_CLOSING: translate('OpenLP.ProjectorConstants', 'Socket is about to close'),
     S_CONNECTED: translate('OpenLP.ProjectorConstants', 'Connected'),
-    S_STATUS: translate('OpenLP.ProjectorConstants', 'Getting status'),
-    S_OFF: translate('OpenLP.ProjectorConstants', 'Off'),
-    S_INITIALIZE: translate('OpenLP.ProjectorConstants', 'Initialize in progress'),
-    S_STANDBY: translate('OpenLP.ProjectorConstants', 'Power in standby'),
-    S_WARMUP: translate('OpenLP.ProjectorConstants', 'Warmup in progress'),
-    S_ON: translate('OpenLP.ProjectorConstants', 'Power is on'),
+    S_CONNECTING: translate('OpenLP.ProjectorConstants', 'Connecting'),
     S_COOLDOWN: translate('OpenLP.ProjectorConstants', 'Cooldown in progress'),
+    S_HOST_LOOKUP: translate('OpenLP.ProjectorConstants', 'Performing a host name lookup'),
     S_INFO: translate('OpenLP.ProjectorConstants', 'Projector Information available'),
+    S_INITIALIZE: translate('OpenLP.ProjectorConstants', 'Initialize in progress'),
+    S_LISTENING: translate('OpenLP.ProjectorConstants', 'Socket it listening (internal use only)'),
+    S_NETWORK_IDLE: translate('OpenLP.ProjectorConstants', 'No network activity at this time'),
+    S_NETWORK_RECEIVING: translate('OpenLP.ProjectorConstants', 'Received data'),
     S_NETWORK_SENDING: translate('OpenLP.ProjectorConstants', 'Sending data'),
-    S_NETWORK_RECEIVED: translate('OpenLP.ProjectorConstants', 'Received data')
+    S_NOT_CONNECTED: translate('OpenLP.ProjectorConstants', 'Not Connected'),
+    S_OFF: translate('OpenLP.ProjectorConstants', 'Off'),
+    S_OK: translate('OpenLP.ProjectorConstants', 'OK'),
+    S_ON: translate('OpenLP.ProjectorConstants', 'Power is on'),
+    S_STANDBY: translate('OpenLP.ProjectorConstants', 'Power in standby'),
+    S_STATUS: translate('OpenLP.ProjectorConstants', 'Getting status'),
+    S_WARMUP: translate('OpenLP.ProjectorConstants', 'Warmup in progress'),
 }
 
-# Map ERST return code positions to equipment
+# Map ERST reply positions to equipment
+PJLINK_ERST_LIST = {
+    "FAN": translate('OpenLP.PJLink', 'Fan'),
+    "LAMP": translate('OpenLP.PJLink', 'Lamp'),
+    "TEMP": translate('OpenLP.PJLink', 'Temperature'),
+    "COVER": translate('OpenLP.PJLink', 'Cover'),
+    "FILTER": translate('OpenLP.PJLink', 'Filter'),
+    "OTHER": translate('OpenPL.PJLink', 'Other')
+}
+
+# Map projector item to ERST data position
 PJLINK_ERST_DATA = {
-    'DATA_LENGTH': 6,
-    0: 'FAN',
-    1: 'LAMP',
-    2: 'TEMP',
-    3: 'COVER',
-    4: 'FILTER',
-    5: 'OTHER',
+    'DATA_LENGTH': 6,  # Zero based so enums are 0-5
     'FAN': 0,
     'LAMP': 1,
     'TEMP': 2,
     'COVER': 3,
     'FILTER': 4,
-    'OTHER': 5
+    'OTHER': 5,
+    0: 'FAN',
+    1: 'LAMP',
+    2: 'TEMP',
+    3: 'COVER',
+    4: 'FILTER',
+    5: 'OTHER'
 }
 
-# Map for ERST return codes to string
+# Map ERST reply codes to string
 PJLINK_ERST_STATUS = {
-    '0': 'OK',
-    '1': ERROR_STRING[E_WARN],
-    '2': ERROR_STRING[E_ERROR],
-    'OK': '0',
-    E_OK: '0',
+    '0': S_OK,
+    '1': E_WARN,
+    '2': E_ERROR,
+    S_OK: '0',
     E_WARN: '1',
     E_ERROR: '2'
 }
 
-# Map for POWR return codes to status code
+# Map POWR return codes to status code
 PJLINK_POWR_STATUS = {
     '0': S_STANDBY,
     '1': S_ON,
