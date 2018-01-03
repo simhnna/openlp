@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -407,8 +407,8 @@ is the function which has to be called from outside. The generated and returned 
         </html>
 """
 import logging
-
 from string import Template
+
 from PyQt5 import QtWebKit
 
 from openlp.core.common.settings import Settings

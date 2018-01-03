@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -29,8 +29,8 @@ from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songs.forms.authorsform import AuthorsForm
-from openlp.plugins.songs.forms.topicsform import TopicsForm
 from openlp.plugins.songs.forms.songbookform import SongBookForm
+from openlp.plugins.songs.forms.topicsform import TopicsForm
 from openlp.plugins.songs.lib.db import Author, Book, Topic, Song
 from .songmaintenancedialog import Ui_SongMaintenanceDialog
 

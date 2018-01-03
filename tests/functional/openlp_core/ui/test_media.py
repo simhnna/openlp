@@ -28,7 +28,6 @@ from unittest.mock import patch
 from PyQt5 import QtCore
 
 from openlp.core.ui.media import get_media_players, parse_optical_path
-
 from tests.helpers.testmixin import TestMixin
 
 

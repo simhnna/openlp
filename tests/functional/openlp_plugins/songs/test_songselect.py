@@ -5,7 +5,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -33,7 +33,6 @@ from openlp.core.common.registry import Registry
 from openlp.plugins.songs.forms.songselectform import SongSelectForm, SearchWorker
 from openlp.plugins.songs.lib import Song
 from openlp.plugins.songs.lib.songselect import SongSelectImport, LOGOUT_URL, BASE_URL
-
 from tests.helpers.songfileimport import SongImportTestHelper
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import RESOURCE_PATH

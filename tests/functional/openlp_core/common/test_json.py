@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,8 +26,8 @@ import json
 from unittest import TestCase
 from unittest.mock import patch
 
-from openlp.core.common.path import Path
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
+from openlp.core.common.path import Path
 
 
 class TestOpenLPJsonDecoder(TestCase):

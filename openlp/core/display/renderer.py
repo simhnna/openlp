@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -21,10 +21,11 @@
 ###############################################################################
 
 import re
-
 from string import Template
+
 from PyQt5 import QtGui, QtCore, QtWebKitWidgets
 
+from openlp.core.common import ThemeLevel
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import path_to_str
 from openlp.core.common.registry import Registry, RegistryBase
@@ -32,7 +33,6 @@ from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
 from openlp.core.lib import FormattingTags, ImageSource, ItemCapabilities, ServiceItem, expand_tags, build_chords_css, \
     build_lyrics_format_css, build_lyrics_outline_css
-from openlp.core.common import ThemeLevel
 from openlp.core.ui.maindisplay import MainDisplay
 
 VERSE = 'The Lord said to {r}Noah{/r}: \n' \

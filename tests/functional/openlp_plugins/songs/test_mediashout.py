@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -27,6 +27,7 @@ from unittest import TestCase, skipUnless
 from unittest.mock import MagicMock, patch, call
 
 from openlp.core.common.registry import Registry
+
 try:
     from openlp.plugins.songs.lib.importers.mediashout import MediaShoutImport
     CAN_RUN_TESTS = True

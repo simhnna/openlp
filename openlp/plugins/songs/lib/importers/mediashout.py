@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -27,8 +27,9 @@ a MediaShout database into the OpenLP database.
 # WARNING: See https://docs.python.org/3/library/sqlite3.html for value substitution
 #          in SQL statements
 
-import pyodbc
 import logging
+
+import pyodbc
 
 from openlp.core.common.i18n import translate
 from openlp.plugins.songs.lib.importers.songimport import SongImport

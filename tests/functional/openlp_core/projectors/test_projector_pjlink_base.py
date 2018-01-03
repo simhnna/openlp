@@ -28,7 +28,6 @@ from unittest.mock import call, patch, MagicMock
 from openlp.core.projectors.constants import E_PARAMETER, STATUS_CODE, S_ON, S_CONNECTED, QSOCKET_STATE
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
-
 from tests.resources.projector.data import TEST1_DATA
 
 pjlink_test = PJLink(Projector(**TEST1_DATA), no_poll=True)

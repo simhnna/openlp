@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -20,14 +20,14 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-import re
 import logging
+import re
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.common.i18n import translate
 from openlp.core.common.settings import Settings
+from openlp.core.lib.ui import critical_error_message_box
 from openlp.plugins.songs.forms.editversedialog import Ui_EditVerseDialog
 from openlp.plugins.songs.lib import VerseType, transpose_lyrics
 
