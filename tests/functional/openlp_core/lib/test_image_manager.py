@@ -25,20 +25,113 @@ Package to test the openlp.core.ui package.
 import os
 import time
 from threading import Lock
-from unittest import TestCase
-from unittest.mock import patch
+from unittest import TestCase, skip
+from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtGui
 
 from openlp.core.common.registry import Registry
 from openlp.core.display.screens import ScreenList
-from openlp.core.lib.imagemanager import ImageManager, Priority
+from openlp.core.lib.imagemanager import ImageWorker, ImageManager, Priority, PriorityQueue
 
 from tests.helpers.testmixin import TestMixin
 
 TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
 
 
+class TestImageWorker(TestCase, TestMixin):
+    """
+    Test all the methods in the ImageWorker class
+    """
+    def test_init(self):
+        """
+        Test the constructor of the ImageWorker
+        """
+        # GIVEN: An ImageWorker class and a mocked ImageManager
+        mocked_image_manager = MagicMock()
+
+        # WHEN: Creating the ImageWorker
+        worker = ImageWorker(mocked_image_manager)
+
+        # THEN: The image_manager attribute should be set correctly
+        assert worker.image_manager is mocked_image_manager, \
+            'worker.image_manager should have been the mocked_image_manager'
+
+    @patch('openlp.core.lib.imagemanager.ThreadWorker.quit')
+    def test_start(self, mocked_quit):
+        """
+        Test that the start() method of the image worker calls the process method and then emits quit.
+        """
+        # GIVEN: A mocked image_manager and a new image worker
+        mocked_image_manager = MagicMock()
+        worker = ImageWorker(mocked_image_manager)
+
+        # WHEN: start() is called
+        worker.start()
+
+        # THEN: process() should have been called and quit should have been emitted
+        mocked_image_manager.process.assert_called_once_with()
+        mocked_quit.emit.assert_called_once_with()
+
+    def test_stop(self):
+        """
+        Test that the stop method does the right thing
+        """
+        # GIVEN: A mocked image_manager and a worker
+        mocked_image_manager = MagicMock()
+        worker = ImageWorker(mocked_image_manager)
+
+        # WHEN: The stop() method is called
+        worker.stop()
+
+        # THEN: The stop_manager attrivute should have been set to True
+        assert mocked_image_manager.stop_manager is True, 'mocked_image_manager.stop_manager should have been True'
+
+
+class TestPriorityQueue(TestCase, TestMixin):
+    """
+    Test the PriorityQueue class
+    """
+    @patch('openlp.core.lib.imagemanager.PriorityQueue.remove')
+    @patch('openlp.core.lib.imagemanager.PriorityQueue.put')
+    def test_modify_priority(self, mocked_put, mocked_remove):
+        """
+        Test the modify_priority() method of PriorityQueue
+        """
+        # GIVEN: An instance of a PriorityQueue and a mocked image
+        mocked_image = MagicMock()
+        mocked_image.priority = Priority.Normal
+        mocked_image.secondary_priority = Priority.Low
+        queue = PriorityQueue()
+
+        # WHEN: modify_priority is called with a mocked image and a new priority
+        queue.modify_priority(mocked_image, Priority.High)
+
+        # THEN: The remove() method should have been called, image priority updated and put() called
+        mocked_remove.assert_called_once_with(mocked_image)
+        assert mocked_image.priority == Priority.High, 'The priority should have been Priority.High'
+        mocked_put.assert_called_once_with((Priority.High, Priority.Low, mocked_image))
+
+    def test_remove(self):
+        """
+        Test the remove() method of PriorityQueue
+        """
+        # GIVEN: A PriorityQueue instance with a mocked image and queue
+        mocked_image = MagicMock()
+        mocked_image.priority = Priority.High
+        mocked_image.secondary_priority = Priority.Normal
+        queue = PriorityQueue()
+
+        # WHEN: An image is removed
+        with patch.object(queue, 'queue') as mocked_queue:
+            mocked_queue.__contains__.return_value = True
+            queue.remove(mocked_image)
+
+        # THEN: The mocked queue.remove() method should have been called
+        mocked_queue.remove.assert_called_once_with((Priority.High, Priority.Normal, mocked_image))
+
+
+@skip('Probably not going to use ImageManager in WebEngine/Reveal.js')
 class TestImageManager(TestCase, TestMixin):
 
     def setUp(self):
@@ -57,10 +150,10 @@ class TestImageManager(TestCase, TestMixin):
         Delete all the C++ objects at the end so that we don't have a segfault
         """
         self.image_manager.stop_manager = True
-        self.image_manager.image_thread.wait()
         del self.app
 
-    def test_basic_image_manager(self):
+    @patch('openlp.core.lib.imagemanager.run_thread')
+    def test_basic_image_manager(self, mocked_run_thread):
         """
         Test the Image Manager setup basic functionality
         """
@@ -86,7 +179,8 @@ class TestImageManager(TestCase, TestMixin):
             self.image_manager.get_image(TEST_PATH, 'church1.jpg')
         assert context.exception is not '', 'KeyError exception should have been thrown for missing image'
 
-    def test_different_dimension_image(self):
+    @patch('openlp.core.lib.imagemanager.run_thread')
+    def test_different_dimension_image(self, mocked_run_thread):
         """
         Test the Image Manager with dimensions
         """
@@ -118,57 +212,58 @@ class TestImageManager(TestCase, TestMixin):
             self.image_manager.get_image(full_path, 'church.jpg', 120, 120)
         assert context.exception is not '', 'KeyError exception should have been thrown for missing dimension'
 
-    def test_process_cache(self):
+    @patch('openlp.core.lib.imagemanager.resize_image')
+    @patch('openlp.core.lib.imagemanager.image_to_byte')
+    @patch('openlp.core.lib.imagemanager.run_thread')
+    def test_process_cache(self, mocked_run_thread, mocked_image_to_byte, mocked_resize_image):
         """
         Test the process_cache method
         """
-        with patch('openlp.core.lib.imagemanager.resize_image') as mocked_resize_image, \
-                patch('openlp.core.lib.imagemanager.image_to_byte') as mocked_image_to_byte:
-            # GIVEN: Mocked functions
-            mocked_resize_image.side_effect = self.mocked_resize_image
-            mocked_image_to_byte.side_effect = self.mocked_image_to_byte
-            image1 = 'church.jpg'
-            image2 = 'church2.jpg'
-            image3 = 'church3.jpg'
-            image4 = 'church4.jpg'
+        # GIVEN: Mocked functions
+        mocked_resize_image.side_effect = self.mocked_resize_image
+        mocked_image_to_byte.side_effect = self.mocked_image_to_byte
+        image1 = 'church.jpg'
+        image2 = 'church2.jpg'
+        image3 = 'church3.jpg'
+        image4 = 'church4.jpg'
 
-            # WHEN: Add the images. Then get the lock (=queue can not be processed).
-            self.lock.acquire()
-            self.image_manager.add_image(TEST_PATH, image1, None)
-            self.image_manager.add_image(TEST_PATH, image2, None)
+        # WHEN: Add the images. Then get the lock (=queue can not be processed).
+        self.lock.acquire()
+        self.image_manager.add_image(TEST_PATH, image1, None)
+        self.image_manager.add_image(TEST_PATH, image2, None)
 
-            # THEN: All images have been added to the queue, and only the first image is not be in the list anymore, but
-            #  is being processed (see mocked methods/functions).
-            # Note: Priority.Normal means, that the resize_image() was not completed yet (because afterwards the #
-            # priority is adjusted to Priority.Lowest).
-            assert self.get_image_priority(image1) == Priority.Normal, "image1's priority should be 'Priority.Normal'"
-            assert self.get_image_priority(image2) == Priority.Normal, "image2's priority should be 'Priority.Normal'"
+        # THEN: All images have been added to the queue, and only the first image is not be in the list anymore, but
+        #  is being processed (see mocked methods/functions).
+        # Note: Priority.Normal means, that the resize_image() was not completed yet (because afterwards the #
+        # priority is adjusted to Priority.Lowest).
+        assert self.get_image_priority(image1) == Priority.Normal, "image1's priority should be 'Priority.Normal'"
+        assert self.get_image_priority(image2) == Priority.Normal, "image2's priority should be 'Priority.Normal'"
 
-            # WHEN: Add more images.
-            self.image_manager.add_image(TEST_PATH, image3, None)
-            self.image_manager.add_image(TEST_PATH, image4, None)
-            # Allow the queue to process.
-            self.lock.release()
-            # Request some "data".
-            self.image_manager.get_image_bytes(TEST_PATH, image4)
-            self.image_manager.get_image(TEST_PATH, image3)
-            # Now the mocked methods/functions do not have to sleep anymore.
-            self.sleep_time = 0
-            # Wait for the queue to finish.
-            while not self.image_manager._conversion_queue.empty():
-                time.sleep(0.1)
-            # Because empty() is not reliable, wait a litte; just to make sure.
+        # WHEN: Add more images.
+        self.image_manager.add_image(TEST_PATH, image3, None)
+        self.image_manager.add_image(TEST_PATH, image4, None)
+        # Allow the queue to process.
+        self.lock.release()
+        # Request some "data".
+        self.image_manager.get_image_bytes(TEST_PATH, image4)
+        self.image_manager.get_image(TEST_PATH, image3)
+        # Now the mocked methods/functions do not have to sleep anymore.
+        self.sleep_time = 0
+        # Wait for the queue to finish.
+        while not self.image_manager._conversion_queue.empty():
             time.sleep(0.1)
-            # THEN: The images' priority reflect how they were processed.
-            assert self.image_manager._conversion_queue.qsize() == 0, "The queue should be empty."
-            assert self.get_image_priority(image1) == Priority.Lowest, \
-                "The image should have not been requested (=Lowest)"
-            assert self.get_image_priority(image2) == Priority.Lowest, \
-                "The image should have not been requested (=Lowest)"
-            assert self.get_image_priority(image3) == Priority.Low, \
-                "Only the QImage should have been requested (=Low)."
-            assert self.get_image_priority(image4) == Priority.Urgent, \
-                "The image bytes should have been requested (=Urgent)."
+        # Because empty() is not reliable, wait a litte; just to make sure.
+        time.sleep(0.1)
+        # THEN: The images' priority reflect how they were processed.
+        assert self.image_manager._conversion_queue.qsize() == 0, "The queue should be empty."
+        assert self.get_image_priority(image1) == Priority.Lowest, \
+            "The image should have not been requested (=Lowest)"
+        assert self.get_image_priority(image2) == Priority.Lowest, \
+            "The image should have not been requested (=Lowest)"
+        assert self.get_image_priority(image3) == Priority.Low, \
+            "Only the QImage should have been requested (=Low)."
+        assert self.get_image_priority(image4) == Priority.Urgent, \
+            "The image bytes should have been requested (=Urgent)."
 
     def get_image_priority(self, image):
         """

@@ -155,7 +155,7 @@ class DownloadProgressDialog(QtWidgets.QProgressDialog):
         self.was_cancelled = False
         self.previous_size = 0
 
-    def _download_progress(self, count, block_size):
+    def update_progress(self, count, block_size):
         """
         Calculate and display the download progress.
         """

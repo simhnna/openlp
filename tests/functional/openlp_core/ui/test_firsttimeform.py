@@ -94,7 +94,6 @@ class TestFirstTimeForm(TestCase, TestMixin):
         assert frw.web_access is True, 'The default value of self.web_access should be True'
         assert frw.was_cancelled is False, 'The default value of self.was_cancelled should be False'
         assert [] == frw.theme_screenshot_threads, 'The list of threads should be empty'
-        assert [] == frw.theme_screenshot_workers, 'The list of workers should be empty'
         assert frw.has_run_wizard is False, 'has_run_wizard should be False'
 
     def test_set_defaults(self):
@@ -157,32 +156,33 @@ class TestFirstTimeForm(TestCase, TestMixin):
             mocked_display_combo_box.count.assert_called_with()
             mocked_display_combo_box.setCurrentIndex.assert_called_with(1)
 
-    def test_on_cancel_button_clicked(self):
+    @patch('openlp.core.ui.firsttimeform.time')
+    @patch('openlp.core.ui.firsttimeform.get_thread_worker')
+    @patch('openlp.core.ui.firsttimeform.is_thread_finished')
+    def test_on_cancel_button_clicked(self, mocked_is_thread_finished, mocked_get_thread_worker, mocked_time):
         """
         Test that the cancel button click slot shuts down the threads correctly
         """
         # GIVEN: A FRW, some mocked threads and workers (that isn't quite done) and other mocked stuff
+        mocked_worker = MagicMock()
+        mocked_get_thread_worker.return_value = mocked_worker
+        mocked_is_thread_finished.side_effect = [False, True]
         frw = FirstTimeForm(None)
         frw.initialize(MagicMock())
-        mocked_worker = MagicMock()
-        mocked_thread = MagicMock()
-        mocked_thread.isRunning.side_effect = [True, False]
-        frw.theme_screenshot_workers.append(mocked_worker)
-        frw.theme_screenshot_threads.append(mocked_thread)
-        with patch('openlp.core.ui.firsttimeform.time') as mocked_time, \
-                patch.object(frw.application, 'set_normal_cursor') as mocked_set_normal_cursor:
+        frw.theme_screenshot_threads = ['test_thread']
+        with patch.object(frw.application, 'set_normal_cursor') as mocked_set_normal_cursor:
 
             # WHEN: on_cancel_button_clicked() is called
             frw.on_cancel_button_clicked()
 
             # THEN: The right things should be called in the right order
             assert frw.was_cancelled is True, 'The was_cancelled property should have been set to True'
+            mocked_get_thread_worker.assert_called_once_with('test_thread')
             mocked_worker.set_download_canceled.assert_called_with(True)
-            mocked_thread.isRunning.assert_called_with()
-            assert 2 == mocked_thread.isRunning.call_count, 'isRunning() should have been called twice'
-            mocked_time.sleep.assert_called_with(0.1)
-            assert 1 == mocked_time.sleep.call_count, 'sleep() should have only been called once'
-            mocked_set_normal_cursor.assert_called_with()
+            mocked_is_thread_finished.assert_called_with('test_thread')
+            assert mocked_is_thread_finished.call_count == 2, 'isRunning() should have been called twice'
+            mocked_time.sleep.assert_called_once_with(0.1)
+            mocked_set_normal_cursor.assert_called_once_with()
 
     def test_broken_config(self):
         """

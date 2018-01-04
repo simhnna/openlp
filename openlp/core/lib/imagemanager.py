@@ -57,10 +57,16 @@ class ImageWorker(ThreadWorker):
 
     def start(self):
         """
-        Run the thread.
+        Start the worker
         """
         self.image_manager.process()
         self.quit.emit()
+
+    def stop(self):
+        """
+        Stop the worker
+        """
+        self.image_manager.stop_manager = True
 
 
 class Priority(object):
@@ -132,7 +138,7 @@ class Image(object):
 
 class PriorityQueue(queue.PriorityQueue):
     """
-    Customised ``Queue.PriorityQueue``.
+    Customised ``queue.PriorityQueue``.
 
     Each item in the queue must be a tuple with three values. The first value is the :class:`Image`'s ``priority``
     attribute, the second value the :class:`Image`'s ``secondary_priority`` attribute. The last value the :class:`Image`
@@ -310,9 +316,7 @@ class ImageManager(QtCore.QObject):
                 if image.path == path and image.timestamp != os.stat(path).st_mtime:
                     image.timestamp = os.stat(path).st_mtime
                     self._reset_image(image)
-        # We want only one thread.
-        if not self.image_thread.isRunning():
-            self.image_thread.start()
+        self.process_updates()
 
     def process(self):
         """

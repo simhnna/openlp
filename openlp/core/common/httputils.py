@@ -20,7 +20,7 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 """
-The :mod:`openlp.core.utils` module provides the utility libraries for OpenLP.
+The :mod:`openlp.core.common.httputils` module provides the utility methods for downloading stuff.
 """
 import hashlib
 import logging
@@ -104,7 +104,7 @@ def get_web_page(url, headers=None, update_openlp=False, proxies=None):
             if retries >= CONNECTION_RETRIES:
                 raise ConnectionError('Unable to connect to {url}, see log for details'.format(url=url))
             retries += 1
-        except:
+        except:                                                                # noqa
             # Don't know what's happening, so reraise the original
             log.exception('Unknown error when trying to connect to {url}'.format(url=url))
             raise
@@ -136,12 +136,12 @@ def get_url_file_size(url):
                 continue
 
 
-def url_get_file(callback, url, file_path, sha256=None):
+def download_file(update_object, url, file_path, sha256=None):
     """"
     Download a file given a URL.  The file is retrieved in chunks, giving the ability to cancel the download at any
     point. Returns False on download error.
 
-    :param callback: the class which needs to be updated
+    :param update_object: the object which needs to be updated
     :param url: URL to download
     :param file_path: Destination file
     :param sha256: The check sum value to be checked against the download value
@@ -158,13 +158,14 @@ def url_get_file(callback, url, file_path, sha256=None):
                     hasher = hashlib.sha256()
                 # Download until finished or canceled.
                 for chunk in response.iter_content(chunk_size=block_size):
-                    if callback.was_cancelled:
+                    if hasattr(update_object, 'was_cancelled') and update_object.was_cancelled:
                         break
                     saved_file.write(chunk)
                     if sha256:
                         hasher.update(chunk)
                     block_count += 1
-                    callback._download_progress(block_count, block_size)
+                    if hasattr(update_object, 'update_progress'):
+                        update_object.update_progress(block_count, block_size)
                 response.close()
             if sha256 and hasher.hexdigest() != sha256:
                 log.error('sha256 sums did not match for file %s, got %s, expected %s', file_path, hasher.hexdigest(),
@@ -183,7 +184,7 @@ def url_get_file(callback, url, file_path, sha256=None):
                 retries += 1
                 time.sleep(0.1)
                 continue
-    if callback.was_cancelled and file_path.exists():
+    if hasattr(update_object, 'was_cancelled') and update_object.was_cancelled and file_path.exists():
         file_path.unlink()
     return True
 

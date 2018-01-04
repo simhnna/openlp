@@ -36,7 +36,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import clean_button_text, trace_error_handler
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.httputils import get_web_page, get_url_file_size, url_get_file, CONNECTION_TIMEOUT
+from openlp.core.common.httputils import get_web_page, get_url_file_size, download_file, CONNECTION_TIMEOUT
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.path import Path, create_paths
@@ -55,37 +55,35 @@ class ThemeScreenshotWorker(ThreadWorker):
     This thread downloads a theme's screenshot
     """
     screenshot_downloaded = QtCore.pyqtSignal(str, str, str)
-    finished = QtCore.pyqtSignal()
 
     def __init__(self, themes_url, title, filename, sha256, screenshot):
         """
         Set up the worker object
         """
-        self.was_download_cancelled = False
+        self.was_cancelled = False
         self.themes_url = themes_url
         self.title = title
         self.filename = filename
         self.sha256 = sha256
         self.screenshot = screenshot
-        socket.setdefaulttimeout(CONNECTION_TIMEOUT)
         super().__init__()
 
     def start(self):
         """
         Run the worker
         """
-        if self.was_download_cancelled:
+        if self.was_cancelled:
             return
         try:
-            urllib.request.urlretrieve('{host}{name}'.format(host=self.themes_url, name=self.screenshot),
+            is_success = download_file(self, '{host}{name}'.format(host=self.themes_url, name=self.screenshot),
                                        os.path.join(gettempdir(), 'openlp', self.screenshot))
-            # Signal that the screenshot has been downloaded
-            self.screenshot_downloaded.emit(self.title, self.filename, self.sha256)
+            if is_success and not self.was_cancelled:
+                # Signal that the screenshot has been downloaded
+                self.screenshot_downloaded.emit(self.title, self.filename, self.sha256)
         except:                                                                 # noqa
             log.exception('Unable to download screenshot')
         finally:
             self.quit.emit()
-            self.finished.emit()
 
     @QtCore.pyqtSlot(bool)
     def set_download_canceled(self, toggle):
@@ -358,7 +356,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                     worker.set_download_canceled(True)
         # Was the thread created.
         if self.theme_screenshot_threads:
-            while any([thread.isRunning() for thread in self.theme_screenshot_threads]):
+            while any([not is_thread_finished(thread_name) for thread_name in self.theme_screenshot_threads]):
                 time.sleep(0.1)
         self.application.set_normal_cursor()
 
@@ -562,7 +560,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=filename), 0)
                 self.previous_size = 0
                 destination = Path(songs_destination, str(filename))
-                if not url_get_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
+                if not download_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
                                     destination, sha256):
                     missed_files.append('Song: {name}'.format(name=filename))
         # Download Bibles
@@ -573,7 +571,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 bible, sha256 = item.data(0, QtCore.Qt.UserRole)
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
-                if not url_get_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
+                if not download_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
                                     Path(bibles_destination, bible),
                                     sha256):
                     missed_files.append('Bible: {name}'.format(name=bible))
@@ -585,7 +583,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 theme, sha256 = item.data(QtCore.Qt.UserRole)
                 self._increment_progress_bar(self.downloading.format(name=theme), 0)
                 self.previous_size = 0
-                if not url_get_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
+                if not download_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
                                     Path(themes_destination, theme),
                                     sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
