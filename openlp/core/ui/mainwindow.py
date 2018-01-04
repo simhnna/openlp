@@ -24,7 +24,6 @@ This is the main window, where all the action happens.
 """
 import logging
 import sys
-import time
 from datetime import datetime
 from distutils import dir_util
 from distutils.errors import DistutilsFileError
@@ -548,6 +547,36 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # Reset the cursor
         self.application.set_normal_cursor()
 
+    def _wait_for_threads(self):
+        """
+        Wait for the threads
+        """
+        # Sometimes the threads haven't finished, let's wait for them
+        wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
+        wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
+        wait_dialog.setAutoClose(False)
+        wait_dialog.setCancelButton(None)
+        wait_dialog.show()
+        for thread_name in self.threads.keys():
+            self.application.processEvents()
+            thread = self.threads[thread_name]['thread']
+            try:
+                if thread and thread.isRunning():
+                    # If the thread is running, let's wait 5 seconds for it
+                    retry = 0
+                    while thread.isRunning() and retry < 50:
+                        # Make the GUI responsive while we wait
+                        self.application.processEvents()
+                        thread.wait(100)
+                        retry += 1
+                    if thread.isRunning():
+                        # If the thread is still running after 5 seconds, kill it
+                        thread.terminate()
+            except RuntimeError:
+                # Ignore the RuntimeError that is thrown when Qt has already deleted the C++ thread object
+                pass
+        wait_dialog.close()
+
     def bootstrap_post_set_up(self):
         """
         process the bootstrap post setup request
@@ -999,31 +1028,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if not self.application.is_event_loop_active:
             event.ignore()
             return
-        # Sometimes the threads haven't finished, let's wait for them
-        wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
-        wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
-        wait_dialog.setAutoClose(False)
-        wait_dialog.setCancelButton(None)
-        wait_dialog.show()
-        for thread_name in self.threads.keys():
-            self.application.processEvents()
-            thread = self.threads[thread_name]['thread']
-            try:
-                if thread and thread.isRunning():
-                    # If the thread is running, let's wait 5 seconds for it
-                    retry = 0
-                    while thread.isRunning() and retry < 50:
-                        # Make the GUI responsive while we wait
-                        self.application.processEvents()
-                        thread.wait(100)
-                        retry += 1
-                    if thread.isRunning():
-                        # If the thread is still running after 5 seconds, kill it
-                        thread.terminate()
-            except RuntimeError:
-                # Ignore the RuntimeError that is thrown when Qt has already deleted the C++ thread object
-                pass
-        wait_dialog.close()
         # If we just did a settings import, close without saving changes.
         if self.settings_imported:
             self.clean_up(False)
@@ -1060,6 +1064,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
             else:
                 self.clean_up()
                 event.accept()
+        if event.isAccepted():
+            self._wait_for_threads()
 
     def clean_up(self, save_settings=True):
         """
