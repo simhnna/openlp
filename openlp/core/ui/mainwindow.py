@@ -558,6 +558,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         wait_dialog.setCancelButton(None)
         wait_dialog.show()
         for thread_name in self.threads.keys():
+            log.debug('Waiting for thread %s', thread_name)
             self.application.processEvents()
             thread = self.threads[thread_name]['thread']
             worker = self.threads[thread_name]['worker']

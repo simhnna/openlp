@@ -118,7 +118,7 @@ class WebSocketServer(RegistryProperties, LogMixin):
                 log.debug("Web Socket Server started for class {address} {port}".format(address=address, port=port))
                 break
             except Exception as e:
-                log.error('Failed to start ws server {why}'.format(why=e))
+                log.exception('Failed to start ws server {why}'.format(why=e))
                 loop += 1
                 time.sleep(0.1)
 
