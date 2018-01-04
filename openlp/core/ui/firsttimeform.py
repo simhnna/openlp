@@ -23,8 +23,6 @@
 This module contains the first time wizard.
 """
 import logging
-import os
-import socket
 import time
 import urllib.error
 import urllib.parse
@@ -36,7 +34,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import clean_button_text, trace_error_handler
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.httputils import get_web_page, get_url_file_size, download_file, CONNECTION_TIMEOUT
+from openlp.core.common.httputils import get_web_page, get_url_file_size, download_file
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.path import Path, create_paths
@@ -75,8 +73,9 @@ class ThemeScreenshotWorker(ThreadWorker):
         if self.was_cancelled:
             return
         try:
+            download_path = Path(gettempdir()) / 'openlp' / self.screenshot
             is_success = download_file(self, '{host}{name}'.format(host=self.themes_url, name=self.screenshot),
-                                       os.path.join(gettempdir(), 'openlp', self.screenshot))
+                                       download_path)
             if is_success and not self.was_cancelled:
                 # Signal that the screenshot has been downloaded
                 self.screenshot_downloaded.emit(self.title, self.filename, self.sha256)
@@ -561,7 +560,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self.previous_size = 0
                 destination = songs_destination_path / str(filename)
                 if not download_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
-                                    destination, sha256):
+                                     destination, sha256):
                     missed_files.append('Song: {name}'.format(name=filename))
         # Download Bibles
         bibles_iterator = QtWidgets.QTreeWidgetItemIterator(self.bibles_tree_widget)
@@ -572,7 +571,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
                 if not download_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
-                                    bibles_destination_path / bible, sha256):
+                                     bibles_destination_path / bible, sha256):
                     missed_files.append('Bible: {name}'.format(name=bible))
             bibles_iterator += 1
         # Download themes
@@ -583,7 +582,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=theme), 0)
                 self.previous_size = 0
                 if not download_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
-                                    themes_destination_path / theme, sha256):
+                                     themes_destination_path / theme, sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
         if missed_files:
             file_list = ''
