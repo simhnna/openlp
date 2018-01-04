@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,10 +24,9 @@ The :mod:`powersong` module provides the functionality for importing
 PowerSong songs into the OpenLP database.
 """
 import logging
-import fnmatch
-import os
 
 from openlp.core.common.i18n import translate
+from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 
 log = logging.getLogger(__name__)
@@ -89,26 +88,25 @@ class PowerSongImport(SongImport):
         """
         from openlp.plugins.songs.lib.importer import SongFormat
         ps_string = SongFormat.get(SongFormat.PowerSong, 'name')
-        if isinstance(self.import_source, str):
-            if os.path.isdir(self.import_source):
+        if isinstance(self.import_source, Path):
+            if self.import_source.is_dir():
                 dir = self.import_source
                 self.import_source = []
-                for file in os.listdir(dir):
-                    if fnmatch.fnmatch(file, '*.song'):
-                        self.import_source.append(os.path.join(dir, file))
+                for path in dir.glob('*.song'):
+                    self.import_source.append(path)
             else:
-                self.import_source = ''
+                self.import_source = None
         if not self.import_source or not isinstance(self.import_source, list):
             self.log_error(translate('SongsPlugin.PowerSongImport', 'No songs to import.'),
                            translate('SongsPlugin.PowerSongImport', 'No {text} files found.').format(text=ps_string))
             return
         self.import_wizard.progress_bar.setMaximum(len(self.import_source))
-        for file in self.import_source:
+        for file_path in self.import_source:
             if self.stop_import_flag:
                 return
             self.set_defaults()
             parse_error = False
-            with open(file, 'rb') as song_data:
+            with file_path.open('rb') as song_data:
                 while True:
                     try:
                         label = self._read_string(song_data)
@@ -117,7 +115,7 @@ class PowerSongImport(SongImport):
                         field = self._read_string(song_data)
                     except ValueError:
                         parse_error = True
-                        self.log_error(os.path.basename(file),
+                        self.log_error(file_path.name,
                                        translate('SongsPlugin.PowerSongImport',
                                                  'Invalid {text} file. Unexpected byte value.').format(text=ps_string))
                         break
@@ -135,7 +133,7 @@ class PowerSongImport(SongImport):
                 continue
             # Check that file had TITLE field
             if not self.title:
-                self.log_error(os.path.basename(file),
+                self.log_error(file_path.name,
                                translate('SongsPlugin.PowerSongImport',
                                          'Invalid {text} file. Missing "TITLE" header.').format(text=ps_string))
                 continue

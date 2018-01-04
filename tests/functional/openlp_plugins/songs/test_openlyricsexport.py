@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,10 +26,9 @@ from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
 from openlp.plugins.songs.lib.openlyricsexport import OpenLyricsExport
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -72,9 +71,7 @@ class TestOpenLyricsExport(TestCase, TestMixin):
             ol_export.do_export()
 
             # THEN: The exporter should have created 2 files
-            self.assertTrue((self.temp_folder /
-                             '{title} ({display_name}).xml'.format(
-                                 title=song.title, display_name=author.display_name)).exists())
-            self.assertTrue((self.temp_folder /
-                             '{title} ({display_name})-1.xml'.format(
-                                 title=song.title, display_name=author.display_name)).exists())
+            assert (self.temp_folder / '{title} ({display_name}).xml'.format(
+                title=song.title, display_name=author.display_name)).exists() is True
+            assert (self.temp_folder / '{title} ({display_name})-1.xml'.format(
+                title=song.title, display_name=author.display_name)).exists() is True

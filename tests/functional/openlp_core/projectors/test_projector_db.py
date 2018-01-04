@@ -28,7 +28,6 @@ PREREQUISITE: add_record() and get_all() functions validated.
 import os
 import shutil
 from tempfile import mkdtemp
-
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -36,7 +35,6 @@ from openlp.core.lib.db import upgrade_db
 from openlp.core.projectors import upgrade
 from openlp.core.projectors.constants import PJLINK_PORT
 from openlp.core.projectors.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
-
 from tests.resources.projector.data import TEST_DB_PJLINK1, TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
 from tests.utils.constants import TEST_RESOURCES_PATH
 

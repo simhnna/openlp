@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -23,16 +23,34 @@
 The :mod:`listpreviewwidget` is a widget that lists the slides in the slide controller.
 It is based on a QTableWidget but represents its contents in list form.
 """
-import os
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_win
 from openlp.core.common.i18n import UiStrings
 from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ImageSource, ItemCapabilities, ServiceItem
+
+
+def handle_mime_data_urls(mime_data):
+    """
+    Process the data from a drag and drop operation.
+
+    :param PyQt5.QtCore.QMimeData mime_data: The mime data from the drag and drop opperation.
+    :return: A list of file paths that were dropped
+    :rtype: list[openlp.core.common.path.Path]
+    """
+    file_paths = []
+    for url in mime_data.urls():
+        local_path = Path(url.toLocalFile())
+        if local_path.is_file():
+            file_paths.append(local_path)
+        elif local_path.is_dir():
+            for path in local_path.iterdir():
+                file_paths.append(path)
+    return file_paths
 
 
 class ListPreviewWidget(QtWidgets.QTableWidget, RegistryProperties):
@@ -326,17 +344,9 @@ class ListWidgetWithDnD(QtWidgets.QListWidget):
         if event.mimeData().hasUrls():
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
-            files = []
-            for url in event.mimeData().urls():
-                local_file = os.path.normpath(url.toLocalFile())
-                if os.path.isfile(local_file):
-                    files.append(local_file)
-                elif os.path.isdir(local_file):
-                    listing = os.listdir(local_file)
-                    for file in listing:
-                        files.append(os.path.join(local_file, file))
+            file_paths = handle_mime_data_urls(event.mimeData())
             Registry().execute('{mime_data}_dnd'.format(mime_data=self.mime_data_text),
-                               {'files': files})
+                               {'file_paths': file_paths})
         else:
             event.ignore()
 
@@ -454,16 +464,9 @@ class TreeWidgetWithDnD(QtWidgets.QTreeWidget):
         if event.mimeData().hasUrls():
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()
-            files = []
-            for url in event.mimeData().urls():
-                local_file = url.toLocalFile()
-                if os.path.isfile(local_file):
-                    files.append(local_file)
-                elif os.path.isdir(local_file):
-                    listing = os.listdir(local_file)
-                    for file_name in listing:
-                        files.append(os.path.join(local_file, file_name))
-            Registry().execute('%s_dnd' % self.mime_data_text, {'files': files, 'target': self.itemAt(event.pos())})
+            file_paths = handle_mime_data_urls(event.mimeData())
+            Registry().execute('%s_dnd' % self.mime_data_text,
+                               {'file_paths': file_paths, 'target': self.itemAt(event.pos())})
         elif self.allow_internal_dnd:
             event.setDropAction(QtCore.Qt.CopyAction)
             event.accept()

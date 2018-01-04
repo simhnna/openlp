@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,10 +22,8 @@
 """
 This module contains tests for the CSV Bible importer.
 """
-import os
-import json
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from openlp.core.common.registry import Registry
 from openlp.plugins.alerts.lib.alertsmanager import AlertsManager
@@ -51,7 +49,7 @@ class TestAlertManager(TestCase):
         alert_manager.alert_text('')
 
         # THEN: the display should not have been triggered
-        self.assertFalse(alert_manager.display_alert.called, 'The Alert should not have been called')
+        assert alert_manager.display_alert.called is False, 'The Alert should not have been called'
 
     def test_trigger_message_text(self):
         """
@@ -65,7 +63,7 @@ class TestAlertManager(TestCase):
         alert_manager.alert_text(['This is a string'])
 
         # THEN: the display should have been triggered
-        self.assertTrue(alert_manager.display_alert.called, 'The Alert should have been called')
+        assert alert_manager.display_alert.called is True, 'The Alert should have been called'
 
     def test_line_break_message_text(self):
         """
@@ -79,5 +77,5 @@ class TestAlertManager(TestCase):
         alert_manager.alert_text(['This is \n a string'])
 
         # THEN: the display should have been triggered
-        self.assertTrue(alert_manager.display_alert.called, 'The Alert should have been called')
+        assert alert_manager.display_alert.called is True, 'The Alert should have been called'
         alert_manager.display_alert.assert_called_once_with('This is   a string')

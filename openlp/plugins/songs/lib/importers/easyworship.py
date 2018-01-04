@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -25,10 +25,9 @@ The :mod:`easyworship` module provides the functionality for importing EasyWorsh
 import logging
 import os
 import re
+import sqlite3
 import struct
 import zlib
-
-import sqlite3
 
 from openlp.core.common.i18n import translate
 from openlp.core.common.path import Path

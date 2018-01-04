@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,9 +26,9 @@ import logging
 import os
 import socket
 import time
-import urllib.request
-import urllib.parse
 import urllib.error
+import urllib.parse
+import urllib.request
 from configparser import ConfigParser, MissingSectionHeaderError, NoOptionError, NoSectionError
 from tempfile import gettempdir
 
@@ -399,7 +399,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
             screenshot = self.config.get('theme_{theme}'.format(theme=theme), 'screenshot')
             item = self.themes_list_widget.item(index)
             if item:
-                item.setIcon(build_icon(os.path.join(gettempdir(), 'openlp', screenshot)))
+                item.setIcon(build_icon(Path(gettempdir(), 'openlp', screenshot)))
 
     def _download_progress(self, count, block_size):
         """
@@ -548,9 +548,9 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
         Download selected songs, bibles and themes. Returns False on download error
         """
         # Build directories for downloads
-        songs_destination = os.path.join(gettempdir(), 'openlp')
-        bibles_destination = str(AppLocation.get_section_data_path('bibles'))
-        themes_destination = str(AppLocation.get_section_data_path('themes'))
+        songs_destination_path = Path(gettempdir(), 'openlp')
+        bibles_destination_path = AppLocation.get_section_data_path('bibles')
+        themes_destination_path = AppLocation.get_section_data_path('themes')
         missed_files = []
         # Download songs
         for i in range(self.songs_list_widget.count()):
@@ -559,7 +559,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 filename, sha256 = item.data(QtCore.Qt.UserRole)
                 self._increment_progress_bar(self.downloading.format(name=filename), 0)
                 self.previous_size = 0
-                destination = Path(songs_destination, str(filename))
+                destination = songs_destination_path / str(filename)
                 if not download_file(self, '{path}{name}'.format(path=self.songs_url, name=filename),
                                     destination, sha256):
                     missed_files.append('Song: {name}'.format(name=filename))
@@ -572,8 +572,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=bible), 0)
                 self.previous_size = 0
                 if not download_file(self, '{path}{name}'.format(path=self.bibles_url, name=bible),
-                                    Path(bibles_destination, bible),
-                                    sha256):
+                                    bibles_destination_path / bible, sha256):
                     missed_files.append('Bible: {name}'.format(name=bible))
             bibles_iterator += 1
         # Download themes
@@ -584,8 +583,7 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
                 self._increment_progress_bar(self.downloading.format(name=theme), 0)
                 self.previous_size = 0
                 if not download_file(self, '{path}{name}'.format(path=self.themes_url, name=theme),
-                                    Path(themes_destination, theme),
-                                    sha256):
+                                    themes_destination_path / theme, sha256):
                     missed_files.append('Theme: {name}'.format(name=theme))
         if missed_files:
             file_list = ''

@@ -26,7 +26,6 @@ from unittest import TestCase
 from unittest.mock import patch
 
 from openlp.core.common.httputils import CONNECTION_RETRIES, get_web_page
-
 from tests.helpers.testmixin import TestMixin
 
 

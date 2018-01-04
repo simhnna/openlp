@@ -52,7 +52,7 @@ class TestPath(TestCase):
         result = path_to_str(None)
 
         # THEN: `path_to_str` should return an empty string
-        self.assertEqual(result, '')
+        assert result == ''
 
     def test_path_to_str_path_object(self):
         """
@@ -63,7 +63,7 @@ class TestPath(TestCase):
         result = path_to_str(Path('test/path'))
 
         # THEN: `path_to_str` should return a string representation of the Path object
-        self.assertEqual(result, os.path.join('test', 'path'))
+        assert result == os.path.join('test', 'path')
 
     def test_str_to_path_type_error(self):
         """
@@ -84,4 +84,4 @@ class TestPath(TestCase):
         result = str_to_path('')
 
         # THEN: `path_to_str` should return None
-        self.assertEqual(result, None)
+        assert result is None

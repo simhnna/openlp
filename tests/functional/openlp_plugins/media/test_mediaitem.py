@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -27,10 +27,9 @@ from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore
 
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.plugins.media.lib.mediaitem import MediaMediaItem
-
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
@@ -71,7 +70,7 @@ class MediaItemTest(TestCase, TestMixin):
         # WHEN: Retrieving the test file
         result = self.media_item.search('test.mp4', False)
         # THEN: a file should be found
-        self.assertEqual(result, [['test.mp4', 'test.mp4']], 'The result file contain the file name')
+        assert result == [['test.mp4', 'test.mp4']], 'The result file contain the file name'
 
     def test_search_not_found(self):
         """
@@ -82,4 +81,4 @@ class MediaItemTest(TestCase, TestMixin):
         # WHEN: Retrieving the test file
         result = self.media_item.search('test.mpx', False)
         # THEN: a file should be found
-        self.assertEqual(result, [], 'The result file should be empty')
+        assert result == [], 'The result file should be empty'

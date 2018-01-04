@@ -3,7 +3,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -21,15 +21,12 @@
 """
 This module contains tests for the SundayPlus song importer.
 """
-import os
 from unittest.mock import patch
 
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'sundayplussongs'))
+TEST_PATH = RESOURCE_PATH / 'songs' / 'sundayplus'
 
 
 class TestSundayPlusFileImport(SongImportTestHelper):
@@ -46,5 +43,5 @@ class TestSundayPlusFileImport(SongImportTestHelper):
         with patch('openlp.plugins.songs.lib.importers.sundayplus.retrieve_windows_encoding') as \
                 mocked_retrieve_windows_encoding:
             mocked_retrieve_windows_encoding.return_value = 'cp1252'
-            self.file_import([Path(TEST_PATH, 'Amazing Grace.ptf')],
-                             self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
+            self.file_import([TEST_PATH / 'Amazing Grace.ptf'],
+                             self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))

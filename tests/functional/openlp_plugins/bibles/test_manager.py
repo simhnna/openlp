@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -63,7 +63,7 @@ class TestManager(TestCase):
 
             # THEN: The session should have been closed and set to None, the bible should be deleted, and the result of
             #       the deletion returned.
-            self.assertTrue(result)
+            assert result is True
             mocked_close_all.assert_called_once_with()
-            self.assertIsNone(mocked_bible.session)
+            assert mocked_bible.session is None
             mocked_delete_file.assert_called_once_with(Path('bibles', 'KJV.sqlite'))

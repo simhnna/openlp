@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -32,10 +32,9 @@ from unittest.mock import patch
 from PyQt5.QtWidgets import QDialog
 
 from openlp.core.common.registry import Registry
-from openlp.core.projectors.db import ProjectorDB, Projector
 from openlp.core.projectors.constants import PJLINK_DEFAULT_CODES, PJLINK_DEFAULT_SOURCES
+from openlp.core.projectors.db import ProjectorDB, Projector
 from openlp.core.projectors.sourceselectform import source_group, SourceSelectSingle
-
 from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB, TEST1_DATA
 
@@ -111,8 +110,7 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         check = source_group(codes, PJLINK_DEFAULT_CODES)
 
         # THEN: return dictionary should match test dictionary
-        self.assertEquals(check, build_source_dict(),
-                          "Source group dictionary should match test dictionary")
+        assert check == build_source_dict(), "Source group dictionary should match test dictionary"
 
     @patch.object(QDialog, 'exec')
     def test_source_select_edit_button(self, mocked_qdialog):
@@ -130,9 +128,8 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         projector = select_form.projector
 
         # THEN: Verify all 4 buttons are available
-        self.assertEquals(len(select_form.button_box.buttons()), 4,
-                          'SourceSelect dialog box should have "OK", "Cancel" '
-                          '"Rest", and "Revert" buttons available')
+        assert len(select_form.button_box.buttons()) == 4, \
+            'SourceSelect dialog box should have "OK", "Cancel", "Rest", and "Revert" buttons available'
 
     @patch.object(QDialog, 'exec')
     def test_source_select_noedit_button(self, mocked_qdialog):
@@ -150,6 +147,5 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         projector = select_form.projector
 
         # THEN: Verify only 2 buttons are available
-        self.assertEquals(len(select_form.button_box.buttons()), 2,
-                          'SourceSelect dialog box should only have "OK" '
-                          'and "Cancel" buttons available')
+        assert len(select_form.button_box.buttons()) == 2, \
+            'SourceSelect dialog box should only have "OK" and "Cancel" buttons available'

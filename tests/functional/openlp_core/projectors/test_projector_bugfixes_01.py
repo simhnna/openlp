@@ -26,7 +26,6 @@ from unittest import TestCase
 
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
-
 from tests.resources.projector.data import TEST1_DATA
 
 

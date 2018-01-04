@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -25,8 +25,8 @@ for the Songs plugin.
 """
 
 import logging
-import os
 import sqlite3
+from pathlib import Path
 from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtWidgets
@@ -316,17 +316,16 @@ class SongsPlugin(Plugin):
         self.application.process_events()
         self.on_tools_reindex_item_triggered()
         self.application.process_events()
-        db_dir = os.path.join(gettempdir(), 'openlp')
-        if not os.path.exists(db_dir):
+        db_dir_path = Path(gettempdir(), 'openlp')
+        if not db_dir_path.exists():
             return
-        song_dbs = []
+        song_db_paths = []
         song_count = 0
-        for sfile in os.listdir(db_dir):
-            if sfile.startswith('songs_') and sfile.endswith('.sqlite'):
-                self.application.process_events()
-                song_dbs.append(os.path.join(db_dir, sfile))
-                song_count += SongsPlugin._count_songs(os.path.join(db_dir, sfile))
-        if not song_dbs:
+        for db_file_path in db_dir_path.glob('songs_*.sqlite'):
+            self.application.process_events()
+            song_db_paths.append(db_file_path)
+            song_count += SongsPlugin._count_songs(db_file_path)
+        if not song_db_paths:
             return
         self.application.process_events()
         progress = QtWidgets.QProgressDialog(self.main_window)
@@ -338,8 +337,8 @@ class SongsPlugin(Plugin):
         progress.setMinimumDuration(0)
         progress.forceShow()
         self.application.process_events()
-        for db in song_dbs:
-            importer = OpenLPSongImport(self.manager, file_path=db)
+        for db_path in song_db_paths:
+            importer = OpenLPSongImport(self.manager, file_path=db_path)
             importer.do_import(progress)
             self.application.process_events()
         progress.setValue(song_count)
@@ -373,13 +372,15 @@ class SongsPlugin(Plugin):
             self.manager.delete_object(Song, song.id)
 
     @staticmethod
-    def _count_songs(db_file):
+    def _count_songs(db_path):
         """
         Provide a count of the songs in the database
 
-        :param db_file: the database name to count
+        :param openlp.core.common.path.Path db_path: The database to use
+        :return: The number of songs in the db.
+        :rtype: int
         """
-        connection = sqlite3.connect(db_file)
+        connection = sqlite3.connect(str(db_path))
         cursor = connection.cursor()
         cursor.execute('SELECT COUNT(id) AS song_count FROM songs')
         song_count = cursor.fetchone()[0]

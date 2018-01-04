@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -29,7 +29,6 @@ from PyQt5 import QtCore
 
 from openlp.core.common.registry import Registry
 from openlp.plugins.songs.forms.editsongform import EditSongForm
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -64,7 +63,7 @@ class TestEditSongForm(TestCase, TestMixin):
         valid = self.edit_song_form._validate_tags(tags)
 
         # THEN they should be valid
-        self.assertTrue(valid, "The tags list should be valid")
+        assert valid is True, "The tags list should be valid"
 
     def test_validate_nonmatching_tags(self):
         # Given a set of tags
@@ -74,7 +73,7 @@ class TestEditSongForm(TestCase, TestMixin):
         valid = self.edit_song_form._validate_tags(tags)
 
         # THEN they should be valid
-        self.assertTrue(valid, "The tags list should be valid")
+        assert valid is True, "The tags list should be valid"
 
     @patch('openlp.plugins.songs.forms.editsongform.set_case_insensitive_completer')
     def test_load_objects(self, mocked_set_case_insensitive_completer):

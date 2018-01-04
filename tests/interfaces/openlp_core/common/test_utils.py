@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,7 +26,8 @@ from unittest import TestCase
 
 from openlp.core.common import is_not_image_file
 from openlp.core.common.path import Path
-from tests.utils.constants import TEST_RESOURCES_PATH
+
+from tests.utils.constants import RESOURCE_PATH
 from tests.helpers.testmixin import TestMixin
 
 
@@ -59,10 +60,10 @@ class TestUtils(TestCase, TestMixin):
         Test the method handles an image file
         """
         # Given and empty string
-        file_name = Path(TEST_RESOURCES_PATH, 'church.jpg')
+        file_path = RESOURCE_PATH / 'church.jpg'
 
         # WHEN testing for it
-        result = is_not_image_file(file_name)
+        result = is_not_image_file(file_path)
 
         # THEN the result is false
         assert result is False, 'The file is present so the test should return False'
@@ -72,10 +73,10 @@ class TestUtils(TestCase, TestMixin):
         Test the method handles a non image file
         """
         # Given and empty string
-        file_name = Path(TEST_RESOURCES_PATH, 'serviceitem_custom_1.osj')
+        file_path = RESOURCE_PATH / 'serviceitem_custom_1.osj'
 
         # WHEN testing for it
-        result = is_not_image_file(file_name)
+        result = is_not_image_file(file_path)
 
         # THEN the result is false
         assert result is True, 'The file is not an image file so the test should return True'

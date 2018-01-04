@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -25,8 +25,8 @@ The :mod:`http` module enables OpenLP to retrieve scripture from bible websites.
 import logging
 import re
 import socket
-import urllib.parse
 import urllib.error
+import urllib.parse
 
 from bs4 import BeautifulSoup, NavigableString, Tag
 

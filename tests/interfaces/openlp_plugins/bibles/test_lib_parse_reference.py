@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -28,9 +28,8 @@ from unittest.mock import MagicMock, patch
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.plugins.bibles.lib import BibleManager, parse_reference, LanguageSelection
-
-from tests.utils.constants import TEST_RESOURCES_PATH
 from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import TEST_RESOURCES_PATH
 
 
 class TestBibleManager(TestCase, TestMixin):
@@ -79,7 +78,7 @@ class TestBibleManager(TestCase, TestMixin):
         # WHEN asking to parse the bible reference
         results = parse_reference('1 Timothy 1', self.manager.db_cache['tests'], MagicMock(), 54)
         # THEN a verse array should be returned
-        self.assertEqual([(54, 1, 1, -1)], results, "The bible verses should matches the expected results")
+        assert [(54, 1, 1, -1)] == results, "The bible verses should matches the expected results"
 
     def test_parse_reference_two(self):
         """
@@ -89,7 +88,7 @@ class TestBibleManager(TestCase, TestMixin):
         # WHEN asking to parse the bible reference
         results = parse_reference('1 Timothy 1:1-2', self.manager.db_cache['tests'], MagicMock(), 54)
         # THEN a verse array should be returned
-        self.assertEqual([(54, 1, 1, 2)], results, "The bible verses should matches the expected results")
+        assert [(54, 1, 1, 2)] == results, "The bible verses should matches the expected results"
 
     def test_parse_reference_three(self):
         """
@@ -99,8 +98,8 @@ class TestBibleManager(TestCase, TestMixin):
         # WHEN asking to parse the bible reference
         results = parse_reference('1 Timothy 1:1-2:1', self.manager.db_cache['tests'], MagicMock(), 54)
         # THEN a verse array should be returned
-        self.assertEqual([(54, 1, 1, -1), (54, 2, 1, 1)], results,
-                         "The bible verses should match the expected results")
+        assert [(54, 1, 1, -1), (54, 2, 1, 1)] == results, \
+            "The bible verses should match the expected results"
 
     def test_parse_reference_four(self):
         """
@@ -110,7 +109,7 @@ class TestBibleManager(TestCase, TestMixin):
         # WHEN asking to parse the bible reference
         results = parse_reference('Raoul 1', self.manager.db_cache['tests'], MagicMock())
         # THEN a verse array should be returned
-        self.assertEqual([], results, "The bible Search should return an empty list")
+        assert [] == results, "The bible Search should return an empty list"
 
     def test_parse_reference_five(self):
         """
@@ -120,4 +119,4 @@ class TestBibleManager(TestCase, TestMixin):
         # WHEN asking to parse the bible reference
         results = parse_reference('1 Timothy 1:3-end', self.manager.db_cache['tests'], MagicMock(), 54)
         # THEN a verse array should be returned
-        self.assertEqual([(54, 1, 3, -1)], results, "The bible verses should matches the expected results")
+        assert [(54, 1, 3, -1)] == results, "The bible verses should matches the expected results"

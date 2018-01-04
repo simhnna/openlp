@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,6 +22,7 @@
 """
 Package to test the openlp.core.widgets.views package.
 """
+import os
 from types import GeneratorType
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
@@ -30,7 +31,59 @@ from PyQt5 import QtGui
 
 from openlp.core.common.i18n import UiStrings
 from openlp.core.lib import ImageSource
-from openlp.core.widgets.views import ListPreviewWidget, ListWidgetWithDnD, TreeWidgetWithDnD
+from openlp.core.widgets.views import ListPreviewWidget, ListWidgetWithDnD, TreeWidgetWithDnD, handle_mime_data_urls
+
+
+class TestHandleMimeDataUrls(TestCase):
+    """
+    Test the :func:`openlp.core.widgets.views.handle_mime_data_urls` function.
+    """
+    def test_files(self):
+        """
+        Test handle_mime_data_urls when the data points to some files.
+        """
+        # GIVEN: Some mocked objects that return True when is_file is called, and some mocked mime data
+        mocked_path_instance_1 = MagicMock(**{'is_file.return_value': True})
+        mocked_path_instance_2 = MagicMock(**{'is_file.return_value': True})
+        with patch('openlp.core.widgets.views.Path',
+                   side_effect=[mocked_path_instance_1, mocked_path_instance_2]) as mocked_path:
+            mocked_q_url_1 = MagicMock(**{'toLocalFile.return_value': os.path.join('file', 'test', 'path', '1.ext')})
+            mocked_q_url_2 = MagicMock(**{'toLocalFile.return_value': os.path.join('file', 'test', 'path', '2.ext')})
+            mocked_q_mime_data = MagicMock(**{'urls.return_value': [mocked_q_url_1, mocked_q_url_2]})
+
+            # WHEN: Calling handle_mime_data_urls with the mocked mime data
+            result = handle_mime_data_urls(mocked_q_mime_data)
+
+            # THEN: Both mocked Path objects should be returned in the list
+            mocked_path.assert_has_calls([call(os.path.join('file', 'test', 'path', '1.ext')),
+                                          call(os.path.join('file', 'test', 'path', '2.ext'))])
+            assert result == [mocked_path_instance_1, mocked_path_instance_2]
+
+    def test_directory(self):
+        """
+        Test handle_mime_data_urls when the data points to some directories.
+        """
+        # GIVEN: Some mocked objects that return True when is_dir is called, and some mocked mime data
+        mocked_path_instance_1 = MagicMock()
+        mocked_path_instance_2 = MagicMock()
+        mocked_path_instance_3 = MagicMock()
+        mocked_path_instance_4 = MagicMock(**{'is_file.return_value': False, 'is_directory.return_value': True,
+                                              'iterdir.return_value': [mocked_path_instance_1, mocked_path_instance_2]})
+        mocked_path_instance_5 = MagicMock(**{'is_file.return_value': False, 'is_directory.return_value': True,
+                                              'iterdir.return_value': [mocked_path_instance_3]})
+        with patch('openlp.core.widgets.views.Path',
+                   side_effect=[mocked_path_instance_4, mocked_path_instance_5]) as mocked_path:
+            mocked_q_url_1 = MagicMock(**{'toLocalFile.return_value': os.path.join('file', 'test', 'path')})
+            mocked_q_url_2 = MagicMock(**{'toLocalFile.return_value': os.path.join('file', 'test', 'path')})
+            mocked_q_mime_data = MagicMock(**{'urls.return_value': [mocked_q_url_1, mocked_q_url_2]})
+
+            # WHEN: Calling handle_mime_data_urls with the mocked mime data
+            result = handle_mime_data_urls(mocked_q_mime_data)
+
+            # THEN: The three mocked Path file objects should be returned in the list
+            mocked_path.assert_has_calls([call(os.path.join('file', 'test', 'path')),
+                                          call(os.path.join('file', 'test', 'path'))])
+            assert result == [mocked_path_instance_1, mocked_path_instance_2, mocked_path_instance_3]
 
 
 class TestListPreviewWidget(TestCase):

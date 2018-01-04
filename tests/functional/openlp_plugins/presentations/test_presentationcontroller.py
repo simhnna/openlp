@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -58,8 +58,8 @@ class TestPresentationController(TestCase):
         # WHEN: The PresentationController is created
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('PresentationController', self.presentation.name,
-                         'The name of the presentation controller should be correct')
+        assert 'PresentationController' == self.presentation.name, \
+            'The name of the presentation controller should be correct'
 
     def test_save_titles_and_notes(self):
         """
@@ -76,7 +76,7 @@ class TestPresentationController(TestCase):
             self.document.save_titles_and_notes(titles, notes)
 
             # THEN: the last call to open should have been for slideNotes2.txt
-            self.assertEqual(mocked_write_text.call_count, 3, 'There should be exactly three files written')
+            assert mocked_write_text.call_count == 3, 'There should be exactly three files written'
             mocked_write_text.assert_has_calls([call('uno\ndos'), call('one'), call('two')])
 
     def test_save_titles_and_notes_with_None(self):
@@ -93,7 +93,7 @@ class TestPresentationController(TestCase):
             self.document.save_titles_and_notes(titles, notes)
 
             # THEN: No file should have been created
-            self.assertEqual(mocked_open.call_count, 0, 'No file should be created')
+            assert mocked_open.call_count == 0, 'No file should be created'
 
     def test_get_titles_and_notes(self):
         """
@@ -112,11 +112,11 @@ class TestPresentationController(TestCase):
             result_titles, result_notes = self.document.get_titles_and_notes()
 
             # THEN: it should return two items for the titles and two empty strings for the notes
-            self.assertIs(type(result_titles), list, 'result_titles should be of type list')
-            self.assertEqual(len(result_titles), 2, 'There should be two items in the titles')
-            self.assertIs(type(result_notes), list, 'result_notes should be of type list')
-            self.assertEqual(len(result_notes), 2, 'There should be two items in the notes')
-            self.assertEqual(mocked_read_text.call_count, 3, 'Three files should be read')
+            assert type(result_titles) is list, 'result_titles should be of type list'
+            assert len(result_titles) == 2, 'There should be two items in the titles'
+            assert type(result_notes) is list, 'result_notes should be of type list'
+            assert len(result_notes) == 2, 'There should be two items in the notes'
+            assert mocked_read_text.call_count == 3, 'Three files should be read'
 
     def test_get_titles_and_notes_with_file_not_found(self):
         """
@@ -132,10 +132,10 @@ class TestPresentationController(TestCase):
             result_titles, result_notes = self.document.get_titles_and_notes()
 
             # THEN: it should return two empty lists
-            self.assertIsInstance(result_titles, list, 'result_titles should be of type list')
-            self.assertEqual(len(result_titles), 0, 'there be no titles')
-            self.assertIsInstance(result_notes, list, 'result_notes should be a list')
-            self.assertEqual(len(result_notes), 0, 'but the list should be empty')
+            assert isinstance(result_titles, list), 'result_titles should be of type list'
+            assert len(result_titles) == 0, 'there be no titles'
+            assert isinstance(result_notes, list), 'result_notes should be a list'
+            assert len(result_notes) == 0, 'but the list should be empty'
 
     def test_get_titles_and_notes_with_file_error(self):
         """
@@ -151,7 +151,7 @@ class TestPresentationController(TestCase):
             result_titles, result_notes = self.document.get_titles_and_notes()
 
             # THEN: it should return two empty lists
-            self.assertIs(type(result_titles), list, 'result_titles should be a list')
+            assert type(result_titles) is list, 'result_titles should be a list'
 
 
 class TestPresentationDocument(TestCase):
@@ -226,4 +226,4 @@ class TestPresentationDocument(TestCase):
         result = instance.load_presentation()
 
         # THEN: load_presentation should return false
-        self.assertFalse(result, "PresentationDocument.load_presentation should return false.")
+        assert result is False, "PresentationDocument.load_presentation should return false."

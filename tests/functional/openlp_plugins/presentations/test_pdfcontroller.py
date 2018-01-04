@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -23,19 +23,18 @@
 This module contains tests for the PdfController
 """
 import os
-import shutil
 from tempfile import mkdtemp
 from unittest import TestCase, SkipTest
 from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtCore, QtGui
 
-from openlp.plugins.presentations.lib.pdfcontroller import PdfController, PdfDocument
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.core.display.screens import ScreenList
+from openlp.plugins.presentations.lib.pdfcontroller import PdfController, PdfDocument
 
-from tests.utils.constants import TEST_RESOURCES_PATH
+from tests.utils.constants import RESOURCE_PATH
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
@@ -92,14 +91,14 @@ class TestPdfController(TestCase, TestMixin):
         controller = PdfController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('Pdf', controller.name, 'The name of the presentation controller should be correct')
+        assert 'Pdf' == controller.name, 'The name of the presentation controller should be correct'
 
     def test_load_pdf(self):
         """
         Test loading of a Pdf using the PdfController
         """
         # GIVEN: A Pdf-file
-        test_file = Path(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
+        test_file_path = RESOURCE_PATH / 'presentations' / 'pdf_test1.pdf'
 
         # WHEN: The Pdf is loaded
         controller = PdfController(plugin=self.mock_plugin)
@@ -107,19 +106,19 @@ class TestPdfController(TestCase, TestMixin):
             raise SkipTest('Could not detect mudraw or ghostscript, so skipping PDF test')
         controller.temp_folder = self.temp_folder_path
         controller.thumbnail_folder = self.thumbnail_folder_path
-        document = PdfDocument(controller, test_file)
+        document = PdfDocument(controller, test_file_path)
         loaded = document.load_presentation()
 
         # THEN: The load should succeed and we should be able to get a pagecount
-        self.assertTrue(loaded, 'The loading of the PDF should succeed.')
-        self.assertEqual(3, document.get_slide_count(), 'The pagecount of the PDF should be 3.')
+        assert loaded is True, 'The loading of the PDF should succeed.'
+        assert 3 == document.get_slide_count(), 'The pagecount of the PDF should be 3.'
 
     def test_load_pdf_pictures(self):
         """
         Test loading of a Pdf and check size of generate pictures
         """
         # GIVEN: A Pdf-file
-        test_file = Path(TEST_RESOURCES_PATH, 'presentations', 'pdf_test1.pdf')
+        test_file_path = RESOURCE_PATH / 'presentations' / 'pdf_test1.pdf'
 
         # WHEN: The Pdf is loaded
         controller = PdfController(plugin=self.mock_plugin)
@@ -127,19 +126,19 @@ class TestPdfController(TestCase, TestMixin):
             raise SkipTest('Could not detect mudraw or ghostscript, so skipping PDF test')
         controller.temp_folder = self.temp_folder_path
         controller.thumbnail_folder = self.thumbnail_folder_path
-        document = PdfDocument(controller, test_file)
+        document = PdfDocument(controller, test_file_path)
         loaded = document.load_presentation()
 
         # THEN: The load should succeed and pictures should be created and have been scales to fit the screen
-        self.assertTrue(loaded, 'The loading of the PDF should succeed.')
+        assert loaded is True, 'The loading of the PDF should succeed.'
         image = QtGui.QImage(os.path.join(str(self.temp_folder_path), 'pdf_test1.pdf', 'mainslide001.png'))
         # Based on the converter used the resolution will differ a bit
         if controller.gsbin:
-            self.assertEqual(760, image.height(), 'The height should be 760')
-            self.assertEqual(537, image.width(), 'The width should be 537')
+            assert 760 == image.height(), 'The height should be 760'
+            assert 537 == image.width(), 'The width should be 537'
         else:
-            self.assertEqual(768, image.height(), 'The height should be 768')
-            self.assertEqual(543, image.width(), 'The width should be 543')
+            assert 768 == image.height(), 'The height should be 768'
+            assert 543 == image.width(), 'The width should be 543'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_mudraw(self, mocked_check_binary_exists):
@@ -157,7 +156,7 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mudraw should be detected
-        self.assertEqual('mudraw', ret, 'mudraw should have been detected')
+        assert 'mudraw' == ret, 'mudraw should have been detected'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_new_motool(self, mocked_check_binary_exists):
@@ -177,7 +176,7 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mutool should be detected
-        self.assertEqual('mutool', ret, 'mutool should have been detected')
+        assert 'mutool' == ret, 'mutool should have been detected'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_old_motool(self, mocked_check_binary_exists):
@@ -194,7 +193,7 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mutool should be detected
-        self.assertIsNone(ret, 'old mutool should not be accepted!')
+        assert ret is None, 'old mutool should not be accepted!'
 
     @patch('openlp.plugins.presentations.lib.pdfcontroller.check_binary_exists')
     def test_process_check_binary_gs(self, mocked_check_binary_exists):
@@ -210,4 +209,4 @@ class TestPdfController(TestCase, TestMixin):
         ret = PdfController.process_check_binary('test')
 
         # THEN: mutool should be detected
-        self.assertEqual('gs', ret, 'mutool should have been detected')
+        assert 'gs' == ret, 'mutool should have been detected'

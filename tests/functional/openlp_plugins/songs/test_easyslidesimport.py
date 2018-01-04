@@ -3,7 +3,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -21,14 +21,10 @@
 """
 This module contains tests for the EasySlides song importer.
 """
-import os
-
-from openlp.core.common.path import Path
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'easyslidessongs'))
+TEST_PATH = RESOURCE_PATH / 'songs' / 'easyslides'
 
 
 class TestEasySlidesFileImport(SongImportTestHelper):
@@ -42,7 +38,7 @@ class TestEasySlidesFileImport(SongImportTestHelper):
         """
         Test that loading an EasySlides file works correctly on various files
         """
-        self.file_import(Path(TEST_PATH, 'amazing-grace.xml'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import(Path(TEST_PATH, 'Export_2017-01-12_BB.xml'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Export_2017-01-12_BB.json')))
+        self.file_import(TEST_PATH / 'amazing-grace.xml',
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))
+        self.file_import(TEST_PATH / 'Export_2017-01-12_BB.xml',
+                         self.load_external_result_data(TEST_PATH / 'Export_2017-01-12_BB.json'))

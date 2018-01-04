@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -28,7 +28,6 @@ from unittest.mock import patch, MagicMock
 from openlp.core.common.registry import Registry
 from openlp.plugins.presentations.lib.mediaitem import MessageListener, PresentationMediaItem
 from openlp.plugins.presentations.lib.messagelistener import Controller
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -73,7 +72,7 @@ class TestMessageListener(TestCase, TestMixin):
         ml.startup([mock_item, False, False, False])
 
         # THEN: The controllers will be setup.
-        self.assertTrue(len(controllers), 'We have loaded a controller')
+        assert len(controllers) > 0, 'We have loaded a controller'
 
     @patch('openlp.plugins.presentations.lib.mediaitem.MessageListener._setup')
     def test_start_presentation_with_no_player(self, media_mock):
@@ -105,7 +104,7 @@ class TestMessageListener(TestCase, TestMixin):
         ml.startup([mock_item, False, False, False])
 
         # THEN: The controllers will be setup.
-        self.assertTrue(len(controllers), 'We have loaded a controller')
+        assert len(controllers) > 0, 'We have loaded a controller'
 
     @patch('openlp.plugins.presentations.lib.mediaitem.MessageListener._setup')
     def test_start_pdf_presentation(self, media_mock):
@@ -125,7 +124,7 @@ class TestMessageListener(TestCase, TestMixin):
         ml.startup([mock_item, False, False, False])
 
         # THEN: The handler should be set to None
-        self.assertIsNone(ml.handler, 'The handler should be None')
+        assert ml.handler is None, 'The handler should be None'
 
 
 class TestController(TestCase, TestMixin):
@@ -148,4 +147,4 @@ class TestController(TestCase, TestMixin):
         controller.add_handler(mocked_doc_controller, MagicMock(), True, 0)
 
         # THEN: slidenumber should be 0
-        self.assertEqual(controller.doc.slidenumber, 0, 'doc.slidenumber should be 0')
+        assert controller.doc.slidenumber == 0, 'doc.slidenumber should be 0'

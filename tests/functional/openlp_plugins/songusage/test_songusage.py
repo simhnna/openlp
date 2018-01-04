@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -43,10 +43,10 @@ class TestSongUsage(TestCase):
         # GIVEN: The SongUsagePlugin
         # WHEN: Retrieving the about text
         # THEN: about() should return a string object
-        self.assertIsInstance(SongUsagePlugin.about(), str)
+        assert isinstance(SongUsagePlugin.about(), str)
         # THEN: about() should return a non-empty string
-        self.assertNotEquals(len(SongUsagePlugin.about()), 0)
-        self.assertNotEquals(len(SongUsagePlugin.about()), 0)
+        assert len(SongUsagePlugin.about()) is not 0
+        assert len(SongUsagePlugin.about()) is not 0
 
     @patch('openlp.plugins.songusage.songusageplugin.Manager')
     def test_song_usage_init(self, MockedManager):
@@ -62,8 +62,8 @@ class TestSongUsage(TestCase):
 
         # THEN: It should be initialised correctly
         MockedManager.assert_called_with('songusage', init_schema, upgrade_mod=upgrade)
-        self.assertEqual(mocked_manager, song_usage.manager)
-        self.assertFalse(song_usage.song_usage_active)
+        assert mocked_manager == song_usage.manager
+        assert song_usage.song_usage_active is False
 
     @patch('openlp.plugins.songusage.songusageplugin.Manager')
     def test_check_pre_conditions(self, MockedManager):
@@ -80,7 +80,7 @@ class TestSongUsage(TestCase):
         ret = song_usage.check_pre_conditions()
 
         # THEN: It should return True
-        self.assertTrue(ret)
+        assert ret is True
 
     @patch('openlp.plugins.songusage.songusageplugin.Manager')
     def test_toggle_song_usage_state(self, MockedManager):
@@ -96,4 +96,4 @@ class TestSongUsage(TestCase):
         song_usage.toggle_song_usage_state()
 
         # THEN: song_usage_state should have been toogled
-        self.assertFalse(song_usage.song_usage_active)
+        assert song_usage.song_usage_active is False

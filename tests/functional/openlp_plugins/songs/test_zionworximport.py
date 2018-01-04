@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,19 +22,16 @@
 """
 This module contains tests for the ZionWorx song importer.
 """
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
-from openlp.core.common.path import Path
-from openlp.plugins.songs.lib.importers.zionworx import ZionWorxImport
 from openlp.plugins.songs.lib.importers.songimport import SongImport
-
+from openlp.plugins.songs.lib.importers.zionworx import ZionWorxImport
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'zionworxsongs'))
+TEST_PATH = RESOURCE_PATH / 'songs' / 'zionworx'
 
 
 class TestZionWorxImport(TestCase):
@@ -59,7 +56,7 @@ class TestZionWorxImport(TestCase):
             importer = ZionWorxImport(mocked_manager, file_paths=[])
 
             # THEN: The importer should be an instance of SongImport
-            self.assertIsInstance(importer, SongImport)
+            assert isinstance(importer, SongImport)
 
 
 class TestZionWorxFileImport(SongImportTestHelper):
@@ -73,5 +70,4 @@ class TestZionWorxFileImport(SongImportTestHelper):
         """
         Test that loading an ZionWorx file works correctly on various files
         """
-        self.file_import(Path(TEST_PATH, 'zionworx.csv'),
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'zionworx.json')))
+        self.file_import(TEST_PATH / 'zionworx.csv', self.load_external_result_data(TEST_PATH / 'zionworx.json'))

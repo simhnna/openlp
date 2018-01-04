@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -20,9 +20,9 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 
-from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint, requires_auth
-from openlp.core.api.tab import ApiTab
+from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.poll import Poller
+from openlp.core.api.tab import ApiTab
 
 __all__ = ['Endpoint', 'ApiTab', 'register_endpoint', 'requires_auth']

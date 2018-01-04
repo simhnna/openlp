@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -30,9 +30,8 @@ from PyQt5 import QtGui, QtWidgets
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem
 from openlp.core.widgets.views import ListPreviewWidget
-
-from tests.utils.osdinteraction import read_service_from_file
 from tests.helpers.testmixin import TestMixin
+from tests.utils.osdinteraction import read_service_from_file
 
 
 class TestListPreviewWidget(TestCase, TestMixin):
@@ -64,7 +63,7 @@ class TestListPreviewWidget(TestCase, TestMixin):
         # GIVEN: A new ListPreviewWidget instance.
         # WHEN: No SlideItem has been added yet.
         # THEN: The count of items should be zero.
-        self.assertEqual(self.preview_widget.slide_count(), 0, 'The slide list should be empty.')
+        assert self.preview_widget.slide_count() == 0, 'The slide list should be empty.'
 
     def test_initial_slide_number(self):
         """
@@ -73,7 +72,7 @@ class TestListPreviewWidget(TestCase, TestMixin):
         # GIVEN: A new ListPreviewWidget instance.
         # WHEN: No SlideItem has been added yet.
         # THEN: The number of the current item should be -1.
-        self.assertEqual(self.preview_widget.current_slide_number(), -1, 'The slide number should be -1.')
+        assert self.preview_widget.current_slide_number() == -1, 'The slide number should be -1.'
 
     def test_replace_service_item(self):
         """
@@ -87,8 +86,8 @@ class TestListPreviewWidget(TestCase, TestMixin):
         # WHEN: Added to the preview widget.
         self.preview_widget.replace_service_item(service_item, 1, 1)
         # THEN: The slide count and number should fit.
-        self.assertEqual(self.preview_widget.slide_count(), 2, 'The slide count should be 2.')
-        self.assertEqual(self.preview_widget.current_slide_number(), 1, 'The current slide number should  be 1.')
+        assert self.preview_widget.slide_count() == 2, 'The slide count should be 2.'
+        assert self.preview_widget.current_slide_number() == 1, 'The current slide number should  be 1.'
 
     def test_change_slide(self):
         """
@@ -103,4 +102,4 @@ class TestListPreviewWidget(TestCase, TestMixin):
         self.preview_widget.replace_service_item(service_item, 1, 0)
         self.preview_widget.change_slide(1)
         # THEN: The current_slide_number should reflect the change.
-        self.assertEqual(self.preview_widget.current_slide_number(), 1, 'The current slide number should  be 1.')
+        assert self.preview_widget.current_slide_number() == 1, 'The current slide number should  be 1.'

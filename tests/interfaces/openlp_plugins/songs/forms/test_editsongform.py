@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -31,7 +31,6 @@ from openlp.core.common.i18n import UiStrings
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.plugins.songs.forms.editsongform import EditSongForm
-
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
@@ -69,10 +68,10 @@ class TestEditSongForm(TestCase, TestMixin):
         """
         Test that the EditSongForm defaults are correct
         """
-        self.assertFalse(self.form.verse_edit_button.isEnabled(), 'The verse edit button should not be enabled')
-        self.assertFalse(self.form.verse_delete_button.isEnabled(), 'The verse delete button should not be enabled')
-        self.assertFalse(self.form.author_remove_button.isEnabled(), 'The author remove button should not be enabled')
-        self.assertFalse(self.form.topic_remove_button.isEnabled(), 'The topic remove button should not be enabled')
+        assert self.form.verse_edit_button.isEnabled() is False, 'The verse edit button should not be enabled'
+        assert self.form.verse_delete_button.isEnabled() is False, 'The verse delete button should not be enabled'
+        assert self.form.author_remove_button.isEnabled() is False, 'The author remove button should not be enabled'
+        assert self.form.topic_remove_button.isEnabled() is False, 'The topic remove button should not be enabled'
 
     def test_is_verse_edit_form_executed(self):
         pass
@@ -147,10 +146,10 @@ class TestEditSongForm(TestCase, TestMixin):
         # GIVEN; Mocked methods
         form = self.form
         # THEN: CCLI label should be CCLI song label
-        self.assertNotEquals(form.ccli_label.text(), UiStrings().CCLINumberLabel,
-                             'CCLI label should not be "{}"'.format(UiStrings().CCLINumberLabel))
-        self.assertEquals(form.ccli_label.text(), UiStrings().CCLISongNumberLabel,
-                          'CCLI label text should be "{}"'.format(UiStrings().CCLISongNumberLabel))
+        assert form.ccli_label.text() is not UiStrings().CCLINumberLabel, \
+            'CCLI label should not be "{}"'.format(UiStrings().CCLINumberLabel)
+        assert form.ccli_label.text() == UiStrings().CCLISongNumberLabel, \
+            'CCLI label text should be "{}"'.format(UiStrings().CCLISongNumberLabel)
 
     def test_verse_order_lowercase(self):
         """
@@ -165,4 +164,4 @@ class TestEditSongForm(TestCase, TestMixin):
         form.on_verse_order_text_changed(form.verse_order_edit.text())
 
         # THEN: The verse order should be converted to uppercase
-        self.assertEqual(form.verse_order_edit.text(), 'V1 V2 C1 V3 C1 V4 C1')
+        assert form.verse_order_edit.text() == 'V1 V2 C1 V3 C1 V4 C1'

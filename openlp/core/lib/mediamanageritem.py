@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -28,8 +28,8 @@ import re
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem, StringContent, ServiceItemContext
@@ -331,8 +331,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         """
         new_file_paths = []
         error_shown = False
-        for file_name in data['files']:
-            file_path = str_to_path(file_name)
+        for file_path in data['file_paths']:
             if file_path.suffix[1:].lower() not in self.on_new_file_masks:
                 if not error_shown:
                     critical_error_message_box(

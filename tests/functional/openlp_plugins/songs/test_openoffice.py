@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,7 +26,6 @@ from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
-
 from tests.helpers.testmixin import TestMixin
 
 try:
@@ -59,7 +58,7 @@ class TestOpenOfficeImport(TestCase, TestMixin):
         importer = OpenOfficeImport(mocked_manager, file_paths=[])
 
         # THEN: The importer object should not be None
-        self.assertIsNotNone(importer, 'Import should not be none')
+        assert importer is not None, 'Import should not be none'
 
     @patch('openlp.plugins.songs.lib.importers.openoffice.SongImport')
     def test_close_ooo_file(self, mocked_songimport):
@@ -76,4 +75,4 @@ class TestOpenOfficeImport(TestCase, TestMixin):
         importer.close_ooo_file()
 
         # THEN: The document attribute should be None even if an exception is raised')
-        self.assertIsNone(importer.document, 'Document should be None even if an exception is raised')
+        assert importer.document is None, 'Document should be None even if an exception is raised'

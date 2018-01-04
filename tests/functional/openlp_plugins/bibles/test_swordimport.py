@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,9 +22,6 @@
 """
 This module contains tests for the SWORD Bible importer.
 """
-
-import os
-import json
 from unittest import TestCase, skipUnless
 from unittest.mock import MagicMock, patch
 
@@ -36,8 +33,10 @@ except ImportError:
 
 from openlp.plugins.bibles.lib.db import BibleDB
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'bibles'))
+from tests.utils import load_external_result_data
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'bibles'
 
 
 @skipUnless(HAS_PYSWORD, 'pysword not installed')
@@ -67,7 +66,7 @@ class TestSwordImport(TestCase):
         importer = SwordBible(mocked_manager, path='.', name='.', file_path=None, sword_key='', sword_path='')
 
         # THEN: The importer should be an instance of BibleDB
-        self.assertIsInstance(importer, BibleDB)
+        assert isinstance(importer, BibleDB)
 
     @patch('openlp.plugins.bibles.lib.importers.sword.SwordBible.application')
     @patch('openlp.plugins.bibles.lib.importers.sword.modules')
@@ -81,8 +80,7 @@ class TestSwordImport(TestCase):
         mocked_manager = MagicMock()
         mocked_import_wizard = MagicMock()
         importer = SwordBible(mocked_manager, path='.', name='.', file_path=None, sword_key='', sword_path='')
-        result_file = open(os.path.join(TEST_PATH, 'dk1933.json'), 'rb')
-        test_data = json.loads(result_file.read().decode())
+        test_data = load_external_result_data(TEST_PATH / 'dk1933.json')
         importer.wizard = mocked_import_wizard
         importer.get_book_ref_id_by_name = MagicMock()
         importer.create_verse = MagicMock()
@@ -106,6 +104,6 @@ class TestSwordImport(TestCase):
         importer.do_import()
 
         # THEN: The create_verse() method should have been called with each verse in the file.
-        self.assertTrue(importer.create_verse.called)
+        assert importer.create_verse.called is True
         for verse_tag, verse_text in test_data['verses']:
             importer.create_verse.assert_any_call(importer.create_book().id, 1, int(verse_tag), verse_text)

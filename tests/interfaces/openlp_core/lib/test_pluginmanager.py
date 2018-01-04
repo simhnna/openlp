@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,19 +22,18 @@
 """
 Package to test the openlp.core.lib.pluginmanager package.
 """
-import sys
 import gc
+import sys
 from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from PyQt5 import QtWidgets
 
+from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.common.path import Path
 from openlp.core.lib.pluginmanager import PluginManager
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -86,11 +85,11 @@ class TestPluginManager(TestCase, TestMixin):
 
         # THEN: We should find the "Songs", "Bibles", etc in the plugins list
         plugin_names = [plugin.name for plugin in plugin_manager.plugins]
-        self.assertIn('songs', plugin_names, 'There should be a "songs" plugin')
-        self.assertIn('bibles', plugin_names, 'There should be a "bibles" plugin')
-        self.assertIn('presentations', plugin_names, 'There should be a "presentations" plugin')
-        self.assertIn('images', plugin_names, 'There should be a "images" plugin')
-        self.assertIn('media', plugin_names, 'There should be a "media" plugin')
-        self.assertIn('custom', plugin_names, 'There should be a "custom" plugin')
-        self.assertIn('songusage', plugin_names, 'There should be a "songusage" plugin')
-        self.assertIn('alerts', plugin_names, 'There should be a "alerts" plugin')
+        assert 'songs' in plugin_names, 'There should be a "songs" plugin'
+        assert 'bibles' in plugin_names, 'There should be a "bibles" plugin'
+        assert 'presentations' in plugin_names, 'There should be a "presentations" plugin'
+        assert 'images' in plugin_names, 'There should be a "images" plugin'
+        assert 'media' in plugin_names, 'There should be a "media" plugin'
+        assert 'custom' in plugin_names, 'There should be a "custom" plugin'
+        assert 'songusage'in plugin_names, 'There should be a "songusage" plugin'
+        assert 'alerts' in plugin_names, 'There should be a "alerts" plugin'

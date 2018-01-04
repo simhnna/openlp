@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -25,11 +25,10 @@ Interface tests to test the themeManager class and related methods.
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
+from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.common.path import Path
 from openlp.core.ui import ThemeManager
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -121,4 +120,4 @@ class TestThemeManager(TestCase, TestMixin):
         self.theme_manager.bootstrap_post_set_up()
 
         # THEN:
-        self.assertEqual(1, self.theme_manager.load_themes.call_count, "load_themes should have been called once")
+        assert 1 == self.theme_manager.load_themes.call_count, "load_themes should have been called once"

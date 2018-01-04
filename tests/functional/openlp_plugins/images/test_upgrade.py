@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -34,7 +34,6 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib.db import Manager
 from openlp.plugins.images.lib import upgrade
 from openlp.plugins.images.lib.db import ImageFilenames, init_schema
-
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH
 
@@ -80,6 +79,6 @@ class TestImageDBUpgrade(TestCase, TestMixin):
                                     2: Path('/', 'test', 'dir', 'image2.jpg'),
                                     3: Path('/', 'test', 'dir', 'subdir', 'image3.jpg')}
 
-            self.assertEqual(len(upgraded_results), 3)
+            assert len(upgraded_results) == 3
             for result in upgraded_results:
-                self.assertEqual(expected_result_data[result.id], result.file_path)
+                assert expected_result_data[result.id] == result.file_path

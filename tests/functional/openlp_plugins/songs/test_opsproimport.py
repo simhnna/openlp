@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,8 +22,6 @@
 """
 This module contains tests for the WorshipCenter Pro song importer.
 """
-import os
-import json
 from unittest import TestCase, skipUnless
 from unittest.mock import patch, MagicMock
 
@@ -34,7 +32,10 @@ try:
 except ImportError:
     CAN_RUN_TESTS = False
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'opsprosongs'))
+from tests.utils import load_external_result_data
+from tests.utils.constants import RESOURCE_PATH
+
+TEST_PATH = RESOURCE_PATH / 'songs' / 'opspro'
 
 
 def _get_item(data, key):
@@ -59,8 +60,7 @@ def _build_data(test_file, dual_language):
     song.Version = '1'
     song.Origin = '...'
     lyrics = MagicMock()
-    test_file = open(os.path.join(TEST_PATH, test_file), 'rb')
-    lyrics.Lyrics = test_file.read().decode()
+    lyrics.Lyrics = (TEST_PATH / test_file).read_bytes().decode()
     lyrics.Type = 1
     lyrics.IsDualLanguage = dual_language
     return song, lyrics
@@ -89,7 +89,7 @@ class TestOpsProSongImport(TestCase):
         importer = OPSProImport(mocked_manager, file_paths=[])
 
         # THEN: The importer object should not be None
-        self.assertIsNotNone(importer, 'Import should not be none')
+        assert importer is not None, 'Import should not be none'
 
     @patch('openlp.plugins.songs.lib.importers.opspro.SongImport')
     def test_detect_chorus(self, mocked_songimport):
@@ -106,10 +106,9 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'You are so faithful.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
-        self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
-        self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))
+        result_data = load_external_result_data(TEST_PATH / 'You are so faithful.json')
+        assert importer.verses == _get_item(result_data, 'verses')
+        assert importer.verse_order_list_generated == _get_item(result_data, 'verse_order_list')
 
     @patch('openlp.plugins.songs.lib.importers.opspro.SongImport')
     def test_join_and_split(self, mocked_songimport):
@@ -126,10 +125,9 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'Amazing Grace.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
-        self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
-        self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))
+        result_data = load_external_result_data(TEST_PATH / 'Amazing Grace.json')
+        assert importer.verses == _get_item(result_data, 'verses')
+        assert importer.verse_order_list_generated == _get_item(result_data, 'verse_order_list')
 
     @patch('openlp.plugins.songs.lib.importers.opspro.SongImport')
     def test_trans_off_tag(self, mocked_songimport):
@@ -146,10 +144,9 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'Amazing Grace.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
-        self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
-        self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))
+        result_data = load_external_result_data(TEST_PATH / 'Amazing Grace.json')
+        assert importer.verses == _get_item(result_data, 'verses')
+        assert importer.verse_order_list_generated == _get_item(result_data, 'verse_order_list')
 
     @patch('openlp.plugins.songs.lib.importers.opspro.SongImport')
     def test_trans_tag(self, mocked_songimport):
@@ -166,7 +163,6 @@ class TestOpsProSongImport(TestCase):
         importer.process_song(song, lyrics, [])
 
         # THEN: The imported data should look like expected
-        result_file = open(os.path.join(TEST_PATH, 'Amazing Grace3.json'), 'rb')
-        result_data = json.loads(result_file.read().decode())
-        self.assertListEqual(importer.verses, _get_item(result_data, 'verses'))
-        self.assertListEqual(importer.verse_order_list_generated, _get_item(result_data, 'verse_order_list'))
+        result_data = load_external_result_data(TEST_PATH / 'Amazing Grace3.json')
+        assert importer.verses == _get_item(result_data, 'verses')
+        assert importer.verse_order_list_generated == _get_item(result_data, 'verse_order_list')

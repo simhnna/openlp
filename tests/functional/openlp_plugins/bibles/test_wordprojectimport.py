@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,18 +22,16 @@
 """
 This module contains tests for the WordProject Bible importer.
 """
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, call
 
 from openlp.core.common.path import Path
 from openlp.plugins.bibles.lib.importers.wordproject import WordProjectBible
+from tests.utils.constants import RESOURCE_PATH
 
-
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'bibles'))
-INDEX_PAGE = open(os.path.join(TEST_PATH, 'wordproject_index.htm')).read()
-CHAPTER_PAGE = open(os.path.join(TEST_PATH, 'wordproject_chapter.htm')).read()
+TEST_PATH = RESOURCE_PATH / 'bibles'
+INDEX_PAGE = (TEST_PATH / 'wordproject_index.htm').read_bytes().decode()
+CHAPTER_PAGE = (TEST_PATH / 'wordproject_chapter.htm').read_bytes().decode()
 
 
 class TestWordProjectImport(TestCase):

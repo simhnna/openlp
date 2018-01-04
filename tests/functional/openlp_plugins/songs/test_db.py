@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,12 +24,12 @@ This module contains tests for the db submodule of the Songs plugin.
 """
 import os
 import shutil
-from unittest import TestCase
 from tempfile import mkdtemp
+from unittest import TestCase
 
-from openlp.plugins.songs.lib.db import Song, Author, AuthorType, Book
-from openlp.plugins.songs.lib import upgrade
 from openlp.core.lib.db import upgrade_db
+from openlp.plugins.songs.lib import upgrade
+from openlp.plugins.songs.lib.db import Song, Author, AuthorType, Book
 from tests.utils.constants import TEST_RESOURCES_PATH
 
 
@@ -66,10 +66,10 @@ class TestDB(TestCase):
         song.add_author(author)
 
         # THEN: The author should have been added with author_type=None
-        self.assertEqual(1, len(song.authors_songs))
-        self.assertEqual("Max", song.authors_songs[0].author.first_name)
-        self.assertEqual("Mustermann", song.authors_songs[0].author.last_name)
-        self.assertIsNone(song.authors_songs[0].author_type)
+        assert 1 == len(song.authors_songs)
+        assert "Max" == song.authors_songs[0].author.first_name
+        assert "Mustermann" == song.authors_songs[0].author.last_name
+        assert song.authors_songs[0].author_type is None
 
     def test_add_author_with_type(self):
         """
@@ -86,10 +86,10 @@ class TestDB(TestCase):
         song.add_author(author, AuthorType.Words)
 
         # THEN: The author should have been added with author_type=None
-        self.assertEqual(1, len(song.authors_songs))
-        self.assertEqual("Max", song.authors_songs[0].author.first_name)
-        self.assertEqual("Mustermann", song.authors_songs[0].author.last_name)
-        self.assertEqual(AuthorType.Words, song.authors_songs[0].author_type)
+        assert 1 == len(song.authors_songs)
+        assert "Max" == song.authors_songs[0].author.first_name
+        assert "Mustermann" == song.authors_songs[0].author.last_name
+        assert AuthorType.Words == song.authors_songs[0].author_type
 
     def test_remove_author(self):
         """
@@ -105,7 +105,7 @@ class TestDB(TestCase):
         song.remove_author(author)
 
         # THEN: It should have been removed
-        self.assertEqual(0, len(song.authors_songs))
+        assert 0 == len(song.authors_songs)
 
     def test_remove_author_with_type(self):
         """
@@ -122,8 +122,8 @@ class TestDB(TestCase):
         song.remove_author(author, AuthorType.Translation)
 
         # THEN: It should have been removed and the other author should still be there
-        self.assertEqual(1, len(song.authors_songs))
-        self.assertEqual(None, song.authors_songs[0].author_type)
+        assert 1 == len(song.authors_songs)
+        assert song.authors_songs[0].author_type is None
 
     def test_get_author_type_from_translated_text(self):
         """
@@ -136,7 +136,7 @@ class TestDB(TestCase):
         author_type = AuthorType.from_translated_text(author_type_name)
 
         # THEN: The type should be correct
-        self.assertEqual(author_type, AuthorType.Words)
+        assert author_type == AuthorType.Words
 
     def test_author_get_display_name(self):
         """
@@ -150,7 +150,7 @@ class TestDB(TestCase):
         display_name = author.get_display_name()
 
         # THEN: It should return only the name
-        self.assertEqual("John Doe", display_name)
+        assert "John Doe" == display_name
 
     def test_author_get_display_name_with_type_words(self):
         """
@@ -164,7 +164,7 @@ class TestDB(TestCase):
         display_name = author.get_display_name(AuthorType.Words)
 
         # THEN: It should return the name with the type in brackets
-        self.assertEqual("John Doe (Words)", display_name)
+        assert "John Doe (Words)" == display_name
 
     def test_author_get_display_name_with_type_translation(self):
         """
@@ -178,7 +178,7 @@ class TestDB(TestCase):
         display_name = author.get_display_name(AuthorType.Translation)
 
         # THEN: It should return the name with the type in brackets
-        self.assertEqual("John Doe (Translation)", display_name)
+        assert "John Doe (Translation)" == display_name
 
     def test_add_songbooks(self):
         """
@@ -195,7 +195,7 @@ class TestDB(TestCase):
         song.add_songbook_entry(songbook, "550A")
 
         # THEN: The song should have two songbook entries
-        self.assertEqual(len(song.songbook_entries), 2, 'There should be two Songbook entries.')
+        assert len(song.songbook_entries) == 2, 'There should be two Songbook entries.'
 
     def test_upgrade_old_song_db(self):
         """
@@ -211,8 +211,7 @@ class TestDB(TestCase):
         updated_to_version, latest_version = upgrade_db(db_url, upgrade)
 
         # THEN: the song db should have been upgraded to the latest version
-        self.assertEqual(updated_to_version, latest_version,
-                         'The song DB should have been upgrade to the latest version')
+        assert updated_to_version == latest_version, 'The song DB should have been upgrade to the latest version'
 
     def test_upgrade_invalid_song_db(self):
         """
@@ -228,5 +227,4 @@ class TestDB(TestCase):
         updated_to_version, latest_version = upgrade_db(db_url, upgrade)
 
         # THEN: the song db should have been upgraded to the latest version without errors
-        self.assertEqual(updated_to_version, latest_version,
-                         'The song DB should have been upgrade to the latest version')
+        assert updated_to_version == latest_version, 'The song DB should have been upgrade to the latest version'

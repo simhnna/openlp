@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -68,7 +68,7 @@ class TestEditVerseForm(TestCase, TestMixin):
         # GIVEN: An EditVerseForm instance
         # WHEN: The form is shown
         # THEN: The default value is correct
-        self.assertEqual(self.form.verse_text_edit.toPlainText(), '', 'The verse edit box is empty.')
+        assert self.form.verse_text_edit.toPlainText() == '', 'The verse edit box is empty.'
 
     def test_type_verse_text(self):
         """
@@ -81,8 +81,8 @@ class TestEditVerseForm(TestCase, TestMixin):
         QtTest.QTest.keyClicks(self.form.verse_text_edit, text)
 
         # THEN: The verse text edit should have the verse text in it
-        self.assertEqual(text, self.form.verse_text_edit.toPlainText(),
-                         'The verse text edit should have the typed out verse')
+        assert text == self.form.verse_text_edit.toPlainText(), \
+            'The verse text edit should have the typed out verse'
 
     def test_insert_verse(self):
         """
@@ -93,8 +93,8 @@ class TestEditVerseForm(TestCase, TestMixin):
         QtTest.QTest.mouseClick(self.form.insert_button, QtCore.Qt.LeftButton)
 
         # THEN: The verse text edit should have a Verse:1 in it
-        self.assertIn('---[Verse:1]---', self.form.verse_text_edit.toPlainText(),
-                      'The verse text edit should have a verse marker')
+        assert '---[Verse:1]---' in self.form.verse_text_edit.toPlainText(), \
+            'The verse text edit should have a verse marker'
 
     def test_insert_verse_2(self):
         """
@@ -106,8 +106,8 @@ class TestEditVerseForm(TestCase, TestMixin):
         QtTest.QTest.mouseClick(self.form.insert_button, QtCore.Qt.LeftButton)
 
         # THEN: The verse text edit should have a Verse:1 in it
-        self.assertIn('---[Verse:2]---', self.form.verse_text_edit.toPlainText(),
-                      'The verse text edit should have a "Verse 2" marker')
+        assert '---[Verse:2]---' in self.form.verse_text_edit.toPlainText(), \
+            'The verse text edit should have a "Verse 2" marker'
 
     def test_insert_chorus(self):
         """
@@ -119,5 +119,5 @@ class TestEditVerseForm(TestCase, TestMixin):
         QtTest.QTest.mouseClick(self.form.insert_button, QtCore.Qt.LeftButton)
 
         # THEN: The verse text edit should have a Chorus:1 in it
-        self.assertIn('---[Chorus:1]---', self.form.verse_text_edit.toPlainText(),
-                      'The verse text edit should have a "Chorus 1" marker')
+        assert '---[Chorus:1]---' in self.form.verse_text_edit.toPlainText(), \
+            'The verse text edit should have a "Chorus 1" marker'

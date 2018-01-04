@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -28,9 +28,9 @@ from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
 from openlp.plugins.songs.lib.importers.easyworship import EasyWorshipSongImport, FieldDescEntry, FieldType
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources', 'easyworshipsongs'))
+TEST_PATH = RESOURCE_PATH / 'songs' / 'easyworship'
 SONG_TEST_DATA = [
     {'title': 'Amazing Grace',
      'authors': ['John Newton'],
@@ -165,11 +165,10 @@ class TestEasyWorshipSongImport(TestCase):
         field_desc_entry = FieldDescEntry(name, field_type, size)
 
         # THEN:
-        self.assertIsNotNone(field_desc_entry, 'Import should not be none')
-        self.assertEqual(field_desc_entry.name, name, 'FieldDescEntry.name should be the same as the name argument')
-        self.assertEqual(field_desc_entry.field_type, field_type,
-                         'FieldDescEntry.type should be the same as the type argument')
-        self.assertEqual(field_desc_entry.size, size, 'FieldDescEntry.size should be the same as the size argument')
+        assert field_desc_entry is not None, 'Import should not be none'
+        assert field_desc_entry.name == name, 'FieldDescEntry.name should be the same as the name argument'
+        assert field_desc_entry.field_type == field_type, 'FieldDescEntry.type should be the same as the type argument'
+        assert field_desc_entry.size == size, 'FieldDescEntry.size should be the same as the size argument'
 
     def test_create_importer(self):
         """
@@ -183,7 +182,7 @@ class TestEasyWorshipSongImport(TestCase):
             importer = EasyWorshipSongImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
-            self.assertIsNotNone(importer, 'Import should not be none')
+            assert importer is not None, 'Import should not be none'
 
     def test_find_field_exists(self):
         """
@@ -201,7 +200,7 @@ class TestEasyWorshipSongImport(TestCase):
             for field_name in existing_fields:
 
                 # THEN: The item corresponding the index returned should have the same name attribute
-                self.assertEqual(importer.field_descriptions[importer.db_find_field(field_name)].name, field_name)
+                assert importer.field_descriptions[importer.db_find_field(field_name)].name == field_name
 
     def test_find_non_existing_field(self):
         """
@@ -236,7 +235,7 @@ class TestEasyWorshipSongImport(TestCase):
 
             # THEN: db_set_record_struct should return None and Struct should be called with a value representing
             #       the list of field descriptions
-            self.assertIsNone(return_value, 'db_set_record_struct should return None')
+            assert return_value is None, 'db_set_record_struct should return None'
             mocked_struct.Struct.assert_called_with('>50sHIB250s250s10sQ')
 
     @patch('openlp.plugins.songs.lib.importers.easyworship.SongImport')
@@ -257,9 +256,8 @@ class TestEasyWorshipSongImport(TestCase):
             return_value = importer.db_get_field(field_index)
 
             # THEN: db_get_field should return the known results
-            self.assertEqual(return_value, result,
-                             'db_get_field should return "%s" when called with "%s"' %
-                             (result, TEST_FIELDS[field_index]))
+            assert return_value == result, 'db_get_field should return "%s" when called with "%s"' % \
+                (result, TEST_FIELDS[field_index])
 
     @patch('openlp.plugins.songs.lib.importers.easyworship.SongImport')
     def test_get_memo_field(self, MockSongImport):
@@ -285,7 +283,7 @@ class TestEasyWorshipSongImport(TestCase):
 
             # THEN: db_get_field should return the appropriate value with the appropriate mocked objects being
             # called
-            self.assertEqual(importer.db_get_field(field_index), get_field_result)
+            assert importer.db_get_field(field_index) == get_field_result
             for call in get_field_read_calls:
                 mocked_memo_file.read.assert_any_call(call)
             for call in get_field_seek_calls:
@@ -330,7 +328,7 @@ class TestEasyWorshipSongImport(TestCase):
         mocked_stat.return_value.st_size = 0x7FF
 
         # THEN: do_import should return None having called Path.stat()
-        self.assertIsNone(importer.do_import(), 'do_import should return None when db_size is less than 0x800')
+        assert importer.do_import() is None, 'do_import should return None when db_size is less than 0x800'
         mocked_stat.assert_called_once_with()
 
     @patch('openlp.plugins.songs.lib.importers.easyworship.SongImport')
@@ -353,11 +351,10 @@ class TestEasyWorshipSongImport(TestCase):
 
         # THEN: do_import should return None having called closed the open files db and memo files.
         for effect in struct_unpack_return_values:
-            self.assertIsNone(importer.do_import(), 'do_import should return None when db_size is less than 0x800')
-            self.assertEqual(mocked_open().close.call_count, 2,
-                             'The open db and memo files should have been closed')
+            assert importer.do_import() is None, 'do_import should return None when db_size is less than 0x800'
+            assert mocked_open().close.call_count == 2, 'The open db and memo files should have been closed'
             mocked_open().close.reset_mock()
-            self.assertIs(mocked_open().seek.called, False, 'db_file.seek should not have been called.')
+            assert mocked_open().seek.called is False, 'db_file.seek should not have been called.'
 
     @patch('openlp.plugins.songs.lib.importers.easyworship.SongImport')
     @patch('openlp.plugins.songs.lib.importers.easyworship.Path.is_file', return_value=True)
@@ -383,14 +380,14 @@ class TestEasyWorshipSongImport(TestCase):
             mocked_retrieve_windows_encoding.return_value = False
 
             # THEN: do_import should return None having called retrieve_windows_encoding with the correct encoding.
-            self.assertIsNone(importer.do_import(), 'do_import should return None when db_size is less than 0x800')
+            assert importer.do_import() is None, 'do_import should return None when db_size is less than 0x800'
             mocked_retrieve_windows_encoding.assert_any_call(encoding)
 
     def test_db_file_import(self):
-        return self._run_db_file_import(os.path.join(TEST_PATH, 'Songs.DB'))
+        return self._run_db_file_import(TEST_PATH / 'Songs.DB')
 
     def test_sqlite_db_file_import(self):
-        return self._run_db_file_import(os.path.join(TEST_PATH, 'ew6'))
+        return self._run_db_file_import(TEST_PATH / 'ew6')
 
     def _run_db_file_import(self, source_path):
         """
@@ -420,12 +417,13 @@ class TestEasyWorshipSongImport(TestCase):
             importer.topics = []
 
             # WHEN: Importing each file
-            importer.import_source = source_path
+            # TODO: To Path object
+            importer.import_source = str(source_path)
             import_result = importer.do_import()
 
             # THEN: do_import should return none, the song data should be as expected, and finish should have been
             #       called.
-            self.assertIsNone(import_result, 'do_import should return None when it has completed')
+            assert import_result is None, 'do_import should return None when it has completed'
             for song_data in SONG_TEST_DATA:
                 title = song_data['title']
                 author_calls = song_data['authors']
@@ -433,19 +431,18 @@ class TestEasyWorshipSongImport(TestCase):
                 ccli_number = song_data['ccli_number']
                 add_verse_calls = song_data['verses']
                 verse_order_list = song_data['verse_order_list']
-                self.assertIn(title, importer._title_assignment_list, 'title for %s should be "%s"' % (title, title))
+                assert title in importer._title_assignment_list, 'title for %s should be "%s"' % (title, title)
                 for author in author_calls:
                     mocked_add_author.assert_any_call(author)
                 if song_copyright:
-                    self.assertEqual(importer.copyright, song_copyright)
+                    assert importer.copyright == song_copyright
                 if ccli_number:
-                    self.assertEqual(importer.ccli_number, ccli_number,
-                                     'ccli_number for %s should be %s' % (title, ccli_number))
+                    assert importer.ccli_number == ccli_number, 'ccli_number for %s should be %s' % (title, ccli_number)
                 for verse_text, verse_tag in add_verse_calls:
                     mocked_add_verse.assert_any_call(verse_text, verse_tag)
                 if verse_order_list:
-                    self.assertEqual(importer.verse_order_list, verse_order_list,
-                                     'verse_order_list for %s should be %s' % (title, verse_order_list))
+                    assert importer.verse_order_list == verse_order_list, \
+                        'verse_order_list for %s should be %s' % (title, verse_order_list)
                 mocked_finish.assert_called_with()
 
     @patch('openlp.plugins.songs.lib.importers.easyworship.SongImport')
@@ -475,14 +472,14 @@ class TestEasyWorshipSongImport(TestCase):
         importer.topics = []
 
         # WHEN: Importing ews file
-        importer.import_source = os.path.join(TEST_PATH, 'test1.ews')
+        importer.import_source = str(TEST_PATH / 'test1.ews')
         import_result = importer.do_import()
 
         # THEN: do_import should return none, the song data should be as expected, and finish should have been
         #       called.
         title = EWS_SONG_TEST_DATA['title']
-        self.assertIsNone(import_result, 'do_import should return None when it has completed')
-        self.assertIn(title, importer._title_assignment_list, 'title for should be "%s"' % title)
+        assert import_result is None, 'do_import should return None when it has completed'
+        assert title in importer._title_assignment_list, 'title for should be "%s"' % title
         mocked_add_author.assert_any_call(EWS_SONG_TEST_DATA['authors'][0])
         for verse_text, verse_tag in EWS_SONG_TEST_DATA['verses']:
             mocked_add_verse.assert_any_call(verse_text, verse_tag)
@@ -505,4 +502,4 @@ class TestEasyWorshipSongImport(TestCase):
         importer.set_song_import_object('Test Author', b'Det som var fr\x86n begynnelsen')
 
         # THEN: The import should fail
-        self.assertEquals(importer.entry_error_log, 'Unexpected data formatting.', 'Import should fail')
+        assert importer.entry_error_log == 'Unexpected data formatting.', 'Import should fail'

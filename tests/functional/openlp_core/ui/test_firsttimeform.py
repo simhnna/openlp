@@ -24,14 +24,12 @@ Package to test the openlp.core.ui.firsttimeform package.
 """
 import os
 import tempfile
-import urllib
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
 from openlp.core.ui.firsttimeform import FirstTimeForm
-
 from tests.helpers.testmixin import TestMixin
 
 FAKE_CONFIG = """

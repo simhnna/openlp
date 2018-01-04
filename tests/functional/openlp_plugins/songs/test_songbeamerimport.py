@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,18 +22,15 @@
 """
 This module contains tests for the Songbeamer song importer.
 """
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
-from openlp.core.common.path import Path
 from openlp.plugins.songs.lib.importers.songbeamer import SongBeamerImport, SongBeamerTypes
-
 from tests.helpers.songfileimport import SongImportTestHelper
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'songbeamersongs'))
+TEST_PATH = RESOURCE_PATH / 'songs' / 'songbeamer'
 
 
 class TestSongBeamerFileImport(SongImportTestHelper):
@@ -52,19 +49,19 @@ class TestSongBeamerFileImport(SongImportTestHelper):
         mocked_returned_settings = MagicMock()
         mocked_returned_settings.value.side_effect = lambda value: True if value == 'songs/enable chords' else False
         mocked_settings.return_value = mocked_returned_settings
-        self.file_import([Path(TEST_PATH, 'Amazing Grace.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Amazing Grace.json')))
-        self.file_import([Path(TEST_PATH, 'Lobsinget dem Herrn.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'Lobsinget dem Herrn.json')))
-        self.file_import([Path(TEST_PATH, 'When I Call On You.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'When I Call On You.json')))
+        self.file_import([TEST_PATH / 'Amazing Grace.sng'],
+                         self.load_external_result_data(TEST_PATH / 'Amazing Grace.json'))
+        self.file_import([TEST_PATH / 'Lobsinget dem Herrn.sng'],
+                         self.load_external_result_data(TEST_PATH / 'Lobsinget dem Herrn.json'))
+        self.file_import([TEST_PATH / 'When I Call On You.sng'],
+                         self.load_external_result_data(TEST_PATH / 'When I Call On You.json'))
 
     def test_cp1252_encoded_file(self):
         """
         Test that a CP1252 encoded file get's decoded properly.
         """
-        self.file_import([Path(TEST_PATH, 'cp1252song.sng')],
-                         self.load_external_result_data(os.path.join(TEST_PATH, 'cp1252song.json')))
+        self.file_import([TEST_PATH / 'cp1252song.sng'],
+                         self.load_external_result_data(TEST_PATH / 'cp1252song.json'))
 
 
 class TestSongBeamerImport(TestCase):
@@ -99,7 +96,7 @@ class TestSongBeamerImport(TestCase):
             importer = SongBeamerImport(mocked_manager, file_paths=[])
 
             # THEN: The importer object should not be None
-            self.assertIsNotNone(importer, 'Import should not be none')
+            assert importer is not None, 'Import should not be none'
 
     def test_invalid_import_source(self):
         """
@@ -115,10 +112,10 @@ class TestSongBeamerImport(TestCase):
             self.importer.import_source = source
 
             # THEN: do_import should return none and the progress bar maximum should not be set.
-            self.assertIsNone(self.importer.do_import(),
-                              'do_import should return None when import_source is not a list')
-            self.assertEqual(mocked_import_wizard.progress_bar.setMaximum.called, False,
-                             'setMaxium on import_wizard.progress_bar should not have been called')
+            assert self.importer.do_import() is None, \
+                'do_import should return None when import_source is not a list'
+            assert mocked_import_wizard.progress_bar.setMaximum.called is False, \
+                'setMaxium on import_wizard.progress_bar should not have been called'
 
     def test_valid_import_source(self):
         """
@@ -134,8 +131,8 @@ class TestSongBeamerImport(TestCase):
 
         # THEN: do_import should return none and the progress bar setMaximum should be called with the length of
         #       import_source.
-        self.assertIsNone(self.importer.do_import(),
-                          'do_import should return None when import_source is a list and stop_import_flag is True')
+        assert self.importer.do_import() is None, \
+            'do_import should return None when import_source is a list and stop_import_flag is True'
         mocked_import_wizard.progress_bar.setMaximum.assert_called_with(len(self.importer.import_source))
 
     def test_check_verse_marks(self):
@@ -149,8 +146,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back true and c as self.importer.current_verse_type
-        self.assertTrue(result, 'Versemark for <Refrain> should be found, value true')
-        self.assertEqual(self.importer.current_verse_type, 'c', '<Refrain> should be interpreted as <c>')
+        assert result is True, 'Versemark for <Refrain> should be found, value true'
+        assert self.importer.current_verse_type == 'c', '<Refrain> should be interpreted as <c>'
 
         # GIVEN: line with unnumbered verse-type and trailing space
         line = 'ReFrain '
@@ -158,8 +155,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back true and c as self.importer.current_verse_type
-        self.assertTrue(result, 'Versemark for <ReFrain > should be found, value true')
-        self.assertEqual(self.importer.current_verse_type, 'c', '<ReFrain > should be interpreted as <c>')
+        assert result is True, 'Versemark for <ReFrain > should be found, value true'
+        assert self.importer.current_verse_type == 'c', '<ReFrain > should be interpreted as <c>'
 
         # GIVEN: line with numbered verse-type
         line = 'VersE 1'
@@ -167,8 +164,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back true and v1 as self.importer.current_verse_type
-        self.assertTrue(result, 'Versemark for <VersE 1> should be found, value true')
-        self.assertEqual(self.importer.current_verse_type, 'v1', u'<VersE 1> should be interpreted as <v1>')
+        assert result is True, 'Versemark for <VersE 1> should be found, value true'
+        assert self.importer.current_verse_type == 'v1', u'<VersE 1> should be interpreted as <v1>'
 
         # GIVEN: line with special unnumbered verse-mark (used in Songbeamer to allow usage of non-supported tags)
         line = '$$M=special'
@@ -176,8 +173,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back true and o as self.importer.current_verse_type
-        self.assertTrue(result, 'Versemark for <$$M=special> should be found, value true')
-        self.assertEqual(self.importer.current_verse_type, 'o', u'<$$M=special> should be interpreted as <o>')
+        assert result is True, 'Versemark for <$$M=special> should be found, value true'
+        assert self.importer.current_verse_type == 'o', u'<$$M=special> should be interpreted as <o>'
 
         # GIVEN: line with song-text with 3 words
         line = 'Jesus my saviour'
@@ -185,9 +182,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back false and none as self.importer.current_verse_type
-        self.assertFalse(result, 'No versemark for <Jesus my saviour> should be found, value false')
-        self.assertIsNone(self.importer.current_verse_type,
-                          '<Jesus my saviour> should be interpreted as none versemark')
+        assert result is False, 'No versemark for <Jesus my saviour> should be found, value false'
+        assert self.importer.current_verse_type is None, '<Jesus my saviour> should be interpreted as none versemark'
 
         # GIVEN: line with song-text with 2 words
         line = 'Praise him'
@@ -195,8 +191,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back false and none as self.importer.current_verse_type
-        self.assertFalse(result, 'No versemark for <Praise him> should be found, value false')
-        self.assertIsNone(self.importer.current_verse_type, '<Praise him> should be interpreted as none versemark')
+        assert result is False, 'No versemark for <Praise him> should be found, value false'
+        assert self.importer.current_verse_type is None, '<Praise him> should be interpreted as none versemark'
 
         # GIVEN: line with only a space (could occur, nothing regular)
         line = ' '
@@ -204,8 +200,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back false and none as self.importer.current_verse_type
-        self.assertFalse(result, 'No versemark for < > should be found, value false')
-        self.assertIsNone(self.importer.current_verse_type, '< > should be interpreted as none versemark')
+        assert result is False, 'No versemark for < > should be found, value false'
+        assert self.importer.current_verse_type is None, '< > should be interpreted as none versemark'
 
         # GIVEN: blank line (could occur, nothing regular)
         line = ''
@@ -213,8 +209,8 @@ class TestSongBeamerImport(TestCase):
         # WHEN: line is being checked for verse marks
         result = self.importer.check_verse_marks(line)
         # THEN: we should get back false and none as self.importer.current_verse_type
-        self.assertFalse(result, 'No versemark for <> should be found, value false')
-        self.assertIsNone(self.importer.current_verse_type, '<> should be interpreted as none versemark')
+        assert result is False, 'No versemark for <> should be found, value false'
+        assert self.importer.current_verse_type is None, '<> should be interpreted as none versemark'
 
     def test_verse_marks_defined_in_lowercase(self):
         """
@@ -223,4 +219,4 @@ class TestSongBeamerImport(TestCase):
         # GIVEN: SongBeamber MarkTypes
         for tag in SongBeamerTypes.MarkTypes.keys():
             # THEN: tag should be defined in lowercase
-            self.assertEquals(tag, tag.lower(), 'Tags should be defined in lowercase')
+            assert tag == tag.lower(), 'Tags should be defined in lowercase'

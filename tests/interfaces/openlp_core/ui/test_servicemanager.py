@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -30,7 +30,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, ItemCapabilities
 from openlp.core.ui.servicemanager import ServiceManager
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -79,8 +78,8 @@ class TestServiceManager(TestCase, TestMixin):
         self.service_manager.setup_ui(self.service_manager)
 
         # THEN the count of items should be zero
-        self.assertEqual(self.service_manager.service_manager_list.topLevelItemCount(), 0,
-                         'The service manager list should be empty ')
+        assert self.service_manager.service_manager_list.topLevelItemCount() == 0, \
+            'The service manager list should be empty '
 
     @patch('openlp.core.ui.servicemanager.QtWidgets.QTreeWidget.itemAt')
     @patch('openlp.core.ui.servicemanager.QtWidgets.QWidget.mapToGlobal')
@@ -447,8 +446,8 @@ class TestServiceManager(TestCase, TestMixin):
         # THEN selection should be expanded
         selected_index = self.service_manager.service_manager_list.currentIndex()
         above_selected_index = self.service_manager.service_manager_list.indexAbove(selected_index)
-        self.assertTrue(self.service_manager.service_manager_list.isExpanded(above_selected_index),
-                        'Item should have been expanded')
+        assert self.service_manager.service_manager_list.isExpanded(above_selected_index) is True, \
+            'Item should have been expanded'
         self.service_manager.expanded.assert_called_once_with(song_item)
 
     def test_on_collapse_selection_with_parent_selected(self):
@@ -468,10 +467,10 @@ class TestServiceManager(TestCase, TestMixin):
 
         # THEN selection should be expanded
         selected_index = self.service_manager.service_manager_list.currentIndex()
-        self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
-                         'Item should have been collapsed')
-        self.assertTrue(self.service_manager.service_manager_list.currentItem() == song_item,
-                        'Top item should have been selected')
+        assert self.service_manager.service_manager_list.isExpanded(selected_index) is False, \
+            'Item should have been collapsed'
+        assert self.service_manager.service_manager_list.currentItem() == song_item, \
+            'Top item should have been selected'
         self.service_manager.collapsed.assert_called_once_with(song_item)
 
     def test_on_collapse_selection_with_child_selected(self):
@@ -491,8 +490,8 @@ class TestServiceManager(TestCase, TestMixin):
 
         # THEN selection should be expanded
         selected_index = self.service_manager.service_manager_list.currentIndex()
-        self.assertFalse(self.service_manager.service_manager_list.isExpanded(selected_index),
-                         'Item should have been collapsed')
-        self.assertTrue(self.service_manager.service_manager_list.currentItem() == song_item,
-                        'Top item should have been selected')
+        assert self.service_manager.service_manager_list.isExpanded(selected_index) is False, \
+            'Item should have been collapsed'
+        assert self.service_manager.service_manager_list.currentItem() == song_item, \
+            'Top item should have been selected'
         self.service_manager.collapsed.assert_called_once_with(song_item)

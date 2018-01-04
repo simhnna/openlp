@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -19,7 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import os
 import sys
 from unittest import TestCase, skip
 from unittest.mock import MagicMock, patch
@@ -28,8 +27,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.app import OpenLP, parse_options
 from openlp.core.common.settings import Settings
-
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'resources'))
+from tests.utils.constants import RESOURCE_PATH
 
 
 def test_parse_options_basic():
@@ -280,7 +278,7 @@ class TestOpenLP(TestCase):
         Test the reimplemented event method
         """
         # GIVEN: A file path and a QEvent.
-        file_path = os.path.join(TEST_PATH, 'church.jpg')
+        file_path = str(RESOURCE_PATH / 'church.jpg')
         mocked_file_method = MagicMock(return_value=file_path)
         event = QtCore.QEvent(QtCore.QEvent.FileOpen)
         event.file = mocked_file_method
@@ -310,7 +308,7 @@ class TestOpenLP(TestCase):
 
         # THEN:
         assert result is True, "The method should have returned True."
-        # self.assertFalse(self.openlp.main_window.isMinimized())
+        # assert self.openlp.main_window.isMinimized() is False
 
     @patch('openlp.core.app.get_version')
     @patch('openlp.core.app.QtWidgets.QMessageBox.question')

@@ -5,7 +5,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -39,7 +39,7 @@ def set_up_fault_handling():
     """
     # Create the cache directory if it doesn't exist, and enable the fault handler to log to an error log file
     create_paths(AppLocation.get_directory(AppLocation.CacheDir))
-    faulthandler.enable(open(str(AppLocation.get_directory(AppLocation.CacheDir) / 'error.log'), 'wb'))
+    faulthandler.enable((AppLocation.get_directory(AppLocation.CacheDir) / 'error.log').open('wb'))
 
 
 if __name__ == '__main__':

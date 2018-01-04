@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -30,7 +30,6 @@ from PyQt5 import QtWidgets
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.plugins.images.lib import ImageTab
-
 from tests.helpers.testmixin import TestMixin
 
 __default_settings__ = {
@@ -74,8 +73,8 @@ class TestImageMediaItem(TestCase, TestMixin):
         # WHEN: the save is invoked
         self.form.save()
         # THEN: the post process should not be requested
-        self.assertEqual(0, self.form.settings_form.register_post_process.call_count,
-                         'Image Post processing should not have been requested')
+        assert 0 == self.form.settings_form.register_post_process.call_count, \
+            'Image Post processing should not have been requested'
 
     def test_save_tab_change(self):
         """
@@ -86,7 +85,7 @@ class TestImageMediaItem(TestCase, TestMixin):
         # WHEN: the save is invoked
         self.form.save()
         # THEN: the post process should be requested
-        self.assertEqual(1, self.form.settings_form.register_post_process.call_count,
-                         'Image Post processing should have been requested')
+        assert 1 == self.form.settings_form.register_post_process.call_count, \
+            'Image Post processing should have been requested'
         # THEN: The color should be set
-        self.assertEqual(self.form.background_color, '#999999', 'The updated color should have been saved')
+        assert self.form.background_color == '#999999', 'The updated color should have been saved'

@@ -27,8 +27,8 @@ from unittest.mock import MagicMock
 
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
-from openlp.core.lib.pluginmanager import PluginManager
 from openlp.core.lib import PluginStatus
+from openlp.core.lib.pluginmanager import PluginManager
 
 
 class TestPluginManager(TestCase):

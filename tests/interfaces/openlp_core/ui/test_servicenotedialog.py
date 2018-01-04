@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -29,7 +29,6 @@ from PyQt5 import QtCore, QtTest, QtWidgets
 
 from openlp.core.common.registry import Registry
 from openlp.core.ui import servicenoteform
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -66,7 +65,7 @@ class TestStartNoteDialog(TestCase, TestMixin):
         QtTest.QTest.mouseClick(ok_widget, QtCore.Qt.LeftButton)
 
         # THEN the following input text is returned
-        self.assertEqual(self.form.text_edit.toPlainText(), '', 'The returned text should be empty')
+        assert self.form.text_edit.toPlainText() == '', 'The returned text should be empty'
 
         # WHEN displaying the UI, having set the text and pressing enter
         text = 'OpenLP is the best worship software'
@@ -77,7 +76,7 @@ class TestStartNoteDialog(TestCase, TestMixin):
         QtTest.QTest.mouseClick(ok_widget, QtCore.Qt.LeftButton)
 
         # THEN the following text is returned
-        self.assertEqual(self.form.text_edit.toPlainText(), text, 'The text originally entered should still be there')
+        assert self.form.text_edit.toPlainText() == text, 'The text originally entered should still be there'
 
         # WHEN displaying the UI, having set the text and pressing enter
         self.form.text_edit.setPlainText('')
@@ -88,4 +87,4 @@ class TestStartNoteDialog(TestCase, TestMixin):
         QtTest.QTest.mouseClick(ok_widget, QtCore.Qt.LeftButton)
 
         # THEN the following text is returned
-        self.assertEqual(self.form.text_edit.toPlainText(), text, 'The new text should be returned')
+        assert self.form.text_edit.toPlainText() == text, 'The new text should be returned'

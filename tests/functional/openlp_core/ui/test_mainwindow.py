@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -32,7 +32,6 @@ from openlp.core.common.i18n import UiStrings
 from openlp.core.common.registry import Registry
 from openlp.core.display.screens import ScreenList
 from openlp.core.ui.mainwindow import MainWindow
-
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH
 
@@ -117,8 +116,8 @@ class TestMainWindow(TestCase, TestMixin):
         # WHEN no changes are made to the service
 
         # THEN the main window's title shoud be the same as the OpenLP string in the UiStrings class
-        self.assertEqual(self.main_window.windowTitle(), UiStrings().OpenLP,
-                         'The main window\'s title should be the same as the OpenLP string in UiStrings class')
+        assert self.main_window.windowTitle() == UiStrings().OpenLP, \
+            'The main window\'s title should be the same as the OpenLP string in UiStrings class'
 
     def test_set_service_modifed(self):
         """
@@ -204,7 +203,7 @@ class TestMainWindow(TestCase, TestMixin):
             self.main_window.on_search_shortcut_triggered()
 
             # THEN: The media manager dock is made visible
-            self.assertEqual(0, mocked_media_manager_dock.setVisible.call_count)
+            assert 0 == mocked_media_manager_dock.setVisible.call_count
             mocked_widget.on_focus.assert_called_with()
 
     @patch('openlp.core.ui.mainwindow.FirstTimeForm')

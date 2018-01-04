@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -28,8 +28,7 @@ from unittest.mock import MagicMock, patch
 from PyQt5 import QtWidgets
 
 from openlp.core.common.registry import Registry
-from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm, PYSWORD_AVAILABLE
-
+from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm
 from tests.helpers.testmixin import TestMixin
 
 
@@ -78,7 +77,7 @@ class TestBibleImportForm(TestCase, TestMixin):
         self.form.on_web_update_button_clicked()
 
         # THEN: The webbible list should still be empty
-        self.assertEqual(self.form.web_bible_list, {}, 'The webbible list should be empty')
+        assert self.form.web_bible_list == {}, 'The webbible list should be empty'
 
     def test_custom_init(self):
         """

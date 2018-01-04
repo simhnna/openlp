@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -25,10 +25,9 @@ This module contains tests for the lib submodule of the Presentations plugin.
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, call
 
-from openlp.core.common.registry import Registry
 from openlp.core.common.path import Path
+from openlp.core.common.registry import Registry
 from openlp.plugins.presentations.lib.mediaitem import PresentationMediaItem
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -81,11 +80,11 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.build_file_mask_string()
 
         # THEN: The file mask should be generated correctly
-        self.assertIn('*.odp', self.media_item.on_new_file_masks, 'The file mask should contain the odp extension')
-        self.assertIn('*.ppt', self.media_item.on_new_file_masks, 'The file mask should contain the ppt extension')
-        self.assertIn('*.pdf', self.media_item.on_new_file_masks, 'The file mask should contain the pdf extension')
-        self.assertIn('*.xps', self.media_item.on_new_file_masks, 'The file mask should contain the xps extension')
-        self.assertIn('*.oxps', self.media_item.on_new_file_masks, 'The file mask should contain the oxps extension')
+        assert '*.odp' in self.media_item.on_new_file_masks, 'The file mask should contain the odp extension'
+        assert '*.ppt' in self.media_item.on_new_file_masks, 'The file mask should contain the ppt extension'
+        assert '*.pdf' in self.media_item.on_new_file_masks, 'The file mask should contain the pdf extension'
+        assert '*.xps' in self.media_item.on_new_file_masks, 'The file mask should contain the xps extension'
+        assert '*.oxps' in self.media_item.on_new_file_masks, 'The file mask should contain the oxps extension'
 
     def test_clean_up_thumbnails(self):
         """

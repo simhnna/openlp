@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -35,12 +35,28 @@ from openlp.core.common.registry import RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib.ui import create_widget_action
 from openlp.core.projectors import DialogSourceStyle
-from openlp.core.projectors.constants import ERROR_MSG, ERROR_STRING, E_AUTHENTICATION, E_ERROR, \
-    E_NETWORK, E_NOT_CONNECTED, E_UNKNOWN_SOCKET_ERROR, STATUS_STRING, S_CONNECTED, S_CONNECTING, S_COOLDOWN, \
-    S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, S_STANDBY, S_WARMUP
+from openlp.core.projectors.constants import \
+    E_AUTHENTICATION, \
+    E_ERROR, \
+    E_NETWORK, \
+    E_NOT_CONNECTED, \
+    E_UNKNOWN_SOCKET_ERROR, \
+    S_CONNECTED, \
+    S_CONNECTING, \
+    S_COOLDOWN, \
+    S_INITIALIZE, \
+    S_NOT_CONNECTED, \
+    S_OFF, \
+    S_ON, \
+    S_STANDBY, \
+    S_WARMUP,    \
+    STATUS_CODE, \
+    STATUS_MSG, \
+    QSOCKET_STATE
+
 from openlp.core.projectors.db import ProjectorDB
-from openlp.core.projectors.pjlink import PJLink, PJLinkUDP
 from openlp.core.projectors.editform import ProjectorEditForm
+from openlp.core.projectors.pjlink import PJLink, PJLinkUDP
 from openlp.core.projectors.sourceselectform import SourceSelectTabs, SourceSelectSingle
 from openlp.core.widgets.toolbar import OpenLPToolbar
 
@@ -439,11 +455,12 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         :param opt: Needed by PyQt5
         """
         projector = item.data(QtCore.Qt.UserRole)
-        if projector.link.state() != projector.link.ConnectedState:
+        if QSOCKET_STATE[projector.link.state()] != S_CONNECTED:
             try:
+                log.debug('ProjectorManager: Calling connect_to_host() on "{ip}"'.format(ip=projector.link.ip))
                 projector.link.connect_to_host()
             except:
-                pass
+                log.debug('ProjectorManager: "{ip}" already connected - skipping'.format(ip=projector.link.ip))
         return
 
     def on_connect_projector(self, opt=None):
@@ -646,7 +663,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
                                                                                    'Other info'),
                                                                    data=projector.link.other_info)
             message += '<b>{title}</b>: {data}<br />'.format(title=translate('OpenLP.ProjectorManager', 'Power status'),
-                                                             data=ERROR_MSG[projector.link.power])
+                                                             data=STATUS_MSG[projector.link.power])
             message += '<b>{title}</b>: {data}<br />'.format(title=translate('OpenLP.ProjectorManager', 'Shutter is'),
                                                              data=translate('OpenLP.ProjectorManager', 'Closed')
                                                              if projector.link.shutter
@@ -691,7 +708,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             else:
                 message += '<b>{data}</b>'.format(data=translate('OpenLP.ProjectorManager', 'Current errors/warnings'))
                 for (key, val) in projector.link.projector_errors.items():
-                    message += '<b>{key}</b>: {data}<br />'.format(key=key, data=ERROR_MSG[val])
+                    message += '<b>{key}</b>: {data}<br />'.format(key=key, data=STATUS_MSG[val])
         QtWidgets.QMessageBox.information(self, translate('OpenLP.ProjectorManager', 'Projector Information'), message)
 
     def _add_projector(self, projector):
@@ -816,31 +833,18 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             if ip == list_item.link.ip:
                 item = list_item
                 break
-        message = translate('OpenLP.ProjectorManager', 'No message') if msg is None else msg
-        if status in STATUS_STRING:
-            status_code = STATUS_STRING[status]
-            message = ERROR_MSG[status] if msg is None else msg
-        elif status in ERROR_STRING:
-            status_code = ERROR_STRING[status]
-            message = ERROR_MSG[status] if msg is None else msg
-        else:
-            status_code = status
-            message = ERROR_MSG[status] if msg is None else msg
-        log.debug('({name}) updateStatus(status={status}) message: "{message}"'.format(name=item.link.name,
-                                                                                       status=status_code,
-                                                                                       message=message))
-        if status in STATUS_ICONS:
-            if item.status == status:
-                return
-            item.status = status
-            item.icon = QtGui.QIcon(QtGui.QPixmap(STATUS_ICONS[status]))
-            if status in ERROR_STRING:
-                status_code = ERROR_STRING[status]
-            elif status in STATUS_STRING:
-                status_code = STATUS_STRING[status]
-            log.debug('({name}) Updating icon with {code}'.format(name=item.link.name, code=status_code))
-            item.widget.setIcon(item.icon)
-            self.update_icons()
+        if item is None:
+            log.error('ProjectorManager: Unknown item "{ip}" - not updating status'.format(ip=ip))
+            return
+        elif item.status == status:
+            log.debug('ProjectorManager: No status change for "{ip}" - not updating status'.format(ip=ip))
+            return
+
+        item.status = status
+        item.icon = QtGui.QIcon(QtGui.QPixmap(STATUS_ICONS[status]))
+        log.debug('({name}) Updating icon with {code}'.format(name=item.link.name, code=STATUS_CODE[status]))
+        item.widget.setIcon(item.icon)
+        return self.update_icons()
 
     def get_toolbar_item(self, name, enabled=False, hidden=False):
         item = self.one_toolbar.findChild(QtWidgets.QAction, name)
@@ -876,7 +880,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             self.get_toolbar_item('show_projector_multiple', hidden=True)
         elif count == 1:
             projector = self.projector_list_widget.selectedItems()[0].data(QtCore.Qt.UserRole)
-            connected = projector.link.state() == projector.link.ConnectedState
+            connected = QSOCKET_STATE[projector.link.state()] == S_CONNECTED
             power = projector.link.power == S_ON
             self.get_toolbar_item('connect_projector_multiple', hidden=True)
             self.get_toolbar_item('disconnect_projector_multiple', hidden=True)

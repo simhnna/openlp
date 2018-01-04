@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -30,7 +30,6 @@ from PyQt5 import QtCore
 from openlp.core.common.registry import Registry
 from openlp.core.lib import ServiceItem, PluginStatus
 from openlp.plugins.custom.lib import CustomMediaItem
-
 from tests.helpers.testmixin import TestMixin
 
 FOOTER = ['Arky Arky (Unknown)', 'Public Domain', 'CCLI 123456']
@@ -73,7 +72,7 @@ class TestMediaItem(TestCase, TestMixin):
         item = self.media_item.service_load(service_item)
 
         # THEN: the processing should be ignored
-        self.assertEqual(item, None, 'The Service item is inactive so processing should be bypassed')
+        assert item is None, 'The Service item is inactive so processing should be bypassed'
 
     def test_service_load_basic_custom_false(self):
         """
@@ -95,8 +94,8 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.service_load(service_item)
 
             # THEN: the item should not be added to the database.
-            self.assertEqual(self.media_item.create_from_service_item.call_count, 0,
-                             'The item should not have been added to the database')
+            assert self.media_item.create_from_service_item.call_count == 0, \
+                'The item should not have been added to the database'
 
     def test_service_load_basic_custom_true(self):
         """
@@ -118,5 +117,5 @@ class TestMediaItem(TestCase, TestMixin):
             self.media_item.service_load(service_item)
 
             # THEN: the item should not be added to the database.
-            self.assertEqual(self.media_item.create_from_service_item.call_count, 1,
-                             'The item should have been added to the database')
+            assert self.media_item.create_from_service_item.call_count == 1, \
+                'The item should have been added to the database'

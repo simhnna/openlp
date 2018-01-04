@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -27,12 +27,11 @@ from tempfile import mkdtemp
 from unittest import TestCase, skipIf
 from unittest.mock import MagicMock, patch
 
-from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from openlp.core.common import is_win
 from openlp.core.common.path import Path
-
+from openlp.plugins.presentations.lib.pptviewcontroller import PptviewDocument, PptviewController
 from tests.helpers.testmixin import TestMixin
-from tests.utils.constants import TEST_RESOURCES_PATH
+from tests.utils.constants import RESOURCE_PATH
 
 
 class TestPptviewController(TestCase, TestMixin):
@@ -67,8 +66,7 @@ class TestPptviewController(TestCase, TestMixin):
         controller = PptviewController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('Powerpoint Viewer', controller.name,
-                         'The name of the presentation controller should be correct')
+        assert 'Powerpoint Viewer' == controller.name, 'The name of the presentation controller should be correct'
 
     def test_check_available(self):
         """
@@ -86,9 +84,9 @@ class TestPptviewController(TestCase, TestMixin):
 
             # THEN: On windows it should return True, on other platforms False
             if is_win():
-                self.assertTrue(available, 'check_available should return True on windows.')
+                assert available is True, 'check_available should return True on windows.'
             else:
-                self.assertFalse(available, 'check_available should return False when not on windows.')
+                assert available is False, 'check_available should return False when not on windows.'
 
 
 class TestPptviewDocument(TestCase):
@@ -165,7 +163,7 @@ class TestPptviewDocument(TestCase):
             result = instance.load_presentation()
 
         # THEN: The temp folder should be created and PptviewDocument.load_presentation should return False
-        self.assertFalse(result)
+        assert result is False
 
     def test_create_titles_and_notes(self):
         """
@@ -173,7 +171,7 @@ class TestPptviewDocument(TestCase):
         """
         # GIVEN: mocked PresentationController.save_titles_and_notes and a pptx file
         doc = PptviewDocument(self.mock_controller, self.mock_presentation)
-        doc.file_path = Path(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
+        doc.file_path = RESOURCE_PATH / 'presentations' / 'test.pptx'
         doc.save_titles_and_notes = MagicMock()
 
         # WHEN reading the titles and notes
@@ -205,7 +203,7 @@ class TestPptviewDocument(TestCase):
             # THEN: File existens should have been checked, and not have been opened.
             doc.save_titles_and_notes.assert_called_once_with(None, None)
             mocked_path_exists.assert_called_with()
-            self.assertEqual(mocked_open.call_count, 0, 'There should be no calls to open a file.')
+            assert mocked_open.call_count == 0, 'There should be no calls to open a file.'
 
     def test_create_titles_and_notes_invalid_file(self):
         """
@@ -217,7 +215,7 @@ class TestPptviewDocument(TestCase):
             mocked_is_zf.return_value = False
             mocked_open.filesize = 10
             doc = PptviewDocument(self.mock_controller, self.mock_presentation)
-            doc.file_path = Path(TEST_RESOURCES_PATH, 'presentations', 'test.ppt')
+            doc.file_path = RESOURCE_PATH / 'presentations' / 'test.ppt'
             doc.save_titles_and_notes = MagicMock()
 
             # WHEN: reading the titles and notes
@@ -225,4 +223,4 @@ class TestPptviewDocument(TestCase):
 
             # THEN:
             doc.save_titles_and_notes.assert_called_once_with(None, None)
-            self.assertEqual(mocked_is_zf.call_count, 1, 'is_zipfile should have been called once')
+            assert mocked_is_zf.call_count == 1, 'is_zipfile should have been called once'

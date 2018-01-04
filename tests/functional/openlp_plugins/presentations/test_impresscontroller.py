@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,17 +22,17 @@
 """
 Functional tests to test the Impress class and related methods.
 """
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
 import shutil
 from tempfile import mkdtemp
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.plugins.presentations.lib.impresscontroller import ImpressController, ImpressDocument, TextType
 from openlp.plugins.presentations.presentationplugin import __default_settings__
 
-from tests.utils.constants import TEST_RESOURCES_PATH
+from tests.utils.constants import RESOURCE_PATH
 from tests.helpers.testmixin import TestMixin
 
 
@@ -69,8 +69,7 @@ class TestImpressController(TestCase, TestMixin):
         controller = ImpressController(plugin=self.mock_plugin)
 
         # THEN: The name of the presentation controller should be correct
-        self.assertEqual('Impress', controller.name,
-                         'The name of the presentation controller should be correct')
+        assert 'Impress' == controller.name, 'The name of the presentation controller should be correct'
 
     @patch('openlp.plugins.presentations.lib.impresscontroller.log')
     def test_check_available(self, mocked_log):
@@ -135,7 +134,7 @@ class TestImpressDocument(TestCase):
         mocked_plugin = MagicMock()
         mocked_plugin.settings_section = 'presentations'
         Settings().extend_default_settings(__default_settings__)
-        self.file_name = Path(TEST_RESOURCES_PATH, 'presentations', 'test.pptx')
+        self.file_name = RESOURCE_PATH / 'presentations' / 'test.pptx'
         self.ppc = ImpressController(mocked_plugin)
         self.doc = ImpressDocument(self.ppc, self.file_name)
 
@@ -179,22 +178,21 @@ class TestImpressDocument(TestCase):
         result = self.doc._ImpressDocument__get_text_from_page(0, TextType.Notes)
 
         # THEN: the result should be an empty string
-        self.assertEqual(result, '', 'Result should be an empty string')
+        assert result == '', 'Result should be an empty string'
 
         # WHEN: regardless of the type of text, index 0x00 is out of bounds
         result = self.doc._ImpressDocument__get_text_from_page(0, TextType.Title)
 
         # THEN: result should be an empty string
-        self.assertEqual(result, '', 'Result should be an empty string')
+        assert result == '', 'Result should be an empty string'
 
         # WHEN: when called with 2, it should also be out of bounds
         result = self.doc._ImpressDocument__get_text_from_page(2, TextType.SlideText)
 
         # THEN: result should be an empty string ... and, getByIndex should
         # have never been called
-        self.assertEqual(result, '', 'Result should be an empty string')
-        self.assertEqual(self.doc.document.getDrawPages().getByIndex.call_count, 0,
-                         'There should be no call to getByIndex')
+        assert result == '', 'Result should be an empty string'
+        assert self.doc.document.getDrawPages().getByIndex.call_count == 0, 'There should be no call to getByIndex'
 
     def test_get_text_from_page_wrong_type(self):
         """
@@ -208,9 +206,8 @@ class TestImpressDocument(TestCase):
         result = self.doc._ImpressDocument__get_text_from_page(1, 3)
 
         # THEN: result should be an empty string
-        self.assertEqual(result, '', 'Result should be and empty string')
-        self.assertEqual(self.doc.document.getDrawPages().getByIndex.call_count, 0,
-                         'There should be no call to getByIndex')
+        assert result == '', 'Result should be and empty string'
+        assert self.doc.document.getDrawPages().getByIndex.call_count == 0, 'There should be no call to getByIndex'
 
     def test_get_text_from_page_valid_params(self):
         """
@@ -224,19 +221,19 @@ class TestImpressDocument(TestCase):
         result = self.doc._ImpressDocument__get_text_from_page(1, TextType.Notes)
 
         # THEN: result should be 'Note\nNote\n'
-        self.assertEqual(result, 'Note\nNote\n', 'Result should be \'Note\\n\' times the count of notes in the page')
+        assert result == 'Note\nNote\n', 'Result should be \'Note\\n\' times the count of notes in the page'
 
         # WHEN: get the Title
         result = self.doc._ImpressDocument__get_text_from_page(1, TextType.Title)
 
         # THEN: result should be 'Title\n'
-        self.assertEqual(result, 'Title\n', 'Result should be exactly \'Title\\n\'')
+        assert result == 'Title\n', 'Result should be exactly \'Title\\n\''
 
         # WHEN: get all text
         result = self.doc._ImpressDocument__get_text_from_page(1, TextType.SlideText)
 
         # THEN: result should be 'Title\nString\nString\n'
-        self.assertEqual(result, 'Title\nString\nString\n', 'Result should be exactly \'Title\\nString\\nString\\n\'')
+        assert result == 'Title\nString\nString\n', 'Result should be exactly \'Title\\nString\\nString\\n\''
 
     def _mock_a_LibreOffice_document(self, page_count, note_count, text_count):
         """

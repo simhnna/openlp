@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,24 +22,21 @@
 """
 This module contains tests for the OpenLyrics song importer.
 """
-import os
 import json
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from lxml import etree, objectify
 
-from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib.importers.openlyrics import OpenLyricsImport
 from openlp.plugins.songs.lib.importers.songimport import SongImport
 from openlp.plugins.songs.lib.openlyricsxml import OpenLyrics
-
 from tests.helpers.testmixin import TestMixin
+from tests.utils.constants import RESOURCE_PATH
 
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                         '..', '..', '..', 'resources', 'openlyricssongs'))
+TEST_PATH = RESOURCE_PATH / 'songs' / 'openlyrics'
 SONG_TEST_DATA = {
     'What a friend we have in Jesus.xml': {
         'title': 'What A Friend We Have In Jesus',
@@ -114,7 +111,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             importer = OpenLyricsImport(mocked_manager, file_paths=[])
 
             # THEN: The importer should be an instance of SongImport
-            self.assertIsInstance(importer, SongImport)
+            assert isinstance(importer, SongImport)
 
     def test_file_import(self):
         """
@@ -130,11 +127,11 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             importer.open_lyrics.xml_to_song = MagicMock()
 
             # WHEN: Importing each file
-            importer.import_source = [Path(TEST_PATH, song_file)]
+            importer.import_source = [TEST_PATH / song_file]
             importer.do_import()
 
             # THEN: The xml_to_song() method should have been called
-            self.assertTrue(importer.open_lyrics.xml_to_song.called)
+            assert importer.open_lyrics.xml_to_song.called is True
 
     def test_process_formatting_tags(self):
         """
@@ -145,7 +142,7 @@ class TestOpenLyricsImport(TestCase, TestMixin):
         Settings().setValue('formattingTags/html_tags', json.dumps(start_tags))
         ol = OpenLyrics(mocked_manager)
         parser = etree.XMLParser(remove_blank_text=True)
-        parsed_file = etree.parse(open(os.path.join(TEST_PATH, 'duchu-tags.xml'), 'rb'), parser)
+        parsed_file = etree.parse((TEST_PATH / 'duchu-tags.xml').open('rb'), parser)
         xml = etree.tostring(parsed_file).decode()
         song_xml = objectify.fromstring(xml)
 
@@ -153,9 +150,8 @@ class TestOpenLyricsImport(TestCase, TestMixin):
         ol._process_formatting_tags(song_xml, False)
 
         # THEN: New tags should have been saved
-        self.assertListEqual(json.loads(json.dumps(result_tags)),
-                             json.loads(str(Settings().value('formattingTags/html_tags'))),
-                             'The formatting tags should contain both the old and the new')
+        assert json.loads(json.dumps(result_tags)) == json.loads(str(Settings().value('formattingTags/html_tags'))), \
+            'The formatting tags should contain both the old and the new'
 
     def test_process_author(self):
         """
@@ -173,8 +169,8 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             ol._process_authors(properties_xml, mocked_song)
 
             # THEN: add_author should have been called twice
-            self.assertEquals(mocked_song.method_calls[0][1][1], 'words+music')
-            self.assertEquals(mocked_song.method_calls[1][1][1], 'words')
+            assert mocked_song.method_calls[0][1][1] == 'words+music'
+            assert mocked_song.method_calls[1][1][1] == 'words'
 
     def test_process_songbooks(self):
         """
@@ -192,5 +188,5 @@ class TestOpenLyricsImport(TestCase, TestMixin):
             ol._process_songbooks(properties_xml, mocked_song)
 
             # THEN: add_songbook_entry should have been called twice
-            self.assertEquals(mocked_song.method_calls[0][1][1], '48')
-            self.assertEquals(mocked_song.method_calls[1][1][1], '445 A')
+            assert mocked_song.method_calls[0][1][1] == '48'
+            assert mocked_song.method_calls[1][1][1] == '445 A'

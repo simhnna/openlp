@@ -22,7 +22,6 @@
 """
 Package to test the openlp.core.lib package.
 """
-import os
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -32,8 +31,7 @@ from openlp.core.common.path import Path
 from openlp.core.lib import FormattingTags, build_icon, check_item_selected, clean_tags, compare_chord_lyric, \
     create_separated_list, create_thumb, expand_chords, expand_chords_for_printing, expand_tags, find_formatting_tags, \
     get_text_file_string, image_to_byte, resize_image, str_to_bool, validate_thumb
-
-TEST_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'resources'))
+from tests.utils.constants import RESOURCE_PATH
 
 
 class TestLib(TestCase):
@@ -273,8 +271,8 @@ class TestLib(TestCase):
         Test the create_thumb() function with a given size.
         """
         # GIVEN: An image to create a thumb of.
-        image_path = Path(TEST_PATH, 'church.jpg')
-        thumb_path = Path(TEST_PATH, 'church_thumb.jpg')
+        image_path = RESOURCE_PATH / 'church.jpg'
+        thumb_path = RESOURCE_PATH / 'church_thumb.jpg'
         thumb_size = QtCore.QSize(10, 20)
 
         # Remove the thumb so that the test actually tests if the thumb will be created. Maybe it was not deleted in the
@@ -291,7 +289,7 @@ class TestLib(TestCase):
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created and scaled to the given size.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert thumb_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -307,8 +305,8 @@ class TestLib(TestCase):
         Test the create_thumb() function with no size specified.
         """
         # GIVEN: An image to create a thumb of.
-        image_path = Path(TEST_PATH, 'church.jpg')
-        thumb_path = Path(TEST_PATH, 'church_thumb.jpg')
+        image_path = RESOURCE_PATH / 'church.jpg'
+        thumb_path = RESOURCE_PATH / 'church_thumb.jpg'
         expected_size = QtCore.QSize(63, 88)
 
         # Remove the thumb so that the test actually tests if the thumb will be created. Maybe it was not deleted in the
@@ -325,7 +323,7 @@ class TestLib(TestCase):
         icon = create_thumb(image_path, thumb_path)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -341,8 +339,8 @@ class TestLib(TestCase):
         Test the create_thumb() function with invalid size specified.
         """
         # GIVEN: An image to create a thumb of.
-        image_path = Path(TEST_PATH, 'church.jpg')
-        thumb_path = Path(TEST_PATH, 'church_thumb.jpg')
+        image_path = RESOURCE_PATH / 'church.jpg'
+        thumb_path = RESOURCE_PATH / 'church_thumb.jpg'
         thumb_size = QtCore.QSize(-1, -1)
         expected_size = QtCore.QSize(63, 88)
 
@@ -376,8 +374,8 @@ class TestLib(TestCase):
         Test the create_thumb() function with a size of only width specified.
         """
         # GIVEN: An image to create a thumb of.
-        image_path = Path(TEST_PATH, 'church.jpg')
-        thumb_path = Path(TEST_PATH, 'church_thumb.jpg')
+        image_path = RESOURCE_PATH / 'church.jpg'
+        thumb_path = RESOURCE_PATH / 'church_thumb.jpg'
         thumb_size = QtCore.QSize(100, -1)
         expected_size = QtCore.QSize(100, 137)
 
@@ -411,8 +409,8 @@ class TestLib(TestCase):
         Test the create_thumb() function with a size of only height specified.
         """
         # GIVEN: An image to create a thumb of.
-        image_path = Path(TEST_PATH, 'church.jpg')
-        thumb_path = Path(TEST_PATH, 'church_thumb.jpg')
+        image_path = RESOURCE_PATH / 'church.jpg'
+        thumb_path = RESOURCE_PATH / 'church_thumb.jpg'
         thumb_size = QtCore.QSize(-1, 100)
         expected_size = QtCore.QSize(72, 100)
 
@@ -430,7 +428,7 @@ class TestLib(TestCase):
         icon = create_thumb(image_path, thumb_path, size=thumb_size)
 
         # THEN: Check if the thumb was created, retaining its aspect ratio.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert expected_size == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -446,8 +444,8 @@ class TestLib(TestCase):
         Test the create_thumb() function with a size of only height specified.
         """
         # GIVEN: An image to create a thumb of.
-        image_path = Path(TEST_PATH, 'church.jpg')
-        thumb_path = Path(TEST_PATH, 'church_thumb.jpg')
+        image_path = RESOURCE_PATH / 'church.jpg'
+        thumb_path = RESOURCE_PATH / 'church_thumb.jpg'
         thumb_size = QtCore.QSize(-1, 100)
         expected_size_1 = QtCore.QSize(88, 88)
         expected_size_2 = QtCore.QSize(100, 100)
@@ -468,7 +466,7 @@ class TestLib(TestCase):
             icon = create_thumb(image_path, thumb_path, size=None)
 
         # THEN: Check if the thumb was created with aspect ratio of 1.
-        self.assertTrue(thumb_path.exists(), 'Test was not ran, because the thumb already exists')
+        assert thumb_path.exists() is True, 'Test was not ran, because the thumb already exists'
         assert isinstance(icon, QtGui.QIcon), 'The icon should be a QIcon'
         assert icon.isNull() is False, 'The icon should not be null'
         assert expected_size_1 == QtGui.QImageReader(str(thumb_path)).size(), 'The thumb should have the given size'
@@ -639,7 +637,7 @@ class TestLib(TestCase):
         Test the resize_thumb() function
         """
         # GIVEN: A path to an image.
-        image_path = os.path.join(TEST_PATH, 'church.jpg')
+        image_path = str(RESOURCE_PATH / 'church.jpg')
         wanted_width = 777
         wanted_height = 72
         # We want the background to be white.
@@ -660,7 +658,7 @@ class TestLib(TestCase):
         Test the resize_thumb() function ignoring aspect ratio
         """
         # GIVEN: A path to an image.
-        image_path = os.path.join(TEST_PATH, 'church.jpg')
+        image_path = str(RESOURCE_PATH / 'church.jpg')
         wanted_width = 1000
         wanted_height = 1000
         # We want the background to be white.
@@ -789,7 +787,7 @@ class TestLib(TestCase):
         ret = compare_chord_lyric(chord, lyrics)
 
         # THEN: The returned value should 0 because the lyric is longer than the chord
-        self.assertEquals(0, ret, 'The returned value should 0 because the lyric is longer than the chord')
+        assert 0 == ret, 'The returned value should 0 because the lyric is longer than the chord'
 
     def test_compare_chord_lyric_long_chord(self):
         """

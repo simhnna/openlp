@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,11 +24,11 @@ The :mod:`http` module contains the API web server. This is a lightweight web se
 with OpenLP. It uses JSON to communicate with the remotes.
 """
 import asyncio
-import websockets
 import json
 import logging
 import time
 
+import websockets
 from PyQt5 import QtCore
 
 from openlp.core.common.mixins import LogMixin, RegistryProperties

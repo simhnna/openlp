@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -58,9 +58,9 @@ class TestAuthorsForm(TestCase, TestMixin):
         """
         Test the AuthorForm defaults are correct
         """
-        self.assertEqual(self.form.first_name_edit.text(), '', 'The first name edit should be empty')
-        self.assertEqual(self.form.last_name_edit.text(), '', 'The last name edit should be empty')
-        self.assertEqual(self.form.display_edit.text(), '', 'The display name edit should be empty')
+        assert self.form.first_name_edit.text() == '', 'The first name edit should be empty'
+        assert self.form.last_name_edit.text() == '', 'The last name edit should be empty'
+        assert self.form.display_edit.text() == '', 'The display name edit should be empty'
 
     def test_get_first_name_property(self):
         """
@@ -73,7 +73,7 @@ class TestAuthorsForm(TestCase, TestMixin):
         self.form.first_name_edit.setText(first_name)
 
         # THEN: The first_name property should have the correct value
-        self.assertEqual(self.form.first_name, first_name, 'The first name property should be correct')
+        assert self.form.first_name == first_name, 'The first name property should be correct'
 
     def test_set_first_name_property(self):
         """
@@ -86,7 +86,7 @@ class TestAuthorsForm(TestCase, TestMixin):
         self.form.first_name = first_name
 
         # THEN: The first_name_edit should have the correct value
-        self.assertEqual(self.form.first_name_edit.text(), first_name, 'The first name should be set correctly')
+        assert self.form.first_name_edit.text() == first_name, 'The first name should be set correctly'
 
     def test_get_last_name_property(self):
         """
@@ -99,7 +99,7 @@ class TestAuthorsForm(TestCase, TestMixin):
         self.form.last_name_edit.setText(last_name)
 
         # THEN: The last_name property should have the correct value
-        self.assertEqual(self.form.last_name, last_name, 'The last name property should be correct')
+        assert self.form.last_name == last_name, 'The last name property should be correct'
 
     def test_set_last_name_property(self):
         """
@@ -112,7 +112,7 @@ class TestAuthorsForm(TestCase, TestMixin):
         self.form.last_name = last_name
 
         # THEN: The last_name_edit should have the correct value
-        self.assertEqual(self.form.last_name_edit.text(), last_name, 'The last name should be set correctly')
+        assert self.form.last_name_edit.text() == last_name, 'The last name should be set correctly'
 
     def test_get_display_name_property(self):
         """
@@ -125,7 +125,7 @@ class TestAuthorsForm(TestCase, TestMixin):
         self.form.display_edit.setText(display_name)
 
         # THEN: The display_name property should have the correct value
-        self.assertEqual(self.form.display_name, display_name, 'The display name property should be correct')
+        assert self.form.display_name == display_name, 'The display name property should be correct'
 
     def test_set_display_name_property(self):
         """
@@ -138,7 +138,7 @@ class TestAuthorsForm(TestCase, TestMixin):
         self.form.display_name = display_name
 
         # THEN: The display_name_edit should have the correct value
-        self.assertEqual(self.form.display_edit.text(), display_name, 'The display name should be set correctly')
+        assert self.form.display_edit.text() == display_name, 'The display name should be set correctly'
 
     @patch('openlp.plugins.songs.forms.authorsform.QtWidgets.QDialog.exec')
     def test_exec(self, mocked_exec):

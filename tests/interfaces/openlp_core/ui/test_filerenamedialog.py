@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -29,7 +29,6 @@ from PyQt5 import QtTest, QtWidgets
 
 from openlp.core.common.registry import Registry
 from openlp.core.ui import filerenameform
-
 from tests.helpers.testmixin import TestMixin
 
 
@@ -63,19 +62,19 @@ class TestStartFileRenameForm(TestCase, TestMixin):
             self.form.exec()
 
             # THEN: the window title is set correctly
-            self.assertEqual(self.form.windowTitle(), 'File Rename', 'The window title should be "File Rename"')
+            assert self.form.windowTitle() == 'File Rename', 'The window title should be "File Rename"'
 
             # WHEN: The form is executed with False arg
             self.form.exec(False)
 
             # THEN: the window title is set correctly
-            self.assertEqual(self.form.windowTitle(), 'File Rename', 'The window title should be "File Rename"')
+            assert self.form.windowTitle() == 'File Rename', 'The window title should be "File Rename"'
 
             # WHEN: The form is executed with True arg
             self.form.exec(True)
 
             # THEN: the window title is set correctly
-            self.assertEqual(self.form.windowTitle(), 'File Copy', 'The window title should be "File Copy"')
+            assert self.form.windowTitle() == 'File Copy', 'The window title should be "File Copy"'
 
     def test_line_edit_focus(self):
         """
@@ -104,4 +103,4 @@ class TestStartFileRenameForm(TestCase, TestMixin):
 
         # THEN: The text in the QLineEdit should be the same as the input string with the invalid characters filtered
         # out.
-        self.assertEqual(self.form.file_name_edit.text(), 'Invalid File Name')
+        assert self.form.file_name_edit.text() == 'Invalid File Name'
