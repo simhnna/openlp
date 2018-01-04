@@ -29,7 +29,6 @@ import logging
 import time
 
 import websockets
-from PyQt5 import QtCore
 
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.registry import Registry
@@ -59,12 +58,11 @@ class WebSocketWorker(ThreadWorker):
         self.ws_server.start_server()
         self.quit.emit()
 
-    @QtCore.pyqtSlot()
     def stop(self):
         """
         Stop the websocket server
         """
-        self.ws_server.stop = True
+        self.ws_server.stop_server()
 
 
 class WebSocketServer(RegistryProperties, LogMixin):
@@ -96,6 +94,15 @@ class WebSocketServer(RegistryProperties, LogMixin):
             event_loop.run_forever()
         else:
             log.debug('Failed to start ws server on port {port}'.format(port=port))
+
+    def stop_server(self):
+        """
+        Stop the websocket server
+        """
+        if hasattr(self.ws_server, 'ws_server'):
+            self.ws_server.ws_server.close()
+        elif hasattr(self.ws_server, 'server'):
+            self.ws_server.server.close()
 
     def start_websocket_instance(self, address, port):
         """

@@ -27,7 +27,7 @@ import logging
 import time
 
 from PyQt5 import QtCore, QtWidgets
-from waitress import serve
+from waitress.server import create_server
 
 from openlp.core.api.deploy import download_and_check, download_sha256
 from openlp.core.api.endpoint.controller import controller_endpoint, api_controller_endpoint
@@ -61,10 +61,18 @@ class HttpWorker(ThreadWorker):
         port = Settings().value('api/port')
         Registry().execute('get_website_version')
         try:
-            serve(application, host=address, port=port)
+            self.server = create_server(application, host=address, port=port)
+            self.server.run()
         except OSError:
             log.exception('An error occurred when serving the application.')
         self.quit.emit()
+
+    def stop(self):
+        """
+        A method to stop the worker
+        """
+        if hasattr(self, 'server'):
+            self.server.close()
 
 
 class HttpServer(RegistryBase, RegistryProperties, LogMixin):

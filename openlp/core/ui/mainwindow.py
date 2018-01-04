@@ -499,8 +499,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Settings().set_up_default_values()
         self.about_form = AboutForm(self)
         MediaController()
-        websockets.WebSocketServer()
-        server.HttpServer()
+        self.ws_server = websockets.WebSocketServer()
+        self.http_server = server.HttpServer(self)
         SettingsForm(self)
         self.formatting_tag_form = FormattingTagForm(self)
         self.shortcut_form = ShortcutListForm(self)
@@ -560,7 +560,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         for thread_name in self.threads.keys():
             self.application.processEvents()
             thread = self.threads[thread_name]['thread']
+            worker = self.threads[thread_name]['worker']
             try:
+                if worker and hasattr(worker, 'stop'):
+                    # If the worker has a stop method, run it
+                    worker.stop()
                 if thread and thread.isRunning():
                     # If the thread is running, let's wait 5 seconds for it
                     retry = 0
@@ -1028,20 +1032,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if not self.application.is_event_loop_active:
             event.ignore()
             return
-        # If we just did a settings import, close without saving changes.
-        if self.settings_imported:
-            self.clean_up(False)
-            event.accept()
         if self.service_manager_contents.is_modified():
             ret = self.service_manager_contents.save_modified_service()
             if ret == QtWidgets.QMessageBox.Save:
                 if self.service_manager_contents.decide_save_method():
-                    self.clean_up()
                     event.accept()
                 else:
                     event.ignore()
             elif ret == QtWidgets.QMessageBox.Discard:
-                self.clean_up()
                 event.accept()
             else:
                 event.ignore()
@@ -1057,15 +1055,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 close_button.setText(translate('OpenLP.MainWindow', '&Exit OpenLP'))
                 msg_box.setDefaultButton(QtWidgets.QMessageBox.Close)
                 if msg_box.exec() == QtWidgets.QMessageBox.Close:
-                    self.clean_up()
                     event.accept()
                 else:
                     event.ignore()
             else:
-                self.clean_up()
                 event.accept()
         if event.isAccepted():
+            # Wait for all the threads to complete
             self._wait_for_threads()
+            # If we just did a settings import, close without saving changes.
+            self.clean_up(save_settings=not self.settings_imported)
 
     def clean_up(self, save_settings=True):
         """
