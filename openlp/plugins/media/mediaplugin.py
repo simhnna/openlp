@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -23,7 +23,6 @@
 The Media plugin
 """
 import logging
-import os
 import re
 
 from PyQt5 import QtCore
@@ -36,7 +35,6 @@ from openlp.core.common.path import Path
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.media.endpoint import api_media_endpoint, media_endpoint
 from openlp.plugins.media.lib import MediaMediaItem, MediaTab
-
 
 log = logging.getLogger(__name__)
 

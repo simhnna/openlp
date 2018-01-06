@@ -34,7 +34,6 @@ from openlp.core.display.screens import ScreenList
 from openlp.core.lib import PluginManager
 from openlp.core.ui import MainDisplay, AudioPlayer
 from openlp.core.ui.maindisplay import TRANSPARENT_STYLESHEET, OPAQUE_STYLESHEET
-
 from tests.helpers.testmixin import TestMixin
 
 if is_macosx():

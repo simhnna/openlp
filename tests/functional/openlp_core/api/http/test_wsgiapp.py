@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -23,12 +23,11 @@
 Functional test the routing code.
 """
 import os
-
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from openlp.core.api.http.endpoint import Endpoint
 from openlp.core.api.http import register_endpoint, application, NotFound
+from openlp.core.api.http.endpoint import Endpoint
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 

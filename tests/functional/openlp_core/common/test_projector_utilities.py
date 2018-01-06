@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -26,7 +26,6 @@ Package to test the openlp.core.ui.projector.networkutils package.
 from unittest import TestCase
 
 from openlp.core.common import verify_ip_address, md5_hash, qmd5_hash
-
 from tests.resources.projector.data import TEST_PIN, TEST_SALT, TEST_HASH
 
 salt = TEST_SALT

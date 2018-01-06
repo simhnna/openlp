@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -24,15 +24,14 @@ Functional tests to test the PowerPointController class and related methods.
 """
 import os
 import shutil
+from tempfile import mkdtemp
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
-from tempfile import mkdtemp
 
 from openlp.core.common import is_win
 from openlp.core.common.settings import Settings
 from openlp.plugins.presentations.lib.powerpointcontroller import PowerpointController, PowerpointDocument, \
     _get_text_from_shapes
-
 from tests.helpers.testmixin import TestMixin
 from tests.utils.constants import TEST_RESOURCES_PATH
 

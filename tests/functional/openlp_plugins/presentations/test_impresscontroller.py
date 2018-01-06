@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -22,13 +22,13 @@
 """
 Functional tests to test the Impress class and related methods.
 """
-from unittest import TestCase
-from unittest.mock import MagicMock, patch
 import shutil
 from tempfile import mkdtemp
+from unittest import TestCase
+from unittest.mock import MagicMock, patch
 
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from openlp.plugins.presentations.lib.impresscontroller import ImpressController, ImpressDocument, TextType
 from openlp.plugins.presentations.presentationplugin import __default_settings__
 

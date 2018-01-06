@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -27,28 +27,28 @@ import logging
 from openlp.core.common import is_win
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.widgets.wizard import WizardStrings
-from .importers.opensong import OpenSongImport
+from .importers.cclifile import CCLIFileImport
+from .importers.chordpro import ChordProImport
+from .importers.dreambeam import DreamBeamImport
 from .importers.easyslides import EasySlidesImport
+from .importers.easyworship import EasyWorshipSongImport
+from .importers.foilpresenter import FoilPresenterImport
+from .importers.lyrix import LyrixImport
 from .importers.openlp import OpenLPSongImport
 from .importers.openlyrics import OpenLyricsImport
-from .importers.wordsofworship import WordsOfWorshipImport
-from .importers.cclifile import CCLIFileImport
-from .importers.dreambeam import DreamBeamImport
-from .importers.powersong import PowerSongImport
-from .importers.easyworship import EasyWorshipSongImport
-from .importers.songbeamer import SongBeamerImport
-from .importers.songshowplus import SongShowPlusImport
-from .importers.songpro import SongProImport
-from .importers.sundayplus import SundayPlusImport
-from .importers.foilpresenter import FoilPresenterImport
-from .importers.zionworx import ZionWorxImport
-from .importers.propresenter import ProPresenterImport
-from .importers.worshipassistant import WorshipAssistantImport
+from .importers.opensong import OpenSongImport
 from .importers.powerpraise import PowerPraiseImport
+from .importers.powersong import PowerSongImport
 from .importers.presentationmanager import PresentationManagerImport
-from .importers.lyrix import LyrixImport
+from .importers.propresenter import ProPresenterImport
+from .importers.songbeamer import SongBeamerImport
+from .importers.songpro import SongProImport
+from .importers.songshowplus import SongShowPlusImport
+from .importers.sundayplus import SundayPlusImport
 from .importers.videopsalm import VideoPsalmImport
-from .importers.chordpro import ChordProImport
+from .importers.wordsofworship import WordsOfWorshipImport
+from .importers.worshipassistant import WorshipAssistantImport
+from .importers.zionworx import ZionWorxImport
 
 log = logging.getLogger(__name__)
 

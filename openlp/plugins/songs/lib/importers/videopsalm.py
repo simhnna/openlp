@@ -4,7 +4,7 @@
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
 # --------------------------------------------------------------------------- #
-# Copyright (c) 2008-2017 OpenLP Developers                                   #
+# Copyright (c) 2008-2018 OpenLP Developers                                   #
 # --------------------------------------------------------------------------- #
 # This program is free software; you can redistribute it and/or modify it     #
 # under the terms of the GNU General Public License as published by the Free  #
@@ -27,10 +27,10 @@ import logging
 import re
 
 from openlp.core.common.i18n import translate
-from openlp.core.common.settings import Settings
 from openlp.core.common.path import Path
-from openlp.plugins.songs.lib.importers.songimport import SongImport
+from openlp.core.common.settings import Settings
 from openlp.plugins.songs.lib.db import AuthorType
+from openlp.plugins.songs.lib.importers.songimport import SongImport
 
 log = logging.getLogger(__name__)
 

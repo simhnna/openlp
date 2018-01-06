@@ -22,7 +22,6 @@
 """
 Package to test the openlp.core.lib.theme package.
 """
-import os
 from pathlib import Path
 from unittest import TestCase
 
