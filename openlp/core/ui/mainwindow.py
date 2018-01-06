@@ -1382,4 +1382,4 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if not isinstance(filename, str):
             filename = str(filename, sys.getfilesystemencoding())
         if filename.endswith(('.osz', '.oszl')):
-            self.service_manager_contents.load_file(filename)
+            self.service_manager_contents.load_file(Path(filename))

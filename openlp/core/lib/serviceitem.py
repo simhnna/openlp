@@ -427,13 +427,8 @@ class ServiceItem(RegistryProperties):
         self.has_original_files = True
         if 'background_audio' in header:
             self.background_audio = []
-            for filename in header['background_audio']:
-                # Give them real file paths.
-                filepath = str(filename)
-                if path:
-                    # Windows can handle both forward and backward slashes, so we use ntpath to get the basename
-                    filepath = os.path.join(path, ntpath.basename(str(filename)))
-                self.background_audio.append(filepath)
+            for file_path in header['background_audio']:
+                self.background_audio.append(file_path)
         self.theme_overwritten = header.get('theme_overwritten', False)
         if self.service_item_type == ServiceItemType.Text:
             for slide in service_item['serviceitem']['data']:
@@ -538,7 +533,7 @@ class ServiceItem(RegistryProperties):
         Confirms if the ServiceItem uses a file
         """
         return self.service_item_type == ServiceItemType.Image or \
-            (self.service_item_type == ServiceItemType.Command and not self.is_capable(ItemCapabilities.IsOptical))
+               (self.service_item_type == ServiceItemType.Command and not self.is_capable(ItemCapabilities.IsOptical))
 
     def is_text(self):
         """
