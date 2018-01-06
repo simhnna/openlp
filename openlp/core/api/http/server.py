@@ -72,7 +72,10 @@ class HttpWorker(ThreadWorker):
         A method to stop the worker
         """
         if hasattr(self, 'server'):
-            self.server.close()
+            # Loop through all the channels and close them to stop the server
+            for channel in self.server._map.values():
+                if hasattr(channel, 'close'):
+                    channel.close()
 
 
 class HttpServer(RegistryBase, RegistryProperties, LogMixin):
