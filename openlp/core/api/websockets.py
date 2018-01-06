@@ -79,8 +79,8 @@ class WebSocketWorker(ThreadWorker, RegistryProperties, LogMixin):
         address = Settings().value('api/ip address')
         port = Settings().value('api/websocket port')
         # Start the event loop
-        event_loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(event_loop)
+        self.event_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self.event_loop)
         # Create the websocker server
         loop = 1
         self.server = None
@@ -96,8 +96,8 @@ class WebSocketWorker(ThreadWorker, RegistryProperties, LogMixin):
                 log.error('Unable to start WebSocket server {addr}:{port}, giving up'.format(addr=address, port=port))
         if self.server:
             # If the websocket server exists, start listening
-            event_loop.run_until_complete(self.server)
-            event_loop.run_forever()
+            self.event_loop.run_until_complete(self.server)
+            self.event_loop.run_forever()
         self.quit.emit()
 
     def stop(self):
@@ -108,6 +108,8 @@ class WebSocketWorker(ThreadWorker, RegistryProperties, LogMixin):
             self.server.ws_server.close()
         elif hasattr(self.server, 'server'):
             self.server.server.close()
+        self.event_loop.stop()
+        self.event_loop.close()
 
 
 class WebSocketServer(RegistryProperties, LogMixin):
