@@ -308,8 +308,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         self.settings_section = 'projector'
         self.projectordb = projectordb
         self.projector_list = []
-        self.pjlink_udp = PJLinkUDP()
-        self.pjlink_udp.projector_list = self.projector_list
+        self.pjlink_udp = PJLinkUDP(self.projector_list)
         self.source_select_form = None
 
     def bootstrap_initialise(self):

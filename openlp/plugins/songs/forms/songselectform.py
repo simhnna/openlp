@@ -27,24 +27,23 @@ from time import sleep
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common import is_win
 from openlp.core.common.i18n import translate
-from openlp.core.common.registry import Registry
+from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.settings import Settings
+from openlp.core.threading import ThreadWorker, run_thread
 from openlp.plugins.songs.forms.songselectdialog import Ui_SongSelectDialog
 from openlp.plugins.songs.lib.songselect import SongSelectImport
 
 log = logging.getLogger(__name__)
 
 
-class SearchWorker(QtCore.QObject):
+class SearchWorker(ThreadWorker):
     """
     Run the actual SongSelect search, and notify the GUI when we find each song.
     """
     show_info = QtCore.pyqtSignal(str, str)
     found_song = QtCore.pyqtSignal(dict)
     finished = QtCore.pyqtSignal()
-    quit = QtCore.pyqtSignal()
 
     def __init__(self, importer, search_text):
         super().__init__()
@@ -74,7 +73,7 @@ class SearchWorker(QtCore.QObject):
         self.found_song.emit(song)
 
 
-class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog):
+class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog, RegistryProperties):
     """
     The :class:`SongSelectForm` class is the SongSelect dialog.
     """
@@ -90,8 +89,6 @@ class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog):
         """
         Initialise the SongSelectForm
         """
-        self.thread = None
-        self.worker = None
         self.song_count = 0
         self.song = None
         self.set_progress_visible(False)
@@ -311,17 +308,11 @@ class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog):
         search_history = self.search_combobox.getItems()
         Settings().setValue(self.plugin.settings_section + '/songselect searches', '|'.join(search_history))
         # Create thread and run search
-        self.thread = QtCore.QThread()
-        self.worker = SearchWorker(self.song_select_importer, self.search_combobox.currentText())
-        self.worker.moveToThread(self.thread)
-        self.thread.started.connect(self.worker.start)
-        self.worker.show_info.connect(self.on_search_show_info)
-        self.worker.found_song.connect(self.on_search_found_song)
-        self.worker.finished.connect(self.on_search_finished)
-        self.worker.quit.connect(self.thread.quit)
-        self.worker.quit.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
-        self.thread.start()
+        worker = SearchWorker(self.song_select_importer, self.search_combobox.currentText())
+        worker.show_info.connect(self.on_search_show_info)
+        worker.found_song.connect(self.on_search_found_song)
+        worker.finished.connect(self.on_search_finished)
+        run_thread(worker, 'songselect')
 
     def on_stop_button_clicked(self):
         """
@@ -408,16 +399,3 @@ class SongSelectForm(QtWidgets.QDialog, Ui_SongSelectDialog):
         """
         self.search_progress_bar.setVisible(is_visible)
         self.stop_button.setVisible(is_visible)
-
-    @property
-    def application(self):
-        """
-        Adds the openlp to the class dynamically.
-        Windows needs to access the application in a dynamic manner.
-        """
-        if is_win():
-            return Registry().get('application')
-        else:
-            if not hasattr(self, '_application'):
-                self._application = Registry().get('application')
-            return self._application

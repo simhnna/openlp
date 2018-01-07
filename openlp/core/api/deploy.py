@@ -25,7 +25,7 @@ Download and "install" the remote web client
 from zipfile import ZipFile
 
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.httputils import url_get_file, get_web_page, get_url_file_size
+from openlp.core.common.httputils import download_file, get_web_page, get_url_file_size
 from openlp.core.common.registry import Registry
 
 
@@ -65,7 +65,7 @@ def download_and_check(callback=None):
     sha256, version = download_sha256()
     file_size = get_url_file_size('https://get.openlp.org/webclient/site.zip')
     callback.setRange(0, file_size)
-    if url_get_file(callback, 'https://get.openlp.org/webclient/site.zip',
-                    AppLocation.get_section_data_path('remotes') / 'site.zip',
-                    sha256=sha256):
+    if download_file(callback, 'https://get.openlp.org/webclient/site.zip',
+                     AppLocation.get_section_data_path('remotes') / 'site.zip',
+                     sha256=sha256):
         deploy_zipfile(AppLocation.get_section_data_path('remotes'), 'site.zip')

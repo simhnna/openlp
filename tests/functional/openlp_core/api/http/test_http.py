@@ -42,23 +42,8 @@ class TestHttpServer(TestCase):
         Registry().register('service_list', MagicMock())
 
     @patch('openlp.core.api.http.server.HttpWorker')
-    @patch('openlp.core.api.http.server.QtCore.QThread')
-    def test_server_start(self, mock_qthread, mock_thread):
-        """
-        Test the starting of the Waitress Server with the disable flag set off
-        """
-        # GIVEN: A new httpserver
-        # WHEN: I start the server
-        Registry().set_flag('no_web_server', True)
-        HttpServer()
-
-        # THEN: the api environment should have been created
-        assert mock_qthread.call_count == 1, 'The qthread should have been called once'
-        assert mock_thread.call_count == 1, 'The http thread should have been called once'
-
-    @patch('openlp.core.api.http.server.HttpWorker')
-    @patch('openlp.core.api.http.server.QtCore.QThread')
-    def test_server_start_not_required(self, mock_qthread, mock_thread):
+    @patch('openlp.core.api.http.server.run_thread')
+    def test_server_start(self, mocked_run_thread, MockHttpWorker):
         """
         Test the starting of the Waitress Server with the disable flag set off
         """
@@ -68,5 +53,20 @@ class TestHttpServer(TestCase):
         HttpServer()
 
         # THEN: the api environment should have been created
-        assert mock_qthread.call_count == 0, 'The qthread should not have have been called'
-        assert mock_thread.call_count == 0, 'The http thread should not have been called'
+        assert mocked_run_thread.call_count == 1, 'The qthread should have been called once'
+        assert MockHttpWorker.call_count == 1, 'The http thread should have been called once'
+
+    @patch('openlp.core.api.http.server.HttpWorker')
+    @patch('openlp.core.api.http.server.run_thread')
+    def test_server_start_not_required(self, mocked_run_thread, MockHttpWorker):
+        """
+        Test the starting of the Waitress Server with the disable flag set off
+        """
+        # GIVEN: A new httpserver
+        # WHEN: I start the server
+        Registry().set_flag('no_web_server', True)
+        HttpServer()
+
+        # THEN: the api environment should have been created
+        assert mocked_run_thread.call_count == 0, 'The qthread should not have have been called'
+        assert MockHttpWorker.call_count == 0, 'The http thread should not have been called'
