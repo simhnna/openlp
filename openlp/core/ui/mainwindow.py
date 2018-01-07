@@ -728,7 +728,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # Update the theme widget
         self.theme_manager_contents.load_themes()
         # Check if any Bibles downloaded.  If there are, they will be processed.
-        Registry().execute('bibles_load_list', True)
+        Registry().execute('bibles_load_list')
         self.application.set_normal_cursor()
 
     def is_display_blank(self):
