@@ -87,7 +87,7 @@ class HttpServer(RegistryBase, RegistryProperties, LogMixin):
         Initialise the http server, and start the http server
         """
         super(HttpServer, self).__init__(parent)
-        if Registry().get_flag('no_web_server'):
+        if not Registry().get_flag('no_web_server'):
             worker = HttpWorker()
             run_thread(worker, 'http_server')
             Registry().register_function('download_website', self.first_time)

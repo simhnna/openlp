@@ -305,7 +305,7 @@ def parse_options(args=None):
     parser.add_argument('-d', '--dev-version', dest='dev_version', action='store_true',
                         help='Ignore the version file and pull the version directly from Bazaar')
     parser.add_argument('-s', '--style', dest='style', help='Set the Qt5 style (passed directly to Qt5).')
-    parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_false',
+    parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_true',
                         help='Turn off the Web and Socket Server ')
     parser.add_argument('rargs', nargs='?', default=[])
     # Parse command line options and deal with them. Use args supplied pragmatically if possible.
@@ -358,7 +358,7 @@ def main(args=None):
     application.setOrganizationDomain('openlp.org')
     application.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
     application.setAttribute(QtCore.Qt.AA_DontCreateNativeWidgetSiblings, True)
-    if args and args.portable:
+    if args.portable:
         application.setApplicationName('OpenLPPortable')
         Settings.setDefaultFormat(Settings.IniFormat)
         # Get location OpenLPPortable.ini

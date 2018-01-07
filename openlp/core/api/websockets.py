@@ -121,6 +121,6 @@ class WebSocketServer(RegistryProperties, LogMixin):
         Initialise and start the WebSockets server
         """
         super(WebSocketServer, self).__init__()
-        if Registry().get_flag('no_web_server'):
+        if not Registry().get_flag('no_web_server'):
             worker = WebSocketWorker()
             run_thread(worker, 'websocket_server')
