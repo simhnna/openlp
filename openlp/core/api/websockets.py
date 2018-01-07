@@ -40,13 +40,13 @@ log = logging.getLogger(__name__)
 
 async def handle_websocket(request, path):
     """
-    Handle web socket requests and return the poll information.
-    Check ever 0.2 seconds to get the latest position and send if changed.
-    Only gets triggered when 1st client attaches
+    Handle web socket requests and return the poll information
+
+    Check every 0.2 seconds to get the latest position and send if it changed. This only gets triggered when the first
+    client connects.
 
     :param request: request from client
     :param path: determines the endpoints supported
-    :return:
     """
     log.debug('WebSocket handler registered with client')
     previous_poll = None
@@ -88,7 +88,7 @@ class WebSocketWorker(ThreadWorker, RegistryProperties, LogMixin):
             try:
                 self.server = serve(handle_websocket, address, port)
                 log.debug('WebSocket server started on {addr}:{port}'.format(addr=address, port=port))
-            except Exception as e:
+            except Exception:
                 log.exception('Failed to start WebSocket server')
                 loop += 1
                 time.sleep(0.1)
