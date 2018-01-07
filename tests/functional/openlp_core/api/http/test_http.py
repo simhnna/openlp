@@ -49,7 +49,7 @@ class TestHttpServer(TestCase):
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        Registry().set_flag('no_web_server', True)
+        Registry().set_flag('no_web_server', False)
         HttpServer()
 
         # THEN: the api environment should have been created
@@ -64,7 +64,7 @@ class TestHttpServer(TestCase):
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        Registry().set_flag('no_web_server', False)
+        Registry().set_flag('no_web_server', True)
         HttpServer()
 
         # THEN: the api environment should have been created

@@ -70,7 +70,7 @@ class TestWSServer(TestCase, TestMixin):
         """
         # GIVEN: A new httpserver
         # WHEN: I start the server
-        Registry().set_flag('no_web_server', True)
+        Registry().set_flag('no_web_server', False)
         WebSocketServer()
 
         # THEN: the api environment should have been created
@@ -85,7 +85,7 @@ class TestWSServer(TestCase, TestMixin):
         """
         # GIVEN: A new httpserver and the server is not required
         # WHEN: I start the server
-        Registry().set_flag('no_web_server', False)
+        Registry().set_flag('no_web_server', True)
         WebSocketServer()
 
         # THEN: the api environment should have been created

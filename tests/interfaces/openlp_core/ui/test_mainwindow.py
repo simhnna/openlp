@@ -44,21 +44,21 @@ class TestMainWindow(TestCase, TestMixin):
         self.app.set_normal_cursor = MagicMock()
         self.app.args = []
         Registry().register('application', self.app)
-        Registry().set_flag('no_web_server', False)
+        Registry().set_flag('no_web_server', True)
         # Mock classes and methods used by mainwindow.
-        with patch('openlp.core.ui.mainwindow.SettingsForm') as mocked_settings_form, \
-                patch('openlp.core.ui.mainwindow.ImageManager') as mocked_image_manager, \
-                patch('openlp.core.ui.mainwindow.LiveController') as mocked_live_controller, \
-                patch('openlp.core.ui.mainwindow.PreviewController') as mocked_preview_controller, \
-                patch('openlp.core.ui.mainwindow.OpenLPDockWidget') as mocked_dock_widget, \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox') as mocked_q_tool_box_class, \
-                patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget') as mocked_add_dock_method, \
-                patch('openlp.core.ui.mainwindow.ServiceManager') as mocked_service_manager, \
-                patch('openlp.core.ui.mainwindow.ThemeManager') as mocked_theme_manager, \
-                patch('openlp.core.ui.mainwindow.ProjectorManager') as mocked_projector_manager, \
-                patch('openlp.core.ui.mainwindow.Renderer') as mocked_renderer, \
-                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer') as mocked_websocketserver, \
-                patch('openlp.core.ui.mainwindow.server.HttpServer') as mocked_httpserver:
+        with patch('openlp.core.ui.mainwindow.SettingsForm'), \
+                patch('openlp.core.ui.mainwindow.ImageManager'), \
+                patch('openlp.core.ui.mainwindow.LiveController'), \
+                patch('openlp.core.ui.mainwindow.PreviewController'), \
+                patch('openlp.core.ui.mainwindow.OpenLPDockWidget'), \
+                patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox'), \
+                patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget'), \
+                patch('openlp.core.ui.mainwindow.ServiceManager'), \
+                patch('openlp.core.ui.mainwindow.ThemeManager'), \
+                patch('openlp.core.ui.mainwindow.ProjectorManager'), \
+                patch('openlp.core.ui.mainwindow.Renderer'), \
+                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer'), \
+                patch('openlp.core.ui.mainwindow.server.HttpServer'):
             self.main_window = MainWindow()
 
     def tearDown(self):
