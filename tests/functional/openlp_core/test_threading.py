@@ -47,9 +47,9 @@ def test_run_thread_exists(MockRegistry):
     Test that trying to run a thread with a name that already exists will throw a KeyError
     """
     # GIVEN: A mocked registry with a main window object
-    mocked_main_window = MagicMock()
-    mocked_main_window.threads = {'test_thread': MagicMock()}
-    MockRegistry.return_value.get.return_value = mocked_main_window
+    mocked_application = MagicMock()
+    mocked_application.worker_threads = {'test_thread': MagicMock()}
+    MockRegistry.return_value.get.return_value = mocked_application
 
     # WHEN: run_thread() is called
     try:
@@ -66,18 +66,19 @@ def test_run_thread(MockRegistry, MockQThread):
     Test that running a thread works correctly
     """
     # GIVEN: A mocked registry with a main window object
-    mocked_main_window = MagicMock()
-    mocked_main_window.threads = {}
-    MockRegistry.return_value.get.return_value = mocked_main_window
+    mocked_application = MagicMock()
+    mocked_application.worker_threads = {}
+    MockRegistry.return_value.get.return_value = mocked_application
 
     # WHEN: run_thread() is called
     run_thread(MagicMock(), 'test_thread')
 
     # THEN: The thread should be in the threads list and the correct methods should have been called
-    assert len(mocked_main_window.threads.keys()) == 1, 'There should be 1 item in the list of threads'
-    assert list(mocked_main_window.threads.keys()) == ['test_thread'], 'The test_thread item should be in the list'
-    mocked_worker = mocked_main_window.threads['test_thread']['worker']
-    mocked_thread = mocked_main_window.threads['test_thread']['thread']
+    assert len(mocked_application.worker_threads.keys()) == 1, 'There should be 1 item in the list of threads'
+    assert list(mocked_application.worker_threads.keys()) == ['test_thread'], \
+        'The test_thread item should be in the list'
+    mocked_worker = mocked_application.worker_threads['test_thread']['worker']
+    mocked_thread = mocked_application.worker_threads['test_thread']['thread']
     mocked_worker.moveToThread.assert_called_once_with(mocked_thread)
     mocked_thread.started.connect.assert_called_once_with(mocked_worker.start)
     expected_quit_calls = [call(mocked_thread.quit), call(mocked_worker.deleteLater)]
