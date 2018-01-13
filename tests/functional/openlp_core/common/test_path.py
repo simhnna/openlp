@@ -27,7 +27,7 @@ from unittest import TestCase
 from unittest.mock import ANY, MagicMock, patch
 
 from openlp.core.common.path import Path, copy, copyfile, copytree, create_paths, path_to_str, replace_params, \
-    str_to_path, which
+    str_to_path, which, files_to_paths
 
 
 class TestShutil(TestCase):
@@ -401,3 +401,16 @@ class TestPath(TestCase):
         except:
             # THEN: `create_paths` raises an exception
             pass
+
+    def test_files_to_paths(self):
+        """
+        Test the files_to_paths() method
+        """
+        # GIVEN: A list of string filenames
+        test_files = ['/tmp/openlp/file1.txt', '/tmp/openlp/file2.txt']
+
+        # WHEN: files_to_paths is called
+        result = files_to_paths(test_files)
+
+        # THEN: The result should be a list of Paths
+        assert result == [Path('/tmp/openlp/file1.txt'), Path('/tmp/openlp/file2.txt')]

@@ -23,14 +23,14 @@
 Package to test the openlp.core.lib.ui package.
 """
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.lib.ui import add_welcome_page, create_button_box, create_horizontal_adjusting_combo_box, \
     create_button, create_action, create_valign_selection_widgets, find_and_set_in_combo_box, create_widget_action, \
-    set_case_insensitive_completer
+    set_case_insensitive_completer, critical_error_message_box
 
 
 class TestUi(TestCase):
@@ -80,6 +80,34 @@ class TestUi(TestCase):
         assert 1 == len(btnbox.buttons())
         assert QtWidgets.QDialogButtonBox.HelpRole, btnbox.buttonRole(btnbox.buttons()[0])
 
+    @patch('openlp.core.lib.ui.Registry')
+    def test_critical_error_message_box(self, MockRegistry):
+        """
+        Test the critical_error_message_box() function
+        """
+        # GIVEN: A mocked Registry
+        # WHEN: critical_error_message_box() is called
+        critical_error_message_box('Error', 'This is an error')
+
+        # THEN: The error_message() method on the main window should be called
+        MockRegistry.return_value.get.return_value.error_message.assert_called_once_with('Error', 'This is an error')
+
+    @patch('openlp.core.lib.ui.QtWidgets.QMessageBox.critical')
+    def test_critical_error_question(self, mocked_critical):
+        """
+        Test the critical_error_message_box() function
+        """
+        # GIVEN: A mocked critical() method and some other mocks
+        mocked_parent = MagicMock()
+
+        # WHEN: critical_error_message_box() is called
+        critical_error_message_box(None, 'This is a question', mocked_parent, True)
+
+        # THEN: The error_message() method on the main window should be called
+        mocked_critical.assert_called_once_with(mocked_parent, 'Error', 'This is a question',
+                                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
+                                                                                      QtWidgets.QMessageBox.No))
+
     def test_create_horizontal_adjusting_combo_box(self):
         """
         Test creating a horizontal adjusting combo box
@@ -92,65 +120,64 @@ class TestUi(TestCase):
 
         # THEN: We should get a ComboBox
         assert isinstance(combo, QtWidgets.QComboBox)
-        assert 'combo1' == combo.objectName()
+        assert combo.objectName() == 'combo1'
         assert QtWidgets.QComboBox.AdjustToMinimumContentsLength == combo.sizeAdjustPolicy()
 
-    def test_create_button(self):
+    @patch('openlp.core.lib.ui.log')
+    def test_create_button(self, mocked_log):
         """
         Test creating a button
         """
         # GIVEN: A dialog
         dialog = QtWidgets.QDialog()
 
-        # WHEN: We create the button
-        btn = create_button(dialog, 'my_btn')
-
-        # THEN: We should get a button with a name
-        assert isinstance(btn, QtWidgets.QPushButton)
-        assert 'my_btn' == btn.objectName()
-        assert btn.isEnabled() is True
-
         # WHEN: We create a button with some attributes
-        btn = create_button(dialog, 'my_btn', text='Hello', tooltip='How are you?', enabled=False)
+        btn = create_button(dialog, 'my_btn', text='Hello', tooltip='How are you?', enabled=False, role='test', test=1)
 
         # THEN: We should get a button with those attributes
         assert isinstance(btn, QtWidgets.QPushButton)
-        assert 'Hello' == btn.text()
-        assert 'How are you?' == btn.toolTip()
+        assert btn.objectName() == 'my_btn'
+        assert btn.text() == 'Hello'
+        assert btn.toolTip() == 'How are you?'
         assert btn.isEnabled() is False
+        assert mocked_log.warning.call_args_list == [call('The role "test" is not defined in create_push_button().'),
+                                                     call('Parameter test was not consumed in create_button().')]
+
+    def test_create_tool_button(self):
+        """
+        Test creating a toolbutton
+        """
+        # GIVEN: A dialog
+        dialog = QtWidgets.QDialog()
 
         # WHEN: We create a toolbutton
         btn = create_button(dialog, 'my_btn', btn_class='toolbutton')
 
         # THEN: We should get a toolbutton
         assert isinstance(btn, QtWidgets.QToolButton)
-        assert 'my_btn' == btn.objectName()
+        assert btn.objectName() == 'my_btn'
         assert btn.isEnabled() is True
 
-    def test_create_action(self):
+    @patch('openlp.core.lib.ui.log')
+    def test_create_action(self, mocked_log):
         """
         Test creating an action
         """
         # GIVEN: A dialog
         dialog = QtWidgets.QDialog()
 
-        # WHEN: We create an action
-        action = create_action(dialog, 'my_action')
-
-        # THEN: We should get a QAction
-        assert isinstance(action, QtWidgets.QAction)
-        assert 'my_action' == action.objectName()
-
         # WHEN: We create an action with some properties
         action = create_action(dialog, 'my_action', text='my text', icon=':/wizards/wizard_firsttime.bmp',
-                               tooltip='my tooltip', statustip='my statustip')
+                               tooltip='my tooltip', statustip='my statustip', test=1)
 
         # THEN: These properties should be set
         assert isinstance(action, QtWidgets.QAction)
-        assert 'my text' == action.text()
+        assert action.objectName() == 'my_action'
+        assert action.text() == 'my text'
         assert isinstance(action.icon(), QtGui.QIcon)
-        assert 'my tooltip' == action.toolTip()
-        assert 'my statustip' == action.statusTip()
+        assert action.toolTip() == 'my tooltip'
+        assert action.statusTip() == 'my statustip'
+        mocked_log.warning.assert_called_once_with('Parameter test was not consumed in create_action().')
 
     def test_create_action_on_mac_osx(self):
         """
