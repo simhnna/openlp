@@ -89,5 +89,5 @@ def upgrade_3(session, metadata):
     upgrade_db = 'pjlink_class' not in [col.name for col in projector_table.c.values()]
     if upgrade_db:
         new_op = get_upgrade_op(session)
-        new_op.add_column('projector', Column('pjlink_class', types.String(1), server_default=null()))
+        new_op.add_column('projector', Column('pjlink_class', types.String(5), server_default=null()))
     log.debug('{status} projector DB upgrade to version 3'.format(status='Updated' if upgrade_db else 'Skipping'))

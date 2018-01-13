@@ -152,7 +152,7 @@ class Projector(Base, CommonMixin):
         location:       Column(String(30))
         notes:          Column(String(200))
         pjlink_name:    Column(String(128))  # From projector
-        pjlink_class    Column(String(1))    # From projector
+        pjlink_class    Column(String(5))    # From projector
         manufacturer:   Column(String(128))  # From projector
         model:          Column(String(128))  # From projector
         other:          Column(String(128))  # From projector
@@ -199,7 +199,7 @@ class Projector(Base, CommonMixin):
     location = Column(String(30))
     notes = Column(String(200))
     pjlink_name = Column(String(128))
-    pjlink_class = Column(String(1))
+    pjlink_class = Column(String(5))
     manufacturer = Column(String(128))
     model = Column(String(128))
     other = Column(String(128))
