@@ -93,7 +93,8 @@ def is_thread_finished(thread_name):
     """
     thread_info = Registry().get('application').worker_threads.get(thread_name)
     if not thread_info:
-        raise KeyError('No thread named "{}" exists'.format(thread_name))
+        # If the thread doesnt exist anymore, it's probably because it is finished
+        return True
     return thread_info['thread'].isFinished()
 
 

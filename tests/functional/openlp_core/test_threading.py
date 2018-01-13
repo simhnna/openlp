@@ -151,33 +151,29 @@ def test_is_thread_finished(MockRegistry):
     """
     # GIVEN: A mock thread and worker
     mocked_thread = MagicMock()
-    mocked_thread.isFinished.return_value = True
+    mocked_thread.isFinished.return_value = False
     MockRegistry.return_value.get.return_value.worker_threads = {'test': {'thread': mocked_thread}}
 
     # WHEN: is_thread_finished() is called
     result = is_thread_finished('test')
 
     # THEN: The result should be correct
-    assert result is True, 'is_thread_finished should have returned True'
+    assert result is False, 'is_thread_finished should have returned False'
 
 
 @patch('openlp.core.threading.Registry')
-def test_is_thread_finished_mising(MockRegistry):
+def test_is_thread_finished_missing(MockRegistry):
     """
-    Test that calling the is_thread_finished() function raises a KeyError if it does not exist
+    Test that calling the is_thread_finished() function returns True if the thread doesn't exist
     """
     # GIVEN: A mocked thread worker
     MockRegistry.return_value.get.return_value.worker_threads = {}
 
-    try:
-        # WHEN: get_thread_worker() is called
-        is_thread_finished('test_thread')
-        assert False, 'A KeyError should have been raised when calling is_thread_finished'
-    except KeyError:
-        # THEN: The mocked worker is returned
-        pass
-    except Exception:
-        assert False, 'A KeyError should have been raised when calling is_thread_finished'
+    # WHEN: get_thread_worker() is called
+    result = is_thread_finished('test_thread')
+
+    # THEN: The result should be correct
+    assert result is True, 'is_thread_finished should return True when a thread is missing'
 
 
 def test_make_remove_thread():
