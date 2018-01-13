@@ -570,24 +570,25 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             service.append({'serviceitem': service_item})
         self.repaint_service_list(-1, -1)
         service_content = json.dumps(service, cls=OpenLPJsonEncoder)
-        total_size = len(bytes(service_content, encoding='utf-8'))
+        service_content_size = len(bytes(service_content, encoding='utf-8'))
+        total_size = service_content_size
         for file_item in write_list:
-            file_size = os.path.getsize(file_item)
-            total_size += file_size
+            total_size += file_item.stat().st_size
         self.log_debug('ServiceManager.save_file - ZIP contents size is %i bytes' % total_size)
 
         # Number of items + 1 to zip it
         self.main_window.display_progress_bar(total_size)
 
-        #self.main_window.increment_progress_bar()
         try:
             with NamedTemporaryFile() as temp_file, \
                     zipfile.ZipFile(temp_file, 'w') as zip_file:
                 # First we add service contents..
                 zip_file.writestr('service_data.osj', service_content)
+                self.main_window.increment_progress_bar(service_content_size)
                 # Finally add all the listed media files.
-                for write_from in write_list:
-                    zip_file.write(write_from, write_from)
+                for write_path in write_list:
+                    zip_file.write(str(write_path), str(write_path))
+                    self.main_window.increment_progress_bar(write_path.stat().st_size)
                 with suppress(FileNotFoundError):
                     file_path.unlink()
                 os.link(temp_file.name, str(file_path))
@@ -678,6 +679,10 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.application.set_busy_cursor()
         try:
             with zipfile.ZipFile(str(file_path)) as zip_file:
+                compressed_size = 0
+                for zip_info in zip_file.infolist():
+                    compressed_size += zip_info.compress_size
+                self.main_window.display_progress_bar(compressed_size)
                 for zip_info in zip_file.infolist():
                     self.log_debug('Extract file: {name}'.format(name=zip_info.filename))
                     # The json file has been called 'service_data.osj' since OpenLP 3.0
@@ -687,12 +692,12 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                     else:
                         zip_info.filename = os.path.basename(zip_info.filename)
                         zip_file.extract(zip_info, str(self.service_path))
+                    self.main_window.increment_progress_bar(zip_info.compress_size)
             if service_data:
                 items = json.loads(service_data, cls=OpenLPJsonDecoder)
                 self.new_file()
                 self.process_service_items(items)
                 self.set_file_name(file_path)
-                self.main_window.display_progress_bar(len(items))
                 self.main_window.add_recent_file(file_path)
                 self.set_modified(False)
                 Settings().setValue('servicemanager/last file', file_path)
@@ -704,8 +709,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 message=translate('OpenLP.ServiceManager',
                                   'The service file {file_path} could not be loaded because it is either corrupt, or '
                                   'not a valid OpenLP 2 or OpenLP 3 service file.'.format(file_path=file_path)))
-            self.application.set_normal_cursor()
-            return
         self.main_window.finished_progress_bar()
         self.application.set_normal_cursor()
         self.repaint_service_list(-1, -1)
