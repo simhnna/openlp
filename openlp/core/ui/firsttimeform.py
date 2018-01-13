@@ -400,9 +400,9 @@ class FirstTimeForm(QtWidgets.QWizard, UiFirstTimeWizard, RegistryProperties):
             if item:
                 item.setIcon(build_icon(Path(gettempdir(), 'openlp', screenshot)))
 
-    def _download_progress(self, count, block_size):
+    def update_progress(self, count, block_size):
         """
-        Calculate and display the download progress.
+        Calculate and display the download progress. This method is called by download_file().
         """
         increment = (count * block_size) - self.previous_size
         self._increment_progress_bar(None, increment)

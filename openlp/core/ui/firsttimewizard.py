@@ -63,7 +63,7 @@ class UiFirstTimeWizard(object):
         first_time_wizard.setOptions(QtWidgets.QWizard.IndependentPages | QtWidgets.QWizard.NoBackButtonOnStartPage |
                                      QtWidgets.QWizard.NoBackButtonOnLastPage | QtWidgets.QWizard.HaveCustomButton1 |
                                      QtWidgets.QWizard.HaveCustomButton2)
-        if is_macosx():
+        if is_macosx():                                                                             # pragma: nocover
             first_time_wizard.setPixmap(QtWidgets.QWizard.BackgroundPixmap,
                                         QtGui.QPixmap(':/wizards/openlp-osx-wizard.png'))
             first_time_wizard.resize(634, 386)
