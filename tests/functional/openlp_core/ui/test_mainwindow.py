@@ -61,9 +61,10 @@ class TestMainWindow(TestCase, TestMixin):
         # Mock cursor busy/normal methods.
         self.app.set_busy_cursor = MagicMock()
         self.app.set_normal_cursor = MagicMock()
+        self.app.process_events = MagicMock()
         self.app.args = []
         Registry().register('application', self.app)
-        Registry().set_flag('no_web_server', False)
+        Registry().set_flag('no_web_server', True)
         self.add_toolbar_action_patcher = patch('openlp.core.ui.mainwindow.create_action')
         self.mocked_add_toolbar_action = self.add_toolbar_action_patcher.start()
         self.mocked_add_toolbar_action.side_effect = self._create_mock_action
@@ -75,8 +76,8 @@ class TestMainWindow(TestCase, TestMixin):
         """
         Delete all the C++ objects and stop all the patchers
         """
-        self.add_toolbar_action_patcher.stop()
         del self.main_window
+        self.add_toolbar_action_patcher.stop()
 
     def test_cmd_line_file(self):
         """
@@ -92,20 +93,20 @@ class TestMainWindow(TestCase, TestMixin):
         # THEN the service from the arguments is loaded
         mocked_load_file.assert_called_with(Path(service))
 
-    def test_cmd_line_arg(self):
+    @patch('openlp.core.ui.servicemanager.ServiceManager.load_file')
+    def test_cmd_line_arg(self, mocked_load_file):
         """
         Test that passing a non service file does nothing.
         """
         # GIVEN a non service file as an argument to openlp
         service = os.path.join('openlp.py')
         self.main_window.arguments = [service]
-        with patch('openlp.core.ui.servicemanager.ServiceManager.load_file') as mocked_load_file:
 
-            # WHEN the argument is processed
-            self.main_window.open_cmd_line_files("")
+        # WHEN the argument is processed
+        self.main_window.open_cmd_line_files(service)
 
-            # THEN the file should not be opened
-            assert mocked_load_file.called is False, 'load_file should not have been called'
+        # THEN the file should not be opened
+        assert mocked_load_file.called is False, 'load_file should not have been called'
 
     def test_main_window_title(self):
         """

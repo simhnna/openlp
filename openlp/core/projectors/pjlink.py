@@ -89,11 +89,11 @@ class PJLinkUDP(QtNetwork.QUdpSocket):
         'SRCH'   # Class 2  (reply is ACKN)
     ]
 
-    def __init__(self, port=PJLINK_PORT):
+    def __init__(self, projector_list, port=PJLINK_PORT):
         """
         Initialize socket
         """
-
+        self.projector_list = projector_list
         self.port = port
 
 
