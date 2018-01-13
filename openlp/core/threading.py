@@ -78,7 +78,10 @@ def get_thread_worker(thread_name):
     :param str thread_name: The name of the thread
     :returns: The worker for this thread name
     """
-    return Registry().get('application').worker_threads.get(thread_name)
+    thread_info = Registry().get('application').worker_threads.get(thread_name)
+    if not thread_info:
+        raise KeyError('No thread named "{}" exists'.format(thread_name))
+    return thread_info.get('worker')
 
 
 def is_thread_finished(thread_name):
@@ -88,8 +91,10 @@ def is_thread_finished(thread_name):
     :param str thread_name: The name of the thread
     :returns: True if the thread is finished, False if it is still running
     """
-    app = Registry().get('application')
-    return thread_name not in app.worker_threads or app.worker_threads[thread_name]['thread'].isFinished()
+    thread_info = Registry().get('application').worker_threads.get(thread_name)
+    if not thread_info:
+        raise KeyError('No thread named "{}" exists'.format(thread_name))
+    return thread_info['thread'].isFinished()
 
 
 def make_remove_thread(thread_name):
@@ -99,7 +104,8 @@ def make_remove_thread(thread_name):
     :param str thread_name: The name of the thread which should be removed from the thread registry.
     :returns: A function which will remove the thread from the thread registry.
     """
-    def remove_thread():
+
+    def remove_thread():                                                                        # pragma: nocover
         """
         Stop and remove a registered thread
 
