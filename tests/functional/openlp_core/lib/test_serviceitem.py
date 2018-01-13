@@ -27,6 +27,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
 from openlp.core.common import md5_hash
+from openlp.core.common.path import Path
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, ServiceItem, ServiceItemType, FormattingTags
@@ -351,5 +352,5 @@ class TestServiceItem(TestCase, TestMixin):
             '"Amazing Grace! how sweet the s" has been returned as the title'
         assert '’Twas grace that taught my hea' == service_item.get_frame_title(1), \
             '"’Twas grace that taught my hea" has been returned as the title'
-        assert '/test/amazing_grace.mp3' == service_item.background_audio[0], \
+        assert Path('/test/amazing_grace.mp3') == service_item.background_audio[0], \
             '"/test/amazing_grace.mp3" should be in the background_audio list'

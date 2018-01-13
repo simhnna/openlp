@@ -23,6 +23,7 @@
 Package to test openlp.core.ui.mainwindow package.
 """
 import os
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -83,14 +84,13 @@ class TestMainWindow(TestCase, TestMixin):
         """
         # GIVEN a service as an argument to openlp
         service = os.path.join(TEST_RESOURCES_PATH, 'service', 'test.osz')
-        self.main_window.arguments = [service]
 
         # WHEN the argument is processed
         with patch.object(self.main_window.service_manager, 'load_file') as mocked_load_file:
             self.main_window.open_cmd_line_files(service)
 
         # THEN the service from the arguments is loaded
-        mocked_load_file.assert_called_with(service)
+        mocked_load_file.assert_called_with(Path(service))
 
     def test_cmd_line_arg(self):
         """
