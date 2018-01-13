@@ -44,15 +44,16 @@ class TestPJLinkRouting(TestCase):
         Test not a valid command
         """
         # GIVEN: Test object
-        log_warning_text = [call('(111.111.111.111) get_data(): Invalid packet - unknown command "UNK"')]
-        log_debug_text = [call('(111.111.111.111) get_data(ip="111.111.111.111" buffer="b\'%1UNK=Huh?\'"'),
-                          call('(111.111.111.111) get_data(): Checking new data "%1UNK=Huh?"')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, '_trash_buffer') as mock_buffer:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.pjlink_functions = MagicMock()
+            log_warning_text = [call('({ip}) get_data(): Invalid packet - '
+                                     'unknown command "UNK"'.format(ip=pjlink.name))]
+            log_debug_text = [call('({ip}) get_data(ip="111.111.111.111" '
+                                   'buffer="b\'%1UNK=Huh?\'"'.format(ip=pjlink.name)),
+                              call('({ip}) get_data(): Checking new data "%1UNK=Huh?"'.format(ip=pjlink.name))]
 
             # WHEN: get_data called with an unknown command
             pjlink.get_data(buff='{prefix}1UNK=Huh?'.format(prefix=PJLINK_PREFIX).encode('utf-8'))
@@ -68,13 +69,12 @@ class TestPJLinkRouting(TestCase):
         Test process_command calls proper function
         """
         # GIVEN: Test object and mocks
-        log_debug_calls = [call('(111.111.111.111) Processing command "CLSS" with data "1"'),
-                           call('(111.111.111.111) Calling function for CLSS')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_debug_calls = [call('({ip}) Processing command "CLSS" with data "1"'.format(ip=pjlink.name)),
+                               call('({ip}) Calling function for CLSS'.format(ip=pjlink.name))]
 
             # WHEN: process_command is called with valid function and data
             pjlink.process_command(cmd='CLSS', data='1')
@@ -88,9 +88,6 @@ class TestPJLinkRouting(TestCase):
         Test ERRA - Authentication Error
         """
         # GIVEN: Test object
-        log_error_calls = [call('(111.111.111.111) PJLINK: {msg}'.format(msg=STATUS_MSG[E_AUTHENTICATION]))]
-        log_debug_calls = [call('(111.111.111.111) Processing command "PJLINK" with data "ERRA"')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_pjlink') as mock_process_pjlink, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'change_status') as mock_change_status, \
@@ -98,6 +95,8 @@ class TestPJLinkRouting(TestCase):
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'projectorAuthentication') as mock_authentication:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_error_calls = [call('({ip}) PJLINK: {msg}'.format(ip=pjlink.name, msg=STATUS_MSG[E_AUTHENTICATION]))]
+            log_debug_calls = [call('({ip}) Processing command "PJLINK" with data "ERRA"'.format(ip=pjlink.name))]
 
             # WHEN: process_command called with ERRA
             pjlink.process_command(cmd='PJLINK', data=PJLINK_ERRORS[E_AUTHENTICATION])
@@ -115,14 +114,13 @@ class TestPJLinkRouting(TestCase):
         Test ERR1 - Undefined projector function
         """
         # GIVEN: Test object
-        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_UNDEFINED]))]
-        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR1"'),
-                          call('(111.111.111.111) Calling function for CLSS')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_error_text = [call('({ip}) CLSS: {msg}'.format(ip=pjlink.name, msg=STATUS_MSG[E_UNDEFINED]))]
+            log_debug_text = [call('({ip}) Processing command "CLSS" with data "ERR1"'.format(ip=pjlink.name)),
+                              call('({ip}) Calling function for CLSS'.format(ip=pjlink.name))]
 
             # WHEN: process_command called with ERR1
             pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_UNDEFINED])
@@ -137,14 +135,13 @@ class TestPJLinkRouting(TestCase):
         Test ERR2 - Parameter Error
         """
         # GIVEN: Test object
-        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_PARAMETER]))]
-        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR2"'),
-                          call('(111.111.111.111) Calling function for CLSS')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_error_text = [call('({ip}) CLSS: {msg}'.format(ip=pjlink.name, msg=STATUS_MSG[E_PARAMETER]))]
+            log_debug_text = [call('({ip}) Processing command "CLSS" with data "ERR2"'.format(ip=pjlink.name)),
+                              call('({ip}) Calling function for CLSS'.format(ip=pjlink.name))]
 
             # WHEN: process_command called with ERR2
             pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_PARAMETER])
@@ -159,14 +156,13 @@ class TestPJLinkRouting(TestCase):
         Test ERR3 - Unavailable error
         """
         # GIVEN: Test object
-        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_UNAVAILABLE]))]
-        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR3"'),
-                          call('(111.111.111.111) Calling function for CLSS')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_error_text = [call('({ip}) CLSS: {msg}'.format(ip=pjlink.name, msg=STATUS_MSG[E_UNAVAILABLE]))]
+            log_debug_text = [call('({ip}) Processing command "CLSS" with data "ERR3"'.format(ip=pjlink.name)),
+                              call('({ip}) Calling function for CLSS'.format(ip=pjlink.name))]
 
             # WHEN: process_command called with ERR3
             pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_UNAVAILABLE])
@@ -181,14 +177,13 @@ class TestPJLinkRouting(TestCase):
         Test ERR3 - Unavailable error
         """
         # GIVEN: Test object
-        log_error_text = [call('(111.111.111.111) CLSS: {msg}'.format(msg=STATUS_MSG[E_PROJECTOR]))]
-        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "ERR4"'),
-                          call('(111.111.111.111) Calling function for CLSS')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_error_text = [call('({ip}) CLSS: {msg}'.format(ip=pjlink.name, msg=STATUS_MSG[E_PROJECTOR]))]
+            log_debug_text = [call('({ip}) Processing command "CLSS" with data "ERR4"'.format(ip=pjlink.name)),
+                              call('({ip}) Calling function for CLSS'.format(ip=pjlink.name))]
 
             # WHEN: process_command called with ERR4
             pjlink.process_command(cmd='CLSS', data=PJLINK_ERRORS[E_PROJECTOR])
@@ -203,14 +198,13 @@ class TestPJLinkRouting(TestCase):
         Test command valid but no method to process yet
         """
         # GIVEN: Test object
-        log_warning_text = [call('(111.111.111.111) Unable to process command="CLSS" (Future option?)')]
-        log_debug_text = [call('(111.111.111.111) Processing command "CLSS" with data "Huh?"')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.pjlink_functions = MagicMock()
+            log_warning_text = [call('({ip}) Unable to process command="CLSS" (Future option?)'.format(ip=pjlink.name))]
+            log_debug_text = [call('({ip}) Processing command "CLSS" with data "Huh?"'.format(ip=pjlink.name))]
 
             # WHEN: Processing a possible future command
             pjlink.process_command(cmd='CLSS', data="Huh?")
@@ -227,14 +221,13 @@ class TestPJLinkRouting(TestCase):
         """
         # GIVEN: Initial mocks and data
         # GIVEN: Test object and mocks
-        log_debug_calls = [call('(111.111.111.111) Processing command "CLSS" with data "OK"'),
-                           call('(111.111.111.111) Command "CLSS" returned OK')]
-
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'process_clss') as mock_process_clss:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_debug_calls = [call('({ip}) Processing command "CLSS" with data "OK"'.format(ip=pjlink.name)),
+                               call('({ip}) Command "CLSS" returned OK'.format(ip=pjlink.name))]
 
             # WHEN: process_command is called with valid function and data
             pjlink.process_command(cmd='CLSS', data='OK')
