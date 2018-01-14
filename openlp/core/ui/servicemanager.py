@@ -507,6 +507,11 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         return service
 
     def get_write_file_list(self):
+        """
+
+        :return:
+        :rtype: (list[openlp.core.common.path.Path], list[openlp.core.common.path.Path])
+        """
         write_list = []
         missing_list = []
         for item in self.service_items:
