@@ -522,8 +522,8 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         except (AttributeError, TypeError):
             pass
         try:
-            projector.timer.stop()
-            projector.timer.timeout.disconnect(projector.link.poll_loop)
+            projector.poll_timer.stop()
+            projector.poll_timer.timeout.disconnect(projector.link.poll_loop)
         except (AttributeError, TypeError):
             pass
         try:
@@ -531,7 +531,6 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             projector.socket_timer.timeout.disconnect(projector.link.socket_abort)
         except (AttributeError, TypeError):
             pass
-        projector.thread.quit()
         new_list = []
         for item in self.projector_list:
             if item.link.db_item.id == projector.link.db_item.id:
@@ -733,39 +732,18 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         """
         item = ProjectorItem(link=self._add_projector(projector))
         item.db_item = projector
-        icon = QtGui.QIcon(QtGui.QPixmap(STATUS_ICONS[S_NOT_CONNECTED]))
-        item.icon = icon
-        widget = QtWidgets.QListWidgetItem(icon,
+        item.icon = QtGui.QIcon(QtGui.QPixmap(STATUS_ICONS[S_NOT_CONNECTED]))
+        widget = QtWidgets.QListWidgetItem(item.icon,
                                            item.link.name,
                                            self.projector_list_widget
                                            )
         widget.setData(QtCore.Qt.UserRole, item)
         item.link.db_item = item.db_item
         item.widget = widget
-        thread = QtCore.QThread(parent=self)
-        thread.my_parent = self
-        item.moveToThread(thread)
-        thread.started.connect(item.link.thread_started)
-        thread.finished.connect(item.link.thread_stopped)
-        thread.finished.connect(thread.deleteLater)
         item.link.changeStatus.connect(self.update_status)
         item.link.projectorAuthentication.connect(self.authentication_error)
         item.link.projectorNoAuthentication.connect(self.no_authentication_error)
         item.link.projectorUpdateIcons.connect(self.update_icons)
-        timer = QtCore.QTimer(self)
-        timer.setInterval(self.poll_time)
-        timer.timeout.connect(item.link.poll_loop)
-        item.timer = timer
-        # Timeout in case of brain-dead projectors or cable disconnected
-        socket_timer = QtCore.QTimer(self)
-        socket_timer.setInterval(11000)
-        socket_timer.timeout.connect(item.link.socket_abort)
-        item.socket_timer = socket_timer
-        thread.start()
-        item.thread = thread
-        item.link.timer = timer
-        item.link.socket_timer = socket_timer
-        item.link.widget = item.widget
         self.projector_list.append(item)
         if start:
             item.link.connect_to_host()

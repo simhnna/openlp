@@ -26,9 +26,17 @@ from unittest import TestCase
 from unittest.mock import call, patch
 
 import openlp.core.projectors.pjlink
-from openlp.core.projectors.constants import PJLINK_ERST_DATA, PJLINK_ERST_STATUS, PJLINK_POWR_STATUS, \
-    STATUS_CODE, STATUS_MSG, E_ERROR, E_NOT_CONNECTED, E_UNKNOWN_SOCKET_ERROR, E_WARN, \
-    S_CONNECTED, S_CONNECTING, S_OFF, S_OK, S_ON, S_NOT_CONNECTED, S_STANDBY
+from openlp.core.projectors.constants import \
+    PJLINK_ERST_DATA, \
+    PJLINK_ERST_STATUS, \
+    PJLINK_POWR_STATUS, \
+    STATUS_CODE, \
+    E_ERROR, \
+    E_WARN, \
+    S_OK, \
+    S_ON, \
+    S_NOT_CONNECTED, \
+    S_STANDBY
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
 
@@ -39,401 +47,6 @@ class TestPJLinkCommands(TestCase):
     """
     Tests for the PJLinkCommands class part 1
     """
-    def test_projector_change_status_unknown_socket_error(self):
-        """
-        Test change_status with connection error
-        """
-        log_debug_calls = [
-            call('(111.111.111.111) Changing status to '
-                 '{status} "{msg}"'.format(status=STATUS_CODE[E_UNKNOWN_SOCKET_ERROR],
-                                           msg=STATUS_MSG[E_UNKNOWN_SOCKET_ERROR])),
-            call('(111.111.111.111) status_connect: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[E_NOT_CONNECTED],
-                                          msg=STATUS_MSG[E_NOT_CONNECTED])),
-            call('(111.111.111.111) projector_status: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[S_OK],
-                                          msg=STATUS_MSG[S_OK])),
-            call('(111.111.111.111) error_status: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[E_UNKNOWN_SOCKET_ERROR],
-                                          msg=STATUS_MSG[E_UNKNOWN_SOCKET_ERROR]))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'changeStatus') as mock_changeStatus, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'projectorUpdateIcons') as mock_UpdateIcons:
-
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-            pjlink.projector_status = 0
-            pjlink.status_connect = 0
-
-            # WHEN: change_status called with unknown socket error
-            pjlink.change_status(status=E_UNKNOWN_SOCKET_ERROR)
-
-            # THEN: Proper settings should change and signals sent
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            assert pjlink.projector_status == S_OK, 'Projector status should not have changed'
-            assert pjlink.status_connect == E_NOT_CONNECTED, 'Status connect should be NOT CONNECTED'
-            assert mock_UpdateIcons.emit.called is True, 'Should have called UpdateIcons'
-            mock_changeStatus.emit.assert_called_once_with(pjlink.ip, E_UNKNOWN_SOCKET_ERROR,
-                                                           STATUS_MSG[E_UNKNOWN_SOCKET_ERROR])
-
-    def test_projector_change_status_connection_status_connecting(self):
-        """
-        Test change_status with connecting status
-        """
-        log_debug_calls = [
-            call('(111.111.111.111) Changing status to '
-                 '{status} "{msg}"'.format(status=STATUS_CODE[S_CONNECTING],
-                                           msg=STATUS_MSG[S_CONNECTING])),
-            call('(111.111.111.111) status_connect: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[S_CONNECTING],
-                                          msg=STATUS_MSG[S_CONNECTING])),
-            call('(111.111.111.111) projector_status: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[S_OK],
-                                          msg=STATUS_MSG[S_OK])),
-            call('(111.111.111.111) error_status: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[S_OK],
-                                          msg=STATUS_MSG[S_OK]))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'changeStatus') as mock_changeStatus, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'projectorUpdateIcons') as mock_UpdateIcons:
-
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-            pjlink.projector_status = 0
-            pjlink.status_connect = 0
-
-            # WHEN: change_status called with CONNECTING
-            pjlink.change_status(status=S_CONNECTING)
-
-            # THEN: Proper settings should change and signals sent
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_changeStatus.emit.assert_called_once_with(pjlink.ip, S_CONNECTING, STATUS_MSG[S_CONNECTING])
-            assert pjlink.projector_status == S_OK, 'Projector status should not have changed'
-            assert pjlink.status_connect == S_CONNECTING, 'Status connect should be CONNECTING'
-            assert mock_UpdateIcons.emit.called is True, 'Should have called UpdateIcons'
-
-    def test_projector_change_status_connection_status_connected(self):
-        """
-        Test change_status with connected status
-        """
-        log_debug_calls = [
-            call('(111.111.111.111) Changing status to '
-                 '{status} "{msg}"'.format(status=STATUS_CODE[S_CONNECTED],
-                                           msg=STATUS_MSG[S_CONNECTED])),
-            call('(111.111.111.111) status_connect: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[S_CONNECTED],
-                                          msg=STATUS_MSG[S_CONNECTED])),
-            call('(111.111.111.111) projector_status: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[S_OK],
-                                          msg=STATUS_MSG[S_OK])),
-            call('(111.111.111.111) error_status: '
-                 '{code}: "{msg}"'.format(code=STATUS_CODE[S_OK],
-                                          msg=STATUS_MSG[S_OK]))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'changeStatus') as mock_changeStatus:
-
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-            pjlink.projector_status = 0
-            pjlink.status_connect = 0
-
-            # WHEN: change_status called with CONNECTED
-            pjlink.change_status(status=S_CONNECTED)
-
-            # THEN: Proper settings should change and signals sent
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_changeStatus.emit.assert_called_once_with(pjlink.ip, S_CONNECTED, 'Connected')
-            assert pjlink.projector_status == S_OK, 'Projector status should not have changed'
-            assert pjlink.status_connect == S_CONNECTED, 'Status connect should be CONNECTED'
-
-    def test_projector_change_status_connection_status_with_message(self):
-        """
-        Test change_status with connection status
-        """
-        test_message = 'Different Status Message than default'
-        log_debug_calls = [
-            call('(111.111.111.111) Changing status to {status} "{msg}"'.format(status=STATUS_CODE[S_ON],
-                                                                                msg=test_message)),
-            call('(111.111.111.111) status_connect: {code}: "{msg}"'.format(code=STATUS_CODE[S_OK],
-                                                                            msg=test_message)),
-            call('(111.111.111.111) projector_status: {code}: "{msg}"'.format(code=STATUS_CODE[S_ON],
-                                                                              msg=test_message)),
-            call('(111.111.111.111) error_status: {code}: "{msg}"'.format(code=STATUS_CODE[S_OK],
-                                                                          msg=test_message))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'changeStatus') as mock_changeStatus:
-
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-            pjlink.projector_status = 0
-            pjlink.status_connect = 0
-
-            # WHEN: change_status called with projector ON status
-            pjlink.change_status(status=S_ON, msg=test_message)
-
-            # THEN: Proper settings should change and signals sent
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_changeStatus.emit.assert_called_once_with(pjlink.ip, S_ON, test_message)
-            assert pjlink.projector_status == S_ON, 'Projector status should be ON'
-            assert pjlink.status_connect == S_OK, 'Status connect should not have changed'
-
-    def test_projector_get_av_mute_status(self):
-        """
-        Test sending command to retrieve shutter/audio state
-        """
-        test_data = 'AVMT'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_av_mute_status is called
-            pjlink.get_av_mute_status()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_available_inputs(self):
-        """
-        Test sending command to retrieve avaliable inputs
-        """
-        test_data = 'INST'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_available_inputs is called
-            pjlink.get_available_inputs()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_error_status(self):
-        """
-        Test sending command to retrieve projector error status
-        """
-        test_data = 'ERST'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_error_status is called
-            pjlink.get_error_status()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_input_source(self):
-        """
-        Test sending command to retrieve current input
-        """
-        test_data = 'INPT'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_input_source is called
-            pjlink.get_input_source()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_lamp_status(self):
-        """
-        Test sending command to retrieve lamp(s) status
-        """
-        test_data = 'LAMP'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_input_source is called
-            pjlink.get_lamp_status()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_manufacturer(self):
-        """
-        Test sending command to retrieve manufacturer name
-        """
-        test_data = 'INF1'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_input_source is called
-            pjlink.get_manufacturer()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_model(self):
-        """
-        Test sending command to get model information
-        """
-        test_data = 'INF2'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_input_source is called
-            pjlink.get_model()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_name(self):
-        """
-        Test sending command to get user-assigned name
-        """
-        test_data = 'NAME'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_input_source is called
-            pjlink.get_name()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_other_info(self):
-        """
-        Test sending command to retrieve other information
-        """
-        test_data = 'INFO'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_input_source is called
-            pjlink.get_other_info()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_power_status(self):
-        """
-        Test sending command to retrieve current power state
-        """
-        test_data = 'POWR'
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Sending {cmd} command'.format(cmd=test_data))]
-
-        # GIVEN: Test object and mocks
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-            # WHEN: get_input_source is called
-            pjlink.get_power_status()
-
-            # THEN: log data and send_command should have been called
-            mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
-
-    def test_projector_get_status_invalid(self):
-        """
-        Test to check returned information for error code
-        """
-        # GIVEN: Test object
-        pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-        test_string = 'NaN test'
-
-        # WHEN: get_status called
-        code, message = pjlink._get_status(status=test_string)
-
-        # THEN: Proper data should have been returned
-        assert code == -1, 'Should have returned -1 as a bad status check'
-        assert message is None, 'Invalid code type should have returned None for message'
-
-    def test_projector_get_status_valid(self):
-        """
-        Test to check returned information for status codes
-        """
-        # GIVEN: Test object
-        test_message = 'Not Connected'
-        pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-        # WHEN: get_status called
-        code, message = pjlink._get_status(status=S_NOT_CONNECTED)
-
-        # THEN: Proper strings should have been returned
-        assert code == 'S_NOT_CONNECTED', 'Code returned should have been the same code that was sent'
-        assert message == test_message, 'Description of code should have been returned'
-
-    def test_projector_get_status_unknown(self):
-        """
-        Test to check returned information for unknown code
-        """
-        # GIVEN: Test object
-        pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-
-        # WHEN: get_status called
-        code, message = pjlink._get_status(status=9999)
-
-        # THEN: Proper strings should have been returned
-        assert code is None, 'Code returned should have been the same code that was sent'
-        assert message is None, 'Should have returned None as message'
-
     def test_projector_process_inf1(self):
         """
         Test saving INF1 data (manufacturer)
@@ -602,14 +215,14 @@ class TestPJLinkCommands(TestCase):
         """
         Test CLSS reply has no class number
         """
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Setting pjlink_class for this projector to "1"')]
-        log_error_calls = [call('(111.111.111.111) NAN CLSS version reply "Z" - defaulting to class "1"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_debug_calls = [call('({ip}) reset_information() connect status is '
+                                    '{state}'.format(ip=pjlink.name, state=STATUS_CODE[S_NOT_CONNECTED])),
+                               call('({ip}) Setting pjlink_class for this projector to "1"'.format(ip=pjlink.name))]
+            log_error_calls = [call('({ip}) NAN CLSS version reply "Z" - '
+                                    'defaulting to class "1"'.format(ip=pjlink.name))]
 
             # WHEN: Process invalid reply
             pjlink.process_clss('Z')
@@ -623,15 +236,14 @@ class TestPJLinkCommands(TestCase):
         """
         Test CLSS reply has no class number
         """
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED])),
-                           call('(111.111.111.111) Setting pjlink_class for this projector to "1"')]
-        log_error_calls = [call('(111.111.111.111) No numbers found in class version reply "Invalid" '
-                                '- defaulting to class "1"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            log_debug_calls = [call('({ip}) reset_information() connect status is '
+                                    '{state}'.format(ip=pjlink.name, state=STATUS_CODE[S_NOT_CONNECTED])),
+                               call('({ip}) Setting pjlink_class for this projector to "1"'.format(ip=pjlink.name))]
+            log_error_calls = [call('({ip}) No numbers found in class version reply "Invalid" '
+                                    '- defaulting to class "1"'.format(ip=pjlink.name))]
 
             # WHEN: Process invalid reply
             pjlink.process_clss('Invalid')
@@ -640,6 +252,32 @@ class TestPJLinkCommands(TestCase):
             assert pjlink.pjlink_class == '1', 'Invalid class reply should have set class=1'
             mock_log.error.assert_has_calls(log_error_calls)
             mock_log.debug.assert_has_calls(log_debug_calls)
+
+    def test_projector_process_clss_nonstandard_reply_1(self):
+        """
+        Test CLSS request returns non-standard reply 1
+        """
+        # GIVEN: Test object
+        pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+        # WHEN: Process non-standard reply
+        pjlink.process_clss('Class 1')
+
+        # THEN: Projector class should be set with proper value
+        assert '1' == pjlink.pjlink_class, 'Non-standard class reply should have set class=1'
+
+    def test_projector_process_clss_nonstandard_reply_2(self):
+        """
+        Test CLSS request returns non-standard reply 2
+        """
+        # GIVEN: Test object
+        pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+
+        # WHEN: Process non-standard reply
+        pjlink.process_clss('Version2')
+
+        # THEN: Projector class should be set with proper value
+        assert '2' == pjlink.pjlink_class, 'Non-standard class reply should have set class=2'
 
     def test_projector_process_erst_all_ok(self):
         """
@@ -660,16 +298,15 @@ class TestPJLinkCommands(TestCase):
         """
         Test test_projector_process_erst_data_invalid_length
         """
-        chk_data = '0' * (PJLINK_ERST_DATA['DATA_LENGTH'] + 1)
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED]))]
-        log_warn_calls = [call('111.111.111.111) Invalid error status response "0000000": '
-                               'length != {chk}'.format(chk=PJLINK_ERST_DATA['DATA_LENGTH']))]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.projector_errors = None
+            chk_data = '0' * (PJLINK_ERST_DATA['DATA_LENGTH'] + 1)
+            log_debug_calls = [call('({ip}) reset_information() connect status is '
+                                    '{state}'.format(ip=pjlink.name, state=STATUS_CODE[S_NOT_CONNECTED]))]
+            log_warn_calls = [call('({ip}) Invalid error status response "0000000": '
+                                   'length != {chk}'.format(ip=pjlink.name, chk=PJLINK_ERST_DATA['DATA_LENGTH']))]
 
             # WHEN: process_erst called with invalid data (too many values
             pjlink.process_erst(chk_data)
@@ -683,15 +320,14 @@ class TestPJLinkCommands(TestCase):
         """
         Test test_projector_process_erst_data_invalid_nan
         """
-        chk_data = 'Z' + ('0' * (PJLINK_ERST_DATA['DATA_LENGTH'] - 1))
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is '
-                                '{state}'.format(state=STATUS_CODE[S_NOT_CONNECTED]))]
-        log_warn_calls = [call('(111.111.111.111) Invalid error status response "Z00000"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.projector_errors = None
+            chk_data = 'Z' + ('0' * (PJLINK_ERST_DATA['DATA_LENGTH'] - 1))
+            log_debug_calls = [call('({ip}) reset_information() connect status is '
+                                    '{state}'.format(ip=pjlink.name, state=STATUS_CODE[S_NOT_CONNECTED]))]
+            log_warn_calls = [call('({ip}) Invalid error status response "Z00000"'.format(ip=pjlink.name))]
 
             # WHEN: process_erst called with invalid data (too many values
             pjlink.process_erst(chk_data)
@@ -784,14 +420,14 @@ class TestPJLinkCommands(TestCase):
         """
         Test input source status shows current input
         """
-        log_debug_calls = [call('(111.111.111.111) reset_information() connect status is S_NOT_CONNECTED')]
-        chk_source_available = ['11', '12', '21', '22', '31', '32']
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-            pjlink.source_available = chk_source_available
             pjlink.source = '11'
+            log_debug_calls = [call('({ip}) reset_information() connect status is '
+                                    'S_NOT_CONNECTED'.format(ip=pjlink.name))]
+            chk_source_available = ['11', '12', '21', '22', '31', '32']
+            pjlink.source_available = chk_source_available
 
             # WHEN: Called with input source
             pjlink.process_inpt('21')
@@ -826,15 +462,14 @@ class TestPJLinkCommands(TestCase):
         """
         Test saving video source available information
         """
-        log_debug_calls = [call('(111.111.111.111) Setting projector sources_available to '
-                                '"[\'11\', \'12\', \'21\', \'22\', \'31\', \'32\']"')]
-        chk_data = '21 12 11 22 32 31'  # Although they should already be sorted, use unsorted to verify method
-        chk_test = ['11', '12', '21', '22', '31', '32']
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.source_available = []
+            log_debug_calls = [call('({ip}) Setting projector sources_available to '
+                                    '"[\'11\', \'12\', \'21\', \'22\', \'31\', \'32\']"'.format(ip=pjlink.name))]
+            chk_data = '21 12 11 22 32 31'  # Although they should already be sorted, use unsorted to verify method
+            chk_test = ['11', '12', '21', '22', '31', '32']
 
             # WHEN: process_inst called with test data
             pjlink.process_inst(data=chk_data)
@@ -847,13 +482,12 @@ class TestPJLinkCommands(TestCase):
         """
         Test status multiple lamp on/off and hours
         """
-        log_data = [call('(111.111.111.111) process_lamp(): Invalid data "11111 1 22222 0 333A3 1"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.lamp = [{'Hours': 00000, 'On': True},
                            {'Hours': 11111, 'On': False}]
+            log_data = [call('({ip}) process_lamp(): Invalid data "11111 1 22222 0 333A3 1"'.format(ip=pjlink.name))]
 
             # WHEN: Call process_command with invalid lamp data
             pjlink.process_lamp('11111 1 22222 0 333A3 1')
@@ -903,17 +537,32 @@ class TestPJLinkCommands(TestCase):
         assert pjlink.lamp[0]['On'] is True, 'Lamp power status should have been set to TRUE'
         assert 22222 == pjlink.lamp[0]['Hours'], 'Lamp hours should have been set to 22222'
 
+    def test_projector_process_lamp_single_hours_only(self):
+        """
+        Test process lamp with 1 lamp reply hours only and no on/off status
+        """
+        # GIVEN: Test object
+        pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+        pjlink.lamp = []
+
+        # WHEN: Process lamp command called with only hours and no lamp power state
+        pjlink.process_lamp("45")
+
+        # THEN: Lamp should show hours as 45 and lamp power as Unavailable
+        assert 1 == len(pjlink.lamp), 'There should only be 1 lamp available'
+        assert 45 == pjlink.lamp[0]['Hours'], 'Lamp hours should have equalled 45'
+        assert pjlink.lamp[0]['On'] is None, 'Lamp power should be "None"'
+
     def test_projector_process_name(self):
         """
         Test saving NAME data from projector
         """
-        chk_data = "Some Name the End-User Set IN Projector"
-        log_debug_calls = [call('(111.111.111.111) Setting projector PJLink name to '
-                                '"Some Name the End-User Set IN Projector"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            chk_data = "Some Name the End-User Set IN Projector"
+            log_debug_calls = [call('({ip}) Setting projector PJLink name to '
+                                    '"Some Name the End-User Set IN Projector"'.format(ip=pjlink.name))]
 
             # WHEN: process_name called with test data
             pjlink.process_name(data=chk_data)
@@ -947,8 +596,6 @@ class TestPJLinkCommands(TestCase):
         """
         Test process_powr invalid call
         """
-        log_warn_calls = [call('(111.111.111.111) Unknown power response: "99"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command, \
@@ -957,6 +604,7 @@ class TestPJLinkCommands(TestCase):
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.power = S_STANDBY
+            log_warn_calls = [call('({ip}) Unknown power response: "99"'.format(ip=pjlink.name))]
 
             # WHEN: process_name called with test data
             pjlink.process_powr(data='99')
@@ -1009,16 +657,15 @@ class TestPJLinkCommands(TestCase):
         """
         Test saving filter type previously saved
         """
-        filter_model = 'Filter Type Test'
-        log_warn_calls = [call('(111.111.111.111) Filter model already set'),
-                          call('(111.111.111.111) Saved model: "Old filter type"'),
-                          call('(111.111.111.111) New model: "Filter Type Test"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.model_filter = 'Old filter type'
+            filter_model = 'Filter Type Test'
+            log_warn_calls = [call('({ip}) Filter model already set'.format(ip=pjlink.name)),
+                              call('({ip}) Saved model: "Old filter type"'.format(ip=pjlink.name)),
+                              call('({ip}) New model: "Filter Type Test"'.format(ip=pjlink.name))]
 
             # WHEN: Filter model is received
             pjlink.process_rfil(data=filter_model)
@@ -1047,16 +694,15 @@ class TestPJLinkCommands(TestCase):
         """
         Test saving lamp type previously saved
         """
-        lamp_model = 'Lamp Type Test'
-        log_warn_calls = [call('(111.111.111.111) Lamp model already set'),
-                          call('(111.111.111.111) Saved lamp: "Old lamp type"'),
-                          call('(111.111.111.111) New lamp: "Lamp Type Test"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.model_lamp = 'Old lamp type'
+            lamp_model = 'Lamp Type Test'
+            log_warn_calls = [call('({ip}) Lamp model already set'.format(ip=pjlink.name)),
+                              call('({ip}) Saved lamp: "Old lamp type"'.format(ip=pjlink.name)),
+                              call('({ip}) New lamp: "Lamp Type Test"'.format(ip=pjlink.name))]
 
             # WHEN: Filter model is received
             pjlink.process_rlmp(data=lamp_model)
@@ -1069,14 +715,14 @@ class TestPJLinkCommands(TestCase):
         """
         Test saving serial number from projector
         """
-        log_debug_calls = [call('(111.111.111.111) Setting projector serial number to "Test Serial Number"')]
-        test_number = 'Test Serial Number'
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
 
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.serial_no = None
+            log_debug_calls = [call('({ip}) Setting projector serial number to '
+                                    '"Test Serial Number"'.format(ip=pjlink.name))]
+            test_number = 'Test Serial Number'
 
             # WHEN: No serial number is set and we receive serial number command
             pjlink.process_snum(data=test_number)
@@ -1089,16 +735,16 @@ class TestPJLinkCommands(TestCase):
         """
         Test projector serial number different than saved serial number
         """
-        log_warn_calls = [call('(111.111.111.111) Projector serial number does not match saved serial number'),
-                          call('(111.111.111.111) Saved:    "Previous serial number"'),
-                          call('(111.111.111.111) Received: "Test Serial Number"'),
-                          call('(111.111.111.111) NOT saving serial number')]
-        test_number = 'Test Serial Number'
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.serial_no = 'Previous serial number'
+            log_warn_calls = [call('({ip}) Projector serial number does not match '
+                                   'saved serial number'.format(ip=pjlink.name)),
+                              call('({ip}) Saved:    "Previous serial number"'.format(ip=pjlink.name)),
+                              call('({ip}) Received: "Test Serial Number"'.format(ip=pjlink.name)),
+                              call('({ip}) NOT saving serial number'.format(ip=pjlink.name))]
+            test_number = 'Test Serial Number'
 
             # WHEN: No serial number is set and we receive serial number command
             pjlink.process_snum(data=test_number)
@@ -1111,14 +757,14 @@ class TestPJLinkCommands(TestCase):
         """
         Test invalid software version information - too long
         """
-        test_data = 'Test 1 Subtest 1'
-        log_debug_calls = [call('(111.111.111.111) Setting projector software version to "Test 1 Subtest 1"')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
             pjlink.sw_version = None
             pjlink.sw_version_received = None
+            test_data = 'Test 1 Subtest 1'
+            log_debug_calls = [call('({ip}) Setting projector software version to '
+                                    '"Test 1 Subtest 1"'.format(ip=pjlink.name))]
 
             # WHEN: process_sver called with invalid data
             pjlink.process_sver(data=test_data)
@@ -1131,16 +777,16 @@ class TestPJLinkCommands(TestCase):
         """
         Test invalid software version information - Received different than saved
         """
-        test_data_old = 'Test 1 Subtest 1'
-        test_data_new = 'Test 1 Subtest 2'
-        log_warn_calls = [call('(111.111.111.111) Projector software version does not match saved software version'),
-                          call('(111.111.111.111) Saved:    "Test 1 Subtest 1"'),
-                          call('(111.111.111.111) Received: "Test 1 Subtest 2"'),
-                          call('(111.111.111.111) Updating software version')]
-
         # GIVEN: Test object
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
             pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+            test_data_old = 'Test 1 Subtest 1'
+            test_data_new = 'Test 1 Subtest 2'
+            log_warn_calls = [call('({ip}) Projector software version does not match '
+                                   'saved software version'.format(ip=pjlink.name)),
+                              call('({ip}) Saved:    "Test 1 Subtest 1"'.format(ip=pjlink.name)),
+                              call('({ip}) Received: "Test 1 Subtest 2"'.format(ip=pjlink.name)),
+                              call('({ip}) Updating software version'.format(ip=pjlink.name))]
             pjlink.sw_version = test_data_old
 
             # WHEN: process_sver called with invalid data
@@ -1169,51 +815,3 @@ class TestPJLinkCommands(TestCase):
             assert pjlink.sw_version is None, 'Software version should not have changed'
             assert pjlink.sw_version_received is None, 'Received software version should not have changed'
             mock_log.warning.assert_has_calls(log_warn_calls)
-
-    def test_projector_reset_information(self):
-        """
-        Test reset_information() resets all information and stops timers
-        """
-        log_debug_calls = [call('(111.111.111.111): Calling timer.stop()'),
-                           call('(111.111.111.111): Calling socket_timer.stop()')]
-
-        # GIVEN: Test object
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log:
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-            # timer and socket_timer not available until instantiation, so mock here
-            with patch.object(pjlink, 'socket_timer') as mock_socket_timer, \
-                    patch.object(pjlink, 'timer') as mock_timer:
-
-                pjlink.power = S_ON
-                pjlink.pjlink_name = 'OPENLPTEST'
-                pjlink.manufacturer = 'PJLINK'
-                pjlink.model = '1'
-                pjlink.shutter = True
-                pjlink.mute = True
-                pjlink.lamp = True
-                pjlink.fan = True
-                pjlink.source_available = True
-                pjlink.other_info = 'ANOTHER TEST'
-                pjlink.send_queue = True
-                pjlink.send_busy = True
-
-                # WHEN: reset_information() is called
-                pjlink.reset_information()
-
-                # THEN: All information should be reset and timers stopped
-                assert pjlink.power == S_OFF, 'Projector power should be OFF'
-                assert pjlink.pjlink_name is None, 'Projector pjlink_name should be None'
-                assert pjlink.manufacturer is None, 'Projector manufacturer should be None'
-                assert pjlink.model is None, 'Projector model should be None'
-                assert pjlink.shutter is None, 'Projector shutter should be None'
-                assert pjlink.mute is None, 'Projector shuttter should be None'
-                assert pjlink.lamp is None, 'Projector lamp should be None'
-                assert pjlink.fan is None, 'Projector fan should be None'
-                assert pjlink.source_available is None, 'Projector source_available should be None'
-                assert pjlink.source is None, 'Projector source should be None'
-                assert pjlink.other_info is None, 'Projector other_info should be None'
-                assert pjlink.send_queue == [], 'Projector send_queue should be an empty list'
-                assert pjlink.send_busy is False, 'Projector send_busy should be False'
-                assert mock_timer.stop.called is True, 'Projector timer.stop()  should have been called'
-                assert mock_socket_timer.stop.called is True, 'Projector socket_timer.stop() should have been called'
-                mock_log.debug.assert_has_calls(log_debug_calls)
