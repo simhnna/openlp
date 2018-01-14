@@ -58,8 +58,8 @@ from openlp.core.projectors.constants import CONNECTION_ERRORS, PJLINK_CLASS, PJ
     PJLINK_ERST_DATA, PJLINK_ERST_STATUS, PJLINK_MAX_PACKET, PJLINK_PREFIX, PJLINK_PORT, PJLINK_POWR_STATUS, \
     PJLINK_SUFFIX, PJLINK_VALID_CMD, PROJECTOR_STATE, STATUS_CODE, STATUS_MSG, QSOCKET_STATE, \
     E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_INVALID_DATA, E_NETWORK, E_NOT_CONNECTED, \
-    E_OK, E_SOCKET_TIMEOUT, \
-    S_CONNECTED, S_CONNECTING, S_INFO, S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STATUS
+    E_SOCKET_TIMEOUT, \
+    S_CONNECTED, S_CONNECTING, S_NOT_CONNECTED, S_OFF, S_OK, S_ON
 
 log = logging.getLogger(__name__)
 log.debug('pjlink loaded')
@@ -121,8 +121,6 @@ class PJLinkCommands(object):
             'LAMP': self.process_lamp,
             'NAME': self.process_name,
             'PJLINK': self.process_pjlink,
-            # TODO: Part of check_login refactor - remove when done
-            # 'PJLINK': self.check_login,
             'POWR': self.process_powr,
             'SNUM': self.process_snum,
             'SVER': self.process_sver,
@@ -135,7 +133,7 @@ class PJLinkCommands(object):
         Initialize instance variables. Also used to reset projector-specific information to default.
         """
         conn_state = STATUS_CODE[QSOCKET_STATE[self.state()]]
-        log.debug('({ip}) reset_information() connect status is {state}'.format(ip=self.ip,
+        log.debug('({ip}) reset_information() connect status is {state}'.format(ip=self.entry.name,
                                                                                 state=conn_state))
         self.fan = None  # ERST
         self.filter_time = None  # FILT
@@ -147,7 +145,6 @@ class PJLinkCommands(object):
         self.model_lamp = None  # RLMP
         self.mute = None  # AVMT
         self.other_info = None  # INFO
-        self.pjlink_class = PJLINK_CLASS  # Default class
         self.pjlink_name = None  # NAME
         self.power = S_OFF  # POWR
         self.serial_no = None  # SNUM
@@ -158,11 +155,11 @@ class PJLinkCommands(object):
         self.source_available = None  # INST
         self.source = None  # INPT
         # These should be part of PJLink() class, but set here for convenience
-        if hasattr(self, 'timer'):
-            log.debug('({ip}): Calling timer.stop()'.format(ip=self.ip))
-            self.timer.stop()
+        if hasattr(self, 'poll_timer'):
+            log.debug('({ip}): Calling poll_timer.stop()'.format(ip=self.entry.name))
+            self.poll_timer.stop()
         if hasattr(self, 'socket_timer'):
-            log.debug('({ip}): Calling socket_timer.stop()'.format(ip=self.ip))
+            log.debug('({ip}): Calling socket_timer.stop()'.format(ip=self.entry.name))
             self.socket_timer.stop()
         self.send_busy = False
         self.send_queue = []
@@ -175,7 +172,7 @@ class PJLinkCommands(object):
         :param cmd: Command to process
         :param data: Data being processed
         """
-        log.debug('({ip}) Processing command "{cmd}" with data "{data}"'.format(ip=self.ip,
+        log.debug('({ip}) Processing command "{cmd}" with data "{data}"'.format(ip=self.entry.name,
                                                                                 cmd=cmd,
                                                                                 data=data))
         # cmd should already be in uppercase, but data may be in mixed-case.
@@ -183,15 +180,15 @@ class PJLinkCommands(object):
         _data = data.upper()
         # Check if we have a future command not available yet
         if cmd not in self.pjlink_functions:
-            log.warning('({ip}) Unable to process command="{cmd}" (Future option?)'.format(ip=self.ip, cmd=cmd))
+            log.warning('({ip}) Unable to process command="{cmd}" (Future option?)'.format(ip=self.entry.name, cmd=cmd))
             return
         elif _data == 'OK':
-            log.debug('({ip}) Command "{cmd}" returned OK'.format(ip=self.ip, cmd=cmd))
+            log.debug('({ip}) Command "{cmd}" returned OK'.format(ip=self.entry.name, cmd=cmd))
             # A command returned successfully, so do a query on command to verify status
             return self.send_command(cmd=cmd)
         elif _data in PJLINK_ERRORS:
             # Oops - projector error
-            log.error('({ip}) {cmd}: {err}'.format(ip=self.ip,
+            log.error('({ip}) {cmd}: {err}'.format(ip=self.entry.name,
                                                    cmd=cmd,
                                                    err=STATUS_MSG[PJLINK_ERRORS[_data]]))
             if PJLINK_ERRORS[_data] == E_AUTHENTICATION:
@@ -199,7 +196,7 @@ class PJLinkCommands(object):
                 self.projectorAuthentication.emit(self.name)
                 return self.change_status(status=E_AUTHENTICATION)
         # Command checks already passed
-        log.debug('({ip}) Calling function for {cmd}'.format(ip=self.ip, cmd=cmd))
+        log.debug('({ip}) Calling function for {cmd}'.format(ip=self.entry.name, cmd=cmd))
         self.pjlink_functions[cmd](data=data)
 
     def process_avmt(self, data):
@@ -219,7 +216,7 @@ class PJLinkCommands(object):
                     '31': {'shutter': True, 'mute': True}
                     }
         if data not in settings:
-            log.warning('({ip}) Invalid shutter response: {data}'.format(ip=self.ip, data=data))
+            log.warning('({ip}) Invalid shutter response: {data}'.format(ip=self.entry.name, data=data))
             return
         shutter = settings[data]['shutter']
         mute = settings[data]['mute']
@@ -243,7 +240,7 @@ class PJLinkCommands(object):
         #            : Received: '%1CLSS=Class 1'  (Optoma)
         #            : Received: '%1CLSS=Version1'  (BenQ)
         if len(data) > 1:
-            log.warning('({ip}) Non-standard CLSS reply: "{data}"'.format(ip=self.ip, data=data))
+            log.warning('({ip}) Non-standard CLSS reply: "{data}"'.format(ip=self.entry.name, data=data))
             # Due to stupid projectors not following standards (Optoma, BenQ comes to mind),
             # AND the different responses that can be received, the semi-permanent way to
             # fix the class reply is to just remove all non-digit characters.
@@ -251,17 +248,23 @@ class PJLinkCommands(object):
                 clss = re.findall('\d', data)[0]  # Should only be the first match
             except IndexError:
                 log.error('({ip}) No numbers found in class version reply "{data}" - '
-                          'defaulting to class "1"'.format(ip=self.ip, data=data))
+                          'defaulting to class "1"'.format(ip=self.entry.name, data=data))
                 clss = '1'
         elif not data.isdigit():
             log.error('({ip}) NAN CLSS version reply "{data}" - '
-                      'defaulting to class "1"'.format(ip=self.ip, data=data))
+                      'defaulting to class "1"'.format(ip=self.entry.name, data=data))
             clss = '1'
         else:
             clss = data
         self.pjlink_class = clss
-        log.debug('({ip}) Setting pjlink_class for this projector to "{data}"'.format(ip=self.ip,
+        log.debug('({ip}) Setting pjlink_class for this projector to "{data}"'.format(ip=self.entry.name,
                                                                                       data=self.pjlink_class))
+        # Since we call this one on first connect, setup polling from here
+        if not self.no_poll:
+            log.debug('({ip}) process_pjlink(): Starting timer'.format(ip=self.entry.name))
+            self.poll_timer.setInterval(1000)  # Set 1 second for initial information
+            self.poll_timer.start()
+
         return
 
     def process_erst(self, data):
@@ -273,15 +276,15 @@ class PJLinkCommands(object):
         """
         if len(data) != PJLINK_ERST_DATA['DATA_LENGTH']:
             count = PJLINK_ERST_DATA['DATA_LENGTH']
-            log.warning('{ip}) Invalid error status response "{data}": length != {count}'.format(ip=self.ip,
-                                                                                                 data=data,
-                                                                                                 count=count))
+            log.warning('({ip}) Invalid error status response "{data}": length != {count}'.format(ip=self.entry.name,
+                                                                                                  data=data,
+                                                                                                  count=count))
             return
         try:
             datacheck = int(data)
         except ValueError:
             # Bad data - ignore
-            log.warning('({ip}) Invalid error status response "{data}"'.format(ip=self.ip, data=data))
+            log.warning('({ip}) Invalid error status response "{data}"'.format(ip=self.entry.name, data=data))
             return
         if datacheck == 0:
             self.projector_errors = None
@@ -323,7 +326,8 @@ class PJLinkCommands(object):
         :param data: Projector manufacturer
         """
         self.manufacturer = data
-        log.debug('({ip}) Setting projector manufacturer data to "{data}"'.format(ip=self.ip, data=self.manufacturer))
+        log.debug('({ip}) Setting projector manufacturer data to "{data}"'.format(ip=self.entry.name,
+                                                                                  data=self.manufacturer))
         return
 
     def process_inf2(self, data):
@@ -334,7 +338,7 @@ class PJLinkCommands(object):
         :param data: Model name
         """
         self.model = data
-        log.debug('({ip}) Setting projector model to "{data}"'.format(ip=self.ip, data=self.model))
+        log.debug('({ip}) Setting projector model to "{data}"'.format(ip=self.entry.name, data=self.model))
         return
 
     def process_info(self, data):
@@ -345,7 +349,7 @@ class PJLinkCommands(object):
         :param data: Projector other info
         """
         self.other_info = data
-        log.debug('({ip}) Setting projector other_info to "{data}"'.format(ip=self.ip, data=self.other_info))
+        log.debug('({ip}) Setting projector other_info to "{data}"'.format(ip=self.entry.name, data=self.other_info))
         return
 
     def process_inpt(self, data):
@@ -359,14 +363,15 @@ class PJLinkCommands(object):
         if self.source_available is not None:
             # We have available inputs, so verify it's in the list
             if data not in self.source_available:
-                log.warn('({ip}) Input source not listed in available sources - ignoring'.format(ip=self.ip))
+                log.warn('({ip}) Input source not listed in available sources - ignoring'.format(ip=self.entry.name))
                 return
         elif data not in PJLINK_DEFAULT_CODES:
             # Hmm - no sources available yet, so check with PJLink defaults
-            log.warn('({ip}) Input source not listed as a PJLink available source - ignoring'.format(ip=self.ip))
+            log.warn('({ip}) Input source not listed as a PJLink available source '
+                     '- ignoring'.format(ip=self.entry.name))
             return
         self.source = data
-        log.debug('({ip}) Setting data source to "{data}"'.format(ip=self.ip, data=self.source))
+        log.debug('({ip}) Setting data source to "{data}"'.format(ip=self.entry.name, data=self.source))
         return
 
     def process_inst(self, data):
@@ -382,7 +387,7 @@ class PJLinkCommands(object):
             sources.append(source)
         sources.sort()
         self.source_available = sources
-        log.debug('({ip}) Setting projector sources_available to "{data}"'.format(ip=self.ip,
+        log.debug('({ip}) Setting projector sources_available to "{data}"'.format(ip=self.entry.name,
                                                                                   data=self.source_available))
         return
 
@@ -404,7 +409,7 @@ class PJLinkCommands(object):
                     fill = {'Hours': int(lamp_list[0]), 'On': False if lamp_list[1] == '0' else True}
                 except ValueError:
                     # In case of invalid entry
-                    log.warning('({ip}) process_lamp(): Invalid data "{data}"'.format(ip=self.ip, data=data))
+                    log.warning('({ip}) process_lamp(): Invalid data "{data}"'.format(ip=self.entry.name, data=data))
                     return
                 lamps.append(fill)
                 lamp_list.pop(0)  # Remove lamp hours
@@ -420,7 +425,7 @@ class PJLinkCommands(object):
         :param data: Projector name
         """
         self.pjlink_name = data
-        log.debug('({ip}) Setting projector PJLink name to "{data}"'.format(ip=self.ip, data=self.pjlink_name))
+        log.debug('({ip}) Setting projector PJLink name to "{data}"'.format(ip=self.entry.name, data=self.pjlink_name))
         return
 
     def process_pjlink(self, data):
@@ -429,42 +434,38 @@ class PJLinkCommands(object):
 
         :param data: Initial packet with authentication scheme
         """
-        log.debug('({ip}) Processing PJLINK command'.format(ip=self.ip))
+        log.debug('({ip}) Processing PJLINK command'.format(ip=self.entry.name))
         chk = data.split(' ')
         if len(chk[0]) != 1:
             # Invalid - after splitting, first field should be 1 character, either '0' or '1' only
-            log.error('({ip}) Invalid initial authentication scheme - aborting'.format(ip=self.ip))
+            log.error('({ip}) Invalid initial authentication scheme - aborting'.format(ip=self.entry.name))
             return self.disconnect_from_host()
         elif chk[0] == '0':
             # Normal connection no authentication
             if len(chk) > 1:
                 # Invalid data - there should be nothing after a normal authentication scheme
-                log.error('({ip}) Normal connection with extra information - aborting'.format(ip=self.ip))
+                log.error('({ip}) Normal connection with extra information - aborting'.format(ip=self.entry.name))
                 return self.disconnect_from_host()
             elif self.pin:
-                log.error('({ip}) Normal connection but PIN set - aborting'.format(ip=self.ip))
+                log.error('({ip}) Normal connection but PIN set - aborting'.format(ip=self.entry.name))
                 return self.disconnect_from_host()
             else:
                 data_hash = None
         elif chk[0] == '1':
             if len(chk) < 2:
                 # Not enough information for authenticated connection
-                log.error('({ip}) Authenticated connection but not enough info - aborting'.format(ip=self.ip))
+                log.error('({ip}) Authenticated connection but not enough info - aborting'.format(ip=self.entry.name))
                 return self.disconnect_from_host()
             elif not self.pin:
-                log.error('({ip}) Authenticate connection but no PIN - aborting'.format(ip=self.ip))
+                log.error('({ip}) Authenticate connection but no PIN - aborting'.format(ip=self.entry.name))
                 return self.disconnect_from_host()
             else:
                 data_hash = str(qmd5_hash(salt=chk[1].encode('utf-8'), data=self.pin.encode('utf-8')),
                                 encoding='ascii')
         # Passed basic checks, so start connection
         self.readyRead.connect(self.get_socket)
-        if not self.no_poll:
-            log.debug('({ip}) process_pjlink(): Starting timer'.format(ip=self.ip))
-            self.timer.setInterval(2000)  # Set 2 seconds for initial information
-            self.timer.start()
         self.change_status(S_CONNECTED)
-        log.debug('({ip}) process_pjlink(): Sending "CLSS" initial command'.format(ip=self.ip))
+        log.debug('({ip}) process_pjlink(): Sending "CLSS" initial command'.format(ip=self.entry.name))
         # Since this is an initial connection, make it a priority just in case
         return self.send_command(cmd="CLSS", salt=data_hash, priority=True)
 
@@ -475,7 +476,7 @@ class PJLinkCommands(object):
 
         :param data: Power status
         """
-        log.debug('({ip}: Processing POWR command'.format(ip=self.ip))
+        log.debug('({ip}: Processing POWR command'.format(ip=self.entry.name))
         if data in PJLINK_POWR_STATUS:
             power = PJLINK_POWR_STATUS[data]
             update_icons = self.power != power
@@ -488,7 +489,7 @@ class PJLinkCommands(object):
                     self.send_command('INST')
         else:
             # Log unknown status response
-            log.warning('({ip}) Unknown power response: "{data}"'.format(ip=self.ip, data=data))
+            log.warning('({ip}) Unknown power response: "{data}"'.format(ip=self.entry.name, data=data))
         return
 
     def process_rfil(self, data):
@@ -498,9 +499,9 @@ class PJLinkCommands(object):
         if self.model_filter is None:
             self.model_filter = data
         else:
-            log.warning('({ip}) Filter model already set'.format(ip=self.ip))
-            log.warning('({ip}) Saved model: "{old}"'.format(ip=self.ip, old=self.model_filter))
-            log.warning('({ip}) New model: "{new}"'.format(ip=self.ip, new=data))
+            log.warning('({ip}) Filter model already set'.format(ip=self.entry.name))
+            log.warning('({ip}) Saved model: "{old}"'.format(ip=self.entry.name, old=self.model_filter))
+            log.warning('({ip}) New model: "{new}"'.format(ip=self.entry.name, new=data))
 
     def process_rlmp(self, data):
         """
@@ -509,9 +510,9 @@ class PJLinkCommands(object):
         if self.model_lamp is None:
             self.model_lamp = data
         else:
-            log.warning('({ip}) Lamp model already set'.format(ip=self.ip))
-            log.warning('({ip}) Saved lamp: "{old}"'.format(ip=self.ip, old=self.model_lamp))
-            log.warning('({ip}) New lamp: "{new}"'.format(ip=self.ip, new=data))
+            log.warning('({ip}) Lamp model already set'.format(ip=self.entry.name))
+            log.warning('({ip}) Saved lamp: "{old}"'.format(ip=self.entry.name, old=self.model_lamp))
+            log.warning('({ip}) New lamp: "{new}"'.format(ip=self.entry.name, new=data))
 
     def process_snum(self, data):
         """
@@ -520,16 +521,17 @@ class PJLinkCommands(object):
         :param data: Serial number from projector.
         """
         if self.serial_no is None:
-            log.debug('({ip}) Setting projector serial number to "{data}"'.format(ip=self.ip, data=data))
+            log.debug('({ip}) Setting projector serial number to "{data}"'.format(ip=self.entry.name, data=data))
             self.serial_no = data
             self.db_update = False
         else:
             # Compare serial numbers and see if we got the same projector
             if self.serial_no != data:
-                log.warning('({ip}) Projector serial number does not match saved serial number'.format(ip=self.ip))
-                log.warning('({ip}) Saved:    "{old}"'.format(ip=self.ip, old=self.serial_no))
-                log.warning('({ip}) Received: "{new}"'.format(ip=self.ip, new=data))
-                log.warning('({ip}) NOT saving serial number'.format(ip=self.ip))
+                log.warning('({ip}) Projector serial number does not match saved serial '
+                            'number'.format(ip=self.entry.name))
+                log.warning('({ip}) Saved:    "{old}"'.format(ip=self.entry.name, old=self.serial_no))
+                log.warning('({ip}) Received: "{new}"'.format(ip=self.entry.name, new=data))
+                log.warning('({ip}) NOT saving serial number'.format(ip=self.entry.name))
                 self.serial_no_received = data
 
     def process_sver(self, data):
@@ -541,14 +543,14 @@ class PJLinkCommands(object):
             log.warning('Invalid software version - too long')
             return
         elif self.sw_version is None:
-            log.debug('({ip}) Setting projector software version to "{data}"'.format(ip=self.ip, data=data))
+            log.debug('({ip}) Setting projector software version to "{data}"'.format(ip=self.entry.name, data=data))
         else:
             if self.sw_version != data:
                 log.warning('({ip}) Projector software version does not match saved '
-                            'software version'.format(ip=self.ip))
-                log.warning('({ip}) Saved:    "{old}"'.format(ip=self.ip, old=self.sw_version))
-                log.warning('({ip}) Received: "{new}"'.format(ip=self.ip, new=data))
-                log.warning('({ip}) Updating software version'.format(ip=self.ip))
+                            'software version'.format(ip=self.entry.name))
+                log.warning('({ip}) Saved:    "{old}"'.format(ip=self.entry.name, old=self.sw_version))
+                log.warning('({ip}) Received: "{new}"'.format(ip=self.entry.name, new=data))
+                log.warning('({ip}) Updating software version'.format(ip=self.entry.name))
         self.sw_version = data
         self.db_update = True
 
@@ -588,14 +590,14 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         self.notes = self.entry.notes
         self.pin = self.entry.pin
         self.port = self.entry.port
+        self.pjlink_class = PJLINK_CLASS if self.entry.pjlink_class is None else self.entry.pjlink_class
         self.db_update = False  # Use to check if db needs to be updated prior to exiting
         # Poll time 20 seconds unless called with something else
         self.poll_time = 20000 if 'poll_time' not in kwargs else kwargs['poll_time'] * 1000
-        # Timeout 5 seconds unless called with something else
+        # Socket timeout (in case of brain-dead projectors) 5 seconds unless called with something else
         self.socket_timeout = 5000 if 'socket_timeout' not in kwargs else kwargs['socket_timeout'] * 1000
         # In case we're called from somewhere that only wants information
         self.no_poll = 'no_poll' in kwargs
-        self.i_am_running = False
         self.status_connect = S_NOT_CONNECTED
         self.last_command = ''
         self.projector_status = S_NOT_CONNECTED
@@ -605,61 +607,29 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         self.max_size = PJLINK_MAX_PACKET + 2
         self.setReadBufferSize(self.max_size)
         self.reset_information()
-        # Set from ProjectorManager.add_projector()
-        self.widget = None  # QListBox entry
-        self.timer = None  # Timer that calls the poll_loop
         self.send_queue = []
         self.priority_queue = []
         self.send_busy = False
-        # Socket timer for some possible brain-dead projectors or network cable pulled
-        self.socket_timer = None
-
-    def thread_started(self):
-        """
-        Connects signals to methods when thread is started.
-        """
-        log.debug('({ip}) Thread starting'.format(ip=self.ip))
-        self.i_am_running = True
+        # Poll timer for status updates
+        self.poll_timer = QtCore.QTimer(self)  # Timer that calls the poll_loop
+        self.poll_timer.setInterval(self.poll_time)
+        self.poll_timer.timeout.connect(self.poll_loop)
+        # Socket timer for some possible brain-dead projectors or network issues
+        self.socket_timer = QtCore.QTimer(self)
+        self.socket_timer.setInterval(self.socket_timeout)
+        self.socket_timer.timeout.connect(self.socket_abort)
+        # Socket status signals
         self.connected.connect(self.check_login)
         self.disconnected.connect(self.disconnect_from_host)
         self.error.connect(self.get_error)
         self.projectorReceivedData.connect(self._send_command)
-
-    def thread_stopped(self):
-        """
-        Cleanups when thread is stopped.
-        """
-        log.debug('({ip}) Thread stopped'.format(ip=self.ip))
-        try:
-            self.connected.disconnect(self.check_login)
-        except TypeError:
-            pass
-        try:
-            self.disconnected.disconnect(self.disconnect_from_host)
-        except TypeError:
-            pass
-        try:
-            self.error.disconnect(self.get_error)
-        except TypeError:
-            pass
-        try:
-            self.projectorReceivedData.disconnect(self._send_command)
-        except TypeError:
-            pass
-        try:
-            self.readyRead.disconnect(self.get_socket)  # Set in process_pjlink
-        except TypeError:
-            pass
-        self.disconnect_from_host()
-        self.deleteLater()
-        self.i_am_running = False
 
     def socket_abort(self):
         """
         Aborts connection and closes socket in case of brain-dead projectors.
         Should normally be called by socket_timer().
         """
-        log.debug('({ip}) socket_abort() - Killing connection'.format(ip=self.ip))
+        log.debug('({ip}) socket_abort() - Killing connection'.format(ip=self.entry.name))
         self.disconnect_from_host(abort=True)
 
     def poll_loop(self):
@@ -668,15 +638,11 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         Normally called by timer().
         """
         if QSOCKET_STATE[self.state()] != S_CONNECTED:
-            log.warning('({ip}) poll_loop(): Not connected - returning'.format(ip=self.ip))
+            log.warning('({ip}) poll_loop(): Not connected - returning'.format(ip=self.entry.name))
+            # Stop timer just in case it's missed elsewhere
+            self.poll_timer.stop()
             return
-        log.debug('({ip}) poll_loop(): Updating projector status'.format(ip=self.ip))
-        # Reset timer in case we were called from a set command
-        if self.timer.interval() < self.poll_time:
-            # Reset timer to 5 seconds
-            self.timer.setInterval(self.poll_time)
-        # Restart timer
-        self.timer.start()
+        log.debug('({ip}) poll_loop(): Updating projector status'.format(ip=self.entry.name))
         # The following commands do not change, so only check them once
         # Call them first in case other functions rely on something here
         if self.power == S_ON and self.source_available is None:
@@ -705,6 +671,8 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
             check_list.extend(['FILT', 'FREZ'])
         for command in check_list:
             self.send_command(command)
+        # Reset the poll_timer for normal operations in case of initial connection
+        self.poll_timer.setInterval(self.poll_time)
 
     def _get_status(self, status):
         """
@@ -732,11 +700,11 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         if status in STATUS_CODE:
             log.debug('({ip}) Changing status to {status} '
-                      '"{msg}"'.format(ip=self.ip,
+                      '"{msg}"'.format(ip=self.entry.name,
                                        status=STATUS_CODE[status],
                                        msg=msg if msg is not None else STATUS_MSG[status]))
         else:
-            log.warning('({ip}) Unknown status change code: {code}'.format(ip=self.ip,
+            log.warning('({ip}) Unknown status change code: {code}'.format(ip=self.entry.name,
                                                                            code=status))
             return
         if status in CONNECTION_ERRORS:
@@ -752,15 +720,15 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
 
         # These log entries are for troubleshooting only
         (status_code, status_message) = self._get_status(self.status_connect)
-        log.debug('({ip}) status_connect: {code}: "{message}"'.format(ip=self.ip,
+        log.debug('({ip}) status_connect: {code}: "{message}"'.format(ip=self.entry.name,
                                                                       code=status_code,
                                                                       message=status_message if msg is None else msg))
         (status_code, status_message) = self._get_status(self.projector_status)
-        log.debug('({ip}) projector_status: {code}: "{message}"'.format(ip=self.ip,
+        log.debug('({ip}) projector_status: {code}: "{message}"'.format(ip=self.entry.name,
                                                                         code=status_code,
                                                                         message=status_message if msg is None else msg))
         (status_code, status_message) = self._get_status(self.error_status)
-        log.debug('({ip}) error_status: {code}: "{message}"'.format(ip=self.ip,
+        log.debug('({ip}) error_status: {code}: "{message}"'.format(ip=self.entry.name,
                                                                     code=status_code,
                                                                     message=status_message if msg is None else msg))
 
@@ -782,27 +750,27 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
 
         :param data: Optional data if called from another routine
         """
-        log.debug('({ip}) check_login(data="{data}")'.format(ip=self.ip, data=data))
+        log.debug('({ip}) check_login(data="{data}")'.format(ip=self.entry.name, data=data))
         if data is None:
             # Reconnected setup?
             if not self.waitForReadyRead(2000):
                 # Possible timeout issue
-                log.error('({ip}) Socket timeout waiting for login'.format(ip=self.ip))
+                log.error('({ip}) Socket timeout waiting for login'.format(ip=self.entry.name))
                 self.change_status(E_SOCKET_TIMEOUT)
                 return
             read = self.readLine(self.max_size)
             self.readLine(self.max_size)  # Clean out any trailing whitespace
             if read is None:
-                log.warning('({ip}) read is None - socket error?'.format(ip=self.ip))
+                log.warning('({ip}) read is None - socket error?'.format(ip=self.entry.name))
                 return
             elif len(read) < 8:
-                log.warning('({ip}) Not enough data read - skipping'.format(ip=self.ip))
+                log.warning('({ip}) Not enough data read - skipping'.format(ip=self.entry.name))
                 return
             data = decode(read, 'utf-8')
             # Possibility of extraneous data on input when reading.
             # Clean out extraneous characters in buffer.
             self.read(1024)
-            log.debug('({ip}) check_login() read "{data}"'.format(ip=self.ip, data=data.strip()))
+            log.debug('({ip}) check_login() read "{data}"'.format(ip=self.entry.name, data=data.strip()))
         # At this point, we should only have the initial login prompt with
         # possible authentication
         # PJLink initial login will be:
@@ -810,76 +778,26 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         # 'PJLink 1 XXXXXX' Authenticated login - extra processing required.
         if not data.startswith('PJLINK'):
             # Invalid initial packet - close socket
-            log.error('({ip}) Invalid initial packet received - closing socket'.format(ip=self.ip))
+            log.error('({ip}) Invalid initial packet received - closing socket'.format(ip=self.entry.name))
             return self.disconnect_from_host()
         # Convert the initial login prompt with the expected PJLink normal command format for processing
-        log.debug('({ip}) check_login(): Formatting initial connection prompt to PJLink packet'.format(ip=self.ip))
+        log.debug('({ip}) check_login(): Formatting initial connection prompt'
+                  'to PJLink packet'.format(ip=self.entry.name))
         return self.get_data('{start}{clss}{data}'.format(start=PJLINK_PREFIX,
                                                           clss='1',
                                                           data=data.replace(' ', '=', 1)).encode('utf-8'))
-        # TODO: The below is replaced by process_pjlink() - remove when  working properly
-        """
-        if '=' in data:
-            # Processing a login reply
-            data_check = data.strip().split('=')
-        else:
-            # Process initial connection
-            data_check = data.strip().split(' ')
-        log.debug('({ip}) data_check="{data}"'.format(ip=self.ip, data=data_check))
-        # Check for projector reporting an error
-        if data_check[1].upper() == 'ERRA':
-            # Authentication error
-            self.disconnect_from_host()
-            self.change_status(E_AUTHENTICATION)
-            log.debug('({ip}) emitting projectorAuthentication() signal'.format(ip=self.ip))
-            return
-        elif (data_check[1] == '0') and (self.pin):
-            # Pin set and no authentication needed
-            log.warning('({ip}) Regular connection but PIN set'.format(ip=self.name))
-            self.disconnect_from_host()
-            self.change_status(E_AUTHENTICATION)
-            log.debug('({ip}) Emitting projectorNoAuthentication() signal'.format(ip=self.ip))
-            self.projectorNoAuthentication.emit(self.name)
-            return
-        elif data_check[1] == '1':
-            # Authenticated login with salt
-            if not self.pin:
-                log.warning('({ip}) Authenticated connection but no pin set'.format(ip=self.ip))
-                self.disconnect_from_host()
-                self.change_status(E_AUTHENTICATION)
-                log.debug('({ip}) Emitting projectorAuthentication() signal'.format(ip=self.ip))
-                self.projectorAuthentication.emit(self.ip)
-                return
-            else:
-                log.debug('({ip}) Setting hash with salt="{data}"'.format(ip=self.ip, data=data_check[2]))
-                log.debug('({ip}) pin="{data}"'.format(ip=self.ip, data=self.pin))
-                data_hash = str(qmd5_hash(salt=data_check[2].encode('utf-8'), data=self.pin.encode('utf-8')),
-                                encoding='ascii')
-        else:
-            data_hash = None
-        # We're connected at this point, so go ahead and setup regular I/O
-        self.readyRead.connect(self.get_socket)
-        self.projectorReceivedData.connect(self._send_command)
-        # Initial data we should know about
-        self.send_command(cmd='CLSS', salt=data_hash)
-        self.waitForReadyRead()
-        if (not self.no_poll) and (self.state() == self.ConnectedState):
-            log.debug('({ip}) Starting timer'.format(ip=self.ip))
-            self.timer.setInterval(2000)  # Set 2 seconds for initial information
-            self.timer.start()
-        """
 
     def _trash_buffer(self, msg=None):
         """
         Clean out extraneous stuff in the buffer.
         """
-        log.warning('({ip}) {message}'.format(ip=self.ip, message='Invalid packet' if msg is None else msg))
+        log.warning('({ip}) {message}'.format(ip=self.entry.name, message='Invalid packet' if msg is None else msg))
         self.send_busy = False
         trash_count = 0
         while self.bytesAvailable() > 0:
             trash = self.read(self.max_size)
             trash_count += len(trash)
-        log.debug('({ip}) Finished cleaning buffer - {count} bytes dropped'.format(ip=self.ip,
+        log.debug('({ip}) Finished cleaning buffer - {count} bytes dropped'.format(ip=self.entry.name,
                                                                                    count=trash_count))
         return
 
@@ -891,9 +809,9 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         :param data:  Data to process. buffer must be formatted as a proper PJLink packet.
         :param ip:      Destination IP for buffer.
         """
-        log.debug('({ip}) get_buffer(data="{buff}" ip="{ip_in}"'.format(ip=self.ip, buff=data, ip_in=ip))
+        log.debug('({ip}) get_buffer(data="{buff}" ip="{ip_in}"'.format(ip=self.entry.name, buff=data, ip_in=ip))
         if ip is None:
-            log.debug("({ip}) get_buffer() Don't know who data is for - exiting".format(ip=self.ip))
+            log.debug("({ip}) get_buffer() Don't know who data is for - exiting".format(ip=self.entry.name))
             return
         return self.get_data(buff=data, ip=ip)
 
@@ -902,17 +820,17 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         Get data from TCP socket.
         """
-        log.debug('({ip}) get_socket(): Reading data'.format(ip=self.ip))
+        log.debug('({ip}) get_socket(): Reading data'.format(ip=self.entry.name))
         if QSOCKET_STATE[self.state()] != S_CONNECTED:
-            log.debug('({ip}) get_socket(): Not connected - returning'.format(ip=self.ip))
+            log.debug('({ip}) get_socket(): Not connected - returning'.format(ip=self.entry.name))
             self.send_busy = False
             return
         # Although we have a packet length limit, go ahead and use a larger buffer
         read = self.readLine(1024)
-        log.debug('({ip}) get_socket(): "{buff}"'.format(ip=self.ip, buff=read))
+        log.debug('({ip}) get_socket(): "{buff}"'.format(ip=self.entry.name, buff=read))
         if read == -1:
             # No data available
-            log.debug('({ip}) get_socket(): No data available (-1)'.format(ip=self.ip))
+            log.debug('({ip}) get_socket(): No data available (-1)'.format(ip=self.entry.name))
             return self.receive_data_signal()
         self.socket_timer.stop()
         return self.get_data(buff=read, ip=self.ip)
@@ -928,7 +846,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         # set to default here
         if ip is None:
             ip = self.ip
-        log.debug('({ip}) get_data(ip="{ip_in}" buffer="{buff}"'.format(ip=self.ip, ip_in=ip, buff=buff))
+        log.debug('({ip}) get_data(ip="{ip_in}" buffer="{buff}"'.format(ip=self.entry.name, ip_in=ip, buff=buff))
         # NOTE: Class2 has changed to some values being UTF-8
         data_in = decode(buff, 'utf-8')
         data = data_in.strip()
@@ -945,7 +863,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         elif '=' not in data:
             self._trash_buffer(msg='get_data(): Invalid reply - Does not have "="')
             return self.receive_data_signal()
-        log.debug('({ip}) get_data(): Checking new data "{data}"'.format(ip=self.ip, data=data))
+        log.debug('({ip}) get_data(): Checking new data "{data}"'.format(ip=self.entry.name, data=data))
         header, data = data.split('=')
         # At this point, the header should contain:
         #   "PVCCCC"
@@ -957,16 +875,17 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
             version, cmd = header[1], header[2:].upper()
         except ValueError as e:
             self.change_status(E_INVALID_DATA)
-            log.warning('({ip}) get_data(): Received data: "{data}"'.format(ip=self.ip, data=data_in))
+            log.warning('({ip}) get_data(): Received data: "{data}"'.format(ip=self.entry.name, data=data_in))
             self._trash_buffer('get_data(): Expected header + command + data')
             return self.receive_data_signal()
         if cmd not in PJLINK_VALID_CMD:
-            log.warning('({ip}) get_data(): Invalid packet - unknown command "{data}"'.format(ip=self.ip, data=cmd))
+            log.warning('({ip}) get_data(): Invalid packet - unknown command "{data}"'.format(ip=self.entry.name,
+                                                                                              data=cmd))
             self._trash_buffer(msg='get_data(): Unknown command "{data}"'.format(data=cmd))
             return self.receive_data_signal()
         if int(self.pjlink_class) < int(version):
             log.warning('({ip}) get_data(): Projector returned class reply higher '
-                        'than projector stated class'.format(ip=self.ip))
+                        'than projector stated class'.format(ip=self.entry.name))
         self.process_command(cmd, data)
         return self.receive_data_signal()
 
@@ -978,12 +897,14 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
 
         :param err: Error code
         """
-        log.debug('({ip}) get_error(err={error}): {data}'.format(ip=self.ip, error=err, data=self.errorString()))
+        log.debug('({ip}) get_error(err={error}): {data}'.format(ip=self.entry.name,
+                                                                 error=err,
+                                                                 data=self.errorString()))
         if err <= 18:
             # QSocket errors. Redefined in projector.constants so we don't mistake
             # them for system errors
             check = err + E_CONNECTION_REFUSED
-            self.timer.stop()
+            self.poll_timer.stop()
         else:
             check = err
         if check < E_GENERAL:
@@ -1007,12 +928,12 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         :param priority: Option to send packet now rather than queue it up
         """
         if QSOCKET_STATE[self.state()] != S_CONNECTED:
-            log.warning('({ip}) send_command(): Not connected - returning'.format(ip=self.ip))
+            log.warning('({ip}) send_command(): Not connected - returning'.format(ip=self.entry.name))
             return self.reset_information()
         if cmd not in PJLINK_VALID_CMD:
-            log.error('({ip}) send_command(): Invalid command requested - ignoring.'.format(ip=self.ip))
+            log.error('({ip}) send_command(): Invalid command requested - ignoring.'.format(ip=self.entry.name))
             return
-        log.debug('({ip}) send_command(): Building cmd="{command}" opts="{data}"{salt}'.format(ip=self.ip,
+        log.debug('({ip}) send_command(): Building cmd="{command}" opts="{data}"{salt}'.format(ip=self.entry.name,
                                                                                                command=cmd,
                                                                                                data=opts,
                                                                                                salt='' if salt is None
@@ -1025,7 +946,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
             header = PJLINK_HEADER.format(linkclass=cmd_ver[0])
         else:
             # NOTE: Once we get to version 3 then think about looping
-            log.error('({ip}): send_command(): PJLink class check issue? Aborting'.format(ip=self.ip))
+            log.error('({ip}): send_command(): PJLink class check issue? Aborting'.format(ip=self.entry.name))
             return
         out = '{salt}{header}{command} {options}{suffix}'.format(salt="" if salt is None else salt,
                                                                  header=header,
@@ -1033,15 +954,15 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
                                                                  options=opts,
                                                                  suffix=PJLINK_SUFFIX)
         if out in self.priority_queue:
-            log.debug('({ip}) send_command(): Already in priority queue - skipping'.format(ip=self.ip))
+            log.debug('({ip}) send_command(): Already in priority queue - skipping'.format(ip=self.entry.name))
         elif out in self.send_queue:
-            log.debug('({ip}) send_command(): Already in normal queue - skipping'.format(ip=self.ip))
+            log.debug('({ip}) send_command(): Already in normal queue - skipping'.format(ip=self.entry.name))
         else:
             if priority:
-                log.debug('({ip}) send_command(): Adding to priority queue'.format(ip=self.ip))
+                log.debug('({ip}) send_command(): Adding to priority queue'.format(ip=self.entry.name))
                 self.priority_queue.append(out)
             else:
-                log.debug('({ip}) send_command(): Adding to normal queue'.format(ip=self.ip))
+                log.debug('({ip}) send_command(): Adding to normal queue'.format(ip=self.entry.name))
                 self.send_queue.append(out)
         if self.priority_queue or self.send_queue:
             # May be some initial connection setup so make sure we send data
@@ -1056,44 +977,45 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         :param utf8: Send as UTF-8 string otherwise send as ASCII string
         """
         # Funny looking data check, but it's a quick check for data=None
-        log.debug('({ip}) _send_command(data="{data}")'.format(ip=self.ip, data=data.strip() if data else data))
+        log.debug('({ip}) _send_command(data="{data}")'.format(ip=self.entry.name, data=data.strip() if data else data))
         conn_state = STATUS_CODE[QSOCKET_STATE[self.state()]]
-        log.debug('({ip}) _send_command(): Connection status: {data}'.format(ip=self.ip,
+        log.debug('({ip}) _send_command(): Connection status: {data}'.format(ip=self.entry.name,
                                                                              data=conn_state))
         if QSOCKET_STATE[self.state()] != S_CONNECTED:
-            log.debug('({ip}) _send_command() Not connected - abort'.format(ip=self.ip))
+            log.debug('({ip}) _send_command() Not connected - abort'.format(ip=self.entry.name))
             self.send_busy = False
             return self.disconnect_from_host()
         if data and data not in self.priority_queue:
-            log.debug('({ip}) _send_command(): Priority packet - adding to priority queue'.format(ip=self.ip))
+            log.debug('({ip}) _send_command(): Priority packet - adding to priority queue'.format(ip=self.entry.name))
             self.priority_queue.append(data)
 
         if self.send_busy:
             # Still waiting for response from last command sent
-            log.debug('({ip}) _send_command(): Still busy, returning'.format(ip=self.ip))
-            log.debug('({ip}) _send_command(): Priority queue = {data}'.format(ip=self.ip, data=self.priority_queue))
-            log.debug('({ip}) _send_command(): Normal queue = {data}'.format(ip=self.ip, data=self.send_queue))
+            log.debug('({ip}) _send_command(): Still busy, returning'.format(ip=self.entry.name))
+            log.debug('({ip}) _send_command(): Priority queue = {data}'.format(ip=self.entry.name,
+                                                                               data=self.priority_queue))
+            log.debug('({ip}) _send_command(): Normal queue = {data}'.format(ip=self.entry.name, data=self.send_queue))
             return
 
         if len(self.priority_queue) != 0:
             out = self.priority_queue.pop(0)
-            log.debug('({ip}) _send_command(): Getting priority queued packet'.format(ip=self.ip))
+            log.debug('({ip}) _send_command(): Getting priority queued packet'.format(ip=self.entry.name))
         elif len(self.send_queue) != 0:
             out = self.send_queue.pop(0)
-            log.debug('({ip}) _send_command(): Getting normal queued packet'.format(ip=self.ip))
+            log.debug('({ip}) _send_command(): Getting normal queued packet'.format(ip=self.entry.name))
         else:
             # No data to send
-            log.debug('({ip}) _send_command(): No data to send'.format(ip=self.ip))
+            log.debug('({ip}) _send_command(): No data to send'.format(ip=self.entry.name))
             self.send_busy = False
             return
         self.send_busy = True
-        log.debug('({ip}) _send_command(): Sending "{data}"'.format(ip=self.ip, data=out.strip()))
+        log.debug('({ip}) _send_command(): Sending "{data}"'.format(ip=self.entry.name, data=out.strip()))
         self.socket_timer.start()
         sent = self.write(out.encode('{string_encoding}'.format(string_encoding='utf-8' if utf8 else 'ascii')))
         self.waitForBytesWritten(2000)  # 2 seconds should be enough
         if sent == -1:
             # Network error?
-            log.warning('({ip}) _send_command(): -1 received - disconnecting from host'.format(ip=self.ip))
+            log.warning('({ip}) _send_command(): -1 received - disconnecting from host'.format(ip=self.entry.name))
             self.change_status(E_NETWORK,
                                translate('OpenLP.PJLink', 'Error while sending data to projector'))
             self.disconnect_from_host()
@@ -1102,9 +1024,9 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         Initiate connection to projector.
         """
-        log.debug('({ip}) connect_to_host(): Starting connection'.format(ip=self.ip))
+        log.debug('({ip}) connect_to_host(): Starting connection'.format(ip=self.entry.name))
         if QSOCKET_STATE[self.state()] == S_CONNECTED:
-            log.warning('({ip}) connect_to_host(): Already connected - returning'.format(ip=self.ip))
+            log.warning('({ip}) connect_to_host(): Already connected - returning'.format(ip=self.entry.name))
             return
         self.error_status = S_OK
         self.change_status(S_CONNECTING)
@@ -1117,17 +1039,17 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         if abort or QSOCKET_STATE[self.state()] != S_NOT_CONNECTED:
             if abort:
-                log.warning('({ip}) disconnect_from_host(): Aborting connection'.format(ip=self.ip))
+                log.warning('({ip}) disconnect_from_host(): Aborting connection'.format(ip=self.entry.name))
                 self.abort()
             else:
-                log.warning('({ip}) disconnect_from_host(): Not connected'.format(ip=self.ip))
+                log.warning('({ip}) disconnect_from_host(): Not connected'.format(ip=self.entry.name))
             self.disconnectFromHost()
         try:
             self.readyRead.disconnect(self.get_socket)
         except TypeError:
             pass
         log.debug('({ip}) disconnect_from_host() '
-                  'Current status {data}'.format(ip=self.ip, data=self._get_status(self.status_connect)[0]))
+                  'Current status {data}'.format(ip=self.entry.name, data=self._get_status(self.status_connect)[0]))
         if abort:
             self.change_status(E_NOT_CONNECTED)
         else:
@@ -1138,70 +1060,70 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         Send command to retrieve shutter status.
         """
-        log.debug('({ip}) Sending AVMT command'.format(ip=self.ip))
+        log.debug('({ip}) Sending AVMT command'.format(ip=self.entry.name))
         return self.send_command(cmd='AVMT')
 
     def get_available_inputs(self):
         """
         Send command to retrieve available source inputs.
         """
-        log.debug('({ip}) Sending INST command'.format(ip=self.ip))
+        log.debug('({ip}) Sending INST command'.format(ip=self.entry.name))
         return self.send_command(cmd='INST')
 
     def get_error_status(self):
         """
         Send command to retrieve currently known errors.
         """
-        log.debug('({ip}) Sending ERST command'.format(ip=self.ip))
+        log.debug('({ip}) Sending ERST command'.format(ip=self.entry.name))
         return self.send_command(cmd='ERST')
 
     def get_input_source(self):
         """
         Send command to retrieve currently selected source input.
         """
-        log.debug('({ip}) Sending INPT command'.format(ip=self.ip))
+        log.debug('({ip}) Sending INPT command'.format(ip=self.entry.name))
         return self.send_command(cmd='INPT')
 
     def get_lamp_status(self):
         """
         Send command to return the lap status.
         """
-        log.debug('({ip}) Sending LAMP command'.format(ip=self.ip))
+        log.debug('({ip}) Sending LAMP command'.format(ip=self.entry.name))
         return self.send_command(cmd='LAMP')
 
     def get_manufacturer(self):
         """
         Send command to retrieve manufacturer name.
         """
-        log.debug('({ip}) Sending INF1 command'.format(ip=self.ip))
+        log.debug('({ip}) Sending INF1 command'.format(ip=self.entry.name))
         return self.send_command(cmd='INF1')
 
     def get_model(self):
         """
         Send command to retrieve the model name.
         """
-        log.debug('({ip}) Sending INF2 command'.format(ip=self.ip))
+        log.debug('({ip}) Sending INF2 command'.format(ip=self.entry.name))
         return self.send_command(cmd='INF2')
 
     def get_name(self):
         """
         Send command to retrieve name as set by end-user (if set).
         """
-        log.debug('({ip}) Sending NAME command'.format(ip=self.ip))
+        log.debug('({ip}) Sending NAME command'.format(ip=self.entry.name))
         return self.send_command(cmd='NAME')
 
     def get_other_info(self):
         """
         Send command to retrieve extra info set by manufacturer.
         """
-        log.debug('({ip}) Sending INFO command'.format(ip=self.ip))
+        log.debug('({ip}) Sending INFO command'.format(ip=self.entry.name))
         return self.send_command(cmd='INFO')
 
     def get_power_status(self):
         """
         Send command to retrieve power status.
         """
-        log.debug('({ip}) Sending POWR command'.format(ip=self.ip))
+        log.debug('({ip}) Sending POWR command'.format(ip=self.entry.name))
         return self.send_command(cmd='POWR')
 
     def set_input_source(self, src=None):
@@ -1211,12 +1133,12 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
 
         :param src: Video source to select in projector
         """
-        log.debug('({ip}) set_input_source(src="{data}")'.format(ip=self.ip, data=src))
+        log.debug('({ip}) set_input_source(src="{data}")'.format(ip=self.entry.name, data=src))
         if self.source_available is None:
             return
         elif src not in self.source_available:
             return
-        log.debug('({ip}) Setting input source to "{data}"'.format(ip=self.ip, data=src))
+        log.debug('({ip}) Setting input source to "{data}"'.format(ip=self.entry.name, data=src))
         self.send_command(cmd='INPT', opts=src, priority=True)
         self.poll_loop()
 
@@ -1224,7 +1146,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         Send command to turn power to on.
         """
-        log.debug('({ip}) Setting POWR to 1 (on)'.format(ip=self.ip))
+        log.debug('({ip}) Setting POWR to 1 (on)'.format(ip=self.entry.name))
         self.send_command(cmd='POWR', opts='1', priority=True)
         self.poll_loop()
 
@@ -1232,7 +1154,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         Send command to turn power to standby.
         """
-        log.debug('({ip}) Setting POWR to 0 (standby)'.format(ip=self.ip))
+        log.debug('({ip}) Setting POWR to 0 (standby)'.format(ip=self.entry.name))
         self.send_command(cmd='POWR', opts='0', priority=True)
         self.poll_loop()
 
@@ -1240,7 +1162,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         Send command to set shutter to closed position.
         """
-        log.debug('({ip}) Setting AVMT to 11 (shutter closed)'.format(ip=self.ip))
+        log.debug('({ip}) Setting AVMT to 11 (shutter closed)'.format(ip=self.entry.name))
         self.send_command(cmd='AVMT', opts='11', priority=True)
         self.poll_loop()
 
@@ -1248,7 +1170,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         Send command to set shutter to open position.
         """
-        log.debug('({ip}) Setting AVMT to "10" (shutter open)'.format(ip=self.ip))
+        log.debug('({ip}) Setting AVMT to "10" (shutter open)'.format(ip=self.entry.name))
         self.send_command(cmd='AVMT', opts='10', priority=True)
         self.poll_loop()
         self.projectorUpdateIcons.emit()
