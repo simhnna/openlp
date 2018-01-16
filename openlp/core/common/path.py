@@ -26,9 +26,9 @@ from contextlib import suppress
 from openlp.core.common import is_win
 
 if is_win():
-    from pathlib import WindowsPath as PathVariant
+    from pathlib import WindowsPath as PathVariant          # pragma: nocover
 else:
-    from pathlib import PosixPath as PathVariant
+    from pathlib import PosixPath as PathVariant            # pragma: nocover
 
 log = logging.getLogger(__name__)
 

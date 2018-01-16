@@ -22,38 +22,40 @@
 """
 Functional tests to test the API Error Class.
 """
-
-from unittest import TestCase
-
-from openlp.core.api.http.errors import NotFound, ServerError
+from openlp.core.api.http.errors import HttpError, NotFound, ServerError
 
 
-class TestApiError(TestCase):
+def test_http_error():
     """
-    A test suite to test out the Error in the API code
+    Test the HTTPError class
     """
-    def test_not_found(self):
-        """
-        Test the Not Found error displays the correct information
-        """
-        # GIVEN:
-        # WHEN: I raise an exception
-        with self.assertRaises(Exception) as context:
-            raise NotFound()
+    # GIVEN: An HTTPError class
+    # WHEN: An instance is created
+    error = HttpError(400, 'Access Denied')
 
-        # THEN: we get an error and a status
-        assert 'Not Found' == context.exception.message, 'A Not Found exception should be thrown'
-        assert 404 == context.exception.status, 'A 404 status should be thrown'
+    # THEN: The to_response() method should return the correct information
+    assert error.to_response() == ('Access Denied', 400), 'to_response() should have returned the correct info'
 
-    def test_server_error(self):
-        """
-        Test the server error displays the correct information
-        """
-        # GIVEN:
-        # WHEN: I raise an exception
-        with self.assertRaises(Exception) as context:
-            raise ServerError()
 
-        # THEN: we get an error and a status
-        assert'Server Error' == context.exception.message, 'A Not Found exception should be thrown'
-        assert 500 == context.exception.status, 'A 500 status should be thrown'
+def test_not_found():
+    """
+    Test the Not Found error displays the correct information
+    """
+    # GIVEN: A NotFound class
+    # WHEN: An instance is created
+    error = NotFound()
+
+    # THEN: The to_response() method should return the correct information
+    assert error.to_response() == ('Not Found', 404), 'to_response() should have returned the correct info'
+
+
+def test_server_error():
+    """
+    Test the server error displays the correct information
+    """
+    # GIVEN: A ServerError class
+    # WHEN: An instance of the class is created
+    error = ServerError()
+
+    # THEN: The to_response() method should return the correct information
+    assert error.to_response() == ('Server Error', 500), 'to_response() should have returned the correct info'

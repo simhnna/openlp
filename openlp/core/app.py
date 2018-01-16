@@ -63,8 +63,8 @@ class OpenLP(QtWidgets.QApplication, LogMixin):
     The core application class. This class inherits from Qt's QApplication
     class in order to provide the core of the application.
     """
-
     args = []
+    worker_threads = {}
 
     def exec(self):
         """

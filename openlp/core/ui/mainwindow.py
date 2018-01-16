@@ -477,7 +477,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         """
         super(MainWindow, self).__init__()
         Registry().register('main_window', self)
-        self.threads = {}
         self.clipboard = self.application.clipboard()
         self.arguments = ''.join(self.application.args)
         # Set up settings sections for the main application (not for use by plugins).
@@ -557,11 +556,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         wait_dialog.setAutoClose(False)
         wait_dialog.setCancelButton(None)
         wait_dialog.show()
-        for thread_name in self.threads.keys():
+        for thread_name in self.application.worker_threads.keys():
             log.debug('Waiting for thread %s', thread_name)
             self.application.processEvents()
-            thread = self.threads[thread_name]['thread']
-            worker = self.threads[thread_name]['worker']
+            thread = self.application.worker_threads[thread_name]['thread']
+            worker = self.application.worker_threads[thread_name]['worker']
             try:
                 if worker and hasattr(worker, 'stop'):
                     # If the worker has a stop method, run it

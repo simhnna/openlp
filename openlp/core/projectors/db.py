@@ -152,6 +152,7 @@ class Projector(Base, CommonMixin):
         location:       Column(String(30))
         notes:          Column(String(200))
         pjlink_name:    Column(String(128))  # From projector
+        pjlink_class    Column(String(5))    # From projector
         manufacturer:   Column(String(128))  # From projector
         model:          Column(String(128))  # From projector
         other:          Column(String(128))  # From projector
@@ -168,7 +169,7 @@ class Projector(Base, CommonMixin):
         Return basic representation of Source table entry.
         """
         return '< Projector(id="{data}", ip="{ip}", port="{port}", mac_adx="{mac}", pin="{pin}", name="{name}", ' \
-            'location="{location}", notes="{notes}", pjlink_name="{pjlink_name}", ' \
+            'location="{location}", notes="{notes}", pjlink_name="{pjlink_name}", pjlink_class="{pjlink_class}", ' \
             'manufacturer="{manufacturer}", model="{model}", serial_no="{serial}", other="{other}", ' \
             'sources="{sources}", source_list="{source_list}", model_filter="{mfilter}", ' \
             'model_lamp="{mlamp}", sw_version="{sw_ver}") >'.format(data=self.id,
@@ -180,6 +181,7 @@ class Projector(Base, CommonMixin):
                                                                     location=self.location,
                                                                     notes=self.notes,
                                                                     pjlink_name=self.pjlink_name,
+                                                                    pjlink_class=self.pjlink_class,
                                                                     manufacturer=self.manufacturer,
                                                                     model=self.model,
                                                                     other=self.other,
@@ -197,6 +199,7 @@ class Projector(Base, CommonMixin):
     location = Column(String(30))
     notes = Column(String(200))
     pjlink_name = Column(String(128))
+    pjlink_class = Column(String(5))
     manufacturer = Column(String(128))
     model = Column(String(128))
     other = Column(String(128))
