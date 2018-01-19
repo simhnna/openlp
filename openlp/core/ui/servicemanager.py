@@ -580,8 +580,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         for file_item in write_list:
             total_size += file_item.stat().st_size
         self.log_debug('ServiceManager.save_file - ZIP contents size is %i bytes' % total_size)
-
-        # Number of items + 1 to zip it
         self.main_window.display_progress_bar(total_size)
 
         try:

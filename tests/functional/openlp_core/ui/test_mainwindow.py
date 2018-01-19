@@ -242,3 +242,30 @@ class TestMainWindow(TestCase, TestMixin):
 
         # THEN: projector_manager_dock.setVisible should had been called once
         mocked_dock.setVisible.assert_called_once_with(False)
+
+    def test_increment_progress_bar_default_increment(self):
+        """
+        Test that increment_progress_bar increments the progress bar by 1 when called without the `increment` arg.
+        """
+        # GIVEN: A mocked progress bar
+        with patch.object(self.main_window, 'load_progress_bar', **{'value.return_value': 0}) as mocked_progress_bar:
+
+            # WHEN: Calling increment_progress_bar without the `increment` arg
+            self.main_window.increment_progress_bar()
+
+        # THEN: The progress bar value should have been incremented by 1
+        mocked_progress_bar.setValue.assert_called_once_with(1)
+
+    def test_increment_progress_bar_custom_increment(self):
+        """
+        Test that increment_progress_bar increments the progress bar by the `increment` arg when called with the
+        `increment` arg with a set value.
+        """
+        # GIVEN: A mocked progress bar
+        with patch.object(self.main_window, 'load_progress_bar', **{'value.return_value': 0}) as mocked_progress_bar:
+
+            # WHEN: Calling increment_progress_bar with `increment` set to 10
+            self.main_window.increment_progress_bar(increment=10)
+
+        # THEN: The progress bar value should have been incremented by 10
+        mocked_progress_bar.setValue.assert_called_once_with(10)
