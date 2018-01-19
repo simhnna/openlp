@@ -35,7 +35,7 @@ from PyQt5 import QtCore
 
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.settings import Settings
-from openlp.core.threading import run_thread
+from openlp.core.threading import ThreadWorker, run_thread
 
 log = logging.getLogger(__name__)
 
@@ -44,14 +44,13 @@ CONNECTION_TIMEOUT = 30
 CONNECTION_RETRIES = 2
 
 
-class VersionWorker(QtCore.QObject):
+class VersionWorker(ThreadWorker):
     """
     A worker class to fetch the version of OpenLP from the website. This is run from within a thread so that it
     doesn't affect the loading time of OpenLP.
     """
     new_version = QtCore.pyqtSignal(dict)
     no_internet = QtCore.pyqtSignal()
-    quit = QtCore.pyqtSignal()
 
     def __init__(self, last_check_date, current_version):
         """
@@ -75,13 +74,11 @@ class VersionWorker(QtCore.QObject):
         * If a version number's minor version is an even number, it is a stable release.
         """
         log.debug('VersionWorker - Start')
-        # I'm not entirely sure why this was here, I'm commenting it out until I hit the same scenario
-        time.sleep(1)
-        download_url = 'http://www.openlp.org/files/version.txt'
+        download_url = 'https://www.openlp.org/files/version.txt'
         if self.current_version['build']:
-            download_url = 'http://www.openlp.org/files/nightly_version.txt'
+            download_url = 'https://www.openlp.org/files/nightly_version.txt'
         elif int(self.current_version['version'].split('.')[1]) % 2 != 0:
-            download_url = 'http://www.openlp.org/files/dev_version.txt'
+            download_url = 'https://www.openlp.org/files/dev_version.txt'
         headers = {
             'User-Agent': 'OpenLP/{version} {system}/{release}; '.format(version=self.current_version['full'],
                                                                          system=platform.system(),
@@ -92,7 +89,7 @@ class VersionWorker(QtCore.QObject):
         while retries < 3:
             try:
                 response = requests.get(download_url, headers=headers)
-                remote_version = response.text
+                remote_version = response.text.strip()
                 log.debug('New version found: %s', remote_version)
                 break
             except OSError:
@@ -112,22 +109,22 @@ def update_check_date():
     Settings().setValue('core/last version test', date.today().strftime('%Y-%m-%d'))
 
 
-def check_for_update(parent):
+def check_for_update(main_window):
     """
     Run a thread to download and check the version of OpenLP
 
-    :param MainWindow parent: The parent object for the thread. Usually the OpenLP main window.
+    :param MainWindow main_window: The OpenLP main window.
     """
     last_check_date = Settings().value('core/last version test')
     if date.today().strftime('%Y-%m-%d') <= last_check_date:
         log.debug('Version check skipped, last checked today')
         return
     worker = VersionWorker(last_check_date, get_version())
-    worker.new_version.connect(parent.on_new_version)
+    worker.new_version.connect(main_window.on_new_version)
     worker.quit.connect(update_check_date)
     # TODO: Use this to figure out if there's an Internet connection?
     # worker.no_internet.connect(parent.on_no_internet)
-    run_thread(parent, worker, 'version')
+    run_thread(worker, 'version')
 
 
 def get_version():

@@ -33,7 +33,7 @@ from openlp.core.lib.db import get_upgrade_op
 log = logging.getLogger(__name__)
 
 # Initial projector DB was unversioned
-__version__ = 2
+__version__ = 3
 
 log.debug('Projector DB upgrade module loading')
 
@@ -71,3 +71,23 @@ def upgrade_2(session, metadata):
         new_op.add_column('projector', Column('model_filter', types.String(30), server_default=null()))
         new_op.add_column('projector', Column('model_lamp', types.String(30), server_default=null()))
     log.debug('{status} projector DB upgrade to version 2'.format(status='Updated' if upgrade_db else 'Skipping'))
+
+
+def upgrade_3(session, metadata):
+    """
+    Version 3 upgrade.
+
+    Update Projector() table to inlcude PJLink class as part of record.
+
+    pjlink_version:     Column(String(1))
+
+    :param session: DB Session instance
+    :param metadata: Metadata of current DB
+    """
+    log.debug('Checking projector DB upgrade to version 3')
+    projector_table = Table('projector', metadata, autoload=True)
+    upgrade_db = 'pjlink_class' not in [col.name for col in projector_table.c.values()]
+    if upgrade_db:
+        new_op = get_upgrade_op(session)
+        new_op.add_column('projector', Column('pjlink_class', types.String(5), server_default=null()))
+    log.debug('{status} projector DB upgrade to version 3'.format(status='Updated' if upgrade_db else 'Skipping'))

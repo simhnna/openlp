@@ -24,7 +24,6 @@ This is the main window, where all the action happens.
 """
 import logging
 import sys
-import time
 from datetime import datetime
 from distutils import dir_util
 from distutils.errors import DistutilsFileError
@@ -478,8 +477,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         """
         super(MainWindow, self).__init__()
         Registry().register('main_window', self)
-        self.version_thread = None
-        self.version_worker = None
         self.clipboard = self.application.clipboard()
         self.arguments = ''.join(self.application.args)
         # Set up settings sections for the main application (not for use by plugins).
@@ -501,8 +498,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Settings().set_up_default_values()
         self.about_form = AboutForm(self)
         MediaController()
-        websockets.WebSocketServer()
-        server.HttpServer()
+        self.ws_server = websockets.WebSocketServer()
+        self.http_server = server.HttpServer(self)
         SettingsForm(self)
         self.formatting_tag_form = FormattingTagForm(self)
         self.shortcut_form = ShortcutListForm(self)
@@ -548,6 +545,41 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         Registry().register_function('bootstrap_post_set_up', self.bootstrap_post_set_up)
         # Reset the cursor
         self.application.set_normal_cursor()
+
+    def _wait_for_threads(self):
+        """
+        Wait for the threads
+        """
+        # Sometimes the threads haven't finished, let's wait for them
+        wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
+        wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
+        wait_dialog.setAutoClose(False)
+        wait_dialog.setCancelButton(None)
+        wait_dialog.show()
+        for thread_name in self.application.worker_threads.keys():
+            log.debug('Waiting for thread %s', thread_name)
+            self.application.processEvents()
+            thread = self.application.worker_threads[thread_name]['thread']
+            worker = self.application.worker_threads[thread_name]['worker']
+            try:
+                if worker and hasattr(worker, 'stop'):
+                    # If the worker has a stop method, run it
+                    worker.stop()
+                if thread and thread.isRunning():
+                    # If the thread is running, let's wait 5 seconds for it
+                    retry = 0
+                    while thread.isRunning() and retry < 50:
+                        # Make the GUI responsive while we wait
+                        self.application.processEvents()
+                        thread.wait(100)
+                        retry += 1
+                    if thread.isRunning():
+                        # If the thread is still running after 5 seconds, kill it
+                        thread.terminate()
+            except RuntimeError:
+                # Ignore the RuntimeError that is thrown when Qt has already deleted the C++ thread object
+                pass
+        wait_dialog.close()
 
     def bootstrap_post_set_up(self):
         """
@@ -695,7 +727,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         # Update the theme widget
         self.theme_manager_contents.load_themes()
         # Check if any Bibles downloaded.  If there are, they will be processed.
-        Registry().execute('bibles_load_list', True)
+        Registry().execute('bibles_load_list')
         self.application.set_normal_cursor()
 
     def is_display_blank(self):
@@ -1000,39 +1032,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
         if not self.application.is_event_loop_active:
             event.ignore()
             return
-        # Sometimes the version thread hasn't finished, let's wait for it
-        try:
-            if self.version_thread and self.version_thread.isRunning():
-                wait_dialog = QtWidgets.QProgressDialog('Waiting for some things to finish...', '', 0, 0, self)
-                wait_dialog.setWindowModality(QtCore.Qt.WindowModal)
-                wait_dialog.setAutoClose(False)
-                wait_dialog.setCancelButton(None)
-                wait_dialog.show()
-                retry = 0
-                while self.version_thread.isRunning() and retry < 50:
-                    self.application.processEvents()
-                    self.version_thread.wait(100)
-                    retry += 1
-                if self.version_thread.isRunning():
-                    self.version_thread.terminate()
-                wait_dialog.close()
-        except RuntimeError:
-            # Ignore the RuntimeError that is thrown when Qt has already deleted the C++ thread object
-            pass
-        # If we just did a settings import, close without saving changes.
-        if self.settings_imported:
-            self.clean_up(False)
-            event.accept()
         if self.service_manager_contents.is_modified():
             ret = self.service_manager_contents.save_modified_service()
             if ret == QtWidgets.QMessageBox.Save:
                 if self.service_manager_contents.decide_save_method():
-                    self.clean_up()
                     event.accept()
                 else:
                     event.ignore()
             elif ret == QtWidgets.QMessageBox.Discard:
-                self.clean_up()
                 event.accept()
             else:
                 event.ignore()
@@ -1048,13 +1055,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
                 close_button.setText(translate('OpenLP.MainWindow', '&Exit OpenLP'))
                 msg_box.setDefaultButton(QtWidgets.QMessageBox.Close)
                 if msg_box.exec() == QtWidgets.QMessageBox.Close:
-                    self.clean_up()
                     event.accept()
                 else:
                     event.ignore()
             else:
-                self.clean_up()
                 event.accept()
+        if event.isAccepted():
+            # Wait for all the threads to complete
+            self._wait_for_threads()
+            # If we just did a settings import, close without saving changes.
+            self.clean_up(save_settings=not self.settings_imported)
 
     def clean_up(self, save_settings=True):
         """
@@ -1062,9 +1072,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
 
         :param save_settings: Switch to prevent saving settings. Defaults to **True**.
         """
-        self.image_manager.stop_manager = True
-        while self.image_manager.image_thread.isRunning():
-            time.sleep(0.1)
         if save_settings:
             if Settings().value('advanced/save current plugin'):
                 Settings().setValue('advanced/current media plugin', self.media_tool_box.currentIndex())

@@ -107,7 +107,7 @@ class TestProjectorDBUpdate(TestCase):
 
     def test_upgrade_old_projector_db(self):
         """
-        Test that we can upgrade an old song db to the current schema
+        Test that we can upgrade a version 1 db to the current schema
         """
         # GIVEN: An old prjector db
         old_db = os.path.join(TEST_RESOURCES_PATH, "projector", TEST_DB_PJLINK1)
@@ -119,8 +119,7 @@ class TestProjectorDBUpdate(TestCase):
         updated_to_version, latest_version = upgrade_db(db_url, upgrade)
 
         # THEN: the song db should have been upgraded to the latest version
-        self.assertEqual(updated_to_version, latest_version,
-                         'The projector DB should have been upgrade to the latest version')
+        assert updated_to_version == latest_version, 'The projector DB should have been upgrade to the latest version'
 
 
 class TestProjectorDB(TestCase):
@@ -157,8 +156,7 @@ class TestProjectorDB(TestCase):
         record = self.projector.get_projector_by_ip(TEST2_DATA['ip'])
 
         # THEN: Verify proper record returned
-        self.assertTrue(compare_data(Projector(**TEST2_DATA), record),
-                        'Record found should have been test_2 data')
+        assert compare_data(Projector(**TEST2_DATA), record) is True, 'Record found should have been test_2 data'
 
     def test_find_record_by_name(self):
         """
@@ -171,8 +169,7 @@ class TestProjectorDB(TestCase):
         record = self.projector.get_projector_by_name(TEST2_DATA['name'])
 
         # THEN: Verify proper record returned
-        self.assertTrue(compare_data(Projector(**TEST2_DATA), record),
-                        'Record found should have been test_2 data')
+        assert compare_data(Projector(**TEST2_DATA), record) is True, 'Record found should have been test_2 data'
 
     def test_record_delete(self):
         """
@@ -187,7 +184,7 @@ class TestProjectorDB(TestCase):
 
         # THEN: Verify record not retrievable
         found = self.projector.get_projector_by_ip(TEST3_DATA['ip'])
-        self.assertFalse(found, 'test_3 record should have been deleted')
+        assert found is None, 'test_3 record should have been deleted'
 
     def test_record_edit(self):
         """
@@ -212,12 +209,12 @@ class TestProjectorDB(TestCase):
         record.model_filter = TEST3_DATA['model_filter']
         record.model_lamp = TEST3_DATA['model_lamp']
         updated = self.projector.update_projector(record)
-        self.assertTrue(updated, 'Save updated record should have returned True')
+        assert updated is True, 'Save updated record should have returned True'
         record = self.projector.get_projector_by_ip(TEST3_DATA['ip'])
 
         # THEN: Record ID should remain the same, but data should be changed
-        self.assertEqual(record_id, record.id, 'Edited record should have the same ID')
-        self.assertTrue(compare_data(Projector(**TEST3_DATA), record), 'Edited record should have new data')
+        assert record_id == record.id, 'Edited record should have the same ID'
+        assert compare_data(Projector(**TEST3_DATA), record) is True, 'Edited record should have new data'
 
     def test_source_add(self):
         """
@@ -235,7 +232,7 @@ class TestProjectorDB(TestCase):
 
         # THEN: Projector should have the same source entry
         item = self.projector.get_projector_by_id(item_id)
-        self.assertTrue(compare_source(item.source_list[0], source))
+        assert compare_source(item.source_list[0], source) is True, 'Source entry should be the same'
 
     def test_manufacturer_repr(self):
         """
@@ -248,8 +245,8 @@ class TestProjectorDB(TestCase):
         manufacturer.name = 'OpenLP Test'
 
         # THEN: __repr__ should return a proper string
-        self.assertEqual(str(manufacturer), '<Manufacturer(name="OpenLP Test")>',
-                         'Manufacturer.__repr__() should have returned a proper representation string')
+        assert str(manufacturer) == '<Manufacturer(name="OpenLP Test")>', \
+            'Manufacturer.__repr__() should have returned a proper representation string'
 
     def test_model_repr(self):
         """
@@ -262,8 +259,8 @@ class TestProjectorDB(TestCase):
         model.name = 'OpenLP Test'
 
         # THEN: __repr__ should return a proper string
-        self.assertEqual(str(model), '<Model(name='"OpenLP Test"')>',
-                         'Model.__repr__() should have returned a proper representation string')
+        assert str(model) == '<Model(name='"OpenLP Test"')>', \
+            'Model.__repr__() should have returned a proper representation string'
 
     def test_source_repr(self):
         """
@@ -278,19 +275,25 @@ class TestProjectorDB(TestCase):
         source.text = 'Input text'
 
         # THEN: __repr__ should return a proper string
-        self.assertEqual(str(source), '<Source(pjlink_name="Test object", pjlink_code="11", text="Input text")>',
-                         'Source.__repr__() should have returned a proper representation string')
+        assert str(source) == '<Source(pjlink_name="Test object", pjlink_code="11", text="Input text")>', \
+            'Source.__repr__() should have returned a proper representation string'
 
     def test_projector_repr(self):
         """
         Test Projector.__repr__() text
         """
         # GIVEN: Test object
+        test_string = '< Projector(id="0", ip="127.0.0.1", port="4352", mac_adx="None", pin="None", ' \
+            'name="Test One", location="Somewhere over the rainbow", notes="Not again", ' \
+            'pjlink_name="TEST", pjlink_class="None", manufacturer="IN YOUR DREAMS", model="OpenLP", ' \
+            'serial_no="None", other="None", sources="None", source_list="[]", model_filter="None", ' \
+            'model_lamp="None", sw_version="None") >'
+
         projector = Projector()
 
         # WHEN: projector() is populated
         # NOTE: projector.[pin, other, sources, sw_version, serial_no, sw_version, model_lamp, model_filter]
-        #           should all return None.
+        #       should all return None.
         #       projector.source_list should return an empty list
         projector.id = 0
         projector.ip = '127.0.0.1'
@@ -303,13 +306,7 @@ class TestProjectorDB(TestCase):
         projector.model = 'OpenLP'
 
         # THEN: __repr__ should return a proper string
-        self.assertEqual(str(projector),
-                         '< Projector(id="0", ip="127.0.0.1", port="4352", mac_adx="None", pin="None", '
-                         'name="Test One", location="Somewhere over the rainbow", notes="Not again", '
-                         'pjlink_name="TEST", manufacturer="IN YOUR DREAMS", model="OpenLP", serial_no="None", '
-                         'other="None", sources="None", source_list="[]", model_filter="None", model_lamp="None", '
-                         'sw_version="None") >',
-                         'Projector.__repr__() should have returned a proper representation string')
+        assert str(projector) == test_string, 'Projector.__repr__() should have returned a proper string'
 
     def test_projectorsource_repr(self):
         """
@@ -326,9 +323,8 @@ class TestProjectorDB(TestCase):
         self.projector.add_source(source)
 
         # THEN: __repr__ should return a proper string
-        self.assertEqual(str(source),
-                         '<ProjectorSource(id="1", code="11", text="First RGB source", projector_id="1")>',
-                         'ProjectorSource.__repr__)_ should have returned a proper representation string')
+        assert str(source) == '<ProjectorSource(id="1", code="11", text="First RGB source", projector_id="1")>', \
+            'ProjectorSource.__repr__)_ should have returned a proper representation string'
 
     def test_get_projector_by_id_none(self):
         """
@@ -341,7 +337,7 @@ class TestProjectorDB(TestCase):
         results = projector.get_projector_by_id(dbid=123134556409824506)
 
         # THEN: Verify return was None
-        self.assertEqual(results, None, 'Returned results should have equaled None')
+        assert results is None, 'Returned results should have equaled None'
 
     def test_get_projector_all_none(self):
         """
@@ -354,7 +350,7 @@ class TestProjectorDB(TestCase):
         results = projector.get_projector_all()
 
         # THEN: Verify results is None
-        self.assertEqual(results, [], 'Returned results should have returned an empty list')
+        assert [] == results, 'Returned results should have returned an empty list'
 
     def test_get_projector_all_one(self):
         """
@@ -368,8 +364,8 @@ class TestProjectorDB(TestCase):
         results = self.projector.get_projector_all()
 
         # THEN: We should have a list with one entry
-        self.assertEqual(len(results), 1, 'Returned results should have returned a list with one entry')
-        self.assertTrue((projector in results), 'Result should have been equal to TEST1_DATA')
+        assert 1 == len(results), 'Returned results should have returned a list with one entry'
+        assert (projector in results) is True, 'Result should have been equal to TEST1_DATA'
 
     def test_get_projector_all_many(self):
         """
@@ -387,11 +383,9 @@ class TestProjectorDB(TestCase):
         results = self.projector.get_projector_all()
 
         # THEN: We should have a list with three entries
-        self.assertEqual(len(results), len(projector_list),
-                         'Returned results should have returned a list with three entries')
+        assert len(results) == len(projector_list), 'Returned results should have returned a list with three entries'
         for projector in results:
-            self.assertTrue((projector in projector_list),
-                            'Projector DB entry should have been in expected list')
+            assert (projector in projector_list) is True, 'Projector DB entry should have been in expected list'
 
     def test_get_projector_by_name_fail(self):
         """
@@ -404,7 +398,7 @@ class TestProjectorDB(TestCase):
         results = self.projector.get_projector_by_name(name=TEST2_DATA['name'])
 
         # THEN: We should have None
-        self.assertEqual(results, None, 'projector.get_projector_by_name() should have returned None')
+        assert results is None, 'projector.get_projector_by_name() should have returned None'
 
     def test_add_projector_fail(self):
         """
@@ -417,7 +411,7 @@ class TestProjectorDB(TestCase):
         results = self.projector.add_projector(Projector(**TEST1_DATA))
 
         # THEN: We should have failed to add new entry
-        self.assertFalse(results, 'add_projector() should have failed')
+        assert results is False, 'add_projector() should have failed'
 
     def test_update_projector_default_fail(self):
         """
@@ -430,7 +424,7 @@ class TestProjectorDB(TestCase):
         results = projector.update_projector()
 
         # THEN: We should have failed
-        self.assertFalse(results, 'update_projector(projector=None) should have returned False')
+        assert results is False, 'update_projector(projector=None) should have returned False'
 
     def test_update_projector_not_in_db_fail(self):
         """
@@ -444,7 +438,7 @@ class TestProjectorDB(TestCase):
         results = self.projector.update_projector(projector)
 
         # THEN: Results should be False
-        self.assertFalse(results, 'update_projector(projector=projector) should have returned False')
+        assert results is False, 'update_projector(projector=projector) should have returned False'
 
     def test_delete_projector_fail(self):
         """
@@ -457,4 +451,4 @@ class TestProjectorDB(TestCase):
         results = self.projector.delete_projector(Projector(**TEST2_DATA))
 
         # THEN: Results should be False
-        self.assertFalse(results, 'delete_projector() should have returned False')
+        assert results is False, 'delete_projector() should have returned False'
