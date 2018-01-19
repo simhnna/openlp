@@ -321,9 +321,12 @@ class SongMediaItem(MediaManagerItem):
         :param search_results: A tuple containing (songbook entry, book name, song title, song id)
         :return: None
         """
-        def get_songbook_key(result):
-            """Get the key to sort by"""
-            return (get_natural_key(result[1]), get_natural_key(result[0]), get_natural_key(result[2]))
+        def get_songbook_key(text_array):
+            """
+            Get the key to sort by
+            :param text_array: the result text to be processed.
+            """
+            return get_natural_key(text_array[1]), get_natural_key(text_array[0]), get_natural_key(text_array[2])
 
         log.debug('display results Book')
         self.list_view.clear()
@@ -373,7 +376,7 @@ class SongMediaItem(MediaManagerItem):
         """
         def get_theme_key(song):
             """Get the key to sort by"""
-            return (get_natural_key(song.theme_name), song.sort_key)
+            return get_natural_key(song.theme_name), song.sort_key
 
         log.debug('display results Themes')
         self.list_view.clear()
@@ -396,7 +399,7 @@ class SongMediaItem(MediaManagerItem):
         """
         def get_cclinumber_key(song):
             """Get the key to sort by"""
-            return (get_natural_key(song.ccli_number), song.sort_key)
+            return get_natural_key(song.ccli_number), song.sort_key
 
         log.debug('display results CCLI number')
         self.list_view.clear()
@@ -460,6 +463,8 @@ class SongMediaItem(MediaManagerItem):
         """
         Called by ServiceManager or SlideController by event passing the Song Id in the payload along with an indicator
         to say which type of display is required.
+        :param song_id: the id of the song
+        :param preview: show we preview after the update
         """
         log.debug('on_remote_edit for song {song}'.format(song=song_id))
         song_id = int(song_id)
@@ -721,7 +726,8 @@ class SongMediaItem(MediaManagerItem):
         self.generate_footer(item, song)
         return item
 
-    def _authors_match(self, song, authors):
+    @staticmethod
+    def _authors_match(song, authors):
         """
         Checks whether authors from a song in the database match the authors of the song to be imported.
 
@@ -738,11 +744,12 @@ class SongMediaItem(MediaManagerItem):
         # List must be empty at the end
         return not author_list
 
-    def search(self, string, show_error):
+    def search(self, string, show_error=True):
         """
         Search for some songs
         :param string: The string to show
         :param show_error: Is this an error?
+        :return: the results of the search
         """
         search_results = self.search_entire(string)
         return [[song.id, song.title, song.alternate_title] for song in search_results]

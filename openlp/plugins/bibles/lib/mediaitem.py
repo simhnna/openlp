@@ -384,7 +384,7 @@ class BibleMediaItem(MediaManagerItem):
         This initialises the given bible, which means that its book names and their chapter numbers is added to the
         combo boxes on the 'Select' Tab. This is not of any importance of the 'Search' Tab.
 
-        :param last_book_id: The "book reference id" of the book which is chosen at the moment. (int)
+        :param last_book: The "book reference id" of the book which is chosen at the moment. (int)
         :return: None
         """
         log.debug('initialise_advanced_bible {bible}, {ref}'.format(bible=self.bible, ref=last_book))
@@ -1005,14 +1005,17 @@ class BibleMediaItem(MediaManagerItem):
         }[self.settings.display_style]
         return '{{su}}{bracket[0]}{verse_text}{bracket[1]}{{/su}}&nbsp;'.format(verse_text=verse_text, bracket=bracket)
 
-    def search(self, string, showError):
+    def search(self, string, show_error=True):
         """
         Search for some Bible verses (by reference).
+        :param string: search string
+        :param show_error: do we show the error
+        :return: the results of the search
         """
         if self.bible is None:
             return []
         reference = self.plugin.manager.parse_ref(self.bible.name, string)
-        search_results = self.plugin.manager.get_verses(self.bible.name, reference, showError)
+        search_results = self.plugin.manager.get_verses(self.bible.name, reference, show_error)
         if search_results:
             verse_text = ' '.join([verse.text for verse in search_results])
             return [[string, verse_text]]
