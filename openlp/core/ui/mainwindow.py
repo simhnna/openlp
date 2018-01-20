@@ -1320,7 +1320,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
 
         :param int increment: The value you to increase the progress bar by.
         """
-        # TODO: Test increment default value
         self.load_progress_bar.setValue(self.load_progress_bar.value() + increment)
         self.application.process_events()
 

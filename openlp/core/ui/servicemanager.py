@@ -508,8 +508,9 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
 
     def get_write_file_list(self):
         """
+        Get a list of files used in the service and files that are missing.
 
-        :return:
+        :return: A list of files used in the service that exist, and a list of files that don't.
         :rtype: (list[openlp.core.common.path.Path], list[openlp.core.common.path.Path])
         """
         write_list = []
@@ -570,7 +571,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                     self.service_items.remove(item)
                     continue
             service_item = item['service_item'].get_service_repr(self._save_lite)
-
             # Add the service item to the service.
             service.append({'serviceitem': service_item})
         self.repaint_service_list(-1, -1)
@@ -581,7 +581,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             total_size += file_item.stat().st_size
         self.log_debug('ServiceManager.save_file - ZIP contents size is %i bytes' % total_size)
         self.main_window.display_progress_bar(total_size)
-
         try:
             with NamedTemporaryFile() as temp_file, \
                     zipfile.ZipFile(temp_file, 'w') as zip_file:
@@ -602,8 +601,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 translate('OpenLP.ServiceManager', 'Error Saving File'),
                 translate('OpenLP.ServiceManager', 'There was an error saving your file.\n\n{error}').format(error=error))
             return self.save_file_as()
-
-
         self.main_window.finished_progress_bar()
         self.application.set_normal_cursor()
         self.main_window.add_recent_file(file_path)
