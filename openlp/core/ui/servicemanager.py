@@ -599,7 +599,8 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.log_exception('Failed to save service to disk: {name}'.format(name=temp_file.name))
             self.main_window.error_message(
                 translate('OpenLP.ServiceManager', 'Error Saving File'),
-                translate('OpenLP.ServiceManager', 'There was an error saving your file.\n\n{error}').format(error=error))
+                translate('OpenLP.ServiceManager',
+                          'There was an error saving your file.\n\n{error}').format(error=error))
             return self.save_file_as()
         self.main_window.finished_progress_bar()
         self.application.set_normal_cursor()

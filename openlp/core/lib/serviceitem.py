@@ -539,7 +539,7 @@ class ServiceItem(RegistryProperties):
         Confirms if the ServiceItem uses a file
         """
         return self.service_item_type == ServiceItemType.Image or \
-               (self.service_item_type == ServiceItemType.Command and not self.is_capable(ItemCapabilities.IsOptical))
+            (self.service_item_type == ServiceItemType.Command and not self.is_capable(ItemCapabilities.IsOptical))
 
     def is_text(self):
         """
