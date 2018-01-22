@@ -29,7 +29,7 @@ import shutil
 import zipfile
 from contextlib import suppress
 from datetime import datetime, timedelta
-from tempfile import NamedTemporaryFile, mkstemp
+from tempfile import NamedTemporaryFile
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -39,7 +39,7 @@ from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, format_time, translate
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
 from openlp.core.common.mixins import LogMixin, RegistryProperties
-from openlp.core.common.path import Path, create_paths, str_to_path
+from openlp.core.common.path import Path, str_to_path
 from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem, ItemCapabilities, PluginStatus, build_icon
@@ -582,7 +582,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.log_debug('ServiceManager.save_file - ZIP contents size is %i bytes' % total_size)
         self.main_window.display_progress_bar(total_size)
         try:
-            with NamedTemporaryFile() as temp_file, \
+            with NamedTemporaryFile(dir=str(file_path.parent), prefix='.') as temp_file, \
                     zipfile.ZipFile(temp_file, 'w') as zip_file:
                 # First we add service contents..
                 zip_file.writestr('service_data.osj', service_content)
