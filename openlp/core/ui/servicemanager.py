@@ -27,8 +27,9 @@ import json
 import os
 import shutil
 import zipfile
+from contextlib import suppress
 from datetime import datetime, timedelta
-from tempfile import mkstemp
+from tempfile import NamedTemporaryFile
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -36,11 +37,13 @@ from openlp.core.common import ThemeLevel, delete_file
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, format_time, translate
+from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
 from openlp.core.common.mixins import LogMixin, RegistryProperties
-from openlp.core.common.path import Path, create_paths, str_to_path
+from openlp.core.common.path import Path, str_to_path
 from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ServiceItem, ItemCapabilities, PluginStatus, build_icon
+from openlp.core.lib.exceptions import ValidationError
 from openlp.core.lib.ui import critical_error_message_box, create_widget_action, find_and_set_in_combo_box
 from openlp.core.ui import ServiceNoteForm, ServiceItemEditForm, StartTimeForm
 from openlp.core.widgets.dialogs import FileDialog
@@ -449,7 +452,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         else:
             file_path = str_to_path(load_file)
         Settings().setValue(self.main_window.service_manager_settings_section + '/last directory', file_path.parent)
-        self.load_file(str(file_path))
+        self.load_file(file_path)
 
     def save_modified_service(self):
         """
@@ -475,7 +478,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             elif result == QtWidgets.QMessageBox.Save:
                 self.decide_save_method()
         sender = self.sender()
-        self.load_file(sender.data())
+        self.load_file(Path(sender.data()))
 
     def new_file(self):
         """
@@ -503,7 +506,32 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         service.append({'openlp_core': core})
         return service
 
-    def save_file(self, field=None):
+    def get_write_file_list(self):
+        """
+        Get a list of files used in the service and files that are missing.
+
+        :return: A list of files used in the service that exist, and a list of files that don't.
+        :rtype: (list[openlp.core.common.path.Path], list[openlp.core.common.path.Path])
+        """
+        write_list = []
+        missing_list = []
+        for item in self.service_items:
+            if item['service_item'].uses_file():
+                for frame in item['service_item'].get_frames():
+                    path_from = item['service_item'].get_frame_path(frame=frame)
+                    if path_from in write_list or path_from in missing_list:
+                        continue
+                    if not os.path.exists(path_from):
+                        missing_list.append(Path(path_from))
+                    else:
+                        write_list.append(Path(path_from))
+            for audio_path in item['service_item'].background_audio:
+                if audio_path in write_list:
+                    continue
+                write_list.append(audio_path)
+        return write_list, missing_list
+
+    def save_file(self):
         """
         Save the current service file.
 
@@ -511,178 +539,74 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         there be an error when saving. Audio files are also copied into the service manager directory, and then packaged
         into the zip file.
         """
-        if not self.file_name():
-            return self.save_file_as()
-        temp_file, temp_file_name = mkstemp('.osz', 'openlp_')
-        # We don't need the file handle.
-        os.close(temp_file)
-        self.log_debug(temp_file_name)
-        path_file_name = str(self.file_name())
-        path, file_name = os.path.split(path_file_name)
-        base_name = os.path.splitext(file_name)[0]
-        service_file_name = '{name}.osj'.format(name=base_name)
-        self.log_debug('ServiceManager.save_file - {name}'.format(name=path_file_name))
-        Settings().setValue(self.main_window.service_manager_settings_section + '/last directory', Path(path))
+        file_path = self.file_name()
+        self.log_debug('ServiceManager.save_file - {name}'.format(name=file_path))
+        self.application.set_busy_cursor()
+
         service = self.create_basic_service()
+
         write_list = []
         missing_list = []
-        audio_files = []
-        total_size = 0
-        self.application.set_busy_cursor()
-        # Number of items + 1 to zip it
-        self.main_window.display_progress_bar(len(self.service_items) + 1)
-        # Get list of missing files, and list of files to write
-        for item in self.service_items:
-            if not item['service_item'].uses_file():
-                continue
-            for frame in item['service_item'].get_frames():
-                path_from = item['service_item'].get_frame_path(frame=frame)
-                if path_from in write_list or path_from in missing_list:
-                    continue
-                if not os.path.exists(path_from):
-                    missing_list.append(path_from)
-                else:
-                    write_list.append(path_from)
-        if missing_list:
-            self.application.set_normal_cursor()
-            title = translate('OpenLP.ServiceManager', 'Service File(s) Missing')
-            message = translate('OpenLP.ServiceManager',
-                                'The following file(s) in the service are missing: {name}\n\n'
-                                'These files will be removed if you continue to save.'
-                                ).format(name="\n\t".join(missing_list))
-            answer = QtWidgets.QMessageBox.critical(self, title, message,
-                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok |
-                                                                                          QtWidgets.QMessageBox.Cancel))
-            if answer == QtWidgets.QMessageBox.Cancel:
-                self.main_window.finished_progress_bar()
-                return False
+
+        if not self._save_lite:
+            write_list, missing_list = self.get_write_file_list()
+
+            if missing_list:
+                self.application.set_normal_cursor()
+                title = translate('OpenLP.ServiceManager', 'Service File(s) Missing')
+                message = translate('OpenLP.ServiceManager',
+                                    'The following file(s) in the service are missing: {name}\n\n'
+                                    'These files will be removed if you continue to save.'
+                                    ).format(name='\n\t'.join(missing_list))
+                answer = QtWidgets.QMessageBox.critical(self, title, message,
+                                                        QtWidgets.QMessageBox.StandardButtons(
+                                                            QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel))
+                if answer == QtWidgets.QMessageBox.Cancel:
+                    return False
         # Check if item contains a missing file.
         for item in list(self.service_items):
-            self.main_window.increment_progress_bar()
-            item['service_item'].remove_invalid_frames(missing_list)
-            if item['service_item'].missing_frames():
-                self.service_items.remove(item)
-            else:
-                service_item = item['service_item'].get_service_repr(self._save_lite)
-                if service_item['header']['background_audio']:
-                    for i, file_name in enumerate(service_item['header']['background_audio']):
-                        new_file = os.path.join('audio', item['service_item'].unique_identifier, str(file_name))
-                        audio_files.append((file_name, new_file))
-                        service_item['header']['background_audio'][i] = new_file
-                # Add the service item to the service.
-                service.append({'serviceitem': service_item})
-        self.repaint_service_list(-1, -1)
-        for file_item in write_list:
-            file_size = os.path.getsize(file_item)
-            total_size += file_size
-        self.log_debug('ServiceManager.save_file - ZIP contents size is %i bytes' % total_size)
-        service_content = json.dumps(service)
-        # Usual Zip file cannot exceed 2GiB, file with Zip64 cannot be extracted using unzip in UNIX.
-        allow_zip_64 = (total_size > 2147483648 + len(service_content))
-        self.log_debug('ServiceManager.save_file - allowZip64 is {text}'.format(text=allow_zip_64))
-        zip_file = None
-        success = True
-        self.main_window.increment_progress_bar()
-        try:
-            zip_file = zipfile.ZipFile(temp_file_name, 'w', zipfile.ZIP_STORED, allow_zip_64)
-            # First we add service contents..
-            zip_file.writestr(service_file_name, service_content)
-            # Finally add all the listed media files.
-            for write_from in write_list:
-                zip_file.write(write_from, write_from)
-            for audio_from, audio_to in audio_files:
-                audio_from = str(audio_from)
-                audio_to = str(audio_to)
-                if audio_from.startswith('audio'):
-                    # When items are saved, they get new unique_identifier. Let's copy the file to the new location.
-                    # Unused files can be ignored, OpenLP automatically cleans up the service manager dir on exit.
-                    audio_from = os.path.join(self.service_path, audio_from)
-                save_file = os.path.join(self.service_path, audio_to)
-                save_path = os.path.split(save_file)[0]
-                create_paths(Path(save_path))
-                if not os.path.exists(save_file):
-                    shutil.copy(audio_from, save_file)
-                zip_file.write(audio_from, audio_to)
-        except OSError:
-            self.log_exception('Failed to save service to disk: {name}'.format(name=temp_file_name))
-            self.main_window.error_message(translate('OpenLP.ServiceManager', 'Error Saving File'),
-                                           translate('OpenLP.ServiceManager', 'There was an error saving your file.'))
-            success = False
-        finally:
-            if zip_file:
-                zip_file.close()
-        self.main_window.finished_progress_bar()
-        self.application.set_normal_cursor()
-        if success:
-            try:
-                shutil.copy(temp_file_name, path_file_name)
-            except (shutil.Error, PermissionError):
-                return self.save_file_as()
-            except OSError as ose:
-                QtWidgets.QMessageBox.critical(self, translate('OpenLP.ServiceManager', 'Error Saving File'),
-                                               translate('OpenLP.ServiceManager', 'An error occurred while writing the '
-                                                         'service file: {error}').format(error=ose.strerror),
-                                               QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
-                success = False
-            self.main_window.add_recent_file(path_file_name)
-            self.set_modified(False)
-        delete_file(Path(temp_file_name))
-        return success
-
-    def save_local_file(self):
-        """
-        Save the current service file but leave all the file references alone to point to the current machine.
-        This format is not transportable as it will not contain any files.
-        """
-        if not self.file_name():
-            return self.save_file_as()
-        temp_file, temp_file_name = mkstemp('.oszl', 'openlp_')
-        # We don't need the file handle.
-        os.close(temp_file)
-        self.log_debug(temp_file_name)
-        path_file_name = str(self.file_name())
-        path, file_name = os.path.split(path_file_name)
-        base_name = os.path.splitext(file_name)[0]
-        service_file_name = '{name}.osj'.format(name=base_name)
-        self.log_debug('ServiceManager.save_file - {name}'.format(name=path_file_name))
-        Settings().setValue(self.main_window.service_manager_settings_section + '/last directory', Path(path))
-        service = self.create_basic_service()
-        self.application.set_busy_cursor()
-        # Number of items + 1 to zip it
-        self.main_window.display_progress_bar(len(self.service_items) + 1)
-        for item in self.service_items:
-            self.main_window.increment_progress_bar()
+            if not self._save_lite:
+                item['service_item'].remove_invalid_frames(missing_list)
+                if item['service_item'].missing_frames():
+                    self.service_items.remove(item)
+                    continue
             service_item = item['service_item'].get_service_repr(self._save_lite)
-            # TODO: check for file item on save.
+            # Add the service item to the service.
             service.append({'serviceitem': service_item})
-            self.main_window.increment_progress_bar()
-        service_content = json.dumps(service)
-        zip_file = None
-        success = True
-        self.main_window.increment_progress_bar()
+        self.repaint_service_list(-1, -1)
+        service_content = json.dumps(service, cls=OpenLPJsonEncoder)
+        service_content_size = len(bytes(service_content, encoding='utf-8'))
+        total_size = service_content_size
+        for file_item in write_list:
+            total_size += file_item.stat().st_size
+        self.log_debug('ServiceManager.save_file - ZIP contents size is %i bytes' % total_size)
+        self.main_window.display_progress_bar(total_size)
         try:
-            zip_file = zipfile.ZipFile(temp_file_name, 'w', zipfile.ZIP_STORED, True)
-            # First we add service contents.
-            zip_file.writestr(service_file_name, service_content)
-        except OSError:
-            self.log_exception('Failed to save service to disk: {name}'.format(name=temp_file_name))
-            self.main_window.error_message(translate('OpenLP.ServiceManager', 'Error Saving File'),
-                                           translate('OpenLP.ServiceManager', 'There was an error saving your file.'))
-            success = False
-        finally:
-            if zip_file:
-                zip_file.close()
+            with NamedTemporaryFile(dir=str(file_path.parent), prefix='.') as temp_file, \
+                    zipfile.ZipFile(temp_file, 'w') as zip_file:
+                # First we add service contents..
+                zip_file.writestr('service_data.osj', service_content)
+                self.main_window.increment_progress_bar(service_content_size)
+                # Finally add all the listed media files.
+                for write_path in write_list:
+                    zip_file.write(str(write_path), str(write_path))
+                    self.main_window.increment_progress_bar(write_path.stat().st_size)
+                with suppress(FileNotFoundError):
+                    file_path.unlink()
+                os.link(temp_file.name, str(file_path))
+            Settings().setValue(self.main_window.service_manager_settings_section + '/last directory', file_path.parent)
+        except (PermissionError, OSError) as error:
+            self.log_exception('Failed to save service to disk: {name}'.format(name=file_path))
+            self.main_window.error_message(
+                translate('OpenLP.ServiceManager', 'Error Saving File'),
+                translate('OpenLP.ServiceManager',
+                          'There was an error saving your file.\n\n{error}').format(error=error))
+            return self.save_file_as()
         self.main_window.finished_progress_bar()
         self.application.set_normal_cursor()
-        if success:
-            try:
-                shutil.copy(temp_file_name, path_file_name)
-            except (shutil.Error, PermissionError):
-                return self.save_file_as()
-            self.main_window.add_recent_file(path_file_name)
-            self.set_modified(False)
-        delete_file(Path(temp_file_name))
-        return success
+        self.main_window.add_recent_file(file_path)
+        self.set_modified(False)
+        return True
 
     def save_file_as(self, field=None):
         """
@@ -743,87 +667,49 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         """
         if not self.file_name():
             return self.save_file_as()
-        if self._save_lite:
-            return self.save_local_file()
-        else:
-            return self.save_file()
+        return self.save_file()
 
-    def load_file(self, file_name):
+    def load_file(self, file_path):
         """
         Load an existing service file
-        :param file_name:
+        :param file_path:
         """
-        if not file_name:
+        if not file_path.exists():
             return False
-        file_name = str(file_name)
-        if not os.path.exists(file_name):
-            return False
-        zip_file = None
-        file_to = None
+        service_data = None
         self.application.set_busy_cursor()
         try:
-            zip_file = zipfile.ZipFile(file_name)
-            for zip_info in zip_file.infolist():
-                try:
-                    ucs_file = zip_info.filename
-                except UnicodeDecodeError:
-                    self.log_exception('file_name "{name}" is not valid UTF-8'.format(name=zip_info.file_name))
-                    critical_error_message_box(message=translate('OpenLP.ServiceManager',
-                                               'File is not a valid service.\n The content encoding is not UTF-8.'))
-                    continue
-                os_file = ucs_file.replace('/', os.path.sep)
-                os_file = os.path.basename(os_file)
-                self.log_debug('Extract file: {name}'.format(name=os_file))
-                zip_info.filename = os_file
-                zip_file.extract(zip_info, self.service_path)
-                if os_file.endswith('osj') or os_file.endswith('osd'):
-                    p_file = os.path.join(self.service_path, os_file)
-            if 'p_file' in locals():
-                file_to = open(p_file, 'r')
-                if p_file.endswith('osj'):
-                    items = json.load(file_to)
-                else:
-                    critical_error_message_box(message=translate('OpenLP.ServiceManager',
-                                                                 'The service file you are trying to open is in an old '
-                                                                 'format.\n Please save it using OpenLP 2.0.2 or '
-                                                                 'greater.'))
-                    return
-                file_to.close()
+            with zipfile.ZipFile(str(file_path)) as zip_file:
+                compressed_size = 0
+                for zip_info in zip_file.infolist():
+                    compressed_size += zip_info.compress_size
+                self.main_window.display_progress_bar(compressed_size)
+                for zip_info in zip_file.infolist():
+                    self.log_debug('Extract file: {name}'.format(name=zip_info.filename))
+                    # The json file has been called 'service_data.osj' since OpenLP 3.0
+                    if zip_info.filename == 'service_data.osj' or zip_info.filename.endswith('osj'):
+                        with zip_file.open(zip_info, 'r') as json_file:
+                            service_data = json_file.read()
+                    else:
+                        zip_info.filename = os.path.basename(zip_info.filename)
+                        zip_file.extract(zip_info, str(self.service_path))
+                    self.main_window.increment_progress_bar(zip_info.compress_size)
+            if service_data:
+                items = json.loads(service_data, cls=OpenLPJsonDecoder)
                 self.new_file()
-                self.set_file_name(str_to_path(file_name))
-                self.main_window.display_progress_bar(len(items))
                 self.process_service_items(items)
-                delete_file(Path(p_file))
-                self.main_window.add_recent_file(file_name)
+                self.set_file_name(file_path)
+                self.main_window.add_recent_file(file_path)
                 self.set_modified(False)
-                Settings().setValue('servicemanager/last file', Path(file_name))
+                Settings().setValue('servicemanager/last file', file_path)
             else:
-                critical_error_message_box(message=translate('OpenLP.ServiceManager', 'File is not a valid service.'))
-                self.log_error('File contains no service data')
-        except (OSError, NameError):
-            self.log_exception('Problem loading service file {name}'.format(name=file_name))
-            critical_error_message_box(message=translate('OpenLP.ServiceManager',
-                                       'File could not be opened because it is corrupt.'))
-        except zipfile.BadZipFile:
-            if os.path.getsize(file_name) == 0:
-                self.log_exception('Service file is zero sized: {name}'.format(name=file_name))
-                QtWidgets.QMessageBox.information(self, translate('OpenLP.ServiceManager', 'Empty File'),
-                                                  translate('OpenLP.ServiceManager',
-                                                            'This service file does not contain '
-                                                            'any data.'))
-            else:
-                self.log_exception('Service file is cannot be extracted as zip: {name}'.format(name=file_name))
-                QtWidgets.QMessageBox.information(self, translate('OpenLP.ServiceManager', 'Corrupt File'),
-                                                  translate('OpenLP.ServiceManager',
-                                                            'This file is either corrupt or it is not an OpenLP 2 '
-                                                            'service file.'))
-            self.application.set_normal_cursor()
-            return
-        finally:
-            if file_to:
-                file_to.close()
-            if zip_file:
-                zip_file.close()
+                raise ValidationError(msg='No service data found')
+        except (NameError, OSError, ValidationError, zipfile.BadZipFile) as e:
+            self.log_exception('Problem loading service file {name}'.format(name=file_path))
+            critical_error_message_box(
+                message=translate('OpenLP.ServiceManager',
+                                  'The service file {file_path} could not be loaded because it is either corrupt, or '
+                                  'not a valid OpenLP 2 or OpenLP 3 service file.'.format(file_path=file_path)))
         self.main_window.finished_progress_bar()
         self.application.set_normal_cursor()
         self.repaint_service_list(-1, -1)
@@ -838,7 +724,8 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.main_window.increment_progress_bar()
             service_item = ServiceItem()
             if 'openlp_core' in item:
-                item = item.get('openlp_core')
+                item = item['openlp_core']
+                self._save_lite = item.get('lite-service', False)
                 theme = item.get('service-theme', None)
                 if theme:
                     find_and_set_in_combo_box(self.theme_combo_box, theme, set_missing=False)
@@ -861,9 +748,9 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         Load the last service item from the service manager when the service was last closed. Can be blank if there was
         no service present.
         """
-        file_name = str_to_path(Settings().value('servicemanager/last file'))
-        if file_name:
-            self.load_file(file_name)
+        file_path = Settings().value('servicemanager/last file')
+        if file_path:
+            self.load_file(file_path)
 
     def context_menu(self, point):
         """
