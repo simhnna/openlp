@@ -23,7 +23,7 @@
 Package to test the openlp.core.lib.pluginmanager package.
 """
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -49,6 +49,32 @@ class TestPluginManager(TestCase):
         Registry().register('service_list', MagicMock())
         Registry().register('main_window', self.mocked_main_window)
         Registry().register('settings_form', self.mocked_settings_form)
+
+    def test_bootstrap_initialise(self):
+        """
+        Test the PluginManager.bootstrap_initialise() method
+        """
+        # GIVEN: A plugin manager with some mocked out methods
+        manager = PluginManager()
+
+        with patch.object(manager, 'find_plugins') as mocked_find_plugins, \
+                patch.object(manager, 'hook_settings_tabs') as mocked_hook_settings_tabs, \
+                patch.object(manager, 'hook_media_manager') as mocked_hook_media_manager, \
+                patch.object(manager, 'hook_import_menu') as mocked_hook_import_menu, \
+                patch.object(manager, 'hook_export_menu') as mocked_hook_export_menu, \
+                patch.object(manager, 'hook_tools_menu') as mocked_hook_tools_menu, \
+                patch.object(manager, 'initialise_plugins') as mocked_initialise_plugins:
+            # WHEN: bootstrap_initialise() is called
+            manager.bootstrap_initialise()
+
+        # THEN: The hook methods should have been called
+        mocked_find_plugins.assert_called_with()
+        mocked_hook_settings_tabs.assert_called_with()
+        mocked_hook_media_manager.assert_called_with()
+        mocked_hook_import_menu.assert_called_with()
+        mocked_hook_export_menu.assert_called_with()
+        mocked_hook_tools_menu.assert_called_with()
+        mocked_initialise_plugins.assert_called_with()
 
     def test_hook_media_manager_with_disabled_plugin(self):
         """
