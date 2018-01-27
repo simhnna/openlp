@@ -65,12 +65,14 @@ def live(request, plugin_name, log):
     try:
         json_data = request.GET.get('data')
         request_id = json.loads(json_data)['request']['id']
+        print(request_id)
     except KeyError:
         log.error("Endpoint {text} search request text not found".format(text=plugin_name))
         return []
     plugin = Registry().get('plugin_manager').get_plugin_by_name(plugin_name)
     if plugin.status == PluginStatus.Active and plugin.media_item:
         getattr(plugin.media_item, '{name}_go_live'.format(name=plugin_name)).emit([request_id, True])
+    return {'results': {'items': []}}
 
 
 def service(request, plugin_name, log):

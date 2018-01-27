@@ -39,6 +39,7 @@ def bibles_search(request):
 
     :param request: The http request object.
     """
+    print("A")
     return search(request, 'bibles', log)
 
 

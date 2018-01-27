@@ -72,7 +72,8 @@ class OpenLP(QtWidgets.QApplication, LogMixin):
         """
         self.is_event_loop_active = True
         result = QtWidgets.QApplication.exec()
-        self.shared_memory.detach()
+        state = self.shared_memory.detach()
+        print(state)
         return result
 
     def run(self, args):

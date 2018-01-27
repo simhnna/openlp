@@ -167,7 +167,7 @@ class TestMediaItem(TestCase, TestMixin):
         # THEN: It should be a subclass of :class:`MediaManagerItem`
         assert isinstance(self.media_item, MediaManagerItem)
 
-    def test_steup_item(self):
+    def test_setup_item(self):
         """
         Test the setup_item method
         """

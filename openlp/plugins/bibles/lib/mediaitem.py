@@ -574,6 +574,7 @@ class BibleMediaItem(MediaManagerItem):
         Update the second bible. If changing from single to dual bible modes as if the user wants to clear the search
         results, if not revert to the previously selected bible
 
+        :param: selection not required by part of the signature
         :return: None
         """
         new_selection = self.second_combo_box.currentData()
