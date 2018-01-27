@@ -91,7 +91,7 @@ def _make_response(view_result):
                         content_type='text/html', charset='utf8')
     else:
         return Response(body=view_result, status=200,
-                        content_type='text/text', charset='utf8')
+                        content_type='text/plain', charset='utf8')
 
 
 def _handle_exception(error):
