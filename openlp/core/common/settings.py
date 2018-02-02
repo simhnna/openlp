@@ -259,7 +259,8 @@ class Settings(QtCore.QSettings):
         ('media/last directory', 'media/last directory', [(str_to_path, None)]),
         ('songuasge/db password', 'songusage/db password', []),
         ('songuasge/db hostname', 'songusage/db hostname', []),
-        ('songuasge/db database', 'songusage/db database', [])
+        ('songuasge/db database', 'songusage/db database', []),
+        ('presentations / Powerpoint Viewer', '', [])
     ]
 
     @staticmethod
