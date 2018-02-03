@@ -545,14 +545,14 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.on_theme_display(False)
             self.on_hide_display(False)
 
-    def service_previous(self, field=None):
+    def service_previous(self):
         """
         Live event to select the previous service item from the service manager.
         """
         self.keypress_queue.append(ServiceItemAction.Previous)
         self._process_queue()
 
-    def service_next(self, field=None):
+    def service_next(self):
         """
         Live event to select the next service item from the service manager.
         """
@@ -1103,7 +1103,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             else:
                 Registry().execute('live_display_show')
 
-    def on_slide_selected(self, field=None):
+    def on_slide_selected(self):
         """
         Slide selected in controller
         Note for some reason a dummy field is required.  Nothing is passed!
@@ -1244,7 +1244,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.preview_widget.change_slide(row)
             self.slide_selected()
 
-    def on_slide_selected_previous(self, field=None):
+    def on_slide_selected_previous(self):
         """
         Go to the previous slide.
         """
@@ -1372,7 +1372,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         if event.timerId() == self.timer_id:
             self.on_slide_selected_next(self.play_slides_loop.isChecked())
 
-    def on_edit_song(self, field=None):
+    def on_edit_song(self):
         """
         From the preview display requires the service Item to be editied
         """
@@ -1381,16 +1381,16 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         if new_item:
             self.add_service_item(new_item)
 
-    def on_preview_add_to_service(self, field=None):
+    def on_preview_add_to_service(self):
         """
         From the preview display request the Item to be added to service
         """
         if self.service_item:
             self.service_manager.add_service_item(self.service_item)
 
-    def on_preview_double_click(self, field=None):
+    def on_preview_double_click(self):
         """
-        Triggered when a preview slide item is doubleclicked
+        Triggered when a preview slide item is double clicked
         """
         if self.service_item:
             if Settings().value('advanced/double click live') and Settings().value('core/auto unblank'):
