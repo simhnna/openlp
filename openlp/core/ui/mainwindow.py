@@ -56,7 +56,7 @@ from openlp.core.version import get_version
 from openlp.core.widgets.dialogs import FileDialog
 from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 
-log = logging.getLogger(__name__)
+#log = logging.getLogger(__name__)
 
 
 class Ui_MainWindow(object):
@@ -465,12 +465,10 @@ class Ui_MainWindow(object):
         self.mode_live_item.setStatusTip(translate('OpenLP.MainWindow', 'Use layout that focuses on Live.'))
 
 
-class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMixin):
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, LogMixin, RegistryProperties):
     """
     The main window.
     """
-    log.info('MainWindow loaded')
-
     def __init__(self):
         """
         This constructor sets up the interface, the various managers, and the plugins.
@@ -557,7 +555,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
         wait_dialog.setCancelButton(None)
         wait_dialog.show()
         for thread_name in self.application.worker_threads.keys():
-            log.debug('Waiting for thread %s', thread_name)
+            self.log_debug('Waiting for thread %s' % thread_name)
             self.application.processEvents()
             thread = self.application.worker_threads[thread_name]['thread']
             worker = self.application.worker_threads[thread_name]['worker']
@@ -595,7 +593,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
         """
         Called on start up to restore the last active media plugin.
         """
-        log.info('Load data from Settings')
+        self.log_info('Load data from Settings')
         if Settings().value('advanced/save current plugin'):
             saved_plugin_id = Settings().value('advanced/current media plugin')
             if saved_plugin_id != -1:
@@ -627,7 +625,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
 
         :param version: The Version to be displayed.
         """
-        log.debug('version_notice')
         version_text = translate('OpenLP.MainWindow', 'Version {new} of OpenLP is now available for download (you are '
                                  'currently running version {current}). \n\nYou can download the latest version from '
                                  'http://openlp.org/.').format(new=version, current=get_version()[u'full'])
@@ -774,7 +771,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
             self.application.splash.close()
         QtWidgets.QMessageBox.information(self, title, message)
 
-    def on_help_web_site_clicked(self):
+    @staticmethod
+    def on_help_web_site_clicked():
         """
         Load the OpenLP website
         """
@@ -891,7 +889,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
         settings = Settings()
         import_settings = Settings(str(temp_config_path), Settings.IniFormat)
 
-        log.info('hook upgrade_plugin_settings')
+        self.log_info('hook upgrade_plugin_settings')
         self.plugin_manager.hook_upgrade_plugin_settings(import_settings)
         # Upgrade settings to prepare the import.
         if import_settings.can_upgrade():
@@ -929,7 +927,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
                 value = import_settings.value(section_key)
             except KeyError:
                 value = None
-                log.warning('The key "{key}" does not exist (anymore), so it will be skipped.'.format(key=section_key))
+                self.log_warning('The key "{key}" does not exist (anymore), so it will be skipped.'.
+                                 format(key=section_key))
             if value is not None:
                 settings.setValue('{key}'.format(key=section_key), value)
         now = datetime.now()
@@ -1013,7 +1012,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
         """
         The screen has changed so we have to update components such as the renderer.
         """
-        log.debug('screen_changed')
         self.application.set_busy_cursor()
         self.image_manager.update_display()
         self.renderer.update_display()
@@ -1076,7 +1074,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
             if Settings().value('advanced/save current plugin'):
                 Settings().setValue('advanced/current media plugin', self.media_tool_box.currentIndex())
         # Call the cleanup method to shutdown plugins.
-        log.info('cleanup plugins')
+        self.log_info('cleanup plugins')
         self.plugin_manager.finalise_plugins()
         if save_settings:
             # Save settings
@@ -1216,7 +1214,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
         """
         Load the main window settings.
         """
-        log.debug('Loading QSettings')
         settings = Settings()
         # Remove obsolete entries.
         settings.remove('custom slide')
@@ -1243,7 +1240,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
         # Exit if we just did a settings import.
         if self.settings_imported:
             return
-        log.debug('Saving QSettings')
         settings = Settings()
         settings.beginGroup(self.general_settings_section)
         settings.setValue('recent files', self.recent_files)
@@ -1268,7 +1264,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
             if not recent_path.is_file():
                 continue
             count += 1
-            log.debug('Recent file name: {name}'.format(name=recent_path))
+            self.log_debug('Recent file name: {name}'.format(name=recent_path))
             action = create_action(self, '',
                                    text='&{n} {name}'.format(n=count, name=recent_path.name),
                                    data=recent_path, triggers=self.service_manager_contents.on_recent_service_clicked)
@@ -1348,21 +1344,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
         """
         Change the data directory.
         """
-        log.info('Changing data path to {newpath}'.format(newpath=self.new_data_path))
+        self.log_info('Changing data path to {newpath}'.format(newpath=self.new_data_path))
         old_data_path = AppLocation.get_data_path()
         # Copy OpenLP data to new location if requested.
         self.application.set_busy_cursor()
         if self.copy_data:
-            log.info('Copying data to new path')
+            self.log_info('Copying data to new path')
             try:
                 self.show_status_message(
                     translate('OpenLP.MainWindow', 'Copying OpenLP data to new data directory location - {path} '
                               '- Please wait for copy to finish').format(path=self.new_data_path))
                 dir_util.copy_tree(str(old_data_path), str(self.new_data_path))
-                log.info('Copy successful')
+                self.log_info('Copy successful')
             except (OSError, DistutilsFileError) as why:
                 self.application.set_normal_cursor()
-                log.exception('Data copy failed {err}'.format(err=str(why)))
+                self.log_exception('Data copy failed {err}'.format(err=str(why)))
                 err_text = translate('OpenLP.MainWindow',
                                      'OpenLP Data directory copy failed\n\n{err}').format(err=str(why)),
                 QtWidgets.QMessageBox.critical(self, translate('OpenLP.MainWindow', 'New Data Directory Error'),
@@ -1370,7 +1366,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMi
                                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
                 return False
         else:
-            log.info('No data copy requested')
+            self.log_info('No data copy requested')
         # Change the location of data directory in config file.
         settings = QtCore.QSettings()
         settings.setValue('advanced/data path', self.new_data_path)

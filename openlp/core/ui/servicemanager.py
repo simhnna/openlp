@@ -299,7 +299,7 @@ class Ui_ServiceManager(object):
 class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixin, RegistryProperties):
     """
     Manages the services. This involves taking text strings from plugins and adding them to the service. This service
-    can then be zipped up with all the resources used into one OSZ or oszl file for use on any OpenLP v2 installation.
+    can then be zipped up with all the resources used into one OSZ or OSZL file for use on any OpenLP installation.
     Also handles the UI tasks of moving things up and down etc.
     """
     servicemanager_set_item = QtCore.pyqtSignal(int)
@@ -412,7 +412,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 if suffix not in self.suffixes:
                     self.suffixes.append(suffix)
 
-    def on_new_service_clicked(self, field=None):
+    def on_new_service_clicked(self):
         """
         Create a new service.
         :param field:
@@ -463,7 +463,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                                               QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard |
                                               QtWidgets.QMessageBox.Cancel, QtWidgets.QMessageBox.Save)
 
-    def on_recent_service_clicked(self, field=None):
+    def on_recent_service_clicked(self):
         """
         Load a recent file as the service triggered by mainwindow recent service list.
         :param field:
@@ -503,7 +503,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         service.append({'openlp_core': core})
         return service
 
-    def save_file(self, field=None):
+    def save_file(self):
         """
         Save the current service file.
 
@@ -684,7 +684,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         delete_file(Path(temp_file_name))
         return success
 
-    def save_file_as(self, field=None):
+    def save_file_as(self):
         """
         Get a file name and then call :func:`ServiceManager.save_file` to save the file.
         """
@@ -736,7 +736,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.set_file_name(file_path)
         self.decide_save_method()
 
-    def decide_save_method(self, field=None):
+    def decide_save_method(self):
         """
         Determine which type of save method to use.
         :param field:
@@ -937,7 +937,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 theme_action.setChecked(True)
         self.menu.exec(self.service_manager_list.mapToGlobal(point))
 
-    def on_service_item_note_form(self, field=None):
+    def on_service_item_note_form(self):
         """
         Allow the service note to be edited
         :param field:
@@ -949,7 +949,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.repaint_service_list(item, -1)
             self.set_modified()
 
-    def on_start_time_form(self, field=None):
+    def on_start_time_form(self):
         """
         Opens a dialog to type in service item notes.
         :param field:
@@ -959,7 +959,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         if self.start_time_form.exec():
             self.repaint_service_list(item, -1)
 
-    def toggle_auto_play_slides_once(self, field=None):
+    def toggle_auto_play_slides_once(self):
         """
         Toggle Auto play slide once. Inverts auto play once option for the item
 
@@ -976,7 +976,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 self.main_window.general_settings_section + '/loop delay')
         self.set_modified()
 
-    def toggle_auto_play_slides_loop(self, field=None):
+    def toggle_auto_play_slides_loop(self):
         """
         Toggle Auto play slide loop.
 
@@ -993,7 +993,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 self.main_window.general_settings_section + '/loop delay')
         self.set_modified()
 
-    def on_timed_slide_interval(self, field=None):
+    def on_timed_slide_interval(self):
         """
         Shows input dialog for enter interval in seconds for delay
         :param field:
@@ -1019,7 +1019,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             service_item.auto_play_slides_once = False
         self.set_modified()
 
-    def on_auto_start(self, field=None):
+    def on_auto_start(self):
         """
         Toggles to Auto Start Setting.
         """
@@ -1027,7 +1027,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.service_items[item]['service_item'].will_auto_start = \
             not self.service_items[item]['service_item'].will_auto_start
 
-    def on_service_item_edit_form(self, field=None):
+    def on_service_item_edit_form(self):
         """
         Opens a dialog to edit the service item and update the service display if changes are saved.
         :param field:
@@ -1103,7 +1103,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 prev_item_last_slide = service_iterator.value()
             service_iterator += 1
 
-    def on_set_item(self, message, field=None):
+    def on_set_item(self, message):
         """
         Called by a signal to select a specific item and make it live usually from remote.
 
@@ -1173,7 +1173,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.service_manager.collapsed(item.parent())
             self.service_manager_list.setCurrentItem(item.parent())
 
-    def on_collapse_all(self, field=None):
+    def on_collapse_all(self):
         """
         Collapse all the service items.
         :param field:
@@ -1193,7 +1193,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         if item.childCount():
             self.service_items[pos - 1]['expanded'] = False
 
-    def on_expand_all(self, field=None):
+    def on_expand_all(self):
         """
         Collapse all the service items.
         :param field:
@@ -1213,7 +1213,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         if item.childCount():
             self.service_items[pos - 1]['expanded'] = True
 
-    def on_service_top(self, field=None):
+    def on_service_top(self):
         """
         Move the current ServiceItem to the top of the list.
         :param field:
@@ -1226,7 +1226,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.repaint_service_list(0, child)
             self.set_modified()
 
-    def on_service_up(self, field=None):
+    def on_service_up(self):
         """
         Move the current ServiceItem one position up in the list.
         :param field:
@@ -1239,7 +1239,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.repaint_service_list(item - 1, child)
             self.set_modified()
 
-    def on_service_down(self, field=None):
+    def on_service_down(self):
         """
         Move the current ServiceItem one position down in the list.
         :param field:
@@ -1252,7 +1252,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.repaint_service_list(item + 1, child)
             self.set_modified()
 
-    def on_service_end(self, field=None):
+    def on_service_end(self):
         """
         Move the current ServiceItem to the bottom of the list.
         :param field:
@@ -1265,7 +1265,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.repaint_service_list(len(self.service_items) - 1, child)
             self.set_modified()
 
-    def on_delete_from_service(self, field=None):
+    def on_delete_from_service(self):
         """
         Remove the current ServiceItem from the list.
         :param field:
@@ -1491,7 +1491,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.drop_position = -1
         self.set_modified()
 
-    def make_preview(self, field=None):
+    def make_preview(self):
         """
         Send the current item to the Preview slide controller
         :param field:
@@ -1516,7 +1516,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         else:
             return self.service_items[item]['service_item']
 
-    def on_double_click_live(self, field=None):
+    def on_double_click_live(self):
         """
         Send the current item to the Live slide controller but triggered by a tablewidget click event.
         :param field:
@@ -1524,7 +1524,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.list_double_clicked = True
         self.make_live()
 
-    def on_single_click_preview(self, field=None):
+    def on_single_click_preview(self):
         """
         If single click previewing is enabled, and triggered by a tablewidget click event,
         start a timeout to verify a double-click hasn't triggered.
@@ -1576,7 +1576,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                                                  'is missing or inactive'))
         self.application.set_normal_cursor()
 
-    def remote_edit(self, field=None):
+    def remote_edit(self):
         """
         Triggers a remote edit to a plugin to allow item to be edited.
         :param field:
@@ -1588,7 +1588,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             if new_item:
                 self.add_service_item(new_item, replace=True)
 
-    def on_service_item_rename(self, field=None):
+    def on_service_item_rename(self):
         """
         Opens a dialog to rename the service item.
 
@@ -1606,7 +1606,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.repaint_service_list(item, -1)
             self.set_modified()
 
-    def create_custom(self, field=None):
+    def create_custom(self):
         """
         Saves the current text item as a custom slide
         :param field:
@@ -1726,7 +1726,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         self.renderer.set_service_theme(self.service_theme)
         self.regenerate_service_items()
 
-    def on_theme_change_action(self, field=None):
+    def on_theme_change_action(self):
         """
         Handles theme change events
 
