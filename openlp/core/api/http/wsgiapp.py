@@ -69,6 +69,7 @@ def _make_response(view_result):
     """
     Create a Response object from response
     """
+    log.debug("in Make response")
     if isinstance(view_result, Response):
         return view_result
     elif isinstance(view_result, tuple):
@@ -88,6 +89,9 @@ def _make_response(view_result):
     elif isinstance(view_result, str):
         return Response(body=view_result, status=200,
                         content_type='text/html', charset='utf8')
+    else:
+        return Response(body=view_result, status=200,
+                        content_type='text/plain', charset='utf8')
 
 
 def _handle_exception(error):

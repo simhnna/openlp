@@ -98,7 +98,7 @@ class UiAboutDialog(object):
                       'OpenLP is free church presentation software, or lyrics '
                       'projection software, used to display slides of songs, Bible '
                       'verses, videos, images, and even presentations (if '
-                      'Impress, PowerPoint or PowerPoint Viewer is installed) '
+                      'Impress or PowerPoint is installed) '
                       'for church worship using a computer and a data projector.\n'
                       '\n'
                       'Find out more about OpenLP: http://openlp.org/\n'

@@ -44,7 +44,6 @@ __default_settings__ = {'presentations/override app': QtCore.Qt.Unchecked,
                         'presentations/pdf_program': None,
                         'presentations/Impress': QtCore.Qt.Checked,
                         'presentations/Powerpoint': QtCore.Qt.Checked,
-                        'presentations/Powerpoint Viewer': QtCore.Qt.Checked,
                         'presentations/Pdf': QtCore.Qt.Checked,
                         'presentations/presentations files': [],
                         'presentations/thumbnail_scheme': '',
@@ -57,7 +56,7 @@ __default_settings__ = {'presentations/override app': QtCore.Qt.Unchecked,
 class PresentationPlugin(Plugin):
     """
     This plugin allowed a Presentation to be opened, controlled and displayed on the output display. The plugin controls
-    third party applications such as OpenOffice.org Impress, Microsoft PowerPoint and the PowerPoint viewer.
+    third party applications such as OpenOffice.org Impress, and Microsoft PowerPoint.
     """
     log = logging.getLogger('PresentationPlugin')
 

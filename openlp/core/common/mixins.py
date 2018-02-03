@@ -56,7 +56,10 @@ class LogMixin(object):
         def wrapped(*args, **kwargs):
             parent.logger.debug("Entering {function}".format(function=func.__name__))
             try:
-                return func(*args, **kwargs)
+                if len(inspect.signature(func).parameters.values()):
+                    return func(*args, **kwargs)
+                else:
+                    return func(*args)
             except Exception as e:
                 if parent.logger.getEffectiveLevel() <= logging.ERROR:
                     parent.logger.error('Exception in {function} : {error}'.format(function=func.__name__,
@@ -88,6 +91,13 @@ class LogMixin(object):
         """
         trace_error_handler(self.logger)
         self.logger.error(message)
+
+    def log_critical(self, message):
+        """
+        Common log critical handler which prints the calling path
+        """
+        trace_error_handler(self.logger)
+        self.logger.critical(message)
 
     def log_exception(self, message):
         """
