@@ -56,8 +56,6 @@ from openlp.core.version import get_version
 from openlp.core.widgets.dialogs import FileDialog
 from openlp.core.widgets.docks import OpenLPDockWidget, MediaDockManager
 
-#log = logging.getLogger(__name__)
-
 
 class Ui_MainWindow(object):
     """
