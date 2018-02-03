@@ -72,8 +72,7 @@ class OpenLP(QtWidgets.QApplication, LogMixin):
         """
         self.is_event_loop_active = True
         result = QtWidgets.QApplication.exec()
-        state = self.shared_memory.detach()
-        print(state)
+        self.shared_memory.detach()
         return result
 
     def run(self, args):
@@ -121,7 +120,9 @@ class OpenLP(QtWidgets.QApplication, LogMixin):
         self.main_window.show()
         if can_show_splash:
             # now kill the splashscreen
-            self.splash.finish(self.main_window)
+            log.debug('Splashscreen closing')
+            self.splash.close()
+            #self.splash.finish(self.main_window)
             log.debug('Splashscreen closed')
         # make sure Qt really display the splash screen
         self.processEvents()

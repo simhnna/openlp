@@ -37,7 +37,7 @@ from openlp.core.common import is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import LanguageManager, UiStrings, translate
-from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, copyfile, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -465,7 +465,7 @@ class Ui_MainWindow(object):
         self.mode_live_item.setStatusTip(translate('OpenLP.MainWindow', 'Use layout that focuses on Live.'))
 
 
-class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties):
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, RegistryProperties, LogMixin):
     """
     The main window.
     """
