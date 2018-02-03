@@ -122,7 +122,6 @@ class OpenLP(QtWidgets.QApplication, LogMixin):
             # now kill the splashscreen
             log.debug('Splashscreen closing')
             self.splash.close()
-            #self.splash.finish(self.main_window)
             log.debug('Splashscreen closed')
         # make sure Qt really display the splash screen
         self.processEvents()
