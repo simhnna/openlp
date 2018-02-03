@@ -19,3 +19,26 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
+"""
+Functional tests to test the remote index
+"""
+from unittest.mock import MagicMock, patch
+
+from openlp.core.api.endpoint.remote import index
+from openlp.core.api.endpoint.core import TRANSLATED_STRINGS
+
+
+@patch('openlp.core.api.endpoint.remote.remote_endpoint')
+def test_index(mocked_endpoint):
+    """
+    Test the index method of the remote
+    """
+    # GIVEN: A mocked Endpoint
+    mocked_endpoint.render_template.return_value = 'test template'
+
+    # WHEN: index is called
+    result = index(MagicMock(), 'index')
+
+    # THEN: The result should be "test template" and the right methods should have been called
+    mocked_endpoint.render_template.assert_called_once_with('index.mako', **TRANSLATED_STRINGS)
+    assert result == 'test template'

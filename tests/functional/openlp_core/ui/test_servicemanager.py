@@ -623,10 +623,10 @@ class TestServiceManager(TestCase):
         # THEN: make_preview() should not have been called
         assert mocked_make_preview.call_count == 0, 'ServiceManager.make_preview() should not be called'
 
-    @patch('openlp.core.ui.servicemanager.shutil.copy')
     @patch('openlp.core.ui.servicemanager.zipfile')
     @patch('openlp.core.ui.servicemanager.ServiceManager.save_file_as')
-    def test_save_file_raises_permission_error(self, mocked_save_file_as, mocked_zipfile, mocked_shutil_copy):
+    @patch('openlp.core.ui.servicemanager.os')
+    def test_save_file_raises_permission_error(self, mocked_os, mocked_save_file_as, mocked_zipfile):
         """
         Test that when a PermissionError is raised when trying to save a file, it is handled correctly
         """
@@ -636,45 +636,17 @@ class TestServiceManager(TestCase):
         Registry().register('main_window', mocked_main_window)
         Registry().register('application', MagicMock())
         service_manager = ServiceManager(None)
-        service_manager._service_path = os.path.join('temp', 'filename.osz')
+        service_manager._service_path = MagicMock()
         service_manager._save_lite = False
         service_manager.service_items = []
         service_manager.service_theme = 'Default'
         service_manager.service_manager_list = MagicMock()
         mocked_save_file_as.return_value = True
         mocked_zipfile.ZipFile.return_value = MagicMock()
-        mocked_shutil_copy.side_effect = PermissionError
+        mocked_os.link.side_effect = PermissionError
 
-        # WHEN: The service is saved and a PermissionError is thrown
+        # WHEN: The service is saved and a PermissionError is raised
         result = service_manager.save_file()
-
-        # THEN: The "save_as" method is called to save the service
-        assert result is True
-        mocked_save_file_as.assert_called_with()
-
-    @patch('openlp.core.ui.servicemanager.shutil.copy')
-    @patch('openlp.core.ui.servicemanager.zipfile')
-    @patch('openlp.core.ui.servicemanager.ServiceManager.save_file_as')
-    def test_save_local_file_raises_permission_error(self, mocked_save_file_as, mocked_zipfile, mocked_shutil_copy):
-        """
-        Test that when a PermissionError is raised when trying to save a local file, it is handled correctly
-        """
-        # GIVEN: A service manager, a service to save
-        mocked_main_window = MagicMock()
-        mocked_main_window.service_manager_settings_section = 'servicemanager'
-        Registry().register('main_window', mocked_main_window)
-        Registry().register('application', MagicMock())
-        service_manager = ServiceManager(None)
-        service_manager._service_path = os.path.join('temp', 'filename.osz')
-        service_manager._save_lite = False
-        service_manager.service_items = []
-        service_manager.service_theme = 'Default'
-        mocked_save_file_as.return_value = True
-        mocked_zipfile.ZipFile.return_value = MagicMock()
-        mocked_shutil_copy.side_effect = PermissionError
-
-        # WHEN: The service is saved and a PermissionError is thrown
-        result = service_manager.save_local_file()
 
         # THEN: The "save_as" method is called to save the service
         assert result is True

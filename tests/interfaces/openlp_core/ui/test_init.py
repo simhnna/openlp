@@ -19,36 +19,46 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-from unittest import TestCase
+"""
+Test the openlp.core.ui package.
+"""
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.registry import Registry
-from openlp.core.api.endpoint.controller import controller_text
+from openlp.core.ui import SingleColumnTableWidget
 
 
-class TestController(TestCase):
+def test_single_col_widget_create():
     """
-    Test the Remote plugin deploy functions
+    Test creating the SingleColumnTableWidget object
     """
+    # GIVEN: the SingleColumnTableWidget class
+    # WHEN: An object is created
+    widget = SingleColumnTableWidget(None)
 
-    def setUp(self):
-        """
-        Setup for tests
-        """
-        Registry.create()
-        self.registry = Registry()
-        self.mocked_live_controller = MagicMock()
-        Registry().register('live_controller', self.mocked_live_controller)
+    # THEN: The object should have 1 column and no visible header
+    assert widget.columnCount() == 1, 'There should be only 1 column'
+    assert widget.horizontalHeader().isVisible() is False, 'The horizontal header should not be visible'
 
-    def test_controller_text(self):
-        """
-        Remote Deploy tests - test the dummy zip file is processed correctly
-        """
-        # GIVEN: A mocked service with a dummy service item
-        self.mocked_live_controller.service_item = MagicMock()
-        # WHEN: I trigger the method
-        ret = controller_text("SomeText")
-        # THEN: I get a basic set of results
-        results = ret['results']
-        assert isinstance(results['item'], MagicMock)
-        assert len(results['slides']) == 0
+
+@patch('openlp.core.ui.QtWidgets.QTableWidget')
+def test_single_col_widget_resize_event(MockQTableWidget):
+    """
+    Test that the resizeEvent method does the right thing
+    """
+    # GIVEN: An instance of a SingleColumnTableWidget and a mocked event
+    widget = SingleColumnTableWidget(None)
+    mocked_event = MagicMock()
+    mocked_event.size.return_value.width.return_value = 10
+
+    # WHEN: resizeEvent() is called
+    with patch.object(widget, 'columnCount') as mocked_column_count, \
+            patch.object(widget, 'setColumnWidth') as mocked_set_column_width, \
+            patch.object(widget, 'resizeRowsToContents') as mocked_resize_rows_to_contents:
+        mocked_column_count.return_value = 1
+        widget.resizeEvent(mocked_event)
+
+    # THEN: The correct calls should have been made
+    MockQTableWidget.resizeEvent.assert_called_once_with(widget, mocked_event)
+    mocked_column_count.assert_called_once_with()
+    mocked_set_column_width.assert_called_once_with(0, 10)
+    mocked_resize_rows_to_contents.assert_called_once_with()

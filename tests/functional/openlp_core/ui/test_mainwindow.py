@@ -23,6 +23,7 @@
 Package to test openlp.core.ui.mainwindow package.
 """
 import os
+from pathlib import Path
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
@@ -84,14 +85,13 @@ class TestMainWindow(TestCase, TestMixin):
         """
         # GIVEN a service as an argument to openlp
         service = os.path.join(TEST_RESOURCES_PATH, 'service', 'test.osz')
-        self.main_window.arguments = [service]
 
         # WHEN the argument is processed
         with patch.object(self.main_window.service_manager, 'load_file') as mocked_load_file:
             self.main_window.open_cmd_line_files(service)
 
         # THEN the service from the arguments is loaded
-        mocked_load_file.assert_called_with(service)
+        mocked_load_file.assert_called_with(Path(service))
 
     @patch('openlp.core.ui.servicemanager.ServiceManager.load_file')
     def test_cmd_line_arg(self, mocked_load_file):
@@ -242,3 +242,30 @@ class TestMainWindow(TestCase, TestMixin):
 
         # THEN: projector_manager_dock.setVisible should had been called once
         mocked_dock.setVisible.assert_called_once_with(False)
+
+    def test_increment_progress_bar_default_increment(self):
+        """
+        Test that increment_progress_bar increments the progress bar by 1 when called without the `increment` arg.
+        """
+        # GIVEN: A mocked progress bar
+        with patch.object(self.main_window, 'load_progress_bar', **{'value.return_value': 0}) as mocked_progress_bar:
+
+            # WHEN: Calling increment_progress_bar without the `increment` arg
+            self.main_window.increment_progress_bar()
+
+        # THEN: The progress bar value should have been incremented by 1
+        mocked_progress_bar.setValue.assert_called_once_with(1)
+
+    def test_increment_progress_bar_custom_increment(self):
+        """
+        Test that increment_progress_bar increments the progress bar by the `increment` arg when called with the
+        `increment` arg with a set value.
+        """
+        # GIVEN: A mocked progress bar
+        with patch.object(self.main_window, 'load_progress_bar', **{'value.return_value': 0}) as mocked_progress_bar:
+
+            # WHEN: Calling increment_progress_bar with `increment` set to 10
+            self.main_window.increment_progress_bar(increment=10)
+
+        # THEN: The progress bar value should have been incremented by 10
+        mocked_progress_bar.setValue.assert_called_once_with(10)

@@ -36,6 +36,7 @@ from openlp.core.common import md5_hash
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
+from openlp.core.common.path import Path
 from openlp.core.common.settings import Settings
 from openlp.core.lib import ImageSource, build_icon, clean_tags, expand_tags, expand_chords
 
@@ -427,13 +428,13 @@ class ServiceItem(RegistryProperties):
         self.has_original_files = True
         if 'background_audio' in header:
             self.background_audio = []
-            for filename in header['background_audio']:
-                # Give them real file paths.
-                filepath = str(filename)
-                if path:
+            for file_path in header['background_audio']:
+                # In OpenLP 3.0 we switched to storing Path objects in JSON files
+                if isinstance(file_path, str):
+                    # Handle service files prior to OpenLP 3.0
                     # Windows can handle both forward and backward slashes, so we use ntpath to get the basename
-                    filepath = os.path.join(path, ntpath.basename(str(filename)))
-                self.background_audio.append(filepath)
+                    file_path = Path(path, ntpath.basename(file_path))
+                self.background_audio.append(file_path)
         self.theme_overwritten = header.get('theme_overwritten', False)
         if self.service_item_type == ServiceItemType.Text:
             for slide in service_item['serviceitem']['data']:
@@ -444,8 +445,8 @@ class ServiceItem(RegistryProperties):
             if path:
                 self.has_original_files = False
                 for text_image in service_item['serviceitem']['data']:
-                    filename = os.path.join(path, text_image)
-                    self.add_from_image(filename, text_image, background)
+                    file_path = os.path.join(path, text_image)
+                    self.add_from_image(file_path, text_image, background)
             else:
                 for text_image in service_item['serviceitem']['data']:
                     self.add_from_image(text_image['path'], text_image['title'], background)

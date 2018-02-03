@@ -1308,11 +1308,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, LogMixin, RegistryPropert
         self.load_progress_bar.setValue(0)
         self.application.process_events()
 
-    def increment_progress_bar(self):
+    def increment_progress_bar(self, increment=1):
         """
-        Increase the Progress Bar value by 1
+        Increase the Progress Bar by the value in increment.
+
+        :param int increment: The value you to increase the progress bar by.
         """
-        self.load_progress_bar.setValue(self.load_progress_bar.value() + 1)
+        self.load_progress_bar.setValue(self.load_progress_bar.value() + increment)
         self.application.process_events()
 
     def finished_progress_bar(self):
@@ -1380,4 +1382,4 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, LogMixin, RegistryPropert
         if not isinstance(filename, str):
             filename = str(filename, sys.getfilesystemencoding())
         if filename.endswith(('.osz', '.oszl')):
-            self.service_manager_contents.load_file(filename)
+            self.service_manager_contents.load_file(Path(filename))
