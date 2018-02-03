@@ -418,7 +418,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_new_service_clicked(self):
         """
         Create a new service.
-        :param field:
         """
         if self.is_modified():
             result = self.save_modified_service()
@@ -469,7 +468,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_recent_service_clicked(self):
         """
         Load a recent file as the service triggered by mainwindow recent service list.
-        :param field:
         """
         if self.is_modified():
             result = self.save_modified_service()
@@ -663,7 +661,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def decide_save_method(self):
         """
         Determine which type of save method to use.
-        :param field:
         """
         if not self.file_name():
             return self.save_file_as()
@@ -827,7 +824,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_service_item_note_form(self):
         """
         Allow the service note to be edited
-        :param field:
         """
         item = self.find_service_item()[0]
         self.service_note_form.text_edit.setPlainText(self.service_items[item]['service_item'].notes)
@@ -839,7 +835,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_start_time_form(self):
         """
         Opens a dialog to type in service item notes.
-        :param field:
         """
         item = self.find_service_item()[0]
         self.start_time_form.item = self.service_items[item]
@@ -849,8 +844,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def toggle_auto_play_slides_once(self):
         """
         Toggle Auto play slide once. Inverts auto play once option for the item
-
-        :param field:
         """
         item = self.find_service_item()[0]
         service_item = self.service_items[item]['service_item']
@@ -866,8 +859,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def toggle_auto_play_slides_loop(self):
         """
         Toggle Auto play slide loop.
-
-        :param field:
         """
         item = self.find_service_item()[0]
         service_item = self.service_items[item]['service_item']
@@ -883,7 +874,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_timed_slide_interval(self):
         """
         Shows input dialog for enter interval in seconds for delay
-        :param field:
         """
         item = self.find_service_item()[0]
         service_item = self.service_items[item]['service_item']
@@ -917,7 +907,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_service_item_edit_form(self):
         """
         Opens a dialog to edit the service item and update the service display if changes are saved.
-        :param field:
         """
         item = self.find_service_item()[0]
         self.service_item_edit_form.set_service_item(self.service_items[item]['service_item'])
@@ -993,8 +982,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_set_item(self, message):
         """
         Called by a signal to select a specific item and make it live usually from remote.
-
-        :param field:
         :param message: The data passed in from a remove message
         """
         self.log_debug(message)
@@ -1063,7 +1050,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_collapse_all(self):
         """
         Collapse all the service items.
-        :param field:
         """
         for item in self.service_items:
             item['expanded'] = False
@@ -1083,7 +1069,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_expand_all(self):
         """
         Collapse all the service items.
-        :param field:
         """
         for item in self.service_items:
             item['expanded'] = True
@@ -1103,7 +1088,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_service_top(self):
         """
         Move the current ServiceItem to the top of the list.
-        :param field:
         """
         item, child = self.find_service_item()
         if item < len(self.service_items) and item != -1:
@@ -1116,7 +1100,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_service_up(self):
         """
         Move the current ServiceItem one position up in the list.
-        :param field:
         """
         item, child = self.find_service_item()
         if item > 0:
@@ -1129,7 +1112,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_service_down(self):
         """
         Move the current ServiceItem one position down in the list.
-        :param field:
         """
         item, child = self.find_service_item()
         if item < len(self.service_items) and item != -1:
@@ -1142,7 +1124,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_service_end(self):
         """
         Move the current ServiceItem to the bottom of the list.
-        :param field:
         """
         item, child = self.find_service_item()
         if item < len(self.service_items) and item != -1:
