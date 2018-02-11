@@ -64,7 +64,7 @@ from openlp.core.projectors.constants import CONNECTION_ERRORS, PJLINK_CLASS, PJ
 log = logging.getLogger(__name__)
 log.debug('pjlink loaded')
 
-__all__ = ['PJLink']
+__all__ = ['PJLink', 'PJLinkUDP']
 
 # Shortcuts
 SocketError = QtNetwork.QAbstractSocket.SocketError
@@ -79,22 +79,145 @@ class PJLinkUDP(QtNetwork.QUdpSocket):
     """
     Socket service for PJLink UDP socket.
     """
-    # New commands available in PJLink Class 2
-    pjlink_udp_commands = [
-        'ACKN',  # Class 2  (cmd is SRCH)
-        'ERST',  # Class 1/2
-        'INPT',  # Class 1/2
-        'LKUP',  # Class 2  (reply only - no cmd)
-        'POWR',  # Class 1/2
-        'SRCH'   # Class 2  (reply is ACKN)
-    ]
-
     def __init__(self, projector_list, port=PJLINK_PORT):
         """
-        Initialize socket
+        Socket services for PJLink UDP packets.
+
+        Since all UDP packets from any projector will come into the same
+        port, process UDP packets here then route to the appropriate
+        projector instance as needed.
         """
+        # Keep track of currently defined projectors so we can route
+        # inbound packets to the correct instance
+        super().__init__()
         self.projector_list = projector_list
         self.port = port
+        # Local defines
+        self.ackn_list = {}  # Replies from online projetors
+        self.search_active = False
+        self.search_time = 30000  # 30 seconds for allowed time
+        self.search_timer = QtCore.QTimer()
+        # New commands available in PJLink Class 2
+        # ACKN/SRCH is processed here since it's used to find available projectors
+        # Other commands are processed by the individual projector instances
+        self.pjlink_udp_functions = {
+            'ACKN': self.process_ackn,  # Class 2, command is 'SRCH'
+            'ERST': None,  # Class 1/2
+            'INPT': None,  # Class 1/2
+            'LKUP': None,  # Class 2  (reply only - no cmd)
+            'POWR': None,  # Class 1/2
+            'SRCH': self.process_srch   # Class 2  (reply is ACKN)
+        }
+
+        self.readyRead.connect(self.get_datagram)
+        log.debug('(UDP) PJLinkUDP() Initialized')
+
+    @QtCore.pyqtSlot()
+    def get_datagram(self):
+        """
+        Retrieve packet and basic checks
+        """
+        log.debug('(UDP) get_datagram() - Receiving data')
+        read = self.pendingDatagramSize()
+        if read < 0:
+            log.warn('(UDP) No data (-1)')
+            return
+        if read < 1:
+            log.warn('(UDP) get_datagram() called when pending data size is 0')
+            return
+        data, peer_address, peer_port = self.readDatagram(self.pendingDatagramSize())
+        log.debug('(UDP) {size} bytes received from {adx} on port {port}'.format(size=len(data),
+                                                                                 adx=peer_address,
+                                                                                 port=peer_port))
+        log.debug('(UDP) packet "{data}"'.format(data=data))
+        if len(data) < 0:
+            log.warn('(UDP) No data (-1)')
+            return
+        elif len(data) < 8:
+            # Minimum packet is '%2CCCC='
+            log.warn('(UDP) Invalid packet - not enough data')
+            return
+        elif data is None:
+            log.warn('(UDP) No data (None)')
+            return
+        elif len(data) > PJLINK_MAX_PACKET:
+            log.warn('(UDP) Invalid packet - length too long')
+            return
+        elif not data.startswith(PJLINK_PREFIX):
+            log.warn('(UDP) Invalid packet - does not start with PJLINK_PREFIX')
+            return
+        elif data[1] != '2':
+            log.warn('(UDP) Invalid packet - missing/invalid PJLink class version')
+            return
+        elif data[6] != '=':
+            log.warn('(UDP) Invalid packet - separator missing')
+            return
+        # First two characters are header information we don't need at this time
+        cmd, data = data[2:].split('=')
+        if cmd not in self.pjlink_udp_functions:
+            log.warn('(UDP) Invalid packet - not a valid PJLink UDP reply')
+            return
+        if self.pjlink_udp_functions[cmd] is not None:
+            log.debug('(UDP) Processing {cmd} with "{data}"'.format(cmd=cmd, data=data))
+            return self.pjlink_udp_functions[cmd](data=data, host=peer_address, port=peer_port)
+        else:
+            log.debug('(UDP) Checking projector list for ip {host} to process'.format(host=peer_address))
+            for projector in self.projector_list:
+                if peer_address == projector.ip:
+                    if cmd not in projector.pjlink_functions:
+                        log.error('(UDP) Could not find method to process '
+                                  '"{cmd}" in {host}'.format(cmd=cmd, host=projector.ip))
+                        return
+                    log.debug('(UDP) Calling "{cmd}" in {host}'.format(cmd=cmd, host=projector.ip))
+                    return projector.pjlink_functions[cmd](data=data)
+            log.warn('(UDP) Could not find projector with ip {ip} to process packet'.format(ip=peer_address))
+            return
+
+    def process_ackn(self, data, host, port):
+        """
+        Process the ACKN command.
+
+        :param data: Data in packet
+        :param host: IP address of sending host
+        :param port: Port received on
+        """
+        log.debug('(UDP) Processing ACKN packet')
+        if host not in self.ackn_list:
+            log.debug('(UDP) Adding {host} to ACKN list'.format(host=host))
+            self.ackn_list[host] = {'data': data,
+                                    'port': port}
+        else:
+            log.warn('(UDP) Host {host} already replied - ignoring'.format(host=host))
+
+    def process_srch(self, data, host, port):
+        """
+        Process the SRCH command.
+
+        SRCH is processed by terminals so we ignore any packet.
+
+        :param data: Data in packet
+        :param host: IP address of sending host
+        :param port: Port received on
+        """
+        log.debug('(UDP) SRCH packet received - ignoring')
+        return
+
+    def search_start(self):
+        """
+        Start search for projectors on local network
+        """
+        self.search_active = True
+        self.ackn_list = {}
+        # TODO: Send SRCH packet here
+        self.search_timer.singleShot(self.search_time, self.search_stop)
+
+    @QtCore.pyqtSlot()
+    def search_stop(self):
+        """
+        Stop search
+        """
+        self.search_active = False
+        self.search_timer.stop()
 
 
 class PJLinkCommands(object):
@@ -257,8 +380,9 @@ class PJLinkCommands(object):
         else:
             clss = data
         self.pjlink_class = clss
-        log.debug('({ip}) Setting pjlink_class for this projector to "{data}"'.format(ip=self.entry.name,
-                                                                                      data=self.pjlink_class))
+        log.debug('({ip}) Setting pjlink_class for this projector '
+                  'to "{data}"'.format(ip=self.entry.name,
+                                       data=self.pjlink_class))
         # Since we call this one on first connect, setup polling from here
         if not self.no_poll:
             log.debug('({ip}) process_pjlink(): Starting timer'.format(ip=self.entry.name))
@@ -276,9 +400,10 @@ class PJLinkCommands(object):
         """
         if len(data) != PJLINK_ERST_DATA['DATA_LENGTH']:
             count = PJLINK_ERST_DATA['DATA_LENGTH']
-            log.warning('({ip}) Invalid error status response "{data}": length != {count}'.format(ip=self.entry.name,
-                                                                                                  data=data,
-                                                                                                  count=count))
+            log.warning('({ip}) Invalid error status response "{data}": '
+                        'length != {count}'.format(ip=self.entry.name,
+                                                   data=data,
+                                                   count=count))
             return
         try:
             datacheck = int(data)
@@ -557,7 +682,7 @@ class PJLinkCommands(object):
 
 class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
     """
-    Socket service for PJLink TCP socket.
+    Socket services for PJLink TCP packets.
     """
     # Signals sent by this module
     changeStatus = QtCore.pyqtSignal(str, int, str)

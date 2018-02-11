@@ -29,6 +29,7 @@ from unittest.mock import patch
 from PyQt5 import QtWidgets
 
 from openlp.core.api.tab import ApiTab
+from openlp.core.common import MY_IP4
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from tests.helpers.testmixin import TestMixin
@@ -72,15 +73,18 @@ class TestApiTab(TestCase, TestMixin):
         del self.form
         self.destroy_settings()
 
+    @patch.dict(MY_IP4, {'test': {'ip': '127.0.0.1'}}, clear=True)
     def test_get_ip_address_default(self):
         """
         Test the get_ip_address function with ZERO_URL
         """
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(ZERO_URL)
+
         # THEN: the default ip address will be returned
         assert re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', ip_address), \
             'The return value should be a valid ip address'
+        assert ip_address == '127.0.0.1', 'The return address should match the test address'
 
     def test_get_ip_address_with_ip(self):
         """
@@ -88,8 +92,10 @@ class TestApiTab(TestCase, TestMixin):
         """
         # GIVEN: An ip address
         given_ip = '192.168.1.1'
+
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(given_ip)
+
         # THEN: the default ip address will be returned
         assert ip_address == given_ip, 'The return value should be %s' % given_ip
 

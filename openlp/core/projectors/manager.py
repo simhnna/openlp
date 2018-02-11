@@ -308,7 +308,6 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         self.settings_section = 'projector'
         self.projectordb = projectordb
         self.projector_list = []
-        self.pjlink_udp = PJLinkUDP(self.projector_list)
         self.source_select_form = None
 
     def bootstrap_initialise(self):
@@ -323,6 +322,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         else:
             log.debug('Using existing ProjectorDB() instance')
         self.get_settings()
+        self.pjlink_udp = PJLinkUDP(self.projector_list)
 
     def bootstrap_post_set_up(self):
         """
@@ -344,6 +344,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         """
         Retrieve the saved settings
         """
+        log.debug('Updating ProjectorManager settings')
         settings = Settings()
         settings.beginGroup(self.settings_section)
         self.autostart = settings.value('connect on start')
@@ -501,10 +502,6 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         ans = msg.exec()
         if ans == msg.Cancel:
             return
-        try:
-            projector.link.projectorNetwork.disconnect(self.update_status)
-        except (AttributeError, TypeError):
-            pass
         try:
             projector.link.changeStatus.disconnect(self.update_status)
         except (AttributeError, TypeError):

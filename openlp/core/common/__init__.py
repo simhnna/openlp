@@ -36,6 +36,7 @@ from subprocess import check_output, CalledProcessError, STDOUT
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import QCryptographicHash as QHash
+from PyQt5.QtNetwork import QAbstractSocket, QHostAddress, QNetworkInterface
 from chardet.universaldetector import UniversalDetector
 
 log = logging.getLogger(__name__ + '.__init__')
@@ -50,6 +51,27 @@ REPLACMENT_CHARS_MAP = str.maketrans({'\u2018': '\'', '\u2019': '\'', '\u201c': 
                                       '\u2013': '-', '\u2014': '-', '\v': '\n\n', '\f': '\n\n'})
 NEW_LINE_REGEX = re.compile(r' ?(\r\n?|\n) ?')
 WHITESPACE_REGEX = re.compile(r'[ \t]+')
+
+# Get the local IPv4 active address(es) that are NOT localhost (lo or '127.0.0.1')
+log.debug('Getting local IPv4 interface(es) information')
+MY_IP4 = {}
+for iface in QNetworkInterface.allInterfaces():
+    if not iface.isValid() or not (iface.flags() & (QNetworkInterface.IsUp | QNetworkInterface.IsRunning)):
+        continue
+    for address in iface.addressEntries():
+        ip = address.ip()
+        if (ip.protocol() == QAbstractSocket.IPv4Protocol) and (ip != QHostAddress.LocalHost):
+            MY_IP4[iface.name()] = {'ip': ip.toString(),
+                                    'broadcast': address.broadcast().toString(),
+                                    'netmask': address.netmask().toString(),
+                                    'prefix': address.prefixLength(),
+                                    'localnet': QHostAddress(address.netmask().toIPv4Address() &
+                                                             ip.toIPv4Address()).toString()
+                                    }
+            log.debug('Adding {iface} to active list'.format(iface=iface.name()))
+
+if not MY_IP4:
+    log.warning('No active IPv4 interfaces found')
 
 
 def trace_error_handler(logger):
