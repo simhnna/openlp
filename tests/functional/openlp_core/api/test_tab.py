@@ -29,7 +29,7 @@ from unittest.mock import patch
 from PyQt5 import QtWidgets
 
 from openlp.core.api.tab import ApiTab
-from openlp.core.common import MY_IP4
+from openlp.core.common import get_local_ip4
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from tests.helpers.testmixin import TestMixin
@@ -64,6 +64,7 @@ class TestApiTab(TestCase, TestMixin):
         Registry().create()
         Registry().set_flag('website_version', '00-00-0000')
         self.form = ApiTab(self.parent)
+        self.my_ip4_list = get_local_ip4()
 
     def tearDown(self):
         """
@@ -73,18 +74,22 @@ class TestApiTab(TestCase, TestMixin):
         del self.form
         self.destroy_settings()
 
-    @patch.dict(MY_IP4, {'test': {'ip': '127.0.0.1'}}, clear=True)
     def test_get_ip_address_default(self):
         """
         Test the get_ip_address function with ZERO_URL
         """
+        # GIVEN: list of local IP addresses for this machine
+        ip4_list = []
+        for ip4 in iter(self.my_ip4_list):
+            ip4_list.append(self.my_ip4_list.get(ip4)['ip'])
+
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(ZERO_URL)
 
         # THEN: the default ip address will be returned
         assert re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', ip_address), \
             'The return value should be a valid ip address'
-        assert ip_address == '127.0.0.1', 'The return address should match the test address'
+        assert ip_address in ip4_list, 'The return address should be in the list of local IP addresses'
 
     def test_get_ip_address_with_ip(self):
         """

@@ -52,26 +52,43 @@ REPLACMENT_CHARS_MAP = str.maketrans({'\u2018': '\'', '\u2019': '\'', '\u201c': 
 NEW_LINE_REGEX = re.compile(r' ?(\r\n?|\n) ?')
 WHITESPACE_REGEX = re.compile(r'[ \t]+')
 
-# Get the local IPv4 active address(es) that are NOT localhost (lo or '127.0.0.1')
-log.debug('Getting local IPv4 interface(es) information')
-MY_IP4 = {}
-for iface in QNetworkInterface.allInterfaces():
-    if not iface.isValid() or not (iface.flags() & (QNetworkInterface.IsUp | QNetworkInterface.IsRunning)):
-        continue
-    for address in iface.addressEntries():
-        ip = address.ip()
-        if (ip.protocol() == QAbstractSocket.IPv4Protocol) and (ip != QHostAddress.LocalHost):
-            MY_IP4[iface.name()] = {'ip': ip.toString(),
-                                    'broadcast': address.broadcast().toString(),
-                                    'netmask': address.netmask().toString(),
-                                    'prefix': address.prefixLength(),
-                                    'localnet': QHostAddress(address.netmask().toIPv4Address() &
-                                                             ip.toIPv4Address()).toString()
-                                    }
-            log.debug('Adding {iface} to active list'.format(iface=iface.name()))
 
-if not MY_IP4:
-    log.warning('No active IPv4 interfaces found')
+def get_local_ip4():
+    """
+    Creates a dictionary of local IPv4 interfaces on local machine.
+    If no active interfaces available, returns a dict of localhost IPv4 information
+
+    :returns: Dict of interfaces
+    """
+    # Get the local IPv4 active address(es) that are NOT localhost (lo or '127.0.0.1')
+    log.debug('Getting local IPv4 interface(es) information')
+    MY_IP4 = {}
+    for iface in QNetworkInterface.allInterfaces():
+        if not iface.isValid() or not (iface.flags() & (QNetworkInterface.IsUp | QNetworkInterface.IsRunning)):
+            continue
+        for address in iface.addressEntries():
+            ip = address.ip()
+            # NOTE: Next line will skip if interface is localhost - keep for now until we decide about it later
+            # if (ip.protocol() == QAbstractSocket.IPv4Protocol) and (ip != QHostAddress.LocalHost):
+            if (ip.protocol() == QAbstractSocket.IPv4Protocol):
+                MY_IP4[iface.name()] = {'ip': ip.toString(),
+                                        'broadcast': address.broadcast().toString(),
+                                        'netmask': address.netmask().toString(),
+                                        'prefix': address.prefixLength(),
+                                        'localnet': QHostAddress(address.netmask().toIPv4Address() &
+                                                                ip.toIPv4Address()).toString()
+                                        }
+                log.debug('Adding {iface} to active list'.format(iface=iface.name()))
+    if len(MY_IP4) == 1:
+        if 'lo' in MY_IP4:
+            # No active interfaces - so leave localhost in there
+            log.warning('No active IPv4 interfaces found except localhost')
+    else:
+        # Since we have a valid IP4 interface, remove localhost
+        log.debug('Found at least one IPv4 interface, removing localhost')
+        MY_IP4.pop('lo')
+
+    return MY_IP4
 
 
 def trace_error_handler(logger):
