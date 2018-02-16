@@ -125,7 +125,6 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         select_form = SourceSelectSingle(parent=None, projectordb=self.projectordb)
         select_form.edit = True
         select_form.exec(projector=self.projector)
-        projector = select_form.projector
 
         # THEN: Verify all 4 buttons are available
         assert len(select_form.button_box.buttons()) == 4, \
@@ -144,7 +143,6 @@ class ProjectorSourceFormTest(TestCase, TestMixin):
         select_form = SourceSelectSingle(parent=None, projectordb=self.projectordb)
         select_form.edit = False
         select_form.exec(projector=self.projector)
-        projector = select_form.projector
 
         # THEN: Verify only 2 buttons are available
         assert len(select_form.button_box.buttons()) == 2, \

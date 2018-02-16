@@ -29,6 +29,7 @@ from unittest.mock import patch
 from PyQt5 import QtWidgets
 
 from openlp.core.api.tab import ApiTab
+from openlp.core.common import get_local_ip4
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from tests.helpers.testmixin import TestMixin
@@ -63,6 +64,7 @@ class TestApiTab(TestCase, TestMixin):
         Registry().create()
         Registry().set_flag('website_version', '00-00-0000')
         self.form = ApiTab(self.parent)
+        self.my_ip4_list = get_local_ip4()
 
     def tearDown(self):
         """
@@ -76,11 +78,18 @@ class TestApiTab(TestCase, TestMixin):
         """
         Test the get_ip_address function with ZERO_URL
         """
+        # GIVEN: list of local IP addresses for this machine
+        ip4_list = []
+        for ip4 in iter(self.my_ip4_list):
+            ip4_list.append(self.my_ip4_list.get(ip4)['ip'])
+
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(ZERO_URL)
+
         # THEN: the default ip address will be returned
         assert re.match('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', ip_address), \
             'The return value should be a valid ip address'
+        assert ip_address in ip4_list, 'The return address should be in the list of local IP addresses'
 
     def test_get_ip_address_with_ip(self):
         """
@@ -88,8 +97,10 @@ class TestApiTab(TestCase, TestMixin):
         """
         # GIVEN: An ip address
         given_ip = '192.168.1.1'
+
         # WHEN: the default ip address is given
         ip_address = self.form.get_ip_address(given_ip)
+
         # THEN: the default ip address will be returned
         assert ip_address == given_ip, 'The return value should be %s' % given_ip
 

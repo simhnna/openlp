@@ -45,7 +45,8 @@ TEST1_DATA = dict(ip='111.111.111.111',
                   serial_no='Serial Number 1',
                   sw_version='Version 1',
                   model_filter='Filter type 1',
-                  model_lamp='Lamp type 1')
+                  model_lamp='Lamp type 1',
+                  mac_adx='11:11:11:11:11:11')
 
 TEST2_DATA = dict(ip='222.222.222.222',
                   port='2222',
@@ -56,7 +57,8 @@ TEST2_DATA = dict(ip='222.222.222.222',
                   serial_no='Serial Number 2',
                   sw_version='Version 2',
                   model_filter='Filter type 2',
-                  model_lamp='Lamp type 2')
+                  model_lamp='Lamp type 2',
+                  mac_adx='22:22:22:22:22:22')
 
 TEST3_DATA = dict(ip='333.333.333.333',
                   port='3333',
@@ -67,7 +69,8 @@ TEST3_DATA = dict(ip='333.333.333.333',
                   serial_no='Serial Number 3',
                   sw_version='Version 3',
                   model_filter='Filter type 3',
-                  model_lamp='Lamp type 3')
+                  model_lamp='Lamp type 3',
+                  mac_adx='33:33:33:33:33:33')
 
 TEST_VIDEO_CODES = {
     '11': 'RGB 1',
