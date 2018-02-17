@@ -25,6 +25,7 @@ import asyncio
 import websockets
 import random
 
+
 async def tester():
     async with websockets.connect('ws://localhost:4317/poll') as websocket:
 
