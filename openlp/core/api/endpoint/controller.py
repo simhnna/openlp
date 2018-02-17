@@ -117,12 +117,11 @@ def controller_set(request):
     return {'results': {'success': True}}
 
 
-@controller_endpoint.route('{action:next|previous}')
+@controller_endpoint.route('{controller}/{action:next|previous}')
 @requires_auth
 def controller_direction(request, controller, action):
     """
     Handles requests for setting service items in the slide controller
-11
     :param request: The http request object.
     :param controller: the controller slides forward or backward.
     :param action: the controller slides forward or backward.
@@ -137,7 +136,7 @@ def controller_direction(request, controller, action):
 def controller_direction_api(request, controller, action):
     """
     Handles requests for setting service items in the slide controller
-11
+
     :param request: The http request object.
     :param controller: the controller slides forward or backward.
     :param action: the controller slides forward or backward.
