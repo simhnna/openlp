@@ -572,6 +572,7 @@ class SongMediaItem(MediaManagerItem):
         service_item.add_capability(ItemCapabilities.OnLoadUpdate)
         service_item.add_capability(ItemCapabilities.AddIfNewItem)
         service_item.add_capability(ItemCapabilities.CanSoftBreak)
+        service_item.add_capability(ItemCapabilities.HasMetaData)
         song = self.plugin.manager.get_object(Song, item_id)
         service_item.theme = song.theme_name
         service_item.edit_id = item_id
@@ -685,6 +686,11 @@ class SongMediaItem(MediaManagerItem):
         if Settings().value('core/ccli number'):
             item.raw_footer.append(translate('SongsPlugin.MediaItem',
                                              'CCLI License: ') + Settings().value('core/ccli number'))
+        if song.songbook_entries:
+            for songbook_entry in song.songbook_entries:
+                item.metadata.append("songbook: {book}/{num}/{pub}".format(book=songbook_entry.songbook.name,
+                                                                           num=songbook_entry.entry,
+                                                                           pub=songbook_entry.songbook.publisher))
         return authors_all
 
     def service_load(self, item):
