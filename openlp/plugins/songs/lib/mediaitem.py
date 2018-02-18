@@ -688,7 +688,7 @@ class SongMediaItem(MediaManagerItem):
                                              'CCLI License: ') + Settings().value('core/ccli number'))
         if song.songbook_entries:
             for songbook_entry in song.songbook_entries:
-                item.metadata.append("songbook: {book}/{num}/{pub}".format(book=songbook_entry.songbook.name,
+                item.metadata.append("<em>songbook:</em> {book}/{num}/{pub}".format(book=songbook_entry.songbook.name,
                                                                            num=songbook_entry.entry,
                                                                            pub=songbook_entry.songbook.publisher))
         return authors_all

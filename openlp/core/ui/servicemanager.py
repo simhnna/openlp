@@ -751,7 +751,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
 
     def context_menu(self, point):
         """
-        The Right click context menu from the Serviceitem list
+        The Right click context menu from the Service item list
 
         :param point: The location of the cursor.
         """
@@ -1136,7 +1136,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_delete_from_service(self):
         """
         Remove the current ServiceItem from the list.
-        :param field:
         """
         item = self.find_service_item()[0]
         if item != -1:
@@ -1205,6 +1204,9 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 tips.append('<strong>{text1}: </strong> {text2}'.format(text1=text1, text2=text2))
             if item['service_item'].is_capable(ItemCapabilities.HasVariableStartTime):
                 tips.append(item['service_item'].get_media_time())
+            if item['service_item'].is_capable(ItemCapabilities.HasMetaData):
+                for d in item['service_item'].metadata:
+                    tips.append(d)
             tree_widget_item.setToolTip(0, '<br>'.join(tips))
             tree_widget_item.setData(0, QtCore.Qt.UserRole, item['order'])
             tree_widget_item.setSelected(item['selected'])
@@ -1362,7 +1364,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def make_preview(self):
         """
         Send the current item to the Preview slide controller
-        :param field:
         """
         self.application.set_busy_cursor()
         item, child = self.find_service_item()
@@ -1387,7 +1388,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_double_click_live(self):
         """
         Send the current item to the Live slide controller but triggered by a tablewidget click event.
-        :param field:
         """
         self.list_double_clicked = True
         self.make_live()
@@ -1396,7 +1396,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         """
         If single click previewing is enabled, and triggered by a tablewidget click event,
         start a timeout to verify a double-click hasn't triggered.
-        :param field:
         """
         if Settings().value('advanced/single click service preview'):
             if not self.list_double_clicked:
@@ -1407,7 +1406,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_single_click_preview_timeout(self):
         """
         If a single click ok, but double click not triggered, send the current item to the Preview slide controller.
-        :param field:
         """
         if self.list_double_clicked:
             # If a double click has registered, clear it.
@@ -1447,7 +1445,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def remote_edit(self):
         """
         Triggers a remote edit to a plugin to allow item to be edited.
-        :param field:
         """
         item = self.find_service_item()[0]
         if self.service_items[item]['service_item'].is_capable(ItemCapabilities.CanEdit):
@@ -1459,8 +1456,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_service_item_rename(self):
         """
         Opens a dialog to rename the service item.
-
-        :param field: Not used, but PyQt needs this.
         """
         item = self.find_service_item()[0]
         if not self.service_items[item]['service_item'].is_capable(ItemCapabilities.CanEditTitle):
@@ -1477,7 +1472,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def create_custom(self):
         """
         Saves the current text item as a custom slide
-        :param field:
         """
         item = self.find_service_item()[0]
         Registry().execute('custom_create_from_service', self.service_items[item]['service_item'])
@@ -1597,8 +1591,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
     def on_theme_change_action(self):
         """
         Handles theme change events
-
-        :param field:
         """
         theme = self.sender().objectName()
         # No object name means that the "Default" theme is supposed to be used.
