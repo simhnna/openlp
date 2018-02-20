@@ -42,7 +42,7 @@ class TestController(TestCase):
 
     def test_controller_text(self):
         """
-        Remote Deploy tests - test the dummy zip file is processed correctly
+        Remote API Tests : test the controller text method can be called
         """
         # GIVEN: A mocked service with a dummy service item
         self.mocked_live_controller.service_item = MagicMock()

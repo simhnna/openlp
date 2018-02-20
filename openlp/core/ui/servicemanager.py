@@ -1205,8 +1205,8 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             if item['service_item'].is_capable(ItemCapabilities.HasVariableStartTime):
                 tips.append(item['service_item'].get_media_time())
             if item['service_item'].is_capable(ItemCapabilities.HasMetaData):
-                for d in item['service_item'].metadata:
-                    tips.append(d)
+                for meta in item['service_item'].metadata:
+                    tips.append(meta)
             tree_widget_item.setToolTip(0, '<br>'.join(tips))
             tree_widget_item.setData(0, QtCore.Qt.UserRole, item['order'])
             tree_widget_item.setSelected(item['selected'])
