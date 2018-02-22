@@ -686,17 +686,23 @@ class SongMediaItem(MediaManagerItem):
         if Settings().value('core/ccli number'):
             item.raw_footer.append(translate('SongsPlugin.MediaItem',
                                              'CCLI License: ') + Settings().value('core/ccli number'))
-        item.metadata.append("<em>title:</em> {title}".format(title=song.title))
+        item.metadata.append("<em>{label}:</em> {title}".format(label=translate('SongsPlugin.MediaItem', 'Title'),
+                                                                title=song.title))
         if song.alternate_title:
-            item.metadata.append("<em>alt title:</em> {title}".format(title=song.alternate_title))
+            item.metadata.append("<em>{label}:</em> {title}".
+                                 format(label=translate('SongsPlugin.MediaItem', 'Alt Title'),
+                                        title=song.alternate_title))
         if song.songbook_entries:
             for songbook_entry in song.songbook_entries:
-                item.metadata.append("<em>songbook:</em> {book}/{num}/{pub}".
-                                     format(book=songbook_entry.songbook.name, num=songbook_entry.entry,
+                item.metadata.append("<em>{label}:</em> {book}/{num}/{pub}".
+                                     format(label=translate('SongsPlugin.MediaItem', 'Songbook'),
+                                            book=songbook_entry.songbook.name, 
+                                            num=songbook_entry.entry,
                                             pub=songbook_entry.songbook.publisher))
         if song.topics:
             for topics in song.topics:
-                item.metadata.append("<em>topic:</em> {topic}".format(topic=topics.name))
+                item.metadata.append("<em>{label}:</em> {topic}".
+                                     format(label=translate('SongsPlugin.MediaItem', 'Topic'), topic=topics.name))
         return authors_all
 
     def service_load(self, item):
