@@ -318,6 +318,10 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
                                             tooltip=translate('OpenLP.SlideController',
                                                               'Edit and reload song preview.'),
                                             triggers=self.on_edit_song)
+            self.toolbar.add_toolbar_action('clear', icon=':/general/general_delete.png',
+                                            tooltip=translate('OpenLP.SlideController',
+                                                              'Clear'),
+                                            triggers=self.on_clear)
         self.controller_layout.addWidget(self.toolbar)
         # Build the Media Toolbar
         self.media_controller.register_controller(self)
@@ -428,6 +432,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         else:
             self.preview_widget.doubleClicked.connect(self.on_preview_double_click)
             self.toolbar.set_widget_visible(['editSong'], False)
+            self.toolbar.set_widget_visible(['clear'], False)
             self.controller.addActions([self.next_item, self.previous_item])
         Registry().register_function('slidecontroller_{text}_stop_loop'.format(text=self.type_prefix),
                                      self.on_stop_loop)
@@ -763,6 +768,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         self.toolbar.hide()
         self.mediabar.hide()
         self.toolbar.set_widget_visible(['editSong'], False)
+        self.toolbar.set_widget_visible(['clear'], True)
         if item.is_capable(ItemCapabilities.CanEdit) and item.from_plugin:
             self.toolbar.set_widget_visible(['editSong'])
         elif item.is_media():
@@ -1380,6 +1386,12 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         new_item = Registry().get(self.service_item.name).on_remote_edit(self.service_item.edit_id, True)
         if new_item:
             self.add_service_item(new_item)
+            
+    def on_clear(self):
+        """
+        Clear the preview bar.
+        """
+        pass
 
     def on_preview_add_to_service(self):
         """
