@@ -67,14 +67,20 @@ class OpenLPToolbar(QtWidgets.QToolBar):
         """
         Set the visibility for a widget or a list of widgets.
 
-        :param widgets: A list of string with widget object names.
+        :param widgets: A list of strings or individual string with widget object names.
         :param visible: The new state as bool.
         """
-        for handle in widgets:
-            if handle in self.actions:
-                self.actions[handle].setVisible(visible)
+        if isinstance(widgets, list):
+            for handle in widgets:
+                if handle in self.actions:
+                    self.actions[handle].setVisible(visible)
+                else:
+                    log.warning('No handle "%s" in actions list.', str(handle))
+        else:
+            if widgets in self.actions:
+                self.actions[widgets].setVisible(visible)
             else:
-                log.warning('No handle "%s" in actions list.', str(handle))
+                log.warning('No handle "%s" in actions list.', str(widgets))
 
     def set_widget_enabled(self, widgets, enabled=True):
         """
