@@ -146,6 +146,14 @@ class ListPreviewWidget(QtWidgets.QTableWidget, RegistryProperties):
         self.screen_ratio = screen_ratio
         self.__recalculate_layout()
 
+    def clear_list(self):
+        """
+        Clear the preview list
+        :return:
+        """
+        self.setRowCount(0)
+        self.clear()
+
     def replace_service_item(self, service_item, width, slide_number):
         """
         Replace the current preview items with the ones in service_item and display the given slide
@@ -156,8 +164,7 @@ class ListPreviewWidget(QtWidgets.QTableWidget, RegistryProperties):
         """
         self.service_item = service_item
         self.setRowCount(0)
-        self.clear()
-        self.setColumnWidth(0, width)
+        self.clear_list()
         row = 0
         text = []
         for frame_number, frame in enumerate(self.service_item.get_frames()):

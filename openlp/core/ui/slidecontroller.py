@@ -1386,12 +1386,14 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         new_item = Registry().get(self.service_item.name).on_remote_edit(self.service_item.edit_id, True)
         if new_item:
             self.add_service_item(new_item)
-            
+
     def on_clear(self):
         """
         Clear the preview bar.
         """
-        pass
+        self.preview_widget.clear_list()
+        self.toolbar.set_widget_visible(["editSong"], False)
+        self.toolbar.set_widget_visible(["clear"], False)
 
     def on_preview_add_to_service(self):
         """
