@@ -91,6 +91,7 @@ def controller_text(request):
                 item['text'] = str(frame['title'])
                 item['html'] = str(frame['title'])
             item['selected'] = (live_controller.selected_row == index)
+            item['title'] = current_item.title
             data.append(item)
     json_data = {'results': {'slides': data}}
     if current_item:
