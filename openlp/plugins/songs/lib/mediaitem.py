@@ -577,6 +577,14 @@ class SongMediaItem(MediaManagerItem):
         service_item.theme = song.theme_name
         service_item.edit_id = item_id
         verse_list = SongXML().get_verses(song.lyrics)
+        if Settings().value('songs/add songbook slide') and song.songbook_entries:
+            first_slide = "\n"
+            for songbook_entry in song.songbook_entries:
+                first_slide = first_slide + "{book}/{num}/{pub}\n\n".format(book=songbook_entry.songbook.name,
+                                                                            num=songbook_entry.entry,
+                                                                            pub=songbook_entry.songbook.publisher)
+
+            service_item.add_from_text(first_slide, "O1")
         # no verse list or only 1 space (in error)
         verse_tags_translated = False
         if VerseType.from_translated_string(str(verse_list[0][0]['type'])) is not None:
@@ -623,6 +631,9 @@ class SongMediaItem(MediaManagerItem):
         if song.media_files:
             service_item.add_capability(ItemCapabilities.HasBackgroundAudio)
             service_item.background_audio = [m.file_path for m in song.media_files]
+            item.metadata.append("<em>{label}:</em> {media}".
+                                 format(label=translate('SongsPlugin.MediaItem', 'Media'),
+                                        media=service_item.background_audio))
         return True
 
     def generate_footer(self, item, song):
@@ -696,7 +707,7 @@ class SongMediaItem(MediaManagerItem):
             for songbook_entry in song.songbook_entries:
                 item.metadata.append("<em>{label}:</em> {book}/{num}/{pub}".
                                      format(label=translate('SongsPlugin.MediaItem', 'Songbook'),
-                                            book=songbook_entry.songbook.name, 
+                                            book=songbook_entry.songbook.name,
                                             num=songbook_entry.entry,
                                             pub=songbook_entry.songbook.publisher))
         if song.topics:

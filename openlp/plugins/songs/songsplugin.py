@@ -61,6 +61,7 @@ __default_settings__ = {
     'songs/last import type': SongFormat.OpenLyrics,
     'songs/update service on edit': False,
     'songs/add song from service': True,
+    'songs/add songbook slide': False,
     'songs/display songbar': True,
     'songs/display songbook': False,
     'songs/display written by': True,
