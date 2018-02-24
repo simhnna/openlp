@@ -62,7 +62,7 @@ def get_local_ip4():
     """
     # Get the local IPv4 active address(es) that are NOT localhost (lo or '127.0.0.1')
     log.debug('Getting local IPv4 interface(es) information')
-    MY_IP4 = {}
+    my_ip4 = {}
     for iface in QNetworkInterface.allInterfaces():
         if not iface.isValid() or not (iface.flags() & (QNetworkInterface.IsUp | QNetworkInterface.IsRunning)):
             continue
@@ -70,25 +70,25 @@ def get_local_ip4():
             ip = address.ip()
             # NOTE: Next line will skip if interface is localhost - keep for now until we decide about it later
             # if (ip.protocol() == QAbstractSocket.IPv4Protocol) and (ip != QHostAddress.LocalHost):
-            if (ip.protocol() == QAbstractSocket.IPv4Protocol):
-                MY_IP4[iface.name()] = {'ip': ip.toString(),
+            if ip.protocol() == QAbstractSocket.IPv4Protocol:
+                my_ip4[iface.name()] = {'ip': ip.toString(),
                                         'broadcast': address.broadcast().toString(),
                                         'netmask': address.netmask().toString(),
                                         'prefix': address.prefixLength(),
                                         'localnet': QHostAddress(address.netmask().toIPv4Address() &
-                                                                ip.toIPv4Address()).toString()
+                                                                 ip.toIPv4Address()).toString()
                                         }
                 log.debug('Adding {iface} to active list'.format(iface=iface.name()))
-    if len(MY_IP4) == 1:
-        if 'lo' in MY_IP4:
+    if len(my_ip4) == 1:
+        if 'lo' in my_ip4:
             # No active interfaces - so leave localhost in there
             log.warning('No active IPv4 interfaces found except localhost')
     else:
         # Since we have a valid IP4 interface, remove localhost
         log.debug('Found at least one IPv4 interface, removing localhost')
-        MY_IP4.pop('lo')
+        my_ip4.pop('lo')
 
-    return MY_IP4
+    return my_ip4
 
 
 def trace_error_handler(logger):

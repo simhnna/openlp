@@ -116,7 +116,7 @@ class SongsTab(SettingsTab):
         self.add_from_service_check_box.setText(translate('SongsPlugin.SongsTab',
                                                           'Import missing songs from Service files'))
         self.songbook_slide_check_box.setText(translate('SongsPlugin.SongsTab',
-                                                          'Add Songbooks as first side'))
+                                                        'Add Songbooks as first side'))
         self.display_songbook_check_box.setText(translate('SongsPlugin.SongsTab', 'Display songbook in footer'))
         self.display_written_by_check_box.setText(translate(
             'SongsPlugin.SongsTab', 'Show "Written by:" in footer for unspecified authors'))
