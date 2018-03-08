@@ -62,7 +62,7 @@ class TestController(TestCase):
         # WHEN: I trigger the method
         controller_direction(None, "live", "next")
         # THEN: The correct method is called
-        self.mocked_live_controller.slidecontroller_live_next.emit.assert_called_once()
+        self.mocked_live_controller.slidecontroller_live_next.emit.assert_called_once_with()
 
     def test_controller_direction_previous(self):
         """
