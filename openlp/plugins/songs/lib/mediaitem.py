@@ -578,13 +578,13 @@ class SongMediaItem(MediaManagerItem):
         service_item.edit_id = item_id
         verse_list = SongXML().get_verses(song.lyrics)
         if Settings().value('songs/add songbook slide') and song.songbook_entries:
-            first_slide = "\n"
+            first_slide = '\n'
             for songbook_entry in song.songbook_entries:
-                first_slide = first_slide + "{book}/{num}/{pub}\n\n".format(book=songbook_entry.songbook.name,
+                first_slide = first_slide + '{book}/{num}/{pub}\n\n'.format(book=songbook_entry.songbook.name,
                                                                             num=songbook_entry.entry,
                                                                             pub=songbook_entry.songbook.publisher)
 
-            service_item.add_from_text(first_slide, "O1")
+            service_item.add_from_text(first_slide, 'O1')
         # no verse list or only 1 space (in error)
         verse_tags_translated = False
         if VerseType.from_translated_string(str(verse_list[0][0]['type'])) is not None:
@@ -631,7 +631,7 @@ class SongMediaItem(MediaManagerItem):
         if song.media_files:
             service_item.add_capability(ItemCapabilities.HasBackgroundAudio)
             service_item.background_audio = [m.file_path for m in song.media_files]
-            item.metadata.append("<em>{label}:</em> {media}".
+            item.metadata.append('<em>{label}:</em> {media}'.
                                  format(label=translate('SongsPlugin.MediaItem', 'Media'),
                                         media=service_item.background_audio))
         return True
@@ -697,22 +697,22 @@ class SongMediaItem(MediaManagerItem):
         if Settings().value('core/ccli number'):
             item.raw_footer.append(translate('SongsPlugin.MediaItem',
                                              'CCLI License: ') + Settings().value('core/ccli number'))
-        item.metadata.append("<em>{label}:</em> {title}".format(label=translate('SongsPlugin.MediaItem', 'Title'),
+        item.metadata.append('<em>{label}:</em> {title}'.format(label=translate('SongsPlugin.MediaItem', 'Title'),
                                                                 title=song.title))
         if song.alternate_title:
-            item.metadata.append("<em>{label}:</em> {title}".
+            item.metadata.append('<em>{label}:</em> {title}'.
                                  format(label=translate('SongsPlugin.MediaItem', 'Alt Title'),
                                         title=song.alternate_title))
         if song.songbook_entries:
             for songbook_entry in song.songbook_entries:
-                item.metadata.append("<em>{label}:</em> {book}/{num}/{pub}".
+                item.metadata.append('<em>{label}:</em> {book}/{num}/{pub}'.
                                      format(label=translate('SongsPlugin.MediaItem', 'Songbook'),
                                             book=songbook_entry.songbook.name,
                                             num=songbook_entry.entry,
                                             pub=songbook_entry.songbook.publisher))
         if song.topics:
             for topics in song.topics:
-                item.metadata.append("<em>{label}:</em> {topic}".
+                item.metadata.append('<em>{label}:</em> {topic}'.
                                      format(label=translate('SongsPlugin.MediaItem', 'Topic'), topic=topics.name))
         return authors_all
 

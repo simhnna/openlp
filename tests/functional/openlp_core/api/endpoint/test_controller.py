@@ -60,7 +60,7 @@ class TestController(TestCase):
         # GIVEN: A mocked service with a dummy service item
         self.mocked_live_controller.service_item = MagicMock()
         # WHEN: I trigger the method
-        controller_direction(None, "live", "next")
+        controller_direction(None, 'live', 'next')
         # THEN: The correct method is called
         self.mocked_live_controller.slidecontroller_live_next.emit.assert_called_once_with()
 
@@ -71,6 +71,6 @@ class TestController(TestCase):
         # GIVEN: A mocked service with a dummy service item
         self.mocked_live_controller.service_item = MagicMock()
         # WHEN: I trigger the method
-        controller_direction(None, "live", "previous")
+        controller_direction(None, 'live', 'previous')
         # THEN: The correct method is called
         self.mocked_live_controller.slidecontroller_live_previous.emit.assert_called_once_with()

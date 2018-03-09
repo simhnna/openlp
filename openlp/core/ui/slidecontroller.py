@@ -1392,8 +1392,8 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         Clear the preview bar.
         """
         self.preview_widget.clear_list()
-        self.toolbar.set_widget_visible("editSong", False)
-        self.toolbar.set_widget_visible("clear", False)
+        self.toolbar.set_widget_visible('editSong', False)
+        self.toolbar.set_widget_visible('"clear', False)
 
     def on_preview_add_to_service(self):
         """
