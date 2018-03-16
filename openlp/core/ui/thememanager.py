@@ -428,8 +428,8 @@ class ThemeManager(QtWidgets.QWidget, RegistryBase, Ui_ThemeManager, LogMixin, R
             self.log_exception('Export Theme Failed')
             critical_error_message_box(translate('OpenLP.ThemeManager', 'Theme Export Failed'),
                                        translate('OpenLP.ThemeManager',
-                                                 'The theme_name export failed because this error occurred: {err}')
-                                       .format(err=ose.strerror))
+                                                 'The {theme_name} export failed because this error occurred: {err}')
+                                       .format(theme_name=theme_name, err=ose.strerror))
             if theme_path.exists():
                 theme_path.rmtree(ignore_errors=True)
             return False
