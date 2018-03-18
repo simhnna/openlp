@@ -51,6 +51,9 @@ class SongsTab(SettingsTab):
         self.add_from_service_check_box = QtWidgets.QCheckBox(self.mode_group_box)
         self.add_from_service_check_box.setObjectName('add_from_service_check_box')
         self.mode_layout.addWidget(self.add_from_service_check_box)
+        self.songbook_slide_check_box = QtWidgets.QCheckBox(self.mode_group_box)
+        self.songbook_slide_check_box.setObjectName('songbook_slide_check_box')
+        self.mode_layout.addWidget(self.songbook_slide_check_box)
         self.display_songbook_check_box = QtWidgets.QCheckBox(self.mode_group_box)
         self.display_songbook_check_box.setObjectName('songbook_check_box')
         self.mode_layout.addWidget(self.display_songbook_check_box)
@@ -95,6 +98,7 @@ class SongsTab(SettingsTab):
         self.tool_bar_active_check_box.stateChanged.connect(self.on_tool_bar_active_check_box_changed)
         self.update_on_edit_check_box.stateChanged.connect(self.on_update_on_edit_check_box_changed)
         self.add_from_service_check_box.stateChanged.connect(self.on_add_from_service_check_box_changed)
+        self.songbook_slide_check_box.stateChanged.connect(self.on_songbook_slide_check_box_changed)
         self.display_songbook_check_box.stateChanged.connect(self.on_songbook_check_box_changed)
         self.display_written_by_check_box.stateChanged.connect(self.on_written_by_check_box_changed)
         self.display_copyright_check_box.stateChanged.connect(self.on_copyright_check_box_changed)
@@ -111,6 +115,8 @@ class SongsTab(SettingsTab):
         self.update_on_edit_check_box.setText(translate('SongsPlugin.SongsTab', 'Update service from song edit'))
         self.add_from_service_check_box.setText(translate('SongsPlugin.SongsTab',
                                                           'Import missing songs from Service files'))
+        self.songbook_slide_check_box.setText(translate('SongsPlugin.SongsTab',
+                                                        'Add Songbooks as first side'))
         self.display_songbook_check_box.setText(translate('SongsPlugin.SongsTab', 'Display songbook in footer'))
         self.display_written_by_check_box.setText(translate(
             'SongsPlugin.SongsTab', 'Show "Written by:" in footer for unspecified authors'))
@@ -140,6 +146,9 @@ class SongsTab(SettingsTab):
 
     def on_add_from_service_check_box_changed(self, check_state):
         self.update_load = (check_state == QtCore.Qt.Checked)
+
+    def on_songbook_slide_check_box_changed(self, check_state):
+        self.songbook_slide = (check_state == QtCore.Qt.Checked)
 
     def on_songbook_check_box_changed(self, check_state):
         self.display_songbook = (check_state == QtCore.Qt.Checked)
@@ -171,6 +180,7 @@ class SongsTab(SettingsTab):
         self.tool_bar = settings.value('display songbar')
         self.update_edit = settings.value('update service on edit')
         self.update_load = settings.value('add song from service')
+        self.songbook_slide = settings.value('add songbook slide')
         self.display_songbook = settings.value('display songbook')
         self.display_written_by = settings.value('display written by')
         self.display_copyright_symbol = settings.value('display copyright symbol')
@@ -208,6 +218,7 @@ class SongsTab(SettingsTab):
         settings.setValue('mainview chords', self.mainview_chords)
         settings.setValue('disable chords import', self.disable_chords_import)
         settings.setValue('chord notation', self.chord_notation)
+        settings.setValue('add songbook slide', self.songbook_slide)
         settings.endGroup()
         if self.tab_visited:
             self.settings_form.register_post_process('songs_config_updated')

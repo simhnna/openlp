@@ -164,7 +164,7 @@ class Song(BaseModel):
         """
         Add a Songbook Entry to the song if it not yet exists
 
-        :param songbook_name: Name of the Songbook.
+        :param songbook: Name of the Songbook.
         :param entry: Entry in the Songbook (usually a number)
         """
         for songbook_entry in self.songbook_entries:

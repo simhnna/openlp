@@ -121,6 +121,9 @@ class ItemCapabilities(object):
 
     ``HasThumbnails``
             The item has related thumbnails available
+
+    ``HasMetaData``
+            The item has Meta Data about item
     """
     CanPreview = 1
     CanEdit = 2
@@ -143,6 +146,7 @@ class ItemCapabilities(object):
     HasDisplayTitle = 19
     HasNotes = 20
     HasThumbnails = 21
+    HasMetaData = 22
 
 
 class ServiceItem(RegistryProperties):
@@ -200,6 +204,7 @@ class ServiceItem(RegistryProperties):
         self.will_auto_start = False
         self.has_original_files = True
         self._new_item()
+        self.metadata = []
 
     def _new_item(self):
         """
@@ -375,7 +380,8 @@ class ServiceItem(RegistryProperties):
             'background_audio': self.background_audio,
             'theme_overwritten': self.theme_overwritten,
             'will_auto_start': self.will_auto_start,
-            'processor': self.processor
+            'processor': self.processor,
+            'metadata': self.metadata
         }
         service_data = []
         if self.service_item_type == ServiceItemType.Text:
@@ -426,6 +432,7 @@ class ServiceItem(RegistryProperties):
         self.will_auto_start = header.get('will_auto_start', False)
         self.processor = header.get('processor', None)
         self.has_original_files = True
+        self.metadata = header.get('item_meta_data', [])
         if 'background_audio' in header:
             self.background_audio = []
             for file_path in header['background_audio']:

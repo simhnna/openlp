@@ -431,14 +431,16 @@ class TestMediaItem(TestCase, TestMixin):
         # GIVEN: A Song and a Service Item
         song = Song()
         song.title = 'My Song'
+        song.alternate_title = ''
         song.copyright = 'My copyright'
         song.authors_songs = []
         song.songbook_entries = []
         song.ccli_number = ''
+        song.topics = None
         book1 = MagicMock()
-        book1.name = "My songbook"
+        book1.name = 'My songbook'
         book2 = MagicMock()
-        book2.name = "Thy songbook"
+        book2.name = 'Thy songbook'
         song.songbookentries = []
         song.add_songbook_entry(book1, '12')
         song.add_songbook_entry(book2, '502A')

@@ -179,7 +179,6 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
         """
         Check to see if we have any media Player's available.
         """
-        log.debug('_check_available_media_players')
         controller_dir = os.path.join('core', 'ui', 'media')
         # Find all files that do not begin with '.' (lp:#1738047) and end with player.py
         glob_pattern = os.path.join(controller_dir, '[!.]*player.py')

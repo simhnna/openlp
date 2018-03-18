@@ -20,10 +20,10 @@
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from openlp.core.common.registry import Registry
-from openlp.core.api.endpoint.controller import controller_text
+from openlp.core.api.endpoint.controller import controller_text, controller_direction
 
 
 class TestController(TestCase):
@@ -42,7 +42,7 @@ class TestController(TestCase):
 
     def test_controller_text(self):
         """
-        Remote Deploy tests - test the dummy zip file is processed correctly
+        Remote API Tests : test the controller text method can be called
         """
         # GIVEN: A mocked service with a dummy service item
         self.mocked_live_controller.service_item = MagicMock()
@@ -52,3 +52,25 @@ class TestController(TestCase):
         results = ret['results']
         assert isinstance(results['item'], MagicMock)
         assert len(results['slides']) == 0
+
+    def test_controller_direction_next(self):
+        """
+        Text the live next method is triggered
+        """
+        # GIVEN: A mocked service with a dummy service item
+        self.mocked_live_controller.service_item = MagicMock()
+        # WHEN: I trigger the method
+        controller_direction(None, 'live', 'next')
+        # THEN: The correct method is called
+        self.mocked_live_controller.slidecontroller_live_next.emit.assert_called_once_with()
+
+    def test_controller_direction_previous(self):
+        """
+        Text the live next method is triggered
+        """
+        # GIVEN: A mocked service with a dummy service item
+        self.mocked_live_controller.service_item = MagicMock()
+        # WHEN: I trigger the method
+        controller_direction(None, 'live', 'previous')
+        # THEN: The correct method is called
+        self.mocked_live_controller.slidecontroller_live_previous.emit.assert_called_once_with()
