@@ -259,8 +259,8 @@ class CustomMediaItem(MediaManagerItem):
         old_custom_slide = self.plugin.db_manager.get_object(CustomSlide, item_id)
         new_custom_slide = CustomSlide()
         new_custom_slide.title = '{title} <{text}>'.format(title=old_custom_slide.title,
-                                                           text=translate('SongsPlugin.MediaItem',
-                                                                          'copy', 'For song cloning'))
+                                                           text=translate('CustomPlugin.MediaItem',
+                                                                          'copy', 'For item cloning'))
         new_custom_slide.text = old_custom_slide.text
         new_custom_slide.credits = old_custom_slide.credits
         new_custom_slide.theme_name = old_custom_slide.theme_name
