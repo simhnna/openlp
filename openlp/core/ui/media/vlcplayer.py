@@ -64,7 +64,6 @@ def get_vlc():
 
     :return: The "vlc" module, or None
     """
-    print("get vlc")
     if 'openlp.core.ui.media.vendor.vlc' in sys.modules:
         # If VLC has already been imported, no need to do all the stuff below again
         is_vlc_available = False
@@ -72,7 +71,6 @@ def get_vlc():
             is_vlc_available = bool(sys.modules['openlp.core.ui.media.vendor.vlc'].get_default_instance())
         except:
             pass
-        print(is_vlc_available)
         if is_vlc_available:
             return sys.modules['openlp.core.ui.media.vendor.vlc']
         else:

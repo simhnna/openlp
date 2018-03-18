@@ -459,26 +459,16 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
         log.debug('use %s controller' % self.current_media_players[controller.controller_type].display_name)
         return True
 
-    def media_length(self, service_item):
+    @staticmethod
+    def media_length(service_item):
         """
-        Loads and starts a media item to obtain the media length
+        Uses Media Info to obtain the media length
 
         :param service_item: The ServiceItem containing the details to be played.
         """
         media_info = MediaInfo()
         media_info.volume = 0
         media_info.file_info = QtCore.QFileInfo(service_item.get_frame_path())
-        # display = controller.preview_display
-        suffix = '*.%s' % media_info.file_info.suffix().lower()
-        used_players = get_media_players()[0]
-        player = self.media_players[used_players[0]]
-        if suffix not in player.video_extensions_list and suffix not in player.audio_extensions_list:
-            # Media could not be loaded correctly
-            critical_error_message_box(
-                translate('MediaPlugin.MediaItem', 'Unsupported Media File'),
-                translate('MediaPlugin.MediaItem', 'File {file_path} not supported using player {player_name}'
-                          ).format(file_path=service_item.get_frame_path(), player_name=used_players[0]))
-            return False
         media_data = MediaInfoWrapper.parse(service_item.get_frame_path())
         # duration returns in milli seconds
         service_item.set_media_length(media_data.tracks[0].duration)
@@ -573,16 +563,6 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
                 if not title:
                     continue
                 player = self.media_players[title]
-                # The system player may not return what files it can play so add it now
-                #  and check whether it can play the file later
-                if title == 'system':
-                    if not controller.media_info.is_background or controller.media_info.is_background and \
-                            player.can_background:
-                        self.resize(display, player)
-                        if player.load(display):
-                            self.current_media_players[controller.controller_type] = player
-                            controller.media_info.media_type = MediaType.Video
-                            return True
                 if suffix in player.video_extensions_list:
                     if not controller.media_info.is_background or controller.media_info.is_background and \
                             player.can_background:
