@@ -64,9 +64,19 @@ def get_vlc():
 
     :return: The "vlc" module, or None
     """
+    print("get vlc")
     if 'openlp.core.ui.media.vendor.vlc' in sys.modules:
         # If VLC has already been imported, no need to do all the stuff below again
-        return sys.modules['openlp.core.ui.media.vendor.vlc']
+        is_vlc_available = False
+        try:
+            is_vlc_available = bool(sys.modules['openlp.core.ui.media.vendor.vlc'].get_default_instance())
+        except:
+            pass
+        print(is_vlc_available)
+        if is_vlc_available:
+            return sys.modules['openlp.core.ui.media.vendor.vlc']
+        else:
+            return None
     is_vlc_available = False
     try:
         if is_macosx():
@@ -89,6 +99,7 @@ def get_vlc():
     except (ImportError, NameError, NotImplementedError):
         pass
     except OSError as e:
+        # this will get raised the first time
         if is_win():
             if not isinstance(e, WindowsError) and e.winerror != 126:
                 raise
