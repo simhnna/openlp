@@ -86,7 +86,6 @@ class OpenLP(QtWidgets.QApplication):
         # On Linux and FreeBSD, in order to set the WM_CLASS property for X11, we pass "OpenLP" in as a command line
         # argument. This interferes with files being passed in as command line arguments, so we remove it from the list.
         if 'OpenLP' in args:
-            print("remove2")
             args.remove('OpenLP')
         self.args.extend(args)
         # Decide how many screens we have and their size
@@ -139,15 +138,10 @@ class OpenLP(QtWidgets.QApplication):
     @staticmethod
     def is_already_running():
         """
-        Look to see if OpenLP is already running and ask if a 2nd instance is to be started.
+        Tell the user there is a 2nd instance running.
         """
-        status = QtWidgets.QMessageBox.critical(None, UiStrings().Error, UiStrings().OpenLPStart,
-                                                QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                      QtWidgets.QMessageBox.No))
-        if status == QtWidgets.QMessageBox.No:
-            return True
-        return False
-
+        QtWidgets.QMessageBox.critical(None, UiStrings().Error, UiStrings().OpenLPStart,
+                                       QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
     @staticmethod
     def is_data_path_missing():
         """
@@ -383,6 +377,7 @@ def main(args=None):
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     server = Server()
     if server.is_another_instance_running():
+        application.is_already_running()
         server.post_to_server(qt_args)
         sys.exit()
     else:

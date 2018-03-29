@@ -42,12 +42,9 @@ class Server(QtCore.QObject, LogMixin):
         return self._outSocket.waitForConnected()
 
     def post_to_server(self, args):
-        print(args)
         if 'OpenLP' in args:
-            print("remove1")
             args.remove('OpenLP')
         # Yes, there is.
-        print("isRunning")
         self._outStream = QtCore.QTextStream(self._outSocket)
         self._outStream.setCodec('UTF-8')
         self._outSocket.write(str.encode("".join(args)))
@@ -58,7 +55,6 @@ class Server(QtCore.QObject, LogMixin):
 
     def start_server(self):
             # No, there isn't.
-            print("No it is not")
             self._outSocket = None
             self._outStream = None
             self._inSocket = None
@@ -99,4 +95,5 @@ class Server(QtCore.QObject, LogMixin):
         """
         if self._server:
             self._server.close()
+        # Make sure the server file is removed.
         QtNetwork.QLocalServer.removeServer(self._id)
