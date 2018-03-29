@@ -142,6 +142,7 @@ class OpenLP(QtWidgets.QApplication):
         """
         QtWidgets.QMessageBox.critical(None, UiStrings().Error, UiStrings().OpenLPStart,
                                        QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
+
     @staticmethod
     def is_data_path_missing():
         """
@@ -293,8 +294,7 @@ def parse_options(args=None):
     parser.add_argument('-l', '--log-level', dest='loglevel', default='warning', metavar='LEVEL',
                         help='Set logging to LEVEL level. Valid values are "debug", "info", "warning".')
     parser.add_argument('-p', '--portable', dest='portable', action='store_true',
-                        help='Specify if this should be run as a portable app, '
-                             'off a USB flash drive (not implemented).')
+                        help='Specify if this should be run as a portable app, ')
     parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_true',
                         help='Turn off the Web and Socket Server ')
     parser.add_argument('rargs', nargs='?', default=[])
