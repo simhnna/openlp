@@ -70,7 +70,7 @@ class Server(QtCore.QObject, LogMixin):
         self.in_socket = None
         self.in_stream = None
         self.server = QtNetwork.QLocalServer()
-        self.server.listen(self._id)
+        self.server.listen(self.id)
         self.server.newConnection.connect(self._on_new_connection)
         return True
 

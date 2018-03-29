@@ -19,44 +19,42 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-import sys
-from unittest import TestCase, skip
+from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from PyQt5 import QtCore, QtWidgets
-
-from openlp.core.app import OpenLP, parse_options
-from openlp.core.common.settings import Settings
 from openlp.core.server import Server
-from tests.utils.constants import RESOURCE_PATH
+from openlp.core.common.registry import Registry
+
 from tests.helpers.testmixin import TestMixin
 
 
 class TestServer(TestCase, TestMixin):
     """
-    Test the OpenLP app class
+    Test the Server Class used to check if OpenLP is running.
     """
     def setUp(self):
-        #self.setup_application()
-        #self.build_settings()
-        #self.openlp = OpenLP([])
+        Registry.create()
+        # self.setup_application()
+        # self.build_settings()
+        # self.openlp = OpenLP([])
         with patch('PyQt5.QtNetwork.QLocalSocket'):
             self.server = Server()
 
     def tearDown(self):
-        #self.destroy_settings()
-        #del self.openlp
-        #self.openlp = None
+        # self.destroy_settings()
+        # del self.openlp
+        # self.openlp = None
         self.server.close_server()
-        pass
 
     def test_is_another_instance_running(self):
         """
         Run a test as if this was the first time and no instance is running
         """
         # GIVEN: A running Server
+
         # WHEN: I ask for it to start
         value = self.server.is_another_instance_running()
+
         # THEN the following is called
         self.server.out_socket.waitForConnected.assert_called_once_with()
         self.server.out_socket.connectToServer.assert_called_once_with(self.server.id)
@@ -68,9 +66,55 @@ class TestServer(TestCase, TestMixin):
         """
         # GIVEN: A running Server
         self.server.out_socket.waitForConnected.return_value = True
+
         # WHEN: I ask for it to start
         value = self.server.is_another_instance_running()
+
         # THEN the following is called
         self.server.out_socket.waitForConnected.assert_called_once_with()
         self.server.out_socket.connectToServer.assert_called_once_with(self.server.id)
         assert value is True
+
+    def test_on_read_ready(self):
+        """
+        Test the on_read_ready method calls the service_manager
+        """
+        # GIVEN: A server with a service manager
+        self.server.in_stream = MagicMock()
+        service_manager = MagicMock()
+        Registry().register('service_manager', service_manager)
+
+        # WHEN: a file is added to the socket and the method called
+        file_name = '\\home\\superfly\\'
+        self.server.in_stream.readLine.return_value = file_name
+        self.server._on_ready_read()
+
+        # THEN: the service will be loaded
+        assert service_manager.on_load_service_clicked.call_count == 1
+        service_manager.on_load_service_clicked.assert_called_once_with(file_name)
+
+    @patch("PyQt5.QtCore.QTextStream")
+    def test_post_to_server(self, mocked_stream):
+        """
+        A Basic test with a post to the service
+        :return:
+        """
+        # GIVEN: A server
+        # WHEN: I post to a server
+        self.server.post_to_server(['l', 'a', 'm', 'a', 's'])
+
+        # THEN: the file should be passed out to the socket
+        self.server.out_socket.write.assert_called_once_with(b'lamas')
+
+    @patch("PyQt5.QtCore.QTextStream")
+    def test_post_to_server_openlp(self, mocked_stream):
+        """
+        A Basic test with a post to the service with OpenLP
+        :return:
+        """
+        # GIVEN: A server
+        # WHEN: I post to a server
+        self.server.post_to_server(['l', 'a', 'm', 'a', 's', 'OpenLP'])
+
+        # THEN: the file should be passed out to the socket
+        self.server.out_socket.write.assert_called_once_with(b'lamas')
