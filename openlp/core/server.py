@@ -19,10 +19,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-
-
-from PyQt5 import QtCore
-from PyQt5 import QtNetwork
+from PyQt5 import QtCore, QtNetwork
 
 from openlp.core.common.registry import Registry
 from openlp.core.common.mixins import LogMixin
@@ -33,35 +30,38 @@ class Server(QtCore.QObject, LogMixin):
     The local server to handle OpenLP running in more than one instance and allows file
     handles to be transferred from the new to the existing one.
     """
+    def __init__(self):
+        super(Server, self).__init__()
+        self.out_socket = QtNetwork.QLocalSocket()
+        self.server = None
+        self.id = 'OpenLPDual'
 
     def is_another_instance_running(self):
-        self._id = 'OpenLPDual'
         # Is there another instance running?
-        self._outSocket = QtNetwork.QLocalSocket()
-        self._outSocket.connectToServer(self._id)
-        return self._outSocket.waitForConnected()
+        self.out_socket.connectToServer(self.id)
+        return self.out_socket.waitForConnected()
 
     def post_to_server(self, args):
         if 'OpenLP' in args:
             args.remove('OpenLP')
         # Yes, there is.
-        self._outStream = QtCore.QTextStream(self._outSocket)
-        self._outStream.setCodec('UTF-8')
-        self._outSocket.write(str.encode("".join(args)))
-        if not self._outSocket.waitForBytesWritten(10):
-            raise Exception(str(self._outSocket.errorString()))
-        self._outSocket.disconnectFromServer()
+        self.out_stream = QtCore.QTextStream(self.out_socket)
+        self.out_stream.setCodec('UTF-8')
+        self.out_socket.write(str.encode("".join(args)))
+        if not self.out_socket.waitForBytesWritten(10):
+            raise Exception(str(self.out_socket.errorString()))
+        self.out_socket.disconnectFromServer()
         return False
 
     def start_server(self):
             # No, there isn't.
-            self._outSocket = None
-            self._outStream = None
-            self._inSocket = None
-            self._inStream = None
-            self._server = QtNetwork.QLocalServer()
-            self._server.listen(self._id)
-            self._server.newConnection.connect(self._on_new_connection)
+            self.out_socket = None
+            self.out_stream = None
+            self.in_socket = None
+            self.in_stream = None
+            self.server = QtNetwork.QLocalServer()
+            self.server.listen(self._id)
+            self.server.newConnection.connect(self._on_new_connection)
             return True
 
     def _on_new_connection(self):
@@ -69,21 +69,21 @@ class Server(QtCore.QObject, LogMixin):
         Handle a new connection to the server
         :return:
         """
-        if self._inSocket:
-            self._inSocket.readyRead.disconnect(self._on_ready_read)
-        self._inSocket = self._server.nextPendingConnection()
-        if not self._inSocket:
+        if self.in_socket:
+            self.in_socket.readyRead.disconnect(self._on_ready_read)
+        self.in_socket = self.server.nextPendingConnection()
+        if not self.in_socket:
             return
-        self._inStream = QtCore.QTextStream(self._inSocket)
-        self._inStream.setCodec('UTF-8')
-        self._inSocket.readyRead.connect(self._on_ready_read)
+        self.in_stream = QtCore.QTextStream(self.in_socket)
+        self.in_stream.setCodec('UTF-8')
+        self.in_socket.readyRead.connect(self._on_ready_read)
 
     def _on_ready_read(self):
         """
         Read a record passed to the server and load a service
         :return:
         """
-        msg = self._inStream.readLine()
+        msg = self.in_stream.readLine()
         if msg:
             self.log_debug("socket msg = " + msg)
             Registry().get('service_manager').on_load_service_clicked(msg)
@@ -93,7 +93,7 @@ class Server(QtCore.QObject, LogMixin):
         Shutdown to local socket server and make sure the server is removed.
         :return:
         """
-        if self._server:
-            self._server.close()
+        if self.server:
+            self.server.close()
         # Make sure the server file is removed.
-        QtNetwork.QLocalServer.removeServer(self._id)
+        QtNetwork.QLocalServer.removeServer(self.id)
