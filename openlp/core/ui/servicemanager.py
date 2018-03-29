@@ -434,6 +434,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
 
         :param load_file: The service file to the loaded.  Will be None is from menu so selection will be required.
         """
+        print(load_file)
         if self.is_modified():
             result = self.save_modified_service()
             if result == QtWidgets.QMessageBox.Cancel:
