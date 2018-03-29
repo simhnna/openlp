@@ -51,9 +51,26 @@ class TestServer(TestCase, TestMixin):
         pass
 
     def test_is_another_instance_running(self):
+        """
+        Run a test as if this was the first time and no instance is running
+        """
         # GIVEN: A running Server
         # WHEN: I ask for it to start
-        self.server.is_another_instance_running()
+        value = self.server.is_another_instance_running()
         # THEN the following is called
         self.server.out_socket.waitForConnected.assert_called_once_with()
         self.server.out_socket.connectToServer.assert_called_once_with(self.server.id)
+        assert isinstance(value, MagicMock)
+
+    def test_is_another_instance_running_true(self):
+        """
+        Run a test as if there is another instance running
+        """
+        # GIVEN: A running Server
+        self.server.out_socket.waitForConnected.return_value = True
+        # WHEN: I ask for it to start
+        value = self.server.is_another_instance_running()
+        # THEN the following is called
+        self.server.out_socket.waitForConnected.assert_called_once_with()
+        self.server.out_socket.connectToServer.assert_called_once_with(self.server.id)
+        assert value is True

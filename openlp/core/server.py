@@ -37,11 +37,19 @@ class Server(QtCore.QObject, LogMixin):
         self.id = 'OpenLPDual'
 
     def is_another_instance_running(self):
+        """
+        Check the see if an other instance is running
+        :return: True of False
+        """
         # Is there another instance running?
         self.out_socket.connectToServer(self.id)
         return self.out_socket.waitForConnected()
 
     def post_to_server(self, args):
+        """
+        Post the file name to the over instance
+        :param args: The passed arguments including maybe a file name
+        """
         if 'OpenLP' in args:
             args.remove('OpenLP')
         # Yes, there is.
@@ -51,18 +59,20 @@ class Server(QtCore.QObject, LogMixin):
         if not self.out_socket.waitForBytesWritten(10):
             raise Exception(str(self.out_socket.errorString()))
         self.out_socket.disconnectFromServer()
-        return False
 
     def start_server(self):
-            # No, there isn't.
-            self.out_socket = None
-            self.out_stream = None
-            self.in_socket = None
-            self.in_stream = None
-            self.server = QtNetwork.QLocalServer()
-            self.server.listen(self._id)
-            self.server.newConnection.connect(self._on_new_connection)
-            return True
+        """
+        Start the socket server to allow inter app communication
+        :return:
+        """
+        self.out_socket = None
+        self.out_stream = None
+        self.in_socket = None
+        self.in_stream = None
+        self.server = QtNetwork.QLocalServer()
+        self.server.listen(self._id)
+        self.server.newConnection.connect(self._on_new_connection)
+        return True
 
     def _on_new_connection(self):
         """
@@ -80,7 +90,7 @@ class Server(QtCore.QObject, LogMixin):
 
     def _on_ready_read(self):
         """
-        Read a record passed to the server and load a service
+        Read a record passed to the server and pass to the service manager to handle
         :return:
         """
         msg = self.in_stream.readLine()
