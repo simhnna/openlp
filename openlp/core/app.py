@@ -383,10 +383,8 @@ def main(args=None):
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
     server = Server()
     if server.is_another_instance_running():
-        if server.is_already_running():
-            server.post_to_server(qt_args)
-            server.close_server()
-            sys.exit()
+        server.post_to_server(qt_args)
+        sys.exit()
     else:
         server.start_server()
         application.server = server

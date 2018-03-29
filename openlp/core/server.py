@@ -24,6 +24,7 @@
 from PyQt5 import QtCore
 from PyQt5 import QtNetwork
 
+from openlp.core.common.registry import Registry
 from openlp.core.common.mixins import LogMixin
 
 
@@ -86,16 +87,16 @@ class Server(QtCore.QObject, LogMixin):
         Read a record passed to the server and load a service
         :return:
         """
-        while True:
-            msg = self._inStream.readLine()
-            if msg:
-                self.log_debug("socket msg = " + msg)
-                Registry().get('service_manager').on_load_service_clicked(msg)
+        msg = self._inStream.readLine()
+        if msg:
+            self.log_debug("socket msg = " + msg)
+            Registry().get('service_manager').on_load_service_clicked(msg)
 
     def close_server(self):
         """
-        Shutdown to local socket server
+        Shutdown to local socket server and make sure the server is removed.
         :return:
         """
         if self._server:
             self._server.close()
+        QtNetwork.QLocalServer.removeServer(self._id)
