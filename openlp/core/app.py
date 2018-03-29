@@ -295,8 +295,6 @@ def parse_options(args=None):
     parser.add_argument('-p', '--portable', dest='portable', action='store_true',
                         help='Specify if this should be run as a portable app, '
                              'off a USB flash drive (not implemented).')
-    parser.add_argument('-d', '--dev-version', dest='dev_version', action='store_true',
-                        help='Ignore the version file and pull the version directly from Bazaar')
     parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_true',
                         help='Turn off the Web and Socket Server ')
     parser.add_argument('rargs', nargs='?', default=[])
