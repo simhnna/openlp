@@ -44,6 +44,7 @@ class TestInit(TestCase, TestMixin):
         Registry().create()
         Registry().register('service_list', MagicMock())
         self.build_settings()
+        self.password = 'c3VwZXJmbHk6bGFtYXM='
 
     def tearDown(self):
         self.destroy_settings()
@@ -58,7 +59,7 @@ class TestInit(TestCase, TestMixin):
         Settings().setValue('api/password', "lamas")
 
         # WHEN : I check the authorisation
-        is_valid = check_auth(['aaaaa', 'c3VwZXJmbHk6bGFtYXM='])
+        is_valid = check_auth(['aaaaa', self.password])
 
         # THEN:
         assert is_valid is True
@@ -103,11 +104,48 @@ class TestInit(TestCase, TestMixin):
 
         # WHEN: I call the function
         wrapped_function = requires_auth(func)
-        value = wrapped_function(['a'])
+        req = MagicMock()
+        value = wrapped_function(req)
 
         # THEN: the result will be as expected
         assert str(value) == str(authenticate())
 
+    def test_requires_auth_enabled_auth_error(self):
+        """
+        Test the requires_auth wrapper with enabled security and authorization taken place and and error
+        :return:
+        """
+        # GIVEN: A enabled security
+        Settings().setValue('api/authentication enabled', True)
 
-def func():
+        # WHEN: I call the function with the wrong password
+        wrapped_function = requires_auth(func)
+        req = MagicMock()
+        req.authorization = ['Basic', 'cccccccc']
+        value = wrapped_function(req)
+
+        # THEN: the result will be as expected - try again
+        assert str(value) == str(authenticate())
+
+    def test_requires_auth_enabled_auth(self):
+        """
+        Test the requires_auth wrapper with enabled security and authorization taken place and and error
+        :return:
+        """
+        # GIVEN: An enabled security and a known user
+        Settings().setValue('api/authentication enabled', True)
+        Settings().setValue('api/user id', 'superfly')
+        Settings().setValue('api/password', 'lamas')
+
+        # WHEN: I call the function with the wrong password
+        wrapped_function = requires_auth(func)
+        req = MagicMock()
+        req.authorization = ['Basic', self.password]
+        value = wrapped_function(req)
+
+        # THEN: the result will be as expected - try again
+        assert str(value) == 'called'
+
+
+def func(field=None):
     return 'called'
