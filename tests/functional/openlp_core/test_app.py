@@ -41,7 +41,6 @@ def test_parse_options_basic():
     args = parse_options()
 
     # THEN: the following fields will have been extracted.
-    assert args.dev_version is False, 'The dev_version flag should be False'
     assert args.loglevel == 'warning', 'The log level should be set to warning'
     assert args.no_error_form is False, 'The no_error_form should be set to False'
     assert args.portable is False, 'The portable flag should be set to false'
@@ -59,7 +58,6 @@ def test_parse_options_debug():
     args = parse_options()
 
     # THEN: the following fields will have been extracted.
-    assert args.dev_version is False, 'The dev_version flag should be False'
     assert args.loglevel == ' debug', 'The log level should be set to debug'
     assert args.no_error_form is False, 'The no_error_form should be set to False'
     assert args.portable is False, 'The portable flag should be set to false'
@@ -77,7 +75,6 @@ def test_parse_options_debug_and_portable():
     args = parse_options()
 
     # THEN: the following fields will have been extracted.
-    assert args.dev_version is False, 'The dev_version flag should be False'
     assert args.loglevel == 'warning', 'The log level should be set to warning'
     assert args.no_error_form is False, 'The no_error_form should be set to False'
     assert args.portable is True, 'The portable flag should be set to true'
@@ -89,16 +86,15 @@ def test_parse_options_all_no_file():
     Test the parse options process works with two options
     """
     # GIVEN: a a set of system arguments.
-    sys.argv[1:] = ['-l debug', '-d']
+    sys.argv[1:] = ['-l debug', '-p']
 
     # WHEN: We we parse them to expand to options
     args = parse_options()
 
     # THEN: the following fields will have been extracted.
-    assert args.dev_version is True, 'The dev_version flag should be True'
     assert args.loglevel == ' debug', 'The log level should be set to debug'
     assert args.no_error_form is False, 'The no_error_form should be set to False'
-    assert args.portable is False, 'The portable flag should be set to false'
+    assert args.portable is True, 'The portable flag should be set to false'
     assert args.rargs == [], 'The service file should be blank'
 
 
@@ -113,7 +109,6 @@ def test_parse_options_file():
     args = parse_options()
 
     # THEN: the following fields will have been extracted.
-    assert args.dev_version is False, 'The dev_version flag should be False'
     assert args.loglevel == 'warning', 'The log level should be set to warning'
     assert args.no_error_form is False, 'The no_error_form should be set to False'
     assert args.portable is False, 'The portable flag should be set to false'
@@ -131,7 +126,6 @@ def test_parse_options_file_and_debug():
     args = parse_options()
 
     # THEN: the following fields will have been extracted.
-    assert args.dev_version is False, 'The dev_version flag should be False'
     assert args.loglevel == ' debug', 'The log level should be set to debug'
     assert args.no_error_form is False, 'The no_error_form should be set to False'
     assert args.portable is False, 'The portable flag should be set to false'

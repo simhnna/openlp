@@ -38,7 +38,6 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common import is_macosx, is_win
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import LanguageManager, UiStrings, translate
-from openlp.core.common.mixins import LogMixin
 from openlp.core.common.path import create_paths, copytree
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -50,6 +49,7 @@ from openlp.core.ui.firsttimeform import FirstTimeForm
 from openlp.core.ui.firsttimelanguageform import FirstTimeLanguageForm
 from openlp.core.ui.mainwindow import MainWindow
 from openlp.core.ui.style import get_application_stylesheet
+from openlp.core.server import Server
 from openlp.core.version import check_for_update, get_version
 
 __all__ = ['OpenLP', 'main']
@@ -58,7 +58,7 @@ __all__ = ['OpenLP', 'main']
 log = logging.getLogger()
 
 
-class OpenLP(QtWidgets.QApplication, LogMixin):
+class OpenLP(QtWidgets.QApplication):
     """
     The core application class. This class inherits from Qt's QApplication
     class in order to provide the core of the application.
@@ -72,7 +72,7 @@ class OpenLP(QtWidgets.QApplication, LogMixin):
         """
         self.is_event_loop_active = True
         result = QtWidgets.QApplication.exec()
-        self.shared_memory.detach()
+        self.server.close_server()
         return result
 
     def run(self, args):
@@ -135,23 +135,16 @@ class OpenLP(QtWidgets.QApplication, LogMixin):
         self.main_window.app_startup()
         return self.exec()
 
-    def is_already_running(self):
+    @staticmethod
+    def is_already_running():
         """
-        Look to see if OpenLP is already running and ask if a 2nd instance is to be started.
+        Tell the user there is a 2nd instance running.
         """
-        self.shared_memory = QtCore.QSharedMemory('OpenLP')
-        if self.shared_memory.attach():
-            status = QtWidgets.QMessageBox.critical(None, UiStrings().Error, UiStrings().OpenLPStart,
-                                                    QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Yes |
-                                                                                          QtWidgets.QMessageBox.No))
-            if status == QtWidgets.QMessageBox.No:
-                return True
-            return False
-        else:
-            self.shared_memory.create(1)
-            return False
+        QtWidgets.QMessageBox.critical(None, UiStrings().Error, UiStrings().OpenLPStart,
+                                       QtWidgets.QMessageBox.StandardButtons(QtWidgets.QMessageBox.Ok))
 
-    def is_data_path_missing(self):
+    @staticmethod
+    def is_data_path_missing():
         """
         Check if the data folder path exists.
         """
@@ -301,10 +294,7 @@ def parse_options(args=None):
     parser.add_argument('-l', '--log-level', dest='loglevel', default='warning', metavar='LEVEL',
                         help='Set logging to LEVEL level. Valid values are "debug", "info", "warning".')
     parser.add_argument('-p', '--portable', dest='portable', action='store_true',
-                        help='Specify if this should be run as a portable app, '
-                             'off a USB flash drive (not implemented).')
-    parser.add_argument('-d', '--dev-version', dest='dev_version', action='store_true',
-                        help='Ignore the version file and pull the version directly from Bazaar')
+                        help='Specify if this should be run as a portable app, ')
     parser.add_argument('-w', '--no-web-server', dest='no_web_server', action='store_true',
                         help='Turn off the Web and Socket Server ')
     parser.add_argument('rargs', nargs='?', default=[])
@@ -383,11 +373,17 @@ def main(args=None):
     Registry().set_flag('no_web_server', args.no_web_server)
     application.setApplicationVersion(get_version()['version'])
     # Check if an instance of OpenLP is already running. Quit if there is a running instance and the user only wants one
-    if application.is_already_running():
+    server = Server()
+    if server.is_another_instance_running():
+        application.is_already_running()
+        server.post_to_server(qt_args)
         sys.exit()
+    else:
+        server.start_server()
+        application.server = server
     # If the custom data path is missing and the user wants to restore the data path, quit OpenLP.
     if application.is_data_path_missing():
-        application.shared_memory.detach()
+        server.close_server()
         sys.exit()
     # Upgrade settings.
     settings = Settings()

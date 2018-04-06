@@ -415,7 +415,7 @@ class UiStrings(object):
         self.NoResults = translate('OpenLP.Ui', 'No Search Results')
         self.OpenLP = translate('OpenLP.Ui', 'OpenLP')
         self.OpenLPv2AndUp = translate('OpenLP.Ui', 'OpenLP 2.0 and up')
-        self.OpenLPStart = translate('OpenLP.Ui', 'OpenLP is already running. Do you wish to continue?')
+        self.OpenLPStart = translate('OpenLP.Ui', 'OpenLP is already running on this machine. \nClosing this instance')
         self.OpenService = translate('OpenLP.Ui', 'Open service.')
         self.OptionalShowInFooter = translate('OpenLP.Ui', 'Optional, this will be displayed in footer.')
         self.OptionalHideInFooter = translate('OpenLP.Ui', 'Optional, this won\'t be displayed in footer.')
