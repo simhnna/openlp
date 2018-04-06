@@ -136,48 +136,12 @@ def get_version():
     global APPLICATION_VERSION
     if APPLICATION_VERSION:
         return APPLICATION_VERSION
-    if '--dev-version' in sys.argv or '-d' in sys.argv:
-        # NOTE: The following code is a duplicate of the code in setup.py. Any fix applied here should also be applied
-        # there.
-
-        # Get the revision of this tree.
-        bzr = Popen(('bzr', 'revno'), stdout=PIPE)
-        tree_revision, error = bzr.communicate()
-        tree_revision = tree_revision.decode()
-        code = bzr.wait()
-        if code != 0:
-            raise Exception('Error running bzr log')
-
-        # Get all tags.
-        bzr = Popen(('bzr', 'tags'), stdout=PIPE)
-        output, error = bzr.communicate()
-        code = bzr.wait()
-        if code != 0:
-            raise Exception('Error running bzr tags')
-        tags = list(map(bytes.decode, output.splitlines()))
-        if not tags:
-            tag_version = '0.0.0'
-            tag_revision = '0'
-        else:
-            # Remove any tag that has "?" as revision number. A "?" as revision number indicates, that this tag is from
-            # another series.
-            tags = [tag for tag in tags if tag.split()[-1].strip() != '?']
-            # Get the last tag and split it in a revision and tag name.
-            tag_version, tag_revision = tags[-1].split()
-        # If they are equal, then this tree is tarball with the source for the release. We do not want the revision
-        # number in the full version.
-        if tree_revision == tag_revision:
-            full_version = tag_version.strip()
-        else:
-            full_version = '{tag}-bzr{tree}'.format(tag=tag_version.strip(), tree=tree_revision.strip())
-    else:
-        # We're not running the development version, let's use the file.
-        file_path = AppLocation.get_directory(AppLocation.VersionDir) / '.version'
-        try:
-            full_version = file_path.read_text().rstrip()
-        except OSError:
-            log.exception('Error in version file.')
-            full_version = '0.0.0-bzr000'
+    file_path = AppLocation.get_directory(AppLocation.VersionDir) / '.version'
+    try:
+        full_version = file_path.read_text().rstrip()
+    except OSError:
+        log.exception('Error in version file.')
+        full_version = '0.0.0-bzr000'
     bits = full_version.split('-')
     APPLICATION_VERSION = {
         'full': full_version,
