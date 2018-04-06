@@ -34,16 +34,10 @@ class TestServer(TestCase, TestMixin):
     """
     def setUp(self):
         Registry.create()
-        # self.setup_application()
-        # self.build_settings()
-        # self.openlp = OpenLP([])
         with patch('PyQt5.QtNetwork.QLocalSocket'):
             self.server = Server()
 
     def tearDown(self):
-        # self.destroy_settings()
-        # del self.openlp
-        # self.openlp = None
         self.server.close_server()
 
     def test_is_another_instance_running(self):
