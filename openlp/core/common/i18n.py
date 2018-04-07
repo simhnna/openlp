@@ -560,7 +560,7 @@ import qtawesome as qta
 
 class UiIcons(object):
     """
-    Provide standard strings for objects to use.
+    Provide standard icons for objects to use.
     """
     __instance__ = None
 
@@ -574,9 +574,16 @@ class UiIcons(object):
 
     def __init__(self):
         """
-        These strings should need a good reason to be retranslated elsewhere.
-        Should some/more/less of these have an &amp; attached?
+        These are the font icons used in the code.
         """
+        self.clone = qta.icon('fa.clone')
         self.database = qta.icon('fa.database')
+        self.delete = qta.icon('fa.trash')
+        self.edit = qta.icon('fa.edit')
+        self.download = qta.icon('fa.download')
+        self.music = qta.icon('fa.music')
+        self.new = qta.icon('fa.file')
+        self.print = qta.icon('fa.print')
         self.save = qta.icon('fa.save')
-        #self.images = qta.icon('fa.images')
+        self.upload = qta.icon('fa.upload')
+        #self.video = qta.icon('fa.video')

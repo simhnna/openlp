@@ -33,7 +33,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.common.actions import ActionList
-from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.i18n import UiStrings, UiIcons, translate
 from openlp.core.common.registry import Registry
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
@@ -92,7 +92,7 @@ class SongsPlugin(Plugin):
         super(SongsPlugin, self).__init__('songs', __default_settings__, SongMediaItem, SongsTab)
         self.manager = Manager('songs', init_schema, upgrade_mod=upgrade)
         self.weight = -10
-        self.icon_path = ':/plugins/plugin_songs.png'
+        self.icon_path = UiIcons().music
         self.icon = build_icon(self.icon_path)
         self.songselect_form = None
         register_endpoint(songs_endpoint)

@@ -137,7 +137,7 @@ class Ui_ServiceManager(object):
         self.layout.setContentsMargins(0, 0, 0, 0)
         # Create the top toolbar
         self.toolbar = OpenLPToolbar(self)
-        self.toolbar.add_toolbar_action('newService', text=UiStrings().NewService, icon=':/general/general_new.png',
+        self.toolbar.add_toolbar_action('newService', text=UiStrings().NewService, icon=UiIcons().new,
                                         tooltip=UiStrings().CreateService, triggers=self.on_new_service_clicked)
         self.toolbar.add_toolbar_action('openService', text=UiStrings().OpenService,
                                         icon=':/general/general_open.png',

@@ -64,7 +64,7 @@ class Ui_AlertDialog(object):
         self.manage_button_layout = QtWidgets.QVBoxLayout()
         self.manage_button_layout.setObjectName('manage_button_layout')
         self.new_button = QtWidgets.QPushButton(alert_dialog)
-        self.new_button.setIcon(build_icon(':/general/general_new.png'))
+        self.new_button.setIcon(build_icon(UiIcons().new))
         self.new_button.setObjectName('new_button')
         self.manage_button_layout.addWidget(self.new_button)
         self.save_button = QtWidgets.QPushButton(alert_dialog)

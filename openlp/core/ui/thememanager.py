@@ -30,7 +30,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import delete_file
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.common.i18n import UiStrings, UiIcons, translate, get_locale_key
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, copyfile, create_paths, path_to_str
 from openlp.core.common.registry import Registry, RegistryBase
@@ -79,12 +79,12 @@ class Ui_ThemeManager(object):
         self.toolbar.addSeparator()
         self.toolbar.add_toolbar_action('importTheme',
                                         text=translate('OpenLP.ThemeManager', 'Import Theme'),
-                                        icon=':/general/general_import.png',
+                                        icon=build_icon(UiIcons().upload),
                                         tooltip=translate('OpenLP.ThemeManager', 'Import a theme.'),
                                         triggers=self.on_import_theme)
         self.toolbar.add_toolbar_action('exportTheme',
                                         text=translate('OpenLP.ThemeManager', 'Export Theme'),
-                                        icon=':/general/general_export.png',
+                                        icon=build_icon(UiIcons().download),
                                         tooltip=translate('OpenLP.ThemeManager', 'Export a theme.'),
                                         triggers=self.on_export_theme)
         self.layout.addWidget(self.toolbar)

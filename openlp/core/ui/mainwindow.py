@@ -165,7 +165,7 @@ class Ui_MainWindow(object):
         # Create the menu items
         action_list = ActionList.get_instance()
         action_list.add_category(UiStrings().File, CategoryOrder.standard_menu)
-        self.file_new_item = create_action(main_window, 'fileNewItem', icon=':/general/general_new.png',
+        self.file_new_item = create_action(main_window, 'fileNewItem', icon=UiIcons().new,
                                            can_shortcuts=True, category=UiStrings().File,
                                            triggers=self.service_manager_contents.on_new_service_clicked)
         self.file_open_item = create_action(main_window, 'fileOpenItem', icon=':/general/general_open.png',

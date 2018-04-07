@@ -24,7 +24,7 @@ The UI widgets for the formatting tags window.
 """
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.i18n import UiStrings, UiIcons, translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 
@@ -87,7 +87,7 @@ class Ui_FormattingTagDialog(object):
         self.list_data_grid_layout.addWidget(self.tag_table_widget)
         self.edit_button_layout = QtWidgets.QHBoxLayout()
         self.new_button = QtWidgets.QPushButton(formatting_tag_dialog)
-        self.new_button.setIcon(build_icon(':/general/general_new.png'))
+        self.new_button.setIcon(build_icon(UiIcons().new))
         self.new_button.setObjectName('new_button')
         self.edit_button_layout.addWidget(self.new_button)
         self.delete_button = QtWidgets.QPushButton(formatting_tag_dialog)
