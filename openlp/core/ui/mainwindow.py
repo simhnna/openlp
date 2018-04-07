@@ -22,7 +22,6 @@
 """
 This is the main window, where all the action happens.
 """
-import logging
 import sys
 from datetime import datetime
 from distutils import dir_util
@@ -36,7 +35,7 @@ from openlp.core.api.http import server
 from openlp.core.common import is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import LanguageManager, UiStrings, translate
+from openlp.core.common.i18n import LanguageManager, UiStrings, UiIcons, translate
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, copyfile, create_paths
 from openlp.core.common.registry import Registry
@@ -172,7 +171,7 @@ class Ui_MainWindow(object):
         self.file_open_item = create_action(main_window, 'fileOpenItem', icon=':/general/general_open.png',
                                             can_shortcuts=True, category=UiStrings().File,
                                             triggers=self.service_manager_contents.on_load_service_clicked)
-        self.file_save_item = create_action(main_window, 'fileSaveItem', icon=':/general/general_save.png',
+        self.file_save_item = create_action(main_window, 'fileSaveItem', icon=UiIcons().save,
                                             can_shortcuts=True, category=UiStrings().File,
                                             triggers=self.service_manager_contents.decide_save_method)
         self.file_save_as_item = create_action(main_window, 'fileSaveAsItem', can_shortcuts=True,

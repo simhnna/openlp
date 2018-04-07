@@ -26,7 +26,7 @@ from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_, or_
 
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, translate, get_natural_key
+from openlp.core.common.i18n import UiStrings, UiIcons, translate, get_natural_key
 from openlp.core.common.path import copyfile, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -99,7 +99,7 @@ class SongMediaItem(MediaManagerItem):
         self.toolbar.addSeparator()
         # Song Maintenance Button
         self.maintenance_action = self.toolbar.add_toolbar_action('maintenance_action',
-                                                                  icon=':/songs/song_maintenance.png',
+                                                                  icon=UiIcons().database,
                                                                   triggers=self.on_song_maintenance_click)
         self.add_search_to_toolbar()
         # Signals and slots

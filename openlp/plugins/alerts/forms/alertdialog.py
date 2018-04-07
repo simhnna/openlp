@@ -22,7 +22,7 @@
 
 from PyQt5 import QtWidgets
 
-from openlp.core.common.i18n import translate
+from openlp.core.common.i18n import UiIcons, translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button, create_button_box
 
@@ -69,7 +69,7 @@ class Ui_AlertDialog(object):
         self.manage_button_layout.addWidget(self.new_button)
         self.save_button = QtWidgets.QPushButton(alert_dialog)
         self.save_button.setEnabled(False)
-        self.save_button.setIcon(build_icon(':/general/general_save.png'))
+        self.save_button.setIcon(build_icon(UiIcons().save))
         self.save_button.setObjectName('save_button')
         self.manage_button_layout.addWidget(self.save_button)
         self.delete_button = create_button(alert_dialog, 'delete_button', role='delete', enabled=False,

@@ -36,7 +36,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import ThemeLevel, delete_file
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, format_time, translate
+from openlp.core.common.i18n import UiStrings, UiIcons, format_time, translate
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, str_to_path
@@ -144,7 +144,7 @@ class Ui_ServiceManager(object):
                                         tooltip=translate('OpenLP.ServiceManager', 'Load an existing service.'),
                                         triggers=self.on_load_service_clicked)
         self.toolbar.add_toolbar_action('saveService', text=UiStrings().SaveService,
-                                        icon=':/general/general_save.png',
+                                        icon=UiIcons().save,
                                         tooltip=translate('OpenLP.ServiceManager', 'Save this service.'),
                                         triggers=self.decide_save_method)
         self.toolbar.addSeparator()

@@ -554,3 +554,29 @@ def get_language(name):
             if language.name == name_title or language.code == name_lower:
                 return language
     return None
+
+import qtawesome as qta
+
+
+class UiIcons(object):
+    """
+    Provide standard strings for objects to use.
+    """
+    __instance__ = None
+
+    def __new__(cls):
+        """
+        Override the default object creation method to return a single instance.
+        """
+        if not cls.__instance__:
+            cls.__instance__ = object.__new__(cls)
+        return cls.__instance__
+
+    def __init__(self):
+        """
+        These strings should need a good reason to be retranslated elsewhere.
+        Should some/more/less of these have an &amp; attached?
+        """
+        self.database = qta.icon('fa.database')
+        self.save = qta.icon('fa.save')
+        #self.images = qta.icon('fa.images')

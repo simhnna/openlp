@@ -136,6 +136,7 @@ def build_icon(icon):
     pix_map = None
     button_icon = QtGui.QIcon()
     if isinstance(icon, str):
+        print(icon)
         pix_map = QtGui.QPixmap(icon)
     elif isinstance(icon, Path):
         pix_map = QtGui.QPixmap(str(icon))

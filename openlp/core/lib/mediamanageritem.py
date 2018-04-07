@@ -207,21 +207,21 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         if self.has_edit_icon:
             create_widget_action(self.list_view,
                                  text=self.plugin.get_string(StringContent.Edit)['title'],
-                                 icon=':/general/general_edit.png',
+                                 icon1=':/general/general_edit.png',
                                  triggers=self.on_edit_click)
             create_widget_action(self.list_view, separator=True)
         create_widget_action(self.list_view,
                              'listView{plugin}{preview}Item'.format(plugin=self.plugin.name.title(),
                                                                     preview=StringContent.Preview.title()),
                              text=self.plugin.get_string(StringContent.Preview)['title'],
-                             icon=':/general/general_preview.png',
+                             icon1=':/general/general_preview.png',
                              can_shortcuts=True,
                              triggers=self.on_preview_click)
         create_widget_action(self.list_view,
                              'listView{plugin}{live}Item'.format(plugin=self.plugin.name.title(),
                                                                  live=StringContent.Live.title()),
                              text=self.plugin.get_string(StringContent.Live)['title'],
-                             icon=':/general/general_live.png',
+                             icon1=':/general/general_live.png',
                              can_shortcuts=True,
                              triggers=self.on_live_click)
         create_widget_action(self.list_view,
