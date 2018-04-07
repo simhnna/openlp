@@ -95,7 +95,6 @@
   <qresource prefix="services">
     <file>service_collapse_all.png</file>
     <file>service_expand_all.png</file>
-    <file>service_notes.png</file>
     <file>service_item_notes.png</file>
     <file>service_bottom.png</file>
     <file>service_down.png</file>
@@ -114,7 +113,6 @@
     <file>system_exit.png</file>
     <file>settings_plugin_list.png</file>
     <file>system_settings.png</file>
-    <file>tag_editor.png</file>
     <file>system_configure.png</file>
     <file>system_edit_copy.png</file>
     <file>system_configure_shortcuts.png</file>
@@ -142,12 +140,10 @@
     <file>song_usage_inactive.png</file>
   </qresource>
   <qresource prefix="tools">
-    <file>tools_add.png</file>
     </qresource>
   <qresource prefix="themes">
     <file>theme_new.png</file>
-    <file>theme_edit.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="projector">
     <file>projector_blank.png</file>
     <file>projector_blank_tiled.png</file>

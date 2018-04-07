@@ -168,7 +168,7 @@ class Ui_MainWindow(object):
         self.file_new_item = create_action(main_window, 'fileNewItem', icon=UiIcons().new,
                                            can_shortcuts=True, category=UiStrings().File,
                                            triggers=self.service_manager_contents.on_new_service_clicked)
-        self.file_open_item = create_action(main_window, 'fileOpenItem', icon=':/general/general_open.png',
+        self.file_open_item = create_action(main_window, 'fileOpenItem', icon=UiIcons().open,
                                             can_shortcuts=True, category=UiStrings().File,
                                             triggers=self.service_manager_contents.on_load_service_clicked)
         self.file_save_item = create_action(main_window, 'fileSaveItem', icon=UiIcons().save,
@@ -238,10 +238,10 @@ class Ui_MainWindow(object):
         self.mode_default_item.setChecked(True)
         action_list.add_category(UiStrings().Tools, CategoryOrder.standard_menu)
         self.tools_add_tool_item = create_action(main_window,
-                                                 'toolsAddToolItem', icon=':/tools/tools_add.png',
+                                                 'toolsAddToolItem', icon=UiIcons().add,
                                                  category=UiStrings().Tools, can_shortcuts=True)
         self.tools_open_data_folder = create_action(main_window,
-                                                    'toolsOpenDataFolder', icon=':/general/general_open.png',
+                                                    'toolsOpenDataFolder', icon=UiIcons().open,
                                                     category=UiStrings().Tools, can_shortcuts=True)
         self.tools_first_time_wizard = create_action(main_window,
                                                      'toolsFirstTimeWizard', icon=':/general/general_revert.png',
@@ -271,7 +271,7 @@ class Ui_MainWindow(object):
                                                      category=UiStrings().Settings, can_shortcuts=True)
         # Formatting Tags were also known as display tags.
         self.formatting_tag_item = create_action(main_window, 'displayTagItem',
-                                                 icon=':/system/tag_editor.png', category=UiStrings().Settings,
+                                                 icon=UiIcons().edit, category=UiStrings().Settings,
                                                  can_shortcuts=True)
         self.settings_configure_item = create_action(main_window, 'settingsConfigureItem',
                                                      icon=':/system/system_settings.png', can_shortcuts=True,

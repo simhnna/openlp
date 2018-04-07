@@ -140,7 +140,7 @@ class Ui_ServiceManager(object):
         self.toolbar.add_toolbar_action('newService', text=UiStrings().NewService, icon=UiIcons().new,
                                         tooltip=UiStrings().CreateService, triggers=self.on_new_service_clicked)
         self.toolbar.add_toolbar_action('openService', text=UiStrings().OpenService,
-                                        icon=':/general/general_open.png',
+                                        icon=UiIcons().open,
                                         tooltip=translate('OpenLP.ServiceManager', 'Load an existing service.'),
                                         triggers=self.on_load_service_clicked)
         self.toolbar.add_toolbar_action('saveService', text=UiStrings().SaveService,
@@ -199,7 +199,7 @@ class Ui_ServiceManager(object):
         self.order_toolbar.addSeparator()
         self.delete_action = self.order_toolbar.add_toolbar_action(
             'delete', can_shortcuts=True,
-            text=translate('OpenLP.ServiceManager', '&Delete From Service'), icon=':/general/general_delete.png',
+            text=translate('OpenLP.ServiceManager', '&Delete From Service'), icon=UiIcons().delete,
             tooltip=translate('OpenLP.ServiceManager', 'Delete the selected item from the service.'),
             triggers=self.on_delete_from_service)
         self.order_toolbar.addSeparator()
@@ -216,7 +216,7 @@ class Ui_ServiceManager(object):
         self.order_toolbar.addSeparator()
         self.make_live_action = self.order_toolbar.add_toolbar_action(
             'make_live', can_shortcuts=True,
-            text=translate('OpenLP.ServiceManager', 'Go Live'), icon=':/general/general_live.png',
+            text=translate('OpenLP.ServiceManager', 'Go Live'), icon=UiIcons().live,
             tooltip=translate('OpenLP.ServiceManager', 'Send the selected item to Live.'),
             category=UiStrings().Service,
             triggers=self.on_make_live_action_triggered)
@@ -239,15 +239,15 @@ class Ui_ServiceManager(object):
         # build the context menu
         self.menu = QtWidgets.QMenu()
         self.edit_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Edit Item'),
-                                                icon=':/general/general_edit.png', triggers=self.remote_edit)
+                                                icon=UiIcons().edit, triggers=self.remote_edit)
         self.rename_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Rename...'),
-                                                  icon=':/general/general_edit.png',
+                                                  icon=UiIcons().edit,
                                                   triggers=self.on_service_item_rename)
         self.maintain_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Reorder Item'),
-                                                    icon=':/general/general_edit.png',
+                                                    icon=UiIcons().edit,
                                                     triggers=self.on_service_item_edit_form)
         self.notes_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Notes'),
-                                                 icon=':/services/service_notes.png',
+                                                 icon=UiIcons().notes,
                                                  triggers=self.on_service_item_note_form)
         self.time_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Start Time'),
                                                 icon=':/media/media_time.png', triggers=self.on_start_time_form)
@@ -259,7 +259,7 @@ class Ui_ServiceManager(object):
         self.create_custom_action = create_widget_action(self.menu,
                                                          text=translate('OpenLP.ServiceManager', 'Create New &Custom '
                                                                                                  'Slide'),
-                                                         icon=':/general/general_edit.png',
+                                                         icon=UiIcons().clone,
                                                          triggers=self.create_custom)
         self.menu.addSeparator()
         # Add AutoPlay menu actions
@@ -284,7 +284,7 @@ class Ui_ServiceManager(object):
                                                          triggers=self.on_timed_slide_interval)
         self.menu.addSeparator()
         self.preview_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', 'Show &Preview'),
-                                                   icon=':/general/general_preview.png', triggers=self.make_preview)
+                                                   icon=UiIcons().preview, triggers=self.make_preview)
         # Add already existing make live action to the menu.
         self.menu.addAction(self.make_live_action)
         self.menu.addSeparator()

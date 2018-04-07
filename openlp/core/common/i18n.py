@@ -576,16 +576,21 @@ class UiIcons(object):
         """
         These are the font icons used in the code.
         """
+        self.add = qta.icon('fa.plus-circle')
         self.clone = qta.icon('fa.clone')
         self.copy = qta.icon('fa.copy')
         self.database = qta.icon('fa.database')
+        self.default = qta.icon('fa.info-circle')
         self.delete = qta.icon('fa.trash')
         self.edit = qta.icon('fa.edit')
         self.download = qta.icon('fa.cloud-download')
         self.live = qta.icon('fa.camera')
         self.music = qta.icon('fa.music')
         self.new = qta.icon('fa.file')
+        self.notes = qta.icon('fa.sticky-note')
+        self.open = qta.icon('fa.map')
         self.presentation = qta.icon("fa.bar-chart")
+        self.preview = qta.icon('fa.laptop')
         self.picture = qta.icon("fa.picture-o")
         self.print = qta.icon('fa.print')
         self.save = qta.icon('fa.save')

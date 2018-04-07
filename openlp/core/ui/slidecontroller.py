@@ -31,7 +31,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import SlideLimits
 from openlp.core.common.actions import ActionList, CategoryOrder
-from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.i18n import UiStrings, UiIcons, translate
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
@@ -235,7 +235,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.hide_menu.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
             self.hide_menu.setMenu(QtWidgets.QMenu(translate('OpenLP.SlideController', 'Hide'), self.toolbar))
             self.toolbar.add_toolbar_widget(self.hide_menu)
-            self.toolbar.add_toolbar_action('goPreview', icon=':/general/general_live.png',
+            self.toolbar.add_toolbar_action('goPreview', icon=UiIcons().live,
                                             tooltip=translate('OpenLP.SlideController', 'Move to preview.'),
                                             triggers=self.on_go_preview)
             # The order of the blank to modes in Shortcuts list comes from here.
@@ -307,18 +307,18 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.receive_spin_delay()
             self.toolbar.add_toolbar_widget(self.delay_spin_box)
         else:
-            self.toolbar.add_toolbar_action('goLive', icon=':/general/general_live.png',
+            self.toolbar.add_toolbar_action('goLive', icon=UiIcons().live,
                                             tooltip=translate('OpenLP.SlideController', 'Move to live.'),
                                             triggers=self.on_go_live)
-            self.toolbar.add_toolbar_action('addToService', icon=':/general/general_add.png',
+            self.toolbar.add_toolbar_action('addToService', icon=UiIcons().add,
                                             tooltip=translate('OpenLP.SlideController', 'Add to Service.'),
                                             triggers=self.on_preview_add_to_service)
             self.toolbar.addSeparator()
-            self.toolbar.add_toolbar_action('editSong', icon=':/general/general_edit.png',
+            self.toolbar.add_toolbar_action('editSong', icon=UiIcons().edit,
                                             tooltip=translate('OpenLP.SlideController',
                                                               'Edit and reload song preview.'),
                                             triggers=self.on_edit_song)
-            self.toolbar.add_toolbar_action('clear', icon=':/general/general_delete.png',
+            self.toolbar.add_toolbar_action('clear', icon=UiIcons().delete,
                                             tooltip=translate('OpenLP.SlideController',
                                                               'Clear'),
                                             triggers=self.on_clear)

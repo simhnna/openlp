@@ -168,7 +168,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
             toolbar_actions.append(['Import', StringContent.Import, UiIcons().download, self.on_import_click])
         # Load Button
         if self.has_file_icon:
-            toolbar_actions.append(['Load', StringContent.Load, ':/general/general_open.png', self.on_file_click])
+            toolbar_actions.append(['Load', StringContent.Load, UiIcons().open, self.on_file_click])
         # New Button
         if self.has_new_icon:
             toolbar_actions.append(['New', StringContent.New, UiIcons().new, self.on_new_click])
@@ -179,12 +179,11 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         if self.has_delete_icon:
             toolbar_actions.append(['Delete', StringContent.Delete, UiIcons().delete, self.on_delete_click])
         # Preview
-        toolbar_actions.append(['Preview', StringContent.Preview,
-                                ':/general/general_preview.png', self.on_preview_click])
+        toolbar_actions.append(['Preview', StringContent.Preview, UiIcons().preview, self.on_preview_click])
         # Live Button
         toolbar_actions.append(['Live', StringContent.Live, UiIcons().live, self.on_live_click])
         # Add to service Button
-        toolbar_actions.append(['Service', StringContent.Service, ':/general/general_add.png', self.on_add_click])
+        toolbar_actions.append(['Service', StringContent.Service, UiIcons().add, self.on_add_click])
         for action in toolbar_actions:
             if action[0] == StringContent.Preview:
                 self.toolbar.addSeparator()
@@ -205,21 +204,21 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         if self.has_edit_icon:
             create_widget_action(self.list_view,
                                  text=self.plugin.get_string(StringContent.Edit)['title'],
-                                 icon1=':/general/general_edit.png',
+                                 icon=UiIcons().edit,
                                  triggers=self.on_edit_click)
             create_widget_action(self.list_view, separator=True)
         create_widget_action(self.list_view,
                              'listView{plugin}{preview}Item'.format(plugin=self.plugin.name.title(),
                                                                     preview=StringContent.Preview.title()),
                              text=self.plugin.get_string(StringContent.Preview)['title'],
-                             icon1=':/general/general_preview.png',
+                             icon=UiIcons().preview,
                              can_shortcuts=True,
                              triggers=self.on_preview_click)
         create_widget_action(self.list_view,
                              'listView{plugin}{live}Item'.format(plugin=self.plugin.name.title(),
                                                                  live=StringContent.Live.title()),
                              text=self.plugin.get_string(StringContent.Live)['title'],
-                             icon1=':/general/general_live.png',
+                             icon=UiIcons().live,
                              can_shortcuts=True,
                              triggers=self.on_live_click)
         create_widget_action(self.list_view,
@@ -227,7 +226,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
                                                                     service=StringContent.Service.title()),
                              can_shortcuts=True,
                              text=self.plugin.get_string(StringContent.Service)['title'],
-                             icon=':/general/general_add.png',
+                             icon=UiIcons().add,
                              triggers=self.on_add_click)
         if self.has_delete_icon:
             create_widget_action(self.list_view, separator=True)
@@ -235,13 +234,13 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
                                  'listView{plugin}{delete}Item'.format(plugin=self.plugin.name.title(),
                                                                        delete=StringContent.Delete.title()),
                                  text=self.plugin.get_string(StringContent.Delete)['title'],
-                                 icon=':/general/general_delete.png',
+                                 icon=UiIcons().delete,
                                  can_shortcuts=True, triggers=self.on_delete_click)
         if self.add_to_service_item:
             create_widget_action(self.list_view, separator=True)
             create_widget_action(self.list_view,
                                  text=translate('OpenLP.MediaManagerItem', '&Add to selected Service Item'),
-                                 icon=':/general/general_add.png',
+                                 icon=UiIcons().add,
                                  triggers=self.on_add_edit_click)
         self.add_custom_context_actions()
         # Create the context menu and add all actions from the list_view.
