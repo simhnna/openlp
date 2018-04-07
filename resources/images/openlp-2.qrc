@@ -12,7 +12,6 @@
     <file>author_add.png</file>
     <file>author_delete.png</file>
     <file>book_add.png</file>
-    <file>song_maintenance.png</file>
     <file>topic_add.png</file>
     <file>book_delete.png</file>
     <file>book_edit.png</file>
@@ -61,7 +60,6 @@
     <file>general_zoom_original.png</file>
     <file>general_print.png</file>
     <file>general_open.png</file>
-    <file>general_save.png</file>
     <file>general_email.png</file>
     <file>general_revert.png</file>
     <file>general_clone.png</file>
@@ -90,8 +88,7 @@
   <qresource prefix="imports">
     </qresource>
   <qresource prefix="exports">
-    <file>export_load.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="wizards">
     <file>openlp-osx-wizard.png</file>
     <file>wizard_song.bmp</file>

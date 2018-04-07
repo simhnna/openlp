@@ -577,6 +577,7 @@ class UiIcons(object):
         These are the font icons used in the code.
         """
         self.clone = qta.icon('fa.clone')
+        self.copy = qta.icon('fa.copy')
         self.database = qta.icon('fa.database')
         self.delete = qta.icon('fa.trash')
         self.edit = qta.icon('fa.edit')
