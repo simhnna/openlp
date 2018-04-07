@@ -30,7 +30,7 @@ from PyQt5 import QtCore
 from openlp.core.api.http import register_endpoint
 from openlp.core.common import check_binary_exists
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import translate
+from openlp.core.common.i18n import UiIcons, translate
 from openlp.core.common.path import Path
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.media.endpoint import api_media_endpoint, media_endpoint
@@ -56,7 +56,7 @@ class MediaPlugin(Plugin):
     def __init__(self):
         super(MediaPlugin, self).__init__('media', __default_settings__, MediaMediaItem)
         self.weight = -6
-        self.icon_path = ':/plugins/plugin_media.png'
+        self.icon_path = UiIcons().video
         self.icon = build_icon(self.icon_path)
         # passed with drag and drop messages
         self.dnd_id = 'Media'

@@ -27,7 +27,7 @@ import logging
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_macosx
-from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.i18n import UiStrings, UiIcons, translate
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -197,7 +197,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         self.error_save_to_button = QtWidgets.QPushButton(self.progress_page)
         self.error_save_to_button.setObjectName('error_save_to_button')
         self.error_save_to_button.setHidden(True)
-        self.error_save_to_button.setIcon(build_icon(UiIcon().save))
+        self.error_save_to_button.setIcon(build_icon(UiIcons().save))
         self.error_button_layout.addWidget(self.error_save_to_button)
         self.progress_layout.addLayout(self.error_button_layout)
         self.addPage(self.progress_page)

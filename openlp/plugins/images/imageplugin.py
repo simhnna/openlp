@@ -25,7 +25,7 @@ import logging
 from PyQt5 import QtGui
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common.i18n import translate
+from openlp.core.common.i18n import UiIcons, translate
 from openlp.core.common.settings import Settings
 from openlp.core.lib import Plugin, StringContent, ImageSource, build_icon
 from openlp.core.lib.db import Manager
@@ -53,7 +53,7 @@ class ImagePlugin(Plugin):
         super(ImagePlugin, self).__init__('images', __default_settings__, ImageMediaItem, ImageTab)
         self.manager = Manager('images', init_schema, upgrade_mod=upgrade)
         self.weight = -7
-        self.icon_path = ':/plugins/plugin_images.png'
+        self.icon_path = UiIcons().picture
         self.icon = build_icon(self.icon_path)
         register_endpoint(images_endpoint)
         register_endpoint(api_images_endpoint)

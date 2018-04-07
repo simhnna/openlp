@@ -25,7 +25,7 @@ The GUI widgets of the exception dialog.
 
 from PyQt5 import QtGui, QtWidgets
 
-from openlp.core.common.i18n import translate
+from openlp.core.common.i18n import UiIcons, translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button, create_button_box
 
@@ -75,7 +75,7 @@ class Ui_ExceptionDialog(object):
                                                 icon=':/general/general_email.png',
                                                 click=self.on_send_report_button_clicked)
         self.save_report_button = create_button(exception_dialog, 'save_report_button',
-                                                icon=UiIcon().save,
+                                                icon=UiIcons().save,
                                                 click=self.on_save_report_button_clicked)
         self.attach_tile_button = create_button(exception_dialog, 'attach_tile_button',
                                                 icon=':/general/general_open.png',
