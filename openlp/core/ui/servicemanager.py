@@ -178,22 +178,22 @@ class Ui_ServiceManager(object):
         action_list.add_category(UiStrings().Service, CategoryOrder.standard_toolbar)
         self.move_top_action = self.order_toolbar.add_toolbar_action(
             'moveTop',
-            text=translate('OpenLP.ServiceManager', 'Move to &top'), icon=':/services/service_top.png',
+            text=translate('OpenLP.ServiceManager', 'Move to &top'), icon=UiIcons().top,
             tooltip=translate('OpenLP.ServiceManager', 'Move item to the top of the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_top)
         self.move_up_action = self.order_toolbar.add_toolbar_action(
             'moveUp',
-            text=translate('OpenLP.ServiceManager', 'Move &up'), icon=':/services/service_up.png',
+            text=translate('OpenLP.ServiceManager', 'Move &up'), icon=UiIcons().arrow_up,
             tooltip=translate('OpenLP.ServiceManager', 'Move item up one position in the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_up)
         self.move_down_action = self.order_toolbar.add_toolbar_action(
             'moveDown',
-            text=translate('OpenLP.ServiceManager', 'Move &down'), icon=':/services/service_down.png',
+            text=translate('OpenLP.ServiceManager', 'Move &down'), icon=UiIcons().arrow_down,
             tooltip=translate('OpenLP.ServiceManager', 'Move item down one position in the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_down)
         self.move_bottom_action = self.order_toolbar.add_toolbar_action(
             'moveBottom',
-            text=translate('OpenLP.ServiceManager', 'Move to &bottom'), icon=':/services/service_bottom.png',
+            text=translate('OpenLP.ServiceManager', 'Move to &bottom'), icon=UiIcons().bottom,
             tooltip=translate('OpenLP.ServiceManager', 'Move item to the end of the service.'),
             can_shortcuts=True, category=UiStrings().Service, triggers=self.on_service_end)
         self.order_toolbar.addSeparator()
@@ -205,12 +205,12 @@ class Ui_ServiceManager(object):
         self.order_toolbar.addSeparator()
         self.expand_action = self.order_toolbar.add_toolbar_action(
             'expand', can_shortcuts=True,
-            text=translate('OpenLP.ServiceManager', '&Expand all'), icon=':/services/service_expand_all.png',
+            text=translate('OpenLP.ServiceManager', '&Expand all'), icon=UiIcons().plus,
             tooltip=translate('OpenLP.ServiceManager', 'Expand all the service items.'),
             category=UiStrings().Service, triggers=self.on_expand_all)
         self.collapse_action = self.order_toolbar.add_toolbar_action(
             'collapse', can_shortcuts=True,
-            text=translate('OpenLP.ServiceManager', '&Collapse all'), icon=':/services/service_collapse_all.png',
+            text=translate('OpenLP.ServiceManager', '&Collapse all'), icon=UiIcons().minus,
             tooltip=translate('OpenLP.ServiceManager', 'Collapse all the service items.'),
             category=UiStrings().Service, triggers=self.on_collapse_all)
         self.order_toolbar.addSeparator()

@@ -239,7 +239,7 @@ class ServiceItem(RegistryProperties):
         if self.name == 'songs':
             self.iconic_representation = UiIcons().music
         elif self.name == 'bibles':
-            self.iconic_representation = UiIcons().music
+            self.iconic_representation = UiIcons().bible
         elif self.name == 'presentations':
             self.iconic_representation = UiIcons().presentation
         elif self.name == 'images':

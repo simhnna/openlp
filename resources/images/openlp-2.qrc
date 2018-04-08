@@ -20,7 +20,6 @@
     <file>author_maintenance.png</file>
     <file>topic_maintenance.png</file>
     <file>song_author_edit.png</file>
-    <file>song_book_edit.png</file>
     </qresource>
   <qresource prefix="images">
     <file>image_group.png</file>
@@ -91,12 +90,8 @@
     <file>wizard_duplicateremoval.bmp</file>
     </qresource>
   <qresource prefix="services">
-    <file>service_collapse_all.png</file>
-    <file>service_expand_all.png</file>
     <file>service_item_notes.png</file>
-    <file>service_bottom.png</file>
     <file>service_down.png</file>
-    <file>service_top.png</file>
     <file>service_up.png</file>
   </qresource>
   <qresource prefix="system">

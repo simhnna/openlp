@@ -158,7 +158,7 @@ class SongMediaItem(MediaManagerItem):
                 translate('SongsPlugin.MediaItem', 'Search Authors...')),
             (SongSearch.Topics, ':/songs/song_search_topic.png', SongStrings.Topics,
                 translate('SongsPlugin.MediaItem', 'Search Topics...')),
-            (SongSearch.Books, ':/songs/song_book_edit.png', SongStrings.SongBooks,
+            (SongSearch.Books, UiIcons().address, SongStrings.SongBooks,
                 translate('SongsPlugin.MediaItem', 'Search Songbooks...')),
             (SongSearch.Themes, ':/slides/slide_theme.png', UiStrings().Themes, UiStrings().SearchThemes),
             (SongSearch.Copyright, UiIcons().copyright,
