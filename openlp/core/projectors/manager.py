@@ -29,7 +29,7 @@ import logging
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from openlp.core.common.i18n import translate
+from openlp.core.common.i18n import UiIcons, translate
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.registry import RegistryBase
 from openlp.core.common.settings import Settings
@@ -103,18 +103,18 @@ class UiProjectorManager(object):
         self.one_toolbar = OpenLPToolbar(widget)
         self.one_toolbar.add_toolbar_action('new_projector',
                                             text=translate('OpenLP.ProjectorManager', 'Add Projector'),
-                                            icon=':/projector/projector_new.png',
+                                            icon=UiIcons().new,
                                             tooltip=translate('OpenLP.ProjectorManager', 'Add a new projector.'),
                                             triggers=self.on_add_projector)
         # Show edit/delete when projector not connected
         self.one_toolbar.add_toolbar_action('edit_projector',
                                             text=translate('OpenLP.ProjectorManager', 'Edit Projector'),
-                                            icon=':/general/general_edit.png',
+                                            icon=UiIcons().edit,
                                             tooltip=translate('OpenLP.ProjectorManager', 'Edit selected projector.'),
                                             triggers=self.on_edit_projector)
         self.one_toolbar.add_toolbar_action('delete_projector',
                                             text=translate('OpenLP.ProjectorManager', 'Delete Projector'),
-                                            icon=':/general/general_delete.png',
+                                            icon=UiIcons().delete,
                                             tooltip=translate('OpenLP.ProjectorManager', 'Delete selected projector.'),
                                             triggers=self.on_delete_projector)
         # Show source/view when projector connected
@@ -238,7 +238,7 @@ class UiProjectorManager(object):
         self.edit_action = create_widget_action(self.menu,
                                                 text=translate('OpenLP.ProjectorManager',
                                                                '&Edit Projector'),
-                                                icon=':/projector/projector_edit.png',
+                                                icon=UiIcons().edit,
                                                 triggers=self.on_edit_projector)
         self.menu.addSeparator()
         self.connect_action = create_widget_action(self.menu,
@@ -271,7 +271,7 @@ class UiProjectorManager(object):
         self.edit_input_action = create_widget_action(self.menu,
                                                       text=translate('OpenLP.ProjectorManager',
                                                                      'Edit Input Source'),
-                                                      icon=':/general/general_edit.png',
+                                                      icon=UiIcons().edit,
                                                       triggers=self.on_edit_input)
         self.blank_action = create_widget_action(self.menu,
                                                  text=translate('OpenLP.ProjectorManager',
@@ -287,7 +287,7 @@ class UiProjectorManager(object):
         self.delete_action = create_widget_action(self.menu,
                                                   text=translate('OpenLP.ProjectorManager',
                                                                  '&Delete Projector'),
-                                                  icon=':/general/general_delete.png',
+                                                  icon=UiIcons().delete,
                                                   triggers=self.on_delete_projector)
         self.update_icons()
 

@@ -233,9 +233,9 @@ class Ui_ServiceManager(object):
         # build the drag and drop context menu
         self.dnd_menu = QtWidgets.QMenu()
         self.new_action = self.dnd_menu.addAction(translate('OpenLP.ServiceManager', '&Add New Item'))
-        self.new_action.setIcon(build_icon(':/general/general_edit.png'))
+        self.new_action.setIcon(UiIcons().edit)
         self.add_to_action = self.dnd_menu.addAction(translate('OpenLP.ServiceManager', '&Add to Selected Item'))
-        self.add_to_action.setIcon(build_icon(':/general/general_edit.png'))
+        self.add_to_action.setIcon(UiIcons().edit)
         # build the context menu
         self.menu = QtWidgets.QMenu()
         self.edit_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Edit Item'),
@@ -1169,7 +1169,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 if service_item_from_item.notes:
                     icon = QtGui.QImage(service_item_from_item.icon)
                     icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                    overlay = QtGui.QImage(':/services/service_item_notes.png')
+                    overlay = QtGui.QImage(UiIcons().notes)
                     overlay = overlay.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                     painter = QtGui.QPainter(icon)
                     painter.drawImage(0, 0, overlay)
@@ -1178,7 +1178,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 elif service_item_from_item.temporary_edit:
                     icon = QtGui.QImage(service_item_from_item.icon)
                     icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                    overlay = QtGui.QImage(':/general/general_export.png')
+                    overlay = QtGui.QImage(UiIcons().upload)
                     overlay = overlay.scaled(40, 40, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                     painter = QtGui.QPainter(icon)
                     painter.drawImage(40, 0, overlay)
@@ -1187,7 +1187,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                 else:
                     tree_widget_item.setIcon(0, service_item_from_item.iconic_representation)
             else:
-                tree_widget_item.setIcon(0, build_icon(':/general/general_delete.png'))
+                tree_widget_item.setIcon(0, UiIcons().delete)
             tree_widget_item.setText(0, service_item_from_item.get_display_title())
             tips = []
             if service_item_from_item.temporary_edit:

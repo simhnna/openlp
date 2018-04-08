@@ -96,11 +96,11 @@ class Ui_MainWindow(object):
         self.recent_files_menu.setObjectName('recentFilesMenu')
         self.file_import_menu = QtWidgets.QMenu(self.file_menu)
         if not is_macosx():
-            self.file_import_menu.setIcon(build_icon(u':/general/general_import.png'))
+            self.file_import_menu.setIcon(UiIcons().download)
         self.file_import_menu.setObjectName('file_import_menu')
         self.file_export_menu = QtWidgets.QMenu(self.file_menu)
         if not is_macosx():
-            self.file_export_menu.setIcon(build_icon(u':/general/general_export.png'))
+            self.file_export_menu.setIcon(UiIcons().upload)
         self.file_export_menu.setObjectName('file_export_menu')
         # View Menu
         self.view_menu = QtWidgets.QMenu(self.menu_bar)
@@ -180,7 +180,7 @@ class Ui_MainWindow(object):
         self.print_service_order_item = create_action(main_window, 'printServiceItem', can_shortcuts=True,
                                                       category=UiStrings().File,
                                                       triggers=lambda x: PrintServiceForm().exec())
-        self.file_exit_item = create_action(main_window, 'fileExitItem', icon=':/system/system_exit.png',
+        self.file_exit_item = create_action(main_window, 'fileExitItem', icon=UiIcons().exit,
                                             can_shortcuts=True,
                                             category=UiStrings().File, triggers=main_window.close)
         # Give QT Extra Hint that this is the Exit Menu Item
@@ -274,7 +274,7 @@ class Ui_MainWindow(object):
                                                  icon=UiIcons().edit, category=UiStrings().Settings,
                                                  can_shortcuts=True)
         self.settings_configure_item = create_action(main_window, 'settingsConfigureItem',
-                                                     icon=':/system/system_settings.png', can_shortcuts=True,
+                                                     icon=UiIcons().settings, can_shortcuts=True,
                                                      category=UiStrings().Settings)
         # Give QT Extra Hint that this is the Preferences Menu Item
         self.settings_configure_item.setMenuRole(QtWidgets.QAction.PreferencesRole)

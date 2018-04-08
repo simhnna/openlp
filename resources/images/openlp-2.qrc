@@ -45,7 +45,6 @@
     <file>general_add.png</file>
     <file>general_delete.png</file>
     <file>general_edit.png</file>
-    <file>general_export.png</file>
     <file>general_import.png</file>
     <file>general_zoom_out.png</file>
     <file>general_zoom_in.png</file>
@@ -90,7 +89,6 @@
     <file>wizard_duplicateremoval.bmp</file>
     </qresource>
   <qresource prefix="services">
-    <file>service_item_notes.png</file>
     <file>service_down.png</file>
     <file>service_up.png</file>
   </qresource>
@@ -103,7 +101,6 @@
     <file>system_volunteer.png</file>
     <file>system_servicemanager.png</file>
     <file>system_thememanager.png</file>
-    <file>system_exit.png</file>
     <file>settings_plugin_list.png</file>
     <file>system_settings.png</file>
     <file>system_configure.png</file>
@@ -146,12 +143,10 @@
     <file>projector_cooldown.png</file>
     <file>projector_disconnect.png</file>
     <file>projector_disconnect_tiled.png</file>
-    <file>projector_edit.png</file>
     <file>projector_error.png</file>
     <file>projector_item_connect.png</file>
     <file>projector_item_disconnect.png</file>
     <file>projector_manager.png</file>
-    <file>projector_new.png</file>
     <file>projector_not_connected_error.png</file>
     <file>projector_off.png</file>
     <file>projector_on.png</file>
