@@ -145,7 +145,7 @@ class SongMediaItem(MediaManagerItem):
         self.edit_song_form = EditSongForm(self, self.main_window, self.plugin.manager)
         self.open_lyrics = OpenLyrics(self.plugin.manager)
         self.search_text_edit.set_search_types([
-            (SongSearch.Entire, ':/songs/song_search_all.png',
+            (SongSearch.Entire, UiIcons().music,
                 translate('SongsPlugin.MediaItem', 'Entire Song'),
                 translate('SongsPlugin.MediaItem', 'Search Entire Song...')),
             (SongSearch.Titles, ':/songs/song_search_title.png',
@@ -161,7 +161,7 @@ class SongMediaItem(MediaManagerItem):
             (SongSearch.Books, ':/songs/song_book_edit.png', SongStrings.SongBooks,
                 translate('SongsPlugin.MediaItem', 'Search Songbooks...')),
             (SongSearch.Themes, ':/slides/slide_theme.png', UiStrings().Themes, UiStrings().SearchThemes),
-            (SongSearch.Copyright, ':/songs/song_search_copy.png',
+            (SongSearch.Copyright, UiIcons().copyright,
                 translate('SongsPlugin.MediaItem', 'Copyright'),
                 translate('SongsPlugin.MediaItem', 'Search Copyright...')),
             (SongSearch.CCLInumber, ':/songs/song_search_ccli.png',

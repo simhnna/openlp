@@ -34,7 +34,7 @@ from PyQt5 import QtGui
 
 from openlp.core.common import md5_hash
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import translate
+from openlp.core.common.i18n import UiIcons, translate
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.path import Path
 from openlp.core.common.settings import Settings
@@ -236,7 +236,18 @@ class ServiceItem(RegistryProperties):
         :param icon: A string to an icon in the resources or on disk.
         """
         self.icon = icon
-        self.iconic_representation = build_icon(icon)
+        if self.name == 'songs':
+            self.iconic_representation = UiIcons().music
+        elif self.name == 'bibles':
+            self.iconic_representation = UiIcons().music
+        elif self.name == 'presentations':
+            self.iconic_representation = UiIcons().presentation
+        elif self.name == 'images':
+            self.iconic_representation = UiIcons().picture
+        elif self.name == 'medias':
+            self.iconic_representation = UiIcons().video
+        else:
+            self.iconic_representation = UiIcons().clone
 
     def render(self, provides_own_theme_data=False):
         """
