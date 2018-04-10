@@ -30,7 +30,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import delete_file
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, UiIcons, translate, get_locale_key
+from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, copyfile, create_paths, path_to_str
 from openlp.core.common.registry import Registry, RegistryBase

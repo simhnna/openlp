@@ -26,7 +26,8 @@ from PyQt5 import QtCore, QtWidgets
 from sqlalchemy.sql import and_, or_
 
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, UiIcons, translate, get_natural_key
+from openlp.core.common.i18n import UiStrings, translate, get_natural_key
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.path import copyfile, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings

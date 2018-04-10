@@ -36,7 +36,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import ThemeLevel, delete_file
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import UiStrings, UiIcons, format_time, translate
+from openlp.core.common.i18n import UiStrings, format_time, translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.json import OpenLPJsonDecoder, OpenLPJsonEncoder
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, str_to_path

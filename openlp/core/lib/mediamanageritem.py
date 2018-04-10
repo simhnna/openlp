@@ -27,7 +27,8 @@ import re
 
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.common.i18n import UiStrings, UiIcons, translate
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.path import path_to_str, str_to_path
 from openlp.core.common.registry import Registry

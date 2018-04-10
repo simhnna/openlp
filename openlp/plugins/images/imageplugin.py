@@ -25,7 +25,8 @@ import logging
 from PyQt5 import QtGui
 
 from openlp.core.api.http import register_endpoint
-from openlp.core.common.i18n import UiIcons, translate
+from openlp.core.common.i18n import translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.settings import Settings
 from openlp.core.lib import Plugin, StringContent, ImageSource, build_icon
 from openlp.core.lib.db import Manager

@@ -33,7 +33,8 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.common.actions import ActionList
-from openlp.core.common.i18n import UiStrings, UiIcons, translate
+from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.registry import Registry
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager

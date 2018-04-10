@@ -35,7 +35,8 @@ from openlp.core.api.http import server
 from openlp.core.common import is_win, is_macosx, add_actions
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.applocation import AppLocation
-from openlp.core.common.i18n import LanguageManager, UiStrings, UiIcons, translate
+from openlp.core.common.i18n import LanguageManager, UiStrings, translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, copyfile, create_paths
 from openlp.core.common.registry import Registry
