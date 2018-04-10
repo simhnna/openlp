@@ -32,7 +32,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import SlideLimits
 from openlp.core.common.actions import ActionList, CategoryOrder
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.ui.icons import UiIcons
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.registry import Registry, RegistryBase
 from openlp.core.common.settings import Settings
@@ -40,6 +39,7 @@ from openlp.core.display.screens import ScreenList
 from openlp.core.lib import ItemCapabilities, ServiceItem, ImageSource, ServiceItemAction, build_icon, build_html
 from openlp.core.lib.ui import create_action
 from openlp.core.ui import HideMode, MainDisplay, Display, DisplayControllerType
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.toolbar import OpenLPToolbar
 from openlp.core.widgets.views import ListPreviewWidget
 
@@ -213,14 +213,14 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         self.toolbar.setSizePolicy(size_toolbar_policy)
         self.previous_item = create_action(self, 'previousItem_' + self.type_prefix,
                                            text=translate('OpenLP.SlideController', 'Previous Slide'),
-                                           icon=':/slides/slide_previous.png',
+                                           icon=UiIcons().arrow_left,
                                            tooltip=translate('OpenLP.SlideController', 'Move to previous.'),
                                            can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
                                            category=self.category, triggers=self.on_slide_selected_previous)
         self.toolbar.addAction(self.previous_item)
         self.next_item = create_action(self, 'nextItem_' + self.type_prefix,
                                        text=translate('OpenLP.SlideController', 'Next Slide'),
-                                       icon=':/slides/slide_next.png',
+                                       icon=UiIcons().arrow_right,
                                        tooltip=translate('OpenLP.SlideController', 'Move to next.'),
                                        can_shortcuts=True, context=QtCore.Qt.WidgetWithChildrenShortcut,
                                        category=self.category, triggers=self.on_slide_selected_next_action)
@@ -242,22 +242,22 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             # The order of the blank to modes in Shortcuts list comes from here.
             self.desktop_screen_enable = create_action(self, 'desktopScreenEnable',
                                                        text=translate('OpenLP.SlideController', 'Show Desktop'),
-                                                       icon=':/slides/slide_desktop.png', can_shortcuts=True,
+                                                       icon=UiIcons().desktop, can_shortcuts=True,
                                                        context=QtCore.Qt.WidgetWithChildrenShortcut,
                                                        category=self.category, triggers=self.on_hide_display_enable)
             self.desktop_screen = create_action(self, 'desktopScreen',
                                                 text=translate('OpenLP.SlideController', 'Toggle Desktop'),
-                                                icon=':/slides/slide_desktop.png',
+                                                icon=UiIcons().desktop,
                                                 checked=False, can_shortcuts=True, category=self.category,
                                                 triggers=self.on_hide_display)
             self.theme_screen = create_action(self, 'themeScreen',
                                               text=translate('OpenLP.SlideController', 'Toggle Blank to Theme'),
-                                              icon=':/slides/slide_theme.png',
+                                              icon=UiIcons().theme,
                                               checked=False, can_shortcuts=True, category=self.category,
                                               triggers=self.on_theme_display)
             self.blank_screen = create_action(self, 'blankScreen',
                                               text=translate('OpenLP.SlideController', 'Toggle Blank Screen'),
-                                              icon=':/slides/slide_blank.png',
+                                              icon=UiIcons().blank,
                                               checked=False, can_shortcuts=True, category=self.category,
                                               triggers=self.on_blank_display)
             self.hide_menu.setDefaultAction(self.blank_screen)
@@ -288,10 +288,10 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
                                                           self.toolbar))
             self.toolbar.add_toolbar_widget(self.play_slides_menu)
             self.play_slides_loop = create_action(self, 'playSlidesLoop', text=UiStrings().PlaySlidesInLoop,
-                                                  icon=':/media/media_time.png', checked=False, can_shortcuts=True,
+                                                  icon=UiIcons().clock, checked=False, can_shortcuts=True,
                                                   category=self.category, triggers=self.on_play_slides_loop)
             self.play_slides_once = create_action(self, 'playSlidesOnce', text=UiStrings().PlaySlidesToEnd,
-                                                  icon=':/media/media_time.png', checked=False, can_shortcuts=True,
+                                                  icon=UiIcons().clock, checked=False, can_shortcuts=True,
                                                   category=self.category, triggers=self.on_play_slides_once)
             if Settings().value(self.main_window.advanced_settings_section + '/slide limits') == SlideLimits.Wrap:
                 self.play_slides_menu.setDefaultAction(self.play_slides_loop)
@@ -338,7 +338,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             # FIXME: object name should be changed. But this requires that we migrate the shortcut.
             self.audio_pause_item = self.toolbar.add_toolbar_action(
                 'audioPauseItem',
-                icon=':/slides/media_playback_pause.png', text=translate('OpenLP.SlideController', 'Pause Audio'),
+                icon=UiIcons().pause, text=translate('OpenLP.SlideController', 'Pause Audio'),
                 tooltip=translate('OpenLP.SlideController', 'Pause audio.'),
                 checked=False, visible=False, category=self.category, context=QtCore.Qt.WindowShortcut,
                 can_shortcuts=True, triggers=self.set_audio_pause_clicked)
@@ -347,7 +347,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.audio_pause_item.setParent(self.toolbar)
             self.toolbar.widgetForAction(self.audio_pause_item).setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
             self.next_track_item = create_action(self, 'nextTrackItem', text=UiStrings().NextTrack,
-                                                 icon=':/slides/media_playback_next.png',
+                                                 icon=UiIcons().arrow_right,
                                                  tooltip=translate('OpenLP.SlideController',
                                                                    'Go to next audio track.'),
                                                  category=self.category,
@@ -735,10 +735,10 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         self.toolbar.set_widget_visible('song_menu', False)
         # Reset the button
         self.play_slides_once.setChecked(False)
-        self.play_slides_once.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_once.setIcon(UiIcons().clock)
         self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
         self.play_slides_loop.setChecked(False)
-        self.play_slides_loop.setIcon(build_icon(':/media/media_time.png'))
+        self.play_slides_loop.setIcon(UiIcons().clock)
         self.play_slides_loop.setText(UiStrings().PlaySlidesInLoop)
         if item.is_text():
             if (Settings().value(self.main_window.songs_settings_section + '/display songbar') and
@@ -1313,16 +1313,16 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.play_slides_loop.setChecked(checked)
         self.log_debug('on_play_slides_loop {text}'.format(text=checked))
         if checked:
-            self.play_slides_loop.setIcon(build_icon(':/media/media_stop.png'))
+            self.play_slides_loop.setIcon(UiIcons().stop)
             self.play_slides_loop.setText(UiStrings().StopPlaySlidesInLoop)
-            self.play_slides_once.setIcon(build_icon(':/media/media_time.png'))
+            self.play_slides_once.setIcon(UiIcons().clock)
             self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
             self.play_slides_menu.setDefaultAction(self.play_slides_loop)
             self.play_slides_once.setChecked(False)
             if Settings().value('core/click live slide to unblank'):
                 Registry().execute('slidecontroller_live_unblank')
         else:
-            self.play_slides_loop.setIcon(build_icon(':/media/media_time.png'))
+            self.play_slides_loop.setIcon(UiIcons().clock)
             self.play_slides_loop.setText(UiStrings().PlaySlidesInLoop)
         self.on_toggle_loop()
 
@@ -1338,16 +1338,16 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
             self.play_slides_once.setChecked(checked)
         self.log_debug('on_play_slides_once {text}'.format(text=checked))
         if checked:
-            self.play_slides_once.setIcon(build_icon(':/media/media_stop.png'))
+            self.play_slides_once.setIcon(UiIcons().stop)
             self.play_slides_once.setText(UiStrings().StopPlaySlidesToEnd)
-            self.play_slides_loop.setIcon(build_icon(':/media/media_time.png'))
+            self.play_slides_loop.setIcon(UiIcons().clock)
             self.play_slides_loop.setText(UiStrings().PlaySlidesInLoop)
             self.play_slides_menu.setDefaultAction(self.play_slides_once)
             self.play_slides_loop.setChecked(False)
             if Settings().value('core/click live slide to unblank'):
                 Registry().execute('slidecontroller_live_unblank')
         else:
-            self.play_slides_once.setIcon(build_icon(':/media/media_time'))
+            self.play_slides_once.setIcon(UiIcons().clock)
             self.play_slides_once.setText(UiStrings().PlaySlidesToEnd)
         self.on_toggle_loop()
 

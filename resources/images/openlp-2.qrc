@@ -58,16 +58,11 @@
     <file>general_back.png</file>
   </qresource>
   <qresource prefix="slides">
-    <file>slide_next.png</file>
-    <file>slide_blank.png</file>
-    <file>slide_desktop.png</file>
     <file>slide_theme.png</file>
-    <file>slide_previous.png</file>
     <file>media_playback_start.png</file>
     <file>media_playback_stop.png</file>
     <file>media_playback_pause.png</file>
-    <file>media_playback_next.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="icon">
     <file>openlp-logo.svg</file>
   </qresource>
@@ -109,7 +104,6 @@
   </qresource>
   <qresource prefix="media">
     <file>media_time.png</file>
-    <file>media_stop.png</file>
     <file>media_audio.png</file>
     <file>media_video.png</file>
     <file>media_optical.png</file>
