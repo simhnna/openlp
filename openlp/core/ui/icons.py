@@ -39,9 +39,10 @@ class UiIcons(object):
         """
         if not cls.__instance__:
             cls.__instance__ = object.__new__(cls)
+            cls.load(cls)
         return cls.__instance__
 
-    def __init__(self):
+    def load(self):
         """
         These are the font icons used in the code.
         """
@@ -50,50 +51,64 @@ class UiIcons(object):
                                              QtGui.QPalette.ButtonText),
                          color_disabled=palette.color(QtGui.QPalette.Disabled,
                                                       QtGui.QPalette.ButtonText))
-        self.add = qta.icon('fa.plus-circle')
-        self.arrow_down = qta.icon('fa.arrow-down')
-        self.arrow_left = qta.icon('fa.arrow-left')
-        self.arrow_right = qta.icon('fa.arrow-right')
-        self.arrow_up = qta.icon('fa.arrow-up')
-        self.address = qta.icon('fa.book')
-        self.bible = qta.icon('fa.book')
-        self.blank = qta.icon('fa.times-circle')
-        self.bottom = qta.icon('fa.angle-double-down')
-        self.clock = qta.icon('fa.clock-o')
-        self.clone = qta.icon('fa.clone')
-        self.copy = qta.icon('fa.copy')
-        self.copyright = qta.icon('fa.copyright')
-        self.database = qta.icon('fa.database')
-        self.default = qta.icon('fa.info-circle')
-        self.desktop = qta.icon('fa.desktop')
-        self.delete = qta.icon('fa.trash')
-        self.edit = qta.icon('fa.edit')
-        self.exit = qta.icon('fa.sign-out')
-        self.download = qta.icon('fa.cloud-download')
-        self.live = qta.icon('fa.camera')
-        self.minus = qta.icon('fa.minus')
-        self.music = qta.icon('fa.music')
-        self.new = qta.icon('fa.file')
-        self.notes = qta.icon('fa.sticky-note')
-        self.open = qta.icon('fa.map')
-        self.pause = qta.icon('fa.pause')
-        self.play = qta.icon('fa.play')
-        self.plus = qta.icon('fa.plus')
-        self.presentation = qta.icon("fa.bar-chart")
-        self.preview = qta.icon('fa.laptop')
-        self.picture = qta.icon("fa.picture-o")
-        self.print = qta.icon('fa.print')
-        self.remote = qta.icon('fa.rss')
-        self.save = qta.icon('fa.save')
-        self.settings = qta.icon('fa.cogs')
-        self.stop = qta.icon('fa.stop')
-        self.theme = qta.icon('fa.file-image-o')
-        self.top = qta.icon('fa.angle-double-up')
-        self.upload = qta.icon('fa.cloud-upload')
-        self.user = qta.icon('fa.user')
-        self.video = qta.icon('fa.file-video-o')
-        # Debug code to print fonts as these are not easy to find and do not match web sites
-        # icon = qta._resource['iconic']
-        # fa = icon.charmap['fa']
-        # for ky in fa.keys():
-        #    print(ky, fa[ky])
+        icon_list = {
+            'add': 'fa.plus-circle',
+            'arrow_down': 'fa.arrow-down',
+            'arrow_left': 'fa.arrow-left',
+            'arrow_right': 'fa.arrow-right',
+            'arrow_up': 'fa.arrow-up',
+            'address': 'fa.book',
+            'bible': 'fa.book',
+            'blank': 'fa.times-circle',
+            'bottom': 'fa.angle-double-down',
+            'clock': 'fa.clock-o',
+            'clone': 'fa.clone',
+            'copy': 'fa.copy',
+            'copyright': 'fa.copyright',
+            'database': 'fa.database',
+            'default': 'fa.info-circle',
+            'desktop': 'fa.desktop',
+            'delete': 'fa.trash',
+            'edit': 'fa.edit',
+            'exit': 'fa.sign-out',
+            'download': 'fa.cloud-download',
+            'live': 'fa.camera',
+            'minus': 'fa.minus',
+            'music': 'fa.music',
+            'new': 'fa.file',
+            'notes': 'fa.sticky-note',
+            'open': 'fa.map',
+            'pause': 'fa.pause',
+            'play': 'fa.play',
+            'plus': 'fa.plus',
+            'presentation': 'fa.bar-chart',
+            'preview': 'fa.laptop',
+            'picture': 'fa.picture-o',
+            'print': 'fa.print',
+            'remote': 'fa.rss',
+            'save': 'fa.save',
+            'settings': 'fa.cogs',
+            'stop': 'fa.stop',
+            'theme': 'fa.file-image-o',
+            'top': 'fa.angle-double-up',
+            'upload': 'fa.cloud-upload',
+            'user': 'fa.user',
+            'video': 'fa.file-video-o'
+        }
+
+        for key in icon_list:
+            try:
+                setattr(self, key, qta.icon(icon_list[key]))
+            except:
+                setattr(self, key, qta.icon('fa.plus-circle', color='red'))
+
+    @staticmethod
+    def _print_icons():
+        """
+        Have ability to dump icons to see what is available
+        :return:
+        """
+        ico = qta._resource['iconic']
+        fa = ico.charmap['fa']
+        for ky in fa.keys():
+            print(ky, fa[ky])
