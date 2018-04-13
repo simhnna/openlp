@@ -245,7 +245,7 @@ class Ui_MainWindow(object):
                                                     'toolsOpenDataFolder', icon=UiIcons().open,
                                                     category=UiStrings().Tools, can_shortcuts=True)
         self.tools_first_time_wizard = create_action(main_window,
-                                                     'toolsFirstTimeWizard', icon=':/general/general_revert.png',
+                                                     'toolsFirstTimeWizard', icon=UiIcons().undo,
                                                      category=UiStrings().Tools, can_shortcuts=True)
         self.update_theme_images = create_action(main_window,
                                                  'updateThemeImages', category=UiStrings().Tools, can_shortcuts=True)
@@ -268,7 +268,7 @@ class Ui_MainWindow(object):
             language_item = create_action(main_window, key, checked=qm_list[key] == saved_language)
             add_actions(self.language_group, [language_item])
         self.settings_shortcuts_item = create_action(main_window, 'settingsShortcutsItem',
-                                                     icon=':/system/system_configure_shortcuts.png',
+                                                     icon=UiIcons().shortcuts,
                                                      category=UiStrings().Settings, can_shortcuts=True)
         # Formatting Tags were also known as display tags.
         self.formatting_tag_item = create_action(main_window, 'displayTagItem',
@@ -284,7 +284,7 @@ class Ui_MainWindow(object):
         self.settings_export_item = create_action(main_window, 'settingsExportItem',
                                                   category=UiStrings().Export, can_shortcuts=True)
         action_list.add_category(UiStrings().Help, CategoryOrder.standard_menu)
-        self.about_item = create_action(main_window, 'aboutItem', icon=':/system/system_about.png',
+        self.about_item = create_action(main_window, 'aboutItem', icon=UiIcons().info,
                                         can_shortcuts=True, category=UiStrings().Help,
                                         triggers=self.on_about_item_clicked)
         # Give QT Extra Hint that this is an About Menu Item
@@ -293,7 +293,7 @@ class Ui_MainWindow(object):
             self.local_help_file = AppLocation.get_directory(AppLocation.AppDir) / 'OpenLP.chm'
         elif is_macosx():
             self.local_help_file = AppLocation.get_directory(AppLocation.AppDir) / '..' / 'Resources' / 'OpenLP.help'
-        self.user_manual_item = create_action(main_window, 'userManualItem', icon=':/system/system_help_contents.png',
+        self.user_manual_item = create_action(main_window, 'userManualItem', icon=UiIcons().manual,
                                               can_shortcuts=True, category=UiStrings().Help,
                                               triggers=self.on_help_clicked)
         self.web_site_item = create_action(main_window, 'webSiteItem', can_shortcuts=True, category=UiStrings().Help)
@@ -625,7 +625,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, LogMixin, RegistryPropert
         """
         version_text = translate('OpenLP.MainWindow', 'Version {new} of OpenLP is now available for download (you are '
                                  'currently running version {current}). \n\nYou can download the latest version from '
-                                 'http://openlp.org/.').format(new=version, current=get_version()[u'full'])
+                                 'https://openlp.org/.').format(new=version, current=get_version()[u'full'])
         QtWidgets.QMessageBox.question(self, translate('OpenLP.MainWindow', 'OpenLP Version Updated'), version_text)
 
     def show(self):
@@ -775,7 +775,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, LogMixin, RegistryPropert
         Load the OpenLP website
         """
         import webbrowser
-        webbrowser.open_new('http://openlp.org/')
+        webbrowser.open_new('https://openlp.org/')
 
     def on_help_clicked(self):
         """
@@ -786,7 +786,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, LogMixin, RegistryPropert
             QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(str(self.local_help_file)))
         else:
             import webbrowser
-            webbrowser.open_new('http://manual.openlp.org/')
+            webbrowser.open_new('https://manual.openlp.org/')
 
     def on_about_item_clicked(self):
         """

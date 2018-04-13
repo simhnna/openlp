@@ -53,6 +53,7 @@ class UiIcons(object):
                                                       QtGui.QPalette.ButtonText))
         icon_list = {
             'add': 'fa.plus-circle',
+            'alert': 'fa.exclamation-triangle',
             'arrow_down': 'fa.arrow-down',
             'arrow_left': 'fa.arrow-left',
             'arrow_right': 'fa.arrow-right',
@@ -72,7 +73,9 @@ class UiIcons(object):
             'edit': 'fa.edit',
             'exit': 'fa.sign-out',
             'download': 'fa.cloud-download',
+            'info': 'fa.info',
             'live': 'fa.camera',
+            'manual': 'fa.graduation-cap',
             'minus': 'fa.minus',
             'music': 'fa.music',
             'new': 'fa.file',
@@ -88,6 +91,7 @@ class UiIcons(object):
             'remote': 'fa.rss',
             'save': 'fa.save',
             'settings': 'fa.cogs',
+            'shortcuts': 'fa.wrench',
             'stop': 'fa.stop',
             'theme': 'fa.file-image-o',
             'top': 'fa.angle-double-up',
