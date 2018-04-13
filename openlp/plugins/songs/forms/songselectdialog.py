@@ -28,6 +28,7 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common.i18n import translate
 from openlp.core.lib import build_icon
 from openlp.core.ui import SingleColumnTableWidget
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import HistoryComboBox
 
 
@@ -90,7 +91,7 @@ class Ui_SongSelectDialog(object):
         self.login_progress_bar.setVisible(False)
         self.login_button_layout.addWidget(self.login_progress_bar)
         self.login_button = QtWidgets.QPushButton(self.login_page)
-        self.login_button.setIcon(build_icon(':/songs/song_author_edit.png'))
+        self.login_button.setIcon(UiIcons().edit)
         self.login_button.setObjectName('login_button')
         self.login_button_layout.addWidget(self.login_button)
         self.login_layout.setLayout(4, QtWidgets.QFormLayout.SpanningRole, self.login_button_layout)
@@ -124,7 +125,7 @@ class Ui_SongSelectDialog(object):
         self.search_progress_bar.setValue(0)
         self.search_progress_layout.addWidget(self.search_progress_bar)
         self.stop_button = QtWidgets.QPushButton(self.search_page)
-        self.stop_button.setIcon(build_icon(':/songs/song_search_stop.png'))
+        self.stop_button.setIcon(UiIcons().stop)
         self.stop_button.setObjectName('stop_button')
         self.search_progress_layout.addWidget(self.stop_button)
         self.search_layout.addLayout(self.search_progress_layout)
@@ -143,7 +144,7 @@ class Ui_SongSelectDialog(object):
         self.view_layout.setSpacing(8)
         self.view_layout.setObjectName('view_layout')
         self.logout_button = QtWidgets.QPushButton(self.search_page)
-        self.logout_button.setIcon(build_icon(':/songs/song_author_edit.png'))
+        self.logout_button.setIcon(UiIcons().edit)
         self.view_layout.addWidget(self.logout_button)
         self.view_spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.view_layout.addItem(self.view_spacer)

@@ -31,6 +31,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext, PluginStatus, \
     check_item_selected
 from openlp.core.lib.ui import create_widget_action
+from openlp.core.ui.icons import UiIcons
 from openlp.plugins.custom.forms.editcustomform import EditCustomForm
 from openlp.plugins.custom.lib import CustomXMLParser, CustomXMLBuilder
 from openlp.plugins.custom.lib.db import CustomSlide
@@ -88,7 +89,7 @@ class CustomMediaItem(MediaManagerItem):
     def add_custom_context_actions(self):
         create_widget_action(self.list_view, separator=True)
         create_widget_action(
-            self.list_view, text=translate('OpenLP.MediaManagerItem', '&Clone'), icon=':/general/general_clone.png',
+            self.list_view, text=translate('OpenLP.MediaManagerItem', '&Clone'), icon=UiIcons().clone,
             triggers=self.on_clone_click)
 
     def config_update(self):

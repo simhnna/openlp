@@ -35,6 +35,7 @@ from openlp.core.lib import ItemCapabilities, MediaManagerItem, MediaType, Servi
     build_icon, check_item_selected
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box, create_horizontal_adjusting_combo_box
 from openlp.core.ui import DisplayControllerType
+from openlp.core.ui.icons import UiIcons
 from openlp.core.ui.media import get_media_players, set_media_players, parse_optical_path, format_milliseconds
 from openlp.core.ui.media.vlcplayer import get_vlc
 
@@ -70,7 +71,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
         self.optical_icon = build_icon(':/media/media_optical.png')
         self.video_icon = build_icon(':/media/media_video.png')
         self.audio_icon = build_icon(':/media/media_audio.png')
-        self.error_icon = build_icon(':/general/general_delete.png')
+        self.error_icon = UiIcons().delete
 
     def setup_item(self):
         """

@@ -33,6 +33,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities, MediaManagerItem, ServiceItemContext, StringContent, build_icon, \
     check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import create_widget_action, critical_error_message_box
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.views import TreeWidgetWithDnD
 from openlp.plugins.images.forms import AddGroupForm, ChooseGroupForm
 from openlp.plugins.images.lib.db import ImageFilenames, ImageGroups
@@ -127,21 +128,21 @@ class ImageMediaItem(MediaManagerItem):
             create_widget_action(
                 self.list_view,
                 text=self.plugin.get_string(StringContent.Edit)['title'],
-                icon=':/general/general_edit.png',
+                icon=UiIcons().edit,
                 triggers=self.on_edit_click)
             create_widget_action(self.list_view, separator=True)
         create_widget_action(
             self.list_view,
             'listView{name}{preview}Item'.format(name=self.plugin.name.title(), preview=StringContent.Preview.title()),
             text=self.plugin.get_string(StringContent.Preview)['title'],
-            icon=':/general/general_preview.png',
+            icon=UiIcons().preview,
             can_shortcuts=True,
             triggers=self.on_preview_click)
         create_widget_action(
             self.list_view,
             'listView{name}{live}Item'.format(name=self.plugin.name.title(), live=StringContent.Live.title()),
             text=self.plugin.get_string(StringContent.Live)['title'],
-            icon=':/general/general_live.png',
+            icon=UiIcons().live,
             can_shortcuts=True,
             triggers=self.on_live_click)
         create_widget_action(
@@ -149,14 +150,14 @@ class ImageMediaItem(MediaManagerItem):
             'listView{name}{service}Item'.format(name=self.plugin.name.title(), service=StringContent.Service.title()),
             can_shortcuts=True,
             text=self.plugin.get_string(StringContent.Service)['title'],
-            icon=':/general/general_add.png',
+            icon=UiIcons().add,
             triggers=self.on_add_click)
         if self.add_to_service_item:
             create_widget_action(self.list_view, separator=True)
             create_widget_action(
                 self.list_view,
                 text=translate('OpenLP.MediaManagerItem', '&Add to selected Service Item'),
-                icon=':/general/general_add.png',
+                icon=UiIcons().add,
                 triggers=self.on_add_edit_click)
             create_widget_action(self.list_view, separator=True)
         if self.has_delete_icon:
@@ -164,7 +165,7 @@ class ImageMediaItem(MediaManagerItem):
                 self.list_view,
                 'listView{name}{delete}Item'.format(name=self.plugin.name.title(), delete=StringContent.Delete.title()),
                 text=self.plugin.get_string(StringContent.Delete)['title'],
-                icon=':/general/general_delete.png',
+                icon=UiIcons().delete,
                 can_shortcuts=True, triggers=self.on_delete_click)
         self.add_custom_context_actions()
         # Create the context menu and add all actions from the list_view.
@@ -186,7 +187,7 @@ class ImageMediaItem(MediaManagerItem):
         create_widget_action(
             self.list_view,
             text=translate('ImagePlugin', 'Add new image(s)'),
-            icon=':/general/general_open.png', triggers=self.on_file_click)
+            icon=UiIcons().open, triggers=self.on_file_click)
         create_widget_action(self.list_view, separator=True)
         self.replace_action_context = create_widget_action(
             self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
@@ -371,7 +372,7 @@ class ImageMediaItem(MediaManagerItem):
             file_name = image.file_path.name
             thumbnail_path = self.generate_thumbnail_path(image)
             if not image.file_path.exists():
-                icon = build_icon(':/general/general_delete.png')
+                icon = UiIcons().delete
             else:
                 if validate_thumb(image.file_path, thumbnail_path):
                     icon = build_icon(thumbnail_path)

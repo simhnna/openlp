@@ -106,8 +106,8 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         self.with_progress_page = add_progress_page
         self.setFixedWidth(640)
         self.setObjectName(name)
-        self.open_icon = build_icon(':/general/general_open.png')
-        self.delete_icon = build_icon(':/general/general_delete.png')
+        self.open_icon = UiIcons().open
+        self.delete_icon = UiIcons().delete
         self.finish_button = self.button(QtWidgets.QWizard.FinishButton)
         self.cancel_button = self.button(QtWidgets.QWizard.CancelButton)
         self.setupUi(image)

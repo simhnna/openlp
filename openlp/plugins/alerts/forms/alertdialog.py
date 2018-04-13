@@ -78,9 +78,8 @@ class Ui_AlertDialog(object):
         self.manage_button_layout.addWidget(self.delete_button)
         self.manage_button_layout.addStretch()
         self.alert_dialog_layout.addLayout(self.manage_button_layout, 1, 1)
-        display_icon = build_icon(':/general/general_live.png')
-        self.display_button = create_button(alert_dialog, 'display_button', icon=display_icon, enabled=False)
-        self.display_close_button = create_button(alert_dialog, 'display_close_button', icon=display_icon,
+        self.display_button = create_button(alert_dialog, 'display_button', icon=UiIcons().live, enabled=False)
+        self.display_close_button = create_button(alert_dialog, 'display_close_button', icon=UiIcons().live,
                                                   enabled=False)
         self.button_box = create_button_box(alert_dialog, 'button_box', ['close'],
                                             [self.display_button, self.display_close_button])

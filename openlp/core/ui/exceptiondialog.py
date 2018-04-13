@@ -79,7 +79,7 @@ class Ui_ExceptionDialog(object):
                                                 icon=UiIcons().save,
                                                 click=self.on_save_report_button_clicked)
         self.attach_tile_button = create_button(exception_dialog, 'attach_tile_button',
-                                                icon=':/general/general_open.png',
+                                                icon=UiIcons().open,
                                                 click=self.on_attach_file_button_clicked)
         self.button_box = create_button_box(exception_dialog, 'button_box', ['close'],
                                             [self.send_report_button, self.save_report_button, self.attach_tile_button])
