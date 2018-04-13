@@ -33,6 +33,7 @@ from openlp.core.common.path import Path, path_to_str, str_to_path
 from openlp.core.common.settings import Settings
 from openlp.core.lib import FormattingTags, build_icon
 from openlp.core.lib.ui import create_widget_action, create_action
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.dialogs import FileDialog
 from openlp.core.widgets.enums import PathEditType
 
@@ -229,10 +230,10 @@ class PathEdit(QtWidgets.QWidget):
         self.line_edit = QtWidgets.QLineEdit(self)
         widget_layout.addWidget(self.line_edit)
         self.browse_button = QtWidgets.QToolButton(self)
-        self.browse_button.setIcon(build_icon(':/general/general_open.png'))
+        self.browse_button.setIcon(UiIcons().open)
         widget_layout.addWidget(self.browse_button)
         self.revert_button = QtWidgets.QToolButton(self)
-        self.revert_button.setIcon(build_icon(':/general/general_revert.png'))
+        self.revert_button.setIcon(UiIcons().undo)
         self.revert_button.setVisible(show_revert)
         widget_layout.addWidget(self.revert_button)
         self.setLayout(widget_layout)

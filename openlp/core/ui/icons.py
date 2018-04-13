@@ -91,8 +91,10 @@ class UiIcons(object):
             'stop': 'fa.stop',
             'theme': 'fa.file-image-o',
             'top': 'fa.angle-double-up',
+            'undo': 'fa.undo',
             'upload': 'fa.cloud-upload',
             'user': 'fa.user',
+            'users': 'fa.users',
             'video': 'fa.file-video-o'
         }
 
@@ -105,7 +107,7 @@ class UiIcons(object):
     @staticmethod
     def _print_icons():
         """
-        Have ability to dump icons to see what is available
+        Have ability to dump icons to see what is available.  Can only run within an application
         :return:
         """
         ico = qta._resource['iconic']
