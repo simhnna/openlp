@@ -110,7 +110,6 @@
     <file>theme_new.png</file>
     </qresource>
   <qresource prefix="projector">
-    <file>projector_blank.png</file>
     <file>projector_blank_tiled.png</file>
     <file>projector_connect.png</file>
     <file>projector_connect_tiled.png</file>

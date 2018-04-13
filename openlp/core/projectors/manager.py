@@ -191,7 +191,7 @@ class UiProjectorManager(object):
         self.one_toolbar.add_toolbar_action('blank_projector',
                                             text=translate('OpenLP.ProjectorManager',
                                                            'Blank selected projector screen'),
-                                            icon=':/projector/projector_blank.png',
+                                            icon=UiIcons().blank,
                                             tooltip=translate('OpenLP.ProjectorManager',
                                                               'Blank selected projector screen'),
                                             triggers=self.on_blank_projector)
@@ -277,7 +277,7 @@ class UiProjectorManager(object):
         self.blank_action = create_widget_action(self.menu,
                                                  text=translate('OpenLP.ProjectorManager',
                                                                 '&Blank Projector Screen'),
-                                                 icon=':/projector/projector_blank.png',
+                                                 icon=UiIcons().blank,
                                                  triggers=self.on_blank_projector)
         self.show_action = create_widget_action(self.menu,
                                                 text=translate('OpenLP.ProjectorManager',
