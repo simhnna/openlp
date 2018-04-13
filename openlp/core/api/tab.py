@@ -41,8 +41,6 @@ class ApiTab(SettingsTab):
         self.icon_path = ':/plugins/plugin_remote.png'
         advanced_translated = translate('OpenLP.AdvancedTab', 'Advanced')
         super(ApiTab, self).__init__(parent, 'api', advanced_translated)
-        self.define_main_window_icon()
-        self.generate_icon()
 
     def setupUi(self):
         self.setObjectName('ApiTab')
@@ -155,24 +153,6 @@ class ApiTab(SettingsTab):
         self.thumbnails_check_box.stateChanged.connect(self.on_thumbnails_check_box_changed)
         self.address_edit.textChanged.connect(self.set_urls)
 
-    def define_main_window_icon(self):
-        """
-        Define an icon on the main window to show the state of the server
-        :return:
-        """
-        self.remote_server_icon = QtWidgets.QLabel(self.main_window.status_bar)
-        size_policy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
-        size_policy.setHorizontalStretch(0)
-        size_policy.setVerticalStretch(0)
-        size_policy.setHeightForWidth(self.remote_server_icon.sizePolicy().hasHeightForWidth())
-        self.remote_server_icon.setSizePolicy(size_policy)
-        self.remote_server_icon.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.remote_server_icon.setLineWidth(1)
-        self.remote_server_icon.setScaledContents(True)
-        self.remote_server_icon.setFixedSize(20, 20)
-        self.remote_server_icon.setObjectName('remote_server_icon')
-        self.main_window.status_bar.insertPermanentWidget(2, self.remote_server_icon)
-
     def retranslateUi(self):
         self.tab_title_visible = translate('RemotePlugin.RemoteTab', 'Remote Interface')
         self.server_settings_group_box.setTitle(translate('RemotePlugin.RemoteTab', 'Server Settings'))
@@ -280,19 +260,3 @@ class ApiTab(SettingsTab):
         # we have a set value convert to True/False
         if check_state == QtCore.Qt.Checked:
             self.thumbnails = True
-
-    def generate_icon(self):
-        """
-        Generate icon for main window
-        """
-        self.remote_server_icon.hide()
-        icon = QtGui.QImage(':/remote/network_server.png')
-        icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        if Settings().value(self.settings_section + '/authentication enabled'):
-            overlay = QtGui.QImage(':/remote/network_auth.png')
-            overlay = overlay.scaled(60, 60, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-            painter = QtGui.QPainter(icon)
-            painter.drawImage(20, 0, overlay)
-            painter.end()
-        self.remote_server_icon.setPixmap(QtGui.QPixmap.fromImage(icon))
-        self.remote_server_icon.show()

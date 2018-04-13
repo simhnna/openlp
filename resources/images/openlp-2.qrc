@@ -34,7 +34,6 @@
     <file>general_zoom_out.png</file>
     <file>general_zoom_in.png</file>
     <file>general_zoom_original.png</file>
-    <file>general_print.png</file>
     <file>general_email.png</file>
     <file>general_find.png</file>
     <file>general_back.png</file>
@@ -66,20 +65,16 @@
     <file>wizard_duplicateremoval.bmp</file>
     </qresource>
   <qresource prefix="services">
-    <file>service_down.png</file>
-    <file>service_up.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="system">
     <file>system_close.png</file>
     <file>clear_shortcut.png</file>
-    <file>system_about.png</file>
     <file>system_mediamanager.png</file>
     <file>system_volunteer.png</file>
     <file>system_servicemanager.png</file>
     <file>system_thememanager.png</file>
     <file>settings_plugin_list.png</file>
     <file>system_settings.png</file>
-    <file>system_configure.png</file>
     <file>system_edit_copy.png</file>
     <file>system_configure_shortcuts.png</file>
   </qresource>
@@ -97,9 +92,7 @@
   <qresource prefix="messagebox">
     </qresource>
   <qresource prefix="remote">
-    <file>network_server.png</file>
-    <file>network_auth.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="songusage">
     <file>song_usage_active.png</file>
     <file>song_usage_inactive.png</file>
