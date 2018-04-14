@@ -471,15 +471,15 @@ def get_file_encoding(file_path):
         log.exception('Error detecting file encoding')
 
 
-def normalize_str(irreg_str):
+def normalize_str(string):
     """
     Normalize the supplied string. Remove unicode control chars and tidy up white space.
 
-    :param str irreg_str: The string to normalize.
+    :param str string: The string to normalize.
     :return: The normalized string
     :rtype: str
     """
-    irreg_str = irreg_str.translate(REPLACMENT_CHARS_MAP)
-    irreg_str = CONTROL_CHARS.sub('', irreg_str)
-    irreg_str = NEW_LINE_REGEX.sub('\n', irreg_str)
-    return WHITESPACE_REGEX.sub(' ', irreg_str)
+    string = string.translate(REPLACMENT_CHARS_MAP)
+    string = CONTROL_CHARS.sub('', string)
+    string = NEW_LINE_REGEX.sub('\n', string)
+    return WHITESPACE_REGEX.sub(' ', string)
