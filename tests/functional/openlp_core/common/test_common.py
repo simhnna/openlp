@@ -25,8 +25,8 @@ Functional tests to test the AppLocation class and related methods.
 from unittest import TestCase
 from unittest.mock import MagicMock, call, patch
 
-from openlp.core.common import clean_button_text, de_hump, extension_loader, is_macosx, is_linux, is_win, \
-    path_to_module, trace_error_handler
+from openlp.core.common import (clean_button_text, de_hump, extension_loader, is_macosx, is_linux,
+                                is_win, normalize_str, path_to_module, trace_error_handler)
 from openlp.core.common.path import Path
 
 
@@ -210,6 +210,30 @@ class TestCommonFunctions(TestCase):
             assert is_linux() is True, 'is_linux() should return True'
             assert is_win() is False, 'is_win() should return False'
             assert is_macosx() is False, 'is_macosx() should return False'
+
+    def test_normalize_str_leaves_newlines(self):
+        # GIVEN: a string containing newlines
+        str = 'something\nelse'
+        # WHEN: normalize is called
+        normalized_string = normalize_str(str)
+        # THEN: string is unchanged
+        assert normalized_string == str
+
+    def test_normalize_str_removes_null_byte(self):
+        # GIVEN: a string containing newlines
+        str = 'somet\x00hing'
+        # WHEN: normalize is called
+        normalized_string = normalize_str(str)
+        # THEN: string is unchanged
+        assert normalized_string == 'something'
+
+    def test_normalize_str_replaces_crlf_with_lf(self):
+        # GIVEN: a string containing crlf
+        str = 'something\r\nelse'
+        # WHEN: normalize is called
+        normalized_string = normalize_str(str)
+        # THEN: crlf is replaced with lf
+        assert normalized_string == 'something\nelse'
 
     def test_clean_button_text(self):
         """

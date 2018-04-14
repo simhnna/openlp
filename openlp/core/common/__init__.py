@@ -44,7 +44,7 @@ log = logging.getLogger(__name__ + '.__init__')
 
 FIRST_CAMEL_REGEX = re.compile('(.)([A-Z][a-z]+)')
 SECOND_CAMEL_REGEX = re.compile('([a-z0-9])([A-Z])')
-CONTROL_CHARS = re.compile(r'[\x00-\x1F\x7F-\x9F]')
+CONTROL_CHARS = re.compile(r'[\x00-\08\x0E-\x1F\x7F-\x9F]')
 INVALID_FILE_CHARS = re.compile(r'[\\/:\*\?"<>\|\+\[\]%]')
 IMAGES_FILTER = None
 REPLACMENT_CHARS_MAP = str.maketrans({'\u2018': '\'', '\u2019': '\'', '\u201c': '"', '\u201d': '"', '\u2026': '...',
