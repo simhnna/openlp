@@ -220,11 +220,11 @@ class TestCommonFunctions(TestCase):
         assert normalized_string == string
 
     def test_normalize_str_removes_null_byte(self):
-        # GIVEN: a string containing newlines
+        # GIVEN: a string containing a null byte
         string = 'somet\x00hing'
         # WHEN: normalize is called
         normalized_string = normalize_str(string)
-        # THEN: string is unchanged
+        # THEN: nullbyte is removed
         assert normalized_string == 'something'
 
     def test_normalize_str_replaces_crlf_with_lf(self):
