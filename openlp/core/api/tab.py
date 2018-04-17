@@ -22,13 +22,14 @@
 """
 The :mod:`~openlp.core.api.tab` module contains the settings tab for the API
 """
-from PyQt5 import QtCore, QtGui, QtNetwork, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import get_local_ip4
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
+from openlp.core.ui.icons import UiIcons
 
 ZERO_URL = '0.0.0.0'
 
@@ -38,7 +39,7 @@ class ApiTab(SettingsTab):
     RemoteTab is the Remotes settings tab in the settings dialog.
     """
     def __init__(self, parent):
-        self.icon_path = ':/plugins/plugin_remote.png'
+        self.icon_path = UiIcons().remote
         advanced_translated = translate('OpenLP.AdvancedTab', 'Advanced')
         super(ApiTab, self).__init__(parent, 'api', advanced_translated)
 

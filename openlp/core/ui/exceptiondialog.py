@@ -73,7 +73,7 @@ class Ui_ExceptionDialog(object):
         self.exception_text_edit.setObjectName('exception_text_edit')
         self.exception_layout.addWidget(self.exception_text_edit)
         self.send_report_button = create_button(exception_dialog, 'send_report_button',
-                                                icon=':/general/general_email.png',
+                                                icon=UiIcons().email,
                                                 click=self.on_send_report_button_clicked)
         self.save_report_button = create_button(exception_dialog, 'save_report_button',
                                                 icon=UiIcons().save,
@@ -92,7 +92,7 @@ class Ui_ExceptionDialog(object):
         """
         Translate the widgets on the fly.
         """
-        # Note that bugs mail is not clicable, but it adds the blue color and underlining and makes the test copyable.
+        # Note that bugs mail is not clickable, but it adds the blue color and underlining and makes the test copyable.
         exception_dialog.setWindowTitle(translate('OpenLP.ExceptionDialog', 'Error Occurred'))
         # Explanation text, &nbsp; adds a small space before: If possible, write in English.
         self.description_explanation.setText(

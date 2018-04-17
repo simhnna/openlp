@@ -50,7 +50,7 @@ class AdvancedTab(SettingsTab):
         Initialise the settings tab
         """
         self.data_exists = False
-        self.icon_path = ':/system/system_settings.png'
+        self.icon_path = UiIcons().settings
         self.autoscroll_map = [None, {'dist': -1, 'pos': 0}, {'dist': -1, 'pos': 1}, {'dist': -1, 'pos': 2},
                                {'dist': 0, 'pos': 0}, {'dist': 0, 'pos': 1}, {'dist': 0, 'pos': 2},
                                {'dist': 0, 'pos': 3}, {'dist': 1, 'pos': 0}, {'dist': 1, 'pos': 1},
