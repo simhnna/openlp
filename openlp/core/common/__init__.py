@@ -44,7 +44,7 @@ log = logging.getLogger(__name__ + '.__init__')
 
 FIRST_CAMEL_REGEX = re.compile('(.)([A-Z][a-z]+)')
 SECOND_CAMEL_REGEX = re.compile('([a-z0-9])([A-Z])')
-CONTROL_CHARS = re.compile(r'[\x00-\x1F\x7F-\x9F]')
+CONTROL_CHARS = re.compile(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]')
 INVALID_FILE_CHARS = re.compile(r'[\\/:\*\?"<>\|\+\[\]%]')
 IMAGES_FILTER = None
 REPLACMENT_CHARS_MAP = str.maketrans({'\u2018': '\'', '\u2019': '\'', '\u201c': '"', '\u201d': '"', '\u2026': '...',
@@ -471,15 +471,15 @@ def get_file_encoding(file_path):
         log.exception('Error detecting file encoding')
 
 
-def normalize_str(irreg_str):
+def normalize_str(irregular_string):
     """
     Normalize the supplied string. Remove unicode control chars and tidy up white space.
 
-    :param str irreg_str: The string to normalize.
+    :param str irregular_string: The string to normalize.
     :return: The normalized string
     :rtype: str
     """
-    irreg_str = irreg_str.translate(REPLACMENT_CHARS_MAP)
-    irreg_str = CONTROL_CHARS.sub('', irreg_str)
-    irreg_str = NEW_LINE_REGEX.sub('\n', irreg_str)
-    return WHITESPACE_REGEX.sub(' ', irreg_str)
+    irregular_string = irregular_string.translate(REPLACMENT_CHARS_MAP)
+    irregular_string = CONTROL_CHARS.sub('', irregular_string)
+    irregular_string = NEW_LINE_REGEX.sub('\n', irregular_string)
+    return WHITESPACE_REGEX.sub(' ', irregular_string)
