@@ -22,14 +22,14 @@
 """
 Package to test the openlp.core.projectors.pjlink commands package.
 """
-from unittest import TestCase
+from unittest import TestCase, skip
 from unittest.mock import patch, call
 
 import openlp.core.projectors.pjlink
-from openlp.core.projectors.constants import S_CONNECTED, S_OFF, S_ON
+from openlp.core.projectors.constants import PJLINK_PORT, S_CONNECTED, S_OFF, S_ON
 from openlp.core.projectors.db import Projector
-from openlp.core.projectors.pjlink import PJLink
-from tests.resources.projector.data import TEST_HASH, TEST_PIN, TEST_SALT, TEST1_DATA
+from openlp.core.projectors.pjlink import PJLink, PJLinkUDP
+from tests.resources.projector.data import TEST_HASH, TEST_PIN, TEST_SALT, TEST1_DATA, TEST2_DATA
 
 
 class TestPJLinkCommands(TestCase):
@@ -235,3 +235,114 @@ class TestPJLinkCommands(TestCase):
         mock_log.error.assert_has_calls(log_check)
         assert 1 == mock_disconnect_from_host.call_count, 'Should have only been called once'
         mock_send_command.assert_not_called()
+
+    @skip('Change to pjlink_udp.get_datagram() call')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
+    def test_process_ackn_duplicate(self, mock_log):
+        """
+        Test process_ackn method with multiple calls with same data
+        """
+        # TODO: Change this to call pjlink_udp.get_datagram() so ACKN can be processed properly
+
+        # GIVEN: Test setup
+        pjlink = PJLink(projector=self.test_list[0])
+        check_list = {TEST1_DATA['ip']: {'data': TEST1_DATA['mac_adx'], 'port': PJLINK_PORT}}
+        log_warn_calls = [call('(___TEST_ONE___) Host {host} already replied - '
+                               'ignoring'.format(host=TEST1_DATA['ip']))]
+        log_debug_calls = [call('PJlinkCommands(args=() kwargs={})'),
+                           call('(___TEST_ONE___) reset_information() connect status is S_NOT_CONNECTED'),
+                           call('(___TEST_ONE___) Processing ACKN packet'),
+                           call('(___TEST_ONE___) Adding {host} to ACKN list'.format(host=TEST1_DATA['ip'])),
+                           call('(___TEST_ONE___) Processing ACKN packet')]
+
+        # WHEN: process_ackn called twice with same data
+        pjlink.process_ackn(data=TEST1_DATA['mac_adx'], host=TEST1_DATA['ip'], port=PJLINK_PORT)
+        pjlink.process_ackn(data=TEST1_DATA['mac_adx'], host=TEST1_DATA['ip'], port=PJLINK_PORT)
+
+        # THEN: pjlink_udp.ack_list should equal test_list
+        # NOTE: This assert only returns AssertionError - does not list differences. Maybe add a compare function?
+        if pjlink.ackn_list != check_list:
+            # Check this way so we can print differences to stdout
+            print('\nackn_list: ', pjlink.ackn_list)
+            print('test_list: ', check_list, '\n')
+            assert pjlink.ackn_list == check_list
+        mock_log.debug.assert_has_calls(log_debug_calls)
+        mock_log.warning.assert_has_calls(log_warn_calls)
+
+    @skip('Change to pjlink_udp.get_datagram() call')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
+    def test_process_ackn_multiple(self, mock_log):
+        """
+        Test process_ackn method with multiple calls
+        """
+        # TODO: Change this to call pjlink_udp.get_datagram() so ACKN can be processed properly
+
+        # GIVEN: Test setup
+        pjlink_udp = PJLinkUDP(projector_list=self.test_list)
+        check_list = {TEST1_DATA['ip']: {'data': TEST1_DATA['mac_adx'], 'port': PJLINK_PORT},
+                      TEST2_DATA['ip']: {'data': TEST2_DATA['mac_adx'], 'port': PJLINK_PORT}}
+        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized'),
+                           call('(UDP) Processing ACKN packet'),
+                           call('(UDP) Adding {host} to ACKN list'.format(host=TEST1_DATA['ip'])),
+                           call('(UDP) Processing ACKN packet'),
+                           call('(UDP) Adding {host} to ACKN list'.format(host=TEST2_DATA['ip']))]
+
+        # WHEN: process_ackn called twice with different data
+        pjlink_udp.process_ackn(data=TEST1_DATA['mac_adx'], host=TEST1_DATA['ip'], port=PJLINK_PORT)
+        pjlink_udp.process_ackn(data=TEST2_DATA['mac_adx'], host=TEST2_DATA['ip'], port=PJLINK_PORT)
+
+        # THEN: pjlink_udp.ack_list should equal test_list
+        # NOTE: This assert only returns AssertionError - does not list differences. Maybe add a compare function?
+        if pjlink_udp.ackn_list != check_list:
+            # Check this way so we can print differences to stdout
+            print('\nackn_list: ', pjlink_udp.ackn_list)
+            print('test_list: ', check_list)
+            assert pjlink_udp.ackn_list == check_list
+        mock_log.debug.assert_has_calls(log_debug_calls)
+
+    @skip('Change to pjlink_udp.get_datagram() call')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
+    def test_process_ackn_single(self, mock_log):
+        """
+        Test process_ackn method with single call
+        """
+        # TODO: Change this to call pjlink_udp.get_datagram() so ACKN can be processed properly
+
+        # GIVEN: Test setup
+        pjlink_udp = PJLinkUDP(projector_list=self.test_list)
+        check_list = {TEST1_DATA['ip']: {'data': TEST1_DATA['mac_adx'], 'port': PJLINK_PORT}}
+        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized'),
+                           call('(UDP) Processing ACKN packet'),
+                           call('(UDP) Adding {host} to ACKN list'.format(host=TEST1_DATA['ip']))]
+
+        # WHEN: process_ackn called twice with different data
+        pjlink_udp.process_ackn(data=TEST1_DATA['mac_adx'], host=TEST1_DATA['ip'], port=PJLINK_PORT)
+
+        # THEN: pjlink_udp.ack_list should equal test_list
+        # NOTE: This assert only returns AssertionError - does not list differences. Maybe add a compare function?
+        if pjlink_udp.ackn_list != check_list:
+            # Check this way so we can print differences to stdout
+            print('\nackn_list: ', pjlink_udp.ackn_list)
+            print('test_list: ', check_list)
+            assert pjlink_udp.ackn_list == check_list
+        mock_log.debug.assert_has_calls(log_debug_calls)
+
+    @skip('Change to pjlink_udp.get_datagram() call')
+    @patch.object(openlp.core.projectors.pjlink, 'log')
+    def test_process_srch(self, mock_log):
+        """
+        Test process_srch method
+        """
+        # TODO: Change this to call pjlink_udp.get_datagram() so ACKN can be processed properly
+
+        # GIVEN: Test setup
+        log_warn_calls = [call('(UDP) SRCH packet received from {ip} - ignoring'.format(ip=TEST1_DATA['ip'])), ]
+        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized'), ]
+        pjlink_udp = PJLinkUDP(projector_list=self.test_list)
+
+        # WHEN: process_srch called
+        pjlink_udp.process_srch(data=None, host=TEST1_DATA['ip'], port=PJLINK_PORT)
+
+        # THEN: log entries should be entered
+        mock_log.warning.assert_has_calls(log_warn_calls)
+        mock_log.debug.assert_has_calls(log_debug_calls)

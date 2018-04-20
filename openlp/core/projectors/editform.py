@@ -58,10 +58,15 @@ class Ui_ProjectorEditForm(object):
         # IP Address
         self.ip_label = QtWidgets.QLabel(edit_projector_dialog)
         self.ip_label.setObjectName('projector_edit_ip_label')
-        self.ip_text = QtWidgets.QLineEdit(edit_projector_dialog)
-        self.ip_text.setObjectName('projector_edit_ip_text')
+        self.ip_text_edit = QtWidgets.QLineEdit(edit_projector_dialog)
+        self.ip_text_edit.setObjectName('projector_edit_ip_text')
+        self.ip_text_label = QtWidgets.QLabel(edit_projector_dialog)
+        self.ip_text_label.setObjectName('projector_show_ip_text')
         self.dialog_layout.addWidget(self.ip_label, 0, 0)
-        self.dialog_layout.addWidget(self.ip_text, 0, 1)
+        # For new projector, use edit widget
+        self.dialog_layout.addWidget(self.ip_text_edit, 0, 1)
+        # For edit projector, use show widget
+        self.dialog_layout.addWidget(self.ip_text_label, 0, 1)
         # Port number
         self.port_label = QtWidgets.QLabel(edit_projector_dialog)
         self.port_label.setObjectName('projector_edit_ip_label')
@@ -111,8 +116,8 @@ class Ui_ProjectorEditForm(object):
             title = translate('OpenLP.ProjectorEditForm', 'Edit Projector')
         edit_projector_dialog.setWindowTitle(title)
         self.ip_label.setText(translate('OpenLP.ProjectorEditForm', 'IP Address'))
-        self.ip_text.setText(self.projector.ip)
-        self.ip_text.setFocus()
+        self.ip_text_edit.setText(self.projector.ip)
+        self.ip_text_label.setText(self.projector.ip)
         self.port_label.setText(translate('OpenLP.ProjectorEditForm', 'Port Number'))
         self.port_text.setText(str(self.projector.port))
         self.pin_label.setText(translate('OpenLP.ProjectorEditForm', 'PIN'))
@@ -131,7 +136,7 @@ class ProjectorEditForm(QtWidgets.QDialog, Ui_ProjectorEditForm):
     Class to add or edit a projector entry in the database.
 
     Fields that are editable:
-        ip = Column(String(100))
+        ip = Column(String(100)) (Only edit for new projector)
         port = Column(String(8))
         pin = Column(String(20))
         name = Column(String(20))
@@ -154,9 +159,16 @@ class ProjectorEditForm(QtWidgets.QDialog, Ui_ProjectorEditForm):
         if projector is None:
             self.projector = Projector()
             self.new_projector = True
+            self.ip_text_edit.setVisible(True)
+            self.ip_text_edit.setFocus()
+            self.ip_text_label.setVisible(False)
         else:
             self.projector = projector
             self.new_projector = False
+            self.ip_text_edit.setVisible(False)
+            self.ip_text_label.setVisible(True)
+            # Since it's already defined, IP address is unchangeable, so focus on port number
+            self.port_text.setFocus()
         self.retranslateUi(self)
         reply = QtWidgets.QDialog.exec(self)
         return reply
@@ -187,30 +199,32 @@ class ProjectorEditForm(QtWidgets.QDialog, Ui_ProjectorEditForm):
                                                                                             record=record.id)))
             valid = False
             return
-        adx = self.ip_text.text()
-        valid = verify_ip_address(adx)
-        if valid:
-            ip = self.projectordb.get_projector_by_ip(adx)
-            if ip is None:
-                valid = True
-                self.new_projector = True
-            elif ip.id != self.projector.id:
+        if self.new_projector:
+            # Only validate a new entry - otherwise it's been previously verified
+            adx = self.ip_text_edit.text()
+            valid = verify_ip_address(adx)
+            if valid:
+                # With a valid IP - check if it's already in database so we don't duplicate
+                ip = self.projectordb.get_projector_by_ip(adx)
+                if ip is None:
+                    valid = True
+                    self.new_projector = True
+                elif ip.id != self.projector.id:
+                    QtWidgets.QMessageBox.warning(self,
+                                                  translate('OpenLP.ProjectorWizard', 'Duplicate IP Address'),
+                                                  translate('OpenLP.ProjectorWizard',
+                                                            'IP address "{ip}"<br />is already in the database '
+                                                            'as ID {data}.<br /><br />Please Enter a different '
+                                                            'IP address.'.format(ip=adx, data=ip.id)))
+                    return
+            else:
                 QtWidgets.QMessageBox.warning(self,
-                                              translate('OpenLP.ProjectorWizard', 'Duplicate IP Address'),
+                                              translate('OpenLP.ProjectorWizard', 'Invalid IP Address'),
                                               translate('OpenLP.ProjectorWizard',
-                                                        'IP address "{ip}"<br />is already in the database '
-                                                        'as ID {data}.<br /><br />Please Enter a different '
-                                                        'IP address.'.format(ip=adx, data=ip.id)))
+                                                        'IP address "{ip}"<br>is not a valid IP address.'
+                                                        '<br /><br />Please enter a valid IP address.'.format(ip=adx)))
                 valid = False
                 return
-        else:
-            QtWidgets.QMessageBox.warning(self,
-                                          translate('OpenLP.ProjectorWizard', 'Invalid IP Address'),
-                                          translate('OpenLP.ProjectorWizard',
-                                                    'IP address "{ip}"<br>is not a valid IP address.'
-                                                    '<br /><br />Please enter a valid IP address.'.format(ip=adx)))
-            valid = False
-            return
         port = int(self.port_text.text())
         if port < 1000 or port > 32767:
             QtWidgets.QMessageBox.warning(self,
@@ -223,7 +237,8 @@ class ProjectorEditForm(QtWidgets.QDialog, Ui_ProjectorEditForm):
                                                     'Default PJLink port is {port}'.format(port=PJLINK_PORT)))
             valid = False
         if valid:
-            self.projector.ip = self.ip_text.text()
+            if self.new_projector:
+                self.projector.ip = self.ip_text_edit.text()
             self.projector.pin = self.pin_text.text()
             self.projector.port = int(self.port_text.text())
             self.projector.name = self.name_text.text()

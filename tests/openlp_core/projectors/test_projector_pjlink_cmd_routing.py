@@ -39,30 +39,31 @@ class TestPJLinkRouting(TestCase):
     """
     Tests for the PJLink module command routing
     """
-    def test_get_data_unknown_command(self):
+    @patch.object(openlp.core.projectors.pjlink, 'log')
+    def test_get_data_unknown_command(self, mock_log):
         """
         Test not a valid command
         """
         # GIVEN: Test object
-        with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
-                patch.object(openlp.core.projectors.pjlink.PJLink, '_trash_buffer') as mock_buffer:
+        pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
+        pjlink.pjlink_functions = MagicMock()
+        log_warning_text = [call('({ip}) get_data(): Invalid packet - '
+                                 'unknown command "UNKN"'.format(ip=pjlink.name))]
+        log_debug_text = [call('(___TEST_ONE___) get_data(ip="111.111.111.111" buffer="%1UNKN=Huh?"'),
+                          call('(___TEST_ONE___) get_data(): Checking new data "%1UNKN=Huh?"'),
+                          call('(___TEST_ONE___) get_data() header="%1UNKN" data="Huh?"'),
+                          call('(___TEST_ONE___) get_data() version="1" cmd="UNKN"'),
+                          call('(___TEST_ONE___) Cleaning buffer - msg = "get_data(): '
+                               'Invalid packet - unknown command "UNKN""'),
+                          call('(___TEST_ONE___) Finished cleaning buffer - 0 bytes dropped')]
 
-            pjlink = PJLink(Projector(**TEST1_DATA), no_poll=True)
-            pjlink.pjlink_functions = MagicMock()
-            log_warning_text = [call('({ip}) get_data(): Invalid packet - '
-                                     'unknown command "UNK"'.format(ip=pjlink.name))]
-            log_debug_text = [call('({ip}) get_data(ip="111.111.111.111" '
-                                   'buffer="b\'%1UNK=Huh?\'"'.format(ip=pjlink.name)),
-                              call('({ip}) get_data(): Checking new data "%1UNK=Huh?"'.format(ip=pjlink.name))]
+        # WHEN: get_data called with an unknown command
+        pjlink.get_data(buff='{prefix}1UNKN=Huh?'.format(prefix=PJLINK_PREFIX))
 
-            # WHEN: get_data called with an unknown command
-            pjlink.get_data(buff='{prefix}1UNK=Huh?'.format(prefix=PJLINK_PREFIX).encode('utf-8'))
-
-            # THEN: Appropriate log entries should have been made and methods called/not called
-            mock_log.debug.assert_has_calls(log_debug_text)
-            mock_log.warning.assert_has_calls(log_warning_text)
-            assert pjlink.pjlink_functions.called is False, 'Should not have accessed pjlink_functions'
-            assert mock_buffer.called is True, 'Should have called _trash_buffer'
+        # THEN: Appropriate log entries should have been made and methods called/not called
+        mock_log.warning.assert_has_calls(log_warning_text)
+        mock_log.debug.assert_has_calls(log_debug_text)
+        assert pjlink.pjlink_functions.called is False, 'Should not have accessed pjlink_functions'
 
     def test_process_command_call_clss(self):
         """
@@ -219,7 +220,6 @@ class TestPJLinkRouting(TestCase):
         """
         Test command returned success
         """
-        # GIVEN: Initial mocks and data
         # GIVEN: Test object and mocks
         with patch.object(openlp.core.projectors.pjlink, 'log') as mock_log, \
                 patch.object(openlp.core.projectors.pjlink.PJLink, 'send_command') as mock_send_command, \
