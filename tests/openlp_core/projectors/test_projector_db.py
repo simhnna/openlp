@@ -29,12 +29,15 @@ import os
 import shutil
 from tempfile import mkdtemp
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
+from openlp.core.common.registry import Registry
 from openlp.core.lib.db import upgrade_db
 from openlp.core.projectors import upgrade
 from openlp.core.projectors.constants import PJLINK_PORT
 from openlp.core.projectors.db import Manufacturer, Model, Projector, ProjectorDB, ProjectorSource, Source
+from openlp.core.ui.mainwindow import MainWindow
+from tests.helpers.testmixin import TestMixin
 from tests.resources.projector.data import TEST_DB_PJLINK1, TEST_DB, TEST1_DATA, TEST2_DATA, TEST3_DATA
 from tests.utils.constants import TEST_RESOURCES_PATH
 
@@ -122,7 +125,7 @@ class TestProjectorDBUpdate(TestCase):
         assert updated_to_version == latest_version, 'The projector DB should have been upgrade to the latest version'
 
 
-class TestProjectorDB(TestCase):
+class TestProjectorDB(TestCase, TestMixin):
     """
     Test case for ProjectorDB
     """
@@ -131,6 +134,33 @@ class TestProjectorDB(TestCase):
         """
         Set up anything necessary for all tests
         """
+        # Create a test app to keep from segfaulting
+        Registry.create()
+        self.registry = Registry()
+        self.setup_application()
+        # Mock cursor busy/normal methods.
+        self.app.set_busy_cursor = MagicMock()
+        self.app.set_normal_cursor = MagicMock()
+        self.app.args = []
+        Registry().register('application', self.app)
+        Registry().set_flag('no_web_server', True)
+        # Mock classes and methods used by mainwindow.
+        with patch('openlp.core.ui.mainwindow.SettingsForm'), \
+                patch('openlp.core.ui.mainwindow.ImageManager'), \
+                patch('openlp.core.ui.mainwindow.LiveController'), \
+                patch('openlp.core.ui.mainwindow.PreviewController'), \
+                patch('openlp.core.ui.mainwindow.OpenLPDockWidget'), \
+                patch('openlp.core.ui.mainwindow.QtWidgets.QToolBox'), \
+                patch('openlp.core.ui.mainwindow.QtWidgets.QMainWindow.addDockWidget'), \
+                patch('openlp.core.ui.mainwindow.ServiceManager'), \
+                patch('openlp.core.ui.mainwindow.ThemeManager'), \
+                patch('openlp.core.ui.mainwindow.ProjectorManager'), \
+                patch('openlp.core.ui.mainwindow.Renderer'), \
+                patch('openlp.core.ui.mainwindow.websockets.WebSocketServer'), \
+                patch('openlp.core.ui.mainwindow.server.HttpServer'):
+            self.main_window = MainWindow()
+
+        # Create a temporary database directory and database
         self.tmp_folder = mkdtemp(prefix='openlp_')
         tmpdb_url = 'sqlite:///{db}'.format(db=os.path.join(self.tmp_folder, TEST_DB))
         mocked_init_url.return_value = tmpdb_url
@@ -139,9 +169,12 @@ class TestProjectorDB(TestCase):
     def tearDown(self):
         """
         Clean up
+
+        Delete all the C++ objects at the end so that we don't have a segfault
         """
         self.projector.session.close()
         self.projector = None
+        del self.main_window
         # Ignore errors since windows can have problems with locked files
         shutil.rmtree(self.tmp_folder, ignore_errors=True)
 
