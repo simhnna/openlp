@@ -35,24 +35,9 @@ from openlp.core.common.registry import RegistryBase
 from openlp.core.common.settings import Settings
 from openlp.core.lib.ui import create_widget_action
 from openlp.core.projectors import DialogSourceStyle
-from openlp.core.projectors.constants import \
-    E_AUTHENTICATION, \
-    E_ERROR, \
-    E_NETWORK, \
-    E_NOT_CONNECTED, \
-    E_UNKNOWN_SOCKET_ERROR, \
-    S_CONNECTED, \
-    S_CONNECTING, \
-    S_COOLDOWN, \
-    S_INITIALIZE, \
-    S_NOT_CONNECTED, \
-    S_OFF, \
-    S_ON, \
-    S_STANDBY, \
-    S_WARMUP,    \
-    STATUS_CODE, \
-    STATUS_MSG, \
-    QSOCKET_STATE
+from openlp.core.projectors.constants import E_AUTHENTICATION, E_ERROR, E_NETWORK, E_NOT_CONNECTED, \
+    E_UNKNOWN_SOCKET_ERROR, S_CONNECTED, S_CONNECTING, S_COOLDOWN, S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, \
+    S_STANDBY, S_WARMUP, STATUS_CODE, STATUS_MSG, QSOCKET_STATE
 
 from openlp.core.projectors.db import ProjectorDB
 from openlp.core.projectors.editform import ProjectorEditForm
