@@ -25,7 +25,6 @@ The UI widgets of the print service dialog.
 from PyQt5 import QtCore, QtWidgets, QtPrintSupport
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
 from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import SpellTextEdit
 
@@ -51,7 +50,7 @@ class Ui_PrintServiceDialog(object):
         Set up the UI
         """
         print_service_dialog.setObjectName('print_service_dialog')
-        print_service_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        print_service_dialog.setWindowIcon(UiIcons().main_icon)
         print_service_dialog.resize(664, 594)
         self.main_layout = QtWidgets.QVBoxLayout(print_service_dialog)
         self.main_layout.setSpacing(0)

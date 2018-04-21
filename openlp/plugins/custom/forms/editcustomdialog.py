@@ -22,8 +22,8 @@
 from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box, create_button
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_CustomEditDialog(object):
@@ -33,7 +33,7 @@ class Ui_CustomEditDialog(object):
         :param custom_edit_dialog: The Dialog
         """
         custom_edit_dialog.setObjectName('custom_edit_dialog')
-        custom_edit_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        custom_edit_dialog.setWindowIcon(UiIcons().main_icon)
         custom_edit_dialog.resize(450, 350)
         self.dialog_layout = QtWidgets.QVBoxLayout(custom_edit_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

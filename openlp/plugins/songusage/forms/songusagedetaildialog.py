@@ -22,8 +22,8 @@
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import PathEdit
 from openlp.core.widgets.enums import PathEditType
 
@@ -39,7 +39,7 @@ class Ui_SongUsageDetailDialog(object):
         :param song_usage_detail_dialog:
         """
         song_usage_detail_dialog.setObjectName('song_usage_detail_dialog')
-        song_usage_detail_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        song_usage_detail_dialog.setWindowIcon(UiIcons().main_icon)
         song_usage_detail_dialog.resize(609, 413)
         self.vertical_layout = QtWidgets.QVBoxLayout(song_usage_detail_dialog)
         self.vertical_layout.setSpacing(8)

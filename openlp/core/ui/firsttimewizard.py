@@ -25,10 +25,10 @@ The UI widgets for the first time wizard.
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_macosx, clean_button_text
-from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.common.i18n import translate
 from openlp.core.common.settings import Settings
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import add_welcome_page
+from openlp.core.ui.icons import UiIcons
 
 
 class FirstTimePage(object):
@@ -57,7 +57,7 @@ class UiFirstTimeWizard(object):
         :param first_time_wizard: The wizard form
         """
         first_time_wizard.setObjectName('first_time_wizard')
-        first_time_wizard.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        first_time_wizard.setWindowIcon(UiIcons().main_icon)
         first_time_wizard.resize(550, 386)
         first_time_wizard.setModal(True)
         first_time_wizard.setOptions(QtWidgets.QWizard.IndependentPages | QtWidgets.QWizard.NoBackButtonOnStartPage |

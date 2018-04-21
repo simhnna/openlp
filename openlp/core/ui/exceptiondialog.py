@@ -27,7 +27,6 @@ from PyQt5 import QtGui, QtWidgets
 
 from openlp.core.common.i18n import translate
 from openlp.core.ui.icons import UiIcons
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button, create_button_box
 
 
@@ -40,7 +39,7 @@ class Ui_ExceptionDialog(object):
         Set up the UI.
         """
         exception_dialog.setObjectName('exception_dialog')
-        exception_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        exception_dialog.setWindowIcon(UiIcons().main_icon)
         self.exception_layout = QtWidgets.QVBoxLayout(exception_dialog)
         self.exception_layout.setObjectName('exception_layout')
         self.message_layout = QtWidgets.QHBoxLayout()

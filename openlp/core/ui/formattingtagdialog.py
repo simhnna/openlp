@@ -26,7 +26,6 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.ui.icons import UiIcons
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 
 
@@ -39,7 +38,7 @@ class Ui_FormattingTagDialog(object):
         Set up the UI
         """
         formatting_tag_dialog.setObjectName('formatting_tag_dialog')
-        formatting_tag_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        formatting_tag_dialog.setWindowIcon(UiIcons().main_icon)
         formatting_tag_dialog.resize(725, 548)
         self.list_data_grid_layout = QtWidgets.QVBoxLayout(formatting_tag_dialog)
         self.list_data_grid_layout.setContentsMargins(8, 8, 8, 8)

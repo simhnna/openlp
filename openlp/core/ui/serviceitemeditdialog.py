@@ -25,8 +25,8 @@ The UI widgets for the service item edit dialog
 from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box, create_button
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_ServiceItemEditDialog(object):
@@ -38,7 +38,7 @@ class Ui_ServiceItemEditDialog(object):
         Set up the UI
         """
         serviceItemEditDialog.setObjectName('serviceItemEditDialog')
-        serviceItemEditDialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        serviceItemEditDialog.setWindowIcon(UiIcons().main_icon)
         self.dialog_layout = QtWidgets.QGridLayout(serviceItemEditDialog)
         self.dialog_layout.setContentsMargins(8, 8, 8, 8)
         self.dialog_layout.setSpacing(8)

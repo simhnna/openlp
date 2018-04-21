@@ -124,7 +124,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         Set up the wizard UI.
         :param image: path to start up image
         """
-        self.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        self.setWindowIcon(UiIcons().main_icon)
         self.setModal(True)
         self.setOptions(QtWidgets.QWizard.IndependentPages |
                         QtWidgets.QWizard.NoBackButtonOnStartPage | QtWidgets.QWizard.NoBackButtonOnLastPage)

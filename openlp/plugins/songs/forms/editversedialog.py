@@ -24,7 +24,6 @@ from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.settings import Settings
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import SpellTextEdit
@@ -34,7 +33,7 @@ from openlp.plugins.songs.lib import VerseType
 class Ui_EditVerseDialog(object):
     def setupUi(self, edit_verse_dialog):
         edit_verse_dialog.setObjectName('edit_verse_dialog')
-        edit_verse_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        edit_verse_dialog.setWindowIcon(UiIcons().main_icon)
         edit_verse_dialog.resize(400, 400)
         edit_verse_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(edit_verse_dialog)

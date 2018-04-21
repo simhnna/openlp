@@ -25,7 +25,6 @@ The list of shortcuts within a dialog.
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 from openlp.core.ui.icons import UiIcons
 
@@ -73,7 +72,7 @@ class Ui_ShortcutListDialog(object):
         Set up the UI
         """
         shortcutListDialog.setObjectName('shortcutListDialog')
-        shortcutListDialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        shortcutListDialog.setWindowIcon(UiIcons().main_icon)
         shortcutListDialog.resize(500, 438)
         self.shortcut_list_layout = QtWidgets.QVBoxLayout(shortcutListDialog)
         self.shortcut_list_layout.setObjectName('shortcut_list_layout')

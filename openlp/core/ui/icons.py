@@ -26,6 +26,8 @@ import qtawesome as qta
 
 from PyQt5 import QtGui, QtWidgets
 
+from openlp.core.lib import build_icon
+
 
 class UiIcons(object):
     """
@@ -113,6 +115,8 @@ class UiIcons(object):
                 setattr(self, key, qta.icon(icon_list[key]))
             except:
                 setattr(self, key, qta.icon('fa.plus-circle', color='red'))
+
+        self.main_icon = build_icon(':/icon/openlp-logo.svg')
 
     @staticmethod
     def _print_icons():

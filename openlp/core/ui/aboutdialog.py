@@ -24,8 +24,8 @@ import datetime
 from PyQt5 import QtGui, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button, create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class UiAboutDialog(object):
@@ -40,7 +40,7 @@ class UiAboutDialog(object):
         :param about_dialog: The QDialog object to set up.
         """
         about_dialog.setObjectName('about_dialog')
-        about_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        about_dialog.setWindowIcon(UiIcons().main_icon)
         self.about_dialog_layout = QtWidgets.QVBoxLayout(about_dialog)
         self.about_dialog_layout.setContentsMargins(8, 8, 8, 8)
         self.about_dialog_layout.setObjectName('about_dialog_layout')

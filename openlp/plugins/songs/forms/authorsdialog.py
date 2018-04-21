@@ -23,8 +23,8 @@
 from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_AuthorsDialog(object):
@@ -37,7 +37,7 @@ class Ui_AuthorsDialog(object):
         Set up the UI for the dialog.
         """
         authors_dialog.setObjectName('authors_dialog')
-        authors_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        authors_dialog.setWindowIcon(UiIcons().main_icon)
         authors_dialog.resize(300, 10)
         authors_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(authors_dialog)

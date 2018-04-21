@@ -43,7 +43,7 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.display.renderer import Renderer
 from openlp.core.display.screens import ScreenList
-from openlp.core.lib import PluginManager, ImageManager, PluginStatus, build_icon
+from openlp.core.lib import PluginManager, ImageManager, PluginStatus
 from openlp.core.lib.ui import create_action
 from openlp.core.projectors.manager import ProjectorManager
 from openlp.core.ui import AboutForm, SettingsForm, ServiceManager, ThemeManager, LiveController, PluginForm, \
@@ -66,7 +66,7 @@ class Ui_MainWindow(object):
         Set up the user interface
         """
         main_window.setObjectName('MainWindow')
-        main_window.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        main_window.setWindowIcon(UiIcons().main_icon)
         main_window.setDockNestingEnabled(True)
         if is_macosx():
             main_window.setDocumentMode(True)

@@ -23,14 +23,14 @@
 from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_LanguageDialog(object):
     def setupUi(self, language_dialog):
         language_dialog.setObjectName('language_dialog')
-        language_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        language_dialog.setWindowIcon(UiIcons().main_icon)
         language_dialog.resize(400, 165)
         self.language_layout = QtWidgets.QVBoxLayout(language_dialog)
         self.language_layout.setSpacing(8)
