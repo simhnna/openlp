@@ -59,6 +59,7 @@ class UiIcons(object):
             'arrow_right': 'fa.arrow-right',
             'arrow_up': 'fa.arrow-up',
             'address': 'fa.book',
+            'back': 'fa.step-backward',
             'bible': 'fa.book',
             'blank': 'fa.times-circle',
             'bottom': 'fa.angle-double-down',

@@ -27,6 +27,7 @@ from PyQt5 import QtCore, QtWidgets
 from openlp.core.common.i18n import translate
 from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class CaptureShortcutButton(QtWidgets.QPushButton):
@@ -101,23 +102,23 @@ class Ui_ShortcutListDialog(object):
         self.primary_push_button = CaptureShortcutButton(shortcutListDialog)
         self.primary_push_button.setObjectName('primary_push_button')
         self.primary_push_button.setMinimumSize(QtCore.QSize(84, 0))
-        self.primary_push_button.setIcon(build_icon(':/system/system_configure_shortcuts.png'))
+        self.primary_push_button.setIcon(UiIcons.shortcuts)
         self.primary_layout.addWidget(self.primary_push_button)
         self.clear_primary_button = QtWidgets.QToolButton(shortcutListDialog)
         self.clear_primary_button.setObjectName('clear_primary_button')
         self.clear_primary_button.setMinimumSize(QtCore.QSize(0, 16))
-        self.clear_primary_button.setIcon(build_icon(':/system/clear_shortcut.png'))
+        self.clear_primary_button.setIcon(UiIcons().settings)
         self.primary_layout.addWidget(self.clear_primary_button)
         self.details_layout.addLayout(self.primary_layout, 1, 1, 1, 1)
         self.alternate_layout = QtWidgets.QHBoxLayout()
         self.alternate_layout.setObjectName('alternate_layout')
         self.alternate_push_button = CaptureShortcutButton(shortcutListDialog)
         self.alternate_push_button.setObjectName('alternate_push_button')
-        self.alternate_push_button.setIcon(build_icon(':/system/system_configure_shortcuts.png'))
+        self.alternate_push_button.setIcon(UiIcons().settings)
         self.alternate_layout.addWidget(self.alternate_push_button)
         self.clear_alternate_button = QtWidgets.QToolButton(shortcutListDialog)
         self.clear_alternate_button.setObjectName('clear_alternate_button')
-        self.clear_alternate_button.setIcon(build_icon(':/system/clear_shortcut.png'))
+        self.clear_alternate_button.setIcon(UiIcons().settings)
         self.alternate_layout.addWidget(self.clear_alternate_button)
         self.details_layout.addLayout(self.alternate_layout, 1, 2, 1, 1)
         self.primary_label = QtWidgets.QLabel(shortcutListDialog)

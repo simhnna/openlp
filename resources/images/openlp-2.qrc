@@ -1,6 +1,5 @@
 <RCC>
   <qresource prefix="songs">
-    <file>song_search_all.png</file>
     <file>song_search_author.png</file>
     <file>song_search_ccli.png</file>
     <file>song_search_lyrics.png</file>
@@ -20,8 +19,7 @@
     <file>bibles_search_text.png</file>
     <file>bibles_search_reference.png</file>
     <file>bibles_search_clear.png</file>
-    <file>bibles_save_results.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="plugins">
     <file>plugin_alerts.png</file>
     <file>plugin_songs.png</file>
@@ -30,9 +28,7 @@
   <qresource prefix="general">
     <file>general_delete.png</file>
     <file>general_import.png</file>
-    <file>general_find.png</file>
-    <file>general_back.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="slides">
     <file>slide_theme.png</file>
     <file>media_playback_start.png</file>
@@ -63,15 +59,13 @@
     </qresource>
   <qresource prefix="system">
     <file>system_close.png</file>
-    <file>clear_shortcut.png</file>
     <file>system_mediamanager.png</file>
     <file>system_volunteer.png</file>
     <file>system_servicemanager.png</file>
     <file>system_thememanager.png</file>
     <file>settings_plugin_list.png</file>
     <file>system_edit_copy.png</file>
-    <file>system_configure_shortcuts.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="media">
     <file>media_time.png</file>
     <file>media_audio.png</file>

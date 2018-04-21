@@ -63,7 +63,7 @@ class SearchEdit(QtWidgets.QLineEdit):
         self.settings_section = settings_section
         self._current_search_type = -1
         self.clear_button = QtWidgets.QToolButton(self)
-        self.clear_button.setIcon(build_icon(':/system/clear_shortcut.png'))
+        self.clear_button.setIcon(UiIcons().shortcuts)
         self.clear_button.setCursor(QtCore.Qt.ArrowCursor)
         self.clear_button.setStyleSheet('QToolButton { border: none; padding: 0px; }')
         self.clear_button.resize(18, 18)
@@ -151,7 +151,7 @@ class SearchEdit(QtWidgets.QLineEdit):
             action.placeholder_text = placeholder
         if not hasattr(self, 'menu_button'):
             self.menu_button = QtWidgets.QToolButton(self)
-            self.menu_button.setIcon(build_icon(':/system/clear_shortcut.png'))
+            self.menu_button.setIcon(UiIcons().shortcuts)
             self.menu_button.setCursor(QtCore.Qt.ArrowCursor)
             self.menu_button.setPopupMode(QtWidgets.QToolButton.InstantPopup)
             self.menu_button.setStyleSheet('QToolButton { border: none; padding: 0px 10px 0px 0px; }')
