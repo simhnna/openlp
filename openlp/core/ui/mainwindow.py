@@ -801,7 +801,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow, LogMixin, RegistryPropert
         self.plugin_form.load()
         self.plugin_form.exec()
 
-    def on_tools_open_data_folder_clicked(self):
+    @staticmethod
+    def on_tools_open_data_folder_clicked():
         """
         Open data folder
         """
