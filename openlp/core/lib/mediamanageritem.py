@@ -619,7 +619,7 @@ class MediaManagerItem(QtWidgets.QWidget, RegistryProperties):
         :param context: The context on which this is called
         """
         service_item = ServiceItem(self.plugin)
-        service_item.add_icon(self.plugin.icon_path)
+        service_item.add_icon()
         if self.generate_slide_data(service_item, item, xml_version, remote, context):
             return service_item
         else:

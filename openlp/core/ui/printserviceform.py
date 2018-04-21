@@ -209,7 +209,7 @@ class PrintServiceForm(QtWidgets.QDialog, Ui_PrintServiceDialog, RegistryPropert
         div = self._add_element('div', class_id='item', parent=body)
         # Add the title of the service item.
         item_title = self._add_element('h2', parent=div, class_id='itemTitle')
-        img = image_to_byte(item.iconic_representation.pixmap(20, 20).toImage())
+        img = image_to_byte(item.icon.pixmap(20, 20).toImage())
         self._add_element('img', parent=item_title, attribute=('src', 'data:image/png;base64, ' + img))
         self._add_element('span', '&nbsp;' + html.escape(item.get_display_title()), item_title)
         if self.slide_text_check_box.isChecked():

@@ -198,7 +198,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         self.error_save_to_button = QtWidgets.QPushButton(self.progress_page)
         self.error_save_to_button.setObjectName('error_save_to_button')
         self.error_save_to_button.setHidden(True)
-        self.error_save_to_button.setIcon(build_icon(UiIcons().save))
+        self.error_save_to_button.setIcon(UiIcons().save)
         self.error_button_layout.addWidget(self.error_save_to_button)
         self.progress_layout.addLayout(self.error_button_layout)
         self.addPage(self.progress_page)

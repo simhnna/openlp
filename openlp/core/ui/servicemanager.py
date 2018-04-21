@@ -1168,16 +1168,16 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             tree_widget_item = QtWidgets.QTreeWidgetItem(self.service_manager_list)
             if service_item_from_item.is_valid:
                 if service_item_from_item.notes:
-                    icon = QtGui.QImage(service_item_from_item.icon)
+                    icon = service_item_from_item.icon.pixmap(80, 80).toImage()
                     icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-                    overlay = QtGui.QImage(UiIcons().notes)
-                    overlay = overlay.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                    overlay = UiIcons().notes.pixmap(40, 40).toImage()
+                    overlay = overlay.scaled(40, 40, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                     painter = QtGui.QPainter(icon)
                     painter.drawImage(0, 0, overlay)
                     painter.end()
                     tree_widget_item.setIcon(0, build_icon(icon))
                 elif service_item_from_item.temporary_edit:
-                    icon = QtGui.QImage(service_item_from_item.icon)
+                    icon = service_item_from_item.icon.pixmap(80, 80).toImage()
                     icon = icon.scaled(80, 80, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
                     overlay = QtGui.QImage(UiIcons().upload)
                     overlay = overlay.scaled(40, 40, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
@@ -1186,7 +1186,7 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
                     painter.end()
                     tree_widget_item.setIcon(0, build_icon(icon))
                 else:
-                    tree_widget_item.setIcon(0, service_item_from_item.iconic_representation)
+                    tree_widget_item.setIcon(0, service_item_from_item.icon)
             else:
                 tree_widget_item.setIcon(0, UiIcons().delete)
             tree_widget_item.setText(0, service_item_from_item.get_display_title())

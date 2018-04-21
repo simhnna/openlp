@@ -25,16 +25,11 @@
   <qresource prefix="plugins">
     <file>plugin_alerts.png</file>
     <file>plugin_songs.png</file>
-    <file>plugin_remote.png</file>
     <file>plugin_songusage.png</file>
   </qresource>
   <qresource prefix="general">
     <file>general_delete.png</file>
     <file>general_import.png</file>
-    <file>general_zoom_out.png</file>
-    <file>general_zoom_in.png</file>
-    <file>general_zoom_original.png</file>
-    <file>general_email.png</file>
     <file>general_find.png</file>
     <file>general_back.png</file>
   </qresource>
@@ -74,7 +69,6 @@
     <file>system_servicemanager.png</file>
     <file>system_thememanager.png</file>
     <file>settings_plugin_list.png</file>
-    <file>system_settings.png</file>
     <file>system_edit_copy.png</file>
     <file>system_configure_shortcuts.png</file>
   </qresource>

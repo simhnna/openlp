@@ -26,6 +26,7 @@ from PyQt5 import QtCore, QtWidgets, QtPrintSupport
 
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.lib import build_icon
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import SpellTextEdit
 
 
@@ -59,31 +60,31 @@ class Ui_PrintServiceDialog(object):
         self.toolbar = QtWidgets.QToolBar(print_service_dialog)
         self.toolbar.setIconSize(QtCore.QSize(22, 22))
         self.toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
-        self.print_button = self.toolbar.addAction(build_icon(':/general/general_print.png'),
+        self.print_button = self.toolbar.addAction(UiIcons().print,
                                                    translate('OpenLP.PrintServiceForm', 'Print'))
         self.options_button = QtWidgets.QToolButton(self.toolbar)
         self.options_button.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
-        self.options_button.setIcon(build_icon(':/system/system_configure.png'))
+        self.options_button.setIcon(UiIcons().settings)
         self.options_button.setCheckable(True)
         self.toolbar.addWidget(self.options_button)
         self.toolbar.addSeparator()
-        self.plain_copy = self.toolbar.addAction(build_icon(':/system/system_edit_copy.png'),
+        self.plain_copy = self.toolbar.addAction(UiIcons().clone,
                                                  translate('OpenLP.PrintServiceForm', 'Copy'))
-        self.html_copy = self.toolbar.addAction(build_icon(':/system/system_edit_copy.png'),
+        self.html_copy = self.toolbar.addAction(UiIcons().clone,
                                                 translate('OpenLP.PrintServiceForm', 'Copy as HTML'))
         self.toolbar.addSeparator()
         self.zoom_in_button = QtWidgets.QToolButton(self.toolbar)
-        self.zoom_in_button.setIcon(build_icon(':/general/general_zoom_in.png'))
+        self.zoom_in_button.setIcon(UiIcons().search_plus)
         self.zoom_in_button.setObjectName('zoom_in_button')
         self.zoom_in_button.setIconSize(QtCore.QSize(22, 22))
         self.toolbar.addWidget(self.zoom_in_button)
         self.zoom_out_button = QtWidgets.QToolButton(self.toolbar)
-        self.zoom_out_button.setIcon(build_icon(':/general/general_zoom_out.png'))
+        self.zoom_out_button.setIcon(UiIcons().search_minus)
         self.zoom_out_button.setObjectName('zoom_out_button')
         self.zoom_out_button.setIconSize(QtCore.QSize(22, 22))
         self.toolbar.addWidget(self.zoom_out_button)
         self.zoom_original_button = QtWidgets.QToolButton(self.toolbar)
-        self.zoom_original_button.setIcon(build_icon(':/general/general_zoom_original.png'))
+        self.zoom_original_button.setIcon(UiIcons().search)
         self.zoom_original_button.setObjectName('zoom_original_button')
         self.zoom_original_button.setIconSize(QtCore.QSize(22, 22))
         self.toolbar.addWidget(self.zoom_original_button)

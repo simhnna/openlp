@@ -170,7 +170,7 @@ class ServiceItem(RegistryProperties):
         self.processor = None
         self.audit = ''
         self.items = []
-        self.iconic_representation = None
+        self.icon = UiIcons().default
         self.raw_footer = []
         self.foot_text = ''
         self.theme = None
@@ -230,25 +230,22 @@ class ServiceItem(RegistryProperties):
         """
         return capability in self.capabilities
 
-    def add_icon(self, icon):
+    def add_icon(self):
         """
         Add an icon to the service item. This is used when displaying the service item in the service manager.
-
-        :param icon: A string to an icon in the resources or on disk.
         """
-        self.icon = icon
         if self.name == 'songs':
-            self.iconic_representation = UiIcons().music
+            self.icon = UiIcons().music
         elif self.name == 'bibles':
-            self.iconic_representation = UiIcons().bible
+            self.icon = UiIcons().bible
         elif self.name == 'presentations':
-            self.iconic_representation = UiIcons().presentation
+            self.icon = UiIcons().presentation
         elif self.name == 'images':
-            self.iconic_representation = UiIcons().picture
+            self.icon = UiIcons().picture
         elif self.name == 'medias':
-            self.iconic_representation = UiIcons().video
+            self.icon = UiIcons().video
         else:
-            self.iconic_representation = UiIcons().clone
+            self.icon = UiIcons().clone
 
     def render(self, provides_own_theme_data=False):
         """
@@ -425,7 +422,7 @@ class ServiceItem(RegistryProperties):
         self.name = header['name']
         self.service_item_type = header['type']
         self.theme = header['theme']
-        self.add_icon(header['icon'])
+        self.add_icon()
         self.raw_footer = header['footer']
         self.audit = header['audit']
         self.notes = header['notes']

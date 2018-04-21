@@ -80,12 +80,12 @@ class Ui_ThemeManager(object):
         self.toolbar.addSeparator()
         self.toolbar.add_toolbar_action('importTheme',
                                         text=translate('OpenLP.ThemeManager', 'Import Theme'),
-                                        icon=build_icon(UiIcons().download),
+                                        icon=UiIcons().download,
                                         tooltip=translate('OpenLP.ThemeManager', 'Import a theme.'),
                                         triggers=self.on_import_theme)
         self.toolbar.add_toolbar_action('exportTheme',
                                         text=translate('OpenLP.ThemeManager', 'Export Theme'),
-                                        icon=build_icon(UiIcons().upload),
+                                        icon=UiIcons().upload,
                                         tooltip=translate('OpenLP.ThemeManager', 'Export a theme.'),
                                         triggers=self.on_export_theme)
         self.layout.addWidget(self.toolbar)
