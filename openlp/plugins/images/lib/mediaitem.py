@@ -183,7 +183,7 @@ class ImageMediaItem(MediaManagerItem):
         create_widget_action(self.list_view, separator=True)
         create_widget_action(
             self.list_view,
-            text=UiStrings().AddGroup, icon=':/images/image_new_group.png', triggers=self.on_add_group_click)
+            text=UiStrings().AddGroup, icon=UiIcons().group, triggers=self.on_add_group_click)
         create_widget_action(
             self.list_view,
             text=translate('ImagePlugin', 'Add new image(s)'),
@@ -201,7 +201,7 @@ class ImageMediaItem(MediaManagerItem):
         Add custom buttons to the start of the toolbar.
         """
         self.add_group_action = self.toolbar.add_toolbar_action('add_group_action',
-                                                                icon=':/images/image_new_group.png',
+                                                                icon=UiIcons().group,
                                                                 triggers=self.on_add_group_click)
 
     def add_end_header_bar(self):
@@ -283,7 +283,7 @@ class ImageMediaItem(MediaManagerItem):
         """
         image_groups = self.manager.get_all_objects(ImageGroups, ImageGroups.parent_id == parent_group_id)
         image_groups.sort(key=lambda group_object: get_natural_key(group_object.group_name))
-        folder_icon = build_icon(':/images/image_group.png')
+        folder_icon = UiIcons().group
         for image_group in image_groups:
             group = QtWidgets.QTreeWidgetItem()
             group.setText(0, image_group.group_name)

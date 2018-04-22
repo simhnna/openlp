@@ -10,9 +10,7 @@
     <file>topic_maintenance.png</file>
     </qresource>
   <qresource prefix="images">
-    <file>image_group.png</file>
-    <file>image_new_group.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="bibles">
     <file>bibles_book_sort.png</file>
     <file>bibles_search_combined.png</file>
@@ -68,9 +66,6 @@
     </qresource>
   <qresource prefix="media">
     <file>media_time.png</file>
-    <file>media_audio.png</file>
-    <file>media_video.png</file>
-    <file>media_optical.png</file>
     <file>media_repeat.png</file>
     <file>slidecontroller_multimedia.png</file>
     <file>auto-start_active.png</file>

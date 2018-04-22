@@ -242,7 +242,7 @@ class ServiceItem(RegistryProperties):
             self.icon = UiIcons().presentation
         elif self.name == 'images':
             self.icon = UiIcons().picture
-        elif self.name == 'medias':
+        elif self.name == 'media':
             self.icon = UiIcons().video
         else:
             self.icon = UiIcons().clone
@@ -370,7 +370,6 @@ class ServiceItem(RegistryProperties):
             'plugin': self.name,
             'theme': self.theme,
             'title': self.title,
-            'icon': self.icon,
             'footer': self.raw_footer,
             'type': self.service_item_type,
             'audit': self.audit,
