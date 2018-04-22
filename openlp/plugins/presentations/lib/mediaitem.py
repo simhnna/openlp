@@ -37,9 +37,6 @@ from openlp.plugins.presentations.lib.pdfcontroller import PDF_CONTROLLER_FILETY
 log = logging.getLogger(__name__)
 
 
-ERROR_IMAGE = QtGui.QImage(':/general/general_delete.png')
-
-
 class PresentationMediaItem(MediaManagerItem):
     """
     This is the Presentation media manager item for Presentation Items. It can present files using Openoffice and
@@ -175,7 +172,7 @@ class PresentationMediaItem(MediaManagerItem):
             file_name = file_path.name
             if not file_path.exists():
                 item_name = QtWidgets.QListWidgetItem(file_name)
-                item_name.setIcon(build_icon(ERROR_IMAGE))
+                item_name.setIcon(UiIcons().delete)
                 item_name.setData(QtCore.Qt.UserRole, path_to_str(file_path))
                 item_name.setToolTip(str(file_path))
                 self.list_view.addItem(item_name)

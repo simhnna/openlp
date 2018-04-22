@@ -26,7 +26,6 @@ The :mod:`~openlp.plugins.songs.forms.songselectdialog` module contains the user
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.ui import SingleColumnTableWidget
 from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import HistoryComboBox
@@ -211,7 +210,7 @@ class Ui_SongSelectDialog(object):
                                                    QtWidgets.QSizePolicy.Minimum)
         self.import_layout.addItem(self.import_spacer)
         self.import_button = QtWidgets.QPushButton(self.song_page)
-        self.import_button.setIcon(build_icon(':/general/general_import.png'))
+        self.import_button.setIcon(UiIcons().download)
         self.import_button.setObjectName('import_button')
         self.import_layout.addWidget(self.import_button)
         self.song_layout.addLayout(self.import_layout, 5, 0, 1, 5)

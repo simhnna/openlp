@@ -97,6 +97,7 @@ class UiIcons(object):
             'picture': 'fa.picture-o',
             'print': 'fa.print',
             'remote': 'fa.rss',
+            'repeat': 'fa.repeat',
             'save': 'fa.save',
             'search': 'fa.search',
             'search_minus': 'fa.search-minus',

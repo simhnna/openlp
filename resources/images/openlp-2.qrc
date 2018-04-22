@@ -24,14 +24,9 @@
     <file>plugin_songusage.png</file>
   </qresource>
   <qresource prefix="general">
-    <file>general_delete.png</file>
-    <file>general_import.png</file>
     </qresource>
   <qresource prefix="slides">
     <file>slide_theme.png</file>
-    <file>media_playback_start.png</file>
-    <file>media_playback_stop.png</file>
-    <file>media_playback_pause.png</file>
     </qresource>
   <qresource prefix="icon">
     <file>openlp-logo.svg</file>
@@ -66,7 +61,6 @@
     </qresource>
   <qresource prefix="media">
     <file>media_time.png</file>
-    <file>media_repeat.png</file>
     <file>slidecontroller_multimedia.png</file>
     <file>auto-start_active.png</file>
     <file>auto-start_inactive.png</file>

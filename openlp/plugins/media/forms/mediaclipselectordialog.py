@@ -24,7 +24,7 @@
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_MediaClipSelector(object):
@@ -106,7 +106,7 @@ class Ui_MediaClipSelector(object):
         self.controls_layout = QtWidgets.QHBoxLayout()
         self.controls_layout.setObjectName('controls_layout')
         self.play_button = QtWidgets.QToolButton(media_clip_selector)
-        self.play_button.setIcon(build_icon(':/slides/media_playback_start.png'))
+        self.play_button.setIcon(UiIcons().play)
         self.play_button.setObjectName('play_button')
         self.controls_layout.addWidget(self.play_button)
         self.position_slider = QtWidgets.QSlider(media_clip_selector)
