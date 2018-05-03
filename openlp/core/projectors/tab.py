@@ -89,6 +89,10 @@ class ProjectorTab(SettingsTab):
         self.connect_box_layout.addRow(self.dialog_type_label, self.dialog_type_combo_box)
         self.left_layout.addStretch()
         self.dialog_type_combo_box.activated.connect(self.on_dialog_type_combo_box_changed)
+        # Connect on LKUP packet received (PJLink v2+ only)
+        self.connect_on_linkup = QtWidgets.QCheckBox(self.connect_box)
+        self.connect_on_linkup.setObjectName('connect_on_linkup')
+        self.connect_box_layout.addRow(self.connect_on_linkup)
 
     def retranslateUi(self):
         """
@@ -109,6 +113,8 @@ class ProjectorTab(SettingsTab):
                                                translate('OpenLP.ProjectorTab', 'Tabbed dialog box'))
         self.dialog_type_combo_box.setItemText(DialogSourceStyle.Single,
                                                translate('OpenLP.ProjectorTab', 'Single dialog box'))
+        self.connect_on_linkup.setText(
+            translate('OpenLP.ProjectorTab', 'Connect to projector when LINKUP received (v2 only)'))
 
     def load(self):
         """
@@ -120,6 +126,7 @@ class ProjectorTab(SettingsTab):
         self.socket_timeout_spin_box.setValue(settings.value('socket timeout'))
         self.socket_poll_spin_box.setValue(settings.value('poll time'))
         self.dialog_type_combo_box.setCurrentIndex(settings.value('source dialog type'))
+        self.connect_on_linkup.setChecked(settings.value('connect when LKUP received'))
         settings.endGroup()
 
     def save(self):
@@ -132,6 +139,7 @@ class ProjectorTab(SettingsTab):
         settings.setValue('socket timeout', self.socket_timeout_spin_box.value())
         settings.setValue('poll time', self.socket_poll_spin_box.value())
         settings.setValue('source dialog type', self.dialog_type_combo_box.currentIndex())
+        settings.setValue('connect when LKUP received', self.connect_on_linkup.isChecked())
         settings.endGroup()
 
     def on_dialog_type_combo_box_changed(self):

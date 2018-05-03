@@ -49,13 +49,23 @@ class TestPJLinkRouting(TestCase):
         pjlink.pjlink_functions = MagicMock()
         log_warning_text = [call('({ip}) get_data(): Invalid packet - '
                                  'unknown command "UNKN"'.format(ip=pjlink.name))]
-        log_debug_text = [call('(___TEST_ONE___) get_data(ip="111.111.111.111" buffer="%1UNKN=Huh?"'),
+        log_debug_text = [call('PJlink(projector="< Projector(id="None", ip="111.111.111.111", port="1111", '
+                               'mac_adx="11:11:11:11:11:11", pin="1111", name="___TEST_ONE___", '
+                               'location="location one", notes="notes one", pjlink_name="None", '
+                               'pjlink_class="None", manufacturer="None", model="None", serial_no="Serial Number 1", '
+                               'other="None", sources="None", source_list="[]", model_filter="Filter type 1", '
+                               'model_lamp="Lamp type 1", sw_version="Version 1") >", '
+                               'args="()" kwargs="{\'no_poll\': True}")'),
+                          call('PJlinkCommands(args=() kwargs={})'),
+                          call('(___TEST_ONE___) reset_information() connect status is S_NOT_CONNECTED'),
+                          call('(___TEST_ONE___) get_data(buffer="%1UNKN=Huh?"'),
                           call('(___TEST_ONE___) get_data(): Checking new data "%1UNKN=Huh?"'),
                           call('(___TEST_ONE___) get_data() header="%1UNKN" data="Huh?"'),
                           call('(___TEST_ONE___) get_data() version="1" cmd="UNKN"'),
-                          call('(___TEST_ONE___) Cleaning buffer - msg = "get_data(): '
-                               'Invalid packet - unknown command "UNKN""'),
-                          call('(___TEST_ONE___) Finished cleaning buffer - 0 bytes dropped')]
+                          call('(___TEST_ONE___) Cleaning buffer - msg = "get_data(): Invalid packet - '
+                               'unknown command "UNKN""'),
+                          call('(___TEST_ONE___) Finished cleaning buffer - 0 bytes dropped'),
+                          call('(___TEST_ONE___) _send_command(): Nothing to send - returning')]
 
         # WHEN: get_data called with an unknown command
         pjlink.get_data(buff='{prefix}1UNKN=Huh?'.format(prefix=PJLINK_PREFIX))
