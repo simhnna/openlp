@@ -94,17 +94,18 @@ def get_merge_info(url):
         print('Unable to load merge URL: {}'.format(url))
         return None
     soup = BeautifulSoup(page.read(), 'lxml')
-    # Find this span tag that contains the branch url
+    # Find the span tag that contains the branch url
     # <span class="branch-url">
     span_branch_url = soup.find('span', class_='branch-url')
     if not span_branch_url:
         print('Unable to find merge details on URL: {}'.format(url))
         return None
     merge_info['branch_url'] = span_branch_url.contents[0]
-    # Find this tag that describes the branch. We'll use that for commit message
-    # <meta name="description" content="...">
-    meta = soup.find('meta', attrs={"name": "description"})
-    merge_info['commit_message'] = meta.get('content')
+    # Find the p tag that contains the commit message
+    # <div id="commit-message">...<div id="edit-commit_message">...<div class="yui3-editable_text-text"><p>
+    commit_message = soup.find('div', id='commit-message').find('div', id='edit-commit_message')\
+            .find('div', 'yui3-editable_text-text').p
+    merge_info['commit_message'] = commit_message.string
     # Find all tr-tags with this class. Makes it possible to get bug numbers.
     # <tr class="bug-branch-summary"
     bug_rows = soup.find_all('tr', class_='bug-branch-summary')
