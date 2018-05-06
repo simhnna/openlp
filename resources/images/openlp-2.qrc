@@ -6,17 +6,11 @@
     <file>song_search_title.png</file>
     <file>song_search_topic.png</file>
     <file>book_maintenance.png</file>
-    <file>author_maintenance.png</file>
     <file>topic_maintenance.png</file>
     </qresource>
   <qresource prefix="images">
     </qresource>
   <qresource prefix="bibles">
-    <file>bibles_book_sort.png</file>
-    <file>bibles_search_combined.png</file>
-    <file>bibles_search_text.png</file>
-    <file>bibles_search_reference.png</file>
-    <file>bibles_search_clear.png</file>
     </qresource>
   <qresource prefix="plugins">
     <file>plugin_alerts.png</file>

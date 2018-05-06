@@ -48,7 +48,7 @@ class Ui_SongMaintenanceDialog(object):
         self.type_list_widget.setUniformItemSizes(True)
         self.type_list_widget.setObjectName('type_list_widget')
         self.authors_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
-        self.authors_list_item.setIcon(build_icon(':/songs/author_maintenance.png'))
+        self.authors_list_item.setIcon(UiIcons().usermo)
         self.topics_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
         self.topics_list_item.setIcon(build_icon(':/songs/topic_maintenance.png'))
         self.books_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
