@@ -253,7 +253,7 @@ class Ui_ServiceManager(object):
         self.time_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Start Time'),
                                                 icon=':/media/media_time.png', triggers=self.on_start_time_form)
         self.auto_start_action = create_widget_action(self.menu, text='',
-                                                      icon=':/media/auto-start_active.png',
+                                                      icon=UiIcons().active,
                                                       triggers=self.on_auto_start)
         # Add already existing delete action to the menu.
         self.menu.addAction(self.delete_action)
@@ -315,8 +315,6 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
         Sets up the service manager, toolbars, list view, et al.
         """
         super().__init__(parent)
-        self.active = build_icon(':/media/auto-start_active.png')
-        self.inactive = build_icon(':/media/auto-start_inactive.png')
         self.service_items = []
         self.suffixes = []
         self.drop_position = -1
@@ -799,11 +797,12 @@ class ServiceManager(QtWidgets.QWidget, RegistryBase, Ui_ServiceManager, LogMixi
             self.time_action.setVisible(True)
         if service_item['service_item'].is_capable(ItemCapabilities.CanAutoStartForLive):
             self.auto_start_action.setVisible(True)
-            self.auto_start_action.setIcon(self.inactive)
-            self.auto_start_action.setText(translate('OpenLP.ServiceManager', '&Auto Start - inactive'))
             if service_item['service_item'].will_auto_start:
                 self.auto_start_action.setText(translate('OpenLP.ServiceManager', '&Auto Start - active'))
-                self.auto_start_action.setIcon(self.active)
+                self.auto_start_action.setIcon(UiIcons().active)
+            else:
+                self.auto_start_action.setIcon(UiIcons().inactive)
+                self.auto_start_action.setText(translate('OpenLP.ServiceManager', '&Auto Start - inactive'))
         if service_item['service_item'].is_text():
             for plugin in self.plugin_manager.plugins:
                 if plugin.name == 'custom' and plugin.status == PluginStatus.Active:

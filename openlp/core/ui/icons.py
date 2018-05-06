@@ -54,6 +54,7 @@ class UiIcons(object):
                          color_disabled=palette.color(QtGui.QPalette.Disabled,
                                                       QtGui.QPalette.ButtonText))
         icon_list = {
+            'active': {'icon': 'fa.child'},
             'add': {'icon': 'fa.plus-circle'},
             'alert': {'icon': 'fa.exclamation-triangle'},
             'arrow_down': {'icon': 'fa.arrow-down'},
@@ -65,6 +66,7 @@ class UiIcons(object):
             'back': {'icon': 'fa.step-backward'},
             'bible': {'icon': 'fa.book'},
             'blank': {'icon': 'fa.times-circle'},
+            'book': {'icon': 'fa.book'},
             'bottom': {'icon': 'fa.angle-double-down'},
             'clock': {'icon': 'fa.clock-o'},
             'clone': {'icon': 'fa.clone'},
@@ -79,6 +81,7 @@ class UiIcons(object):
             'email': {'icon': 'fa.envelope'},
             'exit': {'icon': 'fa.sign-out'},
             'group': {'icon': 'fa.object-group'},
+            'inactive': {'icon': 'fa.child', 'attr': 'color=\'red\''},
             'info': {'icon': 'fa.info'},
             'live': {'icon': 'fa.desktop'},
             'manual': {'icon': 'fa.graduation-cap'},

@@ -52,7 +52,7 @@ class Ui_SongMaintenanceDialog(object):
         self.topics_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
         self.topics_list_item.setIcon(build_icon(':/songs/topic_maintenance.png'))
         self.books_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
-        self.books_list_item.setIcon(build_icon(':/songs/book_maintenance.png'))
+        self.books_list_item.setIcon(UiIcons().book)
         self.dialog_layout.addWidget(self.type_list_widget, 0, 0)
         self.stacked_layout = QtWidgets.QStackedLayout()
         self.stacked_layout.setObjectName('stacked_layout')
