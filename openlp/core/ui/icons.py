@@ -81,7 +81,7 @@ class UiIcons(object):
             'email': {'icon': 'fa.envelope'},
             'exit': {'icon': 'fa.sign-out'},
             'group': {'icon': 'fa.object-group'},
-            'inactive': {'icon': 'fa.child', 'attr': 'color=\'red\''},
+            'inactive': {'icon': 'fa.child', 'attr': 'lightGray'},
             'info': {'icon': 'fa.info'},
             'live': {'icon': 'fa.desktop'},
             'manual': {'icon': 'fa.graduation-cap'},
@@ -128,9 +128,13 @@ class UiIcons(object):
                 icon = icon_list[key]['icon']
                 try:
                     attr = icon_list[key]['attr']
-                    setattr(self, key, qta.icon('fa.plus-circle', attr))
-                except:
+                    setattr(self, key, qta.icon(icon, color=attr))
+                    a = 1
+                except KeyError:
                     setattr(self, key, qta.icon(icon))
+                except Exception:
+                    import sys
+                    print("Unexpected error:", sys.exc_info())
             except:
                 setattr(self, key, qta.icon('fa.plus-circle', color='red'))
 
