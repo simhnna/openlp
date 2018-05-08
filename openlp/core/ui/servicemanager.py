@@ -251,7 +251,7 @@ class Ui_ServiceManager(object):
                                                  icon=UiIcons().notes,
                                                  triggers=self.on_service_item_note_form)
         self.time_action = create_widget_action(self.menu, text=translate('OpenLP.ServiceManager', '&Start Time'),
-                                                icon=':/media/media_time.png', triggers=self.on_start_time_form)
+                                                icon=UiIcons().time, triggers=self.on_start_time_form)
         self.auto_start_action = create_widget_action(self.menu, text='',
                                                       icon=UiIcons().active,
                                                       triggers=self.on_auto_start)

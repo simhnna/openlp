@@ -23,7 +23,6 @@
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 from openlp.core.ui.icons import UiIcons
 from openlp.plugins.songs.lib.ui import SongStrings
@@ -50,7 +49,7 @@ class Ui_SongMaintenanceDialog(object):
         self.authors_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
         self.authors_list_item.setIcon(UiIcons().usermo)
         self.topics_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
-        self.topics_list_item.setIcon(build_icon(':/songs/topic_maintenance.png'))
+        self.topics_list_item.setIcon(UiIcons().lightbulb)
         self.books_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
         self.books_list_item.setIcon(UiIcons().book)
         self.dialog_layout.addWidget(self.type_list_widget, 0, 0)

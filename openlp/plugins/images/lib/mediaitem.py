@@ -193,7 +193,7 @@ class ImageMediaItem(MediaManagerItem):
             self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
             triggers=self.on_replace_click)
         self.reset_action_context = create_widget_action(
-            self.list_view, text=UiStrings().ReplaceLiveBG, icon=':/system/system_close.png',
+            self.list_view, text=UiStrings().ReplaceLiveBG, icon=UiIcons().close,
             visible=False, triggers=self.on_reset_click)
 
     def add_start_header_bar(self):
@@ -212,7 +212,7 @@ class ImageMediaItem(MediaManagerItem):
                                                               icon=':/slides/slide_theme.png',
                                                               triggers=self.on_replace_click)
         self.reset_action = self.toolbar.add_toolbar_action('reset_action',
-                                                            icon=':/system/system_close.png',
+                                                            icon=UiIcons().close,
                                                             visible=False, triggers=self.on_reset_click)
 
     def recursively_delete_group(self, image_group):

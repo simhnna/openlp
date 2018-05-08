@@ -153,7 +153,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
             self.replace_action.setDisabled(True)
             if hasattr(self, 'replace_action_context'):
                 self.replace_action_context.setDisabled(True)
-        self.reset_action = self.toolbar.add_toolbar_action('reset_action', icon=':/system/system_close.png',
+        self.reset_action = self.toolbar.add_toolbar_action('reset_action', icon=UiIcons().close,
                                                             visible=False, triggers=self.on_reset_click)
         self.media_widget = QtWidgets.QWidget(self)
         self.media_widget.setObjectName('media_widget')
@@ -177,7 +177,7 @@ class MediaMediaItem(MediaManagerItem, RegistryProperties):
             self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
             triggers=self.on_replace_click)
         self.reset_action_context = create_widget_action(
-            self.list_view, text=UiStrings().ReplaceLiveBG, icon=':/system/system_close.png',
+            self.list_view, text=UiStrings().ReplaceLiveBG, icon=UiIcons().close,
             visible=False, triggers=self.on_reset_click)
 
     @staticmethod

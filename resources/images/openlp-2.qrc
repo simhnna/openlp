@@ -5,17 +5,14 @@
     <file>song_search_lyrics.png</file>
     <file>song_search_title.png</file>
     <file>song_search_topic.png</file>
-    <file>topic_maintenance.png</file>
     </qresource>
   <qresource prefix="images">
     </qresource>
   <qresource prefix="bibles">
     </qresource>
   <qresource prefix="plugins">
-    <file>plugin_alerts.png</file>
     <file>plugin_songs.png</file>
-    <file>plugin_songusage.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="general">
     </qresource>
   <qresource prefix="slides">
@@ -25,7 +22,6 @@
     <file>openlp-logo.svg</file>
   </qresource>
   <qresource prefix="graphics">
-    <file>exception.png</file>
     <file>openlp-splash-screen.png</file>
     <file>openlp-about-logo.png</file>
   </qresource>
@@ -44,7 +40,6 @@
   <qresource prefix="services">
     </qresource>
   <qresource prefix="system">
-    <file>system_close.png</file>
     <file>system_mediamanager.png</file>
     <file>system_volunteer.png</file>
     <file>system_servicemanager.png</file>
@@ -53,7 +48,6 @@
     <file>system_edit_copy.png</file>
     </qresource>
   <qresource prefix="media">
-    <file>media_time.png</file>
     <file>slidecontroller_multimedia.png</file>
     <file>multimedia-player.png</file>
   </qresource>

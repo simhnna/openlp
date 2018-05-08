@@ -32,6 +32,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.core.lib.ui import create_action
+from openlp.core.ui.icons import UiIcons
 from openlp.plugins.songusage.forms import SongUsageDetailForm, SongUsageDeleteForm
 from openlp.plugins.songusage.lib import upgrade
 from openlp.plugins.songusage.lib.db import init_schema, SongUsageItem
@@ -63,7 +64,7 @@ class SongUsagePlugin(Plugin):
         super(SongUsagePlugin, self).__init__('songusage', __default_settings__)
         self.manager = Manager('songusage', init_schema, upgrade_mod=upgrade)
         self.weight = -4
-        self.icon = build_icon(':/plugins/plugin_songusage.png')
+        self.icon = UiIcons().song_usage
         self.active_icon = build_icon(':/songusage/song_usage_active.png')
         self.inactive_icon = build_icon(':/songusage/song_usage_inactive.png')
         self.song_usage_active = False
