@@ -26,6 +26,7 @@ import qtawesome as qta
 
 from PyQt5 import QtGui, QtWidgets
 
+from openlp.core.common.applocation import AppLocation
 from openlp.core.lib import build_icon
 
 
@@ -48,6 +49,9 @@ class UiIcons(object):
         """
         These are the font icons used in the code.
         """
+        font_path = AppLocation.get_directory(AppLocation.AppDir) / 'core' / 'ui' / 'fonts' / 'OpenLP.ttf'
+        charmap_path = AppLocation.get_directory(AppLocation.AppDir) / 'core' / 'ui' / 'fonts' / 'openlp-charmap.json'
+        qta.load_font('op', font_path, charmap_path)
         palette = QtWidgets.QApplication.palette()
         qta.set_defaults(color=palette.color(QtGui.QPalette.Active,
                                              QtGui.QPalette.ButtonText),
@@ -112,13 +116,13 @@ class UiIcons(object):
             'sort': {'icon': 'fa.sort'},
             'stop': {'icon': 'fa.stop'},
             'square': {'icon': 'fa.square'},
-            'text': {'icon': 'fa.file-text'},
+            'text': {'icon': 'op.file-text'},
             'theme': {'icon': 'fa.file-image-o'},
             'top': {'icon': 'fa.angle-double-up'},
             'undo': {'icon': 'fa.undo'},
             'upload': {'icon': 'fa.cloud-upload'},
             'user': {'icon': 'fa.user'},
-            'usermo': {'icon': 'fa.user-md'},
+            'usermo': {'icon': 'op.users'},
             'users': {'icon': 'fa.users'},
             'video': {'icon': 'fa.file-video-o'}
         }
