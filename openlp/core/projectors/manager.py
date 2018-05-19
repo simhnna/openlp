@@ -336,14 +336,10 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         Retrieve the saved settings
         """
         log.debug('Updating ProjectorManager settings')
-        settings = Settings()
-        settings.beginGroup(self.settings_section)
-        self.autostart = settings.value('connect on start')
-        self.poll_time = settings.value('poll time')
-        self.socket_timeout = settings.value('socket timeout')
-        self.source_select_dialog_type = settings.value('source dialog type')
-        settings.endGroup()
-        del settings
+        self.autostart = Settings().value('projector/connect on start')
+        self.poll_time = Settings().value('projector/poll time')
+        self.socket_timeout = Settings().value('projector/socket timeout')
+        self.source_select_dialog_type = Settings().value('projector/source dialog type')
 
     def context_menu(self, point):
         """

@@ -120,27 +120,21 @@ class ProjectorTab(SettingsTab):
         """
         Load the projector settings on startup
         """
-        settings = Settings()
-        settings.beginGroup(self.settings_section)
-        self.connect_on_startup.setChecked(settings.value('connect on start'))
-        self.socket_timeout_spin_box.setValue(settings.value('socket timeout'))
-        self.socket_poll_spin_box.setValue(settings.value('poll time'))
-        self.dialog_type_combo_box.setCurrentIndex(settings.value('source dialog type'))
-        self.connect_on_linkup.setChecked(settings.value('connect when LKUP received'))
-        settings.endGroup()
+        self.connect_on_startup.setChecked(Settings().value('projector/connect on start'))
+        self.socket_timeout_spin_box.setValue(Settings().value('projector/socket timeout'))
+        self.socket_poll_spin_box.setValue(Settings().value('projector/poll time'))
+        self.dialog_type_combo_box.setCurrentIndex(Settings().value('projector/source dialog type'))
+        self.connect_on_linkup.setChecked(Settings().value('projector/connect when LKUP received'))
 
     def save(self):
         """
         Save the projector settings
         """
-        settings = Settings()
-        settings.beginGroup(self.settings_section)
-        settings.setValue('connect on start', self.connect_on_startup.isChecked())
-        settings.setValue('socket timeout', self.socket_timeout_spin_box.value())
-        settings.setValue('poll time', self.socket_poll_spin_box.value())
-        settings.setValue('source dialog type', self.dialog_type_combo_box.currentIndex())
-        settings.setValue('connect when LKUP received', self.connect_on_linkup.isChecked())
-        settings.endGroup()
+        Settings().setValue('projector/connect on start', self.connect_on_startup.isChecked())
+        Settings().setValue('projector/socket timeout', self.socket_timeout_spin_box.value())
+        Settings().setValue('projector/poll time', self.socket_poll_spin_box.value())
+        Settings().setValue('projector/source dialog type', self.dialog_type_combo_box.currentIndex())
+        Settings().setValue('projector/connect when LKUP received', self.connect_on_linkup.isChecked())
 
     def on_dialog_type_combo_box_changed(self):
         self.dialog_type = self.dialog_type_combo_box.currentIndex()

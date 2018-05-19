@@ -516,12 +516,7 @@ class PJLinkCommands(object):
         :param data: Data packet from remote
         """
         log.debug('({ip}) Processing LKUP command'.format(ip=self.entry.name))
-        settings = Settings()
-        settings.beginGroup(self.settings_section)
-        autostart = settings.value('connect when LKUP received')
-        settings.endGroup()
-        del settings
-        if autostart:
+        if Settings().value('projector/connect when LKUP received'):
             self.connect_to_host()
 
     def process_name(self, data):
