@@ -199,6 +199,7 @@ class Settings(QtCore.QSettings):
         'projector/db database': '',
         'projector/enable': True,
         'projector/connect on start': False,
+        'projector/connect when LKUP received': True,  # PJLink v2: Projector sends LKUP command after it powers up
         'projector/last directory import': None,
         'projector/last directory export': None,
         'projector/poll time': 20,  # PJLink  timeout is 30 seconds

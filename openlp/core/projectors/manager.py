@@ -37,7 +37,7 @@ from openlp.core.lib.ui import create_widget_action
 from openlp.core.projectors import DialogSourceStyle
 from openlp.core.projectors.constants import E_AUTHENTICATION, E_ERROR, E_NETWORK, E_NOT_CONNECTED, \
     E_UNKNOWN_SOCKET_ERROR, S_CONNECTED, S_CONNECTING, S_COOLDOWN, S_INITIALIZE, S_NOT_CONNECTED, S_OFF, S_ON, \
-    S_STANDBY, S_WARMUP, STATUS_CODE, STATUS_MSG, QSOCKET_STATE
+    S_STANDBY, S_WARMUP, PJLINK_PORT, STATUS_CODE, STATUS_MSG, QSOCKET_STATE
 
 from openlp.core.projectors.db import ProjectorDB
 from openlp.core.projectors.editform import ProjectorEditForm
@@ -294,6 +294,9 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         self.projectordb = projectordb
         self.projector_list = []
         self.source_select_form = None
+        # Dictionary of PJLinkUDP objects to listen for UDP broadcasts from PJLink 2+ projectors.
+        # Key is port number that projectors use
+        self.pjlink_udp = {}
 
     def bootstrap_initialise(self):
         """
@@ -307,12 +310,15 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         else:
             log.debug('Using existing ProjectorDB() instance')
         self.get_settings()
-        self.pjlink_udp = PJLinkUDP(self.projector_list)
 
     def bootstrap_post_set_up(self):
         """
         Post-initialize setups.
         """
+        # Default PJLink port UDP socket
+        log.debug('Creating PJLinkUDP listener for default port {port}'.format(port=PJLINK_PORT))
+        self.pjlink_udp = {PJLINK_PORT: PJLinkUDP(port=PJLINK_PORT)}
+        self.pjlink_udp[PJLINK_PORT].bind(PJLINK_PORT)
         # Set 1.5 second delay before loading all projectors
         if self.autostart:
             log.debug('Delaying 1.5 seconds before loading all projectors')
@@ -330,14 +336,10 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         Retrieve the saved settings
         """
         log.debug('Updating ProjectorManager settings')
-        settings = Settings()
-        settings.beginGroup(self.settings_section)
-        self.autostart = settings.value('connect on start')
-        self.poll_time = settings.value('poll time')
-        self.socket_timeout = settings.value('socket timeout')
-        self.source_select_dialog_type = settings.value('source dialog type')
-        settings.endGroup()
-        del settings
+        self.autostart = Settings().value('projector/connect on start')
+        self.poll_time = Settings().value('projector/poll time')
+        self.socket_timeout = Settings().value('projector/socket timeout')
+        self.source_select_dialog_type = Settings().value('projector/source dialog type')
 
     def context_menu(self, point):
         """
@@ -513,6 +515,14 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             projector.socket_timer.timeout.disconnect(projector.link.socket_abort)
         except (AttributeError, TypeError):
             pass
+        # Disconnect signals from projector being deleted
+        if self.pjlink_udp[projector.port]:
+            try:
+                self.pjlink_udp[projector.port].data_received.disconnect(projector.get_buffer)
+            except (AttributeError, TypeError):
+                pass
+
+        # Rebuild projector list
         new_list = []
         for item in self.projector_list:
             if item.link.db_item.id == projector.link.db_item.id:
@@ -726,6 +736,15 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         item.link.projectorAuthentication.connect(self.authentication_error)
         item.link.projectorNoAuthentication.connect(self.no_authentication_error)
         item.link.projectorUpdateIcons.connect(self.update_icons)
+        # Connect UDP signal to projector instances with same port
+        if item.link.port not in self.pjlink_udp:
+            log.debug('Adding new PJLinkUDP listener fo port {port}'.format(port=item.link.port))
+            self.pjlink_udp[item.link.port] = PJLinkUDP(port=item.link.port)
+            self.pjlink_udp[item.link.port].bind(item.link.port)
+        log.debug('Connecting PJLinkUDP port {port} signal to "{item}"'.format(port=item.link.port,
+                                                                               item=item.link.name))
+        self.pjlink_udp[item.link.port].data_received.connect(item.link.get_buffer)
+
         self.projector_list.append(item)
         if start:
             item.link.connect_to_host()

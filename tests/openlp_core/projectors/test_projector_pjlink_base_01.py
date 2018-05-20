@@ -27,22 +27,12 @@ from unittest.mock import call, patch, MagicMock
 
 import openlp.core.projectors.pjlink
 from openlp.core.projectors.constants import \
-    E_NOT_CONNECTED, \
-    E_PARAMETER, \
-    E_UNKNOWN_SOCKET_ERROR, \
-    STATUS_CODE, \
-    STATUS_MSG, \
-    S_CONNECTED, \
-    S_CONNECTING, \
-    S_NOT_CONNECTED, \
-    S_OK, \
-    S_ON, \
+    E_NOT_CONNECTED, E_PARAMETER, E_UNKNOWN_SOCKET_ERROR, STATUS_CODE, STATUS_MSG, \
+    S_CONNECTED, S_CONNECTING, S_NOT_CONNECTED, S_OK, S_ON, \
     QSOCKET_STATE
 from openlp.core.projectors.db import Projector
 from openlp.core.projectors.pjlink import PJLink
 from tests.resources.projector.data import TEST1_DATA
-
-pjlink_test = PJLink(Projector(**TEST1_DATA), no_poll=True)
 
 
 class TestPJLinkBase(TestCase):

@@ -30,37 +30,23 @@ from unittest.mock import call, patch
 import openlp.core.projectors.pjlink
 from openlp.core.projectors.constants import PJLINK_PORT
 
-from openlp.core.projectors.db import Projector
-from openlp.core.projectors.pjlink import PJLinkUDP, PJLink
-from tests.resources.projector.data import TEST1_DATA, TEST2_DATA
+from openlp.core.projectors.pjlink import PJLinkUDP
+from tests.resources.projector.data import TEST1_DATA
 
 
 class TestPJLinkBase(TestCase):
     """
     Tests for the PJLinkUDP class
     """
-    def setUp(self):
-        """
-        Setup generic test conditions
-        """
-        self.test_list = [PJLink(projector=Projector(**TEST1_DATA)),
-                          PJLink(projector=Projector(**TEST2_DATA))]
-
-    def tearDown(self):
-        """
-        Close generic test condidtions
-        """
-        self.test_list = None
-
     @patch.object(openlp.core.projectors.pjlink, 'log')
     def test_get_datagram_data_negative_zero_length(self, mock_log):
         """
         Test get_datagram when pendingDatagramSize = 0
         """
         # GIVEN: Test setup
-        pjlink_udp = PJLinkUDP(projector_list=self.test_list)
-        log_warn_calls = [call('(UDP) No data (-1)')]
-        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized'),
+        pjlink_udp = PJLinkUDP()
+        log_warning_calls = [call('(UDP) No data (-1)')]
+        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized for port 4352'),
                            call('(UDP) get_datagram() - Receiving data')]
         with patch.object(pjlink_udp, 'pendingDatagramSize') as mock_datagram, \
                 patch.object(pjlink_udp, 'readDatagram') as mock_read:
@@ -71,7 +57,7 @@ class TestPJLinkBase(TestCase):
             pjlink_udp.get_datagram()
 
             # THEN: Log entries should be made and method returns
-            mock_log.warning.assert_has_calls(log_warn_calls)
+            mock_log.warning.assert_has_calls(log_warning_calls)
             mock_log.debug.assert_has_calls(log_debug_calls)
 
     @patch.object(openlp.core.projectors.pjlink, 'log')
@@ -80,9 +66,10 @@ class TestPJLinkBase(TestCase):
         Test get_datagram when data length = 0
         """
         # GIVEN: Test setup
-        pjlink_udp = PJLinkUDP(projector_list=self.test_list)
-        log_warn_calls = [call('(UDP) get_datagram() called when pending data size is 0')]
-        log_debug_calls = [call('(UDP) get_datagram() - Receiving data')]
+        pjlink_udp = PJLinkUDP()
+        log_warning_calls = [call('(UDP) get_datagram() called when pending data size is 0')]
+        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized for port 4352'),
+                           call('(UDP) get_datagram() - Receiving data')]
         with patch.object(pjlink_udp, 'pendingDatagramSize') as mock_datagram, \
                 patch.object(pjlink_udp, 'readDatagram') as mock_read:
             mock_datagram.return_value = 0
@@ -92,7 +79,7 @@ class TestPJLinkBase(TestCase):
             pjlink_udp.get_datagram()
 
             # THEN: Log entries should be made and method returns
-            mock_log.warning.assert_has_calls(log_warn_calls)
+            mock_log.warning.assert_has_calls(log_warning_calls)
             mock_log.debug.assert_has_calls(log_debug_calls)
 
     @patch.object(openlp.core.projectors.pjlink, 'log')
@@ -101,9 +88,9 @@ class TestPJLinkBase(TestCase):
         Test get_datagram when pendingDatagramSize = 0
         """
         # GIVEN: Test setup
-        pjlink_udp = PJLinkUDP(projector_list=self.test_list)
-        log_warn_calls = [call('(UDP) get_datagram() called when pending data size is 0')]
-        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized'),
+        pjlink_udp = PJLinkUDP()
+        log_warning_calls = [call('(UDP) get_datagram() called when pending data size is 0')]
+        log_debug_calls = [call('(UDP) PJLinkUDP() Initialized for port 4352'),
                            call('(UDP) get_datagram() - Receiving data')]
         with patch.object(pjlink_udp, 'pendingDatagramSize') as mock_datagram:
             mock_datagram.return_value = 0
@@ -112,5 +99,5 @@ class TestPJLinkBase(TestCase):
             pjlink_udp.get_datagram()
 
             # THEN: Log entries should be made and method returns
-            mock_log.warning.assert_has_calls(log_warn_calls)
+            mock_log.warning.assert_has_calls(log_warning_calls)
             mock_log.debug.assert_has_calls(log_debug_calls)
