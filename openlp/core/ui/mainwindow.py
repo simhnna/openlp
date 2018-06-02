@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
         action_list.add_category(UiStrings().Settings, CategoryOrder.standard_menu)
         self.settings_plugin_list_item = create_action(main_window,
                                                        'settingsPluginListItem',
-                                                       icon=':/system/settings_plugin_list.png',
+                                                       icon=UiIcons().plugin_list,
                                                        can_shortcuts=True,
                                                        category=UiStrings().Settings,
                                                        triggers=self.on_plugin_item_clicked)

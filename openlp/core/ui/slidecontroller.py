@@ -252,7 +252,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
                                                 triggers=self.on_hide_display)
             self.theme_screen = create_action(self, 'themeScreen',
                                               text=translate('OpenLP.SlideController', 'Toggle Blank to Theme'),
-                                              icon=UiIcons().theme,
+                                              icon=UiIcons().blank_theme,
                                               checked=False, can_shortcuts=True, category=self.category,
                                               triggers=self.on_theme_display)
             self.blank_screen = create_action(self, 'blankScreen',

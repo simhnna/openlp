@@ -11,7 +11,6 @@
   <qresource prefix="bibles">
     </qresource>
   <qresource prefix="plugins">
-    <file>plugin_songs.png</file>
     </qresource>
   <qresource prefix="general">
     </qresource>
@@ -44,7 +43,6 @@
     <file>system_volunteer.png</file>
     <file>system_servicemanager.png</file>
     <file>system_thememanager.png</file>
-    <file>settings_plugin_list.png</file>
     <file>system_edit_copy.png</file>
     </qresource>
   <qresource prefix="media">

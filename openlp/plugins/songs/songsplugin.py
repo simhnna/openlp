@@ -171,7 +171,7 @@ class SongsPlugin(Plugin):
         self.tools_reindex_item = create_action(
             tools_menu, 'toolsReindexItem',
             text=translate('SongsPlugin', '&Re-index Songs'),
-            icon=':/plugins/plugin_songs.png',
+            icon=UiIcons().music,
             statustip=translate('SongsPlugin', 'Re-index the songs database to improve searching and ordering.'),
             triggers=self.on_tools_reindex_item_triggered)
         self.tools_find_duplicates = create_action(

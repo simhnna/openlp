@@ -190,8 +190,7 @@ class ImageMediaItem(MediaManagerItem):
             icon=UiIcons().open, triggers=self.on_file_click)
         create_widget_action(self.list_view, separator=True)
         self.replace_action_context = create_widget_action(
-            self.list_view, text=UiStrings().ReplaceBG, icon=':/slides/slide_theme.png',
-            triggers=self.on_replace_click)
+            self.list_view, text=UiStrings().ReplaceBG, icon=UiIcons().theme, triggers=self.on_replace_click)
         self.reset_action_context = create_widget_action(
             self.list_view, text=UiStrings().ReplaceLiveBG, icon=UiIcons().close,
             visible=False, triggers=self.on_reset_click)
@@ -209,7 +208,7 @@ class ImageMediaItem(MediaManagerItem):
         Add custom buttons to the end of the toolbar
         """
         self.replace_action = self.toolbar.add_toolbar_action('replace_action',
-                                                              icon=':/slides/slide_theme.png',
+                                                              icon=UiIcons().theme,
                                                               triggers=self.on_replace_click)
         self.reset_action = self.toolbar.add_toolbar_action('reset_action',
                                                             icon=UiIcons().close,
