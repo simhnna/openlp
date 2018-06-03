@@ -193,7 +193,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         self.error_copy_to_button = QtWidgets.QPushButton(self.progress_page)
         self.error_copy_to_button.setObjectName('error_copy_to_button')
         self.error_copy_to_button.setHidden(True)
-        self.error_copy_to_button.setIcon(build_icon(':/system/system_edit_copy.png'))
+        self.error_copy_to_button.setIcon(UiIcons().copy)
         self.error_button_layout.addWidget(self.error_copy_to_button)
         self.error_save_to_button = QtWidgets.QPushButton(self.progress_page)
         self.error_save_to_button.setObjectName('error_save_to_button')

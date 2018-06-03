@@ -240,7 +240,6 @@ class ApiTab(SettingsTab):
         Settings().setValue(self.settings_section + '/authentication enabled', self.user_login_group_box.isChecked())
         Settings().setValue(self.settings_section + '/user id', self.user_id.text())
         Settings().setValue(self.settings_section + '/password', self.password.text())
-        self.generate_icon()
         if self.update_site_group_box.isChecked():
             self.settings_form.register_post_process('download_website')
 

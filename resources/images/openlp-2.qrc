@@ -1,10 +1,5 @@
 <RCC>
   <qresource prefix="songs">
-    <file>song_search_author.png</file>
-    <file>song_search_ccli.png</file>
-    <file>song_search_lyrics.png</file>
-    <file>song_search_title.png</file>
-    <file>song_search_topic.png</file>
     </qresource>
   <qresource prefix="images">
     </qresource>
@@ -43,12 +38,9 @@
     <file>system_volunteer.png</file>
     <file>system_servicemanager.png</file>
     <file>system_thememanager.png</file>
-    <file>system_edit_copy.png</file>
     </qresource>
   <qresource prefix="media">
-    <file>slidecontroller_multimedia.png</file>
-    <file>multimedia-player.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="messagebox">
     </qresource>
   <qresource prefix="remote">

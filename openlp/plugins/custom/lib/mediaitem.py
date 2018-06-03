@@ -112,9 +112,9 @@ class CustomMediaItem(MediaManagerItem):
         Initialise the UI so it can provide Searches
         """
         self.search_text_edit.set_search_types(
-            [(CustomSearch.Titles, ':/songs/song_search_title.png', translate('SongsPlugin.MediaItem', 'Titles'),
+            [(CustomSearch.Titles, UiIcons().search, translate('SongsPlugin.MediaItem', 'Titles'),
               translate('SongsPlugin.MediaItem', 'Search Titles...')),
-             (CustomSearch.Themes, ':/slides/slide_theme.png', UiStrings().Themes, UiStrings().SearchThemes)])
+             (CustomSearch.Themes, UiIcons().theme, UiStrings().Themes, UiStrings().SearchThemes)])
         self.load_list(self.plugin.db_manager.get_all_objects(CustomSlide, order_by_ref=CustomSlide.title))
         self.config_update()
 

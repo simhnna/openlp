@@ -49,7 +49,7 @@ class Ui_SongMaintenanceDialog(object):
         self.authors_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
         self.authors_list_item.setIcon(UiIcons().usermo)
         self.topics_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
-        self.topics_list_item.setIcon(UiIcons().lightbulb)
+        self.topics_list_item.setIcon(UiIcons().light_bulb)
         self.books_list_item = QtWidgets.QListWidgetItem(self.type_list_widget)
         self.books_list_item.setIcon(UiIcons().book)
         self.dialog_layout.addWidget(self.type_list_widget, 0, 0)

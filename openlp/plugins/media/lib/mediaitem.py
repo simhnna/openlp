@@ -46,7 +46,7 @@ if get_vlc() is not None:
 log = logging.getLogger(__name__)
 
 
-CLAPPERBOARD = ':/media/slidecontroller_multimedia.png'
+CLAPPERBOARD = UiIcons().clapperboard
 
 
 class MediaMediaItem(MediaManagerItem, RegistryProperties):

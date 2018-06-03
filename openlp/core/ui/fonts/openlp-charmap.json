@@ -1,4 +1,7 @@
 {
     "users": "0041", 
-    "file-text": "0042"
+    "file-text": "0042",
+    "search-text": "0043",   
+    "search-lyrcs": "0044",   
+    "search-CCLI": "0045"       
 }
