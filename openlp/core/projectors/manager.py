@@ -50,25 +50,6 @@ log = logging.getLogger(__name__)
 log.debug('projectormanager loaded')
 
 
-# Dict for matching projector status to display icon
-STATUS_ICONS = {
-    S_NOT_CONNECTED: ':/projector/projector_item_disconnect.png',
-    S_CONNECTING: ':/projector/projector_item_connect.png',
-    S_CONNECTED: ':/projector/projector_off.png',
-    S_OFF: ':/projector/projector_off.png',
-    S_INITIALIZE: ':/projector/projector_off.png',
-    S_STANDBY: ':/projector/projector_off.png',
-    S_WARMUP: ':/projector/projector_warmup.png',
-    S_ON: ':/projector/projector_on.png',
-    S_COOLDOWN: ':/projector/projector_cooldown.png',
-    E_ERROR: ':/projector/projector_error.png',
-    E_NETWORK: ':/projector/projector_not_connected_error.png',
-    E_AUTHENTICATION: ':/projector/projector_not_connected_error.png',
-    E_UNKNOWN_SOCKET_ERROR: ':/projector/projector_not_connected_error.png',
-    E_NOT_CONNECTED: ':/projector/projector_not_connected_error.png'
-}
-
-
 class UiProjectorManager(object):
     """
     UI part of the Projector Manager
@@ -295,6 +276,23 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         self.projectordb = projectordb
         self.projector_list = []
         self.source_select_form = None
+        # Dict for matching projector status to display icon
+        self.self.status_icons = {
+            S_NOT_CONNECTED: UiIcons().projector_disconnect,
+            S_CONNECTING: UiIcons().projector_connect,
+            S_CONNECTED: UiIcons().projector_off,
+            S_OFF: UiIcons().projector_off,
+            S_INITIALIZE: UiIcons().projector_on,
+            S_STANDBY: UiIcons().projector_off,
+            S_WARMUP: UiIcons().projector_warmup,
+            S_ON: UiIcons().projector_off,
+            S_COOLDOWN: UiIcons().projector_cooldown,
+            E_ERROR: UiIcons().projector_error,
+            E_NETWORK: ':/projector/projector_not_connected_error.png',
+            E_AUTHENTICATION: ':/projector/projector_not_connected_error.png',
+            E_UNKNOWN_SOCKET_ERROR: ':/projector/projector_not_connected_error.png',
+            E_NOT_CONNECTED: ':/projector/projector_not_connected_error.png'
+        }
 
     def bootstrap_initialise(self):
         """
@@ -715,7 +713,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
         """
         item = ProjectorItem(link=self._add_projector(projector))
         item.db_item = projector
-        item.icon = QtGui.QIcon(QtGui.QPixmap(STATUS_ICONS[S_NOT_CONNECTED]))
+        item.icon = QtGui.QIcon(QtGui.QPixmap(self.status_icons[S_NOT_CONNECTED]))
         widget = QtWidgets.QListWidgetItem(item.icon,
                                            item.link.name,
                                            self.projector_list_widget
@@ -802,7 +800,7 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             return
 
         item.status = status
-        item.icon = QtGui.QIcon(QtGui.QPixmap(STATUS_ICONS[status]))
+        item.icon = QtGui.QIcon(QtGui.QPixmap(self.status_icons[status]))
         log.debug('({name}) Updating icon with {code}'.format(name=item.link.name, code=STATUS_CODE[status]))
         item.widget.setIcon(item.icon)
         return self.update_icons()

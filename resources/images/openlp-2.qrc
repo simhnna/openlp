@@ -59,22 +59,15 @@
     <file>projector_connect.png</file>
     <file>projector_connect_tiled.png</file>
     <file>projector_hdmi.png</file>
-    <file>projector_cooldown.png</file>
     <file>projector_disconnect.png</file>
     <file>projector_disconnect_tiled.png</file>
-    <file>projector_error.png</file>
-    <file>projector_item_connect.png</file>
-    <file>projector_item_disconnect.png</file>
     <file>projector_not_connected_error.png</file>
-    <file>projector_off.png</file>
-    <file>projector_on.png</file>
     <file>projector_power_off.png</file>
     <file>projector_power_off_tiled.png</file>
     <file>projector_power_on.png</file>
     <file>projector_power_on_tiled.png</file>
     <file>projector_show.png</file>
     <file>projector_show_tiled.png</file>
-    <file>projector_warmup.png</file>
     </qresource>
   <qresource prefix="remotes">
     <file>app_qr.svg</file>

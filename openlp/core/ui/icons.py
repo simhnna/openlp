@@ -115,9 +115,9 @@ class UiIcons(object):
             'projector_cooldown': {'icon': 'fa.video', 'attr': 'blue'},
             'projector_disconnect': {'icon': 'fa.plug', 'attr': 'lightGray'},
             'projector_error': {'icon': 'fa.video', 'attr': 'red'},
-            'projector_off': {'icon': 'fa.video', 'attr': 'red'},
+            'projector_off': {'icon': 'fa.video', 'attr': 'black'},
             'projector_on': {'icon': 'fa.video', 'attr': 'green'},
-            'projector_warm': {'icon': 'fa.video', 'attr': 'yellow'},
+            'projector_warmup': {'icon': 'fa.video', 'attr': 'yellow'},
             'picture': {'icon': 'fa.picture-o'},
             'print': {'icon': 'fa.print'},
             'remote': {'icon': 'fa.rss'},
@@ -161,6 +161,7 @@ class UiIcons(object):
                 except Exception:
                     import sys
                     print("Unexpected error:", sys.exc_info())
+                    setattr(self, key, qta.icon('fa.plus-circle', color='red'))
             except:
                 setattr(self, key, qta.icon('fa.plus-circle', color='red'))
 
