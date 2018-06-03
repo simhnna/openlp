@@ -29,6 +29,7 @@ from PyQt5 import QtWidgets
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
+from openlp.core.ui.icons import UiIcons
 from openlp.core.projectors import DialogSourceStyle
 
 log = logging.getLogger(__name__)
@@ -45,7 +46,7 @@ class ProjectorTab(SettingsTab):
 
         :param parent: Parent widget
         """
-        self.icon_path = ':/projector/projector_manager.png'
+        self.icon_path = UiIcons().projectore
         projector_translated = translate('OpenLP.ProjectorTab', 'Projector')
         super(ProjectorTab, self).__init__(parent, 'Projector', projector_translated)
 

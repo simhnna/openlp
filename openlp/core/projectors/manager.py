@@ -120,7 +120,7 @@ class UiProjectorManager(object):
         self.one_toolbar.add_toolbar_action('connect_projector',
                                             text=translate('OpenLP.ProjectorManager',
                                                            'Connect to selected projector.'),
-                                            icon=':/projector/projector_connect.png',
+                                            icon=UiIcons().projector_connect,
                                             tooltip=translate('OpenLP.ProjectorManager',
                                                               'Connect to selected projector.'),
                                             triggers=self.on_connect_projector)
@@ -134,7 +134,7 @@ class UiProjectorManager(object):
         self.one_toolbar.add_toolbar_action('disconnect_projector',
                                             text=translate('OpenLP.ProjectorManager',
                                                            'Disconnect from selected projectors'),
-                                            icon=':/projector/projector_disconnect.png',
+                                            icon=UiIcons().disconnect,
                                             tooltip=translate('OpenLP.ProjectorManager',
                                                               'Disconnect from selected projector.'),
                                             triggers=self.on_disconnect_projector)
@@ -149,7 +149,7 @@ class UiProjectorManager(object):
         self.one_toolbar.add_toolbar_action('poweron_projector',
                                             text=translate('OpenLP.ProjectorManager',
                                                            'Power on selected projector'),
-                                            icon=':/projector/projector_power_on.png',
+                                            icon=UiIcons().projector_on,
                                             tooltip=translate('OpenLP.ProjectorManager',
                                                               'Power on selected projector.'),
                                             triggers=self.on_poweron_projector)
@@ -162,7 +162,7 @@ class UiProjectorManager(object):
                                             triggers=self.on_poweron_projector)
         self.one_toolbar.add_toolbar_action('poweroff_projector',
                                             text=translate('OpenLP.ProjectorManager', 'Standby selected projector'),
-                                            icon=':/projector/projector_power_off.png',
+                                            icon=UiIcons().projector_off,
                                             tooltip=translate('OpenLP.ProjectorManager',
                                                               'Put selected projector in standby.'),
                                             triggers=self.on_poweroff_projector)

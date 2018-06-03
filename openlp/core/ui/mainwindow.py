@@ -157,7 +157,7 @@ class Ui_MainWindow(object):
         # Create the projector manager
         self.projector_manager_dock = OpenLPDockWidget(parent=main_window,
                                                        name='projector_manager_dock',
-                                                       icon=':/projector/projector_manager.png')
+                                                       icon=UiIcons().projector)
         self.projector_manager_contents = ProjectorManager(self.projector_manager_dock)
         self.projector_manager_contents.setObjectName('projector_manager_contents')
         self.projector_manager_dock.setWidget(self.projector_manager_contents)
@@ -200,7 +200,7 @@ class Ui_MainWindow(object):
                                                    can_shortcuts=False)
         action_list.add_category(UiStrings().Import, CategoryOrder.standard_menu)
         self.view_projector_manager_item = create_action(main_window, 'viewProjectorManagerItem',
-                                                         icon=':/projector/projector_manager.png',
+                                                         icon=UiIcons().projector,
                                                          checked=self.projector_manager_dock.isVisible(),
                                                          can_shortcuts=True,
                                                          category=UiStrings().View,
