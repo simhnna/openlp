@@ -27,13 +27,14 @@ import tempfile
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 
-from openlp.core.common.httputils import get_user_agent, get_web_page, get_url_file_size, download_file
+from openlp.core.common.httputils import ProxyMode, download_file, get_proxy_settings, get_url_file_size, \
+    get_user_agent, get_web_page
 from openlp.core.common.path import Path
+from openlp.core.common.settings import Settings
 from tests.helpers.testmixin import TestMixin
 
 
 class TestHttpUtils(TestCase, TestMixin):
-
     """
     A test suite to test out various http helper functions.
     """
@@ -240,3 +241,121 @@ class TestHttpUtils(TestCase, TestMixin):
         # THEN: socket.timeout should have been caught
         # NOTE: Test is if $tmpdir/tempfile is still there, then test fails since ftw deletes bad downloaded files
         assert os.path.exists(self.tempfile) is False, 'tempfile should have been deleted'
+
+
+class TestGetProxySettings(TestCase, TestMixin):
+    def setUp(self):
+        self.build_settings()
+        self.addCleanup(self.destroy_settings)
+
+    @patch('openlp.core.common.httputils.Settings')
+    def test_mode_arg_specified(self, MockSettings):
+        """
+        Test that the argument is used rather than reading the 'advanced/proxy mode' setting
+        """
+        # GIVEN: Mocked settings
+        mocked_settings = MagicMock()
+        MockSettings.return_value = mocked_settings
+
+        # WHEN: Calling `get_proxy_settings` with the mode arg specified
+        get_proxy_settings(mode=ProxyMode.NO_PROXY)
+
+        # THEN: The mode arg should have been used rather than looking it up in the settings
+        mocked_settings.value.assert_not_called()
+
+    @patch('openlp.core.common.httputils.Settings')
+    def test_mode_incorrect_arg_specified(self, MockSettings):
+        """
+        Test that the system settings are used when the mode arg specieied is invalid
+        """
+        # GIVEN: Mocked settings
+        mocked_settings = MagicMock()
+        MockSettings.return_value = mocked_settings
+
+        # WHEN: Calling `get_proxy_settings` with an invalid mode arg specified
+        result = get_proxy_settings(mode='qwerty')
+
+        # THEN: An None should be returned
+        mocked_settings.value.assert_not_called()
+        assert result is None
+
+
+    def test_no_proxy_mode(self):
+        """
+        Test that a dictionary with http and https values are set to None is returned, when `NO_PROXY` mode is specified
+        """
+        # GIVEN: A `proxy mode` setting of NO_PROXY
+        Settings().setValue('advanced/proxy mode', ProxyMode.NO_PROXY)
+
+        # WHEN: Calling `get_proxy_settings`
+        result = get_proxy_settings()
+
+        # THEN: The returned value should be a dictionary with http and https values set to None
+        assert result == {'http': None, 'https': None}
+
+    def test_system_proxy_mode(self):
+        """
+        Test that None is returned, when `SYSTEM_PROXY` mode is specified
+        """
+        # GIVEN: A `proxy mode` setting of SYSTEM_PROXY
+        Settings().setValue('advanced/proxy mode', ProxyMode.SYSTEM_PROXY)
+
+        # WHEN: Calling `get_proxy_settings`
+        result = get_proxy_settings()
+
+        # THEN: The returned value should be None
+        assert result is None
+
+    def test_manual_proxy_mode_no_auth(self):
+        """
+        Test that the correct proxy addresses are returned when basic authentication is not used
+        """
+        # GIVEN: A `proxy mode` setting of MANUAL_PROXY with proxy servers, but no auth credentials are supplied
+        Settings().setValue('advanced/proxy mode', ProxyMode.MANUAL_PROXY)
+        Settings().setValue('advanced/proxy http', 'testhttp.server:port')
+        Settings().setValue('advanced/proxy https', 'testhttps.server:port')
+        Settings().setValue('advanced/proxy username', '')
+        Settings().setValue('advanced/proxy password', '')
+
+        # WHEN: Calling `get_proxy_settings`
+        result = get_proxy_settings()
+
+        # THEN: The returned value should be the proxy servers without authentication
+        assert result == {'http': 'http://testhttp.server:port', 'https': 'https://testhttps.server:port'}
+
+
+    def test_manual_proxy_mode_auth(self):
+        """
+        Test that the correct proxy addresses are returned when basic authentication is used
+        """
+        # GIVEN: A `proxy mode` setting of MANUAL_PROXY with proxy servers and auth credentials supplied
+        Settings().setValue('advanced/proxy mode', ProxyMode.MANUAL_PROXY)
+        Settings().setValue('advanced/proxy http', 'testhttp.server:port')
+        Settings().setValue('advanced/proxy https', 'testhttps.server:port')
+        Settings().setValue('advanced/proxy username', 'user')
+        Settings().setValue('advanced/proxy password', 'pass')
+
+        # WHEN: Calling `get_proxy_settings`
+        result = get_proxy_settings()
+
+        # THEN: The returned value should be the proxy servers with the authentication credentials
+        assert result == {'http': 'http://user:pass@testhttp.server:port',
+                          'https': 'https://user:pass@testhttps.server:port'}
+
+    def test_manual_proxy_mode_no_servers(self):
+        """
+        Test that the system proxies are overidden when the MANUAL_PROXY mode is specified, but no server addresses are
+        supplied
+        """
+        # GIVEN: A `proxy mode` setting of MANUAL_PROXY with no servers specified
+        Settings().setValue('advanced/proxy mode', ProxyMode.MANUAL_PROXY)
+        Settings().setValue('advanced/proxy http', None)
+        Settings().setValue('advanced/proxy https', None)
+        Settings().setValue('advanced/proxy username', 'user')
+        Settings().setValue('advanced/proxy password', 'pass')
+
+        # WHEN: Calling `get_proxy_settings`
+        result = get_proxy_settings()
+
+        # THEN: The returned value should be the proxy servers set to None
+        assert result == {'http': None, 'https': None}

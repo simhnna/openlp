@@ -32,6 +32,7 @@ import requests
 
 from openlp.core.common import trace_error_handler
 from openlp.core.common.registry import Registry
+from openlp.core.common.settings import ProxyMode, Settings
 
 log = logging.getLogger(__name__ + '.__init__')
 
@@ -64,6 +65,39 @@ CONNECTION_TIMEOUT = 30
 CONNECTION_RETRIES = 2
 
 
+def get_proxy_settings(mode=None):
+    """
+    Create a dictionary containing the proxy settings.
+
+    :param ProxyMode | None mode: Specify the source of the proxy settings
+    :return: A dict using the format expected by the requests library.
+    :rtype: dict | None
+    """
+    settings = Settings()
+    if mode is None:
+        mode = settings.value('advanced/proxy mode')
+    if mode == ProxyMode.NO_PROXY:
+        return {'http': None, 'https': None}
+    elif mode == ProxyMode.SYSTEM_PROXY:
+        # The requests library defaults to using the proxy settings in the environment variables
+        return
+    elif mode == ProxyMode.MANUAL_PROXY:
+        http_addr = settings.value('advanced/proxy http')
+        https_addr = settings.value('advanced/proxy https')
+        username = settings.value('advanced/proxy username')
+        password = settings.value('advanced/proxy password')
+        basic_auth = ''
+        if username:
+            basic_auth = '{username}:{password}@'.format(username=username, password=password)
+        http_value = None
+        https_value = None
+        if http_addr is not None:
+            http_value = 'http://{basic_auth}{http_addr}'.format(basic_auth=basic_auth, http_addr=http_addr)
+        if https_addr is not None:
+            https_value = 'https://{basic_auth}{https_addr}'.format(basic_auth=basic_auth, https_addr=https_addr)
+        return {'http': http_value, 'https': https_value}
+
+
 def get_user_agent():
     """
     Return a user agent customised for the platform the user is on.
@@ -75,7 +109,7 @@ def get_user_agent():
     return browser_list[random_index]
 
 
-def get_web_page(url, headers=None, update_openlp=False, proxies=None):
+def get_web_page(url, headers=None, update_openlp=False, proxy_mode=None):
     """
     Attempts to download the webpage at url and returns that page or None.
 
@@ -90,6 +124,8 @@ def get_web_page(url, headers=None, update_openlp=False, proxies=None):
         headers = {}
     if 'user-agent' not in [key.lower() for key in headers.keys()]:
         headers['User-Agent'] = get_user_agent()
+    if proxy_mode is None:
+        proxies = get_proxy_settings(mode=proxy_mode)
     log.debug('Downloading URL = %s' % url)
     retries = 0
     while retries < CONNECTION_RETRIES:
