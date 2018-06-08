@@ -199,7 +199,6 @@ def get_repo_name():
     """
     This returns the name of branch of the working directory. For example it returns *lp:~googol/openlp/render*.
     """
-    return 'lp:~phill-ridout/openlp/proxies'
     # Run the bzr command.
     bzr = Popen(('bzr', 'info'), stdout=PIPE, stderr=PIPE)
     raw_output, error = bzr.communicate()

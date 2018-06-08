@@ -109,14 +109,15 @@ def get_user_agent():
     return browser_list[random_index]
 
 
-def get_web_page(url, headers=None, update_openlp=False, proxy_mode=None):
+def get_web_page(url, headers=None, update_openlp=False, proxy=None):
     """
     Attempts to download the webpage at url and returns that page or None.
 
     :param url: The URL to be downloaded.
-    :param header:  An optional HTTP header to pass in the request to the web server.
-    :param update_openlp: Tells OpenLP to update itself if the page is successfully downloaded.
-        Defaults to False.
+    :param dict | None headers:  An optional HTTP header to pass in the request to the web server.
+    :param update_openlp: Tells OpenLP to update itself if the page is successfully downloaded. Defaults to False.
+    :param dict | ProxyMode | None proxy: ProxyMode enum or a dictionary containing the proxy servers, with their types
+        as the key e.g. {'http': 'http://proxyserver:port', 'https': 'https://proxyserver:port'}
     """
     if not url:
         return None
@@ -124,13 +125,13 @@ def get_web_page(url, headers=None, update_openlp=False, proxy_mode=None):
         headers = {}
     if 'user-agent' not in [key.lower() for key in headers.keys()]:
         headers['User-Agent'] = get_user_agent()
-    if proxy_mode is None:
-        proxies = get_proxy_settings(mode=proxy_mode)
+    if not isinstance(proxy, dict):
+        proxy = get_proxy_settings(mode=proxy)
     log.debug('Downloading URL = %s' % url)
     retries = 0
     while retries < CONNECTION_RETRIES:
         try:
-            response = requests.get(url, headers=headers, proxies=proxies, timeout=float(CONNECTION_TIMEOUT))
+            response = requests.get(url, headers=headers, proxies=proxy, timeout=float(CONNECTION_TIMEOUT))
             log.debug('Downloaded page {url}'.format(url=response.url))
             break
         except OSError:
