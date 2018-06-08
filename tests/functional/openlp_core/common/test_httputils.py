@@ -349,8 +349,8 @@ class TestGetProxySettings(TestCase, TestMixin):
         """
         # GIVEN: A `proxy mode` setting of MANUAL_PROXY with no servers specified
         Settings().setValue('advanced/proxy mode', ProxyMode.MANUAL_PROXY)
-        Settings().setValue('advanced/proxy http', None)
-        Settings().setValue('advanced/proxy https', None)
+        Settings().setValue('advanced/proxy http', '')
+        Settings().setValue('advanced/proxy https', '')
         Settings().setValue('advanced/proxy username', 'user')
         Settings().setValue('advanced/proxy password', 'pass')
 

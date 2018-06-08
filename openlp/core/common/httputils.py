@@ -91,9 +91,9 @@ def get_proxy_settings(mode=None):
             basic_auth = '{username}:{password}@'.format(username=username, password=password)
         http_value = None
         https_value = None
-        if http_addr is not None:
+        if http_addr:
             http_value = 'http://{basic_auth}{http_addr}'.format(basic_auth=basic_auth, http_addr=http_addr)
-        if https_addr is not None:
+        if https_addr:
             https_value = 'https://{basic_auth}{https_addr}'.format(basic_auth=basic_auth, https_addr=https_addr)
         return {'http': http_value, 'https': https_value}
 
