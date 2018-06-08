@@ -279,7 +279,6 @@ class TestGetProxySettings(TestCase, TestMixin):
         mocked_settings.value.assert_not_called()
         assert result is None
 
-
     def test_no_proxy_mode(self):
         """
         Test that a dictionary with http and https values are set to None is returned, when `NO_PROXY` mode is specified
@@ -322,7 +321,6 @@ class TestGetProxySettings(TestCase, TestMixin):
 
         # THEN: The returned value should be the proxy servers without authentication
         assert result == {'http': 'http://testhttp.server:port', 'https': 'https://testhttps.server:port'}
-
 
     def test_manual_proxy_mode_auth(self):
         """
