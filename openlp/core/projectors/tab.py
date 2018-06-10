@@ -46,7 +46,7 @@ class ProjectorTab(SettingsTab):
 
         :param parent: Parent widget
         """
-        self.icon_path = UiIcons().projectore
+        self.icon_path = UiIcons().projector
         projector_translated = translate('OpenLP.ProjectorTab', 'Projector')
         super(ProjectorTab, self).__init__(parent, 'Projector', projector_translated)
 

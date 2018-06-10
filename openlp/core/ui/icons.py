@@ -112,12 +112,12 @@ class UiIcons(object):
             'projector': {'icon': 'fa.video'},
             'projector_blank': {'icon': 'fa.desktop'},
             'projector_connect': {'icon': 'fa.plug'},
-            'projector_cooldown': {'icon': 'fa.video', 'attr': 'blue'},
+            'projector_cooldown': {'icon': 'fa.video-camera', 'attr': 'blue'},
             'projector_disconnect': {'icon': 'fa.plug', 'attr': 'lightGray'},
-            'projector_error': {'icon': 'fa.video', 'attr': 'red'},
-            'projector_off': {'icon': 'fa.video', 'attr': 'black'},
-            'projector_on': {'icon': 'fa.video', 'attr': 'green'},
-            'projector_warmup': {'icon': 'fa.video', 'attr': 'yellow'},
+            'projector_error': {'icon': 'fa.video-camera', 'attr': 'red'},
+            'projector_off': {'icon': 'fa.video-camera', 'attr': 'black'},
+            'projector_on': {'icon': 'fa.video-camera', 'attr': 'green'},
+            'projector_warmup': {'icon': 'fa.video-camera', 'attr': 'yellow'},
             'picture': {'icon': 'fa.picture-o'},
             'print': {'icon': 'fa.print'},
             'remote': {'icon': 'fa.rss'},
@@ -149,13 +149,18 @@ class UiIcons(object):
             'video': {'icon': 'fa.file-video-o'}
         }
 
+        self.load_icons(self, icon_list)
+
+    def load_icons(self, icon_list):
+        """
+        Load the list of icons to be processed
+        """
         for key in icon_list:
             try:
                 icon = icon_list[key]['icon']
                 try:
                     attr = icon_list[key]['attr']
                     setattr(self, key, qta.icon(icon, color=attr))
-                    a = 1
                 except KeyError:
                     setattr(self, key, qta.icon(icon))
                 except Exception:
@@ -170,7 +175,7 @@ class UiIcons(object):
     @staticmethod
     def _print_icons():
         """
-        Have ability to dump icons to see what is available.  Can only run within an application
+        Have ability to dump icons to see what is actually available.  Can only run within an application
         :return:
         """
         ico = qta._resource['iconic']
