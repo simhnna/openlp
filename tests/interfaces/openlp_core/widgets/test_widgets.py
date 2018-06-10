@@ -42,13 +42,14 @@ class TestProxyWidget(TestCase, TestMixin):
         Registry.create()
         self.setup_application()
 
-    def test_radio_button_exclusivity(self):
+    def test_radio_button_exclusivity_no_proxy(self):
         """
         Test that only one radio button can be checked at a time, and that the line edits are only enabled when the
         `manual_proxy_radio` is checked
         """
-        # GIVEN: An instance of the `openlp.core.common.widgets.widgets.ProxyWidget`
+        # GIVEN: An instance of the `openlp.core.common.widgets.widgets.ProxyWidget` with a radio already checked
         proxy_widget = ProxyWidget()
+        proxy_widget.manual_proxy_radio.setChecked(True)
 
         # WHEN: 'Checking' the `no_proxy_radio` button
         proxy_widget.no_proxy_radio.setChecked(True)
@@ -61,6 +62,15 @@ class TestProxyWidget(TestCase, TestMixin):
         assert proxy_widget.username_edit.isEnabled() is False
         assert proxy_widget.password_edit.isEnabled() is False
 
+    def test_radio_button_exclusivity_system_proxy(self):
+        """
+        Test that only one radio button can be checked at a time, and that the line edits are only enabled when the
+        `manual_proxy_radio` is checked
+        """
+        # GIVEN: An instance of the `openlp.core.common.widgets.widgets.ProxyWidget` with a radio already checked
+        proxy_widget = ProxyWidget()
+        proxy_widget.manual_proxy_radio.setChecked(True)
+
         # WHEN: 'Checking' the `use_sysem_proxy_radio` button
         proxy_widget.use_sysem_proxy_radio.setChecked(True)
 
@@ -71,6 +81,15 @@ class TestProxyWidget(TestCase, TestMixin):
         assert proxy_widget.https_edit.isEnabled() is False
         assert proxy_widget.username_edit.isEnabled() is False
         assert proxy_widget.password_edit.isEnabled() is False
+
+    def test_radio_button_exclusivity_manual_proxy(self):
+        """
+        Test that only one radio button can be checked at a time, and that the line edits are only enabled when the
+        `manual_proxy_radio` is checked
+        """
+        # GIVEN: An instance of the `openlp.core.common.widgets.widgets.ProxyWidget` with a radio already checked
+        proxy_widget = ProxyWidget()
+        proxy_widget.no_proxy_radio.setChecked(True)
 
         # WHEN: 'Checking' the `manual_proxy_radio` button
         proxy_widget.manual_proxy_radio.setChecked(True)
