@@ -75,8 +75,6 @@ class ProxyWidget(QtWidgets.QGroupBox):
         # Signal / Slots
         self.radio_group.buttonToggled.connect(self.on_radio_group_button_toggled)
 
-    # @QtCore.pyqtSlot(int, bool)  For some reason PyQt doesn't think this signature exists.
-    #                              (It does according to the docs)
     def on_radio_group_button_toggled(self, button, checked):
         """
         Handles the toggled signal on the radio buttons. The signal is emitted twice if a radio butting being toggled on
@@ -103,12 +101,12 @@ class ProxyWidget(QtWidgets.QGroupBox):
         self.use_sysem_proxy_radio.setText(translate('OpenLP.ProxyWidget', '&Use system proxy'))
         self.manual_proxy_radio.setText(translate('OpenLP.ProxyWidget', '&Manual proxy configuration'))
         proxy_example = translate('OpenLP.ProxyWidget', 'e.g. proxy_server_address:port_no')
-        self.layout.labelForField(self.http_edit).setText('HTTP:')
+        self.layout.labelForField(self.http_edit).setText(translate('OpenLP.ProxyWidget', 'HTTP:'))
         self.http_edit.setPlaceholderText(proxy_example)
-        self.layout.labelForField(self.https_edit).setText('HTTPS:')
+        self.layout.labelForField(self.https_edit).setText(translate('OpenLP.ProxyWidget', 'HTTPS:'))
         self.https_edit.setPlaceholderText(proxy_example)
-        self.layout.labelForField(self.username_edit).setText('Username:')
-        self.layout.labelForField(self.password_edit).setText('Password:')
+        self.layout.labelForField(self.username_edit).setText(translate('OpenLP.ProxyWidget', 'Username:'))
+        self.layout.labelForField(self.password_edit).setText(translate('OpenLP.ProxyWidget', 'Password:'))
 
     def load(self):
         """
