@@ -87,7 +87,7 @@ class UiProjectorManager(object):
         # Show source/view when projector connected
         self.one_toolbar.add_toolbar_action('source_view_projector',
                                             text=translate('OpenLP.ProjectorManager', 'Select Input Source'),
-                                            icon=':/projector/projector_hdmi.png',
+                                            icon=UiIcons().projector_hdmi,
                                             tooltip=translate('OpenLP.ProjectorManager',
                                                               'Choose input source on selected projector.'),
                                             triggers=self.on_select_input)
@@ -211,29 +211,29 @@ class UiProjectorManager(object):
         self.connect_action = create_widget_action(self.menu,
                                                    text=translate('OpenLP.ProjectorManager',
                                                                   '&Connect Projector'),
-                                                   icon=':/projector/projector_connect.png',
+                                                   icon=UiIcons().projector_connect,
                                                    triggers=self.on_connect_projector)
         self.disconnect_action = create_widget_action(self.menu,
                                                       text=translate('OpenLP.ProjectorManager',
                                                                      'D&isconnect Projector'),
-                                                      icon=':/projector/projector_disconnect.png',
+                                                      icon=UiIcons().projector_off,
                                                       triggers=self.on_disconnect_projector)
         self.menu.addSeparator()
         self.poweron_action = create_widget_action(self.menu,
                                                    text=translate('OpenLP.ProjectorManager',
                                                                   'Power &On Projector'),
-                                                   icon=':/projector/projector_power_on.png',
+                                                   icon=UiIcons().projector_on,
                                                    triggers=self.on_poweron_projector)
         self.poweroff_action = create_widget_action(self.menu,
                                                     text=translate('OpenLP.ProjectorManager',
                                                                    'Power O&ff Projector'),
-                                                    icon=':/projector/projector_power_off.png',
+                                                    icon=UiIcons().projector_off,
                                                     triggers=self.on_poweroff_projector)
         self.menu.addSeparator()
         self.select_input_action = create_widget_action(self.menu,
                                                         text=translate('OpenLP.ProjectorManager',
                                                                        'Select &Input'),
-                                                        icon=':/projector/projector_hdmi.png',
+                                                        icon=UiIcons().projector_hdmi,
                                                         triggers=self.on_select_input)
         self.edit_input_action = create_widget_action(self.menu,
                                                       text=translate('OpenLP.ProjectorManager',
@@ -248,7 +248,7 @@ class UiProjectorManager(object):
         self.show_action = create_widget_action(self.menu,
                                                 text=translate('OpenLP.ProjectorManager',
                                                                '&Show Projector Screen'),
-                                                icon=':/projector/projector_show.png',
+                                                icon=UiIcons().projector,
                                                 triggers=self.on_show_projector)
         self.menu.addSeparator()
         self.delete_action = create_widget_action(self.menu,
@@ -288,10 +288,10 @@ class ProjectorManager(QtWidgets.QWidget, RegistryBase, UiProjectorManager, LogM
             S_ON: UiIcons().projector_off,
             S_COOLDOWN: UiIcons().projector_cooldown,
             E_ERROR: UiIcons().projector_error,
-            E_NETWORK: ':/projector/projector_not_connected_error.png',
-            E_AUTHENTICATION: ':/projector/projector_not_connected_error.png',
-            E_UNKNOWN_SOCKET_ERROR: ':/projector/projector_not_connected_error.png',
-            E_NOT_CONNECTED: ':/projector/projector_not_connected_error.png'
+            E_NETWORK: UiIcons().error,
+            E_AUTHENTICATION: UiIcons().authentication,
+            E_UNKNOWN_SOCKET_ERROR: UiIcons().error,
+            E_NOT_CONNECTED: UiIcons().projector_disconnect
         }
 
     def bootstrap_initialise(self):
