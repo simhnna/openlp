@@ -134,7 +134,7 @@ class Ui_MainWindow(object):
         self.status_bar.addPermanentWidget(self.default_theme_label)
         # Create the MediaManager
         self.media_manager_dock = OpenLPDockWidget(main_window, 'media_manager_dock',
-                                                   ':/system/system_mediamanager.png')
+                                                   UiIcons().box)
         self.media_manager_dock.setStyleSheet(get_library_stylesheet())
         # Create the media toolbox
         self.media_tool_box = QtWidgets.QToolBox(self.media_manager_dock)
@@ -143,13 +143,13 @@ class Ui_MainWindow(object):
         main_window.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.media_manager_dock)
         # Create the service manager
         self.service_manager_dock = OpenLPDockWidget(main_window, 'service_manager_dock',
-                                                     ':/system/system_servicemanager.png')
+                                                     UiIcons().live)
         self.service_manager_contents = ServiceManager(self.service_manager_dock)
         self.service_manager_dock.setWidget(self.service_manager_contents)
         main_window.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.service_manager_dock)
         # Create the theme manager
         self.theme_manager_dock = OpenLPDockWidget(main_window, 'theme_manager_dock',
-                                                   ':/system/system_thememanager.png')
+                                                   UiIcons().theme)
         self.theme_manager_contents = ThemeManager(self.theme_manager_dock)
         self.theme_manager_contents.setObjectName('theme_manager_contents')
         self.theme_manager_dock.setWidget(self.theme_manager_contents)
@@ -206,16 +206,16 @@ class Ui_MainWindow(object):
                                                          category=UiStrings().View,
                                                          triggers=self.toggle_projector_manager)
         self.view_media_manager_item = create_action(main_window, 'viewMediaManagerItem',
-                                                     icon=':/system/system_mediamanager.png',
+                                                     icon=UiIcons().box,
                                                      checked=self.media_manager_dock.isVisible(),
                                                      can_shortcuts=True,
                                                      category=UiStrings().View, triggers=self.toggle_media_manager)
         self.view_theme_manager_item = create_action(main_window, 'viewThemeManagerItem', can_shortcuts=True,
-                                                     icon=':/system/system_thememanager.png',
+                                                     icon=UiIcons().theme,
                                                      checked=self.theme_manager_dock.isVisible(),
                                                      category=UiStrings().View, triggers=self.toggle_theme_manager)
         self.view_service_manager_item = create_action(main_window, 'viewServiceManagerItem', can_shortcuts=True,
-                                                       icon=':/system/system_servicemanager.png',
+                                                       icon=UiIcons().live,
                                                        checked=self.service_manager_dock.isVisible(),
                                                        category=UiStrings().View, triggers=self.toggle_service_manager)
         self.view_preview_panel = create_action(main_window, 'viewPreviewPanel', can_shortcuts=True,

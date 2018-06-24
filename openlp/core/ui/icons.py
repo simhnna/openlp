@@ -74,6 +74,7 @@ class UiIcons(object):
             'blank_theme': {'icon': 'fa.file-image-o'},
             'book': {'icon': 'fa.book'},
             'bottom': {'icon': 'fa.angle-double-down'},
+            'box': {'icon': 'fa.briefcase'},
             'clapperboard': {'icon': 'fa.chess-board'},
             'clock': {'icon': 'fa.clock-o'},
             'clone': {'icon': 'fa.clone'},
@@ -94,7 +95,7 @@ class UiIcons(object):
             'inactive': {'icon': 'fa.child', 'attr': 'lightGray'},
             'info': {'icon': 'fa.info'},
             'light_bulb': {'icon': 'fa.lightbulb-o'},
-            'live': {'icon': 'fa.desktop'},
+            'live': {'icon': 'fa.eye'},
             'manual': {'icon': 'fa.graduation-cap'},
             'media': {'icon': 'fa.fax'},
             'minus': {'icon': 'fa.minus'},
@@ -111,8 +112,7 @@ class UiIcons(object):
             'plus': {'icon': 'fa.plus'},
             'presentation': {'icon': 'fa.bar-chart'},
             'preview': {'icon': 'fa.laptop'},
-            'projector': {'icon': 'fa.video'},
-            'projector_blank': {'icon': 'fa.desktop'},
+            'projector': {'icon': 'op.video'},
             'projector_connect': {'icon': 'fa.plug'},
             'projector_cooldown': {'icon': 'fa.video-camera', 'attr': 'blue'},
             'projector_disconnect': {'icon': 'fa.plug', 'attr': 'lightGray'},
@@ -137,6 +137,8 @@ class UiIcons(object):
             'settings': {'icon': 'fa.cogs'},
             'shortcuts': {'icon': 'fa.wrench'},
             'song_usage': {'icon': 'fa.line-chart'},
+            'song_usage_active': {'icon': 'op.plus_sign'},
+            'song_usage_inactive': {'icon': 'op.minus_sign'},
             'sort': {'icon': 'fa.sort'},
             'stop': {'icon': 'fa.stop'},
             'square': {'icon': 'fa.square'},
@@ -149,7 +151,8 @@ class UiIcons(object):
             'user': {'icon': 'fa.user'},
             'usermo': {'icon': 'op.users'},
             'users': {'icon': 'fa.users'},
-            'video': {'icon': 'fa.file-video-o'}
+            'video': {'icon': 'fa.file-video-o'},
+            'volunteer': {'icon': 'fa.group'}
         }
 
         self.load_icons(self, icon_list)

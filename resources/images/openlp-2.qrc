@@ -34,10 +34,6 @@
   <qresource prefix="services">
     </qresource>
   <qresource prefix="system">
-    <file>system_mediamanager.png</file>
-    <file>system_volunteer.png</file>
-    <file>system_servicemanager.png</file>
-    <file>system_thememanager.png</file>
     </qresource>
   <qresource prefix="media">
     </qresource>
@@ -46,13 +42,10 @@
   <qresource prefix="remote">
     </qresource>
   <qresource prefix="songusage">
-    <file>song_usage_active.png</file>
-    <file>song_usage_inactive.png</file>
-  </qresource>
+    </qresource>
   <qresource prefix="tools">
     </qresource>
   <qresource prefix="themes">
-    <file>theme_new.png</file>
     </qresource>
   <qresource prefix="projector">
     </qresource>
