@@ -16,7 +16,6 @@ OpenLP.egg-info
 build
 resources/innosetup/Output
 .pylint.d
-*.qm
 openlp/core/resources.py.old
 *.qm
 resources/windows/warnOpenLP.txt
@@ -46,3 +45,4 @@ output
 htmlcov
 openlp-test-projectordb.sqlite
 .cache
+.pytest_cache
