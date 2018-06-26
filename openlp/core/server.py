@@ -53,12 +53,13 @@ class Server(QtCore.QObject, LogMixin):
         if 'OpenLP' in args:
             args.remove('OpenLP')
         # Yes, there is.
-        self.out_stream = QtCore.QTextStream(self.out_socket)
-        self.out_stream.setCodec('UTF-8')
-        self.out_socket.write(str.encode("".join(args)))
-        if not self.out_socket.waitForBytesWritten(10):
-            raise Exception(str(self.out_socket.errorString()))
-        self.out_socket.disconnectFromServer()
+        if len(args):
+            self.out_stream = QtCore.QTextStream(self.out_socket)
+            self.out_stream.setCodec('UTF-8')
+            self.out_socket.write(str.encode("".join(args)))
+            if not self.out_socket.waitForBytesWritten(10):
+                raise Exception(str(self.out_socket.errorString()))
+            self.out_socket.disconnectFromServer()
 
     def start_server(self):
         """

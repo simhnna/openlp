@@ -38,6 +38,7 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib import ItemCapabilities
 from openlp.core.lib.ui import critical_error_message_box
 from openlp.core.ui import DisplayControllerType
+from openlp.core.ui.icons import UiIcons
 from openlp.core.ui.media import MediaState, MediaInfo, MediaType, get_media_players, set_media_players, \
     parse_optical_path
 from openlp.core.ui.media.endpoint import media_endpoint
@@ -283,19 +284,19 @@ class MediaController(RegistryBase, LogMixin, RegistryProperties):
         # Build a Media ToolBar
         controller.mediabar = OpenLPToolbar(controller)
         controller.mediabar.add_toolbar_action('playbackPlay', text='media_playback_play',
-                                               icon=':/slides/media_playback_start.png',
+                                               icon=UiIcons().play,
                                                tooltip=translate('OpenLP.SlideController', 'Start playing media.'),
                                                triggers=controller.send_to_plugins)
         controller.mediabar.add_toolbar_action('playbackPause', text='media_playback_pause',
-                                               icon=':/slides/media_playback_pause.png',
+                                               icon=UiIcons().pause,
                                                tooltip=translate('OpenLP.SlideController', 'Pause playing media.'),
                                                triggers=controller.send_to_plugins)
         controller.mediabar.add_toolbar_action('playbackStop', text='media_playback_stop',
-                                               icon=':/slides/media_playback_stop.png',
+                                               icon=UiIcons().stop,
                                                tooltip=translate('OpenLP.SlideController', 'Stop playing media.'),
                                                triggers=controller.send_to_plugins)
         controller.mediabar.add_toolbar_action('playbackLoop', text='media_playback_loop',
-                                               icon=':/media/media_repeat.png', checked=False,
+                                               icon=UiIcons().repeat, checked=False,
                                                tooltip=translate('OpenLP.SlideController', 'Loop playing media.'),
                                                triggers=controller.send_to_plugins)
         controller.position_label = QtWidgets.QLabel()

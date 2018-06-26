@@ -28,11 +28,12 @@ from openlp.core.api.http import register_endpoint
 from openlp.core.common.actions import ActionList
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.settings import Settings
-from openlp.core.lib import Plugin, StringContent, build_icon
+from openlp.core.lib import Plugin, StringContent
 from openlp.core.lib.db import Manager
 from openlp.core.lib.theme import VerticalType
 from openlp.core.lib.ui import create_action
 from openlp.core.ui import AlertLocation
+from openlp.core.ui.icons import UiIcons
 from openlp.plugins.alerts.endpoint import api_alerts_endpoint, alerts_endpoint
 from openlp.plugins.alerts.forms import AlertForm
 from openlp.plugins.alerts.lib import AlertsManager, AlertsTab
@@ -138,8 +139,8 @@ class AlertsPlugin(Plugin):
         """
         super(AlertsPlugin, self).__init__('alerts', __default_settings__, settings_tab_class=AlertsTab)
         self.weight = -3
-        self.icon_path = ':/plugins/plugin_alerts.png'
-        self.icon = build_icon(self.icon_path)
+        self.icon_path = UiIcons().alert
+        self.icon = self.icon_path
         AlertsManager(self)
         self.manager = Manager('alerts', init_schema)
         self.alert_form = AlertForm(self)
@@ -155,7 +156,7 @@ class AlertsPlugin(Plugin):
         log.info('add tools menu')
         self.tools_alert_item = create_action(tools_menu, 'toolsAlertItem',
                                               text=translate('AlertsPlugin', '&Alert'),
-                                              icon=':/plugins/plugin_alerts.png',
+                                              icon=UiIcons().alert,
                                               statustip=translate('AlertsPlugin', 'Show an alert message.'),
                                               visible=False, can_shortcuts=True, triggers=self.on_alerts_trigger)
         self.main_window.tools_menu.addAction(self.tools_alert_item)

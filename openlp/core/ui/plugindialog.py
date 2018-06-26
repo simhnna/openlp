@@ -25,8 +25,8 @@ The UI widgets of the plugin view dialog
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_PluginViewDialog(object):
@@ -38,7 +38,7 @@ class Ui_PluginViewDialog(object):
         Set up the UI
         """
         plugin_view_dialog.setObjectName('plugin_view_dialog')
-        plugin_view_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        plugin_view_dialog.setWindowIcon(UiIcons().main_icon)
         plugin_view_dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         self.plugin_layout = QtWidgets.QVBoxLayout(plugin_view_dialog)
         self.plugin_layout.setObjectName('plugin_layout')

@@ -141,7 +141,7 @@ def get_version():
         full_version = file_path.read_text().rstrip()
     except OSError:
         log.exception('Error in version file.')
-        full_version = '0.0.0-bzr000'
+        full_version = '0.0.0'
     bits = full_version.split('-')
     APPLICATION_VERSION = {
         'full': full_version,

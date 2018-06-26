@@ -24,8 +24,8 @@ import datetime
 from PyQt5 import QtGui, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button, create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class UiAboutDialog(object):
@@ -40,7 +40,7 @@ class UiAboutDialog(object):
         :param about_dialog: The QDialog object to set up.
         """
         about_dialog.setObjectName('about_dialog')
-        about_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        about_dialog.setWindowIcon(UiIcons().main_icon)
         self.about_dialog_layout = QtWidgets.QVBoxLayout(about_dialog)
         self.about_dialog_layout.setContentsMargins(8, 8, 8, 8)
         self.about_dialog_layout.setObjectName('about_dialog_layout')
@@ -78,7 +78,7 @@ class UiAboutDialog(object):
         self.license_tab_layout.addWidget(self.license_text_edit)
         self.about_notebook.addTab(self.license_tab, '')
         self.about_dialog_layout.addWidget(self.about_notebook)
-        self.volunteer_button = create_button(None, 'volunteer_button', icon=':/system/system_volunteer.png')
+        self.volunteer_button = create_button(None, 'volunteer_button', icon=UiIcons().volunteer)
         self.button_box = create_button_box(about_dialog, 'button_box', ['close'], [self.volunteer_button])
         self.about_dialog_layout.addWidget(self.button_box)
         self.retranslate_ui(about_dialog)

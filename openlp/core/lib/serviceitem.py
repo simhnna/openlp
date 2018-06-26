@@ -35,6 +35,7 @@ from PyQt5 import QtGui
 from openlp.core.common import md5_hash
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.path import Path
 from openlp.core.common.settings import Settings
@@ -169,7 +170,7 @@ class ServiceItem(RegistryProperties):
         self.processor = None
         self.audit = ''
         self.items = []
-        self.iconic_representation = None
+        self.icon = UiIcons().default
         self.raw_footer = []
         self.foot_text = ''
         self.theme = None
@@ -229,14 +230,22 @@ class ServiceItem(RegistryProperties):
         """
         return capability in self.capabilities
 
-    def add_icon(self, icon):
+    def add_icon(self):
         """
         Add an icon to the service item. This is used when displaying the service item in the service manager.
-
-        :param icon: A string to an icon in the resources or on disk.
         """
-        self.icon = icon
-        self.iconic_representation = build_icon(icon)
+        if self.name == 'songs':
+            self.icon = UiIcons().music
+        elif self.name == 'bibles':
+            self.icon = UiIcons().bible
+        elif self.name == 'presentations':
+            self.icon = UiIcons().presentation
+        elif self.name == 'images':
+            self.icon = UiIcons().picture
+        elif self.name == 'media':
+            self.icon = UiIcons().video
+        else:
+            self.icon = UiIcons().clone
 
     def render(self, provides_own_theme_data=False):
         """
@@ -361,7 +370,6 @@ class ServiceItem(RegistryProperties):
             'plugin': self.name,
             'theme': self.theme,
             'title': self.title,
-            'icon': self.icon,
             'footer': self.raw_footer,
             'type': self.service_item_type,
             'audit': self.audit,
@@ -413,7 +421,7 @@ class ServiceItem(RegistryProperties):
         self.name = header['name']
         self.service_item_type = header['type']
         self.theme = header['theme']
-        self.add_icon(header['icon'])
+        self.add_icon()
         self.raw_footer = header['footer']
         self.audit = header['audit']
         self.notes = header['notes']

@@ -347,7 +347,7 @@ class MessageListener(object):
             # Some of the original serviceitem attributes is needed in the new serviceitem
             item.footer = item_cpy.footer
             item.from_service = item_cpy.from_service
-            item.iconic_representation = item_cpy.iconic_representation
+            item.iconic_representation = item_cpy.icon
             item.image_border = item_cpy.image_border
             item.main = item_cpy.main
             item.theme_data = item_cpy.theme_data

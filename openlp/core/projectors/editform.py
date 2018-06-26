@@ -29,7 +29,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import verify_ip_address
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
+from openlp.core.ui.icons import UiIcons
 from openlp.core.projectors.constants import PJLINK_PORT
 from openlp.core.projectors.db import Projector
 
@@ -47,7 +47,7 @@ class Ui_ProjectorEditForm(object):
         Create the interface layout.
         """
         edit_projector_dialog.setObjectName('edit_projector_dialog')
-        edit_projector_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        edit_projector_dialog.setWindowIcon(UiIcons().main_icon)
         edit_projector_dialog.setMinimumWidth(400)
         edit_projector_dialog.setModal(True)
         # Define the basic layout

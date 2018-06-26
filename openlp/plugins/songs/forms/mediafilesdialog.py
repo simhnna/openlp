@@ -23,8 +23,8 @@
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_MediaFilesDialog(object):
@@ -36,7 +36,7 @@ class Ui_MediaFilesDialog(object):
         Set up the user interface.
         """
         media_files_dialog.setObjectName('media_files_dialog')
-        media_files_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        media_files_dialog.setWindowIcon(UiIcons().main_icon)
         media_files_dialog.setWindowModality(QtCore.Qt.ApplicationModal)
         media_files_dialog.resize(400, 300)
         media_files_dialog.setModal(True)

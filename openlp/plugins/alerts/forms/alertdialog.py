@@ -23,7 +23,7 @@
 from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
+from openlp.core.ui.icons import UiIcons
 from openlp.core.lib.ui import create_button, create_button_box
 
 
@@ -39,7 +39,7 @@ class Ui_AlertDialog(object):
         """
         alert_dialog.setObjectName('alert_dialog')
         alert_dialog.resize(400, 300)
-        alert_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        alert_dialog.setWindowIcon(UiIcons().main_icon)
         self.alert_dialog_layout = QtWidgets.QGridLayout(alert_dialog)
         self.alert_dialog_layout.setObjectName('alert_dialog_layout')
         self.alert_text_layout = QtWidgets.QFormLayout()
@@ -64,12 +64,12 @@ class Ui_AlertDialog(object):
         self.manage_button_layout = QtWidgets.QVBoxLayout()
         self.manage_button_layout.setObjectName('manage_button_layout')
         self.new_button = QtWidgets.QPushButton(alert_dialog)
-        self.new_button.setIcon(build_icon(':/general/general_new.png'))
+        self.new_button.setIcon(UiIcons().new)
         self.new_button.setObjectName('new_button')
         self.manage_button_layout.addWidget(self.new_button)
         self.save_button = QtWidgets.QPushButton(alert_dialog)
         self.save_button.setEnabled(False)
-        self.save_button.setIcon(build_icon(':/general/general_save.png'))
+        self.save_button.setIcon(UiIcons().save)
         self.save_button.setObjectName('save_button')
         self.manage_button_layout.addWidget(self.save_button)
         self.delete_button = create_button(alert_dialog, 'delete_button', role='delete', enabled=False,
@@ -77,9 +77,8 @@ class Ui_AlertDialog(object):
         self.manage_button_layout.addWidget(self.delete_button)
         self.manage_button_layout.addStretch()
         self.alert_dialog_layout.addLayout(self.manage_button_layout, 1, 1)
-        display_icon = build_icon(':/general/general_live.png')
-        self.display_button = create_button(alert_dialog, 'display_button', icon=display_icon, enabled=False)
-        self.display_close_button = create_button(alert_dialog, 'display_close_button', icon=display_icon,
+        self.display_button = create_button(alert_dialog, 'display_button', icon=UiIcons().live, enabled=False)
+        self.display_close_button = create_button(alert_dialog, 'display_close_button', icon=UiIcons().live,
                                                   enabled=False)
         self.button_box = create_button_box(alert_dialog, 'button_box', ['close'],
                                             [self.display_button, self.display_close_button])

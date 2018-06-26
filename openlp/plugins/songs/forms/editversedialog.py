@@ -24,8 +24,8 @@ from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
 from openlp.core.common.settings import Settings
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import SpellTextEdit
 from openlp.plugins.songs.lib import VerseType
 
@@ -33,7 +33,7 @@ from openlp.plugins.songs.lib import VerseType
 class Ui_EditVerseDialog(object):
     def setupUi(self, edit_verse_dialog):
         edit_verse_dialog.setObjectName('edit_verse_dialog')
-        edit_verse_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        edit_verse_dialog.setWindowIcon(UiIcons().main_icon)
         edit_verse_dialog.resize(400, 400)
         edit_verse_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(edit_verse_dialog)
@@ -44,11 +44,11 @@ class Ui_EditVerseDialog(object):
         self.verse_type_layout = QtWidgets.QHBoxLayout()
         self.verse_type_layout.setObjectName('verse_type_layout')
         self.forced_split_button = QtWidgets.QPushButton(edit_verse_dialog)
-        self.forced_split_button.setIcon(build_icon(':/general/general_add.png'))
+        self.forced_split_button.setIcon(UiIcons().add)
         self.forced_split_button.setObjectName('forced_split_button')
         self.verse_type_layout.addWidget(self.forced_split_button)
         self.overflow_split_button = QtWidgets.QPushButton(edit_verse_dialog)
-        self.overflow_split_button.setIcon(build_icon(':/general/general_add.png'))
+        self.overflow_split_button.setIcon(UiIcons().add)
         self.overflow_split_button.setObjectName('overflow_split_button')
         self.verse_type_layout.addWidget(self.overflow_split_button)
         self.verse_type_label = QtWidgets.QLabel(edit_verse_dialog)
@@ -64,7 +64,7 @@ class Ui_EditVerseDialog(object):
         self.verse_number_box.setObjectName('verse_number_box')
         self.verse_type_layout.addWidget(self.verse_number_box)
         self.insert_button = QtWidgets.QPushButton(edit_verse_dialog)
-        self.insert_button.setIcon(build_icon(':/general/general_add.png'))
+        self.insert_button.setIcon(UiIcons().add)
         self.insert_button.setObjectName('insert_button')
         self.verse_type_layout.addWidget(self.insert_button)
         self.verse_type_layout.addStretch()
@@ -76,11 +76,11 @@ class Ui_EditVerseDialog(object):
             self.transpose_label.setObjectName('transpose_label')
             self.transpose_layout.addWidget(self.transpose_label)
             self.transpose_up_button = QtWidgets.QPushButton(edit_verse_dialog)
-            self.transpose_up_button.setIcon(build_icon(':/services/service_up.png'))
+            self.transpose_up_button.setIcon(UiIcons().arrow_up)
             self.transpose_up_button.setObjectName('transpose_up')
             self.transpose_layout.addWidget(self.transpose_up_button)
             self.transpose_down_button = QtWidgets.QPushButton(edit_verse_dialog)
-            self.transpose_down_button.setIcon(build_icon(':/services/service_down.png'))
+            self.transpose_down_button.setIcon(UiIcons().arrow_down)
             self.transpose_down_button.setObjectName('transpose_down')
             self.transpose_layout.addWidget(self.transpose_down_button)
             self.dialog_layout.addLayout(self.transpose_layout)

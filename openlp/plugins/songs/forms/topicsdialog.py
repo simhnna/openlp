@@ -23,8 +23,8 @@
 from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_TopicsDialog(object):
@@ -36,7 +36,7 @@ class Ui_TopicsDialog(object):
         Set up the user interface for the topics dialog.
         """
         topics_dialog.setObjectName('topics_dialog')
-        topics_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        topics_dialog.setWindowIcon(UiIcons().main_icon)
         topics_dialog.resize(300, 10)
         self.dialog_layout = QtWidgets.QVBoxLayout(topics_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

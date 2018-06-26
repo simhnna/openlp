@@ -24,7 +24,7 @@ A widget representing a song in the duplicate song removal wizard review page.
 """
 from PyQt5 import QtCore, QtWidgets
 
-from openlp.core.lib import build_icon
+from openlp.core.ui.icons import UiIcons
 from openlp.plugins.songs.lib import VerseType
 from openlp.plugins.songs.lib.openlyricsxml import SongXML
 
@@ -182,7 +182,7 @@ class SongReviewWidget(QtWidgets.QWidget):
         self.song_vertical_layout.addWidget(self.song_group_box)
         self.song_remove_button = QtWidgets.QPushButton(self)
         self.song_remove_button.setObjectName('song_remove_button')
-        self.song_remove_button.setIcon(build_icon(':/general/general_delete.png'))
+        self.song_remove_button.setIcon(UiIcons().delete)
         self.song_remove_button.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.song_vertical_layout.addWidget(self.song_remove_button, alignment=QtCore.Qt.AlignHCenter)
 

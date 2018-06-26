@@ -43,6 +43,7 @@ from openlp.core.display.screens import ScreenList
 from openlp.core.lib import ServiceItem, ImageSource, build_html, expand_tags, image_to_byte
 from openlp.core.lib.theme import BackgroundType
 from openlp.core.ui import HideMode, AlertLocation, DisplayControllerType
+from openlp.core.ui.icons import UiIcons
 
 if is_macosx():
     from ctypes import pythonapi, c_void_p, c_char_p, py_object
@@ -492,7 +493,7 @@ class MainDisplay(Display, LogMixin, RegistryProperties):
                 path = str(AppLocation.get_section_data_path('themes') / self.service_item.theme_data.theme_name)
                 service_item.add_from_command(path,
                                               path_to_str(self.service_item.theme_data.background_filename),
-                                              ':/media/slidecontroller_multimedia.png')
+                                              UiIcons().media)
                 self.media_controller.video(DisplayControllerType.Live, service_item, video_behind_text=True)
         self._hide_mouse()
 

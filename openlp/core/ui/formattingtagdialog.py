@@ -25,7 +25,7 @@ The UI widgets for the formatting tags window.
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
+from openlp.core.ui.icons import UiIcons
 from openlp.core.lib.ui import create_button_box
 
 
@@ -38,7 +38,7 @@ class Ui_FormattingTagDialog(object):
         Set up the UI
         """
         formatting_tag_dialog.setObjectName('formatting_tag_dialog')
-        formatting_tag_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        formatting_tag_dialog.setWindowIcon(UiIcons().main_icon)
         formatting_tag_dialog.resize(725, 548)
         self.list_data_grid_layout = QtWidgets.QVBoxLayout(formatting_tag_dialog)
         self.list_data_grid_layout.setContentsMargins(8, 8, 8, 8)
@@ -87,11 +87,11 @@ class Ui_FormattingTagDialog(object):
         self.list_data_grid_layout.addWidget(self.tag_table_widget)
         self.edit_button_layout = QtWidgets.QHBoxLayout()
         self.new_button = QtWidgets.QPushButton(formatting_tag_dialog)
-        self.new_button.setIcon(build_icon(':/general/general_new.png'))
+        self.new_button.setIcon(UiIcons().new)
         self.new_button.setObjectName('new_button')
         self.edit_button_layout.addWidget(self.new_button)
         self.delete_button = QtWidgets.QPushButton(formatting_tag_dialog)
-        self.delete_button.setIcon(build_icon(':/general/general_delete.png'))
+        self.delete_button.setIcon(UiIcons().delete)
         self.delete_button.setObjectName('delete_button')
         self.edit_button_layout.addWidget(self.delete_button)
         self.edit_button_layout.addStretch()
@@ -100,7 +100,7 @@ class Ui_FormattingTagDialog(object):
         self.save_button = self.button_box.button(QtWidgets.QDialogButtonBox.Save)
         self.save_button.setObjectName('save_button')
         self.restore_button = self.button_box.button(QtWidgets.QDialogButtonBox.RestoreDefaults)
-        self.restore_button.setIcon(build_icon(':/general/general_revert.png'))
+        self.restore_button.setIcon(UiIcons().undo)
         self.restore_button.setObjectName('restore_button')
         self.list_data_grid_layout.addWidget(self.button_box)
         self.retranslateUi(formatting_tag_dialog)

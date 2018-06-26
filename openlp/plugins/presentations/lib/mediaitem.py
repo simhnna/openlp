@@ -30,13 +30,11 @@ from openlp.core.common.settings import Settings
 from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext, \
     build_icon, check_item_selected, create_thumb, validate_thumb
 from openlp.core.lib.ui import critical_error_message_box, create_horizontal_adjusting_combo_box
+from openlp.core.ui.icons import UiIcons
 from openlp.plugins.presentations.lib import MessageListener
 from openlp.plugins.presentations.lib.pdfcontroller import PDF_CONTROLLER_FILETYPES
 
 log = logging.getLogger(__name__)
-
-
-ERROR_IMAGE = QtGui.QImage(':/general/general_delete.png')
 
 
 class PresentationMediaItem(MediaManagerItem):
@@ -174,7 +172,7 @@ class PresentationMediaItem(MediaManagerItem):
             file_name = file_path.name
             if not file_path.exists():
                 item_name = QtWidgets.QListWidgetItem(file_name)
-                item_name.setIcon(build_icon(ERROR_IMAGE))
+                item_name.setIcon(UiIcons().delete)
                 item_name.setData(QtCore.Qt.UserRole, path_to_str(file_path))
                 item_name.setToolTip(str(file_path))
                 self.list_view.addItem(item_name)
@@ -196,7 +194,7 @@ class PresentationMediaItem(MediaManagerItem):
                         preview_path = doc.get_thumbnail_path(1, True)
                     doc.close_presentation()
                     if not (preview_path and preview_path.exists()):
-                        icon = build_icon(':/general/general_delete.png')
+                        icon = UiIcons().delete
                     else:
                         if validate_thumb(preview_path, thumbnail_path):
                             icon = build_icon(thumbnail_path)
@@ -204,7 +202,7 @@ class PresentationMediaItem(MediaManagerItem):
                             icon = create_thumb(preview_path, thumbnail_path)
                 else:
                     if initial_load:
-                        icon = build_icon(':/general/general_delete.png')
+                        icon = UiIcons().delete
                     else:
                         critical_error_message_box(UiStrings().UnsupportedFile,
                                                    translate('PresentationPlugin.MediaItem',

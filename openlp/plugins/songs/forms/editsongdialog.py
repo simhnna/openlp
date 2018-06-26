@@ -23,9 +23,9 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box, create_button
 from openlp.core.ui import SingleColumnTableWidget
+from openlp.core.ui.icons import UiIcons
 from openlp.plugins.songs.lib.ui import SongStrings
 
 
@@ -36,7 +36,7 @@ class Ui_EditSongDialog(object):
     """
     def setupUi(self, edit_song_dialog):
         edit_song_dialog.setObjectName('edit_song_dialog')
-        edit_song_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        edit_song_dialog.setWindowIcon(UiIcons().main_icon)
         edit_song_dialog.resize(900, 600)
         edit_song_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(edit_song_dialog)

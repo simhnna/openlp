@@ -31,6 +31,7 @@ from PyQt5 import QtCore
 from openlp.core.api.http import register_endpoint
 from openlp.core.common import extension_loader
 from openlp.core.common.i18n import translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.settings import Settings
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.plugins.presentations.endpoint import api_presentations_endpoint, presentations_endpoint
@@ -68,7 +69,7 @@ class PresentationPlugin(Plugin):
         self.controllers = {}
         Plugin.__init__(self, 'presentations', __default_settings__, __default_settings__)
         self.weight = -8
-        self.icon_path = ':/plugins/plugin_presentations.png'
+        self.icon_path = UiIcons().presentation
         self.icon = build_icon(self.icon_path)
         register_endpoint(presentations_endpoint)
         register_endpoint(api_presentations_endpoint)

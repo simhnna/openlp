@@ -30,6 +30,7 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
 from openlp.core.lib.ui import find_and_set_in_combo_box
+from openlp.core.ui.icons import UiIcons
 
 
 class ThemesTab(SettingsTab):
@@ -40,7 +41,7 @@ class ThemesTab(SettingsTab):
         """
         Constructor
         """
-        self.icon_path = ':/themes/theme_new.png'
+        self.icon_path = UiIcons().theme
         theme_translated = translate('OpenLP.ThemesTab', 'Themes')
         super(ThemesTab, self).__init__(parent, 'Themes', theme_translated)
 
