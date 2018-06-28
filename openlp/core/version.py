@@ -89,11 +89,8 @@ class VersionWorker(ThreadWorker):
         while retries < 3:
             try:
                 response = requests.get(download_url, headers=headers)
-                if response.status_code != 200:
-                    log.warn('Server returned status code {code}: '
-                             'Version update check not available.'.format(code=response.status_code))
-                    break
-                remote_version = response.text.strip()
+                if response.status_code == 200:
+                    remote_version = response.text.strip()
                 log.debug('New version found: %s', remote_version)
                 break
             except OSError:
