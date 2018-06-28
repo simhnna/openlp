@@ -54,7 +54,7 @@ def test_worker_start(mock_requests, mock_platform):
     current_version = {'full': '2.0', 'version': '2.0', 'build': None}
     mock_platform.system.return_value = 'Linux'
     mock_platform.release.return_value = '4.12.0-1-amd64'
-    mock_requests.get.return_value = MagicMock(text='2.4.6')
+    mock_requests.get.return_value = MagicMock(text='2.4.6', status_code=200)
     worker = VersionWorker(last_check_date, current_version)
 
     # WHEN: The worker is run
@@ -79,7 +79,7 @@ def test_worker_start_dev_version(mock_requests, mock_platform):
     current_version = {'full': '2.1.3', 'version': '2.1.3', 'build': None}
     mock_platform.system.return_value = 'Linux'
     mock_platform.release.return_value = '4.12.0-1-amd64'
-    mock_requests.get.return_value = MagicMock(text='2.4.6')
+    mock_requests.get.return_value = MagicMock(text='2.4.6', status_code=200)
     worker = VersionWorker(last_check_date, current_version)
 
     # WHEN: The worker is run
@@ -104,7 +104,7 @@ def test_worker_start_nightly_version(mock_requests, mock_platform):
     current_version = {'full': '2.1-bzr2345', 'version': '2.1', 'build': '2345'}
     mock_platform.system.return_value = 'Linux'
     mock_platform.release.return_value = '4.12.0-1-amd64'
-    mock_requests.get.return_value = MagicMock(text='2.4.6')
+    mock_requests.get.return_value = MagicMock(text='2.4.6', status_code=200)
     worker = VersionWorker(last_check_date, current_version)
 
     # WHEN: The worker is run

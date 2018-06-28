@@ -103,8 +103,8 @@ def get_merge_info(url):
     merge_info['branch_url'] = span_branch_url.contents[0]
     # Find the p tag that contains the commit message
     # <div id="commit-message">...<div id="edit-commit_message">...<div class="yui3-editable_text-text"><p>
-    commit_message = soup.find('div', id='commit-message').find('div', id='edit-commit_message')\
-            .find('div', 'yui3-editable_text-text').p
+    commit_message = soup.find('div', id='commit-message').find('div', id='edit-commit_message') \
+        .find('div', 'yui3-editable_text-text').p
     merge_info['commit_message'] = commit_message.string
     # Find all tr-tags with this class. Makes it possible to get bug numbers.
     # <tr class="bug-branch-summary"

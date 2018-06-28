@@ -59,7 +59,7 @@ from openlp.core.projectors.constants import CONNECTION_ERRORS, PJLINK_CLASS, PJ
     PJLINK_ERST_DATA, PJLINK_ERST_STATUS, PJLINK_MAX_PACKET, PJLINK_PREFIX, PJLINK_PORT, PJLINK_POWR_STATUS, \
     PJLINK_SUFFIX, PJLINK_VALID_CMD, PROJECTOR_STATE, STATUS_CODE, STATUS_MSG, QSOCKET_STATE, \
     E_AUTHENTICATION, E_CONNECTION_REFUSED, E_GENERAL, E_NETWORK, E_NOT_CONNECTED, E_SOCKET_TIMEOUT, \
-    S_CONNECTED, S_CONNECTING, S_NOT_CONNECTED, S_OFF, S_OK, S_ON
+    S_CONNECTED, S_CONNECTING, S_NOT_CONNECTED, S_OFF, S_OK, S_ON, S_STANDBY
 
 log = logging.getLogger(__name__)
 log.debug('pjlink loaded')
@@ -233,6 +233,10 @@ class PJLinkCommands(object):
         if hasattr(self, 'socket_timer'):
             log.debug('({ip}): Calling socket_timer.stop()'.format(ip=self.entry.name))
             self.socket_timer.stop()
+        if hasattr(self, 'status_timer'):
+            log.debug('({ip}): Calling status_timer.stop()'.format(ip=self.entry.name))
+            self.status_timer.stop()
+        self.status_timer_checks = {}
         self.send_busy = False
         self.send_queue = []
         self.priority_queue = []
@@ -287,14 +291,18 @@ class PJLinkCommands(object):
         """
         Process shutter and speaker status. See PJLink specification for format.
         Update self.mute (audio) and self.shutter (video shutter).
+        10 = Shutter open, audio unchanged
         11 = Shutter closed, audio unchanged
+        20 = Shutter unchanged, Audio normal
         21 = Shutter unchanged, Audio muted
-        30 = Shutter closed, audio muted
-        31 = Shutter open,  audio normal
+        30 = Shutter open, audio muted
+        31 = Shutter closed,  audio normal
 
         :param data: Shutter and audio status
         """
-        settings = {'11': {'shutter': True, 'mute': self.mute},
+        settings = {'10': {'shutter': False, 'mute': self.mute},
+                    '11': {'shutter': True, 'mute': self.mute},
+                    '20': {'shutter': self.shutter, 'mute': False},
                     '21': {'shutter': self.shutter, 'mute': True},
                     '30': {'shutter': False, 'mute': False},
                     '31': {'shutter': True, 'mute': True}
@@ -309,6 +317,8 @@ class PJLinkCommands(object):
         self.shutter = shutter
         self.mute = mute
         if update_icons:
+            if 'AVMT' in self.status_timer_checks:
+                self.status_timer_delete('AVMT')
             self.projectorUpdateIcons.emit()
         return
 
@@ -592,6 +602,8 @@ class PJLinkCommands(object):
         else:
             # Log unknown status response
             log.warning('({ip}) Unknown power response: "{data}"'.format(ip=self.entry.name, data=data))
+        if self.power in [S_ON, S_STANDBY, S_OFF] and 'POWR' in self.status_timer_checks:
+            self.status_timer_delete(cmd='POWR')
         return
 
     def process_rfil(self, data):
@@ -734,6 +746,11 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         self.socket_timer = QtCore.QTimer(self)
         self.socket_timer.setInterval(self.socket_timeout)
         self.socket_timer.timeout.connect(self.socket_abort)
+        # Timer for doing status updates for commands that change state and should update faster
+        self.status_timer_checks = {}  # Keep track of events for the status timer
+        self.status_timer = QtCore.QTimer(self)
+        self.status_timer.setInterval(2000)  # 2 second interval should be fast enough
+        self.status_timer.timeout.connect(self.status_timer_update)
         # Socket status signals
         self.connected.connect(self.check_login)
         self.disconnected.connect(self.disconnect_from_host)
@@ -1191,12 +1208,12 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
             self.change_status(S_NOT_CONNECTED)
         self.reset_information()
 
-    def get_av_mute_status(self):
+    def get_av_mute_status(self, priority=False):
         """
         Send command to retrieve shutter status.
         """
         log.debug('({ip}) Sending AVMT command'.format(ip=self.entry.name))
-        return self.send_command(cmd='AVMT')
+        return self.send_command(cmd='AVMT', priority=priority)
 
     def get_available_inputs(self):
         """
@@ -1254,12 +1271,14 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         log.debug('({ip}) Sending INFO command'.format(ip=self.entry.name))
         return self.send_command(cmd='INFO')
 
-    def get_power_status(self):
+    def get_power_status(self, priority=False):
         """
         Send command to retrieve power status.
+
+        :param priority: (OPTIONAL) Send in priority queue
         """
         log.debug('({ip}) Sending POWR command'.format(ip=self.entry.name))
-        return self.send_command(cmd='POWR')
+        return self.send_command(cmd='POWR', priority=priority)
 
     def set_input_source(self, src=None):
         """
@@ -1283,6 +1302,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         log.debug('({ip}) Setting POWR to 1 (on)'.format(ip=self.entry.name))
         self.send_command(cmd='POWR', opts='1', priority=True)
+        self.status_timer_add(cmd='POWR', callback=self.get_power_status)
         self.poll_loop()
 
     def set_power_off(self):
@@ -1291,6 +1311,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         log.debug('({ip}) Setting POWR to 0 (standby)'.format(ip=self.entry.name))
         self.send_command(cmd='POWR', opts='0', priority=True)
+        self.status_timer_add(cmd='POWR', callback=self.get_power_status)
         self.poll_loop()
 
     def set_shutter_closed(self):
@@ -1299,6 +1320,7 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         log.debug('({ip}) Setting AVMT to 11 (shutter closed)'.format(ip=self.entry.name))
         self.send_command(cmd='AVMT', opts='11', priority=True)
+        self.status_timer_add('AVMT', self.get_av_mute_status)
         self.poll_loop()
 
     def set_shutter_open(self):
@@ -1307,8 +1329,51 @@ class PJLink(QtNetwork.QTcpSocket, PJLinkCommands):
         """
         log.debug('({ip}) Setting AVMT to "10" (shutter open)'.format(ip=self.entry.name))
         self.send_command(cmd='AVMT', opts='10', priority=True)
+        self.status_timer_add('AVMT', self.get_av_mute_status)
         self.poll_loop()
-        self.projectorUpdateIcons.emit()
+
+    def status_timer_add(self, cmd, callback):
+        """
+        Add a callback to the status timer.
+
+        :param cmd: PJLink command associated with callback
+        :param callback: Method to call
+        """
+        if cmd in self.status_timer_checks:
+            log.warning('({ip}) "{cmd}" already in checks - returning'.format(ip=self.entry.name, cmd=cmd))
+            return
+        log.debug('({ip}) Adding "{cmd}" callback for status timer'.format(ip=self.entry.name, cmd=cmd))
+        if not self.status_timer.isActive():
+            self.status_timer.start()
+        self.status_timer_checks[cmd] = callback
+
+    def status_timer_delete(self, cmd):
+        """
+        Delete a callback from the status timer.
+
+        :param cmd: PJLink command associated with callback
+        :param callback: Method to call
+        """
+        if cmd not in self.status_timer_checks:
+            log.warning('({ip}) "{cmd}" not listed in status timer - returning'.format(ip=self.entry.name, cmd=cmd))
+            return
+        log.debug('({ip}) Removing "{cmd}" from status timer'.format(ip=self.entry.name, cmd=cmd))
+        self.status_timer_checks.pop(cmd)
+        if not self.status_timer_checks:
+            self.status_timer.stop()
+
+    def status_timer_update(self):
+        """
+        Call methods defined in status_timer_checks for updates
+        """
+        if not self.status_timer_checks:
+            log.warning('({ip}) status_timer_update() called when no callbacks - '
+                        'Race condition?'.format(ip=self.entry.name))
+            self.status_timer.stop()
+            return
+        for cmd, callback in self.status_timer_checks.items():
+            log.debug('({ip}) Status update call for {cmd}'.format(ip=self.entry.name, cmd=cmd))
+            callback(priority=True)
 
     def receive_data_signal(self):
         """
