@@ -290,7 +290,7 @@ class TestPJLinkBase(TestCase):
 
             # THEN: log data and send_command should have been called
             mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
+            mock_send_command.assert_called_once_with(cmd=test_data, priority=False)
 
     def test_projector_get_available_inputs(self):
         """
@@ -470,7 +470,7 @@ class TestPJLinkBase(TestCase):
 
             # THEN: log data and send_command should have been called
             mock_log.debug.assert_has_calls(log_debug_calls)
-            mock_send_command.assert_called_once_with(cmd=test_data)
+            mock_send_command.assert_called_once_with(cmd=test_data, priority=False)
 
     def test_projector_get_status_invalid(self):
         """

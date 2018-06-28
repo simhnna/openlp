@@ -23,10 +23,11 @@
 Package to test the openlp.core.common.actions package.
 """
 from unittest import TestCase
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call, patch
 
 from PyQt5 import QtGui, QtCore, QtWidgets
 
+import openlp.core.common.actions
 from openlp.core.common.actions import CategoryActionList, ActionList
 from openlp.core.common.settings import Settings
 from tests.helpers.testmixin import TestMixin
@@ -139,8 +140,21 @@ class TestCategoryActionList(TestCase):
         # THEN: Now the element should not be in the list anymore.
         assert self.action1 not in self.list
 
-        # THEN: Check if an exception is raised when trying to remove a not present action.
-        self.assertRaises(ValueError, self.list.remove, self.action2)
+    def test_remove_not_in_list(self):
+        """
+        Test the remove() method when action not in list
+        """
+        with patch.object(openlp.core.common.actions, 'log') as mock_log:
+            log_warn_calls = [call('Action "" does not exist.')]
+
+            # GIVEN: The list
+            self.list.append(self.action1)
+
+            # WHEN: Delete an item not in the list.
+            self.list.remove('')
+
+            # THEN: Warning should be logged
+            mock_log.warning.assert_has_calls(log_warn_calls)
 
 
 class TestActionList(TestCase, TestMixin):
