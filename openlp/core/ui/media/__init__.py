@@ -80,7 +80,7 @@ def get_media_players():
     """
     log.debug('get_media_players')
     saved_players = Settings().value('media/players')
-    reg_ex = QtCore.QRegExp(".*\[(.*)\].*")
+    reg_ex = QtCore.QRegExp(r'.*\[(.*)\].*')
     if Settings().value('media/override player') == QtCore.Qt.Checked:
         if reg_ex.exactMatch(saved_players):
             overridden_player = '{text}'.format(text=reg_ex.cap(1))

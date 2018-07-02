@@ -338,7 +338,7 @@ class PJLinkCommands(object):
             # Due to stupid projectors not following standards (Optoma, BenQ comes to mind),
             # AND the different responses that can be received, the semi-permanent way to
             # fix the class reply is to just remove all non-digit characters.
-            chk = re.findall('\d', data)
+            chk = re.findall(r'\d', data)
             if len(chk) < 1:
                 log.error('({ip}) No numbers found in class version reply "{data}" - '
                           'defaulting to class "1"'.format(ip=self.entry.name, data=data))

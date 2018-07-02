@@ -80,7 +80,7 @@ class LyrixImport(SongImport):
                     continue
                 # Detect and get CCLI number
                 if line.lower().startswith('ccli'):
-                    ccli = re.findall('\d+', line)[0]
+                    ccli = re.findall(r'\d+', line)[0]
                     try:
                         # If the CCLI was found, we are near the end
                         # Find author

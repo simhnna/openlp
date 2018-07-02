@@ -37,7 +37,7 @@ class EasySlidesImport(SongImport):
     Import songs exported from EasySlides
 
     The format example is here:
-    http://wiki.openlp.org/Development:EasySlides\_-_Song_Data_Format
+    http://wiki.openlp.org/Development:EasySlides_-_Song_Data_Format
     """
     def __init__(self, manager, **kwargs):
         """
@@ -210,7 +210,7 @@ class EasySlidesImport(SongImport):
                 vn = '1'
                 # have we got any digits?
                 # If so, versenumber is everything from the digits to the end
-                match = re.match('(.*)(\d+.*)', marker)
+                match = re.match(r'(.*)(\d+.*)', marker)
                 if match:
                     marker = match.group(1).strip()
                     vn = match.group(2)

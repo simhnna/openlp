@@ -217,7 +217,7 @@ def update_reference_separators():
         # add various Unicode alternatives
         source_string = source_string.replace('-', '(?:[-\u00AD\u2010\u2011\u2012\u2014\u2014\u2212\uFE63\uFF0D])')
         source_string = source_string.replace(',', '(?:[,\u201A])')
-        REFERENCE_SEPARATORS['sep_{role}'.format(role=role)] = '\s*(?:{source})\s*'.format(source=source_string)
+        REFERENCE_SEPARATORS['sep_{role}'.format(role=role)] = r'\s*(?:{source})\s*'.format(source=source_string)
         REFERENCE_SEPARATORS['sep_{role}_default'.format(role=role)] = default_separators[index]
     # verse range match: (<chapter>:)?<verse>(-((<chapter>:)?<verse>|end)?)?
     range_regex = '(?:(?P<from_chapter>[0-9]+){sep_v})?' \

@@ -142,7 +142,7 @@ class WorshipAssistantImport(SongImport):
                     # drop the square brackets
                     right_bracket = line.find(']')
                     content = line[1:right_bracket].lower()
-                    match = re.match('(\D*)(\d+)', content)
+                    match = re.match(r'(\D*)(\d+)', content)
                     if match is not None:
                         verse_tag = match.group(1)
                         verse_num = match.group(2)

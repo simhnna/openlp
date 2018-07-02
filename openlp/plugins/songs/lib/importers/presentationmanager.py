@@ -51,7 +51,7 @@ class PresentationManagerImport(SongImport):
                 encoding = get_file_encoding(file_path)['encoding']
                 # Open file with detected encoding and remove encoding declaration
                 text = file_path.read_text(encoding=encoding)
-                text = re.sub('.+\?>\n', '', text)
+                text = re.sub(r'.+\?>\n', '', text)
                 try:
                     tree = etree.fromstring(text, parser=etree.XMLParser(recover=True))
                 except ValueError:

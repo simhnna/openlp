@@ -105,7 +105,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
         self.topics_list_view.setSortingEnabled(False)
         self.topics_list_view.setAlternatingRowColors(True)
         self.audio_list_widget.setAlternatingRowColors(True)
-        self.find_verse_split = re.compile('---\[\]---\n')
+        self.find_verse_split = re.compile(r'---\[\]---\n')
         self.whitespace = re.compile(r'\W+')
         self.find_tags = re.compile(r'\{/?\w+\}')
 
@@ -316,7 +316,7 @@ class EditSongForm(QtWidgets.QDialog, Ui_EditSongDialog, RegistryProperties):
                     multiple.append(verse_tag)
             self.song.lyrics = str(sxml.extract_xml(), 'utf-8')
             for verse in multiple:
-                self.song.verse_order = re.sub('([' + verse.upper() + verse.lower() + '])(\W|$)',
+                self.song.verse_order = re.sub(r'([' + verse.upper() + verse.lower() + r'])(\W|$)',
                                                r'\g<1>1\2', self.song.verse_order)
         except:
             log.exception('Problem processing song Lyrics \n{xml}'.format(xml=sxml.dump_xml()))

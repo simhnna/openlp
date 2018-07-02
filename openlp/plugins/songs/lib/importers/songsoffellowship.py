@@ -333,7 +333,7 @@ class SongsOfFellowshipImport(OpenOfficeImport):
         There is a complicated word "One", which is sometimes lower and
         sometimes upper depending on context. Never mind, keep it lower.
         """
-        text_arr = re.split('(\W+)', text)
+        text_arr = re.split(r'(\W+)', text)
         text_arr[0] = text_arr[0].capitalize()
         for i in range(1, len(text_arr)):
             # Do not translate these. Fixed strings in SOF song file

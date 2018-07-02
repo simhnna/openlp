@@ -124,7 +124,7 @@ def get_merge_info(url):
     script_tag = soup.find('script', attrs={"id": "codereview-script"})
     content = script_tag.contents[0]
     start_pos = content.find('source_revid') + 16
-    pattern = re.compile('.*\w-\d\d\d\d\d+')
+    pattern = re.compile(r'.*\w-\d\d\d\d\d+')
     match = pattern.match(content[start_pos:])
     merge_info['author_email'] = match.group()[:-15]
     # Launchpad doesn't supply the author's true name, so we'll just grab whatever they use for display on LP

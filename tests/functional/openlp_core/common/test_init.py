@@ -238,7 +238,7 @@ class TestInit(TestCase, TestMixin):
         Test the clean_filename() function
         """
         # GIVEN: A invalid file name and the valid file name.
-        invalid_name = 'A_file_with_invalid_characters_[\\/:\*\?"<>\|\+\[\]%].py'
+        invalid_name = 'A_file_with_invalid_characters_[\\/:\*\?"<>\|\+\[\]%].py'  # nopep8
         wanted_name = 'A_file_with_invalid_characters______________________.py'
 
         # WHEN: Clean the name.
