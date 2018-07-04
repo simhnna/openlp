@@ -255,7 +255,7 @@ def get_reference_match(match_type):
 
 
 def parse_reference(reference, bible, language_selection, book_ref_id=False):
-    """
+    r"""
     This is the next generation über-awesome function that takes a person's typed in string and converts it to a list
     of references to be queried from the Bible database files.
 

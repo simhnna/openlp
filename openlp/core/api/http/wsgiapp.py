@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 
 
 def _route_to_regex(route):
-    """
+    r"""
     Convert a route to a regular expression
 
     For example:

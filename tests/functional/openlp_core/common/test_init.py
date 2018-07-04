@@ -238,13 +238,14 @@ class TestInit(TestCase, TestMixin):
         Test the clean_filename() function
         """
         # GIVEN: A invalid file name and the valid file name.
-        invalid_name = 'A_file_with_invalid_characters_[\\/:\*\?"<>\|\+\[\]%].py'  # nopep8
-        wanted_name = 'A_file_with_invalid_characters______________________.py'
+        invalid_name = 'A_file_with_invalid_characters_[\\/:*?"<>|+[]%].py'
+        wanted_name = 'A_file_with_invalid_characters________________.py'
 
         # WHEN: Clean the name.
         result = clean_filename(invalid_name)
 
         # THEN: The file name should be cleaned.
+        print(result)
         assert wanted_name == result, 'The file name should not contain any special characters.'
 
     def test_delete_file_no_path(self):

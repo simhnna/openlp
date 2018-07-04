@@ -12,7 +12,7 @@ from openlp.core.lib.htmlbuilder import build_html, build_background_css, build_
 from openlp.core.lib.theme import HorizontalType, VerticalType
 from tests.helpers.testmixin import TestMixin
 
-HTML = """
+HTML = r"""
     <!DOCTYPE html>
     <html>
     <head>
