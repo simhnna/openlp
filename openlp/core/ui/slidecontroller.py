@@ -1126,7 +1126,7 @@ class SlideController(DisplayController, LogMixin, RegistryProperties):
         # done by the thread holding the lock. If it is a "start" slide, we must wait for the lock, but only for 0.2
         # seconds, since we don't want to cause a deadlock
         timeout = 0.2 if start else -1
-        if not self.slide_selected_lock.acquire(start, timeout): #  pylint: disable=too-many-function-args
+        if not self.slide_selected_lock.acquire(start, timeout):  # pylint: disable=too-many-function-args
             if start:
                 self.log_debug('Could not get lock in slide_selected after waiting %f, skip to avoid deadlock.'
                                % timeout)
