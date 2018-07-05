@@ -121,7 +121,7 @@ HTML = r"""
         }
 
         function show_text(new_text){
-            var match = /-webkit-text-fill-color:[^;"]+/gi;
+            var match = /-webkit-text-fill-color:[^;\"]+/gi;
             if(timer != null)
                 clearTimeout(timer);
             /*
