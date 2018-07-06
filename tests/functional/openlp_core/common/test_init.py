@@ -245,7 +245,6 @@ class TestInit(TestCase, TestMixin):
         result = clean_filename(invalid_name)
 
         # THEN: The file name should be cleaned.
-        print(result)
         assert wanted_name == result, 'The file name should not contain any special characters.'
 
     def test_delete_file_no_path(self):
