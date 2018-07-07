@@ -99,7 +99,7 @@ class TestStartFileRenameForm(TestCase, TestMixin):
         # GIVEN: QLineEdit with a validator set with illegal file name characters.
 
         # WHEN: 'Typing' a string containing invalid file characters.
-        QtTest.QTest.keyClicks(self.form.file_name_edit, 'I/n\\v?a*l|i<d> \F[i\l]e" :N+a%me')
+        QtTest.QTest.keyClicks(self.form.file_name_edit, r'I/n\\v?a*l|i<d> \F[i\l]e" :N+a%me')
 
         # THEN: The text in the QLineEdit should be the same as the input string with the invalid characters filtered
         # out.

@@ -415,7 +415,7 @@ def expand_chords(text):
                 chords_on_prev_line = True
             # Matches a chord, a tail, a remainder and a line end. See expand_and_align_chords_in_line() for more info.
             new_line += re.sub(r'\[(.*?)\]([\u0080-\uFFFF,\w]*)'
-                               '([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?',
+                               r'([\u0080-\uFFFF,\w,\s,\.,\,,\!,\?,\;,\:,\|,\",\',\-,\_]*)(\Z)?',
                                expand_and_align_chords_in_line, line)
             new_line += '</span>'
             expanded_text_lines.append(new_line)

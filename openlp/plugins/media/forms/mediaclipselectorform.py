@@ -210,7 +210,7 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         # detect if we're dealing with a DVD or CD, so we use different loading approaches depending on the OS.
         if is_win():
             # If the given path is in the format "D:\" or "D:", prefix it with "/" to make VLC happy
-            pattern = re.compile('^\w:\\\\*$')
+            pattern = re.compile(r'^\w:\\\\*$')
             if pattern.match(path):
                 path = '/' + path
             self.vlc_media = self.vlc_instance.media_new_location('dvd://' + path)

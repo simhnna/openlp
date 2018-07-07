@@ -73,7 +73,7 @@ class DreamBeamImport(SongImport):
 
     Valid extensions for a DreamBeam song file are:
 
-        * \*.xml
+        * .xml
     """
 
     def do_import(self):

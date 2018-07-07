@@ -557,7 +557,7 @@ def transpose_lyrics(lyrics, transpose_value):
     :return: The transposed lyrics
     """
     # Split text by verse delimiter - both normal and optional
-    verse_list = re.split('(---\[.+?:.+?\]---|\[---\])', lyrics)
+    verse_list = re.split(r'(---\[.+?:.+?\]---|\[---\])', lyrics)
     transposed_lyrics = ''
     notation = Settings().value('songs/chord notation')
     for verse in verse_list:
@@ -580,7 +580,7 @@ def transpose_verse(verse_text, transpose_value, notation):
     if '[' not in verse_text:
         return verse_text
     # Split the lyrics based on chord tags
-    lyric_list = re.split('(\[|\]|/)', verse_text)
+    lyric_list = re.split(r'(\[|\]|/)', verse_text)
     transposed_lyrics = ''
     in_tag = False
     for word in lyric_list:

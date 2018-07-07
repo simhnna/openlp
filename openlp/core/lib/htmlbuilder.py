@@ -19,7 +19,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc., 59  #
 # Temple Place, Suite 330, Boston, MA 02111-1307 USA                          #
 ###############################################################################
-"""
+r"""
 This module is responsible for generating the HTML for :class:`~openlp.core.ui.maindisplay`. The ``build_html`` function
 is the function which has to be called from outside. The generated and returned HTML will look similar to this::
 
@@ -416,7 +416,7 @@ from openlp.core.lib.theme import BackgroundType, BackgroundGradientType, Vertic
 
 log = logging.getLogger(__name__)
 
-HTML_SRC = Template("""
+HTML_SRC = Template(r"""
     <!DOCTYPE html>
     <html>
     <head>
