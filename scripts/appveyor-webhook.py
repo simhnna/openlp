@@ -92,21 +92,24 @@ def get_yml(branch, build_type):
     f = open('appveyor.yml')
     yml_text = f.read()
     f.close()
-    yml_text = yml_text.replace('BRANCHNAME', branch)
+    version_string, version = get_version()
+    yml_text = yml_text.replace('TAG', version_string)
     if build_type in ['openlp', 'trunk']:
+        yml_text = yml_text.replace('BRANCHPATH', '~openlp-core/openlp/trunk')
         yml_text = yml_text.replace('BUILD_DOCS', '$TRUE')
     else:
+        yml_text = yml_text.replace('BRANCHPATH', branch.split(':')[1])
         yml_text = yml_text.replace('BUILD_DOCS', '$FALSE')
-    return yml_text
+    return yml_text, version_string
 
 
-def hook(webhook_url, yml):
+def hook(webhook_url, branch, build_type):
     """
     Activate the webhook to start the build
     """
+    yml, version_string = get_yml(branch, build_type)
     webhook_element['config'] = yml
     webhook_element['commit']['message'] = 'Building ' + branch
-    version_string, version = get_version()
     webhook_element['commit']['id'] = version_string
     request = urllib.request.Request(webhook_url)
     request.add_header('Content-Type', 'application/json;charset=utf-8')
@@ -137,7 +140,7 @@ else:
     if build_type not in ['dev', 'trunk', 'openlp']:
         print('Invalid build type\nUsage: %s <webhook-url> <branch> <dev|trunk|openlp>' % sys.argv[0])
         exit()
-    hook(webhook_url, get_yml(branch, build_type))
+    hook(webhook_url, branch, build_type)
     # Wait 5 seconds to make sure the hook has been triggered
     time.sleep(5)
     get_appveyor_build_url(build_type)

@@ -1,11 +1,10 @@
 version: OpenLP-win-ci-b{build}
 
-init:
-  - choco install -y --force bzr
-  - set PATH=C:\Program Files (x86)\Bazaar;%PATH%
-
 clone_script:
-  - bzr checkout --lightweight BRANCHNAME openlp-branch
+  - curl -L https://bazaar.launchpad.net/~tomasgroth/openlp/pco-24/tarball -o pco.tar.gz
+  - 7z e pco.tar.gz
+  - 7z x pco.tar
+  - mv ~tomasgroth/openlp/pco-24 openlp-branch
 
 environment:
   PYTHON: C:\\Python34
@@ -74,10 +73,10 @@ after_test:
         7z x documentation.tar
         mv ~openlp-core/openlp/documentation documentation
         cd packaging
-        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable
+        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update -c windows/config-appveyor.ini -b ../openlp-branch -d ../documentation --portable --tag-override TAG
       } else {
         cd packaging
-        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch --portable
+        &"$env:PYTHON\python.exe" builders/windows-builder.py --skip-update --skip-translations -c windows/config-appveyor.ini -b ../openlp-branch --portable --tag-override TAG
       }
 
 artifacts:
