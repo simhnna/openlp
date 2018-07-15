@@ -22,12 +22,15 @@
 """
 The :mod:`languages` module provides a list of icons.
 """
+import logging
 import qtawesome as qta
 
 from PyQt5 import QtGui, QtWidgets
 
 from openlp.core.common.applocation import AppLocation
 from openlp.core.lib import build_icon
+
+log = logging.getLogger(__name__)
 
 
 class UiIcons(object):
@@ -171,7 +174,7 @@ class UiIcons(object):
                     setattr(self, key, qta.icon(icon))
                 except Exception:
                     import sys
-                    print("Unexpected error:", sys.exc_info())
+                    log.error("Unexpected error:", sys.exc_info())
                     setattr(self, key, qta.icon('fa.plus-circle', color='red'))
             except:
                 setattr(self, key, qta.icon('fa.plus-circle', color='red'))

@@ -48,20 +48,3 @@ class TestIcons(TestCase, TestMixin):
         icon_active = UiIcons().active
         # THEN: I should have an icon
         assert isinstance(icon_active, QtGui.QIcon)
-
-    @patch('openlp.core.ui.icons.UiIcons.load')
-    def test_simple_icon_mission(self, _):
-        # GIVEN: an basic set of icons
-        icons = UiIcons()
-        icon_list = {
-            'active': {'icon': 'fa.child_lost'}
-
-        }
-
-        icons.load_icons(icon_list)
-        # WHEN: I use the icons
-        icon_active = UiIcons().active
-        # THEN: I should have an icon
-        assert isinstance(icon_active, QtGui.QIcon)
-
-
