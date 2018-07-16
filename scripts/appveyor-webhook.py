@@ -81,7 +81,7 @@ def get_version():
     latest = output.decode('utf-8').split(':')[0]
     version_string = latest == revision and tag or 'r%s' % latest
     # Save decimal version in case we need to do a portable build.
-    version = latest == revision and tag or '%s.%s' % (tag, latest)
+    version = latest == revision and tag or '%s-bzr%s' % (tag, latest)
     return version_string, version
 
 
@@ -93,7 +93,7 @@ def get_yml(branch, build_type):
     yml_text = f.read()
     f.close()
     version_string, version = get_version()
-    yml_text = yml_text.replace('TAG', version_string)
+    yml_text = yml_text.replace('TAG', version)
     if build_type in ['openlp', 'trunk']:
         yml_text = yml_text.replace('BRANCHPATH', '~openlp-core/openlp/trunk')
         yml_text = yml_text.replace('BUILD_DOCS', '$TRUE')
