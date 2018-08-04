@@ -98,7 +98,8 @@ MODULES = [
     'waitress',
     'six',
     'webob',
-    'requests'
+    'requests',
+    'qtawesome'
 ]
 
 

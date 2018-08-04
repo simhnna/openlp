@@ -27,6 +27,7 @@ from sqlalchemy.sql import and_, or_
 
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate, get_natural_key
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.path import copyfile, create_paths
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -99,7 +100,7 @@ class SongMediaItem(MediaManagerItem):
         self.toolbar.addSeparator()
         # Song Maintenance Button
         self.maintenance_action = self.toolbar.add_toolbar_action('maintenance_action',
-                                                                  icon=':/songs/song_maintenance.png',
+                                                                  icon=UiIcons().database,
                                                                   triggers=self.on_song_maintenance_click)
         self.add_search_to_toolbar()
         # Signals and slots
@@ -111,7 +112,7 @@ class SongMediaItem(MediaManagerItem):
     def add_custom_context_actions(self):
         create_widget_action(self.list_view, separator=True)
         create_widget_action(
-            self.list_view, text=translate('OpenLP.MediaManagerItem', '&Clone'), icon=':/general/general_clone.png',
+            self.list_view, text=translate('OpenLP.MediaManagerItem', '&Clone'), icon=UiIcons().clone,
             triggers=self.on_clone_click)
 
     def on_focus(self):
@@ -145,26 +146,26 @@ class SongMediaItem(MediaManagerItem):
         self.edit_song_form = EditSongForm(self, self.main_window, self.plugin.manager)
         self.open_lyrics = OpenLyrics(self.plugin.manager)
         self.search_text_edit.set_search_types([
-            (SongSearch.Entire, ':/songs/song_search_all.png',
+            (SongSearch.Entire, UiIcons().music,
                 translate('SongsPlugin.MediaItem', 'Entire Song'),
                 translate('SongsPlugin.MediaItem', 'Search Entire Song...')),
-            (SongSearch.Titles, ':/songs/song_search_title.png',
+            (SongSearch.Titles, UiIcons().search_text,
                 translate('SongsPlugin.MediaItem', 'Titles'),
                 translate('SongsPlugin.MediaItem', 'Search Titles...')),
-            (SongSearch.Lyrics, ':/songs/song_search_lyrics.png',
+            (SongSearch.Lyrics, UiIcons().search_lyrcs,
                 translate('SongsPlugin.MediaItem', 'Lyrics'),
                 translate('SongsPlugin.MediaItem', 'Search Lyrics...')),
-            (SongSearch.Authors, ':/songs/song_search_author.png', SongStrings.Authors,
+            (SongSearch.Authors, UiIcons().user, SongStrings.Authors,
                 translate('SongsPlugin.MediaItem', 'Search Authors...')),
-            (SongSearch.Topics, ':/songs/song_search_topic.png', SongStrings.Topics,
+            (SongSearch.Topics, UiIcons().theme, SongStrings.Topics,
                 translate('SongsPlugin.MediaItem', 'Search Topics...')),
-            (SongSearch.Books, ':/songs/song_book_edit.png', SongStrings.SongBooks,
+            (SongSearch.Books, UiIcons().address, SongStrings.SongBooks,
                 translate('SongsPlugin.MediaItem', 'Search Songbooks...')),
-            (SongSearch.Themes, ':/slides/slide_theme.png', UiStrings().Themes, UiStrings().SearchThemes),
-            (SongSearch.Copyright, ':/songs/song_search_copy.png',
+            (SongSearch.Themes, UiIcons().theme, UiStrings().Themes, UiStrings().SearchThemes),
+            (SongSearch.Copyright, UiIcons().copyright,
                 translate('SongsPlugin.MediaItem', 'Copyright'),
                 translate('SongsPlugin.MediaItem', 'Search Copyright...')),
-            (SongSearch.CCLInumber, ':/songs/song_search_ccli.png',
+            (SongSearch.CCLInumber, UiIcons().search_ccli,
                 translate('SongsPlugin.MediaItem', 'CCLI number'),
                 translate('SongsPlugin.MediaItem', 'Search CCLI number...'))
         ])

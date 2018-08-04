@@ -137,8 +137,7 @@ class TestMediaItem(TestCase, TestMixin):
         Registry().register('main_window', self.mocked_main_window)
 
         self.mocked_plugin = MagicMock()
-        with patch('openlp.plugins.bibles.lib.mediaitem.build_icon'), \
-                patch('openlp.plugins.bibles.lib.mediaitem.MediaManagerItem._setup'), \
+        with patch('openlp.plugins.bibles.lib.mediaitem.MediaManagerItem._setup'), \
                 patch('openlp.plugins.bibles.lib.mediaitem.BibleMediaItem.setup_item'):
             self.media_item = BibleMediaItem(None, self.mocked_plugin)
 

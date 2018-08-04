@@ -26,7 +26,7 @@ The GUI widgets of the exception dialog.
 from PyQt5 import QtGui, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
+from openlp.core.ui.icons import UiIcons
 from openlp.core.lib.ui import create_button, create_button_box
 
 
@@ -39,7 +39,7 @@ class Ui_ExceptionDialog(object):
         Set up the UI.
         """
         exception_dialog.setObjectName('exception_dialog')
-        exception_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        exception_dialog.setWindowIcon(UiIcons().main_icon)
         self.exception_layout = QtWidgets.QVBoxLayout(exception_dialog)
         self.exception_layout.setObjectName('exception_layout')
         self.message_layout = QtWidgets.QHBoxLayout()
@@ -48,7 +48,7 @@ class Ui_ExceptionDialog(object):
         self.message_layout.setContentsMargins(0, 0, 50, 0)
         self.message_layout.addSpacing(12)
         self.bug_label = QtWidgets.QLabel(exception_dialog)
-        self.bug_label.setPixmap(QtGui.QPixmap(':/graphics/exception.png'))
+        self.bug_label.setPixmap(UiIcons().exception.pixmap(40, 40))
         self.bug_label.setSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         self.bug_label.setObjectName('bug_label')
         self.message_layout.addWidget(self.bug_label)
@@ -72,13 +72,13 @@ class Ui_ExceptionDialog(object):
         self.exception_text_edit.setObjectName('exception_text_edit')
         self.exception_layout.addWidget(self.exception_text_edit)
         self.send_report_button = create_button(exception_dialog, 'send_report_button',
-                                                icon=':/general/general_email.png',
+                                                icon=UiIcons().email,
                                                 click=self.on_send_report_button_clicked)
         self.save_report_button = create_button(exception_dialog, 'save_report_button',
-                                                icon=':/general/general_save.png',
+                                                icon=UiIcons().save,
                                                 click=self.on_save_report_button_clicked)
         self.attach_tile_button = create_button(exception_dialog, 'attach_tile_button',
-                                                icon=':/general/general_open.png',
+                                                icon=UiIcons().open,
                                                 click=self.on_attach_file_button_clicked)
         self.button_box = create_button_box(exception_dialog, 'button_box', ['close'],
                                             [self.send_report_button, self.save_report_button, self.attach_tile_button])
@@ -91,7 +91,7 @@ class Ui_ExceptionDialog(object):
         """
         Translate the widgets on the fly.
         """
-        # Note that bugs mail is not clicable, but it adds the blue color and underlining and makes the test copyable.
+        # Note that bugs mail is not clickable, but it adds the blue color and underlining and makes the test copyable.
         exception_dialog.setWindowTitle(translate('OpenLP.ExceptionDialog', 'Error Occurred'))
         # Explanation text, &nbsp; adds a small space before: If possible, write in English.
         self.description_explanation.setText(

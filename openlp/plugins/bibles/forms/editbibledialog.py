@@ -23,16 +23,16 @@
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
 from openlp.plugins.bibles.lib import LanguageSelection, BibleStrings
 from openlp.plugins.bibles.lib.db import BiblesResourcesDB
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_EditBibleDialog(object):
     def setupUi(self, edit_bible_dialog):
         edit_bible_dialog.setObjectName('edit_bible_dialog')
-        edit_bible_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        edit_bible_dialog.setWindowIcon(UiIcons().main_icon)
         edit_bible_dialog.resize(520, 400)
         edit_bible_dialog.setModal(True)
         self.dialog_layout = QtWidgets.QVBoxLayout(edit_bible_dialog)

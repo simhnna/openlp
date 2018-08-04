@@ -33,6 +33,7 @@ from openlp.core.common.i18n import UiStrings, format_time, translate
 from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab, build_icon
 from openlp.core.ui.style import HAS_DARK_STYLE
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import PathEdit
 from openlp.core.widgets.enums import PathEditType
 from openlp.core.widgets.widgets import ProxyWidget
@@ -50,7 +51,7 @@ class AdvancedTab(SettingsTab):
         Initialise the settings tab
         """
         self.data_exists = False
-        self.icon_path = ':/system/system_settings.png'
+        self.icon_path = UiIcons().settings
         self.autoscroll_map = [None, {'dist': -1, 'pos': 0}, {'dist': -1, 'pos': 1}, {'dist': -1, 'pos': 2},
                                {'dist': 0, 'pos': 0}, {'dist': 0, 'pos': 1}, {'dist': 0, 'pos': 2},
                                {'dist': 0, 'pos': 3}, {'dist': 1, 'pos': 0}, {'dist': 1, 'pos': 1},
@@ -153,7 +154,7 @@ class AdvancedTab(SettingsTab):
         self.new_data_directory_has_files_label.setWordWrap(True)
         self.data_directory_cancel_button = QtWidgets.QToolButton(self.data_directory_group_box)
         self.data_directory_cancel_button.setObjectName('data_directory_cancel_button')
-        self.data_directory_cancel_button.setIcon(build_icon(':/general/general_delete.png'))
+        self.data_directory_cancel_button.setIcon(UiIcons().delete)
         self.data_directory_copy_check_layout = QtWidgets.QHBoxLayout()
         self.data_directory_copy_check_layout.setObjectName('data_directory_copy_check_layout')
         self.data_directory_copy_check_box = QtWidgets.QCheckBox(self.data_directory_group_box)
@@ -206,7 +207,7 @@ class AdvancedTab(SettingsTab):
         self.service_name_edit.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r'[^/\\?*|<>\[\]":+]+'), self))
         self.service_name_revert_button = QtWidgets.QToolButton(self.service_name_group_box)
         self.service_name_revert_button.setObjectName('service_name_revert_button')
-        self.service_name_revert_button.setIcon(build_icon(':/general/general_revert.png'))
+        self.service_name_revert_button.setIcon(UiIcons().undo)
         self.service_name_button_layout = QtWidgets.QHBoxLayout()
         self.service_name_button_layout.setObjectName('service_name_button_layout')
         self.service_name_button_layout.addWidget(self.service_name_edit)

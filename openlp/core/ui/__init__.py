@@ -125,4 +125,4 @@ __all__ = ['SplashScreen', 'AboutForm', 'SettingsForm', 'MainDisplay', 'SlideCon
            'ServiceNoteForm', 'ThemeLayoutForm', 'FileRenameForm', 'StartTimeForm', 'MainDisplay',
            'SlideController', 'DisplayController', 'GeneralTab', 'ThemesTab', 'AdvancedTab', 'PluginForm',
            'FormattingTagForm', 'ShortcutListForm', 'FormattingTagController', 'SingleColumnTableWidget',
-           'ProjectorManager', 'ProjectorTab', 'ProjectorEditForm']
+           'ProjectorManager', 'ProjectorTab', 'ProjectorEditForm', 'LiveController', 'PreviewController']

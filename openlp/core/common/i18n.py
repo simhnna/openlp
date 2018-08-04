@@ -339,9 +339,10 @@ class UiStrings(object):
         """
         if not cls.__instance__:
             cls.__instance__ = object.__new__(cls)
+            cls.load(cls)
         return cls.__instance__
 
-    def __init__(self):
+    def load(self):
         """
         These strings should need a good reason to be retranslated elsewhere.
         Should some/more/less of these have an &amp; attached?

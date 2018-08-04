@@ -23,23 +23,22 @@
 from PyQt5 import QtWidgets
 
 from openlp.core.common.i18n import UiStrings, translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button, create_button_box
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import SpellTextEdit
 
 
 class Ui_CustomSlideEditDialog(object):
     def setupUi(self, custom_slide_edit_dialog):
         custom_slide_edit_dialog.setObjectName('custom_slide_edit_dialog')
-        custom_slide_edit_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        custom_slide_edit_dialog.setWindowIcon(UiIcons().main_icon)
         custom_slide_edit_dialog.resize(350, 300)
         self.dialog_layout = QtWidgets.QVBoxLayout(custom_slide_edit_dialog)
         self.slide_text_edit = SpellTextEdit(self)
         self.slide_text_edit.setObjectName('slide_text_edit')
         self.dialog_layout.addWidget(self.slide_text_edit)
-        self.split_button = create_button(custom_slide_edit_dialog, 'splitButton', icon=':/general/general_add.png')
-        self.insert_button = create_button(custom_slide_edit_dialog, 'insertButton',
-                                           icon=':/general/general_add.png')
+        self.split_button = create_button(custom_slide_edit_dialog, 'splitButton', icon=UiIcons().add)
+        self.insert_button = create_button(custom_slide_edit_dialog, 'insertButton', icon=UiIcons().add)
         self.button_box = create_button_box(custom_slide_edit_dialog, 'button_box', ['cancel', 'save'],
                                             [self.split_button, self.insert_button])
         self.dialog_layout.addWidget(self.button_box)

@@ -25,13 +25,14 @@ import re
 from datetime import datetime
 from time import sleep
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common import is_win, is_linux, is_macosx
 from openlp.core.common.i18n import translate
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.path import Path
 from openlp.core.lib.ui import critical_error_message_box
+from openlp.core.ui.icons import UiIcons
 from openlp.core.ui.media.vlcplayer import get_vlc
 from openlp.plugins.media.forms.mediaclipselectordialog import Ui_MediaClipSelector
 
@@ -66,12 +67,8 @@ class MediaClipSelectorForm(QtWidgets.QDialog, Ui_MediaClipSelector, RegistryPro
         self.media_item = media_item
         self.setupUi(self)
         # setup play/pause icon
-        self.play_icon = QtGui.QIcon()
-        self.play_icon.addPixmap(QtGui.QPixmap(":/slides/media_playback_start.png"), QtGui.QIcon.Normal,
-                                 QtGui.QIcon.Off)
-        self.pause_icon = QtGui.QIcon()
-        self.pause_icon.addPixmap(QtGui.QPixmap(":/slides/media_playback_pause.png"), QtGui.QIcon.Normal,
-                                  QtGui.QIcon.Off)
+        self.play_icon = UiIcons().play
+        self.pause_icon = UiIcons().pause
 
     def reject(self):
         """

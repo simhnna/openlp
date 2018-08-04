@@ -31,6 +31,7 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import SettingsTab
 from openlp.core.lib.ui import create_button
+from openlp.core.ui.icons import UiIcons
 from openlp.core.ui.media import get_media_players, set_media_players
 from openlp.core.widgets.buttons import ColorButton
 
@@ -56,7 +57,7 @@ class PlayerTab(SettingsTab):
         """
         self.media_players = Registry().get('media_controller').media_players
         self.saved_used_players = None
-        self.icon_path = ':/media/multimedia-player.png'
+        self.icon_path = UiIcons().player
         player_translated = translate('OpenLP.PlayerTab', 'Players')
         super(PlayerTab, self).__init__(parent, 'Players', player_translated)
 

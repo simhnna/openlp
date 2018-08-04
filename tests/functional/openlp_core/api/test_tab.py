@@ -51,9 +51,7 @@ class TestApiTab(TestCase, TestMixin):
     """
     Test the functions in the :mod:`lib` module.
     """
-    @patch('openlp.core.api.tab.ApiTab.define_main_window_icon')
-    @patch('openlp.core.api.tab.ApiTab.generate_icon')
-    def setUp(self, mocked_main_window, mocked_icon):
+    def setUp(self):
         """
         Create the UI
         """

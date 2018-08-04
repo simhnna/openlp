@@ -404,6 +404,7 @@ def main(args=None):
     if not Settings().value('core/has run wizard'):
         if not FirstTimeLanguageForm().exec():
             # if cancel then stop processing
+            server.close_server()
             sys.exit()
     # i18n Set Language
     language = LanguageManager.get_language()

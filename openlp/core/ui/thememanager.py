@@ -31,6 +31,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from openlp.core.common import delete_file
 from openlp.core.common.applocation import AppLocation
 from openlp.core.common.i18n import UiStrings, translate, get_locale_key
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.mixins import LogMixin, RegistryProperties
 from openlp.core.common.path import Path, copyfile, create_paths, path_to_str
 from openlp.core.common.registry import Registry, RegistryBase
@@ -61,30 +62,30 @@ class Ui_ThemeManager(object):
         self.toolbar = OpenLPToolbar(widget)
         self.toolbar.setObjectName('toolbar')
         self.toolbar.add_toolbar_action('newTheme',
-                                        text=UiStrings().NewTheme, icon=':/themes/theme_new.png',
+                                        text=UiStrings().NewTheme, icon=UiIcons().new,
                                         tooltip=translate('OpenLP.ThemeManager', 'Create a new theme.'),
                                         triggers=self.on_add_theme)
         self.toolbar.add_toolbar_action('editTheme',
                                         text=translate('OpenLP.ThemeManager', 'Edit Theme'),
-                                        icon=':/themes/theme_edit.png',
+                                        icon=UiIcons().edit,
                                         tooltip=translate('OpenLP.ThemeManager', 'Edit a theme.'),
                                         triggers=self.on_edit_theme)
         self.delete_toolbar_action = self.toolbar.add_toolbar_action('delete_theme',
                                                                      text=translate('OpenLP.ThemeManager',
                                                                                     'Delete Theme'),
-                                                                     icon=':/general/general_delete.png',
+                                                                     icon=UiIcons().delete,
                                                                      tooltip=translate('OpenLP.ThemeManager',
                                                                                        'Delete a theme.'),
                                                                      triggers=self.on_delete_theme)
         self.toolbar.addSeparator()
         self.toolbar.add_toolbar_action('importTheme',
                                         text=translate('OpenLP.ThemeManager', 'Import Theme'),
-                                        icon=':/general/general_import.png',
+                                        icon=UiIcons().download,
                                         tooltip=translate('OpenLP.ThemeManager', 'Import a theme.'),
                                         triggers=self.on_import_theme)
         self.toolbar.add_toolbar_action('exportTheme',
                                         text=translate('OpenLP.ThemeManager', 'Export Theme'),
-                                        icon=':/general/general_export.png',
+                                        icon=UiIcons().upload,
                                         tooltip=translate('OpenLP.ThemeManager', 'Export a theme.'),
                                         triggers=self.on_export_theme)
         self.layout.addWidget(self.toolbar)
@@ -102,24 +103,24 @@ class Ui_ThemeManager(object):
         self.menu = QtWidgets.QMenu()
         self.edit_action = create_widget_action(self.menu,
                                                 text=translate('OpenLP.ThemeManager', '&Edit Theme'),
-                                                icon=':/themes/theme_edit.png', triggers=self.on_edit_theme)
+                                                icon=UiIcons().edit, triggers=self.on_edit_theme)
         self.copy_action = create_widget_action(self.menu,
                                                 text=translate('OpenLP.ThemeManager', '&Copy Theme'),
-                                                icon=':/themes/theme_edit.png', triggers=self.on_copy_theme)
+                                                icon=UiIcons().copy, triggers=self.on_copy_theme)
         self.rename_action = create_widget_action(self.menu,
                                                   text=translate('OpenLP.ThemeManager', '&Rename Theme'),
-                                                  icon=':/themes/theme_edit.png', triggers=self.on_rename_theme)
+                                                  icon=UiIcons().edit, triggers=self.on_rename_theme)
         self.delete_action = create_widget_action(self.menu,
                                                   text=translate('OpenLP.ThemeManager', '&Delete Theme'),
-                                                  icon=':/general/general_delete.png', triggers=self.on_delete_theme)
+                                                  icon=UiIcons().delete, triggers=self.on_delete_theme)
         self.menu.addSeparator()
         self.global_action = create_widget_action(self.menu,
                                                   text=translate('OpenLP.ThemeManager', 'Set As &Global Default'),
-                                                  icon=':/general/general_export.png',
+                                                  icon=UiIcons().default,
                                                   triggers=self.change_global_from_screen)
         self.export_action = create_widget_action(self.menu,
                                                   text=translate('OpenLP.ThemeManager', '&Export Theme'),
-                                                  icon=':/general/general_export.png', triggers=self.on_export_theme)
+                                                  icon=UiIcons().upload, triggers=self.on_export_theme)
         # Signals
         self.theme_list_widget.doubleClicked.connect(self.change_global_from_screen)
         self.theme_list_widget.currentItemChanged.connect(self.check_list_state)

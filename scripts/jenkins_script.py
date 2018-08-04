@@ -178,7 +178,6 @@ class JenkinsTrigger(object):
         print('{:<70} [WAITING]'.format(job['nextBuildUrl']), end='', flush=True)
         self.current_build = self._get_build_info(job_name, job['nextBuildNumber'])
         print('\b\b\b\b\b\b\b\b\b[RUNNING]', end='', flush=True)
-        is_success = False
         while self.current_build['building'] is True:
             time.sleep(0.5)
             self.current_build = self.server.get_build_info(job_name, job['nextBuildNumber'])

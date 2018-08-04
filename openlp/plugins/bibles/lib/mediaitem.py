@@ -31,7 +31,8 @@ from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
 from openlp.core.lib import MediaManagerItem, ItemCapabilities, ServiceItemContext
 from openlp.core.lib.ui import set_case_insensitive_completer, create_horizontal_adjusting_combo_box, \
-    critical_error_message_box, find_and_set_in_combo_box, build_icon
+    critical_error_message_box, find_and_set_in_combo_box
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import SearchEdit
 from openlp.plugins.bibles.forms.bibleimportform import BibleImportForm
 from openlp.plugins.bibles.forms.editbibleform import EditBibleForm
@@ -104,9 +105,9 @@ class BibleMediaItem(MediaManagerItem):
         :param args: Positional arguments to pass to the super method. (tuple)
         :param kwargs: Keyword arguments to pass to the super method. (dict)
         """
-        self.clear_icon = build_icon(':/bibles/bibles_search_clear.png')
-        self.save_results_icon = build_icon(':/bibles/bibles_save_results.png')
-        self.sort_icon = build_icon(':/bibles/bibles_book_sort.png')
+        self.clear_icon = UiIcons().square
+        self.save_results_icon = UiIcons.save
+        self.sort_icon = UiIcons().sort
         self.bible = None
         self.second_bible = None
         self.saved_results = []
@@ -314,13 +315,13 @@ class BibleMediaItem(MediaManagerItem):
         self.plugin.manager.media = self
         self.populate_bible_combo_boxes()
         self.search_edit.set_search_types([
-            (BibleSearch.Combined, ':/bibles/bibles_search_combined.png',
+            (BibleSearch.Combined, UiIcons().search_comb,
                 translate('BiblesPlugin.MediaItem', 'Text or Reference'),
                 translate('BiblesPlugin.MediaItem', 'Text or Reference...')),
-            (BibleSearch.Reference, ':/bibles/bibles_search_reference.png',
+            (BibleSearch.Reference, UiIcons().search_ref,
                 translate('BiblesPlugin.MediaItem', 'Scripture Reference'),
                 translate('BiblesPlugin.MediaItem', 'Search Scripture Reference...')),
-            (BibleSearch.Text, ':/bibles/bibles_search_text.png',
+            (BibleSearch.Text, UiIcons().text,
                 translate('BiblesPlugin.MediaItem', 'Text Search'),
                 translate('BiblesPlugin.MediaItem', 'Search Text...'))
         ])

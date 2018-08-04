@@ -28,6 +28,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from openlp.core.common import is_macosx
 from openlp.core.common.i18n import UiStrings, translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.common.mixins import RegistryProperties
 from openlp.core.common.registry import Registry
 from openlp.core.common.settings import Settings
@@ -105,8 +106,8 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         self.with_progress_page = add_progress_page
         self.setFixedWidth(640)
         self.setObjectName(name)
-        self.open_icon = build_icon(':/general/general_open.png')
-        self.delete_icon = build_icon(':/general/general_delete.png')
+        self.open_icon = UiIcons().open
+        self.delete_icon = UiIcons().delete
         self.finish_button = self.button(QtWidgets.QWizard.FinishButton)
         self.cancel_button = self.button(QtWidgets.QWizard.CancelButton)
         self.setupUi(image)
@@ -123,7 +124,7 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         Set up the wizard UI.
         :param image: path to start up image
         """
-        self.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        self.setWindowIcon(UiIcons().main_icon)
         self.setModal(True)
         self.setOptions(QtWidgets.QWizard.IndependentPages |
                         QtWidgets.QWizard.NoBackButtonOnStartPage | QtWidgets.QWizard.NoBackButtonOnLastPage)
@@ -192,12 +193,12 @@ class OpenLPWizard(QtWidgets.QWizard, RegistryProperties):
         self.error_copy_to_button = QtWidgets.QPushButton(self.progress_page)
         self.error_copy_to_button.setObjectName('error_copy_to_button')
         self.error_copy_to_button.setHidden(True)
-        self.error_copy_to_button.setIcon(build_icon(':/system/system_edit_copy.png'))
+        self.error_copy_to_button.setIcon(UiIcons().copy)
         self.error_button_layout.addWidget(self.error_copy_to_button)
         self.error_save_to_button = QtWidgets.QPushButton(self.progress_page)
         self.error_save_to_button.setObjectName('error_save_to_button')
         self.error_save_to_button.setHidden(True)
-        self.error_save_to_button.setIcon(build_icon(':/general/general_save.png'))
+        self.error_save_to_button.setIcon(UiIcons().save)
         self.error_button_layout.addWidget(self.error_save_to_button)
         self.progress_layout.addLayout(self.error_button_layout)
         self.addPage(self.progress_page)

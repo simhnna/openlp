@@ -26,8 +26,8 @@ The :mod:`~openlp.plugins.songs.forms.songselectdialog` module contains the user
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.ui import SingleColumnTableWidget
+from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import HistoryComboBox
 
 
@@ -90,7 +90,7 @@ class Ui_SongSelectDialog(object):
         self.login_progress_bar.setVisible(False)
         self.login_button_layout.addWidget(self.login_progress_bar)
         self.login_button = QtWidgets.QPushButton(self.login_page)
-        self.login_button.setIcon(build_icon(':/songs/song_author_edit.png'))
+        self.login_button.setIcon(UiIcons().edit)
         self.login_button.setObjectName('login_button')
         self.login_button_layout.addWidget(self.login_button)
         self.login_layout.setLayout(4, QtWidgets.QFormLayout.SpanningRole, self.login_button_layout)
@@ -111,7 +111,7 @@ class Ui_SongSelectDialog(object):
         self.search_combobox.setObjectName('search_combobox')
         self.search_input_layout.addWidget(self.search_combobox)
         self.search_button = QtWidgets.QPushButton(self.search_page)
-        self.search_button.setIcon(build_icon(':/general/general_find.png'))
+        self.search_button.setIcon(UiIcons().search)
         self.search_button.setObjectName('search_button')
         self.search_input_layout.addWidget(self.search_button)
         self.search_layout.addLayout(self.search_input_layout)
@@ -124,7 +124,7 @@ class Ui_SongSelectDialog(object):
         self.search_progress_bar.setValue(0)
         self.search_progress_layout.addWidget(self.search_progress_bar)
         self.stop_button = QtWidgets.QPushButton(self.search_page)
-        self.stop_button.setIcon(build_icon(':/songs/song_search_stop.png'))
+        self.stop_button.setIcon(UiIcons().stop)
         self.stop_button.setObjectName('stop_button')
         self.search_progress_layout.addWidget(self.stop_button)
         self.search_layout.addLayout(self.search_progress_layout)
@@ -143,12 +143,12 @@ class Ui_SongSelectDialog(object):
         self.view_layout.setSpacing(8)
         self.view_layout.setObjectName('view_layout')
         self.logout_button = QtWidgets.QPushButton(self.search_page)
-        self.logout_button.setIcon(build_icon(':/songs/song_author_edit.png'))
+        self.logout_button.setIcon(UiIcons().edit)
         self.view_layout.addWidget(self.logout_button)
         self.view_spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.view_layout.addItem(self.view_spacer)
         self.view_button = QtWidgets.QPushButton(self.search_page)
-        self.view_button.setIcon(build_icon(':/songs/song_search_all.png'))
+        self.view_button.setIcon(UiIcons().search)
         self.view_button.setObjectName('view_button')
         self.view_layout.addWidget(self.view_button)
         self.search_layout.addLayout(self.view_layout)
@@ -203,14 +203,14 @@ class Ui_SongSelectDialog(object):
         self.import_layout = QtWidgets.QHBoxLayout()
         self.import_layout.setObjectName('import_layout')
         self.back_button = QtWidgets.QPushButton(self.song_page)
-        self.back_button.setIcon(build_icon(':/general/general_back.png'))
+        self.back_button.setIcon(UiIcons().back)
         self.back_button.setObjectName('back_button')
         self.import_layout.addWidget(self.back_button)
         self.import_spacer = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
                                                    QtWidgets.QSizePolicy.Minimum)
         self.import_layout.addItem(self.import_spacer)
         self.import_button = QtWidgets.QPushButton(self.song_page)
-        self.import_button.setIcon(build_icon(':/general/general_import.png'))
+        self.import_button.setIcon(UiIcons().download)
         self.import_button.setObjectName('import_button')
         self.import_layout.addWidget(self.import_button)
         self.song_layout.addLayout(self.import_layout, 5, 0, 1, 5)

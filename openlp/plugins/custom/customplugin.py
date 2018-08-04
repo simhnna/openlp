@@ -28,6 +28,7 @@ import logging
 
 from openlp.core.api.http import register_endpoint
 from openlp.core.common.i18n import translate
+from openlp.core.ui.icons import UiIcons
 from openlp.core.lib import Plugin, StringContent, build_icon
 from openlp.core.lib.db import Manager
 from openlp.plugins.custom.endpoint import api_custom_endpoint, custom_endpoint
@@ -62,7 +63,7 @@ class CustomPlugin(Plugin):
         super(CustomPlugin, self).__init__('custom', __default_settings__, CustomMediaItem, CustomTab)
         self.weight = -5
         self.db_manager = Manager('custom', init_schema)
-        self.icon_path = ':/plugins/plugin_custom.png'
+        self.icon_path = UiIcons().clone
         self.icon = build_icon(self.icon_path)
         register_endpoint(custom_endpoint)
         register_endpoint(api_custom_endpoint)

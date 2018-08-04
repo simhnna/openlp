@@ -25,8 +25,8 @@ The UI widgets of the settings dialog.
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_SettingsDialog(object):
@@ -38,7 +38,7 @@ class Ui_SettingsDialog(object):
         Set up the UI
         """
         settings_dialog.setObjectName('settings_dialog')
-        settings_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        settings_dialog.setWindowIcon(UiIcons().main_icon)
         settings_dialog.resize(920, 625)
         self.dialog_layout = QtWidgets.QGridLayout(settings_dialog)
         self.dialog_layout.setObjectName('dialog_layout')

@@ -49,7 +49,7 @@ class ColorButton(QtWidgets.QPushButton):
         """
         Sets the _color variable and the background color.
 
-        :param color:  String representation of a hexidecimal color
+        :param color:  String representation of a hexadecimal color
         """
         self._color = color
         self.setStyleSheet('background-color: %s' % color)
@@ -59,7 +59,7 @@ class ColorButton(QtWidgets.QPushButton):
         """
         Property method to return the color variable
 
-        :return:  String representation of a hexidecimal color
+        :return:  String representation of a hexadecimal color
         """
         return self._color
 
@@ -68,7 +68,7 @@ class ColorButton(QtWidgets.QPushButton):
         """
         Property setter to change the instance color
 
-        :param color:  String representation of a hexidecimal color
+        :param color:  String representation of a hexadecimal color
         """
         self.change_color(color)
 

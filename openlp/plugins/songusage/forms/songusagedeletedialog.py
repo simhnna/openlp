@@ -23,8 +23,8 @@
 from PyQt5 import QtCore, QtWidgets
 
 from openlp.core.common.i18n import translate
-from openlp.core.lib import build_icon
 from openlp.core.lib.ui import create_button_box
+from openlp.core.ui.icons import UiIcons
 
 
 class Ui_SongUsageDeleteDialog(object):
@@ -38,7 +38,7 @@ class Ui_SongUsageDeleteDialog(object):
         :param song_usage_delete_dialog:
         """
         song_usage_delete_dialog.setObjectName('song_usage_delete_dialog')
-        song_usage_delete_dialog.setWindowIcon(build_icon(':/icon/openlp-logo.svg'))
+        song_usage_delete_dialog.setWindowIcon(UiIcons().main_icon)
         song_usage_delete_dialog.resize(291, 243)
         self.vertical_layout = QtWidgets.QVBoxLayout(song_usage_delete_dialog)
         self.vertical_layout.setSpacing(8)

@@ -32,7 +32,9 @@ from openlp.core.version import VersionWorker, check_for_update, get_version, up
 
 
 def test_worker_init():
-    """Test the VersionWorker constructor"""
+    """
+    Test the VersionWorker constructor
+    """
     # GIVEN: A last check date and a current version
     last_check_date = '1970-01-01'
     current_version = '2.0'
@@ -48,7 +50,9 @@ def test_worker_init():
 @patch('openlp.core.version.platform')
 @patch('openlp.core.version.requests')
 def test_worker_start(mock_requests, mock_platform):
-    """Test the VersionWorkder.start() method"""
+    """
+    Test the VersionWorkder.start() method
+    """
     # GIVEN: A last check date, current version, and an instance of worker
     last_check_date = '1970-01-01'
     current_version = {'full': '2.0', 'version': '2.0', 'build': None}
@@ -72,8 +76,37 @@ def test_worker_start(mock_requests, mock_platform):
 
 @patch('openlp.core.version.platform')
 @patch('openlp.core.version.requests')
+def test_worker_start_fail(mock_requests, mock_platform):
+    """
+    Test the Version Workder.start() method with no response
+    """
+    # GIVEN: A last check date, current version, and an instance of worker
+    last_check_date = '1970-01-01'
+    current_version = {'full': '2.0', 'version': '2.0', 'build': None}
+    mock_platform.system.return_value = 'Linux'
+    mock_platform.release.return_value = '4.12.0-1-amd64'
+    mock_requests.get.return_value = MagicMock(text='2.4.6', status_code=500)
+    worker = VersionWorker(last_check_date, current_version)
+
+    # WHEN: The worker is run
+    with patch.object(worker, 'new_version') as mock_new_version, \
+            patch.object(worker, 'quit') as mock_quit:
+        worker.start()
+
+    # THEN: The check completes and the signal is emitted
+    expected_download_url = 'https://www.openlp.org/files/version.txt'
+    expected_headers = {'User-Agent': 'OpenLP/2.0 Linux/4.12.0-1-amd64; '}
+    mock_requests.get.assert_called_once_with(expected_download_url, headers=expected_headers)
+    mock_new_version.emit.assert_not_called()
+    mock_quit.emit.assert_called_once_with()
+
+
+@patch('openlp.core.version.platform')
+@patch('openlp.core.version.requests')
 def test_worker_start_dev_version(mock_requests, mock_platform):
-    """Test the VersionWorkder.start() method for dev versions"""
+    """
+    Test the VersionWorkder.start() method for dev versions
+    """
     # GIVEN: A last check date, current version, and an instance of worker
     last_check_date = '1970-01-01'
     current_version = {'full': '2.1.3', 'version': '2.1.3', 'build': None}
@@ -98,7 +131,9 @@ def test_worker_start_dev_version(mock_requests, mock_platform):
 @patch('openlp.core.version.platform')
 @patch('openlp.core.version.requests')
 def test_worker_start_nightly_version(mock_requests, mock_platform):
-    """Test the VersionWorkder.start() method for nightlies"""
+    """
+    Test the VersionWorkder.start() method for nightlies
+    """
     # GIVEN: A last check date, current version, and an instance of worker
     last_check_date = '1970-01-01'
     current_version = {'full': '2.1-bzr2345', 'version': '2.1', 'build': '2345'}
@@ -123,7 +158,9 @@ def test_worker_start_nightly_version(mock_requests, mock_platform):
 @patch('openlp.core.version.platform')
 @patch('openlp.core.version.requests')
 def test_worker_empty_response(mock_requests, mock_platform):
-    """Test the VersionWorkder.start() method for empty responses"""
+    """
+    Test the VersionWorkder.start() method for empty responses
+    """
     # GIVEN: A last check date, current version, and an instance of worker
     last_check_date = '1970-01-01'
     current_version = {'full': '2.1-bzr2345', 'version': '2.1', 'build': '2345'}
@@ -148,7 +185,9 @@ def test_worker_empty_response(mock_requests, mock_platform):
 @patch('openlp.core.version.platform')
 @patch('openlp.core.version.requests')
 def test_worker_start_connection_error(mock_requests, mock_platform):
-    """Test the VersionWorkder.start() method when a ConnectionError happens"""
+    """
+    Test the VersionWorkder.start() method when a ConnectionError happens
+    """
     # GIVEN: A last check date, current version, and an instance of worker
     last_check_date = '1970-01-01'
     current_version = {'full': '2.0', 'version': '2.0', 'build': None}
@@ -173,7 +212,9 @@ def test_worker_start_connection_error(mock_requests, mock_platform):
 
 @patch('openlp.core.version.Settings')
 def test_update_check_date(MockSettings):
-    """Test that the update_check_date() function writes the correct date"""
+    """
+    Test that the update_check_date() function writes the correct date
+    """
     # GIVEN: A mocked Settings object
     mocked_settings = MagicMock()
     MockSettings.return_value = mocked_settings
@@ -188,7 +229,9 @@ def test_update_check_date(MockSettings):
 @patch('openlp.core.version.Settings')
 @patch('openlp.core.version.run_thread')
 def test_check_for_update(mocked_run_thread, MockSettings):
-    """Test the check_for_update() function"""
+    """
+    Test the check_for_update() function
+    """
     # GIVEN: A mocked settings object
     mocked_settings = MagicMock()
     mocked_settings.value.return_value = '1970-01-01'
@@ -204,7 +247,9 @@ def test_check_for_update(mocked_run_thread, MockSettings):
 @patch('openlp.core.version.Settings')
 @patch('openlp.core.version.run_thread')
 def test_check_for_update_skipped(mocked_run_thread, MockSettings):
-    """Test that the check_for_update() function skips running if it already ran today"""
+    """
+    Test that the check_for_update() function skips running if it already ran today
+    """
     # GIVEN: A mocked settings object
     mocked_settings = MagicMock()
     mocked_settings.value.return_value = date.today().strftime('%Y-%m-%d')
@@ -218,7 +263,9 @@ def test_check_for_update_skipped(mocked_run_thread, MockSettings):
 
 
 def test_get_version_dev_version():
-    """Test the get_version() function"""
+    """
+    Test the get_version() function
+    """
     # GIVEN: We're in dev mode
     with patch.object(sys, 'argv', ['--dev-version']), \
             patch('openlp.core.version.APPLICATION_VERSION', None):
