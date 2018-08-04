@@ -183,7 +183,7 @@ class EditBibleForm(QtWidgets.QDialog, Ui_EditBibleDialog, RegistryProperties):
         """
         Validate a book.
         """
-        book_regex = re.compile('[\d]*[^\d]+$')
+        book_regex = re.compile(r'[\d]*[^\d]+$')
         if not new_book_name:
             self.book_name_edit[abbreviation].setFocus()
             critical_error_message_box(

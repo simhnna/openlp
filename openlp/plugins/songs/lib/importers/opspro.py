@@ -122,7 +122,7 @@ class OPSProImport(SongImport):
         # Try to split lyrics based on various rules
         if lyrics:
             lyrics_text = lyrics.Lyrics
-            verses = re.split('\r\n\s*?\r\n', lyrics_text)
+            verses = re.split(r'\r\n\s*?\r\n', lyrics_text)
             verse_tag_defs = {}
             verse_tag_texts = {}
             for verse_text in verses:
@@ -130,13 +130,13 @@ class OPSProImport(SongImport):
                     continue
                 verse_def = 'v'
                 # Detect verse number
-                verse_number = re.match('^(\d+)\r\n', verse_text)
+                verse_number = re.match(r'^(\d+)\r\n', verse_text)
                 if verse_number:
-                    verse_text = re.sub('^\d+\r\n', '', verse_text)
+                    verse_text = re.sub(r'^\d+\r\n', '', verse_text)
                     verse_def = 'v' + verse_number.group(1)
                 # Detect verse tags
-                elif re.match('^.+?\:\r\n', verse_text):
-                    tag_match = re.match('^(.+?)\:\r\n(.*)', verse_text, flags=re.DOTALL)
+                elif re.match(r'^.+?\:\r\n', verse_text):
+                    tag_match = re.match(r'^(.+?)\:\r\n(.*)', verse_text, flags=re.DOTALL)
                     tag = tag_match.group(1).lower()
                     tag = tag.split(' ')[0]
                     verse_text = tag_match.group(2)
@@ -147,25 +147,25 @@ class OPSProImport(SongImport):
                     verse_tag_defs[tag] = verse_def
                     verse_tag_texts[tag] = verse_text
                 # Detect tag reference
-                elif re.match('^\(.*?\)$', verse_text):
-                    tag_match = re.match('^\((.*?)\)$', verse_text)
+                elif re.match(r'^\(.*?\)$', verse_text):
+                    tag_match = re.match(r'^\((.*?)\)$', verse_text)
                     tag = tag_match.group(1).lower()
                     if tag in verse_tag_defs:
                         verse_text = verse_tag_texts[tag]
                         verse_def = verse_tag_defs[tag]
                 # Detect end tag
-                elif re.match('^\[slot\]\r\n', verse_text, re.IGNORECASE):
+                elif re.match(r'^\[slot\]\r\n', verse_text, re.IGNORECASE):
                     verse_def = 'e'
-                    verse_text = re.sub('^\[slot\]\r\n', '', verse_text, flags=re.IGNORECASE)
+                    verse_text = re.sub(r'^\[slot\]\r\n', '', verse_text, flags=re.IGNORECASE)
                 # Replace the join tag with line breaks
                 verse_text = verse_text.replace('[join]', '')
                 # Replace the split tag with line breaks and an optional split
-                verse_text = re.sub('\[splits?\]', '\r\n[---]', verse_text)
+                verse_text = re.sub(r'\[splits?\]', '\r\n[---]', verse_text)
                 # Handle translations
                 if lyrics.IsDualLanguage:
                     verse_text = self.handle_translation(verse_text)
                 # Remove comments
-                verse_text = re.sub('\(.*?\)\r\n', '', verse_text, flags=re.IGNORECASE)
+                verse_text = re.sub(r'\(.*?\)\r\n', '', verse_text, flags=re.IGNORECASE)
                 self.add_verse(verse_text, verse_def)
         self.finish()
 

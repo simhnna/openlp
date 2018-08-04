@@ -54,7 +54,7 @@ class ApiTab(SettingsTab):
         self.address_label.setObjectName('address_label')
         self.address_edit = QtWidgets.QLineEdit(self.server_settings_group_box)
         self.address_edit.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
-        self.address_edit.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp('\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'),
+        self.address_edit.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}'),
                                        self))
         self.address_edit.setObjectName('address_edit')
         self.server_settings_layout.addRow(self.address_label, self.address_edit)

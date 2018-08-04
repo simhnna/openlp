@@ -115,7 +115,7 @@ def display_thumbnails(request, controller_name, log, dimensions, file_name, sli
     height = -1
     image = None
     if dimensions:
-        match = re.search('(\d+)x(\d+)', dimensions)
+        match = re.search(r'(\d+)x(\d+)', dimensions)
         if match:
             # let's make sure that the dimensions are within reason
             width = sorted([10, int(match.group(1)), 1000])[1]

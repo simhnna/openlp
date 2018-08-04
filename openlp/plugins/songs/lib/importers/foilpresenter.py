@@ -273,15 +273,15 @@ class FoilPresenter(object):
             elif copyright.find('C,)') != -1:
                 temp = copyright.partition('C,)')
                 copyright = temp[0]
-            copyright = re.compile('\\n').sub(' ', copyright)
-            copyright = re.compile('\(.*\)').sub('', copyright)
+            copyright = re.compile(r'\\n').sub(' ', copyright)
+            copyright = re.compile(r'\(.*\)').sub('', copyright)
             if copyright.find('Rechte') != -1:
                 temp = copyright.partition('Rechte')
                 copyright = temp[0]
-            markers = ['Text +u\.?n?d? +Melodie[\w\,\. ]*:',
-                       'Text +u\.?n?d? +Musik', 'T & M', 'Melodie und Satz',
-                       'Text[\w\,\. ]*:', 'Melodie', 'Musik', 'Satz',
-                       'Weise', '[dD]eutsch', '[dD]t[\.\:]', 'Englisch',
+            markers = [r'Text +u\.?n?d? +Melodie[\w\,\. ]*:',
+                       r'Text +u\.?n?d? +Musik', 'T & M', 'Melodie und Satz',
+                       r'Text[\w\,\. ]*:', 'Melodie', 'Musik', 'Satz',
+                       'Weise', '[dD]eutsch', r'[dD]t[\.\:]', 'Englisch',
                        '[oO]riginal', 'Bearbeitung', '[R|r]efrain']
             for marker in markers:
                 copyright = re.compile(marker).sub('<marker>', copyright, re.U)
@@ -301,17 +301,17 @@ class FoilPresenter(object):
                     break
             author_temp = []
             for author in strings:
-                temp = re.split(',(?=\D{2})|(?<=\D),|\/(?=\D{3,})|(?<=\D);', author)
+                temp = re.split(r',(?=\D{2})|(?<=\D),|\/(?=\D{3,})|(?<=\D);', author)
                 for tempx in temp:
                     author_temp.append(tempx)
                 for author in author_temp:
-                    regex = '^[\/,;\-\s\.]+|[\/,;\-\s\.]+$|\s*[0-9]{4}\s*[\-\/]?\s*([0-9]{4})?[\/,;\-\s\.]*$'
+                    regex = r'^[\/,;\-\s\.]+|[\/,;\-\s\.]+$|\s*[0-9]{4}\s*[\-\/]?\s*([0-9]{4})?[\/,;\-\s\.]*$'
                     author = re.compile(regex).sub('', author)
-                    author = re.compile('[0-9]{1,2}\.\s?J(ahr)?h\.|um\s*$|vor\s*$').sub('', author)
-                    author = re.compile('[N|n]ach.*$').sub('', author)
+                    author = re.compile(r'[0-9]{1,2}\.\s?J(ahr)?h\.|um\s*$|vor\s*$').sub('', author)
+                    author = re.compile(r'[N|n]ach.*$').sub('', author)
                     author = author.strip()
-                    if re.search('\w+\.?\s+\w{3,}\s+[a|u]nd\s|\w+\.?\s+\w{3,}\s+&\s', author, re.U):
-                        temp = re.split('\s[a|u]nd\s|\s&\s', author)
+                    if re.search(r'\w+\.?\s+\w{3,}\s+[a|u]nd\s|\w+\.?\s+\w{3,}\s+&\s', author, re.U):
+                        temp = re.split(r'\s[a|u]nd\s|\s&\s', author)
                         for tempx in temp:
                             tempx = tempx.strip()
                             authors.append(tempx)

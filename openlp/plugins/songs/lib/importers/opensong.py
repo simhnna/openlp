@@ -156,7 +156,7 @@ class OpenSongImport(SongImport):
                 ustring = str(root.__getattr__(attr))
                 if isinstance(fn_or_string, str):
                     if attr in ['ccli']:
-                        ustring = ''.join(re.findall('\d+', ustring))
+                        ustring = ''.join(re.findall(r'\d+', ustring))
                         if ustring:
                             setattr(self, fn_or_string, int(ustring))
                         else:
@@ -231,7 +231,7 @@ class OpenSongImport(SongImport):
                 content = this_line[1:right_bracket].lower()
                 # have we got any digits? If so, verse number is everything from the digits to the end (openlp does not
                 # have concept of part verses, so just ignore any non integers on the end (including floats))
-                match = re.match('(\D*)(\d+)', content)
+                match = re.match(r'(\D*)(\d+)', content)
                 if match is not None:
                     verse_tag = match.group(1)
                     verse_num = match.group(2)
@@ -303,7 +303,7 @@ class OpenSongImport(SongImport):
             # whitespace.
             order = order.lower().split()
             for verse_def in order:
-                match = re.match('(\D*)(\d+.*)', verse_def)
+                match = re.match(r'(\D*)(\d+.*)', verse_def)
                 if match is not None:
                     verse_tag = match.group(1)
                     verse_num = match.group(2)

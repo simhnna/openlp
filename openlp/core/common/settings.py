@@ -26,6 +26,7 @@ import datetime
 import json
 import logging
 import os
+from enum import IntEnum
 from tempfile import gettempdir
 
 from PyQt5 import QtCore, QtGui
@@ -37,6 +38,13 @@ from openlp.core.common.path import Path, str_to_path, files_to_paths
 log = logging.getLogger(__name__)
 
 __version__ = 2
+
+
+class ProxyMode(IntEnum):
+    NO_PROXY = 1
+    SYSTEM_PROXY = 2
+    MANUAL_PROXY = 3
+
 
 # Fix for bug #1014422.
 X11_BYPASS_DEFAULT = True
@@ -116,6 +124,11 @@ class Settings(QtCore.QSettings):
         'advanced/print file meta data': False,
         'advanced/print notes': False,
         'advanced/print slide text': False,
+        'advanced/proxy mode': ProxyMode.SYSTEM_PROXY,
+        'advanced/proxy http': '',
+        'advanced/proxy https': '',
+        'advanced/proxy username': '',
+        'advanced/proxy password': '',
         'advanced/recent file count': 4,
         'advanced/save current plugin': False,
         'advanced/slide limits': SlideLimits.End,

@@ -36,6 +36,7 @@ from openlp.core.ui.style import HAS_DARK_STYLE
 from openlp.core.ui.icons import UiIcons
 from openlp.core.widgets.edits import PathEdit
 from openlp.core.widgets.enums import PathEditType
+from openlp.core.widgets.widgets import ProxyWidget
 
 log = logging.getLogger(__name__)
 
@@ -77,6 +78,9 @@ class AdvancedTab(SettingsTab):
         self.media_plugin_check_box = QtWidgets.QCheckBox(self.ui_group_box)
         self.media_plugin_check_box.setObjectName('media_plugin_check_box')
         self.ui_layout.addRow(self.media_plugin_check_box)
+        self.hide_mouse_check_box = QtWidgets.QCheckBox(self.ui_group_box)
+        self.hide_mouse_check_box.setObjectName('hide_mouse_check_box')
+        self.ui_layout.addWidget(self.hide_mouse_check_box)
         self.double_click_live_check_box = QtWidgets.QCheckBox(self.ui_group_box)
         self.double_click_live_check_box.setObjectName('double_click_live_check_box')
         self.ui_layout.addRow(self.double_click_live_check_box)
@@ -117,6 +121,24 @@ class AdvancedTab(SettingsTab):
             self.use_dark_style_checkbox = QtWidgets.QCheckBox(self.ui_group_box)
             self.use_dark_style_checkbox.setObjectName('use_dark_style_checkbox')
             self.ui_layout.addRow(self.use_dark_style_checkbox)
+        # Service Item Slide Limits
+        self.slide_group_box = QtWidgets.QGroupBox(self.left_column)
+        self.slide_group_box.setObjectName('slide_group_box')
+        self.slide_layout = QtWidgets.QVBoxLayout(self.slide_group_box)
+        self.slide_layout.setObjectName('slide_layout')
+        self.slide_label = QtWidgets.QLabel(self.slide_group_box)
+        self.slide_label.setWordWrap(True)
+        self.slide_layout.addWidget(self.slide_label)
+        self.end_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
+        self.end_slide_radio_button.setObjectName('end_slide_radio_button')
+        self.slide_layout.addWidget(self.end_slide_radio_button)
+        self.wrap_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
+        self.wrap_slide_radio_button.setObjectName('wrap_slide_radio_button')
+        self.slide_layout.addWidget(self.wrap_slide_radio_button)
+        self.next_item_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
+        self.next_item_radio_button.setObjectName('next_item_radio_button')
+        self.slide_layout.addWidget(self.next_item_radio_button)
+        self.left_layout.addWidget(self.slide_group_box)
         # Data Directory
         self.data_directory_group_box = QtWidgets.QGroupBox(self.left_column)
         self.data_directory_group_box.setObjectName('data_directory_group_box')
@@ -143,33 +165,6 @@ class AdvancedTab(SettingsTab):
         self.data_directory_layout.addRow(self.data_directory_copy_check_layout)
         self.data_directory_layout.addRow(self.new_data_directory_has_files_label)
         self.left_layout.addWidget(self.data_directory_group_box)
-        # Hide mouse
-        self.hide_mouse_group_box = QtWidgets.QGroupBox(self.right_column)
-        self.hide_mouse_group_box.setObjectName('hide_mouse_group_box')
-        self.hide_mouse_layout = QtWidgets.QVBoxLayout(self.hide_mouse_group_box)
-        self.hide_mouse_layout.setObjectName('hide_mouse_layout')
-        self.hide_mouse_check_box = QtWidgets.QCheckBox(self.hide_mouse_group_box)
-        self.hide_mouse_check_box.setObjectName('hide_mouse_check_box')
-        self.hide_mouse_layout.addWidget(self.hide_mouse_check_box)
-        self.right_layout.addWidget(self.hide_mouse_group_box)
-        # Service Item Slide Limits
-        self.slide_group_box = QtWidgets.QGroupBox(self.right_column)
-        self.slide_group_box.setObjectName('slide_group_box')
-        self.slide_layout = QtWidgets.QVBoxLayout(self.slide_group_box)
-        self.slide_layout.setObjectName('slide_layout')
-        self.slide_label = QtWidgets.QLabel(self.slide_group_box)
-        self.slide_label.setWordWrap(True)
-        self.slide_layout.addWidget(self.slide_label)
-        self.end_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
-        self.end_slide_radio_button.setObjectName('end_slide_radio_button')
-        self.slide_layout.addWidget(self.end_slide_radio_button)
-        self.wrap_slide_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
-        self.wrap_slide_radio_button.setObjectName('wrap_slide_radio_button')
-        self.slide_layout.addWidget(self.wrap_slide_radio_button)
-        self.next_item_radio_button = QtWidgets.QRadioButton(self.slide_group_box)
-        self.next_item_radio_button.setObjectName('next_item_radio_button')
-        self.slide_layout.addWidget(self.next_item_radio_button)
-        self.right_layout.addWidget(self.slide_group_box)
         # Display Workarounds
         self.display_workaround_group_box = QtWidgets.QGroupBox(self.right_column)
         self.display_workaround_group_box.setObjectName('display_workaround_group_box')
@@ -224,6 +219,9 @@ class AdvancedTab(SettingsTab):
         self.service_name_example.setObjectName('service_name_example')
         self.service_name_layout.addRow(self.service_name_example_label, self.service_name_example)
         self.right_layout.addWidget(self.service_name_group_box)
+        # Proxies
+        self.proxy_widget = ProxyWidget(self.right_column)
+        self.right_layout.addWidget(self.proxy_widget)
         # After the last item on each side, add some spacing
         self.left_layout.addStretch()
         self.right_layout.addStretch()
@@ -312,7 +310,6 @@ class AdvancedTab(SettingsTab):
             translate('OpenLP.AdvancedTab',
                       'Revert to the default service name "{name}".').format(name=UiStrings().DefaultServiceName))
         self.service_name_example_label.setText(translate('OpenLP.AdvancedTab', 'Example:'))
-        self.hide_mouse_group_box.setTitle(translate('OpenLP.AdvancedTab', 'Mouse Cursor'))
         self.hide_mouse_check_box.setText(translate('OpenLP.AdvancedTab', 'Hide mouse cursor when over display window'))
         self.data_directory_new_label.setText(translate('OpenLP.AdvancedTab', 'Path:'))
         self.data_directory_cancel_button.setText(translate('OpenLP.AdvancedTab', 'Cancel'))
@@ -335,6 +332,7 @@ class AdvancedTab(SettingsTab):
         self.wrap_slide_radio_button.setText(translate('OpenLP.GeneralTab', '&Wrap around'))
         self.next_item_radio_button.setText(translate('OpenLP.GeneralTab', '&Move to next/previous service item'))
         self.search_as_type_check_box.setText(translate('SongsPlugin.GeneralTab', 'Enable search as you type'))
+        self.proxy_widget.retranslate_ui()
 
     def load(self):
         """
@@ -437,6 +435,7 @@ class AdvancedTab(SettingsTab):
         if HAS_DARK_STYLE:
             settings.setValue('use_dark_style', self.use_dark_style_checkbox.isChecked())
         settings.endGroup()
+        self.proxy_widget.save()
 
     def on_search_as_type_check_box_changed(self, check_state):
         self.is_search_as_you_type_enabled = (check_state == QtCore.Qt.Checked)

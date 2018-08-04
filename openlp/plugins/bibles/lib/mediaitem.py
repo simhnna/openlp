@@ -42,7 +42,7 @@ from openlp.plugins.bibles.lib import DisplayStyle, LayoutStyle, VerseReferenceL
 log = logging.getLogger(__name__)
 
 
-VALID_TEXT_SEARCH = re.compile('\w\w\w')
+VALID_TEXT_SEARCH = re.compile(r'\w\w\w')
 
 
 def get_reference_separators():
