@@ -1,5 +1,5 @@
-# -*- coding: {'icon': utf-8 -*-
-# vim: {'icon': autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
+# -*- coding: utf-8 -*-
+# vim: autoindent shiftwidth=4 expandtab textwidth=120 tabstop=4 softtabstop=4
 
 ###############################################################################
 # OpenLP - Open Source Lyrics Projection                                      #
@@ -157,7 +157,6 @@ class UiIcons(object):
             'video': {'icon': 'fa.file-video-o'},
             'volunteer': {'icon': 'fa.group'}
         }
-
         self.load_icons(self, icon_list)
 
     def load_icons(self, icon_list):
@@ -174,11 +173,10 @@ class UiIcons(object):
                     setattr(self, key, qta.icon(icon))
                 except Exception:
                     import sys
-                    log.error("Unexpected error:", sys.exc_info())
+                    log.error("Unexpected error: %s" % sys.exc_info())
                     setattr(self, key, qta.icon('fa.plus-circle', color='red'))
             except:
                 setattr(self, key, qta.icon('fa.plus-circle', color='red'))
-
         self.main_icon = build_icon(':/icon/openlp-logo.svg')
 
     @staticmethod

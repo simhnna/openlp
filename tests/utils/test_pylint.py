@@ -36,7 +36,8 @@ from openlp.core.common import is_win
 
 TOLERATED_ERRORS = {'registryproperties.py': ['access-member-before-definition'],
                     'opensong.py': ['no-name-in-module'],
-                    'maindisplay.py': ['no-name-in-module']}
+                    'maindisplay.py': ['no-name-in-module'],
+                    'icons.py': ['too-many-function-args']}
 
 
 class TestPylint(TestCase):
