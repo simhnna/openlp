@@ -271,13 +271,12 @@ class TestPath(TestCase):
 
     def test_str_to_path_type_error(self):
         """
-        Test that `str_to_path` raises a type error when called with an invalid type
+        Test that `str_to_path` returns None if called with invalid information
         """
         # GIVEN: The `str_to_path` function
         # WHEN: Calling `str_to_path` with an invalid Type
-        # THEN: A TypeError should have been raised
-        with self.assertRaises(TypeError):
-            str_to_path(Path())
+        # THEN: None is returned
+        assert str_to_path(Path()) is None
 
     def test_str_to_path_empty_str(self):
         """
