@@ -206,7 +206,8 @@ def str_to_path(string):
     :rtype: openlp.core.common.path.Path | None
     """
     if not isinstance(string, str):
-        raise TypeError('parameter \'string\' must be of type str')
+        log.error('parameter \'string\' must be of type str, got {} which is a {} instead'.format(string, type(string)))
+        return None
     if string == '':
         return None
     return Path(string)
