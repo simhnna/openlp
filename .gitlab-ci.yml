@@ -1,6 +1,7 @@
 test:
   script:
-    - apt install python3 qttools5-dev-tools pyqt5-dev-tools python3-pyqt5 python3-pyqt5.qtmultimedia \
+    - apt update -y
+    - apt install -y python3 qttools5-dev-tools pyqt5-dev-tools python3-pyqt5 python3-pyqt5.qtmultimedia \
                    python3-pyqt5.qtsvg python3-pyqt5.qtopengl python3-pyqt5.qtwebchannel \
                    python3-pyqt5.qtwebengine python3-sqlalchemy python3-chardet python3-lxml \
                    python3-enchant python3-bs4 python3-mako python3-uno python3-nose2 python3-nose2-cov \
