@@ -1,0 +1,8 @@
+image: gtalent/openlp-devenv
+test:
+  script:
+    - pip3 install pytest
+    - pip3 freeze
+    - pwd
+    - ls
+    - pytest -v
