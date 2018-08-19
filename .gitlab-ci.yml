@@ -2,5 +2,5 @@ image: simhnna/openlp
 
 test:
   script:
-    - apt install python3-dbus
+    - apt-get install -y python3-dbus
     - xvfb-run pytest-3 -v
