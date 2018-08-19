@@ -5,4 +5,4 @@ test:
     - pip3 freeze
     - pwd
     - ls
-    - pytest3 -v
+    - python3 -m pytest -v
