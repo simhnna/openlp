@@ -1,6 +1,10 @@
-image: simhnna/openlp
-
-test:
+test:ubuntu:
+  image: simhnna/openlp:ubuntu
   script:
-    - apt-get install -y python3-dbus
+    - xvfb-run pytest-3 -v
+
+test:debian:
+  image: simhnna/openlp:latest
+  allow_failure: true
+  script:
     - xvfb-run pytest-3 -v
