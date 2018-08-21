@@ -1,10 +1,10 @@
 test:ubuntu:
   image: simhnna/openlp:ubuntu
   script:
-    - xvfb-run pytest-3 -v
+    - xvfb-run pytest-3
 
 test:debian:
   image: simhnna/openlp:latest
   allow_failure: true
   script:
-    - xvfb-run pytest-3 -v
+    - xvfb-run pytest-3
