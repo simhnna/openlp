@@ -9,7 +9,6 @@ matrix:
     - os: osx
 
 script:
-  - python -v
   - pip install pytest
   - pytest
 
