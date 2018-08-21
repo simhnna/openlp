@@ -3,8 +3,14 @@ test:ubuntu:
   script:
     - xvfb-run pytest-3
 
-test:debian:
+test:debian-stable:
   image: simhnna/openlp:latest
+  allow_failure: true
+  script:
+    - xvfb-run pytest-3
+
+test:debian-buster:
+  image: simhnna/openlp:buster
   allow_failure: true
   script:
     - xvfb-run pytest-3
